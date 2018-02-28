@@ -77,7 +77,7 @@ class Orm
 		$aValues = array_values($objData);
 
 		//Если это существующий элемент
-		if($this->getId())
+		if($this->id)
 		{
 			$queryStr = "UPDATE ".$this->getTableName()." ";
 			$queryStr .= "SET ";
@@ -127,6 +127,17 @@ class Orm
 		catch(PDOException $Exception)
 		{
 			echo $Exception->getMessage();
+		}
+
+		/**
+		*	Добавление id 
+		*/
+		if(!$this->id)
+		{
+			$oLastItem = $this->queryBuilder()
+				->select("max(id)", "id")
+				->find();
+			$this->id = $oLastItem->id;
 		}
 
 		return $this;
@@ -220,7 +231,7 @@ class Orm
 	*	Если параметры не заданы тогда выбираются все столбцы таблицы.
 	*	@return self
 	*/
-	public function select($aParams)
+	public function select($aParams, $as = null)
 	{
 		//Если был передан массив параметров
 		if(is_array($aParams))
@@ -240,6 +251,9 @@ class Orm
 			$this->select == ""
 				? $this->select .= $aParams." "
 				: $this->select .= ", ".$aParams." ";
+
+			if(!is_null($as))	$this->select .= "as " . $as . " ";
+
 			return $this;
 		}
 
