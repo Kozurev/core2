@@ -67,9 +67,15 @@ class Admin_Menu_Structure
 	*/
 	public function updateAction($aParams)
 	{
+		echo "<pre>";
+
 		//Список параметров, не имеющих отношения к свойствам редактируемого/создаваемого объекта
 		$aForbiddenTags = array("menuTab", "menuAction", "ajax", "id", "modelName");
 
+
+		/**
+		*	Обновление свойств самого объекта
+		*/
 		isset($aParams["id"]) && $aParams["id"] != "0"
 			?	$oUpdatingItem = Core::factory($aParams["modelName"], $aParams["id"])
 			: 	$oUpdatingItem = Core::factory($aParams["modelName"]);
@@ -82,16 +88,80 @@ class Admin_Menu_Structure
 
 		//ВНИМАНИЕ: костыль!!!
 		//Активность
-		if(isset($aParams["active"])) 	
+		if(isset($aParams["active"]))	
 			$oUpdatingItem->active(true);
 		else 	
 			$oUpdatingItem->active(false);
 
 		$oUpdatingItem->save();
 
-		// echo "<pre>";
-		// //print_r($aParams);
-		// print_r($oUpdatingItem);		
+
+		/**
+		*	Обновление дополнительных свойств объекта
+		*/
+		foreach ($aParams as $sFieldName => $aFieldValues) 
+		{
+			//Получение id свойства
+			if(!stristr($sFieldName, "property_")) continue;
+
+			$iPropertyId = explode("property_", $sFieldName)[1];
+			$oProperty = Core::factory("Property", $iPropertyId);
+
+			$oProperty->type() == "list"
+				? $aoPropertyValues = Core::factory("Property_List")
+					->where("model_name", "=", $oUpdatingItem->getTableName())
+					->where("property_id", "=", $oProperty->getId())
+					->where("object_id", "=", $oUpdatingItem->getId())
+					->findAll()
+				: $aoPropertyValues = $oProperty->getPropertyValues($oUpdatingItem);
+
+			$aoValuesList = array(); //Список значений свойства
+			$iResidual = count($aFieldValues) - count($aoPropertyValues); //Разница количества переданных значений и существующих
+
+			/**
+			*	Формирование списка значений дополнительного свойства
+			*	удаление лишних (если было передано меньше значений, чем существует) или
+			*	создание новых значений (если передано больше значений, чем существует)
+			*/
+			if($iResidual > 0)	//Если переданных значений больше чем существующих	
+			{
+				for($i = 0; $i < $iResidual; $i++)
+				{
+					$oNewValue = Core::factory("Property_" . ucfirst($oProperty->type()))
+						->property_id($oProperty->getId())
+						->model_name($oUpdatingItem->getTableName())
+						->object_id($oUpdatingItem->getId());
+
+					$aoValuesList[] = $oNewValue;
+				}
+
+				$aoValuesList = array_merge($aoValuesList, $aoPropertyValues);
+			}
+			elseif($iResidual < 0)	//Если существующих значений больше чем переданных	
+			{
+				for($i = 0; $i < abs($iResidual); $i++)
+				{
+					$aoPropertyValues[$i]->delete();
+					unset($aoPropertyValues[$i]);
+				}
+
+				$aoValuesList = array_values($aoPropertyValues);
+			}
+			elseif($iResidual == 0)	//Если количество переданных значений равно количеству существующих
+			{
+				$aoValuesList = $aoPropertyValues;
+			}
+			
+			//Обновление значений
+			for($i = 0; $i < count($aFieldValues); $i++)
+			{
+				$aoValuesList[$i]->value($aFieldValues[$i])->save();
+			}
+
+			print_r($aoValuesList);
+		}
+
+
 	}
 
 
@@ -161,7 +231,6 @@ class Admin_Menu_Structure
 						->where("property_id", "=", $oProperty->getId())
 						->findAll();
 
-					//
 					$oPropertyList = Core::factory("Property_List")
 						->where("property_id", "=", $oProperty->getId())
 						->where("model_name", "=", $aParams["model"])
