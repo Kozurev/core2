@@ -246,20 +246,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	<xsl:template name="input">
 		<xsl:param name="inp_type" />
 		<xsl:param name="maxlength" />
@@ -292,7 +278,7 @@
 		<xsl:param name="value" />
 		<xsl:param name="addClass" />
 
-		<textarea name="{var_name}" maxlength="{maxlength}" class="textarea {$addClass}">
+		<textarea name="{$var_name}" maxlength="{maxlength}" class="textarea {$addClass}">
 			<xsl:value-of select="$value" />
 		</textarea>
 	</xsl:template>
@@ -302,7 +288,7 @@
 		<xsl:param name="var_name" />
 		<xsl:param name="value" />
 
-		<select name="{var_name}" class="form-control">
+		<select name="{$var_name}" class="form-control">
 			<option value="0">...</option>
 			<xsl:for-each select="item">
 				<xsl:variable name="id" select="id" />
