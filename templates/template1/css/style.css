@@ -1,0 +1,18 @@
+body {
+	font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+	font-size: 20px;
+	font-weight: 300;
+	overflow-x: hidden;
+}
+
+.classes_list span {
+	cursor: pointer;
+}
+
+.classes_list .parent_img {
+	cursor: pointer;
+	width: 10px;
+	height: 10px;
+	background-size: cover;
+	display: inline-block;
+}

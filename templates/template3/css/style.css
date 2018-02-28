@@ -1,0 +1,147 @@
+body {
+	background: url("../images/background.jpg") ;
+	background-size: cover;
+}
+
+.error {
+	color: red !important;
+	font-weight: 600 !important;
+}
+
+.loader {
+	width: 100%;
+	height: 100%;
+	background: #000;
+	position: absolute;
+	opacity: 0.5;
+	z-index: -1;
+	background-image: url("../images/loader.gif");
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 50px;
+}
+
+button a {
+	text-decoration: none !important;
+}
+
+.top_bar {
+	background-color: white;
+	opacity: 0.8;
+	text-align: right;
+	padding: 15px 20px 15px 20px;
+}
+
+.top_bar a {
+	color: black;
+}
+
+.top_bar .login {
+	font-weight: 600;
+	margin-right: 10px;
+}
+
+.authorize {
+	width: 20%;
+	position: relative;
+	left: 40%;
+	top: 125px;
+	font-size: 20px;
+    font-weight: 600;
+
+}
+
+.authorize input {
+	margin-bottom: 10px;
+}
+
+.container {
+	width: 90%;
+	padding-top: 30px;
+}
+
+.container button {
+	margin-right: 15px
+}
+
+.container .middle .main .in_main .success:hover {
+	text-decoration: none;
+	opacity: 0.9;
+}
+
+.container .middle {
+	margin-top: 50px;
+}
+
+.container .middle .left_bar {
+	background-color: white;
+	opacity: 0.8;
+}
+
+.container .middle .left_bar .item {
+	width: 100%;
+	//height: 50px;
+	border: 2px solid;
+	border-color: transparent;
+}
+
+.container .middle .left_bar .item:hover {
+	border-color: #FF8240;
+	cursor: pointer;
+}
+
+.container .middle .left_bar .item .text {
+	font-size: 28px;
+}
+
+.container .middle .left_bar a {
+	text-decoration: none;
+	color: black;
+}
+
+.container .middle .main .in_main {
+	background-color: white;
+	opacity: 0.8;
+	padding: 15px;
+}
+
+.container .middle .main .in_main .main_title {
+	//padding-left: 10px;
+}
+
+.container .middle .main .in_main a {
+	color: black;
+	text-decoration: underline;
+}
+
+.container .middle .main .in_main .table tr:hover {
+	background-color: red;
+	opacity: 0.8;
+}
+
+.container .middle .main .in_main .table .delete_icon {
+	height:25px;
+}
+
+.container .middle .main .in_main .table .table_structure:hover {
+	cursor: pointer;
+}
+
+.container .middle .main .in_main .form_block {
+    border: 1px solid;
+    border-radius: 10px;
+    background-color: #E5E5E5;
+    padding: 4px 20px 14px 20px;
+    margin-bottom: 25px;
+}
+
+.container .middle .in_main .form_block .checkbox {
+	width: 25px;
+    height: 25px;
+}
+
+.container .middle .in_main .form_block .textarea {
+	width: 100%;
+	height: 100px;
+}
+
