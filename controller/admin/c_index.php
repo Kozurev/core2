@@ -17,7 +17,7 @@ if(isset($_GET["menuTab"]) && isset($_GET["menuAction"]))
 	if(isset($_GET["ajax"]))
 	{
 		echo "<pre>";
-		print_r($_GET);
+		//print_r($_GET);
 		echo "</pre>";	
 	}
 	
