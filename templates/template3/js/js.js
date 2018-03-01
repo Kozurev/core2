@@ -1,6 +1,12 @@
 
 
 $(function(){
+
+	if(window.location.hash == "")
+	{
+		window.location.hash = "#/admin?menuTab=Structure&menuAction=show";
+	}
+
 	$(document)
 		//Обновление рабочей области административного раздела
 		.on("click", ".link", function(e){
