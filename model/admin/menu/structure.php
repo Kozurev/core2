@@ -243,7 +243,16 @@ class Admin_Menu_Structure
 				else
 				{
 					$aoValues = $oProperty->getPropertyValues($oUpdatingItem);
-					$oProperty->addEntities($aoValues, "property_value");
+
+					/*
+					 * Если значения свойства отсутствуют тогда необходимо добавить пустое значение
+					 * для корректного формирования пустого поля в админ панеле
+					 */
+					count($aoValues) > 0
+                        ?   $oProperty->addEntities($aoValues, "property_value")
+					    :   $oProperty->addEntity(
+					            Core::factory("Property_" . $oProperty->type()), "property_value"
+                            );
 				}		
 
 				$oOutputXml->addEntity($oProperty);
@@ -275,10 +284,14 @@ class Admin_Menu_Structure
 		/**
 		*	Добавление значений для полей типа "список"
 		*/
-		foreach ($aoFields as $oField) 
+		foreach ($aoFields as $oField)
 		{
-			if($oField->list_name())
-				$oField->getList();
+			if($oField->listName())
+			{
+                $sMethodName = "getList" . $oField->listName();
+                if(method_exists($oField, $sMethodName))
+                    $oField->$sMethodName($aParams);
+            }
 		}
 
 		$oOutputXml
