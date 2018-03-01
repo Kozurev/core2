@@ -22,7 +22,6 @@ class Core_Database
 	public static function disconnect()
 	{
 		Core_Database::$db = null;
-		return $this;
 	} 
 
 
