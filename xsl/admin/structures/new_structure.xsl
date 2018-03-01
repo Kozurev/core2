@@ -18,13 +18,6 @@
 				$(".delete_block").on("click", function(){
 					$(this).parent().remove();
 				});
-
-				// $(".add_new_value").on("click", function(){
-				// 	var block = $(this).parent().find("div")[0];
-				// 	$(this).parent().find(".add_new_value").remove();
-				// 	$(this).parent().append($(block));
-				// 	$(this).parent().append('<button class="add_new_value">Добаить значение</button>');
-				// });
 			});
 		</script>
 
@@ -108,7 +101,7 @@
 		</div>
 	</xsl:template>
 
-	<!--Шаблон для ормирования поля-->
+	<!--Шаблон для формирования поля-->
 	<xsl:template match="admin_form">
 		<xsl:variable name="type" select="type_id" />
 		<xsl:variable name="inp_type" select="../admin_form_type[id = $type]/input_type" />
