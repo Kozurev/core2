@@ -84,7 +84,7 @@ class Admin_Form_Model extends Entity
 	}
 
 
-	public function list_name(string $val = null)
+	public function listName(string $val = null)
 	{
 		if(is_null($val))		return $this->list_name;
 		if(strlen($val) > 50) 	die('Значение свойства "list_name" не может превышать 50 символов.');
