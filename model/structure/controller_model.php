@@ -3,7 +3,9 @@
 class Structure_Controller_Model extends Entity_Controller
 {
 	protected $aStructureControllerVars = array(
-		"items" => false 
+		"items" => false,
+        "children" => false,
+        "childrenWithItems" => false
 	);
 	
 
@@ -15,6 +17,26 @@ class Structure_Controller_Model extends Entity_Controller
 		return $this;
 	}
 
+
+	public function children(bool $val = null)
+    {
+        if(is_null($val)) return $this->aStructureControllerVars["children"];
+
+        $this->aStructureControllerVars["children"] = $val;
+        return $this;
+    }
+
+
+    public function childrenWithItems(bool $val = null)
+    {
+        if(is_null($val)) return $this->aStructureControllerVars["childrenWithItems"];
+
+        $this->aStructureControllerVars["childrenWithItems"] = $val;
+
+        if($val === true) $this->aStructureControllerVars["children"] = true;
+
+        return $this;
+    }
 
 
 }
