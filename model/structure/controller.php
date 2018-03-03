@@ -85,7 +85,8 @@ class Structure_Controller extends Structure_Controller_Model
 
         if($this->properties())
         {
-            $outputData = array_merge($outputData, $this->getPropertiesValuesForItems($outputData));
+            //$outputData = array_merge($outputData, $this->getPropertiesValuesForItems($outputData));
+            $outputData = $this->getPropertiesValuesForItems($outputData);
         }
 
 		return $outputData;
