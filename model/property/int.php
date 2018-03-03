@@ -38,7 +38,8 @@ class Property_Int extends Entity
 	public function model_name($val = null)
 	{
 		if(is_null($val)) 	return $this->model_name();
-		if(strlen($val) > 100)	die('Длинна значения "model_name" не должна превышать 100 симолов.');
+		if(strlen($val) > 100)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("model_name", "Property_Int", 100)));
 
 		$this->model_name = $val;
 		return $this;

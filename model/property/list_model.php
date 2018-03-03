@@ -22,7 +22,6 @@ class Property_List_Model extends Entity
 	public function property_id($val = null)
 	{
 		if(is_null($val))	return $this->property_id;
-
 		$this->property_id = intval($val);
 		return $this;
 	}
@@ -31,7 +30,8 @@ class Property_List_Model extends Entity
 	public function model_name($val = null)
 	{
 		if(is_null($val)) 	return $this->model_name();
-		if(strlen($val) > 100)	die('Длинна значения "model_name" не должна превышать 100 симолов.');
+		if(strlen($val) > 100)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("model_name", "Property_List", 100)));
 
 		$this->model_name = $val;
 		return $this;
@@ -41,7 +41,6 @@ class Property_List_Model extends Entity
 	public function object_id($val = null)
 	{
 		if(is_null($val))	return $this->object_id;
-
 		$this->object_id = intval($val);
 		return $this;
 	}
@@ -50,7 +49,6 @@ class Property_List_Model extends Entity
 	public function value($val = null)
 	{
 		if(is_null($val))	return $this->value_id;
-
 		$this->value_id = intval($val);
 		return $this;
 	}

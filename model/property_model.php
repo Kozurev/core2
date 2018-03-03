@@ -22,135 +22,51 @@ class Property_Model extends Entity
 		return $this->id;}
 
 
-	public function active($val = null)
+	public function active(bool $val = null)
 	{
-		try
-		{
-			if(is_null($val))
-			{
-				return $this->active;
-			}
-
-			if(is_numeric($val) || is_bool($val))
-				if($val)
-					$this->active = 1;
-				else
-					$this->active = 0;
-			else 
-				throw new Exception(INVALID_TYPE);
-		}	
-		catch(Ecxeption $e)
-		{
-			echo "<br>".$e->getMessage();
-		}
+		if(is_null($val))   return $this->active;
+		$val === true
+            ?   $this->active = 1
+            :   $this->active = 0;
 
 		return $this;
 	}
 
 
-	public function title($val = null)
+	public function title(string $val = null)
 	{
-		try
-		{
-			if(is_null($val))
-			{
-				return $this->title;
-			}
-			
-			if(!is_array($val) && !is_object($val))
-			{
-				if(strlen($val) <= 150)
-				{
-					$this->title = $val;
-					return $this;
-				}
-				else
-					throw new Exception(TOO_LARGE_VALUE);
-			}
-			throw new Exception(INVALID_TYPE);
-		}
-		catch(Exception $e)
-		{
-			echo "<br>".$e->getMessage();
-		}
+		if(is_null($val))   return $this->title;
+		if(strlen($val) > 150)
+		    die(Core::getMessage("TOO_LARGE_VALUE", array("title", "Property", 150)));
+		$this->title = $val;
+		return $this;
 	}
 
 
-	public function tag_name($val = null)
+	public function tag_name(string $val = null)
 	{
-		try
-		{
-			if(is_null($val))
-			{
-				return $this->tag_name;
-			}
-			
-			if(!is_array($val) && !is_object($val))
-			{
-				if(strlen($val) <= 50)
-				{
-					$this->tag_name = $val;
-					return $this;
-				}
-				else
-					throw new Exception(TOO_LARGE_VALUE);
-			}
-			throw new Exception(INVALID_TYPE);
-		}
-		catch(Exception $e)
-		{
-			echo "<br>".$e->getMessage();
-		}
+		if(is_null($val))   return $this->tag_name;
+		if(strlen($val) > 50)
+		    die(Core::getMessage("TOO_LARGE_VALUE", array("tag_name", "Property", 50)));
+		$this->tag_name = $val;
+		return $this;
 	}
 
 
-	public function description($val = null)
+	public function description(string $val = null)
 	{
-		try
-		{
-			if(is_null($val))
-			{
-				return $this->description;
-			}
-
-			if(is_string($val) || is_numeric($val))
-			{
-				$this->description = $val;
-				return $this;
-			}
-			throw new Exception(INVALID_TYPE);
-		}
-		catch(Exception $e)
-		{
-			echo "<br>".$e->getMessage();
-		}
+		if(is_null($val))   return $this->description;
+		$this->description = $val;
+		return $this;
 	}
 
 
-	public function type($val = null)
+	public function type(string $val = null)
 	{
-		try
-		{
-			if(is_null($val))
-			{
-				return $this->type;
-			}
-			
-			if(!is_array($val) && !is_object($val))
-			{
-				if(strlen($val) <= 50)
-				{
-					$this->type = $val;
-					return $this;
-				}
-				else
-					throw new Exception(TOO_LARGE_VALUE);
-			}
-			throw new Exception(INVALID_TYPE);
-		}
-		catch(Exception $e)
-		{
-			echo "<br>".$e->getMessage();
-		}
+		if(is_null($val))   return $this;
+		if(strlen($val) > 50)
+		    die(Core::getMessage("TOO_LARGE_VALUE", array("type", "Property", 50)));
+		$this->type = $val;
+		return $this;
 	}
 }

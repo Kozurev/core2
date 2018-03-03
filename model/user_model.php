@@ -31,7 +31,8 @@ class User_Model extends Entity
 	public function groupId(int $val = null)
 	{
 		if(is_null($val)) 	return $this->group_id;
-		if($val < 0) 		die('Значение "groupId" должно быть больше либо равным нулю.');
+		if($val < 0)
+            die(Core::getMessage("UNSIGNED_VALUE", array("group_id", "User")));
 
 		$this->group_id = $val;
 		return $this;
@@ -51,7 +52,8 @@ class User_Model extends Entity
 	public function password(string $val = null)
 	{
 		if(is_null($val)) 		return $this->password;
-		if(strlen($val) > 50) 	die('Пароль не должен превышать длины в 50 символов.');
+		if(strlen($val) > 50)
+		    die(Core::getMessage("TOO_LARGE_VALUE", array("password", "User", 50)));
 
 		$this->password = md5($val);
 		return $this;
@@ -61,7 +63,8 @@ class User_Model extends Entity
 	public function phoneNumber(string $val = null)
 	{
 		if(is_null($val))		return $this->phone_number;
-		if(strlen($val) > 20)	die('Значение "phoneNumber" не должно превышать длины в 20 символов');
+		if(strlen($val) > 20)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("phone_number", "User", 20)));
 
 		$this->phone_number = $val;
 		return $this;
@@ -71,7 +74,8 @@ class User_Model extends Entity
 	public function name(string $val = null)
 	{
 		if(is_null($val))		return $this->name;
-		if(strlen($val) > 50)	die('Значение "name" не должно превышать длины в 50 символов');
+		if(strlen($val) > 50)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("name", "User", 50)));
 
 		$this->name = $val;
 		return $this;
@@ -81,7 +85,8 @@ class User_Model extends Entity
 	public function surname(string $val = null)
 	{
 		if(is_null($val))		return $this->surname;
-		if(strlen($val) > 50)	die('Значение "surname" не должно превышать длины в 50 символов');
+		if(strlen($val) > 50)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("surname", "User", 50)));
 
 		$this->surname = $val;
 		return $this;
@@ -91,7 +96,8 @@ class User_Model extends Entity
 	public function patronimyc(string $val = null)
 	{
 		if(is_null($val))		return $this->patronimyc;
-		if(strlen($val) > 50)	die('Значение "patronimyc" не должно превышать длины в 50 символов');
+		if(strlen($val) > 50)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("patronimyc", "User", 50)));
 
 		$this->patronimyc = $val;
 		return $this;
@@ -101,7 +107,8 @@ class User_Model extends Entity
 	public function email($val = null)
 	{
 		if(is_null($val))		return $this->email;
-		if(strlen($val) > 20)	die('Значение "email" не должно превышать длины в 20 символов');
+		if(strlen($val) > 20)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("email", "User", 20)));
 
 		$this->email = $val;
 		return $this;
@@ -111,7 +118,8 @@ class User_Model extends Entity
 	public function login(string $val = null)
 	{
 		if(is_null($val)) 		return $this->login;
-		if(strlen($val) > 50) 	die('Логин не должен превышать длины в 50 символов.');
+		if(strlen($val) > 50)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("login", "User", 50)));
 
 		$this->login = $val;
 		return $this;
