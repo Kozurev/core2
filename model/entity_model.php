@@ -39,19 +39,14 @@ class Entity_Model extends Orm
 	public function xsl(string $val = null)
 	{
 		if(is_null($val)) return $this->aEntityVars["xslPath"];
-		elseif(is_string($val)) 
-		{
-			$this->aEntityVars["xslPath"] = ROOT . "/xsl/" . $val;
-			return $this;
-		}
-		else die(INVALID_TYPE);
+		$this->aEntityVars["xslPath"] = ROOT . "/xsl/" . $val;
+		return $this;
 	}
 
 
 	public function custom_tag($val = null)
 	{
 		if(is_null($val))	return $this->aEntityVars['custom_tag'];
-
 		$this->aEntityVars["custom_tag"] = $val;
 		return $this;
 	}
