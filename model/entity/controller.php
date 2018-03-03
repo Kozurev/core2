@@ -43,26 +43,12 @@ class Entity_Controller extends Entity_Controller_Model
 				$oProperty = Core::factory("Property", $propertyId);
 				$aoValues = $oProperty->getPropertyValues($oItem);
 
-				/*
-				*	Для корректного вывода значений свойств в XSL шаблонах добавляюся 2 переменные
-				*
-				*	object_id - id объекта, которому принадлежит значение свойства
-				*	model_name - название модели, которой принадлежит данное свойство
-				*/
-				if($oProperty->type() == "list")
-				{
-					foreach ($aoValues as $oValue) 
-					{
-						$oValue->object_id = $oItem->getId();
-						$oValue->model_name = $this->databaseTableName();
-					}
-				}
-					
-				$aoPropertiesValues = array_merge($aoPropertiesValues, $aoValues);
+				$oProperty->addEntities($aoValues, "property_value");
+				$oItem->addEntity($oProperty);
 			}
 		}
 
-		return $aoPropertiesValues;
+		return $aoItems;
 	}
 
 
