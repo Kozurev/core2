@@ -1,6 +1,6 @@
 <?php
 
-class Page_Show 
+class Page_Show extends Core
 {
 
 	private $oStructure;
@@ -27,6 +27,13 @@ class Page_Show
 			return $output[0];
 		}
 	}
+
+
+	public function error404()
+    {
+        Core::getMessage("ERROR_404");
+    }
+
 
 
 	/**
@@ -265,7 +272,7 @@ class Page_Show
 
 				if(!$this->oStructureItem)
 				{
-					echo "Error 404";
+					$this->error404();
 					return;
 				}
 			}		
