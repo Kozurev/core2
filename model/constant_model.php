@@ -17,82 +17,29 @@ class Constant_Model extends Orm
 	public function getId(){return $this->id;}
 
 
-	public function title($val = null)
+	public function title(string $val = null)
 	{
-		try
-		{
-			if(is_null($val))
-			{
-				return $this->title;
-			}
-			
-			if(!is_array($val) && !is_object($val) && !is_bool($val))
-			{
-				if(strlen($val) <= 150)
-				{
-					$this->title = $val;
-					return $this;
-				}
-				else
-					throw new Exception(TOO_LARGE_VALUE);
-			}
-			throw new Exception(INVALID_TYPE);
-		}
-		catch(Exception $e)
-		{
-			echo "<br>".$e->getMessage();
-		}
+		if(is_null($val))   return $this->title;
+		if(strlen($val) > 150) die(Core::getMessage("TOO_LARGE_VALUE", array("title", "Constant", 150)));
+		$this->title = $val;
+		return $this;
 	}
 
 
-	public function description($val = null)
+	public function description(string $val = null)
 	{
-		try
-		{
-			if(is_null($val))
-			{
-				return $this->description;
-			}
-			
-			if(!is_array($val) && !is_object($val) && !is_bool($val))
-			{
-				$this->description = $val;
-				return $this;
-			}
-			throw new Exception(INVALID_TYPE);
-		}
-		catch(Exception $e)
-		{
-			echo "<br>".$e->getMessage();
-		}
+		if(is_null($val))   return $this->description;
+		$this->description = $val;
+		return $this;
 	}
 
 
-	public function value($val = null)
+	public function value(string $val = null)
 	{
-		try
-		{
-			if(is_null($val))
-			{
-				return $this->value;
-			}
-			
-			if(!is_array($val) && !is_object($val) && !is_bool($val))
-			{
-				if(strlen($val) <= 150)
-				{
-					$this->value = $val;
-					return $this;
-				}
-				else
-					throw new Exception(TOO_LARGE_VALUE);
-			}
-			throw new Exception(INVALID_TYPE);
-		}
-		catch(Exception $e)
-		{
-			echo "<br>".$e->getMessage();
-		}
+        if(is_null($val))   return $this->value;
+        if(strlen($val) > 150)  die(Core::getMessage("TOO_LARGE_VALUE", array("value", "Constant", 150)));
+        $this->value = $val;
+        return $this;
 	}
 
 
