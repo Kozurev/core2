@@ -4,6 +4,7 @@
 */ 
 class Core //extends Orm
 {
+    private $aStrings;
 
 	/**
 	*	Подключает необходимый файл и создаёт объект класса
@@ -14,7 +15,7 @@ class Core //extends Orm
 		//Формирование пути к файлу класса
 		$segments = explode("_", $className);
 		$filePath = ROOT."/model";
-		$obj;
+		$obj = null;
 
 		foreach ($segments as $segment)
 			$filePath .= "/".lcfirst($segment);
@@ -59,6 +60,19 @@ class Core //extends Orm
 	}
 
 	
+    public static function getMessage($sMessageName, $aMessageParams)
+    {
+        $aStrings = include ROOT . "/config/messages/ru/messages.php";
+
+        if(isset($aStrings[$sMessageName]))
+        {
+            echo $aStrings[$sMessageName];
+        }
+        else
+        {
+            echo $aStrings["UNDEFIND_STRING_NAME"];
+        }
+    }
 
 
 
