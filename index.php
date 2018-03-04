@@ -14,9 +14,9 @@ Core_Database::connect();
 //Подключение обязательных биьлиотек
 require_once ROOT . "/model/orm.php";
 require_once ROOT . "/model/core.php";
-require_once ROOT . "/model/entity_model.php";
+require_once ROOT . "/model/entity/model.php";
 require_once ROOT . "/model/entity.php";
-require_once ROOT . "/model/entity/controller_model.php";
+require_once ROOT . "/model/entity/controller/model.php";
 require_once ROOT . "/model/entity/controller.php";
 
 //Установка системных констант
@@ -24,11 +24,10 @@ define('TEST_MODE_PAGE', false);
 define('TEST_MODE_ORM', false);
 define('TEST_MODE_FACTORY', false);
 
-//Установка пользовательских констант
-$oConstant = Core::factory('Constant');
-$oConstant->setAllConstants();
+//ОбъВлекние констант
+Core::factory("Constant")->setAllConstants();
 
 //Создание страницы
-$oPage = Core::factory('Page_Show');
-$oPage->createPage();
+Core::factory('Page_Show')->createPage();
+
 
