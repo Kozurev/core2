@@ -114,6 +114,14 @@ button a {
 	text-decoration: underline;
 }
 
+.container .middle .main .in_main .table td{
+	text-align: center;
+}
+
+.container .middle .main .in_main .table th{
+	text-align: center;
+}
+
 .container .middle .main .in_main .table tr:hover {
 	background-color: red;
 	opacity: 0.8;
