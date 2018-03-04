@@ -12,13 +12,5 @@ if(isset($_GET["menuTab"]) && isset($_GET["menuAction"]))
 		die("<br>Ошибка: неопознанная вкладка меню");
 
 	$oTab->$action($_GET);
-
-
-	if(isset($_GET["ajax"]))
-	{
-		echo "<pre>";
-		//print_r($_GET);
-		echo "</pre>";	
-	}
 	
 }
