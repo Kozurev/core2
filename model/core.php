@@ -14,6 +14,7 @@ class Core //extends Orm
 	{
 		//Формирование пути к файлу класса
 		$segments = explode("_", $className);
+		$model = $className . "_Model";
 		$filePath = ROOT."/model";
 		$obj = null;
 
@@ -23,15 +24,15 @@ class Core //extends Orm
 		if(TEST_MODE_FACTORY)
 		{
 			echo "<br>FilePath: ".$filePath.".php";
-			echo "<br>FilePath: ".$filePath."_model.php";
+			echo "<br>FilePath: ".$filePath."/model.php";
 			echo "<br>ClassName: ".$className;
 			echo "<br>ClassName: ".$className."_Model";
 		}
 
 		//Подключение модели
-		if(file_exists($filePath."_model.php") && !class_exists($className."_Model"))
+		if(file_exists($filePath."/model.php") && !class_exists($className."_Model"))
 		{
-			 include_once $filePath."_model.php";
+			 include_once $filePath."/model.php";
 		}
 
 		//Подключение файла с методами
