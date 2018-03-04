@@ -23,19 +23,17 @@
 			</table>
 
 			<button class="btn btn-success" type="button">
-				<a href="/admin?menuTab=Structure&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}" class="link">
+				<a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}" class="link">
 					Новый раздел
 				</a>
 			</button>
 
 			<button class="btn btn-success" type="button">
-				<a href="/admin?menuTab=Structure&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}" class="link">
+				<a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}" class="link">
 					Новый элемент
 				</a>
 			</button>
 		</div>
-
-
 	</xsl:template>
 
 
@@ -70,20 +68,20 @@
 
 			<!--Редактирование-->
 			<td>
-				<a href="/admin?menuTab=Structure&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}&amp;model_id={id}"
-				data-model_name="Structure" data-model_id="{id}" class="link">
-				<img 
-					src="/templates/template3/images/delete.ico" 
-					class="delete_icon"/>
+				<a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}&amp;model_id={id}"
+				class="link">
+					<img 
+						src="/templates/template3/images/delete.ico" 
+						class="delete_icon"/>
 				</a>
 			</td>
 
 			<!--Удаление-->
 			<td>
 				<a href="/admin" data-model_name="Structure" data-model_id="{id}" class="delete">
-				<img 
-					src="/templates/template3/images/delete.ico" 
-					class="delete_icon"/>
+					<img 
+						src="/templates/template3/images/delete.ico" 
+						class="delete_icon"/>
 				</a>
 			</td>
 		</tr>
@@ -112,7 +110,7 @@
 
 			<!--Редактирование-->
 			<td>
-				<a href="/admin?menuTab=Structure&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}&amp;model_id={id}"
+				<a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}&amp;model_id={id}"
 				data-model_name="Structure" data-model_id="{id}" class="link">
 				<img 
 					src="/templates/template3/images/delete.ico" 
