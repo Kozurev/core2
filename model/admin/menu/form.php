@@ -13,18 +13,17 @@ class Admin_Menu_Form
 		else 								$parentId = 0;
 		
 		if(!$parentId)		$title = "Список моделей";
-		elseif($parentId)	$title = Core::factory("Admin_Form_Model", $parentId)->model_name();
+		elseif($parentId)	$title = Core::factory("Admin_Form_Modelname", $parentId)->model_name();
 		
 		if($parentId)	
 		{
-
 			$aoData = Core::factory("Admin_Form")
 				->where("model_id", "=", $parentId)
 				->findAll();
 		}
 		else 
 		{
-			$aoData = Core::factory("Admin_Form_Model")
+			$aoData = Core::factory("Admin_Form_Modelname")
 				->findAll();
 		}
 
