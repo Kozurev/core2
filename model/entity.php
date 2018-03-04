@@ -92,8 +92,7 @@ class Entity extends Entity_Model
 		}
 		else
 		{
-			//echo "<br>".$this->aEntityVars["custom_tag"];
-			if($obj->aEntityVars["custom_tag"] != "")	
+			if($obj->aEntityVars["custom_tag"] != "")
 			{
 				$tagName = $obj->aEntityVars["custom_tag"];
 			}
