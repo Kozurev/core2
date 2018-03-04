@@ -61,4 +61,27 @@ class Admin_Form extends Admin_Form_Model
     }
 
 
+    /**
+     * Поиск элементов для списка "Тип значения константы"
+     * @param $aParams
+     */
+    public function getListConstantTypes($aParams)
+    {
+        if(isset($aParams["model_id"]) && $aParams["model_id"] != "")
+            $this->value = Core::factory("Constant", $aParams["model_id"])->valueType();
+
+        $this->addEntities(Core::factory("Constant_Type")->findAll(), "item");
+    }
+
+
+    public function getListConstantDirs($aParams)
+    {
+        //TODO: Доработать добавление дирректорий в список по примеру getListStructures()
+        if(isset($aParams["model_id"]) && $aParams["model_id"] != "")
+            $this->value = Core::factory("Constant", $aParams["model_id"])->dir();
+
+        $this->addEntities(Core::factory("Constant_Dir")->findAll(), "item");
+    }
+
+
 }
