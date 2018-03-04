@@ -14,24 +14,27 @@ $(function(){
 			var link = $(this).attr("href");
 			window.location.hash = link;
 		})
-		//Обработка изменения активности структуры или элемента
+		//Обработка изменения активности элемента
 		.on("click", ".activeCheckbox", function(e){
 			var model_name = $(this).attr("model_name");
 			var model_id = $(this).attr("model_id");
 			var value = $(this).prop("checked");
 			updateActive(model_name, model_id, value);
 		})
+		//Обработчик удаления элемента
 		.on("click", ".delete", function(e){
 			e.preventDefault();
 			var model_name = $(this).data("model_name");
 			var model_id = $(this).data("model_id");
 			deleteItem(model_name, model_id);
 		})
+		//Сохранение даных
 		.on("click", ".submit", function(e){
 			e.preventDefault();
 			var data = $("form").serialize();
 			updateItem(data);
 		})
+		//Добавление поля для дополнительного свойства
 		.on("click", ".add_new_value", function(e){
 			e.preventDefault();
 
@@ -53,6 +56,7 @@ $(function(){
 			var aButtons = $(this).parent().find(".add_new_value");
 			$(aButtons)[0].remove();
 		})
+		//Удаление поля дополнительного свойства
 		.on("click", ".delete_block", function(){
 			$(this).parent().remove();
 		});
@@ -88,7 +92,7 @@ function reloadMain(hash){
 function updateActive(model_name, model_id, value){
 	loaderOn();	
 
-	var link = "/admin?menuTab=Structure&menuAction=updateActive";
+	var link = "/admin?menuTab=Main&menuAction=updateActive&ajax=1";
 	link += "&model_name=" + model_name; 
 	link += "&model_id=" + model_id;
 	link += "&value=" + value;
@@ -99,8 +103,12 @@ function updateActive(model_name, model_id, value){
 	$.ajax({
 		type: "GET",
 		url: link,
-		success: function(){
+		success: function(answer){
 			setTimeout("loaderOff()", 200);
+			if(answer == "0")
+				alert("Изменения успешно сохранены");
+			else
+				alert("Ошибка: " + answer);
 		}
 	});
 }
@@ -111,7 +119,7 @@ function updateActive(model_name, model_id, value){
 */
 function deleteItem(model_name, model_id){
 
-	var link = "/admin?menuTab=Structure&menuAction=deleteAction";
+	var link = "/admin?menuTab=Main&menuAction=deleteAction&ajax=1";
 	link += "&model_name=" + model_name;
 	link += "&model_id=" + model_id;
 
@@ -123,9 +131,13 @@ function deleteItem(model_name, model_id){
 	$.ajax({
 		type: "GET",
 		url: link,
-		success: function(){
+		success: function(answer){
 			reloadMain(window.location.hash);
 			setTimeout("loaderOff()", 200);
+			if(answer == "0")
+				alert("Изменения успешно сохранены");
+			else
+				alert("Ошибка: " + answer);
 		}
 	});
 }
@@ -134,15 +146,19 @@ function deleteItem(model_name, model_id){
 function updateItem(objectData){
 	loaderOn();
 
-	var link = "/admin?menuTab=Structure&menuAction=updateAction&" + objectData;
+	var link = "/admin?menuTab=Main&menuAction=updateAction&ajax=1&" + objectData;
 
 	$.ajax({
 		type: "GET",
 		url: link,
-		success: function(data){
+		success: function(answer){
 			//reloadMain("#" + link);
 			window.history.back();
 			setTimeout("loaderOff()", 200);
+			if(answer == "0")
+				alert("Изменения успешно сохранены");
+			else
+				alert("Ошибка: " + answer);
 		}
 	});
 }
