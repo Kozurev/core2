@@ -11,14 +11,14 @@
 				<xsl:value-of select="title" />
 			</h3>
 			<table class="table">
-				<xsl:apply-templates select="admin_form_model" />
+				<xsl:apply-templates select="admin_form_modelname" />
 				<xsl:apply-templates select="admin_form" />
 			</table>
 		</div>
 	</xsl:template>
 
 
-	<xsl:template match="admin_form_model">
+	<xsl:template match="admin_form_modelname">
 		<tr>
 			<td><xsl:value-of select="id" /></td>
 			<td>
