@@ -62,4 +62,23 @@ class Structure extends Structure_Model
     }
 
 
+    /**]
+     * Реализация рекурсивного удаления структур
+     */
+    public function delete($obj = null)
+    {
+        $oStructureController = Core::factory("Structure_Controller");
+        $aoItems = $oStructureController
+            ->where("id", "=", $this->id)
+            ->childrenWithItems(true)
+            ->items(true)
+            ->findAll();
+
+        foreach ($aoItems as $oItem)
+        {
+            Core::factory("Orm")->delete($oItem);
+        }
+
+    }
+
 }
