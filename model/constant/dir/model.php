@@ -39,7 +39,7 @@ class Constant_Dir_Model extends Entity
     public function parentId(int $val = null)
     {
         if(is_null($val))   return $this->parent_id;
-        if($val <= 0)
+        if($val < 0)
             die(Core::getMessage("UNSIGNED_VALUE", array("parent_id", "Constant_Dir")));
         $this->parent_id = $val;
         return $this;
