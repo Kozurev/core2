@@ -77,7 +77,7 @@ class Admin_Form extends Admin_Form_Model
     public function getListConstantDirs($aParams)
     {
         //TODO: Доработать добавление дирректорий в список по примеру getListStructures()
-        if(isset($aParams["model_id"]) && $aParams["model_id"] != "")
+        if(isset($aParams["model_id"]) && $aParams["model_id"] != "" && $aParams["model"] == "Constant")
             $this->value = Core::factory("Constant", $aParams["model_id"])->dir();
 
         $this->addEntities(Core::factory("Constant_Dir")->findAll(), "item");
