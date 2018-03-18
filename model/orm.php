@@ -217,11 +217,13 @@ class Orm
 	/**
 	*	Удаление
 	*/
-	public function delete()
+	public function delete($obj = null)
 	{
-		$sTableName = $this->getTableName();
-		$query = "DELETE FROM " . $sTableName . " WHERE id = " . $this->getId();
-		$this->executeQuery($query);
+	    if(is_null($obj))   $obj = $this;
+
+		$sTableName = $obj->getTableName();
+		$query = "DELETE FROM " . $sTableName . " WHERE id = " . $obj->getId();
+        $this->executeQuery($query);
 		if(TEST_MODE_ORM) echo "<br>Строка из метода <b>delete()</b>: " . $query;
 	}
 
