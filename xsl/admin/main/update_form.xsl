@@ -51,7 +51,7 @@
 		<div class="in_main">
 			<h3 class="main_title">
 				<xsl:choose>
-					<xsl:when test="/root/structure/id != 0 or /root/structure_item/id != 0">
+					<xsl:when test="/root/object_id != 0">
 						Редактирование объекта
 					</xsl:when>
 					<xsl:otherwise>
