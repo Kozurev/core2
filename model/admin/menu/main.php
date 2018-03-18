@@ -33,9 +33,9 @@ class Admin_Menu_Main
         //ВНИМАНИЕ: костыль!!!
         //TODO: переделать обновление активности элемента при сохранении формы
         //Активность
-        if(isset($aParams["active"]))
+        if(isset($aParams["active"]) && method_exists($oUpdatingItem, "active"))
             $oUpdatingItem->active(true);
-        else
+        elseif(method_exists($oUpdatingItem, "active"))
             $oUpdatingItem->active(false);
 
         $oUpdatingItem->save();
