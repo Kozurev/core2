@@ -1,6 +1,6 @@
 <?php
 
-class Constant_Model extends Entity
+class Constant_Model extends Core_Entity
 {
 	protected $id;
 	protected $title;

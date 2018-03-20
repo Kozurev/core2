@@ -6,7 +6,7 @@
  * Time: 21:25
  */
 
-class Constant_Type_Model extends Entity
+class Constant_Type_Model extends Core_Entity
 {
     protected $id;
     protected $title;

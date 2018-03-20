@@ -2,7 +2,7 @@
 /**
 * 
 */
-class User_Group extends Entity
+class User_Group extends Core_Entity
 {
 	
 	function __construct()

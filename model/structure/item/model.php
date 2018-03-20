@@ -3,7 +3,7 @@
 /**
 *	Модель элемента структуры
 */
-class Structure_Item_Model extends Entity 
+class Structure_Item_Model extends Core_Entity
 {
 	protected $id;
 	protected $title; 

@@ -1,10 +1,11 @@
 <?php 
 
-class Admin_Menu_Model extends Entity
+class Admin_Menu_Model extends Core_Entity
 {
 	protected $id;
 	protected $title;
 	protected $model;
+	protected $sorting;
 
 	public function __construct(){}
 
@@ -30,4 +31,13 @@ class Admin_Menu_Model extends Entity
 		else $this->model = $val;
 		return $this;
 	}
+
+
+	public function sorting(int $val = null)
+    {
+        if(is_null($val))   return $this->sorting;
+        $this->sorting = $val;
+        return $this;
+    }
+
 }

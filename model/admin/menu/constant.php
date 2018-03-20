@@ -13,7 +13,7 @@ class Admin_Menu_Constant
         /**
          * Формирование значения и xml сущьности родительского раздела
          */
-        $oParentId = Core::factory("Entity")
+        $oParentId = Core::factory("Core_Entity")
             ->name("parent_id");
 
         isset($aParams["parent_id"]) && $aParams["parent_id"] != ""
@@ -26,7 +26,7 @@ class Admin_Menu_Constant
         /**
          * Формирование xml сущьности содержащей заголовок раздела
          */
-        $oTitle = Core::factory("Entity")
+        $oTitle = Core::factory("Core_Entity")
             ->name("title");
 
         $iParentId != 0
@@ -50,7 +50,7 @@ class Admin_Menu_Constant
             ->orderBy("sorting")
             ->findAll();
 
-        $oOutputXml = Core::factory("Entity")
+        $oOutputXml = Core::factory("Core_Entity")
             ->addEntity($oParentId)
             ->addEntity($oTitle)
             ->addEntities($aoConstantDirs)

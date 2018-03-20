@@ -1,6 +1,6 @@
 <?php
 
-class Entity_Controller extends Entity_Controller_Model 
+class Core_Entity_Controller extends Core_Entity_Controller_Model
 {
 	public function __construct(){}
 

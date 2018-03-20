@@ -1,6 +1,6 @@
 <?php
 
-class Property_List_Model extends Entity 
+class Property_List_Model extends Core_Entity
 {
 	protected $id;
 	protected $property_id;

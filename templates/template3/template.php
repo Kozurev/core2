@@ -29,9 +29,9 @@
 
 		if(!$oUser->authorize() || !User::getCurent()->superuser())
 		{
-			$oXml = Core::factory("Entity")
+			$oXml = Core::factory("Core_Entity")
 				->addEntity(
-					Core::factory("Entity")
+					Core::factory("Core_Entity")
 						->name("error")
 						->value("Ошибка авторизации")
 				)
@@ -44,7 +44,7 @@
 
 	if(!$oUser::getCurent())
 	{
-		$oXml = Core::factory("Entity")
+		$oXml = Core::factory("Core_Entity")
 			->xsl($authorizeXslLink)
 			->show();
 		exit;
@@ -53,7 +53,7 @@
 	/*
 	*	Верхняя панель
 	*/
-	Core::factory("Entity")
+	Core::factory("Core_Entity")
 		->addEntity(
 			$oUser::getCurent()
 		)
@@ -73,13 +73,10 @@
 			*	Вывод левого меню
 			*/
 			$aoMenuItems = Core::factory("Admin_Menu")
+                ->orderBy("sorting")
 				->findAll();
-			
-			echo "<pre>";
-			//print_r($aoMenuItems);
-			echo "</pre>";
 
-			Core::factory("Entity")
+			Core::factory("Core_Entity")
 				->addEntities($aoMenuItems)
 				->xsl("admin/left_bar.xsl")
 				->show();

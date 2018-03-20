@@ -47,12 +47,12 @@ class Admin_Menu_Structure
 			->orderBy("sorting")
 			->where("parent_id", "=", $parentId)
 			->addEntity(
-				Core::factory("Entity")
+				Core::factory("Core_Entity")
 					->name("parent_id")
 					->value($parentId)
 			)
 			->addEntity(
-				Core::factory("Entity")
+				Core::factory("Core_Entity")
 					->name("title")
 					->value($title)
 			)

@@ -96,7 +96,7 @@ class Structure_Controller extends Structure_Controller_Model
 	public function show()
 	{
 		$aoData = $this->findAll();
-		Core::factory("Entity")
+		Core::factory("Core_Entity")
 			->addEntities($this->childrenObjects)
 			->addEntities($aoData)
 			->xsl($this->xsl())

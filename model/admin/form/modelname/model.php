@@ -1,6 +1,6 @@
 <?php
 
-class Admin_Form_Modelname_Model extends Entity
+class Admin_Form_Modelname_Model extends Core_Entity
 {
 	protected $id;
 	protected $model_name;

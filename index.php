@@ -14,20 +14,19 @@ Core_Database::connect();
 //Подключение обязательных биьлиотек
 require_once ROOT . "/model/orm.php";
 require_once ROOT . "/model/core.php";
-require_once ROOT . "/model/entity/model.php";
-require_once ROOT . "/model/entity.php";
-require_once ROOT . "/model/entity/controller/model.php";
-require_once ROOT . "/model/entity/controller.php";
+//require_once ROOT . "/model/core/array.php";
+require_once ROOT . "/model/core/entity/model.php";
+require_once ROOT . "/model/core/entity.php";
+require_once ROOT . "/model/core/entity/controller/model.php";
+require_once ROOT . "/model/core/entity/controller.php";
 
 //Установка системных констант
 define('TEST_MODE_PAGE', false);
 define('TEST_MODE_ORM', false);
 define('TEST_MODE_FACTORY', false);
 
-//ОбъВлекние констант
+//Объявление констант
 Core::factory("Constant")->setAllConstants();
 
 //Создание страницы
 Core::factory('Page_Show')->createPage();
-
-
