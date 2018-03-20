@@ -1,6 +1,6 @@
 <?php 
 
-class Entity_Controller_Model extends Entity 
+class Core_Entity_Controller_Model extends Core_Entity
 {
 	protected $aControllerShowVars = array(
 		"databaseTableName" => "",

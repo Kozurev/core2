@@ -72,9 +72,9 @@
 				<!--id редактируемого элемента-->
 				<input type="hidden" name="id">
 					<xsl:choose>
-						<xsl:when test="/root/object_id != ''">
+						<xsl:when test="object_id != ''">
 							<xsl:attribute name="value">
-								<xsl:value-of select="/root/object_id" />
+								<xsl:value-of select="object_id" />
 							</xsl:attribute>
 						</xsl:when>
 						<xsl:otherwise>

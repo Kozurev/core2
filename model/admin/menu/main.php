@@ -116,7 +116,7 @@ class Admin_Menu_Main
     {
         $usingXslLink = "admin/main/update_form.xsl";
 
-        $oOutputXml = Core::factory("Entity");
+        $oOutputXml = Core::factory("Core_Entity");
 
         //Получение значения id родительского объекта, если таков указан
         isset($aParams["parent_id"])
@@ -127,7 +127,6 @@ class Admin_Menu_Main
         isset($aParams["model_id"])
             ?	$objectId = (string)$aParams["model_id"]
             :	$objectId = "0";
-
 
         //Поиск полей формы
         $aoFields = Core::factory("Admin_Form")
@@ -212,19 +211,19 @@ class Admin_Menu_Main
          */
         $oOutputXml
             ->addEntity(
-                Core::factory("Entity")
+                Core::factory("Core_Entity")
                     ->name("object_id")
                     ->value($objectId)
             )
             ->addEntity(
-                Core::factory("Entity")
+                Core::factory("Core_Entity")
                     ->name("parent_id")
                     ->value($parentId)
             )
             ->addEntities($aoFields)
             ->addEntities($aoFieldsTypes)
             ->addEntity(
-                Core::factory("Entity")
+                Core::factory("Core_Entity")
                     ->name("model_name")
                     ->value($aParams["model"])
             );

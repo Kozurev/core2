@@ -2,7 +2,7 @@
 /**
 *	Модель свойства структуры или её элемента
 */
-class Property_Model extends Entity
+class Property_Model extends Core_Entity
 {
 	protected $id;
 	protected $tag_name; //

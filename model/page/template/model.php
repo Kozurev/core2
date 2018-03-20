@@ -2,7 +2,7 @@
 /**
 *	Модель шаблона
 */
-class Page_Template_Model extends Entity 
+class Page_Template_Model extends Core_Entity
 {
 	protected $id;
 	protected $title;

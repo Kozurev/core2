@@ -4,7 +4,7 @@
 /**
 *	Модель структуры
 */
-class Structure_Model extends Entity 
+class Structure_Model extends Core_Entity
 {
 	protected $id;
 	protected $title; 

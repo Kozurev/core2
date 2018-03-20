@@ -1,5 +1,5 @@
 <?php
-class Property_Text extends Entity
+class Property_Text extends Core_Entity
 {
 	protected $id;
 	protected $property_id; 

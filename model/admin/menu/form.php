@@ -27,9 +27,9 @@ class Admin_Menu_Form
 				->findAll();
 		}
 
-		Core::factory("Entity")
+		Core::factory("Core_Entity")
 			->addEntity(
-				Core::factory("Entity")
+				Core::factory("Core_Entity")
 					->name("title")
 					->value($title)
 			)

@@ -219,6 +219,7 @@ class Orm
         $this->limit = "";
         $this->join = "";
         $this->having = "";
+        $this->orderBy = "";
         return $this;
     }
 

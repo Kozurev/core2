@@ -6,7 +6,7 @@
  * Time: 17:24
  */
 
-class Constant_Dir_Model extends Entity
+class Constant_Dir_Model extends Core_Entity
 {
     protected $id;
     protected $title;

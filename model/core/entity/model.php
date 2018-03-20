@@ -1,6 +1,6 @@
 <?php
 
-class Entity_Model extends Orm 
+class Core_Entity_Model extends Orm
 {
 
 	protected $aEntityVars = array(

@@ -6,7 +6,7 @@
  * Time: 17:35
  */
 
-class Constant_Dir_Controller_Model extends Entity_Controller
+class Constant_Dir_Controller_Model extends Core_Entity_Controller
 {
 
 }

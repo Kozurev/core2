@@ -2,7 +2,7 @@
 /**
 *	Модель пользователя
 */
-class User_Model extends Entity 
+class User_Model extends Core_Entity
 {
 	protected $id;
 	protected $name; //

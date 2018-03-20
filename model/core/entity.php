@@ -4,7 +4,7 @@
 *	Простой тэг имеет значение и не может иметь вложенных XMK-сущьностей
 *	Сложный тэг не имеет значнеия но может иметь вложенные XML-сущьности
 */
-class Entity extends Entity_Model
+class Core_Entity extends Core_Entity_Model
 {
 	/**
 	*	Конвертирует, к примеру, "Structure_Item" в "structure_item"
@@ -82,7 +82,7 @@ class Entity extends Entity_Model
 		$tagName = "";
 		$objClass = explode("_", get_class($obj));
 
-		if($objClass[0] == "Entity")
+		if(get_class($obj) == "Core_Entity")
 		{
 			if($obj->aEntityVars["value"] != "") 
 				//Формирование простого тэга

@@ -1,6 +1,6 @@
 <?php 
 
-class Admin_Menu_Model extends Entity
+class Admin_Menu_Model extends Core_Entity
 {
 	protected $id;
 	protected $title;
