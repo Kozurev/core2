@@ -10,6 +10,8 @@ class Orm
 	private $order;
 	private $limit;
 	private $join;
+    private $having;
+    private $groupby;
 
 	public function __construct()
 	{
@@ -144,34 +146,40 @@ class Orm
 	}
 
 
-	/**
-	*	Метод для формирования строки запроса
-	*	@return void
-	*/
-	private function setQueryString()
-	{
-		if($this->select == "")
-			$this->queryString .= "SELECT * ";
-		else
-			$this->queryString .= "SELECT ".$this->select;
+    /**
+     *	Метод для формирования строки запроса
+     *	@return void
+     */
+    private function setQueryString()
+    {
+        if($this->select == "")
+            $this->queryString .= "SELECT * ";
+        else
+            $this->queryString .= "SELECT ".$this->select;
 
-		if($this->from)
-			$this->queryString .= " FROM ".$this->from;
-		else
-			$this->queryString .= " FROM ".$this->getTableName();
+        if($this->from)
+            $this->queryString .= " FROM ".$this->from;
+        else
+            $this->queryString .= " FROM ".$this->getTableName();
 
-		if($this->join != "")
-			$this->queryString .= $this->join;
+        if($this->join != "")
+            $this->queryString .= $this->join;
 
-		if($this->where != "")
-			$this->queryString .= " WHERE ".$this->where;
-			
-		if($this->order != "")
-			$this->queryString .= " ORDER BY ".$this->order;
+        if($this->where != "")
+            $this->queryString .= " WHERE ".$this->where;
 
-		if($this->limit != "")
-			$this->queryString .= " LIMIT ".$this->limit;
-	}
+        if($this->order != "")
+            $this->queryString .= " ORDER BY ".$this->order;
+
+        if($this->limit != "")
+            $this->queryString .= " LIMIT ".$this->limit;
+
+        if($this->groupby != "")
+            $this->queryString .= " GROUP BY ".$this->groupby;
+
+        if($this->having != "")
+            $this->queryString .= " HAVING ".$this->having;
+    }
 /**
 *	<<Конец
 *	Вспомагательные методы
@@ -195,23 +203,24 @@ class Orm
 		$result = Core_Database::getConnect()->query($sql);
 		return $result;
 	}
-	
 
-	/**
-	*	Метод, проыеряющий соединение с базой данный
-	*	@return self
-	*/
-	public function queryBuilder()
-	{
-		$this->queryString = "";
-		$this->select = "";
-		$this->where = "";
-		$this->from = "";
-		$this->order = "";
-		$this->limit = "";
-		$this->join = "";
-		return $this;
-	}
+
+    /**
+     *	Метод, проыеряющий соединение с базой данный
+     *	@return self
+     */
+    public function queryBuilder()
+    {
+        $this->queryString = "";
+        $this->select = "";
+        $this->where = "";
+        $this->from = "";
+        $this->order = "";
+        $this->limit = "";
+        $this->join = "";
+        $this->having = "";
+        return $this;
+    }
 
 
 	/**
@@ -393,7 +402,7 @@ class Orm
 
 
 	/**
-	*	Метод для объединения таблиц INNER
+	*	Метод для объединения таблиц INNER JOIN
 	*	@return self
 	*/
 	public function join($table, $condition)
@@ -401,6 +410,23 @@ class Orm
 		$this->join .= " JOIN " . $table . " ON " . $condition;
 		return $this;
 	}
+
+
+    public function having($row, $operation, $value)
+    {
+        if($this->having != "") $this->having .= " and ".$row." ".$operation." ".$value;
+        else $this->having = $row." ".$operation." ".$value;
+
+        return $this;
+    }
+
+
+    public function groupBy($val)
+    {
+        if($this->groupby == "")    $this->groupby = $val;
+        else    $this->groupby .= ", ".$val;
+        return $this;
+    }
 
 
 	/**
