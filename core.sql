@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Мар 18 2018 г., 22:45
--- Версия сервера: 5.5.53
+-- Время создания: Мар 20 2018 г., 16:29
+-- Версия сервера: 5.7.16
 -- Версия PHP: 7.0.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -225,7 +225,6 @@ CREATE TABLE `Page_Template` (
 
 INSERT INTO `Page_Template` (`id`, `title`, `parent_id`, `dir`) VALUES
 (1, 'Макет для страницы авторизации', 0, 0),
-(2, 'Вложенный макет', 1, 0),
 (3, 'Административный раздел', 0, 0),
 (4, 'Главный макет musadm', 0, 0);
 
@@ -406,7 +405,7 @@ INSERT INTO `Structure` (`id`, `title`, `parent_id`, `path`, `action`, `template
 (4, 'Футбол', 2, 'football', 'catalog', 1, '', '', 1, 0, '', '', ''),
 (5, 'Индексная страница', 0, '', 'index', 1, '', '', 1, 0, '', '', ''),
 (6, 'Административный раздел', 0, 'admin', 'admin/index', 3, '', 'b:0;', 1, 0, '', '', ''),
-(7, 'Личный кабинет', 0, 'user', 'user', 2, '', '', 1, 0, '', '', ''),
+(7, 'Личный кабинет', 0, 'user', 'user', 4, '', 'b:0;', 1, 0, '', '', ''),
 (8, 'Иерархия классов', 9, 'models', 'documentation/models', 1, 'Общая структура системы. Описание стандартных классов, их свойств и методов.', '', 1, 0, '', '', ''),
 (9, 'Документация', 0, 'documentation', 'documentation/index', 1, 'Руководство по использованию системы', '', 1, 0, '', '', ''),
 (13, 'Панель управления', 0, 'musadm', 'musadm/index', 4, '', 'b:0;', 1, 0, '', '', ''),
@@ -694,7 +693,7 @@ ALTER TABLE `Structure`
 -- AUTO_INCREMENT для таблицы `Structure_Item`
 --
 ALTER TABLE `Structure_Item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT для таблицы `User`
 --
