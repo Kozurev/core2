@@ -73,11 +73,8 @@
 			*	Вывод левого меню
 			*/
 			$aoMenuItems = Core::factory("Admin_Menu")
+                ->orderBy("sorting")
 				->findAll();
-			
-			echo "<pre>";
-			//print_r($aoMenuItems);
-			echo "</pre>";
 
 			Core::factory("Core_Entity")
 				->addEntities($aoMenuItems)
