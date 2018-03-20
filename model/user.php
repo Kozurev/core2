@@ -25,6 +25,8 @@ class User extends User_Model
 	*/
 	public function save()
 	{
+        $this->properties_list = serialize($this->properties_list);
+
 		if(!$this->id && $this->isUserExists($this->login))
 		{
 			echo "<br>Пользователь с такими данными уже существует";
@@ -32,6 +34,8 @@ class User extends User_Model
 		}
 
 		parent::save();
+
+        $this->properties_list = unserialize($this->properties_list);
 		return $this;
 	}
 
@@ -83,6 +87,8 @@ class User extends User_Model
 	{	
 		unset($_SESSION["core"]["user"]);
 	}
+
+
 
 
 }

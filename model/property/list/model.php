@@ -49,7 +49,7 @@ class Property_List_Model extends Core_Entity
 	public function value($val = null)
 	{
 		if(is_null($val))	return $this->value_id;
-		$this->value_id = intval($val);
+		$this->value_id = $val;
 		return $this;
 	}
 

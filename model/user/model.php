@@ -16,11 +16,14 @@ class User_Model extends Core_Entity
 	protected $register_date; //
 	protected $active = 0; //
 	protected $superuser = 0;
+	protected $properties_list;
 
 	function __construct()
 	{
 		if(!$this->register_date)
 			$this->register_date = date("Y-m-d");
+
+        $this->properties_list = unserialize($this->properties_list);
 	}
 
 
@@ -63,8 +66,8 @@ class User_Model extends Core_Entity
 	public function phoneNumber(string $val = null)
 	{
 		if(is_null($val))		return $this->phone_number;
-		if(strlen($val) > 20)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("phone_number", "User", 20)));
+		if(strlen($val) > 100)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("phone_number", "User", 100)));
 
 		$this->phone_number = $val;
 		return $this;
@@ -140,5 +143,21 @@ class User_Model extends Core_Entity
 		
 		return $this;
 	}
+
+
+    public function properties_list($val = null)
+    {
+        if(is_null($val))
+        {
+            if($this->properties_list == "") 	return array();
+            else 	return $this->properties_list;
+        }
+
+        if(!is_array($val))
+            die(Core::getMessage("TOO_LARGE_VALUE", array("properties_list", "User", "array")));
+
+        $this->properties_list = $val;
+        return $this;
+    }
 
 }

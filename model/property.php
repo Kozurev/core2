@@ -100,12 +100,14 @@ class Property extends Property_Model
 	*	@param $obj - объект, у которого удаляется свойство
 	*	@param $propertyId - id свойства, которое необходимо удалить из списка свойств
 	*	@return void
+     *  TODO: метод работает некорректно. Необходимо протестировать и доработать, добавить проверок и т.д.
 	*/
 	public function deleteFromPropertiesList($obj, $propertyId)
 	{
 		if(!is_int($propertyId)) return;
 
 		$aPropertiesId = $obj->properties_list();
+		if(count($aPropertiesId) == 0)  return;
 
 		//Поиск элемента, который необходимо удалить
 		foreach ($aPropertiesId as $key => $id) 
