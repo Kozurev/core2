@@ -2,11 +2,12 @@
 /**
 * 
 */
-class User_Group extends Core_Entity
+class User_Group extends User_Group_Model
 {
 	
 	function __construct()
 	{
-		//$this->setConnect();
 	}
+
+
 }
