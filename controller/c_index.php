@@ -14,3 +14,9 @@
 //
 //    }
 
+echo "<pre>";
+
+$arr = array("first" => 1, "second" => 2, "third" => 3);
+
+print_r($arr);
+var_dump(Core_Array::unsetValue($arr, "second"));
