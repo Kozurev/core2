@@ -92,7 +92,7 @@
 				<input type="hidden" name="modelName" value="{/root/model_name}" />
 
 				<button class="btn btn-success" type="button">
-					<a href="/admin?menuTab=Structure&amp;menuAction=updateAction" class="submit">
+					<a href="/admin?menuTab={tab}&amp;menuAction=updateAction" class="submit">
 						Сохранить
 					</a>
 				</button>
@@ -112,7 +112,7 @@
 			<span><xsl:value-of select="title" /></span>
 
 			<!--Вызов подшаблона для формирования поля формата input-->
-			<xsl:if test="type_id = 1 or type_id = 2 or type_id = 3">
+			<xsl:if test="type_id = 1 or type_id = 2 or type_id = 3 or type_id = 6">
 				<xsl:call-template name="input">
 			        <xsl:with-param name="inp_type" select="$inp_type"/>
 			        <xsl:with-param name="maxlength" select="$maxlength"/>
