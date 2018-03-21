@@ -48,6 +48,7 @@ class User extends User_Model
 		$result = $this->queryBuilder()
 			->where("login", "=", $this->login)
 			->where("password", "=", $this->password)
+            ->where("active", "=", "1")
 			->find();
 
 		if($result)
@@ -71,7 +72,12 @@ class User extends User_Model
 	{
 		if(isset($_SESSION['core']['user']) && $_SESSION['core']['user'])
 		{
-			return Core::factory('User', $_SESSION['core']['user']);
+		    $oCurentUser = Core::factory('User', $_SESSION['core']['user']);
+
+		    if($oCurentUser != false && $oCurentUser->active() == 1)
+		        return $oCurentUser;
+		    else
+		        return false;
 		}
 		else 
 		{
@@ -89,6 +95,36 @@ class User extends User_Model
 	}
 
 
+	/**
+     * Проверка авторизации пользователя (объявляется в самом начале страницы)
+     */
+	static public function checkUserAccess($aParams)
+    {
+        $aGroups = Core_Array::getValue($aParams, "groups", null);
+        $bOnlyForSuperuser = Core_Array::getValue($aParams, "superuser", null);
+        $oCurentUser = User::getCurent();
+
+        if($oCurentUser == false)
+        {
+            //echo "не авторизован<br>";
+            return false;
+        }
+
+        if(!is_null($aGroups) && !in_array($oCurentUser->groupId(), $aGroups))
+        {
+            //echo "Не подходит группа";
+            return false;
+        }
+
+        if(!is_null($bOnlyForSuperuser) && $oCurentUser->superuser() != 1)
+        {
+            //echo "Пользователь не суппер)";
+            return false;
+        }
+
+
+        return true;
+    }
 
 
 }
