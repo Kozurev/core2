@@ -13,4 +13,18 @@ class Constant_Dir extends Constant_Dir_Model
     {
     }
 
+
+    public function getParent()
+    {
+        return Core::factory("Constant_Dir", $this->parent_id);
+    }
+
+
+    public function isChild($oDir)
+    {
+        if($oDir->parentId() == $this->id) return true;
+        if($oDir->parentId() == 0) return false;
+        return $this->isChild($oDir->getParent());
+    }
+
 }
