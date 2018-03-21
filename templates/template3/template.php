@@ -28,6 +28,7 @@
 			->password($_POST["password"]);
 
 		if(!$oUser->authorize() || !User::getCurent()->superuser())
+        //if($oUser::checkUserAccess(array("superuser" => 1)) != true)
 		{
 			$oXml = Core::factory("Core_Entity")
 				->addEntity(
@@ -42,7 +43,8 @@
 		}
 	}
 
-	if(!$oUser::getCurent())
+	//if(!$oUser::getCurent())
+    if($oUser::checkUserAccess(array("superuser" => 1)) != true)
 	{
 		$oXml = Core::factory("Core_Entity")
 			->xsl($authorizeXslLink)
