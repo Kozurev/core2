@@ -3,10 +3,7 @@
 class Admin_Menu_Main
 {
 
-    public function show()
-    {
-
-    }
+    public function show(){}
 
 
     /**
@@ -14,6 +11,9 @@ class Admin_Menu_Main
      */
     public function updateAction($aParams)
     {
+        //echo "<pre>";
+        //print_r($aParams);
+
         //Список параметров, не имеющих отношения к свойствам редактируемого/создаваемого объекта
         $aForbiddenTags = array("menuTab", "menuAction", "ajax", "id", "modelName");
 
@@ -112,7 +112,7 @@ class Admin_Menu_Main
      *	Формирование формы для создания или редактирования объектов
      *	@param $aParams - array, массив параметров вывода информации
      */
-    public function updateForm($aParams)
+    public function updateForm($aParams, $saveTab = "Main")
     {
         $usingXslLink = "admin/main/update_form.xsl";
 
@@ -219,6 +219,11 @@ class Admin_Menu_Main
                 Core::factory("Core_Entity")
                     ->name("parent_id")
                     ->value($parentId)
+            )
+            ->addEntity(
+                Core::factory("Core_Entity")
+                    ->name("tab")
+                    ->value($saveTab)
             )
             ->addEntities($aoFields)
             ->addEntities($aoFieldsTypes)
