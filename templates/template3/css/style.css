@@ -153,3 +153,18 @@ button a {
 	height: 100px;
 }
 
+.updateLink {
+	display: inline-block;
+	height: 25px;
+	width: 25px;
+	background: url(/templates/template3/images/delete.ico);
+	background-size: cover;
+}
+
+.deleteLink {
+	display: inline-block;
+	height: 25px;
+	width: 25px;
+	background: url(/templates/template3/images/delete.ico);
+	background-size: cover;
+}
