@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Мар 21 2018 г., 11:29
--- Версия сервера: 5.5.53
+-- Время создания: Мар 21 2018 г., 17:04
+-- Версия сервера: 5.7.16
 -- Версия PHP: 7.0.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -67,7 +67,16 @@ INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `t
 (23, 4, 'Заголовок', 'title', 150, 2, 1, 1, '', ''),
 (24, 4, 'Описание', 'description', 2000, 5, 1, 2, '', ''),
 (25, 4, 'Родительский раздел', 'parentId', 0, 4, 1, 3, 'ConstantDirs', ''),
-(26, 4, 'Сортировка', 'sorting', 0, 1, 1, 4, '', '');
+(26, 4, 'Сортировка', 'sorting', 0, 1, 1, 4, '', ''),
+(27, 6, 'Название группы', 'title', 50, 2, 1, 0, '', ''),
+(28, 6, 'Сортировка', 'sorting', 0, 1, 1, 0, '', ''),
+(29, 5, 'Имя', 'name', 50, 2, 1, 0, '', ''),
+(30, 5, 'Фамилия', 'surname', 50, 2, 1, 10, '', ''),
+(31, 5, 'Отчество', 'patronimyc', 50, 2, 1, 20, '', ''),
+(32, 5, 'Номер телефона', 'phoneNumber', 100, 2, 1, 30, '', ''),
+(33, 5, 'Логин', 'login', 50, 2, 1, 40, '', ''),
+(34, 5, 'Пароль', 'pass1', 50, 6, 1, 50, '', ''),
+(35, 5, 'Повторите пароль', 'pass2', 50, 6, 1, 60, '', '');
 
 -- --------------------------------------------------------
 
@@ -88,7 +97,9 @@ INSERT INTO `Admin_Form_Modelname` (`id`, `model_name`) VALUES
 (1, 'Structure'),
 (2, 'Structure_Item'),
 (3, 'Constant'),
-(4, 'Constant_Dir');
+(4, 'Constant_Dir'),
+(5, 'User'),
+(6, 'User_Group');
 
 -- --------------------------------------------------------
 
@@ -111,7 +122,8 @@ INSERT INTO `Admin_Form_Type` (`id`, `title`, `input_type`) VALUES
 (2, 'Строка', 'text'),
 (3, 'Флажок', 'checkbox'),
 (4, 'Список', ''),
-(5, 'Текст', '');
+(5, 'Текст', ''),
+(6, 'Пароль', 'password');
 
 -- --------------------------------------------------------
 
@@ -186,7 +198,9 @@ CREATE TABLE `Constant_Dir` (
 
 INSERT INTO `Constant_Dir` (`id`, `title`, `description`, `parent_id`, `sorting`) VALUES
 (1, 'Системные константы', 'Константы содержащие основные настройки системы', 0, 0),
-(2, 'Тестовый раздел констант', 'Описание тестового раздела констант', 0, 0);
+(2, 'Тестовый раздел констант', 'Описание тестового раздела констант', 0, 0),
+(3, 'Вложенность второго уровня', '123', 2, 0),
+(4, 'Вложенность третьего уровня', '123', 3, 0);
 
 -- --------------------------------------------------------
 
@@ -1252,13 +1266,13 @@ CREATE TABLE `User` (
   `surname` varchar(50) NOT NULL,
   `patronimyc` varchar(50) NOT NULL,
   `phone_number` varchar(100) NOT NULL,
-  `email` varchar(50) NOT NULL,
+  `email` varchar(50) NOT NULL DEFAULT '',
   `login` varchar(50) NOT NULL,
   `password` varchar(50) NOT NULL,
   `group_id` int(11) NOT NULL DEFAULT '2',
   `register_date` date NOT NULL,
   `active` int(11) NOT NULL DEFAULT '1',
-  `superuser` int(11) NOT NULL,
+  `superuser` int(11) NOT NULL DEFAULT '0',
   `properties_list` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1268,7 +1282,7 @@ CREATE TABLE `User` (
 
 INSERT INTO `User` (`id`, `name`, `surname`, `patronimyc`, `phone_number`, `email`, `login`, `password`, `group_id`, `register_date`, `active`, `superuser`, `properties_list`) VALUES
 (1, 'Егор', 'Козырев', 'Алексеевич', '8-980-378-28-56', 'creative27016@gmail.com', 'alexoufx', '4a7d1ed414474e4033ac29ccb8653d9b', 1, '0000-00-00', 1, 1, ''),
-(2, 'Имя', 'Фамилия', '', '8-980-888-88-88', 'test@email.ru', 'test', '098f6bcd4621d373cade4e832627b4f6', 2, '2018-02-15', 1, 0, ''),
+(2, 'Имя', 'Фамилия', '', '8-980-888-88-88', 'test@email.ru', 'test', '098f6bcd4621d373cade4e832627b4f6', 2, '2018-02-15', 1, 0, 'b:0;'),
 (42, 'Александр', 'Булгаков', '', '+79087801122', '', 'БА', 'd93591bdf7860e1e4ee2fca799911215', 4, '2018-03-20', 1, 0, 'a:3:{i:0;i:7;i:1;i:8;i:2;i:9;}'),
 (46, 'Оксана', 'Полтева', '', '+79205764079', '', 'ПО', 'd93591bdf7860e1e4ee2fca799911215', 4, '2018-03-20', 1, 0, 'a:3:{i:0;i:7;i:1;i:8;i:2;i:9;}'),
 (83, 'Алина', 'Романович', '', '+79192882062', '', 'РА', 'd93591bdf7860e1e4ee2fca799911215', 4, '2018-03-20', 1, 0, 'a:3:{i:0;i:7;i:1;i:8;i:2;i:9;}'),
@@ -1519,7 +1533,8 @@ INSERT INTO `User` (`id`, `name`, `surname`, `patronimyc`, `phone_number`, `emai
 (333, 'Лариса', 'Малявина', '', '', '', 'МаЛа', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-03-20', 1, 0, 'a:3:{i:0;i:7;i:1;i:8;i:2;i:9;}'),
 (334, 'Виктория', 'Глебова', '', '89040890974', '', 'ГлВи', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-03-20', 1, 0, 'a:3:{i:0;i:7;i:1;i:8;i:2;i:9;}'),
 (335, 'Галина', 'Кривопускова', '', '89205715555', '', 'КрГа', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-03-20', 1, 0, 'a:3:{i:0;i:7;i:1;i:8;i:2;i:9;}'),
-(336, 'Иван', 'Козицкий', '', '9103690506мама, 9103690702', '', 'КоИв', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-03-20', 1, 0, 'a:3:{i:0;i:7;i:1;i:8;i:2;i:9;}');
+(336, 'Иван', 'Козицкий', '', '9103690506мама, 9103690702', '', 'КоИв', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-03-20', 1, 0, 'a:3:{i:0;i:7;i:1;i:8;i:2;i:9;}'),
+(338, 'Олег', 'Галицин', 'Владимирович', '8-800-555-35-35', '', 'oleg', '4a7d1ed414474e4033ac29ccb8653d9b', 2, '2018-03-21', 1, 1, 'b:0;');
 
 -- --------------------------------------------------------
 
@@ -1529,19 +1544,20 @@ INSERT INTO `User` (`id`, `name`, `surname`, `patronimyc`, `phone_number`, `emai
 
 CREATE TABLE `User_Group` (
   `id` int(11) NOT NULL,
-  `title` varchar(50) NOT NULL
+  `title` varchar(50) NOT NULL,
+  `sorting` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `User_Group`
 --
 
-INSERT INTO `User_Group` (`id`, `title`) VALUES
-(1, 'Администратор'),
-(2, 'Пользователь'),
-(3, 'Директор'),
-(4, 'Учитель'),
-(5, 'Студент');
+INSERT INTO `User_Group` (`id`, `title`, `sorting`) VALUES
+(1, 'Администратор', 0),
+(2, 'Пользователь', 10),
+(3, 'Директор', 20),
+(4, 'Учитель', 30),
+(5, 'Студент', 40);
 
 --
 -- Индексы сохранённых таблиц
@@ -1675,17 +1691,17 @@ ALTER TABLE `User_Group`
 -- AUTO_INCREMENT для таблицы `Admin_Form`
 --
 ALTER TABLE `Admin_Form`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Modelname`
 --
 ALTER TABLE `Admin_Form_Modelname`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Type`
 --
 ALTER TABLE `Admin_Form_Type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Menu`
 --
@@ -1700,7 +1716,7 @@ ALTER TABLE `Constant`
 -- AUTO_INCREMENT для таблицы `Constant_Dir`
 --
 ALTER TABLE `Constant_Dir`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT для таблицы `Constant_Type`
 --
@@ -1765,12 +1781,12 @@ ALTER TABLE `Structure_Item`
 -- AUTO_INCREMENT для таблицы `User`
 --
 ALTER TABLE `User`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=337;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=339;
 --
 -- AUTO_INCREMENT для таблицы `User_Group`
 --
 ALTER TABLE `User_Group`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
