@@ -63,6 +63,7 @@ class Core //extends Orm
 	
     public static function getMessage($sMessageName, $aMessageParams)
     {
+        ini_set('display_errors','Off');
         $aStrings = include ROOT . "/config/messages/ru/messages.php";
 
         if(isset($aStrings[$sMessageName]))
@@ -73,6 +74,8 @@ class Core //extends Orm
         {
             echo $aStrings["UNDEFIND_STRING_NAME"];
         }
+
+        ini_set('display_errors','On');
     }
 
 
