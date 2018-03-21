@@ -152,13 +152,13 @@ function updateItem(objectData){
 		type: "GET",
 		url: link,
 		success: function(answer){
-			//reloadMain("#" + link);
-			window.history.back();
+			reloadMain("#" + link);
+			//window.history.back();
 			setTimeout("loaderOff()", 200);
-			if(answer == "0")
-				alert("Изменения успешно сохранены");
-			else
-				alert("Ошибка: " + answer);
+			// if(answer == "0")
+			// 	alert("Изменения успешно сохранены");
+			// else
+			// 	alert("Ошибка: " + answer);
 		}
 	});
 }
