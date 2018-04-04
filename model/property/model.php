@@ -22,7 +22,7 @@ class Property_Model extends Core_Entity
 		return $this->id;}
 
 
-	public function active(bool $val = null)
+	public function active($val = null)
 	{
 		if(is_null($val))   return $this->active;
 		$val === true
@@ -33,7 +33,7 @@ class Property_Model extends Core_Entity
 	}
 
 
-	public function title(string $val = null)
+	public function title($val = null)
 	{
 		if(is_null($val))   return $this->title;
 		if(strlen($val) > 150)
@@ -43,7 +43,7 @@ class Property_Model extends Core_Entity
 	}
 
 
-	public function tag_name(string $val = null)
+	public function tag_name($val = null)
 	{
 		if(is_null($val))   return $this->tag_name;
 		if(strlen($val) > 50)
@@ -53,7 +53,7 @@ class Property_Model extends Core_Entity
 	}
 
 
-	public function description(string $val = null)
+	public function description($val = null)
 	{
 		if(is_null($val))   return $this->description;
 		$this->description = $val;
@@ -61,7 +61,7 @@ class Property_Model extends Core_Entity
 	}
 
 
-	public function type(string $val = null)
+	public function type($val = null)
 	{
 		if(is_null($val))   return $this->type;
 		if(strlen($val) > 50)
