@@ -31,7 +31,7 @@ class User_Model extends Core_Entity
 		return $this->id;}
 
 
-	public function groupId(int $val = null)
+	public function groupId($val = null)
 	{
 		if(is_null($val)) 	return $this->group_id;
 		if($val < 0)
@@ -42,7 +42,7 @@ class User_Model extends Core_Entity
 	}
 
 
-	public function active(bool $val = null)
+	public function active($val = null)
 	{
 		if(is_null($val))		return $this->active;
 		if($val === true)		$this->active = 1;
@@ -52,7 +52,7 @@ class User_Model extends Core_Entity
 	}
 
 
-	public function password(string $val = null)
+	public function password($val = null)
 	{
 		if(is_null($val)) 		return $this->password;
 		if(strlen($val) > 50)
@@ -63,7 +63,7 @@ class User_Model extends Core_Entity
 	}
 
 
-	public function phoneNumber(string $val = null)
+	public function phoneNumber($val = null)
 	{
 		if(is_null($val))		return $this->phone_number;
 		if(strlen($val) > 100)
@@ -74,7 +74,7 @@ class User_Model extends Core_Entity
 	}
 
 
-	public function name(string $val = null)
+	public function name($val = null)
 	{
 		if(is_null($val))		return $this->name;
 		if(strlen($val) > 50)
@@ -85,7 +85,7 @@ class User_Model extends Core_Entity
 	}
 
 
-	public function surname(string $val = null)
+	public function surname($val = null)
 	{
 		if(is_null($val))		return $this->surname;
 		if(strlen($val) > 50)
@@ -96,7 +96,7 @@ class User_Model extends Core_Entity
 	}
 
 
-	public function patronimyc(string $val = null)
+	public function patronimyc($val = null)
 	{
 		if(is_null($val))		return $this->patronimyc;
 		if(strlen($val) > 50)
@@ -118,7 +118,7 @@ class User_Model extends Core_Entity
 	}
 
 
-	public function login(string $val = null)
+	public function login($val = null)
 	{
 		if(is_null($val)) 		return $this->login;
 		if(strlen($val) > 50)
@@ -135,11 +135,11 @@ class User_Model extends Core_Entity
 	}
 
 
-	public function superuser(bool $val = null)
+	public function superuser($val = null)
 	{
 		if(is_null($val)) 		return $this->superuser;
-		if($val === true)		$this->superuser = 1;
-		elseif($val === false)	$this->superuser = 0;
+		if($val == true)		$this->superuser = 1;
+		elseif($val == false)	$this->superuser = 0;
 		
 		return $this;
 	}
