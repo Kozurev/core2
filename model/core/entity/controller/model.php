@@ -23,7 +23,7 @@ class Core_Entity_Controller_Model extends Core_Entity
 	}
 
 
-	public function xsl(string $val = null)
+	public function xsl($val = null)
 	{
 		if(is_null($val)) return $this->aControllerShowVars["xsl"];
 		elseif(is_string($val))
