@@ -38,6 +38,8 @@ class Admin_Menu_Main
         elseif(method_exists($oUpdatingItem, "active"))
             $oUpdatingItem->active(false);
 
+//        echo "<pre>";
+//        print_r($oUpdatingItem);
         $oUpdatingItem->save();
 
 
@@ -135,7 +137,6 @@ class Admin_Menu_Main
             ->join("Admin_Form_Modelname", "Admin_Form.model_id = Admin_Form_Modelname.id")
             ->where("Admin_Form_Modelname.model_name", "=", $aParams["model"])
             ->findAll();
-
 
         /**
          *	Создание редактируемого объекта
@@ -264,7 +265,7 @@ class Admin_Menu_Main
         //var_dump($value);
 
         if($value == "true")		$bValue = true;
-        elseif($value == "false")	$bValue = false;
+        else	$bValue = false;
 
         //var_dump($bValue);
 
