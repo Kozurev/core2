@@ -31,6 +31,7 @@ $(function(){
 		//Сохранение даных
 		.on("click", ".submit", function(e){
 			e.preventDefault();
+
 			var data = $("form").serialize();
 			updateItem(data);
 		})
@@ -59,9 +60,31 @@ $(function(){
 		//Удаление поля дополнительного свойства
 		.on("click", ".delete_block", function(){
 			$(this).parent().remove();
+		})
+		.on("click", ".next_page", function(e){
+			e.preventDefault();
+			var current_page = Number($("#current_page").text());
+			var count_pages = Number($("#count_pages").text());
+			if(current_page == count_pages)	return;
+			//var hash = window.location.hash;
+			setPage(current_page);
+		})
+		.on("click", ".prev_page", function(e){
+			e.preventDefault();
+            var current_page = Number($("#current_page").text());
+            var count_pages = Number($("#count_pages").text());
+            if(current_page == 1)	return;
+            setPage(current_page-2);
 		});
 });
 
+
+function setPage(page) {
+    var hash = window.location.hash;
+    if(hash.indexOf("&page") >= 0)	hash = hash.substring(0, hash.indexOf("&page"));
+    hash += "&page=" + page;
+    window.location.hash = hash;
+}
 
 /**
 *	Перезагрузка рабочей области административного раздела
@@ -105,9 +128,7 @@ function updateActive(model_name, model_id, value){
 		url: link,
 		success: function(answer){
 			setTimeout("loaderOff()", 200);
-			if(answer == "0")
-				alert("Изменения успешно сохранены");
-			else
+			if(answer != "0")
 				alert("Ошибка: " + answer);
 		}
 	});
@@ -134,9 +155,7 @@ function deleteItem(model_name, model_id){
 		success: function(answer){
 			reloadMain(window.location.hash);
 			setTimeout("loaderOff()", 200);
-			if(answer == "0")
-				alert("Изменения успешно сохранены");
-			else
+			if(answer != "0")
 				alert("Ошибка: " + answer);
 		}
 	});
@@ -152,13 +171,11 @@ function updateItem(objectData){
 		type: "GET",
 		url: link,
 		success: function(answer){
-			reloadMain("#" + link);
-			//window.history.back();
+			//reloadMain("#" + link);
+			window.history.back();
 			setTimeout("loaderOff()", 200);
-			// if(answer == "0")
-			// 	alert("Изменения успешно сохранены");
-			// else
-			// 	alert("Ошибка: " + answer);
+			if(answer != "0")
+				alert("Ошибка: " + answer);
 		}
 	});
 }
