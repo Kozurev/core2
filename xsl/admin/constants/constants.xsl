@@ -68,25 +68,10 @@
 			<td></td>
 
 			<!--Редактирование-->
-			<td>
-				<a 
-					href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant_Dir&amp;parent_id={parent_id}&amp;model_id={id}"
-					class="link">
-					<img 
-						src="/templates/template3/images/delete.ico" 
-						class="delete_icon"/>
-					</a>
-			</td>
+			<td><a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant_Dir&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
 
 			<!--Удаление-->
-			<td>
-				<a 
-					href="/admin" data-model_name="Constant_Dir" data-model_id="{id}" class="delete">
-					<img 
-						src="/templates/template3/images/delete.ico" 
-						class="delete_icon"/>
-					</a>
-			</td>
+			<td><a href="/admin" data-model_name="Constant_Dir" data-model_id="{id}" class="delete deleteLink"></a></td>
 		</tr>
 	</xsl:template>
 
@@ -117,24 +102,10 @@
 			</td>
 
 			<!--Редактирование-->
-			<td>
-				<a 
-					href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant&amp;parent_id={parent_id}&amp;model_id={id}"
-					class="link">
-					<img 
-						src="/templates/template3/images/delete.ico" 
-						class="delete_icon"/>
-				</a>
-			</td>
+			<td><a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
 
 			<!--Удаление-->
-			<td>
-				<a href="/admin" data-model_name="Constant" data-model_id="{id}" class="delete">
-					<img 
-						src="/templates/template3/images/delete.ico" 
-						class="delete_icon"/>
-				</a>
-			</td>
+			<td><a href="/admin" data-model_name="Constant" data-model_id="{id}" class="delete deleteLink"></a></td>
 		</tr>
 	</xsl:template>
 
