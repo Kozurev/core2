@@ -70,6 +70,10 @@ class Admin_Form extends Admin_Form_Model
         if(isset($aParams["model_id"]) && $aParams["model_id"] != "")
             $this->value = Core::factory("Constant", $aParams["model_id"])->valueType();
 
+//        echo "<pre>";
+//        print_r(Core::factory("Constant", $aParams["model_id"]));
+//        echo "</pre>";
+
         $this->addEntities(Core::factory("Constant_Type")->findAll(), "item");
     }
 
@@ -79,6 +83,7 @@ class Admin_Form extends Admin_Form_Model
         if(isset($aParams["model_id"]) && $aParams["model_id"] != "" && $aParams["model"] == "Constant")
             $this->value = Core::factory("Constant", $aParams["model_id"])->dir();
 
+        //$this->value = Core_Array::getValue($aParams, "parent_id", "0");
         $sDirId = Core_Array::getValue($aParams, "model_id", null);
         $aoDirs = Core::factory("Constant_Dir")->findAll();
 
@@ -95,5 +100,28 @@ class Admin_Form extends Admin_Form_Model
         }
     }
 
+
+    public function getListAdminFormModelnames($aParams)
+    {
+        $this->value = Core_Array::getValue($aParams, "parent_id", "0");
+        $aoModels = Core::factory("Admin_Form_Modelname")
+            ->where("indexing", "=", "1")
+            ->orderBy("model_sorting")
+            ->findAll();
+
+        foreach ($aoModels as $model)
+        {
+            $model->title = $model->model_title();
+            $this->addEntity($model, "item");
+        }
+    }
+
+
+    public function getListAdminFormTypes($aParams)
+    {
+        $aFormTypes = Core::factory("Admin_Form_Type")
+            ->findAll();
+        $this->addEntities($aFormTypes, "item");
+    }
 
 }
