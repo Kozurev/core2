@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Мар 21 2018 г., 17:04
+-- Время создания: Апр 04 2018 г., 16:39
 -- Версия сервера: 5.7.16
--- Версия PHP: 7.0.14
+-- Версия PHP: 5.6.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -34,6 +34,7 @@ CREATE TABLE `Admin_Form` (
   `maxlength` int(11) NOT NULL,
   `type_id` int(11) NOT NULL,
   `active` int(11) NOT NULL,
+  `required` int(11) NOT NULL,
   `sorting` int(11) NOT NULL,
   `list_name` varchar(50) NOT NULL,
   `value` text NOT NULL
@@ -43,40 +44,53 @@ CREATE TABLE `Admin_Form` (
 -- Дамп данных таблицы `Admin_Form`
 --
 
-INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `type_id`, `active`, `sorting`, `list_name`, `value`) VALUES
-(1, 1, 'Заголовок', 'title', 150, 2, 1, 1, '', ''),
-(2, 1, 'Путь', 'path', 100, 2, 1, 2, '', ''),
-(3, 1, 'Активость', 'active', 0, 3, 1, 3, '', ''),
-(4, 1, 'Файл обработчик', 'action', 100, 2, 1, 4, '', ''),
-(5, 1, 'Родительский раздел', 'parentId', 0, 4, 1, 5, 'Structures', ''),
-(6, 1, 'Макет', 'template_id', 0, 4, 1, 6, 'Templates', ''),
-(7, 1, 'Описание', 'description', 2000, 5, 1, 7, '', ''),
-(8, 2, 'Название', 'title', 150, 2, 1, 1, '', ''),
-(9, 2, 'Путь', 'path', 50, 2, 1, 2, '', ''),
-(10, 1, 'Сортировка', 'sorting', 0, 1, 1, 8, '', ''),
-(12, 2, 'Сортировка', 'sorting', 0, 1, 1, 4, '', ''),
-(13, 2, 'Активность', 'active', 0, 3, 1, 3, '', ''),
-(14, 2, 'Родительский раздел', 'parentId', 0, 4, 1, 3, 'Structures', ''),
-(15, 3, 'Заголовок', 'title', 150, 2, 1, 1, '', ''),
-(16, 3, 'Название константы (в верхнем регистре)', 'name', 150, 2, 1, 2, '', ''),
-(17, 3, 'Описание', 'description', 2000, 5, 1, 3, '', ''),
-(19, 3, 'Значение', 'value', 2000, 5, 1, 4, '', ''),
-(20, 3, 'Тип значения', 'valueType', 0, 4, 1, 5, 'ConstantTypes', ''),
-(21, 3, 'Активность', 'active', 0, 3, 1, 3, '', ''),
-(22, 3, 'Родительская директория', 'dir', 0, 4, 1, 4, 'ConstantDirs', ''),
-(23, 4, 'Заголовок', 'title', 150, 2, 1, 1, '', ''),
-(24, 4, 'Описание', 'description', 2000, 5, 1, 2, '', ''),
-(25, 4, 'Родительский раздел', 'parentId', 0, 4, 1, 3, 'ConstantDirs', ''),
-(26, 4, 'Сортировка', 'sorting', 0, 1, 1, 4, '', ''),
-(27, 6, 'Название группы', 'title', 50, 2, 1, 0, '', ''),
-(28, 6, 'Сортировка', 'sorting', 0, 1, 1, 0, '', ''),
-(29, 5, 'Имя', 'name', 50, 2, 1, 0, '', ''),
-(30, 5, 'Фамилия', 'surname', 50, 2, 1, 10, '', ''),
-(31, 5, 'Отчество', 'patronimyc', 50, 2, 1, 20, '', ''),
-(32, 5, 'Номер телефона', 'phoneNumber', 100, 2, 1, 30, '', ''),
-(33, 5, 'Логин', 'login', 50, 2, 1, 40, '', ''),
-(34, 5, 'Пароль', 'pass1', 50, 6, 1, 50, '', ''),
-(35, 5, 'Повторите пароль', 'pass2', 50, 6, 1, 60, '', '');
+INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `type_id`, `active`, `required`, `sorting`, `list_name`, `value`) VALUES
+(1, 1, 'Заголовок', 'title', 150, 2, 1, 0, 1, '', ''),
+(2, 1, 'Путь', 'path', 100, 2, 1, 0, 2, '', ''),
+(3, 1, 'Активость', 'active', 0, 3, 1, 0, 3, '', ''),
+(4, 1, 'Файл обработчик', 'action', 100, 2, 1, 0, 4, '', ''),
+(5, 1, 'Родительский раздел', 'parentId', 0, 4, 1, 0, 5, 'Structures', ''),
+(6, 1, 'Макет', 'template_id', 0, 4, 1, 0, 6, 'Templates', ''),
+(7, 1, 'Описание', 'description', 2000, 5, 1, 0, 7, '', ''),
+(8, 2, 'Название', 'title', 150, 2, 1, 0, 1, '', ''),
+(9, 2, 'Путь', 'path', 50, 2, 1, 0, 2, '', ''),
+(10, 1, 'Сортировка', 'sorting', 0, 1, 1, 0, 8, '', ''),
+(12, 2, 'Сортировка', 'sorting', 0, 1, 1, 0, 4, '', ''),
+(13, 2, 'Активность', 'active', 0, 3, 1, 0, 3, '', ''),
+(14, 2, 'Родительский раздел', 'parentId', 0, 4, 1, 0, 3, 'Structures', ''),
+(15, 3, 'Заголовок', 'title', 150, 2, 1, 0, 1, '', ''),
+(16, 3, 'Название константы (в верхнем регистре)', 'name', 150, 2, 1, 1, 2, '', ''),
+(17, 3, 'Описание', 'description', 2000, 5, 1, 0, 3, '', ''),
+(19, 3, 'Значение', 'value', 2000, 5, 1, 0, 4, '', ''),
+(20, 3, 'Тип значения', 'valueType', 0, 4, 1, 0, 5, 'ConstantTypes', ''),
+(21, 3, 'Активность', 'active', 0, 3, 1, 0, 3, '', ''),
+(22, 3, 'Родительская директория', 'dir', 0, 4, 1, 0, 4, 'ConstantDirs', ''),
+(23, 4, 'Заголовок', 'title', 150, 2, 1, 0, 1, '', ''),
+(24, 4, 'Описание', 'description', 2000, 5, 1, 0, 2, '', ''),
+(25, 4, 'Родительский раздел', 'parentId', 0, 4, 1, 0, 3, 'ConstantDirs', ''),
+(26, 4, 'Сортировка', 'sorting', 0, 1, 1, 0, 4, '', ''),
+(27, 6, 'Название группы', 'title', 50, 2, 1, 0, 0, '', ''),
+(28, 6, 'Сортировка', 'sorting', 0, 1, 1, 0, 0, '', ''),
+(29, 5, 'Имя', 'name', 50, 2, 1, 0, 0, '', ''),
+(30, 5, 'Фамилия', 'surname', 50, 2, 1, 0, 10, '', ''),
+(31, 5, 'Отчество', 'patronimyc', 50, 2, 1, 0, 20, '', ''),
+(32, 5, 'Номер телефона', 'phoneNumber', 100, 2, 1, 0, 30, '', ''),
+(33, 5, 'Логин', 'login', 50, 2, 1, 0, 40, '', ''),
+(34, 5, 'Пароль', 'pass1', 50, 6, 1, 0, 50, '', ''),
+(35, 5, 'Повторите пароль', 'pass2', 50, 6, 1, 0, 60, '', ''),
+(36, 7, 'Название модели', 'model_name', 255, 2, 1, 0, 20, '', ''),
+(37, 7, 'Заголовок', 'model_title', 150, 2, 1, 0, 10, '', ''),
+(38, 7, 'Сортировка', 'model_sorting', 0, 1, 1, 0, 30, '', ''),
+(39, 10, 'Заголовок', 'title', 150, 2, 1, 0, 10, '', ''),
+(40, 10, 'Название переменной (сеттера)', 'varName', 50, 2, 1, 0, 20, '', ''),
+(41, 10, 'Родительская модель', 'model_id', 0, 4, 1, 0, 30, 'AdminFormModelnames', ''),
+(42, 10, 'Максимальная длинна поля', 'maxlength', 0, 1, 1, 0, 40, '', ''),
+(43, 10, 'Тип поля', 'type_id', 0, 4, 1, 0, 50, 'AdminFormTypes', ''),
+(44, 10, 'Активность', 'active', 0, 3, 1, 0, 60, '', ''),
+(45, 10, 'Сортировка', 'sorting', 0, 1, 1, 0, 70, '', ''),
+(46, 10, 'Название списка', 'listName', 50, 2, 1, 0, 80, '', ''),
+(47, 10, 'Значение', 'value', 2000, 5, 1, 0, 90, '', ''),
+(49, 10, 'Обязательное поле', 'required', 0, 3, 1, 0, 100, '', '');
 
 -- --------------------------------------------------------
 
@@ -86,20 +100,25 @@ INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `t
 
 CREATE TABLE `Admin_Form_Modelname` (
   `id` int(11) NOT NULL,
-  `model_name` varchar(150) NOT NULL
+  `model_name` varchar(150) NOT NULL,
+  `model_title` varchar(255) NOT NULL,
+  `model_sorting` int(11) NOT NULL,
+  `indexing` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `Admin_Form_Modelname`
 --
 
-INSERT INTO `Admin_Form_Modelname` (`id`, `model_name`) VALUES
-(1, 'Structure'),
-(2, 'Structure_Item'),
-(3, 'Constant'),
-(4, 'Constant_Dir'),
-(5, 'User'),
-(6, 'User_Group');
+INSERT INTO `Admin_Form_Modelname` (`id`, `model_name`, `model_title`, `model_sorting`, `indexing`) VALUES
+(1, 'Structure', 'Структуры', 10, 1),
+(2, 'Structure_Item', 'Элементы структур', 20, 1),
+(3, 'Constant', 'Константы', 30, 1),
+(4, 'Constant_Dir', 'Дирректории констант', 40, 1),
+(5, 'User', 'Пользователи', 50, 1),
+(6, 'User_Group', 'Группы пользователей', 60, 1),
+(7, 'Admin_Form_Modelname', '', 0, 0),
+(10, 'Admin_Form', '', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -173,7 +192,7 @@ CREATE TABLE `Constant` (
 --
 
 INSERT INTO `Constant` (`id`, `title`, `name`, `description`, `value`, `value_type`, `dir`, `active`, `sorting`) VALUES
-(4, 'Пагинация в админ. разделе', 'SHOW_LIMIT', 'Лимит показов количества структур и объектов структур', '30', 0, 1, 1, 0),
+(4, 'Пагинация в админ. разделе', 'SHOW_LIMIT', 'Лимит показов количества структур и объектов структур', '5', 1, 1, 1, 0),
 (5, 'Тестовая константа 1', 'TEST_1', 'Какая-то константа №1', 'test1', 0, 0, 1, 0),
 (6, 'Тестовая константа 2', 'TEST_2', 'Какая-то константа №2', '5', 1, 1, 1, 0),
 (11, 'Новая константа', 'NEW', 'Описание константы', '700', 1, 1, 1, 0);
@@ -811,7 +830,7 @@ CREATE TABLE `Property_List` (
 --
 
 INSERT INTO `Property_List` (`id`, `property_id`, `model_name`, `object_id`, `value_id`) VALUES
-(1, 5, 'Structure_Item', 2, 1),
+(1, 5, 'Structure_Item', 2, 3),
 (2, 5, 'Structure', 1, 4),
 (5, 7, 'User', 46, 1),
 (6, 7, 'User', 83, 0),
@@ -1183,9 +1202,10 @@ CREATE TABLE `Property_Text` (
 --
 
 INSERT INTO `Property_Text` (`id`, `property_id`, `value`, `model_name`, `object_id`) VALUES
-(1, 4, 'Описание товара', 'Structure_Item', 2),
+(1, 4, 'Описание товара1', 'Structure_Item', 2),
 (4, 3, 'Какое-то значение дополнительного свойства \"Параметры\"', 'Structure', 1),
-(5, 3, 'параметры', 'Structure_Item', 2);
+(6, 3, 'параметры1', 'Structure_Item', 2),
+(7, 4, 'Описание товара2', 'Structure_Item', 2);
 
 -- --------------------------------------------------------
 
@@ -1204,9 +1224,9 @@ CREATE TABLE `Structure` (
   `properties_list` text NOT NULL,
   `active` int(11) NOT NULL DEFAULT '1',
   `sorting` int(11) NOT NULL,
-  `meta_title` varchar(100) NOT NULL,
-  `meta_description` text NOT NULL,
-  `meta_keywords` varchar(100) NOT NULL
+  `meta_title` varchar(100) DEFAULT NULL,
+  `meta_description` text,
+  `meta_keywords` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1224,7 +1244,11 @@ INSERT INTO `Structure` (`id`, `title`, `parent_id`, `path`, `action`, `template
 (8, 'Иерархия классов', 9, 'models', 'documentation/models', 1, 'Общая структура системы. Описание стандартных классов, их свойств и методов.', '', 1, 0, '', '', ''),
 (9, 'Документация', 0, 'documentation', 'documentation/index', 1, 'Руководство по использованию системы', '', 1, 0, '', '', ''),
 (13, 'Панель управления', 0, 'musadm', 'musadm/index', 4, '', 'b:0;', 1, 0, '', '', ''),
-(14, 'Авторизация', 13, 'authorize', 'musadm/authorize', 1, '', 'b:0;', 1, 0, '', '', '');
+(14, 'Авторизация', 13, 'authorize', 'musadm/authorize', 1, '', 'b:0;', 1, 0, '', '', ''),
+(15, 'Спорт2', 1, '', '', 0, '', 'b:0;', 1, 0, NULL, NULL, NULL),
+(16, 'Спорт3', 1, '', '', 0, '', 'b:0;', 1, 0, NULL, NULL, NULL),
+(17, 'Спорт4', 1, '', '', 0, '', 'b:0;', 1, 0, NULL, NULL, NULL),
+(18, 'Спорт5', 1, '', '', 0, '', 'b:0;', 0, 0, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1236,12 +1260,12 @@ CREATE TABLE `Structure_Item` (
   `id` int(11) NOT NULL,
   `title` varchar(150) NOT NULL,
   `parent_id` int(11) NOT NULL,
-  `description` text NOT NULL,
+  `description` text,
   `properties_list` text NOT NULL,
   `active` int(11) NOT NULL DEFAULT '1',
-  `meta_title` varchar(100) NOT NULL,
-  `meta_description` text NOT NULL,
-  `meta_keywords` varchar(100) NOT NULL,
+  `meta_title` varchar(100) DEFAULT NULL,
+  `meta_description` text,
+  `meta_keywords` varchar(100) DEFAULT NULL,
   `path` varchar(50) NOT NULL,
   `sorting` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1252,7 +1276,9 @@ CREATE TABLE `Structure_Item` (
 
 INSERT INTO `Structure_Item` (`id`, `title`, `parent_id`, `description`, `properties_list`, `active`, `meta_title`, `meta_description`, `meta_keywords`, `path`, `sorting`) VALUES
 (1, 'Футбольный мячь', 4, '', '', 1, 'SEO title', 'SEO описание', 'SEO ключевые слова', '1', 0),
-(2, 'Кросовки Nike', 4, '', 'a:3:{i:0;i:5;i:1;i:3;i:2;i:4;}', 1, '', '', '', '2', 0);
+(2, 'Кросовки Nike', 4, '', 'a:3:{i:0;i:5;i:1;i:3;i:2;i:4;}', 1, '', '', '', '2', 0),
+(3, 'Название', 1, NULL, 'b:0;', 1, NULL, NULL, NULL, '', 0),
+(4, 'Название2', 1, NULL, 'b:0;', 1, NULL, NULL, NULL, '', 0);
 
 -- --------------------------------------------------------
 
@@ -1691,12 +1717,12 @@ ALTER TABLE `User_Group`
 -- AUTO_INCREMENT для таблицы `Admin_Form`
 --
 ALTER TABLE `Admin_Form`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Modelname`
 --
 ALTER TABLE `Admin_Form_Modelname`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Type`
 --
@@ -1766,17 +1792,17 @@ ALTER TABLE `Property_String`
 -- AUTO_INCREMENT для таблицы `Property_Text`
 --
 ALTER TABLE `Property_Text`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 --
 -- AUTO_INCREMENT для таблицы `Structure`
 --
 ALTER TABLE `Structure`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 --
 -- AUTO_INCREMENT для таблицы `Structure_Item`
 --
 ALTER TABLE `Structure_Item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT для таблицы `User`
 --
@@ -1786,7 +1812,7 @@ ALTER TABLE `User`
 -- AUTO_INCREMENT для таблицы `User_Group`
 --
 ALTER TABLE `User_Group`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
