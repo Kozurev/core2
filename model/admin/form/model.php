@@ -3,7 +3,7 @@
 class Admin_Form_Model extends Core_Entity
 {
 	protected $id;
-	protected $model_name;
+	protected $model_id;
 	protected $title;
 	protected $var_name;
 	protected $maxlength;
@@ -12,6 +12,7 @@ class Admin_Form_Model extends Core_Entity
 	protected $sorting;
 	protected $list_name;
 	protected $value;
+	protected $required;
 
 
 	public function getId()
@@ -19,16 +20,16 @@ class Admin_Form_Model extends Core_Entity
 		return $this->id;
 	}
 
-	public function model_name(int $val = null)
+	public function model_id($val = null)
 	{
-		if(is_null($val))		return $this->model_name;
+		if(is_null($val))		return $this->model_id;
 
-		$this->model_name = $val;
+		$this->model_id = $val;
 		return $this;
 	}
 
 
-	public function title(string $val = null)
+	public function title($val = null)
 	{
 		if(is_null($val))		return $this->title;
 		if(strlen($val) > 150) 	die('Значение свойства "title" не может превышать 150 символов.');
@@ -38,7 +39,7 @@ class Admin_Form_Model extends Core_Entity
 	}
 
 
-	public function varName(string $val = null)
+	public function varName($val = null)
 	{
 		if(is_null($val))		return $this->var_name;
 		if(strlen($val) > 50) 	die('Значение свойства "var_name" не может превышать 50 символов.');
@@ -48,7 +49,7 @@ class Admin_Form_Model extends Core_Entity
 	}
 
 
-	public function maxlength(int $val = null)
+	public function maxlength($val = null)
 	{
 		if(is_null($val))		return $this->maxlength;
 
@@ -57,7 +58,7 @@ class Admin_Form_Model extends Core_Entity
 	}
 
 
-	public function type_id(int $val = null)
+	public function type_id($val = null)
 	{
 		if(is_null($val))		return $this->type_id;
 
@@ -66,16 +67,17 @@ class Admin_Form_Model extends Core_Entity
 	}
 
 
-	public function active(int $val = null)
+	public function active($val = null)
 	{
 		if(is_null($val))		return $this->active;
 
-		$this->active = $val;
+		if($val == true)    $this->active = 1;
+		else $this->active = 0;
 		return $this;
 	}
 
 
-	public function sorting(int $val = null)
+	public function sorting($val = null)
 	{
 		if(is_null($val))		return $this->sorting;
 
@@ -84,7 +86,7 @@ class Admin_Form_Model extends Core_Entity
 	}
 
 
-	public function listName(string $val = null)
+	public function listName($val = null)
 	{
 		if(is_null($val))		return $this->list_name;
 		if(strlen($val) > 50) 	die('Значение свойства "list_name" не может превышать 50 символов.');
@@ -100,5 +102,13 @@ class Admin_Form_Model extends Core_Entity
 		$this->value = $val;
 		return $this;
 	}
+
+
+	public function required($val = null)
+    {
+        if(is_null($val))   return $this->required;
+        if($val == true) $this->required = 1;
+        else $this->required = 0;
+    }
 
 }
