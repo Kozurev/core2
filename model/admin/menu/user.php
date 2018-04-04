@@ -12,14 +12,39 @@ class Admin_Menu_User
         $oOutputEntity = Core::factory("Core_Entity");
         $title = "Пользователи";
 
+        //Пагинация
+        $page = intval(Core_Array::getValue($aParams, "page", 0));
+        $offset = $page * SHOW_LIMIT;
+        $totalCount = count(Core::factory("User")->where("group_id", "=", $groupId)->findAll());
+        if($groupId =="0")  $totalCount += count(Core::factory("User_Group")->findAll());
+        $countPages = intval($totalCount / SHOW_LIMIT);
+        if($totalCount % SHOW_LIMIT != 0)   $countPages++;
+        $oPagination = Core::factory("Core_Entity")
+            ->name("pagination")
+            ->addEntity(
+                Core::factory("Core_Entity")
+                    ->name("current_page")
+                    ->value(++$page)
+            )
+            ->addEntity(
+                Core::factory("Core_Entity")
+                    ->name("count_pages")
+                    ->value($countPages)
+            );
+
+
         $aoUsers = Core::factory("User")
             ->where("group_id", "=", $groupId)
+            ->limit(SHOW_LIMIT)
+            ->offset($offset)
             ->findAll();
 
         if($groupId == "0")
         {
             $aoGroups = Core::factory("User_Group")
                 ->orderBy("sorting")
+                ->limit(SHOW_LIMIT)
+                ->offset($offset)
                 ->findAll();
             $oOutputEntity->addEntities($aoGroups);
         }
@@ -29,10 +54,16 @@ class Admin_Menu_User
         }
 
         $oOutputEntity
+            ->addEntity($oPagination)
             ->addEntity(
                 Core::factory("Core_Entity")
                     ->name("title")
                     ->value($title)
+            )
+            ->addEntity(
+                Core::factory("Core_Entity")
+                    ->name("group_id")
+                    ->value($groupId)
             )
             ->addEntities($aoUsers)
             ->xsl($sXslPath)
