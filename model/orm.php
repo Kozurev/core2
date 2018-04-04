@@ -4,14 +4,16 @@ class Orm
 	protected $queryString;	//Строка запроса
 
 	//Параметры для строки запроса
-	private $select;
-	private $from;
-	private $where;
-	private $order;
-	private $limit;
-	private $join;
+    private $select;
+    private $from;
+    private $where;
+    private $order;
+    private $limit;
+    private $join;
     private $having;
     private $groupby;
+    private $offset;
+
 
 	public function __construct()
 	{
@@ -63,8 +65,15 @@ class Orm
 		$this->select = "count(".$this->getTableName().".id) as count";
 		$this->setQueryString();
 		$result = Core_Database::getConnect()->query($this->queryString);
+
+        if(TEST_MODE_ORM)
+        {
+            echo "<br>Строка запроса метода <b>getCount()</b>: ".$this->queryString;
+        }
+
+		if(!$result)    return 0;
 		$result = $result->fetch();
-		return (integer)$result['count'];
+		return intval($result['count']);
 	}
 
 
@@ -174,6 +183,9 @@ class Orm
         if($this->limit != "")
             $this->queryString .= " LIMIT ".$this->limit;
 
+        if($this->offset != "")
+            $this->queryString .= " OFFSET ".$this->offset;
+
         if($this->groupby != "")
             $this->queryString .= " GROUP BY ".$this->groupby;
 
@@ -220,6 +232,7 @@ class Orm
         $this->join = "";
         $this->having = "";
         $this->orderBy = "";
+        $this->offset = "";
         return $this;
     }
 
@@ -400,6 +413,13 @@ class Orm
 		$this->limit .= $count;
 		return $this;
 	}
+
+
+	public function offset($val)
+    {
+        if($this->offset == "") $this->offset = intval($val);
+        return $this;
+    }
 
 
 	/**
