@@ -20,7 +20,7 @@ class Core_Entity_Model extends Orm
 	}
 
 
-	public function name(string $val = null)
+	public function name($val = null)
 	{
 		if(is_null($val)) return $this->aEntityVars["name"];
 		else $this->aEntityVars["name"] = $val;
@@ -31,12 +31,12 @@ class Core_Entity_Model extends Orm
 	public function value($val = null)
 	{
 		if(is_null($val)) return $this->aEntityVars["value"];
-		else $this->aEntityVars["value"] = $val;
+		else $this->aEntityVars["value"] = strval($val);
 		return $this;
 	}
 
 
-	public function xsl(string $val = null)
+	public function xsl($val = null)
 	{
 		if(is_null($val)) return $this->aEntityVars["xslPath"];
 		$this->aEntityVars["xslPath"] = ROOT . "/xsl/" . $val;
