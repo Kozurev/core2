@@ -30,7 +30,7 @@ class Structure_Controller extends Structure_Controller_Model
      *      true - возвращается всё древо дочерних структур
      * @return array
      */
-    private function getChildren(bool $bWithItems = false)
+    private function getChildren($bWithItems = false)
     {
         $aoChildren = Core::factory("Structure")
             ->where("parent_id", "=", $this->id)
