@@ -54,28 +54,21 @@ class Constant extends Constant_Model
 	*	Метод включает в себя проверку на существование константы с таким же именем
 	*	@return self
 	*/
-//	public function save()
-//	{
-//		try
-//		{
-//			$const = Core::factory("Constant");
-//			$result = $const->queryBuilder()
-//				->where("title", "=", $this->title)
-//				->find();
-//
-//			if(!$result)
-//			{
-//				parent::save();
-//				return $this;
-//			}
-//
-//			throw new Exception("Константа с таким названием уже существует");
-//		}
-//		catch(Exception $e)
-//		{
-//			echo "<br>".$e->getMessage();
-//		}
-//	}
+	public function save()
+	{
+	    if($this->name == "")   die(Core::getMessage("NOT_MULL", array("name", "constant")));
+	    if($this->id) return parent::save($this);
+
+
+
+		$const = Core::factory("Constant")
+            ->where("name", "=", $this->name)
+            ->find();
+
+		if($const != false)     die("Константа с таким именем уже существует.");
+
+		return parent::save();
+	}
 
 
 
