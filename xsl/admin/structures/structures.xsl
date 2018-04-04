@@ -33,6 +33,14 @@
 					Новый элемент
 				</a>
 			</button>
+
+			<div class="pagination">
+				<a class="prev_page" href="/admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
+				<span class="pages">Страница
+					<span id="current_page"><xsl:value-of select="pagination/current_page" /></span> из
+					<span id="count_pages"><xsl:value-of select="pagination/count_pages" /></span></span>
+				<a class="next_page" href="/admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
+			</div>
 		</div>
 	</xsl:template>
 
@@ -42,7 +50,6 @@
 			<td><xsl:value-of select="id" /></td>
 			<td>Структура</td>
 
-			<!--Активность-->
 			<td class="table_structure">
 				<a 
 					class="link"
@@ -67,23 +74,10 @@
 			<td><xsl:value-of select="path" /></td>
 
 			<!--Редактирование-->
-			<td>
-				<a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}&amp;model_id={id}"
-				class="link">
-					<img 
-						src="/templates/template3/images/delete.ico" 
-						class="delete_icon"/>
-				</a>
-			</td>
+			<td><a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
 
 			<!--Удаление-->
-			<td>
-				<a href="/admin" data-model_name="Structure" data-model_id="{id}" class="delete">
-					<img 
-						src="/templates/template3/images/delete.ico" 
-						class="delete_icon"/>
-				</a>
-			</td>
+			<td><a href="/admin" data-model_name="Structure" data-model_id="{id}" class="delete deleteLink"></a></td>
 		</tr>
 	</xsl:template>
 
@@ -109,22 +103,10 @@
 			<td><xsl:value-of select="path" /></td>
 
 			<!--Редактирование-->
-			<td>
-				<a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}&amp;model_id={id}"
-				data-model_name="Structure" data-model_id="{id}" class="link">
-				<img 
-					src="/templates/template3/images/delete.ico" 
-					class="delete_icon"/>
-				</a>
-			</td>
+			<td><a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
 
-			<td>
-				<a href="/admin" data-model_name="Structure_Item" data-model_id="{id}" class="delete">
-				<img 
-					src="/templates/template3/images/delete.ico" 
-					class="delete_icon"/>
-				</a>
-			</td>
+			<!--Удаление-->
+			<td><a href="/admin" data-model_name="Structure_Item" data-model_id="{id}" class="delete deleteLink"></a></td>
 		</tr>
 	</xsl:template>
 
