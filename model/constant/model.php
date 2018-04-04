@@ -20,7 +20,7 @@ class Constant_Model extends Core_Entity
 	public function getId(){return $this->id;}
 
 
-	public function title(string $val = null)
+	public function title($val = null)
 	{
 		if(is_null($val))   return $this->title;
 		if(strlen($val) > 150) die(Core::getMessage("TOO_LARGE_VALUE", array("title", "Constant", 150)));
@@ -29,7 +29,7 @@ class Constant_Model extends Core_Entity
 	}
 
 
-	public function name(string $val = null)
+	public function name($val = null)
     {
         if(is_null($val))   return $this->name;
         if(strlen($val) > 150)
@@ -39,7 +39,7 @@ class Constant_Model extends Core_Entity
     }
 
 
-	public function description(string $val = null)
+	public function description($val = null)
 	{
 		if(is_null($val))   return $this->description;
 		$this->description = $val;
@@ -59,7 +59,7 @@ class Constant_Model extends Core_Entity
 	}
 
 
-	public function valueType(string $val = null)
+	public function valueType($val = null)
     {
         if(is_null($val))   return $this->value_type;
         if(strlen($val) > 10)
@@ -79,7 +79,7 @@ class Constant_Model extends Core_Entity
     }
 
 
-    public function dir(int $val = null)
+    public function dir($val = null)
     {
         if(is_null($val))   return $this->dir;
         if($val < 0)
