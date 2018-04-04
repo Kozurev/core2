@@ -34,10 +34,51 @@ class Admin_Menu_Structure
 				->title();
 		}
 
+		$page = intval(Core_Array::getValue($aParams, "page", 0));
+        $structureOffset = $page * SHOW_LIMIT;
+		$countStructures = count(Core::factory("Structure")->where("parent_id", "=", $parentId)->offset($structureOffset)->limit(SHOW_LIMIT)->findAll());
+
+		$totalCountItems = Core::factory("Structure_Item")->where("parent_id", "=", $parentId)->getCount();
+		$totalCountStructures = Core::factory("Structure")->where("parent_id", "=", $parentId)->getCount();
+		$totalCount = $totalCountItems + $totalCountStructures;
+		$countPages = intval($totalCount / SHOW_LIMIT);
+		if($totalCount % SHOW_LIMIT)    $countPages++;
+
+		if($countStructures < SHOW_LIMIT)
+        {
+            $countItems = SHOW_LIMIT - $countStructures;
+            $itemsOffset = $structureOffset - $totalCountStructures;
+            if($itemsOffset < 0)    $itemsOffset = 0;
+        }
+        else
+        {
+		    $countItems = 0;
+		    $itemsOffset = 0;
+        }
+
+        //echo "structures: $structureOffset, $countStructures; items: $itemsOffset, $countItems<br>";
+
+        $oPagination = Core::factory("Core_Entity")
+            ->name("pagination")
+            ->addEntity(
+                Core::factory("Core_Entity")
+                    ->name("count_pages")
+                    ->value($countPages)
+            )
+            ->addEntity(
+                Core::factory("Core_Entity")
+                    ->name("current_page")
+                    ->value(++$page)
+            );
+
+        //echo "StructuresCount = $countStructures; ItemsCount = "
+
 		//Поиск элементов, принадлежащих структуре
 		$aoItems = Core::factory("Structure_Item")
 			->queryBuilder()
 			->orderBy("sorting")
+            ->limit($countItems)
+            ->offset($itemsOffset)
 			->where("parent_id", "=", $parentId)
 			->findAll();
 
@@ -45,7 +86,10 @@ class Admin_Menu_Structure
 		Core::factory("Structure_Controller")
 			->queryBuilder()
 			->orderBy("sorting")
+            ->offset($structureOffset)
+            ->limit(SHOW_LIMIT)
 			->where("parent_id", "=", $parentId)
+            ->addEntity($oPagination)
 			->addEntity(
 				Core::factory("Core_Entity")
 					->name("parent_id")
