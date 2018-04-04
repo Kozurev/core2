@@ -17,12 +17,4 @@ class Core_Array
         else return $default;
     }
 
-
-    public static function unsetValue($arr, $key)
-    {
-        unset($arr[$key]);
-
-        return $arr;
-    }
-
 }
