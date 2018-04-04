@@ -31,7 +31,7 @@ class Structure_Model extends Core_Entity
 		return $this->id;}
 
 
-	public function title(string $val = null)
+	public function title($val = null)
 	{
 		if(is_null($val)) 		return $this->title;
 		if(strlen($val) > 150)
@@ -42,7 +42,7 @@ class Structure_Model extends Core_Entity
 	}
 
 
-	public function active(bool $val = null)
+	public function active($val = null)
 	{
 		// echo "<h2>Значение: $val</h2>";
 		if(is_null($val)) 		return $this->active;
@@ -75,7 +75,7 @@ class Structure_Model extends Core_Entity
 	}
 
 
-	public function description(string $val = null)
+	public function description($val = null)
 	{
 		if(is_null($val)) 	return $this->description;
 
@@ -84,7 +84,7 @@ class Structure_Model extends Core_Entity
 	}
 
 
-	public function path(string $val = null)
+	public function path($val = null)
 	{
 
 		if(is_null($val)) 		return $this->path;
@@ -96,7 +96,7 @@ class Structure_Model extends Core_Entity
 	}
 
 
-	public function action(string $val = null)
+	public function action($val = null)
 	{
 		if(is_null($val)) 		return $this->action;
 		if(strlen($val) > 100)
@@ -107,7 +107,7 @@ class Structure_Model extends Core_Entity
 	}
 
 
-	public function meta_title(string $val = null)
+	public function meta_title($val = null)
 	{
 		if(is_null($val)) 		return $this->meta_title;
 		if(strlen($val) > 100)
@@ -129,7 +129,7 @@ class Structure_Model extends Core_Entity
 	}
 
 
-	public function meta_description(string $val = null)
+	public function meta_description($val = null)
 	{
 		if(is_null($val)) 	return $this->meta_description;
 
