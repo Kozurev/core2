@@ -124,4 +124,37 @@ class Admin_Form extends Admin_Form_Model
         $this->addEntities($aFormTypes, "item");
     }
 
+
+    public function getListPropertyTypes($aParams)
+    {
+        $int = new stdClass();
+        $int->title = "Число";
+        $int->id = "int";
+        $this->addEntity($int, "item");
+
+        $string = new stdClass();
+        $string->title = "Строка";
+        $string->id = "string";
+        $this->addEntity($string, "item");
+
+        $text = new stdClass();
+        $text->title = "Текст";
+        $text->id = "text";
+        $this->addEntity($text, "item");
+
+        $list = new stdClass();
+        $list->title = "Список";
+        $list->id = "list";
+        $this->addEntity($list, "item");
+    }
+
+
+    public function getListPropertyDirs($aParms)
+    {
+        //TODO: Переработать формирование списка родительских директорий аналогично как у структур и констант
+        $this->addEntities(
+            Core::factory("Property_Dir")->findAll(), "item"
+        );
+    }
+
 }
