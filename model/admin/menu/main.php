@@ -148,7 +148,7 @@ class Admin_Menu_Main
         /**
          *	Добавление дополнительных свойств
          */
-        if($oUpdatingItem->getId())
+        if($oUpdatingItem->getId() && $aParams["model"] != "Property")
         {
             $oOutputXml->addEntity($oUpdatingItem);
 
@@ -159,6 +159,7 @@ class Admin_Menu_Main
             $aoPropertiesValues = array();
             foreach ($aoPropertiesList as $oProperty)
             {
+                if($oProperty->active() == 0)   continue;
                 if($oProperty->type() == "list")
                 {
                     //Добавление значений свойства типа "список"
