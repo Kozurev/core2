@@ -192,6 +192,13 @@ class Orm
         if($this->having != "")
             $this->queryString .= " HAVING ".$this->having;
     }
+
+    public function getQueryString()
+    {
+        $this->setQueryString();
+        return $this->queryString;
+    }
+
 /**
 *	<<Конец
 *	Вспомагательные методы

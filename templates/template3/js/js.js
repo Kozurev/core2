@@ -31,8 +31,14 @@ $(function(){
 		//Сохранение даных
 		.on("click", ".submit", function(e){
 			e.preventDefault();
-
-			var data = $("form").serialize();
+			var form = $("#createData");
+			if(form.valid() == false)	return;
+			var data = form.serialize();
+			var aUnchecked = form.find("input[type=checkbox]:unchecked");
+			for (var i = 0; i < aUnchecked.length; i++)
+			{
+				data += "&" + $(aUnchecked[i]).attr("name") + "=0";
+			}
 			updateItem(data);
 		})
 		//Добавление поля для дополнительного свойства

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Апр 04 2018 г., 16:39
+-- Время создания: Апр 06 2018 г., 17:59
 -- Версия сервера: 5.7.16
 -- Версия PHP: 5.6.29
 
@@ -29,15 +29,15 @@ SET time_zone = "+00:00";
 CREATE TABLE `Admin_Form` (
   `id` int(11) NOT NULL,
   `model_id` int(11) NOT NULL,
-  `title` varchar(150) NOT NULL,
-  `var_name` varchar(50) NOT NULL,
-  `maxlength` int(11) NOT NULL,
-  `type_id` int(11) NOT NULL,
-  `active` int(11) NOT NULL,
-  `required` int(11) NOT NULL,
-  `sorting` int(11) NOT NULL,
-  `list_name` varchar(50) NOT NULL,
-  `value` text NOT NULL
+  `title` varchar(150) NOT NULL DEFAULT '',
+  `var_name` varchar(50) NOT NULL DEFAULT '',
+  `maxlength` int(11) NOT NULL DEFAULT '0',
+  `type_id` int(11) NOT NULL DEFAULT '0',
+  `active` int(11) NOT NULL DEFAULT '1',
+  `required` int(11) NOT NULL DEFAULT '0',
+  `sorting` int(11) NOT NULL DEFAULT '0',
+  `list_name` varchar(50) NOT NULL DEFAULT '',
+  `value` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -45,44 +45,44 @@ CREATE TABLE `Admin_Form` (
 --
 
 INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `type_id`, `active`, `required`, `sorting`, `list_name`, `value`) VALUES
-(1, 1, 'Заголовок', 'title', 150, 2, 1, 0, 1, '', ''),
-(2, 1, 'Путь', 'path', 100, 2, 1, 0, 2, '', ''),
+(1, 1, 'Заголовок', 'title', 150, 2, 1, 1, 1, '', ''),
+(2, 1, 'Путь', 'path', 100, 2, 1, 1, 2, '', ''),
 (3, 1, 'Активость', 'active', 0, 3, 1, 0, 3, '', ''),
-(4, 1, 'Файл обработчик', 'action', 100, 2, 1, 0, 4, '', ''),
+(4, 1, 'Файл обработчик', 'action', 100, 2, 1, 1, 4, '', ''),
 (5, 1, 'Родительский раздел', 'parentId', 0, 4, 1, 0, 5, 'Structures', ''),
-(6, 1, 'Макет', 'template_id', 0, 4, 1, 0, 6, 'Templates', ''),
+(6, 1, 'Макет', 'template_id', 0, 4, 1, 1, 6, 'Templates', ''),
 (7, 1, 'Описание', 'description', 2000, 5, 1, 0, 7, '', ''),
-(8, 2, 'Название', 'title', 150, 2, 1, 0, 1, '', ''),
+(8, 2, 'Название', 'title', 150, 2, 1, 1, 1, '', ''),
 (9, 2, 'Путь', 'path', 50, 2, 1, 0, 2, '', ''),
 (10, 1, 'Сортировка', 'sorting', 0, 1, 1, 0, 8, '', ''),
 (12, 2, 'Сортировка', 'sorting', 0, 1, 1, 0, 4, '', ''),
 (13, 2, 'Активность', 'active', 0, 3, 1, 0, 3, '', ''),
 (14, 2, 'Родительский раздел', 'parentId', 0, 4, 1, 0, 3, 'Structures', ''),
-(15, 3, 'Заголовок', 'title', 150, 2, 1, 0, 1, '', ''),
+(15, 3, 'Заголовок', 'title', 150, 2, 1, 1, 1, '', ''),
 (16, 3, 'Название константы (в верхнем регистре)', 'name', 150, 2, 1, 1, 2, '', ''),
 (17, 3, 'Описание', 'description', 2000, 5, 1, 0, 3, '', ''),
-(19, 3, 'Значение', 'value', 2000, 5, 1, 0, 4, '', ''),
+(19, 3, 'Значение', 'value', 2000, 5, 1, 1, 4, '', ''),
 (20, 3, 'Тип значения', 'valueType', 0, 4, 1, 0, 5, 'ConstantTypes', ''),
 (21, 3, 'Активность', 'active', 0, 3, 1, 0, 3, '', ''),
 (22, 3, 'Родительская директория', 'dir', 0, 4, 1, 0, 4, 'ConstantDirs', ''),
-(23, 4, 'Заголовок', 'title', 150, 2, 1, 0, 1, '', ''),
+(23, 4, 'Заголовок', 'title', 150, 2, 1, 1, 1, '', ''),
 (24, 4, 'Описание', 'description', 2000, 5, 1, 0, 2, '', ''),
 (25, 4, 'Родительский раздел', 'parentId', 0, 4, 1, 0, 3, 'ConstantDirs', ''),
 (26, 4, 'Сортировка', 'sorting', 0, 1, 1, 0, 4, '', ''),
-(27, 6, 'Название группы', 'title', 50, 2, 1, 0, 0, '', ''),
+(27, 6, 'Название группы', 'title', 50, 2, 1, 1, 0, '', ''),
 (28, 6, 'Сортировка', 'sorting', 0, 1, 1, 0, 0, '', ''),
-(29, 5, 'Имя', 'name', 50, 2, 1, 0, 0, '', ''),
-(30, 5, 'Фамилия', 'surname', 50, 2, 1, 0, 10, '', ''),
+(29, 5, 'Имя', 'name', 50, 2, 1, 1, 0, '', ''),
+(30, 5, 'Фамилия', 'surname', 50, 2, 1, 1, 10, '', ''),
 (31, 5, 'Отчество', 'patronimyc', 50, 2, 1, 0, 20, '', ''),
 (32, 5, 'Номер телефона', 'phoneNumber', 100, 2, 1, 0, 30, '', ''),
-(33, 5, 'Логин', 'login', 50, 2, 1, 0, 40, '', ''),
-(34, 5, 'Пароль', 'pass1', 50, 6, 1, 0, 50, '', ''),
-(35, 5, 'Повторите пароль', 'pass2', 50, 6, 1, 0, 60, '', ''),
-(36, 7, 'Название модели', 'model_name', 255, 2, 1, 0, 20, '', ''),
-(37, 7, 'Заголовок', 'model_title', 150, 2, 1, 0, 10, '', ''),
+(33, 5, 'Логин', 'login', 50, 2, 1, 1, 40, '', ''),
+(34, 5, 'Пароль', 'pass1', 50, 6, 1, 1, 50, '', ''),
+(35, 5, 'Повторите пароль', 'pass2', 50, 6, 1, 1, 60, '', ''),
+(36, 7, 'Название модели', 'model_name', 255, 2, 1, 1, 20, '', ''),
+(37, 7, 'Заголовок', 'model_title', 150, 2, 1, 1, 10, '', ''),
 (38, 7, 'Сортировка', 'model_sorting', 0, 1, 1, 0, 30, '', ''),
-(39, 10, 'Заголовок', 'title', 150, 2, 1, 0, 10, '', ''),
-(40, 10, 'Название переменной (сеттера)', 'varName', 50, 2, 1, 0, 20, '', ''),
+(39, 10, 'Заголовок', 'title', 150, 2, 1, 1, 10, '', ''),
+(40, 10, 'Название переменной (сеттера)', 'varName', 50, 2, 1, 1, 20, '', ''),
 (41, 10, 'Родительская модель', 'model_id', 0, 4, 1, 0, 30, 'AdminFormModelnames', ''),
 (42, 10, 'Максимальная длинна поля', 'maxlength', 0, 1, 1, 0, 40, '', ''),
 (43, 10, 'Тип поля', 'type_id', 0, 4, 1, 0, 50, 'AdminFormTypes', ''),
@@ -118,7 +118,8 @@ INSERT INTO `Admin_Form_Modelname` (`id`, `model_name`, `model_title`, `model_so
 (5, 'User', 'Пользователи', 50, 1),
 (6, 'User_Group', 'Группы пользователей', 60, 1),
 (7, 'Admin_Form_Modelname', '', 0, 0),
-(10, 'Admin_Form', '', 0, 0);
+(10, 'Admin_Form', '', 0, 0),
+(11, 'test', 'TEST', 100, 1);
 
 -- --------------------------------------------------------
 
@@ -152,8 +153,9 @@ INSERT INTO `Admin_Form_Type` (`id`, `title`, `input_type`) VALUES
 
 CREATE TABLE `Admin_Menu` (
   `id` int(11) NOT NULL,
-  `title` varchar(50) NOT NULL,
-  `model` varchar(50) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `model` varchar(255) NOT NULL,
+  `parent_id` int(11) NOT NULL DEFAULT '0',
   `sorting` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -161,13 +163,18 @@ CREATE TABLE `Admin_Menu` (
 -- Дамп данных таблицы `Admin_Menu`
 --
 
-INSERT INTO `Admin_Menu` (`id`, `title`, `model`, `sorting`) VALUES
-(1, 'Главная', 'Main', 0),
-(2, 'Структуры', 'Structure', 10),
-(3, 'Пользователи', 'User', 40),
-(4, 'Константы', 'Constant', 30),
-(5, 'Формы редактирования', 'Form', 50),
-(6, 'Макеты', 'Template', 20);
+INSERT INTO `Admin_Menu` (`id`, `title`, `model`, `parent_id`, `sorting`) VALUES
+(2, 'Структуры', 'Structure', 7, 10),
+(3, 'Пользователи', 'User', 7, 40),
+(4, 'Константы', 'Constant', 7, 30),
+(5, 'Формы редактирования', 'Form', 7, 50),
+(6, 'Макеты', 'Template', 7, 20),
+(7, 'Система', '', 0, 10),
+(8, 'Musicmethod', 'Musicmethod', 0, 10),
+(9, 'Платежи', 'Payment', 8, 10),
+(10, 'Тарифы', 'Tarif', 8, 20),
+(11, 'Лиды', 'Lid', 8, 30),
+(12, 'Сертификаты', 'Sertificates', 8, 40);
 
 -- --------------------------------------------------------
 
@@ -192,7 +199,7 @@ CREATE TABLE `Constant` (
 --
 
 INSERT INTO `Constant` (`id`, `title`, `name`, `description`, `value`, `value_type`, `dir`, `active`, `sorting`) VALUES
-(4, 'Пагинация в админ. разделе', 'SHOW_LIMIT', 'Лимит показов количества структур и объектов структур', '5', 1, 1, 1, 0),
+(4, 'Пагинация в админ. разделе', 'SHOW_LIMIT', 'Лимит показов количества структур и объектов структур', '10', 1, 1, 1, 0),
 (5, 'Тестовая константа 1', 'TEST_1', 'Какая-то константа №1', 'test1', 0, 0, 1, 0),
 (6, 'Тестовая константа 2', 'TEST_2', 'Какая-то константа №2', '5', 1, 1, 1, 0),
 (11, 'Новая константа', 'NEW', 'Описание константы', '700', 1, 1, 1, 0);
@@ -1722,7 +1729,7 @@ ALTER TABLE `Admin_Form`
 -- AUTO_INCREMENT для таблицы `Admin_Form_Modelname`
 --
 ALTER TABLE `Admin_Form_Modelname`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Type`
 --
@@ -1732,7 +1739,7 @@ ALTER TABLE `Admin_Form_Type`
 -- AUTO_INCREMENT для таблицы `Admin_Menu`
 --
 ALTER TABLE `Admin_Menu`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 --
 -- AUTO_INCREMENT для таблицы `Constant`
 --
@@ -1812,7 +1819,7 @@ ALTER TABLE `User`
 -- AUTO_INCREMENT для таблицы `User_Group`
 --
 ALTER TABLE `User_Group`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

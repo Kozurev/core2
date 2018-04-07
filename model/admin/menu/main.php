@@ -11,11 +11,11 @@ class Admin_Menu_Main
      */
     public function updateAction($aParams)
     {
-        //echo "<pre>";
-        //print_r($aParams);
+//        echo "<pre>";
+//        print_r($aParams);
 
         //Список параметров, не имеющих отношения к свойствам редактируемого/создаваемого объекта
-        $aForbiddenTags = array("menuTab", "menuAction", "ajax", "id", "modelName");
+        $aForbiddenTags = array("menuTab", "menuAction", "ajax", "id", "modelName", "getId");
 
         /**
          *	Обновление свойств самого объекта
@@ -24,19 +24,12 @@ class Admin_Menu_Main
             ?	$oUpdatingItem = Core::factory($aParams["modelName"], $aParams["id"])
             : 	$oUpdatingItem = Core::factory($aParams["modelName"]);
 
+
         foreach ($aParams as $key => $value)
         {
             if(in_array($key, $aForbiddenTags)) continue;
             if(method_exists($oUpdatingItem, $key)) $oUpdatingItem->$key($value);
         }
-
-        //ВНИМАНИЕ: костыль!!!
-        //TODO: переделать обновление активности элемента при сохранении формы
-        //Активность
-        if(isset($aParams["active"]) && method_exists($oUpdatingItem, "active"))
-            $oUpdatingItem->active(true);
-        elseif(method_exists($oUpdatingItem, "active"))
-            $oUpdatingItem->active(false);
 
 //        echo "<pre>";
 //        print_r($oUpdatingItem);
@@ -49,7 +42,7 @@ class Admin_Menu_Main
         foreach ($aParams as $sFieldName => $aFieldValues)
         {
             //Получение id свойства
-            if(!stristr($sFieldName, "property_")) continue;
+            if(!stristr($sFieldName, "property_") || $aParams["modelName"] == "Property") continue;
 
             $iPropertyId = explode("property_", $sFieldName)[1];
             $oProperty = Core::factory("Property", $iPropertyId);
@@ -152,11 +145,10 @@ class Admin_Menu_Main
                     ->value($oUpdatingItem->$methodName());
         }
 
-
         /**
          *	Добавление дополнительных свойств
          */
-        if($oUpdatingItem->getId() && method_exists($oUpdatingItem, "properties_list"))
+        if($oUpdatingItem->getId())
         {
             $oOutputXml->addEntity($oUpdatingItem);
 
@@ -180,7 +172,8 @@ class Admin_Menu_Main
                         ->where("object_id", "=", $oUpdatingItem->getId())
                         ->find();
 
-                    $oProperty->addEntity($oPropertyList, "property_value");
+                    if($oPropertyList != false)
+                        $oProperty->addEntity($oPropertyList, "property_value");
                     $oProperty->addEntities($aoLitsValues, "item");
                 }
                 else

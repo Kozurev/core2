@@ -13,13 +13,26 @@
 
 
 <xsl:template match="admin_menu">
-	<a href="/admin?menuTab={model}&amp;menuAction=show" class="link">
-		<div class="item">
-		   	<span class="text">
-		    	<xsl:value-of select="title" />
-		    </span>
+	<xsl:if test="parent_id = 0">
+		<!--<a href="/admin?menuTab={model}&amp;menuAction=show" class="parent">-->
+			<div class="item parent" data-id="{id}">
+				<span class="text">
+					<xsl:value-of select="title" />
+				</span>
+			</div>
+
+		<xsl:variable name="id" select="id" />
+		<div class="children" id="{$id}">
+			<xsl:for-each select="//admin_menu[parent_id=$id]">
+				<a href="/admin?menuTab={model}&amp;menuAction=show" class="item link">
+					<span class="text">
+						<xsl:value-of select="title" />
+					</span>
+				</a>
+			</xsl:for-each>
 		</div>
-  	</a>
+		<!--</a>-->
+	</xsl:if>
 </xsl:template>
 
 

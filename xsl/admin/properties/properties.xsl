@@ -10,33 +10,33 @@
 			<h3 class="main_title">
 				<xsl:value-of select="title" />
 			</h3>
+
 			<table class="table">
 				<th>id</th>
-				<th>Заголовок</th>
 				<th>Название</th>
 				<th>Описание</th>
+				<th>Тип</th>
 				<th>Активность</th>
 				<th>Редактировать</th>
 				<th>Удалить</th>
-				<xsl:apply-templates select="constant_dir" />
-				<xsl:apply-templates select="constant" />
+				<xsl:apply-templates select="property_dir" />
+				<xsl:apply-templates select="property" />
 			</table>
 
+
 			<button class="btn btn-success" type="button">
-				<a 
-					href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant_Dir&amp;parent_id={parent_id}" 
-					class="link">
-					Создать раздел
+				<a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property&amp;" class="link">
+					Создать свойство
 				</a>
 			</button>
 
 			<button class="btn btn-success" type="button">
-				<a 
-					href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant&amp;parent_id={parent_id}" 
-					class="link">
-					Создать константы
+				<a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property_Dir&amp;" class="link">
+					Создать директорию
 				</a>
 			</button>
+
+
 
 			<div class="pagination">
 				<a class="prev_page" href="/admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
@@ -46,63 +46,43 @@
 				<a class="next_page" href="/admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
 				<span class="total_count">Всего элементов: <xsl:value-of select="pagination/total_count"/></span>
 			</div>
+
 		</div>
-
-
 	</xsl:template>
 
 
-	<xsl:template match="constant_dir">
+	<xsl:template match="property_dir">
 		<tr>
-			<!--id-->
-			<td><xsl:value-of select="id" /></td>
+			<td><xsl:value-of select="id"/></td>
 
-			<!--Заголовок-->
 			<td class="table_structure">
-				<a 
-					class="link"
-					href="/admin?menuTab=Constant&amp;
-					menuAction=show&amp;parent_id={id}">
+				<a class="link" href="/admin?menuTab=Property&amp;menuAction=show&amp;parent_id={id}">
 					<xsl:value-of select="title" />
 				</a>
 			</td>
 
-			<!--Название-->
+			<td><xsl:value-of select="description"/></td>
 			<td></td>
-
-			<!--Описание-->
-			<td><xsl:value-of select="description" /></td>
-
 			<!--Активность-->
 			<td></td>
-
 			<!--Редактирование-->
-			<td><a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant_Dir&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
-
+			<td><a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property_Dir&amp;model_id={id}" class="link updateLink" /></td>
 			<!--Удаление-->
-			<td><a href="/admin" data-model_name="Constant_Dir" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td><a href="/admin" data-model_name="Property_Dir" data-model_id="{id}" class="delete deleteLink"></a></td>
 		</tr>
 	</xsl:template>
 
-
-	<xsl:template match="constant">
+	<xsl:template match="property">
 		<tr>
-			<!--id-->
-			<td><xsl:value-of select="id" /></td>
-			
-			<!--Заголовок-->
-			<td><xsl:value-of select="title" /></td>
-			
-			<!--Название-->
-			<td><xsl:value-of select="name" /></td>
-
-			<!--Описание-->
-			<td><xsl:value-of select="description" /></td>
+			<td><xsl:value-of select="id"/></td>
+			<td class="table_structure"><xsl:value-of select="title" /></td>
+			<td><xsl:value-of select="description"/></td>
+			<td><xsl:value-of select="type"/></td>
 
 			<!--Активность-->
 			<td>
 				<input type="checkbox" class="activeCheckbox">
-					<xsl:attribute name="model_name">Constant</xsl:attribute>
+					<xsl:attribute name="model_name">Property</xsl:attribute>
 					<xsl:attribute name="model_id"><xsl:value-of select="id" /></xsl:attribute>
 					<xsl:if test="active = 1">
 						<xsl:attribute name="checked">true</xsl:attribute>
@@ -111,11 +91,14 @@
 			</td>
 
 			<!--Редактирование-->
-			<td><a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant&amp;parent_id={dir}&amp;model_id={id}" class="link updateLink" /></td>
+			<td><a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property&amp;model_id={id}" class="link updateLink" /></td>
 
 			<!--Удаление-->
-			<td><a href="/admin" data-model_name="Constant" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td><a href="/admin" data-model_name="Property" data-model_id="{id}" class="delete deleteLink"></a></td>
 		</tr>
 	</xsl:template>
+
+
+
 
 </xsl:stylesheet>

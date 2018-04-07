@@ -21,7 +21,7 @@ class User_Group_Model extends Core_Entity
     }
 
 
-    public function title(string $val = null)
+    public function title($val = null)
     {
         if(is_null($val))   return $this->title;
         if(strlen($val) > 50)
@@ -32,7 +32,7 @@ class User_Group_Model extends Core_Entity
     }
 
 
-    public function sorting(int $val = null)
+    public function sorting($val = null)
     {
         if(is_null($val))   return $this->sorting;
         $this->sorting = $val;

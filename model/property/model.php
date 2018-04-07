@@ -10,6 +10,7 @@ class Property_Model extends Core_Entity
 	protected $description; //
 	protected $type; //
 	protected $active; //
+    protected $sorting;
 
 
 	public function __construct()
@@ -69,4 +70,14 @@ class Property_Model extends Core_Entity
 		$this->type = $val;
 		return $this;
 	}
+
+
+    public function sorting($val = null)
+    {
+        if(is_null($val))   return $this->sorting;
+        if(intval($val) <= 0)   die(Core::getMessage("UNSIGNED_VALUE", array("sorting", "Property_Dir")));
+        $this->sorting = intval($val);
+        return $this;
+    }
+
 }

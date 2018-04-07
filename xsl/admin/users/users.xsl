@@ -34,17 +34,22 @@
 				</table>
 			</xsl:if>
 
-			<button class="btn btn-success" type="button">
-				<a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=User_Group&amp;parent_id={parent_id}" class="link">
-					Создать группу
-				</a>
-			</button>
-
-			<button class="btn btn-success" type="button">
-				<a href="/admin?menuTab=User&amp;menuAction=updateForm&amp;model=User&amp;parent_id={parent_id}" class="link">
-					Создать пользователя
-				</a>
-			</button>
+			<xsl:choose>
+				<xsl:when test="count(user/id) = 0">
+					<button class="btn btn-success" type="button">
+						<a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=User_Group&amp;parent_id={parent_id}" class="link">
+							Создать группу
+						</a>
+					</button>
+				</xsl:when>
+				<xsl:otherwise>
+					<button class="btn btn-success" type="button">
+						<a href="/admin?menuTab=User&amp;menuAction=updateForm&amp;model=User&amp;parent_id={parent_id}" class="link">
+							Создать пользователя
+						</a>
+					</button>
+				</xsl:otherwise>
+			</xsl:choose>
 
 			<div class="pagination">
 				<a class="prev_page" href="/admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
@@ -52,6 +57,7 @@
 					<span id="current_page"><xsl:value-of select="pagination/current_page" /></span> из
 					<span id="count_pages"><xsl:value-of select="pagination/count_pages" /></span></span>
 				<a class="next_page" href="/admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
+				<span class="total_count">Всего элементов: <xsl:value-of select="pagination/total_count"/></span>
 			</div>
 
 		</div>

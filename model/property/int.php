@@ -37,7 +37,7 @@ class Property_Int extends Core_Entity
 
 	public function model_name($val = null)
 	{
-		if(is_null($val)) 	return $this->model_name();
+		if(is_null($val)) 	return $this->model_name;
 		if(strlen($val) > 100)
             die(Core::getMessage("TOO_LARGE_VALUE", array("model_name", "Property_Int", 100)));
 

@@ -80,10 +80,8 @@ class Admin_Form extends Admin_Form_Model
 
     public function getListConstantDirs($aParams)
     {
-        if(isset($aParams["model_id"]) && $aParams["model_id"] != "" && $aParams["model"] == "Constant")
-            $this->value = Core::factory("Constant", $aParams["model_id"])->dir();
+        $this->value = Core_Array::getValue($aParams, "parent_id", 0);
 
-        //$this->value = Core_Array::getValue($aParams, "parent_id", "0");
         $sDirId = Core_Array::getValue($aParams, "model_id", null);
         $aoDirs = Core::factory("Constant_Dir")->findAll();
 
@@ -103,7 +101,9 @@ class Admin_Form extends Admin_Form_Model
 
     public function getListAdminFormModelnames($aParams)
     {
-        $this->value = Core_Array::getValue($aParams, "parent_id", "0");
+        $parentId = Core_Array::getValue($aParams, "parent_id", null);
+        if(!is_null($parentId)) $this->value = $parentId;
+
         $aoModels = Core::factory("Admin_Form_Modelname")
             ->where("indexing", "=", "1")
             ->orderBy("model_sorting")

@@ -17,8 +17,7 @@ class Property extends Property_Model
 		*	Данного свойства
 		*/
 		if(!$this->id) die("Неопределенное свойство"); 
-		if(is_array($obj->properties_list()) && !in_array($this->id, $obj->properties_list())) 
-			die('Свойство "'.$this->title().'" не принадлежит объекту "'.get_class($obj).'" с id: '.$obj->getId().'.');
+
 		if(!$this->active())
 			die('Свойство "'.$this->title().'" не активно');
 
@@ -50,12 +49,14 @@ class Property extends Property_Model
 	*/
 	public function getPropertiesList($obj)
 	{
-		$aPropertiesId = $obj->properties_list(); //Получение списка идентификаторов свойств, которые принадлежат объекту
-		
-		if(
-			!is_array($aPropertiesId) 
-			|| count($aPropertiesId) == 0
-		) return array(); 
+	    $types = array("Int", "String", "Text", "List");
+	    $aPropertiesId = array();
+
+        foreach($types as $type)
+        {
+            $sTableName = "Property_" . $type . "_Assigment";
+            $aPropertiesId = array_merge($aPropertiesId, Core::factory($sTableName)->properties_list($obj));
+        }
 
 		$aoPropertiesList = array();
 
@@ -78,20 +79,26 @@ class Property extends Property_Model
 	*/
 	public function addToPropertiesList($obj, $propertyId)
 	{
-		if(!is_int($propertyId)) return;
+		if(!is_int($propertyId)) return false;
+        $oProperty = Core::factory("Property", $propertyId);
+        if($oProperty == false) return false;
+        $sTableName = "Property_" . $oProperty->type() . "_Assigment";
 
-		$aPropertiesId = $obj->properties_list();
+        $assigment = Core::factory($sTableName)
+            ->where("object_id", "=", $obj->getId())
+	        ->where("property_id", "=", $propertyId)
+            ->where("model_name", "=", get_class($obj))
+            ->find();
 
-		//Проверка на существования такого свойства в списке
-		if(is_array($aPropertiesId))
-			foreach ($aPropertiesId as $id) 
-			{
-				if($id == $propertyId) return;
-			}
+        if($assigment != false) return true;
 
-		$aPropertiesId[] = $propertyId;
-		$obj->properties_list($aPropertiesId);
-		$obj->save();
+        Core::factory($sTableName)
+            ->property_id($propertyId)
+            ->object_id($obj->getId())
+            ->model_name(get_class($obj))
+            ->save();
+
+        return true;
 	}
 
 
@@ -100,41 +107,11 @@ class Property extends Property_Model
 	*	@param $obj - объект, у которого удаляется свойство
 	*	@param $propertyId - id свойства, которое необходимо удалить из списка свойств
 	*	@return void
-     *  TODO: метод работает некорректно. Необходимо протестировать и доработать, добавить проверок и т.д.
 	*/
 	public function deleteFromPropertiesList($obj, $propertyId)
 	{
 		if(!is_int($propertyId)) return;
 
-		$aPropertiesId = $obj->properties_list();
-		if(count($aPropertiesId) == 0)  return;
-
-		//Поиск элемента, который необходимо удалить
-		foreach ($aPropertiesId as $key => $id) 
-		{
-			if($id == $propertyId) 
-			{
-				/*
-				*	Удаление всех значений удаляемого свойства 
-				*/
-				$oProperty = Core::factory("Property", $propertyId);
-				$aPropertyValues = $oProperty->getPropertyValues($obj);
-
-				foreach ($aPropertyValues as $oPropertyValue) 
-				{
-					$oPropertyValue->delete();
-				}
-
-				/*
-				*	Удаление id свойства из списка свойств объекта
-				*/
-				unset($aPropertiesId[$key]);
-				$a = array_values($aPropertiesId);
-				$obj->properties_list($a);
-				$obj->save();
-				return;
-			}
-		}
 	}
 
 
@@ -166,12 +143,12 @@ class Property extends Property_Model
 	*/
 	private function getPropertyListValues($obj)
 	{
-		if($this->type != "list") return;
-		
+		if($this->type != "list") return false;
 		$aoPropertyList = Core::factory("Property_List");
 		$aoPropertyList = $aoPropertyList->queryBuilder()
 			->where("property_id", "=", $this->id)
 			->where("object_id", "=", $obj->getId())
+            ->where("model_name", "=", get_class($obj))
 			->findAll();
 
 		$aoOutputData = array();
@@ -179,18 +156,46 @@ class Property extends Property_Model
 		foreach ($aoPropertyList as $oPropertyList) 
 		{
 			$aoOutputData[] = Core::factory("Property_List_Values")
-				->queryBuilder()
 				->where("property_id", "=", $this->id)
 				->where("id", "=", $oPropertyList->value())
 				->find();
 		}
 
 		return $aoOutputData;
-
 	}
 
 
+    public function delete($obj = null)
+    {
+        $sTableName = "Property_".ucfirst($this->type());
 
+        $oPropertyValue = Core::factory($sTableName);
+        $aPropertyValues = $oPropertyValue->queryBuilder()
+            ->where("property_id", "=", $this->getId())
+            ->findAll();
+
+        foreach ($aPropertyValues as $propertyValue)
+        {
+            //$obj = Core::factory($propertyValue->model_name(), $propertyValue->object_id());
+            $aoValues = Core::factory("Property_Assigment")
+                ->where("property_id", "=", $propertyValue->getId())
+                ->findAll();
+
+            foreach ($aoValues as $value) $value->delete();
+
+            $propertyValue->delete();
+        }
+
+        if($this->type == "list")
+        {
+            $aoListValues = Core::factory("Property_List_Values")
+                ->where("property_id", "=", $this->getId())
+                ->findAll();
+            foreach ($aoListValues as $value)   $value->delete();
+        }
+
+        parent::delete();
+    }
 
 
 

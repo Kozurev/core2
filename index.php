@@ -19,6 +19,8 @@ require_once ROOT . "/model/core/entity/model.php";
 require_once ROOT . "/model/core/entity.php";
 require_once ROOT . "/model/core/entity/controller/model.php";
 require_once ROOT . "/model/core/entity/controller.php";
+require_once ROOT . "/model/property/assigment/model.php";
+require_once ROOT . "/model/property/assigment.php";
 
 //Установка системных констант
 define('TEST_MODE_PAGE', false);

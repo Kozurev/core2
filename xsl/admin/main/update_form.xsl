@@ -46,6 +46,11 @@
 				background-color: green;
 				margin-top: 10px;
 			}
+
+			.error {
+				color: red;
+				border-color: red;
+			}
 		</style>
 
 		<div class="in_main">
@@ -60,7 +65,42 @@
 				</xsl:choose>
 			</h3>
 
-			<form name="createData">
+			<script>
+				$(function(){
+					$("#createData").validate({
+						rules: {
+							<xsl:for-each select="admin_form">
+								<xsl:if test="required = 1 or maxlength != 0">
+									<xsl:value-of select="var_name"/>: {
+										<xsl:if test="required = 1">
+											required: true,
+										</xsl:if>
+										<xsl:if test="maxlength != 0">
+											maxlength: <xsl:value-of select="maxlength"/>,
+										</xsl:if>
+									},
+								</xsl:if>
+							</xsl:for-each>
+						},
+						messages: {
+							<xsl:for-each select="admin_form">
+								<xsl:if test="required = 1 or maxlength != 0">
+									<xsl:value-of select="var_name"/>: {
+									<xsl:if test="required = 1">
+										required: "Это поле обязательно к заполнению",
+									</xsl:if>
+									<xsl:if test="maxlength != 0">
+										maxlength: "Длинна значения данного поля не должна превышаьть <xsl:value-of select="maxlength"/> символов",
+									</xsl:if>
+									},
+								</xsl:if>
+							</xsl:for-each>
+						}
+					});
+				});
+			</script>
+
+			<form name="createData" id="createData" action=".">
 				<h3>Основные свойства</h3>
 				<xsl:apply-templates select="admin_form" />
 
@@ -107,7 +147,7 @@
 		<xsl:variable name="maxlength" select="maxlength" />
 		<xsl:variable name="var_name" select="var_name" />
 		<xsl:variable name="value" select="value" />
-		<xsl:variable name="required" select="required" />
+		<!--<xsl:variable name="required" select="required" />-->
 
 		<div class="form_block">
 			<span><xsl:value-of select="title" /></span>
@@ -119,7 +159,7 @@
 			        <xsl:with-param name="maxlength" select="$maxlength"/>
 			        <xsl:with-param name="var_name" select="$var_name"/>
 			        <xsl:with-param name="value" select="$value" />
-			        <xsl:with-param name="required" select="$required" />
+			        <!--<xsl:with-param name="required" select="$required" />-->
 			     </xsl:call-template>
 			</xsl:if>
 
@@ -128,7 +168,7 @@
 			        <xsl:with-param name="maxlength" select="$maxlength"/>
 			        <xsl:with-param name="var_name" select="$var_name"/>
 			        <xsl:with-param name="value" select="$value" />
-					<xsl:with-param name="required" select="$required" />
+					<!--<xsl:with-param name="required" select="$required" />-->
 			     </xsl:call-template>
 			</xsl:if>
 
@@ -180,7 +220,7 @@
 		<div class="form_block">
 			<span><xsl:value-of select="title" /></span><br/>
 
-			<xsl:if test="type='int' or type='float'">
+			<xsl:if test="type='int' or type='float' or type='string'">
 				<xsl:for-each select="property_value">
 					<xsl:variable name="value" select="value" />
 					<div class="field">
@@ -250,13 +290,13 @@
 		<xsl:param name="required" />
 
 		<input type="{$inp_type}" name="{$var_name}" class="form-control {$inp_type} {$class}">
-			<xsl:if test="$maxlength != '0'">
+			<xsl:if test="$maxlength != 0">
 				<xsl:attribute name="maxlength">
-					<xsl:value-of select="maxlength" />
+					<xsl:value-of select="$maxlength" />
 				</xsl:attribute>
 			</xsl:if>
 
-			<xsl:if test="$required != ''">
+			<xsl:if test="$required = '1'">
 				<xsl:attribute name="required">
 					required
 				</xsl:attribute>
@@ -281,7 +321,7 @@
 		<xsl:param name="addClass" />
 		<xsl:param name="required" />
 
-		<textarea name="{$var_name}" maxlength="{maxlength}" class="textarea {$addClass}">
+		<textarea name="{$var_name}" maxlength="{$maxlength}" class="textarea {$addClass}">
 
 			<xsl:if test="$required != ''">
 				<xsl:attribute name="required">

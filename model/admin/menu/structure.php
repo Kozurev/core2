@@ -34,16 +34,20 @@ class Admin_Menu_Structure
 				->title();
 		}
 
+        /**
+         * Пагинация
+         */
 		$page = intval(Core_Array::getValue($aParams, "page", 0));
         $structureOffset = $page * SHOW_LIMIT;
-		$countStructures = count(Core::factory("Structure")->where("parent_id", "=", $parentId)->offset($structureOffset)->limit(SHOW_LIMIT)->findAll());
+		//$countStructures = count(Core::factory("Structure")->where("parent_id", "=", $parentId)->offset($structureOffset)->limit(SHOW_LIMIT)->findAll());
+		$countStructures = Core::factory("Structure")->where("parent_id", "=", $parentId)->getCount() - $structureOffset;
 
 		$totalCountItems = Core::factory("Structure_Item")->where("parent_id", "=", $parentId)->getCount();
 		$totalCountStructures = Core::factory("Structure")->where("parent_id", "=", $parentId)->getCount();
 		$totalCount = $totalCountItems + $totalCountStructures;
 		$countPages = intval($totalCount / SHOW_LIMIT);
 		if($totalCount % SHOW_LIMIT)    $countPages++;
-
+        if($countPages == 0) $countPages++;
 		if($countStructures < SHOW_LIMIT)
         {
             $countItems = SHOW_LIMIT - $countStructures;
@@ -69,6 +73,11 @@ class Admin_Menu_Structure
                 Core::factory("Core_Entity")
                     ->name("current_page")
                     ->value(++$page)
+            )
+            ->addEntity(
+                Core::factory("Core_Entity")
+                    ->name("total_count")
+                    ->value($totalCountItems + $totalCountStructures)
             );
 
         //echo "StructuresCount = $countStructures; ItemsCount = "

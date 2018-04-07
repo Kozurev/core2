@@ -40,6 +40,7 @@
 					<span id="current_page"><xsl:value-of select="pagination/current_page" /></span> из
 					<span id="count_pages"><xsl:value-of select="pagination/count_pages" /></span></span>
 				<a class="next_page" href="/admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
+				<span class="total_count">Всего элементов: <xsl:value-of select="pagination/total_count"/></span>
 			</div>
 		</div>
 	</xsl:template>

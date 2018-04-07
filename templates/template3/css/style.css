@@ -85,13 +85,30 @@ button a {
 	border-color: transparent;
 }
 
+.container .middle .left_bar .children {
+	position: relative;
+	left: 10px;
+}
+
+.container .middle .left_bar .children .item {
+	display: block;
+	color: red;
+	width: 100%;
+	border: 2px solid;
+	border-color: transparent;
+}
+
 .container .middle .left_bar .item:hover {
 	border-color: #FF8240;
 	cursor: pointer;
 }
 
-.container .middle .left_bar .item .text {
+.container .middle .left_bar .parent .text {
 	font-size: 28px;
+}
+
+.container .middle .left_bar .children .text {
+	font-size: 20px;
 }
 
 .container .middle .left_bar a {
@@ -155,7 +172,13 @@ button a {
 .container .middle .in_main .pagination {
 	float: right;
 	position: relative;
-	bottom: 7px;
+	bottom: 25px;
+}
+
+.container .middle .in_main .pagination .total_count {
+	display: block;
+	position: relative;
+	left: 25px;
 }
 
 .container .middle .in_main .pagination .pages {

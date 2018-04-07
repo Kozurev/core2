@@ -30,6 +30,10 @@ class Structure_Model extends Core_Entity
 	public function getId(){
 		return $this->id;}
 
+    public function getSetters()
+    {
+        return array("title", "active", "parentId", "template_id", "description", "path", "action", "meta_title", "meta_description", "meta_keywords");
+    }
 
 	public function title($val = null)
 	{

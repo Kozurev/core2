@@ -7,6 +7,8 @@
 		->css('/templates/template3/css/bootstrap.min.css')
 		->showCss()
 		->js('/templates/template3/js/jquery.min.js')
+        ->js('/templates/template3/js/jquery.validate.min.js')
+        ->js('/templates/template3/js/left_bar.js')
 		->showJs();
 	?>
 </head>

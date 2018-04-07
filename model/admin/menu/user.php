@@ -19,6 +19,8 @@ class Admin_Menu_User
         if($groupId =="0")  $totalCount += count(Core::factory("User_Group")->findAll());
         $countPages = intval($totalCount / SHOW_LIMIT);
         if($totalCount % SHOW_LIMIT != 0)   $countPages++;
+        if($countPages == 0)    $countPages = 1;
+
         $oPagination = Core::factory("Core_Entity")
             ->name("pagination")
             ->addEntity(
@@ -30,6 +32,11 @@ class Admin_Menu_User
                 Core::factory("Core_Entity")
                     ->name("count_pages")
                     ->value($countPages)
+            )
+            ->addEntity(
+                Core::factory("Core_Entity")
+                    ->name("total_count")
+                    ->value($totalCount)
             );
 
 
@@ -78,10 +85,13 @@ class Admin_Menu_User
         $pass2 = Core_Array::getValue($aParams, "pass2", null);
         unset($aParams["pass1"]);
         unset($aParams["pass2"]);
-        $aParams["password"] = $pass1;
 
-        if($pass1 == $pass2)    Core::factory("Admin_Menu_Main")->updateAction($aParams);
-        else die("Введенные пароли не совпадают");
+        if($pass1 != $pass2)    die("Введенные пароли не совпадают");
+
+        if($pass1 != "" && !is_null($pass1))
+            $aParams["password"] = $pass1;
+
+        Core::factory("Admin_Menu_Main")->updateAction($aParams);
     }
 
 
