@@ -37,7 +37,10 @@ class Core_Entity extends Core_Entity_Model
 	{
 		if(!is_null($tag)) 	
 		{
-			$obj->custom_tag($tag);
+		    if(method_exists($obj, "custom_tag"))
+			    $obj->custom_tag($tag);
+            elseif(get_class($obj) == "stdClass")
+                $obj->custom_tag = $tag;
 			// echo "<pre>";
 			// print_r($obj);
 			// echo "</pre>";
@@ -92,10 +95,14 @@ class Core_Entity extends Core_Entity_Model
 		}
 		else
 		{
-			if($obj->aEntityVars["custom_tag"] != "")
+			if(isset($obj->aEntityVars["custom_tag"]) && $obj->aEntityVars["custom_tag"] != "")
 			{
 				$tagName = $obj->aEntityVars["custom_tag"];
 			}
+			elseif(isset($obj->custom_tag) && $obj->custom_tag != "")
+            {
+                $tagName = $obj->custom_tag;
+            }
 			else 	$tagName = $this->renameModelName(get_class($obj));
 		}
 
