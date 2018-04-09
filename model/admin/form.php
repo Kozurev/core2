@@ -78,7 +78,7 @@ class Admin_Form extends Admin_Form_Model
     }
 
 
-    public function getListConstantDirs($aParams)
+    public function getListConstantDirsForD($aParams)
     {
         $this->value = Core_Array::getValue($aParams, "parent_id", 0);
 
@@ -96,6 +96,14 @@ class Admin_Form extends Admin_Form_Model
                 $this->addEntity($oDir, "item");
             }
         }
+    }
+
+
+    public function getListConstantDirsForC($aParams)
+    {
+        $this->value = Core_Array::getValue($aParams, "parent_id", 0);
+        $aoDirs = Core::factory("Constant_Dir")->findAll();
+        $this->addEntities($aoDirs, "item");
     }
 
 
