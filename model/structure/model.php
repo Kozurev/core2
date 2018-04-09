@@ -47,8 +47,8 @@ class Structure_Model extends Core_Entity
 	{
 		// echo "<h2>Значение: $val</h2>";
 		if(is_null($val)) 		return $this->active;
-		if($val === true) 		$this->active = 1;
-		elseif($val === false)	$this->active = 0;
+		if($val == true) 		$this->active = 1;
+		elseif($val == false)	$this->active = 0;
 
 		return $this;
 	}
@@ -158,7 +158,7 @@ class Structure_Model extends Core_Entity
 	public function sorting($val = null)
 	{
 		if(is_null($val))	return $this->sorting;
-        if(!is_int($val))   die(Core::getMessage("INVALID_TYPE", array("sorting", "Structure", "int")));
+        //if(!is_int($val))   die(Core::getMessage("INVALID_TYPE", array("sorting", "Structure", "int")));
 		$this->sorting = intval($val);
 		return $this;
 	}
