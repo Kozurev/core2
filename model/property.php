@@ -158,7 +158,7 @@ class Property extends Property_Model
 			$aoOutputData[] = Core::factory("Property_List_Values")
 				->where("property_id", "=", $this->id)
 				->where("id", "=", $oPropertyList->value())
-				->find();
+				->findAll();
 		}
 
 		return $aoOutputData;
