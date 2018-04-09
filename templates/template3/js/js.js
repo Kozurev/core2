@@ -1,5 +1,3 @@
-
-
 $(function(){
 
 	if(window.location.hash == "")
