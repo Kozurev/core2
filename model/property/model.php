@@ -11,7 +11,7 @@ class Property_Model extends Core_Entity
 	protected $type; //
 	protected $active; //
     protected $sorting;
-
+    protected $dir;
 
 	public function __construct()
 	{
@@ -32,6 +32,15 @@ class Property_Model extends Core_Entity
 
 		return $this;
 	}
+
+
+	public function dir($val = null)
+    {
+        if(is_null($val))   return $this->dir;
+        if(intval($val) < 0)   die(Core::getMessage("UNSIGNED_VALUE", array("dir", "Property")));
+        $this->dir = intval($val);
+        return $this;
+    }
 
 
 	public function title($val = null)
@@ -75,7 +84,7 @@ class Property_Model extends Core_Entity
     public function sorting($val = null)
     {
         if(is_null($val))   return $this->sorting;
-        if(intval($val) <= 0)   die(Core::getMessage("UNSIGNED_VALUE", array("sorting", "Property_Dir")));
+        if(intval($val) < 0)   die(Core::getMessage("UNSIGNED_VALUE", array("sorting", "Property")));
         $this->sorting = intval($val);
         return $this;
     }
