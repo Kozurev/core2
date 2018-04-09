@@ -1,0 +1,41 @@
+.container .middle .left_bar {
+    background-color: white;
+    opacity: 0.8;
+}
+
+.container .middle .left_bar .item {
+    width: 100%;
+    border: 2px solid;
+    border-color: transparent;
+}
+
+.container .middle .left_bar .children {
+    position: relative;
+    left: 10px;
+}
+
+.container .middle .left_bar .children .item {
+    display: block;
+    color: red;
+    width: 100%;
+    border: 2px solid;
+    border-color: transparent;
+}
+
+.container .middle .left_bar .item:hover {
+    border-color: #FF8240;
+    cursor: pointer;
+}
+
+.container .middle .left_bar .parent .text {
+    font-size: 28px;
+}
+
+.container .middle .left_bar .children .text {
+    font-size: 20px;
+}
+
+.container .middle .left_bar a {
+    text-decoration: none;
+    color: black;
+}

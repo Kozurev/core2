@@ -73,49 +73,6 @@ button a {
 	margin-top: 50px;
 }
 
-.container .middle .left_bar {
-	background-color: white;
-	opacity: 0.8;
-}
-
-.container .middle .left_bar .item {
-	width: 100%;
-	//height: 50px;
-	border: 2px solid;
-	border-color: transparent;
-}
-
-.container .middle .left_bar .children {
-	position: relative;
-	left: 10px;
-}
-
-.container .middle .left_bar .children .item {
-	display: block;
-	color: red;
-	width: 100%;
-	border: 2px solid;
-	border-color: transparent;
-}
-
-.container .middle .left_bar .item:hover {
-	border-color: #FF8240;
-	cursor: pointer;
-}
-
-.container .middle .left_bar .parent .text {
-	font-size: 28px;
-}
-
-.container .middle .left_bar .children .text {
-	font-size: 20px;
-}
-
-.container .middle .left_bar a {
-	text-decoration: none;
-	color: black;
-}
-
 .container .middle .main .in_main {
 	background-color: white;
 	opacity: 0.8;
@@ -125,27 +82,6 @@ button a {
 .container .middle .main .in_main a {
 	color: black;
 	text-decoration: underline;
-}
-
-.container .middle .main .in_main .table td{
-	text-align: center;
-}
-
-.container .middle .main .in_main .table th{
-	text-align: center;
-}
-
-.container .middle .main .in_main .table tr:hover {
-	background-color: red;
-	opacity: 0.8;
-}
-
-.container .middle .main .in_main .table .delete_icon {
-	height:25px;
-}
-
-.container .middle .main .in_main .table .table_structure:hover {
-	cursor: pointer;
 }
 
 .container .middle .main .in_main .form_block {
@@ -166,44 +102,6 @@ button a {
 	height: 100px;
 }
 
-/*
- * Пагинация
- */
-.container .middle .in_main .pagination {
-	float: right;
-	position: relative;
-	bottom: 25px;
-}
-
-.container .middle .in_main .pagination .total_count {
-	display: block;
-	position: relative;
-	left: 25px;
-}
-
-.container .middle .in_main .pagination .pages {
-	padding: 0px 10px 0px 10px;
-	position: relative;
-	bottom: 7px;
-}
-
-.container .middle .in_main .pagination .prev_page {
-	display: inline-block;
-	height: 25px;
-	width: 25px;
-	background: url(/templates/template3/images/left_arrow2.png);
-	background-size: cover;
-}
-
-.container .middle .in_main .pagination .next_page {
-	display: inline-block;
-	height: 25px;
-	width: 25px;
-	background: url(/templates/template3/images/right_arrow2.png);
-	background-size: cover;
-}
-
-
 .updateLink {
 	display: inline-block;
 	height: 25px;
@@ -217,5 +115,17 @@ button a {
 	height: 25px;
 	width: 25px;
 	background: url(/templates/template3/images/delete.ico);
+	background-size: cover;
+}
+
+.dir::before {
+	content: "";
+	position: relative;
+	top: 6px;
+	right: 5px;
+	display: inline-block;
+	height: 20px;
+	width: 20px;
+	background: url(/templates/template3/images/dir.png);
 	background-size: cover;
 }

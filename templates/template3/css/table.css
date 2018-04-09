@@ -1,0 +1,20 @@
+.container .middle .main .in_main .table td{
+    text-align: center;
+}
+
+.container .middle .main .in_main .table th{
+    text-align: center;
+}
+
+.container .middle .main .in_main .table tr:hover {
+    background-color: red;
+    opacity: 0.8;
+}
+
+.container .middle .main .in_main .table .delete_icon {
+    height:25px;
+}
+
+.container .middle .main .in_main .table .table_structure:hover {
+    cursor: pointer;
+}
