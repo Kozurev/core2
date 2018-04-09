@@ -31,9 +31,10 @@ class Admin_Menu_Main
             if(method_exists($oUpdatingItem, $key)) $oUpdatingItem->$key($value);
         }
 
-//        echo "<pre>";
-//        print_r($oUpdatingItem);
-//        echo "</pre>";
+        echo "<pre>";
+        //print_r($oUpdatingItem);
+        print_r($_GET);
+        echo "</pre>";
         $oUpdatingItem->save();
 
 
