@@ -39,7 +39,7 @@
 		<tr>
 			<td><xsl:value-of select="id" /></td>
 			<td>
-				<a class="link" href="/admin?menuTab=Form&amp;menuAction=show&amp;parent_id={id}">
+				<a class="link dir" href="/admin?menuTab=Form&amp;menuAction=show&amp;parent_id={id}">
 					<xsl:value-of select="model_title" />
 				</a>
 			</td>

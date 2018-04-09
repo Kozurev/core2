@@ -56,7 +56,7 @@
 			<td><xsl:value-of select="id"/></td>
 
 			<td class="table_structure">
-				<a class="link" href="/admin?menuTab=Property&amp;menuAction=show&amp;parent_id={id}">
+				<a class="link dir" href="/admin?menuTab=Property&amp;menuAction=show&amp;parent_id={id}">
 					<xsl:value-of select="title" />
 				</a>
 			</td>

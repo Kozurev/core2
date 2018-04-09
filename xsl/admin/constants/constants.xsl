@@ -60,7 +60,7 @@
 			<!--Заголовок-->
 			<td class="table_structure">
 				<a 
-					class="link"
+					class="link dir"
 					href="/admin?menuTab=Constant&amp;
 					menuAction=show&amp;parent_id={id}">
 					<xsl:value-of select="title" />

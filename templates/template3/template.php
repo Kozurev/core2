@@ -5,6 +5,9 @@
 
 	<?$this
 		->css('/templates/template3/css/bootstrap.min.css')
+        ->css('/templates/template3/css/left_bar.css')
+        ->css('/templates/template3/css/table.css')
+        ->css('/templates/template3/css/pagination.css')
 		->showCss()
 		->js('/templates/template3/js/jquery.min.js')
         ->js('/templates/template3/js/jquery.validate.min.js')
