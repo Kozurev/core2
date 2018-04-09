@@ -19,7 +19,7 @@ class Constant_Dir_Model extends Core_Entity
     }
 
 
-    public function title(string $val = null)
+    public function title($val = null)
     {
         if(is_null($val))   return $this->title;
         if(strlen($val) > 150)
@@ -28,7 +28,7 @@ class Constant_Dir_Model extends Core_Entity
         return $this;
     }
 
-    public function description(string $val = null)
+    public function description($val = null)
     {
         if(is_null($val))   return $this->description;
         $this->description = $val;
@@ -36,7 +36,7 @@ class Constant_Dir_Model extends Core_Entity
     }
 
 
-    public function parentId(int $val = null)
+    public function parentId($val = null)
     {
         if(is_null($val))   return $this->parent_id;
         if($val < 0)
