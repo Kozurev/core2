@@ -13,7 +13,7 @@ class Structure_Model extends Core_Entity
 	protected $action; 
 	protected $template_id; 
 	protected $description; 
-	protected $properties_list; 
+	//protected $properties_list;
 	protected $active; 
 	protected $meta_title; 
 	protected $meta_description; 
@@ -23,16 +23,13 @@ class Structure_Model extends Core_Entity
 
 	public function __construct()
 	{
-		$this->properties_list = unserialize($this->properties_list);
+		//$this->properties_list = unserialize($this->properties_list);
 	}
 
 
-	public function getId(){
-		return $this->id;}
-
-    public function getSetters()
+	public function getId()
     {
-        return array("title", "active", "parentId", "template_id", "description", "path", "action", "meta_title", "meta_description", "meta_keywords");
+		return $this->id;
     }
 
 	public function title($val = null)
@@ -142,26 +139,26 @@ class Structure_Model extends Core_Entity
 	}
 
 
-	public function properties_list($val = null)
-	{
-		if(is_null($val))
-		{
-			if($this->properties_list == "") 	return array();
-			else 	return $this->properties_list;
-		}
-		
-		if(!is_array($val))
-            die(Core::getMessage("TOO_LARGE_VALUE", array("properties_list", "Structure", "array")));
-		
-		$this->properties_list = $val;
-		return $this;
-	}
+//	public function properties_list($val = null)
+//	{
+//		if(is_null($val))
+//		{
+//			if($this->properties_list == "") 	return array();
+//			else 	return $this->properties_list;
+//		}
+//
+//		if(!is_array($val))
+//            die(Core::getMessage("TOO_LARGE_VALUE", array("properties_list", "Structure", "array")));
+//
+//		$this->properties_list = $val;
+//		return $this;
+//	}
 
 
 	public function sorting($val = null)
 	{
 		if(is_null($val))	return $this->sorting;
-
+        if(!is_int($val))   die(Core::getMessage("INVALID_TYPE", array("sorting", "Structure", "int")));
 		$this->sorting = intval($val);
 		return $this;
 	}
