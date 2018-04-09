@@ -92,8 +92,8 @@ class Structure_Item_Model extends Core_Entity
 	{
 		// echo "<h2>Значение: $val</h2>";
 		if(is_null($val)) 		return $this->active;
-		if($val === true) 		$this->active = 1;
-		elseif($val === false)	$this->active = 0;
+		if($val == true) 		$this->active = 1;
+		elseif($val == false)	$this->active = 0;
 
 		return $this;
 	}
