@@ -34,7 +34,7 @@
 				<a 
 					href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant&amp;parent_id={parent_id}" 
 					class="link">
-					Создать константы
+					Создать константу
 				</a>
 			</button>
 
