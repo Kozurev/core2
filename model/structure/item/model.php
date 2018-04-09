@@ -10,7 +10,7 @@ class Structure_Item_Model extends Core_Entity
 	protected $path; 
 	protected $parent_id; 
 	protected $description; 
-	protected $properties_list; 
+	//protected $properties_list;
 	protected $active; 
 	protected $meta_title; 
 	protected $meta_description; 
@@ -20,7 +20,7 @@ class Structure_Item_Model extends Core_Entity
 
 	public function __construct()
 	{
-		$this->properties_list = unserialize($this->properties_list);
+		//$this->properties_list = unserialize($this->properties_list);
 	}
 
 
@@ -70,22 +70,22 @@ class Structure_Item_Model extends Core_Entity
 	}
 
 
-	public function properties_list($val = null)
-	{
-		if(is_null($val))
-		{
-			if($this->properties_list == "") 	return array();
-			else 	return $this->properties_list;
-		}
-		
-		if(is_array($val))
-		{
-			$this->properties_list = $val;
-			return $this;
-		}
-		else
-		    die(Core::getMessage("INVALID_TYPE", array("properties_list", "Structure_Item", "array")));
-	}
+//	public function properties_list($val = null)
+//	{
+//		if(is_null($val))
+//		{
+//			if($this->properties_list == "") 	return array();
+//			else 	return $this->properties_list;
+//		}
+//
+//		if(is_array($val))
+//		{
+//			$this->properties_list = $val;
+//			return $this;
+//		}
+//		else
+//		    die(Core::getMessage("INVALID_TYPE", array("properties_list", "Structure_Item", "array")));
+//	}
 
 
 	public function active($val = null)
