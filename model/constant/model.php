@@ -82,8 +82,7 @@ class Constant_Model extends Core_Entity
     public function dir($val = null)
     {
         if(is_null($val))   return $this->dir;
-        if($val < 0)
-            die(Core::getMessage("UNSIGNED_VALUE", array("dir", "Constant")));
+        if($val < 0) die(Core::getMessage("UNSIGNED_VALUE", array("dir", "Constant")));
         $this->dir = $val;
         return $this;
     }
