@@ -33,6 +33,7 @@ class Admin_Menu_Main
 
 //        echo "<pre>";
 //        print_r($oUpdatingItem);
+//        echo "</pre>";
         $oUpdatingItem->save();
 
 
@@ -54,6 +55,7 @@ class Admin_Menu_Main
                 ->where("object_id", "=", $oUpdatingItem->getId())
                 ->findAll()
                 : $aoPropertyValues = $oProperty->getPropertyValues($oUpdatingItem);
+            //$aoPropertyValues = $oProperty->getPropertyValues($oUpdatingItem);
 
             $aoValuesList = array(); //Список значений свойства
             $iResidual = count($aFieldValues) - count($aoPropertyValues); //Разница количества переданных значений и существующих
