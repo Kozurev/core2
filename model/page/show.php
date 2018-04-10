@@ -15,9 +15,9 @@ class Page_Show extends Core
 
 
     /**
-     *	Конвертация строки запроса
-     *	@return string
-     */
+    *   Конвертация строки запроса
+    *   @return string
+    */
     private function getURI()
     {
         if(!empty($_SERVER['REQUEST_URI']))
@@ -25,12 +25,9 @@ class Page_Show extends Core
             $rootdir = include(ROOT . "/config/rootdir.php");
             $output = trim($_SERVER['REQUEST_URI'],  "/");
             $output = explode("?", $output);
-
-
-            $output = str_replace($rootdir, "", $output);
-            $output[0] = trim($output[0], "/");
-
-            return $output[0];
+            $output = substr($output[0], strlen($rootdir));
+            $output = trim($output, "/");
+            return $output;
         }
     }
 
@@ -43,10 +40,10 @@ class Page_Show extends Core
 
 
     /**
-     *	Поиск всех задействованных макетов
-     *	@param $id - id шаблона, принадлежащего структуре
-     *	@return void
-     */
+    *   Поиск всех задействованных макетов
+    *   @param $id - id шаблона, принадлежащего структуре
+    *   @return void
+    */
     private function serchTemplatesPath($id)
     {
         $aTemplates = array();
@@ -70,24 +67,24 @@ class Page_Show extends Core
 
 
     /**
-     *	Вызов следуюего вложенного макета или обработчика
-     *	@return void
-     */
+    *   Вызов следуюего вложенного макета или обработчика
+    *   @return void
+    */
     private function execute()
     {
         if(count($this->aTemplatesPath) == 0)
         {
-            $sIncludedFilePath = ROOT . "/controller";
+            $sIncludedFilePath = ROOT . "/controller"; 
             $aFilePathSegments = explode("/", $this->oStructure->action());
             $sFileName = "c_" . array_pop($aFilePathSegments) . ".php";
 
-            foreach ($aFilePathSegments as $path)
+            foreach ($aFilePathSegments as $path) 
             {
                 $sIncludedFilePath .= "/" . $path;
             }
 
             $sIncludedFilePath .= "/" . $sFileName;
-
+            
             include $sIncludedFilePath;
             return;
         }
@@ -99,8 +96,8 @@ class Page_Show extends Core
 
 
     /**
-     *	Подключение стилей
-     */
+    *   Подключение стилей
+    */
     public function css($path)
     {
         $rootdir = include(ROOT . "/config/rootdir.php");
@@ -109,13 +106,13 @@ class Page_Show extends Core
         if($rootdir != "")  echo "/$rootdir";
         echo $path.'">';
         echo "\n";
-        return $this;
+        return $this;   
     }
 
 
     /**
-     *	Подключение стлей макета
-     */
+    *   Подключение стлей макета
+    */
     public function showCss()
     {
         $rootdir = include(ROOT . "/config/rootdir.php");
@@ -130,8 +127,8 @@ class Page_Show extends Core
 
 
     /**
-     *	Подключение js файлоы
-     */
+    *   Подключение js файлоы
+    */
     public function js($path)
     {
         $rootdir = include(ROOT . "/config/rootdir.php");
@@ -140,13 +137,13 @@ class Page_Show extends Core
         if($rootdir != "")  echo "/".$rootdir;
         echo $path.'"></script>';
         echo "\n";
-        return $this;
+        return $this;   
     }
 
 
     /**
-     *	Подключение скриптов макета
-     */
+    *   Подключение скриптов макета
+    */
     public function showJs()
     {
         $rootdir = include(ROOT . "/config/rootdir.php");
@@ -156,13 +153,13 @@ class Page_Show extends Core
         $path .= "/templates/".$templateName."/js/js.js";
         echo '<script src="'.$path.'"></script>';
         echo "\n";
-        return $this;
+        return $this;       
     }
 
 
     /**
-     *	Установка заголовка страницы
-     */
+    *   Установка заголовка страницы
+    */
     public function setTitle()
     {
         if($this->oStructureItem->getId())
@@ -180,8 +177,8 @@ class Page_Show extends Core
 
 
     /**
-     *	Установка мета-заголовка страницы
-     */
+    *   Установка мета-заголовка страницы
+    */
     public function metaTitle()
     {
         $aTitle[] = $this->oStructure->title();
@@ -200,8 +197,8 @@ class Page_Show extends Core
 
 
     /**
-     *	Установка мета-описания страницы
-     */
+    *   Установка мета-описания страницы
+    */
     public function metaDescription()
     {
         $aDescription[] = $this->oStructure->description();
@@ -223,8 +220,8 @@ class Page_Show extends Core
 
 
     /**
-     *	Установка ключевых слов страницы
-     */
+    *   Установка ключевых слов страницы
+    */
     public function metaKeywords()
     {
         $aKeywords = false;
@@ -243,10 +240,10 @@ class Page_Show extends Core
 
 
     /**
-     *	Анализ строки URI запроса
-     *	Поиск и создание обекта структуры и элемента
-     *	@return void
-     */
+    *   Анализ строки URI запроса
+    *   Поиск и создание обекта структуры и элемента
+    *   @return void
+    */
     public function createPage()
     {
         $uri = $this->getURI();
@@ -262,7 +259,7 @@ class Page_Show extends Core
         $this->oStructureItem = Core::factory('Structure_Item');
 
         while(count($segments) > 0)
-        {
+        {   
             $path = array_shift($segments);
 
             //Поиск необходимой структуры
@@ -280,7 +277,7 @@ class Page_Show extends Core
             if(!$oTmpStructure)
             {
                 $addressing_type = include(ROOT . "/config/item_link.php");
-
+            
                 $this->oStructureItem = $this->oStructureItem
                     ->queryBuilder()
                     ->where("structure_id", "=", $this->oStructure->getId())
@@ -293,7 +290,7 @@ class Page_Show extends Core
                     $this->error404();
                     return;
                 }
-            }
+            }       
         }
 
         //Установка заголовка страницы
@@ -303,14 +300,14 @@ class Page_Show extends Core
         $this->metaTitle();
         $this->metaDescription();
         $this->metaKeywords();
-
+        
 
         //Подключение файла настроек страницы
-        $sIncludedFilePath = ROOT . "/controller";
+        $sIncludedFilePath = ROOT . "/controller"; 
         $aFilePathSegments = explode("/", $this->oStructure->action());
         $sFileName = "s_" . array_pop($aFilePathSegments) . ".php";
 
-        foreach ($aFilePathSegments as $path)
+        foreach ($aFilePathSegments as $path) 
         {
             $sIncludedFilePath .= "/" . $path;
         }
@@ -321,7 +318,7 @@ class Page_Show extends Core
 
         //Подключение макета
         $this->serchTemplatesPath($this->oStructure->template_id());
-        $this->execute();
+        $this->execute();   
 
 
         if(TEST_MODE_PAGE)
@@ -332,7 +329,7 @@ class Page_Show extends Core
                 echo "Structure: ";
                 print_r($this->oStructure);
             }
-
+            
             if($this->oStructureItem)
             {
                 echo "<br>Item: ";
