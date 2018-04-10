@@ -1,11 +1,12 @@
-body {
-	background: url("../images/background.jpg") ;
-	background-size: cover;
-}
+/*body {*/
+	/*background: url("../images/background.jpg") ;*/
+	/*background-size: cover;*/
+/*}*/
 
-.error {
-	color: red !important;
-	font-weight: 600 !important;
+body {
+	background: #2d2c41;
+	font-family: 'Open Sans', Arial, Helvetica, Sans-serif, Verdana, Tahoma;
+	//font-width: 700;
 }
 
 .loader {
@@ -14,11 +15,26 @@ body {
 	background: #000;
 	position: absolute;
 	opacity: 0.5;
-	z-index: -1;
+	z-index: 10000;
 	background-image: url("../images/loader.gif");
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: 50px;
+}
+
+.error {
+	color: red !important;
+	font-weight: 600 !important;
+}
+
+a {
+	color: #b63b4d;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #b63b4d;
+	text-decoration: none;
 }
 
 button a {
@@ -43,6 +59,7 @@ button a {
 
 .authorize {
 	width: 20%;
+	color: white;
 	position: relative;
 	left: 40%;
 	top: 125px;
@@ -60,13 +77,20 @@ button a {
 	padding-top: 30px;
 }
 
-.container button {
-	margin-right: 15px
+.button {
+	color: #b63b4d !important;
+	margin-right: 15px;
+	font-size: 14px;
+	font-weight: 700;
+	background: #444359;
+}
+
+.button:hover {
+	background: #b63b4d;
 }
 
 .container .middle .main .in_main .success:hover {
 	text-decoration: none;
-	opacity: 0.9;
 }
 
 .container .middle {
@@ -74,14 +98,9 @@ button a {
 }
 
 .container .middle .main .in_main {
-	background-color: white;
-	opacity: 0.8;
+	border-radius: 4px;
+	background: #FFF;
 	padding: 15px;
-}
-
-.container .middle .main .in_main a {
-	color: black;
-	text-decoration: underline;
 }
 
 .container .middle .main .in_main .form_block {
@@ -106,7 +125,7 @@ button a {
 	display: inline-block;
 	height: 25px;
 	width: 25px;
-	background: url(/templates/template3/images/edit2.png);
+	background: url(../images/edit2.png);
 	background-size: cover;
 }
 
@@ -114,7 +133,7 @@ button a {
 	display: inline-block;
 	height: 25px;
 	width: 25px;
-	background: url(/templates/template3/images/delete.ico);
+	background: url(../images/delete.png);
 	background-size: cover;
 }
 
@@ -126,6 +145,6 @@ button a {
 	display: inline-block;
 	height: 20px;
 	width: 20px;
-	background: url(/templates/template3/images/dir.png);
+	background: url(../images/dir.png);
 	background-size: cover;
 }

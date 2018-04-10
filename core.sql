@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Апр 09 2018 г., 17:02
--- Версия сервера: 5.7.16
--- Версия PHP: 5.6.29
+-- Время создания: Апр 10 2018 г., 20:37
+-- Версия сервера: 5.5.53
+-- Версия PHP: 7.0.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -46,7 +46,7 @@ CREATE TABLE `Admin_Form` (
 
 INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `type_id`, `active`, `required`, `sorting`, `list_name`, `value`) VALUES
 (1, 1, 'Заголовок', 'title', 150, 2, 1, 1, 1, '', ''),
-(2, 1, 'Путь', 'path', 100, 2, 1, 1, 2, '', ''),
+(2, 1, 'Путь', 'path', 100, 2, 1, 0, 2, '', ''),
 (3, 1, 'Активость', 'active', 0, 3, 1, 0, 3, '', ''),
 (4, 1, 'Файл обработчик', 'action', 100, 2, 1, 1, 4, '', ''),
 (5, 1, 'Родительский раздел', 'parentId', 0, 4, 1, 0, 5, 'Structures', ''),
@@ -210,7 +210,7 @@ CREATE TABLE `Constant` (
 --
 
 INSERT INTO `Constant` (`id`, `title`, `name`, `description`, `value`, `value_type`, `dir`, `active`, `sorting`) VALUES
-(4, 'Пагинация в админ. разделе', 'SHOW_LIMIT', 'Лимит показов количества структур и объектов структур', '5', 1, 1, 1, 0),
+(4, 'Пагинация в админ. разделе', 'SHOW_LIMIT', 'Лимит показов количества структур и объектов структур', '10', 1, 1, 1, 0),
 (5, 'kjn', 'knmlkm', '', '2', 1, 4, 1, 0);
 
 -- --------------------------------------------------------
@@ -892,13 +892,12 @@ INSERT INTO `Structure` (`id`, `title`, `parent_id`, `path`, `action`, `template
 (2, 'Спорт', 1, 'sport', 'catalog', 1, '', 1, 0, '', '', ''),
 (3, 'Теннис', 2, 'tennis', 'catalog', 1, '', 1, 0, '', '', ''),
 (4, 'Футбол', 2, 'football', 'catalog', 1, '', 1, 0, '', '', ''),
-(5, 'Индексная страница', 0, '', 'index', 5, '', 1, 0, '', '', ''),
+(5, 'Панель управления musadm', 0, '', 'musadm/index', 4, '', 1, 0, '', '', ''),
 (6, 'Административный раздел', 0, 'admin', 'admin/index', 3, '', 1, 0, '', '', ''),
 (7, 'Личный кабинет', 0, 'user', 'user', 4, '', 1, 0, '', '', ''),
 (8, 'Иерархия классов', 9, 'models', 'documentation/models', 1, 'Общая структура системы. Описание стандартных классов, их свойств и методов.', 1, 0, '', '', ''),
 (9, 'Документация', 0, 'documentation', 'documentation/index', 1, 'Руководство по использованию системы', 1, 0, '', '', ''),
-(13, 'Панель управления', 0, 'musadm', 'musadm/index', 4, '', 1, 0, '', '', ''),
-(14, 'Авторизация', 13, 'authorize', 'musadm/authorize', 1, '', 1, 0, '', '', ''),
+(14, 'Авторизация', 5, 'authorize', 'musadm/authorize', 1, '', 1, 0, '', '', ''),
 (15, 'Спорт2', 1, '', '', 0, '', 1, 0, NULL, NULL, NULL),
 (16, 'Спорт3', 1, '', '', 0, '', 1, 0, NULL, NULL, NULL),
 (17, 'Спорт4', 1, '', '', 0, '', 1, 0, NULL, NULL, NULL),
@@ -1418,7 +1417,7 @@ ALTER TABLE `Constant`
 -- AUTO_INCREMENT для таблицы `Constant_Dir`
 --
 ALTER TABLE `Constant_Dir`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT для таблицы `Constant_Type`
 --

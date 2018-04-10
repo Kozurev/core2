@@ -15,14 +15,14 @@
         </span>
       </xsl:if>
 
-      <form action="/admin" method="POST">
+      <form action="" method="POST">
         <span>Введите логин</span>
         <input type="text" name="login" class="form-control" />
 
         <span>Введите Пароль</span>
         <input type="password" name="password" class="form-control" />
 
-        <input type="submit" class="btn btn-primary" value="Авторизация" />
+        <input type="submit" class="btn button" value="Авторизация" />
       </form>
     </div>
   </xsl:template>

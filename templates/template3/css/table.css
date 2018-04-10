@@ -1,3 +1,7 @@
+.container .middle .main .in_main .table tr {
+    transition: all 0.4s ease;
+}
+
 .container .middle .main .in_main .table td{
     text-align: center;
 }
@@ -7,8 +11,8 @@
 }
 
 .container .middle .main .in_main .table tr:hover {
-    background-color: red;
-    opacity: 0.8;
+    background: #4D4D4D;
+    //opacity: 0.8;
 }
 
 .container .middle .main .in_main .table .delete_icon {

@@ -9,6 +9,7 @@
 
 
 	<xsl:template match="root">
+		<xsl:variable name="modelid" select="object_id" />
 
 		<script>
 			$(function(){
@@ -69,18 +70,36 @@
 				$(function(){
 					$("#createData").validate({
 						rules: {
-							<xsl:for-each select="admin_form">
-								<xsl:if test="required = 1 or maxlength != 0">
-									<xsl:value-of select="var_name"/>: {
-										<xsl:if test="required = 1">
-											required: true,
+							<xsl:choose>
+								<xsl:when test="model_name = 'Admin_Form'">
+									<xsl:for-each select="admin_form[id != $modelid]">
+										<xsl:if test="required = 1 or maxlength != 0">
+											<xsl:value-of select="var_name"/>: {
+											<xsl:if test="required = 1">
+												required: true,
+											</xsl:if>
+											<xsl:if test="maxlength != 0">
+												maxlength: <xsl:value-of select="maxlength"/>,
+											</xsl:if>
+											},
 										</xsl:if>
-										<xsl:if test="maxlength != 0">
-											maxlength: <xsl:value-of select="maxlength"/>,
+									</xsl:for-each>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:for-each select="admin_form">
+										<xsl:if test="required = 1 or maxlength != 0">
+											<xsl:value-of select="var_name"/>: {
+											<xsl:if test="required = 1">
+												required: true,
+											</xsl:if>
+											<xsl:if test="maxlength != 0">
+												maxlength: <xsl:value-of select="maxlength"/>,
+											</xsl:if>
+											},
 										</xsl:if>
-									},
-								</xsl:if>
-							</xsl:for-each>
+									</xsl:for-each>
+								</xsl:otherwise>
+							</xsl:choose>
 						},
 						messages: {
 							<xsl:for-each select="admin_form">
@@ -102,7 +121,15 @@
 
 			<form name="createData" id="createData" action=".">
 				<h3>Основные свойства</h3>
-				<xsl:apply-templates select="admin_form" />
+
+				<xsl:choose>
+					<xsl:when test="model_name = 'Admin_Form'">
+						<xsl:apply-templates select="admin_form[id != $modelid]" />
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:apply-templates select="admin_form" />
+					</xsl:otherwise>
+				</xsl:choose>
 
 				<xsl:if test="/root/property/id">
 					<h3>Дополнительные свойства</h3>
@@ -131,8 +158,8 @@
 				<!--Название создаваемой/редактируемой модели-->
 				<input type="hidden" name="modelName" value="{/root/model_name}" />
 
-				<button class="btn btn-success" type="button">
-					<a href="/admin?menuTab={tab}&amp;menuAction=updateAction" class="submit">
+				<button class="btn btn-success button" type="button">
+					<a href="admin?menuTab={tab}&amp;menuAction=updateAction" class="submit">
 						Сохранить
 					</a>
 				</button>

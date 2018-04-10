@@ -24,14 +24,14 @@
 			</table>
 
 
-			<button class="btn btn-success" type="button">
-				<a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property&amp;" class="link">
+			<button class="btn button" type="button">
+				<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property&amp;" class="link">
 					Создать свойство
 				</a>
 			</button>
 
-			<button class="btn btn-success" type="button">
-				<a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property_Dir&amp;" class="link">
+			<button class="btn button" type="button">
+				<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property_Dir&amp;" class="link">
 					Создать директорию
 				</a>
 			</button>
@@ -39,11 +39,11 @@
 
 
 			<div class="pagination">
-				<a class="prev_page" href="/admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
+				<a class="prev_page" href="admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
 				<span class="pages">Страница
 					<span id="current_page"><xsl:value-of select="pagination/current_page" /></span> из
 					<span id="count_pages"><xsl:value-of select="pagination/count_pages" /></span></span>
-				<a class="next_page" href="/admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
+				<a class="next_page" href="admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
 				<span class="total_count">Всего элементов: <xsl:value-of select="pagination/total_count"/></span>
 			</div>
 
@@ -56,7 +56,7 @@
 			<td><xsl:value-of select="id"/></td>
 
 			<td class="table_structure">
-				<a class="link dir" href="/admin?menuTab=Property&amp;menuAction=show&amp;parent_id={id}">
+				<a class="link dir" href="admin?menuTab=Property&amp;menuAction=show&amp;parent_id={id}">
 					<xsl:value-of select="title" />
 				</a>
 			</td>
@@ -66,9 +66,9 @@
 			<!--Активность-->
 			<td></td>
 			<!--Редактирование-->
-			<td><a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property_Dir&amp;model_id={id}" class="link updateLink" /></td>
+			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property_Dir&amp;model_id={id}" class="link updateLink" /></td>
 			<!--Удаление-->
-			<td><a href="/admin" data-model_name="Property_Dir" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td><a href="admin" data-model_name="Property_Dir" data-model_id="{id}" class="delete deleteLink"></a></td>
 		</tr>
 	</xsl:template>
 
@@ -91,10 +91,10 @@
 			</td>
 
 			<!--Редактирование-->
-			<td><a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property&amp;model_id={id}" class="link updateLink" /></td>
+			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property&amp;model_id={id}" class="link updateLink" /></td>
 
 			<!--Удаление-->
-			<td><a href="/admin" data-model_name="Property" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td><a href="admin" data-model_name="Property" data-model_id="{id}" class="delete deleteLink"></a></td>
 		</tr>
 	</xsl:template>
 

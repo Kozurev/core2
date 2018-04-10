@@ -22,24 +22,24 @@
 				<xsl:apply-templates select="structure_item" />
 			</table>
 
-			<button class="btn btn-success" type="button">
-				<a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}" class="link">
+			<button class="btn button" type="button">
+				<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}" class="link">
 					Новый раздел
 				</a>
 			</button>
 
-			<button class="btn btn-success" type="button">
-				<a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}" class="link">
+			<button class="btn button" type="button">
+				<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}" class="link">
 					Новый элемент
 				</a>
 			</button>
 
 			<div class="pagination">
-				<a class="prev_page" href="/admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
+				<a class="prev_page" href="admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
 				<span class="pages">Страница
 					<span id="current_page"><xsl:value-of select="pagination/current_page" /></span> из
 					<span id="count_pages"><xsl:value-of select="pagination/count_pages" /></span></span>
-				<a class="next_page" href="/admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
+				<a class="next_page" href="admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
 				<span class="total_count">Всего элементов: <xsl:value-of select="pagination/total_count"/></span>
 			</div>
 		</div>
@@ -54,7 +54,7 @@
 			<td class="table_structure">
 				<a 
 					class="link"
-					href="/admin?menuTab=Structure&amp;
+					href="admin?menuTab=Structure&amp;
 					menuAction=show&amp;parent_id={id}">
 					<xsl:value-of select="title" />
 				</a>
@@ -75,10 +75,10 @@
 			<td><xsl:value-of select="path" /></td>
 
 			<!--Редактирование-->
-			<td><a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
+			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
 
 			<!--Удаление-->
-			<td><a href="/admin" data-model_name="Structure" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td><a href="admin" data-model_name="Structure" data-model_id="{id}" class="delete deleteLink"></a></td>
 		</tr>
 	</xsl:template>
 
@@ -104,10 +104,10 @@
 			<td><xsl:value-of select="path" /></td>
 
 			<!--Редактирование-->
-			<td><a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
+			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
 
 			<!--Удаление-->
-			<td><a href="/admin" data-model_name="Structure_Item" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td><a href="admin" data-model_name="Structure_Item" data-model_id="{id}" class="delete deleteLink"></a></td>
 		</tr>
 	</xsl:template>
 

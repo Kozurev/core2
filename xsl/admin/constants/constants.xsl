@@ -22,28 +22,28 @@
 				<xsl:apply-templates select="constant" />
 			</table>
 
-			<button class="btn btn-success" type="button">
+			<button class="btn button" type="button">
 				<a 
-					href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant_Dir&amp;parent_id={parent_id}" 
+					href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant_Dir&amp;parent_id={parent_id}" 
 					class="link">
 					Создать раздел
 				</a>
 			</button>
 
-			<button class="btn btn-success" type="button">
+			<button class="btn button" type="button">
 				<a 
-					href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant&amp;parent_id={parent_id}" 
+					href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant&amp;parent_id={parent_id}" 
 					class="link">
 					Создать константу
 				</a>
 			</button>
 
 			<div class="pagination">
-				<a class="prev_page" href="/admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
+				<a class="prev_page" href="admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
 				<span class="pages">Страница
 					<span id="current_page"><xsl:value-of select="pagination/current_page" /></span> из
 					<span id="count_pages"><xsl:value-of select="pagination/count_pages" /></span></span>
-				<a class="next_page" href="/admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
+				<a class="next_page" href="admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
 				<span class="total_count">Всего элементов: <xsl:value-of select="pagination/total_count"/></span>
 			</div>
 		</div>
@@ -61,7 +61,7 @@
 			<td class="table_structure">
 				<a 
 					class="link dir"
-					href="/admin?menuTab=Constant&amp;
+					href="admin?menuTab=Constant&amp;
 					menuAction=show&amp;parent_id={id}">
 					<xsl:value-of select="title" />
 				</a>
@@ -77,10 +77,10 @@
 			<td></td>
 
 			<!--Редактирование-->
-			<td><a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant_Dir&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
+			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant_Dir&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
 
 			<!--Удаление-->
-			<td><a href="/admin" data-model_name="Constant_Dir" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td><a href="admin" data-model_name="Constant_Dir" data-model_id="{id}" class="delete deleteLink"></a></td>
 		</tr>
 	</xsl:template>
 
@@ -111,10 +111,10 @@
 			</td>
 
 			<!--Редактирование-->
-			<td><a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant&amp;parent_id={dir}&amp;model_id={id}" class="link updateLink" /></td>
+			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant&amp;parent_id={dir}&amp;model_id={id}" class="link updateLink" /></td>
 
 			<!--Удаление-->
-			<td><a href="/admin" data-model_name="Constant" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td><a href="admin" data-model_name="Constant" data-model_id="{id}" class="delete deleteLink"></a></td>
 		</tr>
 	</xsl:template>
 

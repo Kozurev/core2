@@ -9,7 +9,7 @@ class Structure_Controller_Model extends Core_Entity_Controller
 	);
 	
 
-	public function items(bool $val = null)
+	public function items($val = null)
 	{
 		if(is_null($val)) return $this->aStructureControllerVars["items"];
 		$this->aStructureControllerVars["items"] = $val;
@@ -17,7 +17,7 @@ class Structure_Controller_Model extends Core_Entity_Controller
 	}
 
 
-	public function children(bool $val = null)
+	public function children($val = null)
     {
         if(is_null($val)) return $this->aStructureControllerVars["children"];
         $this->aStructureControllerVars["children"] = $val;
@@ -25,7 +25,7 @@ class Structure_Controller_Model extends Core_Entity_Controller
     }
 
 
-    public function childrenWithItems(bool $val = null)
+    public function childrenWithItems($val = null)
     {
         if(is_null($val)) return $this->aStructureControllerVars["childrenWithItems"];
         $this->aStructureControllerVars["childrenWithItems"] = $val;

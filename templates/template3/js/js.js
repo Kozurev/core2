@@ -2,7 +2,7 @@ $(function(){
 
 	if(window.location.hash == "")
 	{
-		window.location.hash = "#/admin?menuTab=Structure&menuAction=show";
+		window.location.hash = "#admin?menuTab=Structure&menuAction=show";
 	}
 
 	$(document)
@@ -104,7 +104,8 @@ function reloadMain(hash){
 		url: link + "&ajax=1", 	
 		success: function(data){
 			$(".main").html(data);
-			setTimeout("loaderOff()", 200);
+			setTimeout("loaderOff()", 100);
+            //loaderOff();
 		}
 	});
 }
@@ -119,7 +120,7 @@ function reloadMain(hash){
 function updateActive(model_name, model_id, value){
 	loaderOn();	
 
-	var link = "/admin?menuTab=Main&menuAction=updateActive&ajax=1";
+	var link = "admin?menuTab=Main&menuAction=updateActive&ajax=1";
 	link += "&model_name=" + model_name; 
 	link += "&model_id=" + model_id;
 	link += "&value=" + value;
@@ -131,7 +132,8 @@ function updateActive(model_name, model_id, value){
 		type: "GET",
 		url: link,
 		success: function(answer){
-			setTimeout("loaderOff()", 200);
+			setTimeout("loaderOff()", 100);
+            //loaderOff();
 			if(answer != "0")
 				alert("Ошибка: " + answer);
 		}
@@ -144,7 +146,7 @@ function updateActive(model_name, model_id, value){
 */
 function deleteItem(model_name, model_id){
 
-	var link = "/admin?menuTab=Main&menuAction=deleteAction&ajax=1";
+	var link = "admin?menuTab=Main&menuAction=deleteAction&ajax=1";
 	link += "&model_name=" + model_name;
 	link += "&model_id=" + model_id;
 
@@ -158,7 +160,8 @@ function deleteItem(model_name, model_id){
 		url: link,
 		success: function(answer){
 			reloadMain(window.location.hash);
-			setTimeout("loaderOff()", 200);
+			setTimeout("loaderOff()", 100);
+            //loaderOff();
 			if(answer != "0")
 				alert("Ошибка: " + answer);
 		}
@@ -169,7 +172,7 @@ function deleteItem(model_name, model_id){
 function updateItem(objectData){
 	loaderOn();
 
-	var link = "/admin?menuTab=Main&menuAction=updateAction&ajax=1&" + objectData;
+	var link = "admin?menuTab=Main&menuAction=updateAction&ajax=1&" + objectData;
 
 	$.ajax({
 		type: "GET",
@@ -177,7 +180,8 @@ function updateItem(objectData){
 		success: function(answer){
 			//reloadMain("#" + link);
 			window.history.back();
-			setTimeout("loaderOff()", 200);
+			setTimeout("loaderOff()", 100);
+			//loaderOff();
 			if(answer != "0")
 				alert("Ошибка: " + answer);
 		}

@@ -14,8 +14,9 @@ if(!$oUser::getCurent())
 {
     $host  = $_SERVER['HTTP_HOST'];
     $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-    $extra = 'musadm';
-    header("Location: http://$host$uri/musadm/authorize?back=$host$uri/$extra");
+    //$extra = 'musadm';
+    $extra = "";
+    header("Location: http://$host$uri/authorize?back=$host$uri/$extra");
 }
 
 if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)

@@ -13,7 +13,7 @@
 //    ->show();
 ?>
 
-<form action="/musadm/authorize?back=<?=$_GET["back"]?>" method="post">
+<form action="/authorize?back=<?=$_GET["back"]?>" method="post">
     <label for="name">Логин:</label>
     <input type="name" name="login"/>
 

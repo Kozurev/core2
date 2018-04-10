@@ -5,7 +5,8 @@ session_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-define('ROOT', dirname(__FILE__)); 
+$rootdir = include("config/rootdir.php");
+define('ROOT', dirname(__FILE__));
 
 //Установление соединения с базой данных
 require_once ROOT."/model/database.php";

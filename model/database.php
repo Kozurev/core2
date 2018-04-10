@@ -14,6 +14,7 @@ class Core_Database
 		$pdoString .= "host=".$connectionParams['host'].";";
 		$pdoString .= "dbname=".$connectionParams['db'];
 		Core_Database::$db = new PDO($pdoString, $connectionParams['user'], $connectionParams['pass']);
+		Core_Database::$db->query( "SET CHARSET ".$connectionParams['charset'] );
 	}
 
 	/**

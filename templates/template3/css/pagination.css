@@ -20,7 +20,7 @@
     display: inline-block;
     height: 25px;
     width: 25px;
-    background: url(/templates/template3/images/left_arrow2.png);
+    background: url(../images/left_arrow2.png);
     background-size: cover;
 }
 
@@ -28,6 +28,6 @@
     display: inline-block;
     height: 25px;
     width: 25px;
-    background: url(/templates/template3/images/right_arrow2.png);
+    background: url(../images/right_arrow2.png);
     background-size: cover;
 }

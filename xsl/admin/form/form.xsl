@@ -17,15 +17,15 @@
 
 			<xsl:choose>
 				<xsl:when test="parent_id = '0'">
-					<button class="btn btn-success" type="button">
-						<a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Admin_Form_Modelname&amp;parent_id={parent_id}" class="link">
+					<button class="btn button" type="button">
+						<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Admin_Form_Modelname&amp;parent_id={parent_id}" class="link">
 							Создать модель
 						</a>
 					</button>
 				</xsl:when>
 				<xsl:otherwise>
-					<button class="btn btn-success" type="button">
-						<a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Admin_Form&amp;parent_id={parent_id}" class="link">
+					<button class="btn button" type="button">
+						<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Admin_Form&amp;parent_id={parent_id}" class="link">
 							Создать поле модели
 						</a>
 					</button>
@@ -39,14 +39,14 @@
 		<tr>
 			<td><xsl:value-of select="id" /></td>
 			<td>
-				<a class="link dir" href="/admin?menuTab=Form&amp;menuAction=show&amp;parent_id={id}">
+				<a class="link dir" href="admin?menuTab=Form&amp;menuAction=show&amp;parent_id={id}">
 					<xsl:value-of select="model_title" />
 				</a>
 			</td>
 
 			<td><xsl:value-of select="model_name" /></td>
-			<td><a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Admin_Form_Modelname&amp;model_id={id}" class="link updateLink" /></td>
-			<td><a href="/admin" data-model_name="Admin_Form_Modelname" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Admin_Form_Modelname&amp;model_id={id}" class="link updateLink" /></td>
+			<td><a href="admin" data-model_name="Admin_Form_Modelname" data-model_id="{id}" class="delete deleteLink"></a></td>
 		</tr>
 	</xsl:template>
 
@@ -66,8 +66,8 @@
 				</input>
 			</td>
 
-			<td><a href="/admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Admin_Form&amp;model_id={id}" class="link updateLink" /></td>
-			<td><a href="/admin" data-model_name="Admin_Form" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Admin_Form&amp;model_id={id}" class="link updateLink" /></td>
+			<td><a href="admin" data-model_name="Admin_Form" data-model_id="{id}" class="delete deleteLink"></a></td>
 		</tr>
 	</xsl:template>
 

@@ -7,32 +7,31 @@
 
 <xsl:template match="root">
   <div class="col-lg-3 left_bar">
-    <xsl:apply-templates select="admin_menu" />
+	  <ul id="accordion" class="accordion">
+		  <xsl:apply-templates select="admin_menu[parent_id = 0]" />
+	  </ul>
   </div>
 </xsl:template>
 
 
 <xsl:template match="admin_menu">
-	<xsl:if test="parent_id = 0">
-		<!--<a href="/admin?menuTab={model}&amp;menuAction=show" class="parent">-->
-			<div class="item parent" data-id="{id}">
-				<span class="text">
-					<xsl:value-of select="title" />
-				</span>
-			</div>
-
-		<xsl:variable name="id" select="id" />
-		<div class="children" id="{$id}">
-			<xsl:for-each select="//admin_menu[parent_id=$id]">
-				<a href="/admin?menuTab={model}&amp;menuAction=show" class="item link">
-					<span class="text">
-						<xsl:value-of select="title" />
-					</span>
-				</a>
-			</xsl:for-each>
+	<li>
+		<div class="left_link">
+			<i class="fa fa-globe"></i>
+				<xsl:value-of select="title" />
+			<i class="fa fa-chevron-down"></i>
 		</div>
-		<!--</a>-->
-	</xsl:if>
+		<xsl:variable name="id" select="id" />
+		<ul class="submenu">
+			<xsl:for-each select="//admin_menu[parent_id = $id]">
+				<li>
+					<a href="admin?menuTab={model}&amp;menuAction=show" class="link">
+						<xsl:value-of select="title" />
+					</a>
+				</li>
+			</xsl:for-each>
+		</ul>
+	</li>
 </xsl:template>
 
 

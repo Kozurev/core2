@@ -22,16 +22,28 @@ class Page_Show extends Core
 	{
 		if(!empty($_SERVER['REQUEST_URI']))
 		{
-			$output = trim($_SERVER['REQUEST_URI'], "/");
+		    $rootdir = include(ROOT . "/config/rootdir.php");
+			$output = trim($_SERVER['REQUEST_URI'],  "/");
 			$output = explode("?", $output);
-			return $output[0];
+
+            $output = explode("/", $output[0]);
+            if($output[0] == $rootdir)
+            {
+                unset($output[0]);
+                $output = array_values($output);
+            }
+
+            if(count($output) == 0)
+                return "";
+            else
+    			return $output[0];
 		}
 	}
 
 
 	public function error404()
     {
-        Core::getMessage("ERROR_404");
+        Core::getMessage("ERROR_404", array());
     }
 
 
@@ -97,8 +109,11 @@ class Page_Show extends Core
 	*/
 	public function css($path)
 	{
+	    $rootdir = include(ROOT . "/config/rootdir.php");
 		//$templateName = "template".$this->oTemplate->getId();
-		echo '<link rel="stylesheet" type="text/css" href="'.$path.'">';
+		echo '<link rel="stylesheet" type="text/css" href="';
+		if($rootdir != "")  echo "/$rootdir";
+		echo $path.'">';
 		echo "\n";
 		return $this;	
 	}
@@ -109,8 +124,11 @@ class Page_Show extends Core
 	*/
 	public function showCss()
 	{
+        $rootdir = include(ROOT . "/config/rootdir.php");
 		$templateName = "template".$this->oTemplate->getId();
-		$path = "/templates/".$templateName."/css/style.css";
+		$path = "";
+		if($rootdir != "")  $path .= "/".$rootdir;
+		$path .= "/templates/".$templateName."/css/style.css";
 		echo '<link rel="stylesheet" type="text/css" href="'.$path.'">';
 		echo "\n";
 		return $this;
@@ -122,8 +140,11 @@ class Page_Show extends Core
 	*/
 	public function js($path)
 	{
+        $rootdir = include(ROOT . "/config/rootdir.php");
 		//$templateName = "template".$this->oTemplate->getId();
-		echo '<script src="'.$path.'"></script>';
+		echo '<script src="';
+		if($rootdir != "")  echo "/".$rootdir;
+        echo $path.'"></script>';
 		echo "\n";
 		return $this;	
 	}
@@ -134,8 +155,11 @@ class Page_Show extends Core
 	*/
 	public function showJs()
 	{
+        $rootdir = include(ROOT . "/config/rootdir.php");
 		$templateName = "template".$this->oTemplate->getId();
-		$path = "/templates/".$templateName."/js/js.js";
+		$path = "";
+		if($rootdir != "")  $path = "/".$rootdir;
+		$path .= "/templates/".$templateName."/js/js.js";
 		echo '<script src="'.$path.'"></script>';
 		echo "\n";
 		return $this;		
