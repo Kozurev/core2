@@ -16,7 +16,6 @@ if(isset($_GET["menuTab"]) && isset($_GET["menuAction"]))
 	if($oTab === false) 
 		die("<br>Ошибка: неопознанная вкладка меню");
 
-	echo "hello";
 	$oTab->$action($_GET);
 	
 }
