@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Апр 10 2018 г., 20:37
--- Версия сервера: 5.5.53
--- Версия PHP: 7.0.14
+-- Время создания: Апр 11 2018 г., 16:55
+-- Версия сервера: 5.7.16
+-- Версия PHP: 5.6.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -211,7 +211,8 @@ CREATE TABLE `Constant` (
 
 INSERT INTO `Constant` (`id`, `title`, `name`, `description`, `value`, `value_type`, `dir`, `active`, `sorting`) VALUES
 (4, 'Пагинация в админ. разделе', 'SHOW_LIMIT', 'Лимит показов количества структур и объектов структур', '10', 1, 1, 1, 0),
-(5, 'kjn', 'knmlkm', '', '2', 1, 4, 1, 0);
+(5, 'kjn', 'knmlkm', '', '2', 1, 4, 1, 0),
+(6, 'Время запоминания пользователя', 'REMEMBER_USER_TIME', 'Значение константы указывает количество дней, на которое будет \"запомнен\" пользователь при авторизации. При отсутствии данной константы или её значения будет использовано время по умолчанию (10 дней).', '10', 1, 1, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -888,20 +889,22 @@ CREATE TABLE `Structure` (
 --
 
 INSERT INTO `Structure` (`id`, `title`, `parent_id`, `path`, `action`, `template_id`, `description`, `active`, `sorting`, `meta_title`, `meta_description`, `meta_keywords`) VALUES
-(1, 'Магазин', 0, 'shop', 'catalog', 5, 'Интернет-магазин', 1, 0, '', '', ''),
-(2, 'Спорт', 1, 'sport', 'catalog', 1, '', 1, 0, '', '', ''),
-(3, 'Теннис', 2, 'tennis', 'catalog', 1, '', 1, 0, '', '', ''),
-(4, 'Футбол', 2, 'football', 'catalog', 1, '', 1, 0, '', '', ''),
-(5, 'Панель управления musadm', 0, '', 'musadm/index', 4, '', 1, 0, '', '', ''),
+(1, 'Магазин', 0, 'shop', 'catalog', 5, 'Интернет-магазин', 1, 1000, '', '', ''),
+(2, 'Спорт', 1, 'sport', 'catalog', 5, '', 1, 0, '', '', ''),
+(3, 'Теннис', 2, 'tennis', 'catalog', 5, '', 1, 0, '', '', ''),
+(4, 'Футбол', 2, 'football', 'catalog', 5, '', 1, 0, '', '', ''),
+(5, 'Панель управления musadm', 0, '', 'musadm/index', 4, '', 1, 10, '', '', ''),
 (6, 'Административный раздел', 0, 'admin', 'admin/index', 3, '', 1, 0, '', '', ''),
 (7, 'Личный кабинет', 0, 'user', 'user', 4, '', 1, 0, '', '', ''),
 (8, 'Иерархия классов', 9, 'models', 'documentation/models', 1, 'Общая структура системы. Описание стандартных классов, их свойств и методов.', 1, 0, '', '', ''),
-(9, 'Документация', 0, 'documentation', 'documentation/index', 1, 'Руководство по использованию системы', 1, 0, '', '', ''),
+(9, 'Документация', 0, 'documentation', 'documentation/index', 1, 'Руководство по использованию системы', 1, 100, '', '', ''),
 (14, 'Авторизация', 5, 'authorize', 'musadm/authorize', 1, '', 1, 0, '', '', ''),
 (15, 'Спорт2', 1, '', '', 0, '', 1, 0, NULL, NULL, NULL),
 (16, 'Спорт3', 1, '', '', 0, '', 1, 0, NULL, NULL, NULL),
 (17, 'Спорт4', 1, '', '', 0, '', 1, 0, NULL, NULL, NULL),
-(18, 'Спорт5', 1, '', '', 0, '', 0, 0, NULL, NULL, NULL);
+(18, 'Спорт5', 1, '', '', 0, '', 0, 0, NULL, NULL, NULL),
+(19, 'Песочница', 0, 'test', 'index', 5, 'Раздел для тестирования различного функционала или отладки ', 1, 10000, NULL, NULL, NULL),
+(20, 'Авторизация', 6, 'authorize', 'admin/auth', 3, 'Страница авторизации для административного раздела', 1, 0, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1412,7 +1415,7 @@ ALTER TABLE `Admin_Menu`
 -- AUTO_INCREMENT для таблицы `Constant`
 --
 ALTER TABLE `Constant`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT для таблицы `Constant_Dir`
 --
@@ -1492,7 +1495,7 @@ ALTER TABLE `Property_Text_Assigment`
 -- AUTO_INCREMENT для таблицы `Structure`
 --
 ALTER TABLE `Structure`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 --
 -- AUTO_INCREMENT для таблицы `Structure_Item`
 --

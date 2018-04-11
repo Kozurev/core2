@@ -5,11 +5,12 @@ session_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-$rootdir = include("config/rootdir.php");
+
 define('ROOT', dirname(__FILE__));
 
 //Установление соединения с базой данных
 require_once ROOT."/model/database.php";
+require_once ROOT."/config/config.php";
 Core_Database::connect();
 
 //Подключение обязательных биьлиотек

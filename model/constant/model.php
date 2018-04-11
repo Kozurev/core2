@@ -72,8 +72,8 @@ class Constant_Model extends Core_Entity
     public function active($val = null)
     {
         if(is_null($val)) 		return $this->active;
-        if($val === true) 		$this->active = 1;
-        elseif($val === false)	$this->active = 0;
+        if($val == true) 		$this->active = 1;
+        elseif($val == false)	$this->active = 0;
 
         return $this;
     }

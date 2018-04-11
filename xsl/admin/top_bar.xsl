@@ -11,7 +11,7 @@
     	<span class="login"><xsl:value-of select="login" /></span> 
 
 		<button class="btn btn-danger" >
-			<a href="admin?disauthorize=1" >
+			<a href="admin/authorize?disauthorize=1" >
 				Выйти
 			</a>
 		</button>

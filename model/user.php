@@ -43,7 +43,7 @@ class User extends User_Model
 	/**
 	*	Авторизация пользователя
 	*/
-	public function authorize()
+	public function authorize($remember = false)
 	{
 		$result = $this->queryBuilder()
 			->where("login", "=", $this->login)
@@ -53,14 +53,21 @@ class User extends User_Model
 
 		if($result)
 		{
-			$_SESSION['core']['user'] = $result->getId();
+		    if($remember == true)
+            {
+                $_SESSION['core']['user'] = $result->getId();
+                $cookieData = $result->getId();
+                $cookieTime = 3600 * 24;
+                if(REMEMBER_USER_TIME != "")    $cookieTime *= REMEMBER_USER_TIME;
+                setcookie("userdata", $cookieData, time() + $cookieTime, "/");
+            }
+            $_SESSION['core']['user'] = $result->getId();
 			return $this;
 		} 
 		else 
 		{
 			return false;
 		}
-
 	}
 
 
@@ -68,8 +75,13 @@ class User extends User_Model
 	*	Метод возвращает авторизованного пользователя, если такой есть
 	*	@return object or false
 	*/	
-	static public function getCurent()
+	public function getCurent()
 	{
+	    if(isset($_COOKIE["userdata"]))
+        {
+            $_SESSION['core']['user'] = $_COOKIE["userdata"];
+        }
+
 		if(isset($_SESSION['core']['user']) && $_SESSION['core']['user'])
 		{
 		    $oCurentUser = Core::factory('User', $_SESSION['core']['user']);
@@ -92,6 +104,10 @@ class User extends User_Model
 	static public function disauthorize()
 	{	
 		unset($_SESSION["core"]["user"]);
+
+		$cookieTime = 3600 * 24;
+        if(REMEMBER_USER_TIME != "")    $cookieTime *= REMEMBER_USER_TIME;
+        setcookie("userdata", "", 0 - time() - $cookieTime, "/");
 	}
 
 
@@ -102,7 +118,7 @@ class User extends User_Model
     {
         $aGroups = Core_Array::getValue($aParams, "groups", null);
         $bOnlyForSuperuser = Core_Array::getValue($aParams, "superuser", null);
-        $oCurentUser = User::getCurent();
+        $oCurentUser = Core::factory("User")->getCurent();
 
         if($oCurentUser == false)
         {

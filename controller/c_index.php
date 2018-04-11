@@ -1,3 +1,4 @@
 <?php
 
-Core::factory("Admin_List", 1);
+$oProperty = Core::factory("Property", 11);
+$oItem = Core::factory("Structure_Item", 1);

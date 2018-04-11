@@ -110,8 +110,23 @@ class Property extends Property_Model
 	*/
 	public function deleteFromPropertiesList($obj, $propertyId)
 	{
-		if(!is_int($propertyId)) return;
+        if(!is_int($propertyId)) return false;
+        $oProperty = Core::factory("Property", $propertyId);
+        if($oProperty == false) return false;
+        $sTableName = "Property_" . $oProperty->type() . "_Assigment";
 
+        $assigment = Core::factory($sTableName)
+            ->where("object_id", "=", $obj->getId())
+            ->where("property_id", "=", $propertyId)
+            ->where("model_name", "=", get_class($obj))
+            ->find();
+
+        if($assigment != false)
+        {
+            $assigment->delete();
+        }
+
+        return true;
 	}
 
 
@@ -169,32 +184,8 @@ class Property extends Property_Model
     {
         $sTableName = "Property_".ucfirst($this->type());
 
-        $oPropertyValue = Core::factory($sTableName);
-        $aPropertyValues = $oPropertyValue->queryBuilder()
-            ->where("property_id", "=", $this->getId())
-            ->findAll();
 
-        foreach ($aPropertyValues as $propertyValue)
-        {
-            //$obj = Core::factory($propertyValue->model_name(), $propertyValue->object_id());
-            $aoValues = Core::factory("Property_Assigment")
-                ->where("property_id", "=", $propertyValue->getId())
-                ->findAll();
 
-            foreach ($aoValues as $value) $value->delete();
-
-            $propertyValue->delete();
-        }
-
-        if($this->type == "list")
-        {
-            $aoListValues = Core::factory("Property_List_Values")
-                ->where("property_id", "=", $this->getId())
-                ->findAll();
-            foreach ($aoListValues as $value)   $value->delete();
-        }
-
-        parent::delete();
     }
 
 

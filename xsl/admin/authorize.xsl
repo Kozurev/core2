@@ -22,7 +22,10 @@
         <span>Введите Пароль</span>
         <input type="password" name="password" class="form-control" />
 
-        <input type="submit" class="btn button" value="Авторизация" />
+        <span>Запомнить меня</span>
+        <input type="checkbox" name="remember" class="remember" />
+
+        <input type="submit" class="btn button auth_submit" value="Авторизация" />
       </form>
     </div>
   </xsl:template>

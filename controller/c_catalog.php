@@ -1,6 +1,6 @@
 <?php
 //Если это страница элемента структуры
-if($this->oStructureItem->getId())
+if(is_object($this->oStructureItem) && $this->oStructureItem->getId())
 {
 	echo "<h4>Страница товара</h4><pre>";
 	print_r($this->oStructureItem);

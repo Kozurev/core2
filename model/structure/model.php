@@ -12,7 +12,8 @@ class Structure_Model extends Core_Entity
 	protected $path; 
 	protected $action; 
 	protected $template_id; 
-	protected $description; 
+	protected $description;
+	protected $children_name;
 	//protected $properties_list;
 	protected $active; 
 	protected $meta_title; 
@@ -31,6 +32,16 @@ class Structure_Model extends Core_Entity
     {
 		return $this->id;
     }
+
+
+    public function children_name($val = null)
+    {
+        if(is_null($val))   return $this->children_name;
+        if(strlen($val) > 255)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("children_name", "Structure", 255)));
+        $this->children_name = $val;
+    }
+
 
 	public function title($val = null)
 	{

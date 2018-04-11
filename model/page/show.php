@@ -12,6 +12,7 @@ class Page_Show extends Core
     private $meta_title;
     private $meta_description;
     private $meta_keywords;
+    private $action;
 
 
     /**
@@ -20,10 +21,12 @@ class Page_Show extends Core
     */
     private function getURI()
     {
+        global $CFG;
         if(!empty($_SERVER['REQUEST_URI']))
         {
-            $rootdir = include(ROOT . "/config/rootdir.php");
+            $rootdir = $CFG->rootdir;
             $output = trim($_SERVER['REQUEST_URI'],  "/");
+            //echo "<h1>URI = $output <br></h1>";
             $output = explode("?", $output);
             $output = substr($output[0], strlen($rootdir));
             $output = trim($output, "/");
@@ -85,13 +88,13 @@ class Page_Show extends Core
 
             $sIncludedFilePath .= "/" . $sFileName;
             
-            include $sIncludedFilePath;
+            require_once ($sIncludedFilePath);
             return;
         }
 
         $template = array_pop($this->aTemplatesPath);
         $templateName = "template".$template->getId();
-        include ROOT."/templates/$templateName/template.php";
+        require_once (ROOT."/templates/$templateName/template.php");
     }
 
 
@@ -100,7 +103,8 @@ class Page_Show extends Core
     */
     public function css($path)
     {
-        $rootdir = include(ROOT . "/config/rootdir.php");
+        global $CFG;
+        $rootdir = $CFG->rootdir;
         //$templateName = "template".$this->oTemplate->getId();
         echo '<link rel="stylesheet" type="text/css" href="';
         if($rootdir != "")  echo "/$rootdir";
@@ -115,7 +119,8 @@ class Page_Show extends Core
     */
     public function showCss()
     {
-        $rootdir = include(ROOT . "/config/rootdir.php");
+        global $CFG;
+        $rootdir = $CFG->rootdir;
         $templateName = "template".$this->oTemplate->getId();
         $path = "";
         if($rootdir != "")  $path .= "/".$rootdir;
@@ -131,7 +136,8 @@ class Page_Show extends Core
     */
     public function js($path)
     {
-        $rootdir = include(ROOT . "/config/rootdir.php");
+        global $CFG;
+        $rootdir = $CFG->rootdir;
         //$templateName = "template".$this->oTemplate->getId();
         echo '<script src="';
         if($rootdir != "")  echo "/".$rootdir;
@@ -146,7 +152,8 @@ class Page_Show extends Core
     */
     public function showJs()
     {
-        $rootdir = include(ROOT . "/config/rootdir.php");
+        global $CFG;
+        $rootdir = $CFG->rootdir;
         $templateName = "template".$this->oTemplate->getId();
         $path = "";
         if($rootdir != "")  $path = "/".$rootdir;
@@ -162,7 +169,9 @@ class Page_Show extends Core
     */
     public function setTitle()
     {
-        if($this->oStructureItem->getId())
+        if(is_object($this->oStructureItem)
+            && $this->oStructureItem->getId() &&
+            method_exists($this->oStructureItem, "title"))
         {
             $this->title = $this->oStructureItem->title();
             return;
@@ -186,13 +195,16 @@ class Page_Show extends Core
         if($this->oStructure->meta_title() != "")
             $aTitle[] = $this->oStructure->meta_title();
 
-        if($this->oStructureItem->getId())
+        if(is_object($this->oStructureItem)
+            && $this->oStructureItem->getId()
+            && method_exists($this->oStructureItem, "title"))
             $aTitle[] = $this->oStructureItem->title();
 
-        if($this->oStructureItem->meta_title() != "")
+        if(is_object($this->oStructureItem)
+            && method_exists($this->oStructureItem, "meta_title")
+            && $this->oStructureItem->meta_title() != "")
             $aTitle [] = $this->oStructureItem->meta_title();
-
-        $this->meta_title = array_pop($aTitle);
+            $this->meta_title = array_pop($aTitle);
     }
 
 
@@ -203,16 +215,22 @@ class Page_Show extends Core
     {
         $aDescription[] = $this->oStructure->description();
 
-        if($this->oStructureItem->getId())
+        if(is_object($this->oStructureItem)
+            && $this->oStructureItem->getId()
+            && method_exists($this->oStructureItem, "description"))
             $aDescription[] = $this->oStructureItem->description();
 
-        if($this->oStructure->meta_title() != "")
+        if($this->oStructure->meta_description() != "")
             $aDescription[] = $this->oStructure->meta_description();
 
-        if($this->oStructureItem->getId())
+        if(is_object($this->oStructureItem)
+            && $this->oStructureItem->getId()
+            && method_exists($this->oStructureItem, "description"))
             $aDescription[] = $this->oStructureItem->description();
 
-        if($this->oStructureItem->meta_title() != "")
+        if(is_object($this->oStructureItem )
+            && method_exists($this->oStructureItem, "meta_description")
+            && $this->oStructureItem->meta_description() != "")
             $aDescription [] = $this->oStructureItem->meta_description();
 
         $this->meta_description = array_pop($aDescription);
@@ -225,14 +243,13 @@ class Page_Show extends Core
     public function metaKeywords()
     {
         $aKeywords = false;
-        if($this->oStructure->meta_keywords() != "")
+        if(method_exists($this->oStructure, "meta_keywords") && $this->oStructure->meta_keywords() != "")
             $aKeywords[] = $this->oStructure->meta_keywords();
 
-        if($this->oStructureItem->getId())
+        if(is_object($this->oStructureItem)
+            && $this->oStructureItem->getId()
+            && method_exists($this->oStructureItem, "meta_keywords"))
             $aKeywords[] = $this->oStructureItem->meta_keywords();
-
-        if($this->oStructureItem->meta_keywords() != "")
-            $aKeywords [] = $this->oStructureItem->meta_keywords();
 
         if($aKeywords && is_array($aKeywords))
             $this->meta_keywords = array_pop($aKeywords);
@@ -246,6 +263,7 @@ class Page_Show extends Core
     */
     public function createPage()
     {
+        global $CFG;
         $uri = $this->getURI();
         $segments = explode("/", $uri);
 
@@ -256,13 +274,11 @@ class Page_Show extends Core
         }
 
         $this->oStructure = Core::factory('Structure');
-        $this->oStructureItem = Core::factory('Structure_Item');
 
         while(count($segments) > 0)
         {   
             $path = array_shift($segments);
 
-            //Поиск необходимой структуры
             $oTmpStructure = $this->oStructure
                 ->queryBuilder()
                 ->where("parent_id", "=", $this->oStructure->getId())
@@ -274,23 +290,47 @@ class Page_Show extends Core
                 $this->oStructure = $oTmpStructure;
 
             //Поиск элемента структуры
-            if(!$oTmpStructure)
+            if(!$oTmpStructure && $this->oStructure->children_name() != "")
             {
-                $addressing_type = include(ROOT . "/config/item_link.php");
-            
-                $this->oStructureItem = $this->oStructureItem
-                    ->queryBuilder()
-                    ->where("structure_id", "=", $this->oStructure->getId())
-                    ->where($addressing_type, "=", $path)
-                    ->where("active", "=", "1")
-                    ->find();
+                $children_name = $this->oStructure->children_name();
 
-                if(!$this->oStructureItem)
+                while($path != "")
                 {
-                    $this->error404();
-                    return;
+                    $this->oStructureItem = Core::factory($children_name);
+
+                    $this->oStructureItem->queryBuilder();
+
+                    $this->oStructureItem != false
+                        ?   $parentId = $this->oStructureItem->getId()
+                        :   $parentId = $this->oStructure->getId();
+
+                    if(isset($CFG->items_mapping[$children_name]["parent"]))
+                        $this->oStructureItem
+                            ->where($CFG->items_mapping[$children_name]["parent"], "=", $parentId);
+
+                    if($CFG->items_mapping[$children_name]["active"])
+                        $this->oStructureItem
+                            ->where("active", "=", "1");
+
+                    $this->oStructureItem = $this->oStructureItem
+                        ->where($CFG->items_mapping[$children_name]["index"], "=", $path)
+                        ->find();
+
+                    if(!$this->oStructureItem)
+                    {
+                        $this->error404();
+                        return;
+                    }
+
+                    if(method_exists($this->oStructureItem, "children_name")
+                        && $this->oStructureItem->children_name() != "")
+                    {
+                        $children_name = $this->oStructureItem->children_name();
+                    }
+                    $path = array_shift($segments);
                 }
-            }       
+            }
+
         }
 
         //Установка заголовка страницы

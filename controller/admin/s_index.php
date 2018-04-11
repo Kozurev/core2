@@ -1,12 +1,13 @@
 <?php
 
 /*
-*	Обработчик выхода из учетной записи
+*	Блок проверки авторизации
 */
-if(isset($_GET["disauthorize"]))
+$oUser = Core::factory("User")->getCurent();
+if(User::checkUserAccess(array("superuser" => 1)) != true)
 {
-	$oUser = Core::factory("User");
-	$oUser::disauthorize();
+    header('Location: admin/authorize');
+    exit;
 }
 
 if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
@@ -14,3 +15,7 @@ if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
 	$this->execute();
 	exit;
 }
+
+//echo "<pre>";
+//print_r($_COOKIE);
+//echo "</pre>";

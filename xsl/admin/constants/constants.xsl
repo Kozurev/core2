@@ -14,7 +14,7 @@
 				<th>id</th>
 				<th>Заголовок</th>
 				<th>Название</th>
-				<th>Описание</th>
+				<!--<th>Описание</th>-->
 				<th>Активность</th>
 				<th>Редактировать</th>
 				<th>Удалить</th>
@@ -71,7 +71,7 @@
 			<td></td>
 
 			<!--Описание-->
-			<td><xsl:value-of select="description" /></td>
+			<!--<td><xsl:value-of select="description" /></td>-->
 
 			<!--Активность-->
 			<td></td>
@@ -97,7 +97,7 @@
 			<td><xsl:value-of select="name" /></td>
 
 			<!--Описание-->
-			<td><xsl:value-of select="description" /></td>
+			<!--<td><xsl:value-of select="description" /></td>-->
 
 			<!--Активность-->
 			<td>

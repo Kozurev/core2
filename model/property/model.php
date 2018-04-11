@@ -26,7 +26,7 @@ class Property_Model extends Core_Entity
 	public function active($val = null)
 	{
 		if(is_null($val))   return $this->active;
-		$val === true
+		$val == true
             ?   $this->active = 1
             :   $this->active = 0;
 
