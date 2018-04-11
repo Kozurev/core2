@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Апр 11 2018 г., 16:55
--- Версия сервера: 5.7.16
--- Версия PHP: 5.6.29
+-- Время создания: Апр 12 2018 г., 00:16
+-- Версия сервера: 5.5.53
+-- Версия PHP: 7.0.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -97,7 +97,10 @@ INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `t
 (53, 12, 'Тип', 'type', 0, 4, 1, 1, 40, 'PropertyTypes', ''),
 (54, 12, 'Описание', 'description', 0, 5, 1, 0, 50, '', ''),
 (55, 12, 'Родительская дирректория', 'dir', 0, 4, 1, 0, 60, 'PropertyDirs', ''),
-(56, 12, 'Сортировка', 'sorting', 0, 1, 1, 0, 70, '', '');
+(56, 12, 'Сортировка', 'sorting', 0, 1, 1, 0, 70, '', ''),
+(57, 6, 'Путь', 'path', 255, 2, 1, 1, 30, '', ''),
+(58, 6, 'Дочерние объекты', 'children_name', 255, 2, 1, 0, 40, '', 'User'),
+(59, 1, 'Дочерние объекты', 'children_name', 255, 2, 1, 0, 7, '', 'Structure_Item');
 
 -- --------------------------------------------------------
 
@@ -320,7 +323,8 @@ INSERT INTO `Property` (`id`, `tag_name`, `title`, `description`, `type`, `activ
 (3, 'params', 'Параметры', '', 'string', 1, 0, 0),
 (4, 'description', 'Описание', '', 'text', 1, 0, 0),
 (9, 'vk', 'Ссылка вконтакте', '', 'string', 1, 1, 0),
-(10, 'lesson_type', 'Тип урока', '', 'list', 1, 1, 0);
+(10, 'lesson_type', 'Тип урока', '', 'list', 1, 1, 0),
+(11, 'test', 'test', '', 'int', 1, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -877,6 +881,7 @@ CREATE TABLE `Structure` (
   `action` varchar(100) NOT NULL,
   `template_id` int(11) NOT NULL,
   `description` text NOT NULL,
+  `children_name` varchar(255) DEFAULT NULL,
   `active` int(11) NOT NULL DEFAULT '1',
   `sorting` int(11) NOT NULL,
   `meta_title` varchar(100) DEFAULT NULL,
@@ -888,23 +893,23 @@ CREATE TABLE `Structure` (
 -- Дамп данных таблицы `Structure`
 --
 
-INSERT INTO `Structure` (`id`, `title`, `parent_id`, `path`, `action`, `template_id`, `description`, `active`, `sorting`, `meta_title`, `meta_description`, `meta_keywords`) VALUES
-(1, 'Магазин', 0, 'shop', 'catalog', 5, 'Интернет-магазин', 1, 1000, '', '', ''),
-(2, 'Спорт', 1, 'sport', 'catalog', 5, '', 1, 0, '', '', ''),
-(3, 'Теннис', 2, 'tennis', 'catalog', 5, '', 1, 0, '', '', ''),
-(4, 'Футбол', 2, 'football', 'catalog', 5, '', 1, 0, '', '', ''),
-(5, 'Панель управления musadm', 0, '', 'musadm/index', 4, '', 1, 10, '', '', ''),
-(6, 'Административный раздел', 0, 'admin', 'admin/index', 3, '', 1, 0, '', '', ''),
-(7, 'Личный кабинет', 0, 'user', 'user', 4, '', 1, 0, '', '', ''),
-(8, 'Иерархия классов', 9, 'models', 'documentation/models', 1, 'Общая структура системы. Описание стандартных классов, их свойств и методов.', 1, 0, '', '', ''),
-(9, 'Документация', 0, 'documentation', 'documentation/index', 1, 'Руководство по использованию системы', 1, 100, '', '', ''),
-(14, 'Авторизация', 5, 'authorize', 'musadm/authorize', 1, '', 1, 0, '', '', ''),
-(15, 'Спорт2', 1, '', '', 0, '', 1, 0, NULL, NULL, NULL),
-(16, 'Спорт3', 1, '', '', 0, '', 1, 0, NULL, NULL, NULL),
-(17, 'Спорт4', 1, '', '', 0, '', 1, 0, NULL, NULL, NULL),
-(18, 'Спорт5', 1, '', '', 0, '', 0, 0, NULL, NULL, NULL),
-(19, 'Песочница', 0, 'test', 'index', 5, 'Раздел для тестирования различного функционала или отладки ', 1, 10000, NULL, NULL, NULL),
-(20, 'Авторизация', 6, 'authorize', 'admin/auth', 3, 'Страница авторизации для административного раздела', 1, 0, NULL, NULL, NULL);
+INSERT INTO `Structure` (`id`, `title`, `parent_id`, `path`, `action`, `template_id`, `description`, `children_name`, `active`, `sorting`, `meta_title`, `meta_description`, `meta_keywords`) VALUES
+(1, 'Магазин', 0, 'shop', 'catalog', 5, 'Интернет-магазин', 'Structure_Item', 1, 1000, '', '', ''),
+(2, 'Спорт', 1, 'sport', 'catalog', 5, '', 'Structure_Item', 1, 0, '', '', ''),
+(3, 'Теннис', 2, 'tennis', 'catalog', 5, '', 'Structure_Item', 1, 0, '', '', ''),
+(4, 'Футбол', 2, 'football', 'catalog', 5, '', 'Structure_Item', 1, 0, '', '', ''),
+(5, 'Панель управления musadm', 0, '', 'musadm/index', 4, '', '', 1, 10, '', '', ''),
+(6, 'Административный раздел', 0, 'admin', 'admin/index', 3, '', '', 1, 0, '', '', ''),
+(7, 'Пользователи', 5, 'user', 'musadm/user/index', 5, '', 'User_Group', 1, 1000, '', '', ''),
+(8, 'Иерархия классов', 9, 'models', 'documentation/models', 1, 'Общая структура системы. Описание стандартных классов, их свойств и методов.', '', 1, 0, '', '', ''),
+(9, 'Документация', 0, 'documentation', 'documentation/index', 1, 'Руководство по использованию системы', '', 1, 100, '', '', ''),
+(14, 'Вход', 5, 'authorize', 'musadm/authorize', 1, '', '', 1, 0, '', '', ''),
+(15, 'Спорт2', 1, '', '', 0, '', '', 1, 0, NULL, NULL, NULL),
+(16, 'Спорт3', 1, '', '', 0, '', '', 1, 0, NULL, NULL, NULL),
+(17, 'Спорт4', 1, '', '', 0, '', '', 1, 0, NULL, NULL, NULL),
+(18, 'Спорт5', 1, '', '', 0, '', '', 0, 0, NULL, NULL, NULL),
+(19, 'Песочница', 0, 'test', 'index', 5, 'Раздел для тестирования различного функционала или отладки ', '', 1, 1000, NULL, NULL, NULL),
+(20, 'Авторизация', 6, 'authorize', 'admin/auth', 3, 'Страница авторизации для административного раздела', '', 1, 0, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1225,6 +1230,8 @@ INSERT INTO `User` (`id`, `name`, `surname`, `patronimyc`, `phone_number`, `emai
 CREATE TABLE `User_Group` (
   `id` int(11) NOT NULL,
   `title` varchar(50) NOT NULL,
+  `path` varchar(255) DEFAULT NULL,
+  `children_name` varchar(255) DEFAULT NULL,
   `sorting` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1232,12 +1239,12 @@ CREATE TABLE `User_Group` (
 -- Дамп данных таблицы `User_Group`
 --
 
-INSERT INTO `User_Group` (`id`, `title`, `sorting`) VALUES
-(1, 'Администратор', 0),
-(2, 'Пользователь', 10),
-(3, 'Директор', 20),
-(4, 'Учитель', 30),
-(5, 'Студент', 40);
+INSERT INTO `User_Group` (`id`, `title`, `path`, `children_name`, `sorting`) VALUES
+(1, 'Администраторы', 'admin', 'User', 0),
+(2, 'Пользователи', 'manager', 'User', 10),
+(3, 'Директоры', 'director', 'User', 20),
+(4, 'Учителя', 'teacher', 'User', 30),
+(5, 'Клиенты', 'client', 'User', 40);
 
 --
 -- Индексы сохранённых таблиц
@@ -1395,7 +1402,7 @@ ALTER TABLE `User_Group`
 -- AUTO_INCREMENT для таблицы `Admin_Form`
 --
 ALTER TABLE `Admin_Form`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Modelname`
 --
@@ -1440,7 +1447,7 @@ ALTER TABLE `Page_Template_Dir`
 -- AUTO_INCREMENT для таблицы `Property`
 --
 ALTER TABLE `Property`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 --
 -- AUTO_INCREMENT для таблицы `Property_Dir`
 --
