@@ -49,25 +49,29 @@ class Property extends Property_Model
 	*/
 	public function getPropertiesList($obj)
 	{
-	    $types = array("Int", "String", "Text", "List");
-	    $aPropertiesId = array();
+	    if(!is_object($obj) || !method_exists($obj, "getId"))
+	        die("Переданный объект не подходит для работы с доп. свойствами.");
+
+	    $types = array("Int", "String", "Text", "List"/*, "Bool"*/);
+        $aProperties = array();
 
         foreach($types as $type)
         {
             $sTableName = "Property_" . $type . "_Assigment";
-            $aPropertiesId = array_merge($aPropertiesId, Core::factory($sTableName)->properties_list($obj));
+            $aoTypeProperties = Core::factory($sTableName)
+                ->where("object_id", "=", $obj->getId())
+                ->where("model_name", "=", get_class($obj))
+                ->findAll();
+
+            if(is_array($aoTypeProperties))
+            foreach ($aoTypeProperties as $result)
+            {
+                $aProperties[] = Core::factory("Property", $result->property_id());
+            }
+
         }
 
-		$aoPropertiesList = array();
-
-		foreach ($aPropertiesId as $id) 
-		{
-			$aoPropertiesList[] = $this->queryBuilder()
-				->where("id", "=", $id)
-				->find();
-		}
-
-		return $aoPropertiesList;
+		return $aProperties;
 	}
 
 
@@ -79,12 +83,13 @@ class Property extends Property_Model
 	*/
 	public function addToPropertiesList($obj, $propertyId)
 	{
-		if(!is_int($propertyId)) return false;
+		//if(!is_int($propertyId)) return false;
         $oProperty = Core::factory("Property", $propertyId);
         if($oProperty == false) return false;
         $sTableName = "Property_" . $oProperty->type() . "_Assigment";
 
         $assigment = Core::factory($sTableName)
+            //->select("id")
             ->where("object_id", "=", $obj->getId())
 	        ->where("property_id", "=", $propertyId)
             ->where("model_name", "=", get_class($obj))
@@ -110,7 +115,7 @@ class Property extends Property_Model
 	*/
 	public function deleteFromPropertiesList($obj, $propertyId)
 	{
-        if(!is_int($propertyId)) return false;
+        //if(!is_int($propertyId)) return false;
         $oProperty = Core::factory("Property", $propertyId);
         if($oProperty == false) return false;
         $sTableName = "Property_" . $oProperty->type() . "_Assigment";
