@@ -65,6 +65,7 @@ $(function(){
         .on("click", ".delete_block", function(){
             $(this).parent().remove();
         })
+        //Следующая страница
         .on("click", ".next_page", function(e){
             e.preventDefault();
             var current_page = Number($("#current_page").text());
@@ -73,16 +74,29 @@ $(function(){
             //var hash = window.location.hash;
             setPage(current_page);
         })
+        //Предыдущая страница
         .on("click", ".prev_page", function(e){
             e.preventDefault();
             var current_page = Number($("#current_page").text());
             var count_pages = Number($("#count_pages").text());
             if(current_page == 1)	return;
             setPage(current_page-2);
+        })
+        //Активация/деактивация свойства для объекта
+        .on("click", ".active_property_for_object", function(){
+            var model_name = $(this).data("obj_name");
+            var model_id = $(this).data("obj_id");
+            var prop_id = $(this).data("prop_id");
+            var active = $(this).is(':checked');
+            changePropertyForObject(model_id, model_name, prop_id, active);
         });
 });
 
 
+/**
+ * Устанавливает номер страницы (пагинация)
+ * @param page
+ */
 function setPage(page) {
     var hash = window.location.hash;
     if(hash.indexOf("&page") >= 0)	hash = hash.substring(0, hash.indexOf("&page"));
@@ -169,6 +183,10 @@ function deleteItem(model_name, model_id){
 }
 
 
+/**
+ * Обновление значений свойств объекта
+ * @param objectData
+ */
 function updateItem(objectData){
     loaderOn();
 
@@ -186,6 +204,31 @@ function updateItem(objectData){
                 alert("Ошибка: " + answer);
         }
     });
+}
+
+
+function changePropertyForObject(obj_id, obj_name, prop_id, active) {
+    loaderOn();
+
+    var link = "?menuTab=Properties&menuAction=changePropertiesList&ajax=1";
+
+    $.ajax({
+        type: "GET",
+        url: link,
+        data: {
+            model_id: obj_id,
+            model_name: obj_name,
+            property_id: prop_id,
+            active: active
+        },
+        success: function(responce) {
+            //reloadMain(window.location.hash);
+            setTimeout("loaderOff()", 100);
+            if(responce != "0")
+                alert("Ошибка: " + responce);
+        }
+    });
+
 }
 
 
