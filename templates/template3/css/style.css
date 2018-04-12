@@ -86,7 +86,8 @@ button a {
 }
 
 .container {
-	width: 1150px;
+	//width: 1150px;
+	width: 75%;
 	padding-top: 30px;
 }
 
@@ -147,6 +148,14 @@ button a {
 	height: 25px;
 	width: 25px;
 	background: url(../images/delete.png);
+	background-size: cover;
+}
+
+.propertiesLink {
+	display: inline-block;
+	height: 25px;
+	width: 25px;
+	background: url(../images/edit2.png);
 	background-size: cover;
 }
 
