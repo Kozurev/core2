@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Апр 12 2018 г., 00:16
--- Версия сервера: 5.5.53
--- Версия PHP: 7.0.14
+-- Время создания: Апр 12 2018 г., 16:18
+-- Версия сервера: 5.7.16
+-- Версия PHP: 5.6.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -329,6 +329,33 @@ INSERT INTO `Property` (`id`, `tag_name`, `title`, `description`, `type`, `activ
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `Property_Bool`
+--
+
+CREATE TABLE `Property_Bool` (
+  `id` int(11) NOT NULL,
+  `property_id` int(11) NOT NULL,
+  `value` int(11) NOT NULL,
+  `model_name` varchar(100) NOT NULL,
+  `object_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `Property_Bool_Assigment`
+--
+
+CREATE TABLE `Property_Bool_Assigment` (
+  `id` int(11) NOT NULL,
+  `property_id` int(11) NOT NULL,
+  `object_id` int(11) NOT NULL,
+  `model_name` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `Property_Dir`
 --
 
@@ -388,7 +415,8 @@ CREATE TABLE `Property_Int_Assigment` (
 
 INSERT INTO `Property_Int_Assigment` (`id`, `property_id`, `object_id`, `model_name`) VALUES
 (1, 2, 1, 'Structure_Item'),
-(2, 2, 2, 'Structure_Item');
+(2, 2, 2, 'Structure_Item'),
+(5, 2, 4, 'Structure');
 
 -- --------------------------------------------------------
 
@@ -821,7 +849,8 @@ INSERT INTO `Property_String_Assigment` (`id`, `property_id`, `object_id`, `mode
 (250, 9, 335, 'User'),
 (251, 9, 336, 'User'),
 (252, 3, 1, 'Structure_Item'),
-(253, 3, 2, 'Structure_Item');
+(253, 3, 2, 'Structure_Item'),
+(254, 9, 5, 'User_Group');
 
 -- --------------------------------------------------------
 
@@ -907,7 +936,7 @@ INSERT INTO `Structure` (`id`, `title`, `parent_id`, `path`, `action`, `template
 (15, 'Спорт2', 1, '', '', 0, '', '', 1, 0, NULL, NULL, NULL),
 (16, 'Спорт3', 1, '', '', 0, '', '', 1, 0, NULL, NULL, NULL),
 (17, 'Спорт4', 1, '', '', 0, '', '', 1, 0, NULL, NULL, NULL),
-(18, 'Спорт5', 1, '', '', 0, '', '', 0, 0, NULL, NULL, NULL),
+(18, 'Спорт5', 1, '', '', 0, '', '', 1, 0, NULL, NULL, NULL),
 (19, 'Песочница', 0, 'test', 'index', 5, 'Раздел для тестирования различного функционала или отладки ', '', 1, 1000, NULL, NULL, NULL),
 (20, 'Авторизация', 6, 'authorize', 'admin/auth', 3, 'Страница авторизации для административного раздела', '', 1, 0, NULL, NULL, NULL);
 
@@ -1311,6 +1340,18 @@ ALTER TABLE `Property`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Индексы таблицы `Property_Bool`
+--
+ALTER TABLE `Property_Bool`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `Property_Bool_Assigment`
+--
+ALTER TABLE `Property_Bool_Assigment`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Индексы таблицы `Property_Dir`
 --
 ALTER TABLE `Property_Dir`
@@ -1449,6 +1490,16 @@ ALTER TABLE `Page_Template_Dir`
 ALTER TABLE `Property`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 --
+-- AUTO_INCREMENT для таблицы `Property_Bool`
+--
+ALTER TABLE `Property_Bool`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT для таблицы `Property_Bool_Assigment`
+--
+ALTER TABLE `Property_Bool_Assigment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
 -- AUTO_INCREMENT для таблицы `Property_Dir`
 --
 ALTER TABLE `Property_Dir`
@@ -1462,7 +1513,7 @@ ALTER TABLE `Property_Int`
 -- AUTO_INCREMENT для таблицы `Property_Int_Assigment`
 --
 ALTER TABLE `Property_Int_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 --
 -- AUTO_INCREMENT для таблицы `Property_List`
 --
@@ -1487,7 +1538,7 @@ ALTER TABLE `Property_String`
 -- AUTO_INCREMENT для таблицы `Property_String_Assigment`
 --
 ALTER TABLE `Property_String_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=254;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=255;
 --
 -- AUTO_INCREMENT для таблицы `Property_Text`
 --
