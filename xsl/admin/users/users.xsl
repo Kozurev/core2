@@ -16,6 +16,7 @@
 					<th>id</th>
 					<th>Название</th>
 					<th>Путь</th>
+					<th>Доп. св-ва</th>
 					<th>Редактировать</th>
 					<th>Удалить</th>
 					<xsl:apply-templates select="user_group" />
@@ -76,6 +77,8 @@
 			</td>
 
 			<td><xsl:value-of select="path" /></td>
+
+			<td><a href="admin?menuTab=Properties&amp;menuAction=show&amp;model_name=User_Group&amp;model_id={id}" class="link propertiesLink" /></td>
 
 			<!--Редактирование-->
 			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=User_Group&amp;model_id={id}" class="link updateLink" /></td>

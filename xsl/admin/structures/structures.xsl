@@ -16,6 +16,7 @@
 				<th>Название</th>
 				<th>Активность</th>
 				<th>Путь</th>
+				<th>Доп. св-ва</th>
 				<th>Редактировать</th>
 				<th>Удалить</th>
 				<xsl:apply-templates select="structure" />
@@ -74,6 +75,8 @@
 			<!--Путь-->
 			<td><xsl:value-of select="path" /></td>
 
+			<td><a href="admin?menuTab=Properties&amp;menuAction=show&amp;model_name=Structure&amp;model_id={id}" class="link propertiesLink" /></td>
+
 			<!--Редактирование-->
 			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
 
@@ -102,6 +105,8 @@
 			</td>
 
 			<td><xsl:value-of select="path" /></td>
+
+			<td></td>
 
 			<!--Редактирование-->
 			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
