@@ -4,6 +4,16 @@
 */
 class Constant extends Constant_Model
 {
+
+    public function getParent()
+    {
+        if($this->id)
+            return Core::factory("Constant_Dir", $this->dir);
+        else
+            return Core::factory("Constant_Dir");
+    }
+
+
 	/**
 	* 	Установка пользовательских констант
 	*	@return void	

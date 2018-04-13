@@ -24,13 +24,13 @@
 			</table>
 
 			<button class="btn button" type="button">
-				<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}" class="link">
+				<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}&amp;parent_name=Structure" class="link">
 					Новый раздел
 				</a>
 			</button>
 
 			<button class="btn button" type="button">
-				<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}" class="link">
+				<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}&amp;parent_name=Structure" class="link">
 					Новый элемент
 				</a>
 			</button>
@@ -56,7 +56,7 @@
 				<a 
 					class="link"
 					href="admin?menuTab=Structure&amp;
-					menuAction=show&amp;parent_id={id}">
+					menuAction=show&amp;parent_id={id}&amp;parent_name=Structure">
 					<xsl:value-of select="title" />
 				</a>
 			</td>

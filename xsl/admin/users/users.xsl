@@ -39,14 +39,14 @@
 			<xsl:choose>
 				<xsl:when test="count(user/id) = 0">
 					<button class="btn button" type="button">
-						<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=User_Group&amp;parent_id={parent_id}" class="link">
+						<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=User_Group&amp;parent_id={group_id}" class="link">
 							Создать группу
 						</a>
 					</button>
 				</xsl:when>
 				<xsl:otherwise>
 					<button class="btn button" type="button">
-						<a href="admin?menuTab=User&amp;menuAction=updateForm&amp;model=User&amp;parent_id={parent_id}" class="link">
+						<a href="admin?menuTab=User&amp;menuAction=updateForm&amp;model=User&amp;parent_id={group_id}&amp;parent_name=User_Group" class="link">
 							Создать пользователя
 						</a>
 					</button>
@@ -71,7 +71,7 @@
 			<td><xsl:value-of select="id"/></td>
 
 			<td class="table_structure">
-				<a class="link" href="admin?menuTab=User&amp;menuAction=show&amp;group_id={id}">
+				<a class="link" href="admin?menuTab=User&amp;menuAction=show&amp;parent_id={id}&amp;parent_name=User_Group">
 					<xsl:value-of select="title" />
 				</a>
 			</td>

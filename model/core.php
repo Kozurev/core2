@@ -4,7 +4,51 @@
 */ 
 class Core //extends Orm
 {
-    private $aStrings;
+    //private $aStrings;
+    static private $observers = array();
+
+    /**
+     * Создание обработчика для наблюдателя
+     * @param $action - название действия
+     * @param $function - обрабтчик для данного действия
+     */
+    static public function attachObserver($action, $function)
+    {
+        if(isset(Core::$observers[$action]))
+            Core::$observers[$action][] = $function;
+        else
+            Core::$observers[$action][] = $function;
+    }
+
+
+    /**
+     * Удаление последнего добавленного обработчика наблюдателя
+     * @param $action - название действия
+     */
+    static public function detachObserver($action)
+    {
+        foreach (Core::$observers as $name => $observers)
+            if($name == $action)
+                array_pop(Core::$observers[$name]);
+    }
+
+
+    /**
+     * Данный метод устанавливается в месте срабатывания наблюдателя
+     * @param $args - аргументы для функции обработчика наблюдателя
+     * @param $action - название действия
+     */
+    static public function notify($args, $action)
+    {
+        foreach (Core::$observers as $name => $observers)
+            if($name == $action)
+                foreach ($observers as $name => $function)
+                {
+                    $func = $function;
+                    $func($args);
+                }
+    }
+
 
 	/**
 	*	Подключает необходимый файл и создаёт объект класса
@@ -60,7 +104,12 @@ class Core //extends Orm
 
 	}
 
-	
+
+    /**
+     * Получение значения часто используемой строки
+     * @param $sMessageName - назавние строки
+     * @param $aMessageParams - параметры, передаваемые в строку
+     */
     public static function getMessage($sMessageName, $aMessageParams)
     {
         ini_set('display_errors','Off');

@@ -1,6 +1,16 @@
 <?php
 class User extends User_Model
 {
+
+    public function getParent()
+    {
+        if($this->id)
+            return Core::factory("User_Group", $this->group_id);
+        else
+            return Core::factory("User_Group");
+    }
+
+
 	/**
 	*	Проверка для избежания создания пользователей с одинаковыми логинами
 	*	@return boolean
@@ -25,18 +35,18 @@ class User extends User_Model
 	*/
 	public function save()
 	{
-        //$this->properties_list = serialize($this->properties_list);
+        Core::notify(array(&$this), "beforeUserSave");
 
 		if(!$this->id && $this->isUserExists($this->login))
 		{
 			echo "<br>Пользователь с такими данными уже существует";
 			return $this;
 		}
-
 		parent::save();
 
-        //$this->properties_list = unserialize($this->properties_list);
-		return $this;
+        Core::notify(array(&$this), "afterUserSave");
+
+        return $this;
 	}
 
 

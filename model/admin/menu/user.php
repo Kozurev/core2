@@ -8,7 +8,7 @@ class Admin_Menu_User
     public function show($aParams)
     {
         $sXslPath = "admin/users/users.xsl";
-        $groupId = Core_Array::getValue($aParams, "group_id", "0");
+        $groupId = Core_Array::getValue($aParams, "parent_id", "0");
         $oOutputEntity = Core::factory("Core_Entity");
         $title = "Пользователи";
 

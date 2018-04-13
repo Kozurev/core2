@@ -9,5 +9,8 @@ class User_Group extends User_Group_Model
 	{
 	}
 
-
+    public function getParent()
+    {
+        return $this;
+    }
 }

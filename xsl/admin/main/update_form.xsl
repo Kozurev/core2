@@ -159,7 +159,7 @@
 				<input type="hidden" name="modelName" value="{/root/model_name}" />
 
 				<button class="btn btn-success button" type="button">
-					<a href="admin?menuTab={tab}&amp;menuAction=updateAction" class="submit">
+					<a href="?menuTab={tab}&amp;menuAction=updateAction" class="submit">
 						Сохранить
 					</a>
 				</button>

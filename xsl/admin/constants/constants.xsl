@@ -24,7 +24,7 @@
 
 			<button class="btn button" type="button">
 				<a 
-					href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant_Dir&amp;parent_id={parent_id}" 
+					href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant_Dir&amp;parent_id={parent_id}"
 					class="link">
 					Создать раздел
 				</a>
@@ -32,7 +32,7 @@
 
 			<button class="btn button" type="button">
 				<a 
-					href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant&amp;parent_id={parent_id}" 
+					href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant&amp;parent_id={parent_id}&amp;parent_name=Constant_Dir"
 					class="link">
 					Создать константу
 				</a>
@@ -62,7 +62,7 @@
 				<a 
 					class="link dir"
 					href="admin?menuTab=Constant&amp;
-					menuAction=show&amp;parent_id={id}">
+					menuAction=show&amp;parent_id={id}&amp;parent_name=Constant_Dir">
 					<xsl:value-of select="title" />
 				</a>
 			</td>

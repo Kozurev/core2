@@ -37,7 +37,8 @@ $(function(){
             {
                 data += "&" + $(aUnchecked[i]).attr("name") + "=0";
             }
-            updateItem(data);
+            var link = $(this).attr("href");
+            updateItem(data, link);
         })
         //Добавление поля для дополнительного свойства
         .on("click", ".add_new_value", function(e){
@@ -187,10 +188,11 @@ function deleteItem(model_name, model_id){
  * Обновление значений свойств объекта
  * @param objectData
  */
-function updateItem(objectData){
+function updateItem(objectData, link){
     loaderOn();
 
-    var link = "?menuTab=Main&menuAction=updateAction&ajax=1&" + objectData;
+    //var link = "?menuTab=Main&menuAction=updateAction&ajax=1&" + objectData;
+    link += "&ajax=1&" + objectData;
 
     $.ajax({
         type: "GET",

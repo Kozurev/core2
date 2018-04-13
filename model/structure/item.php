@@ -5,10 +5,21 @@
 
 class Structure_Item extends Structure_Item_Model
 {
-	
-//	public function save()
-//	{
-//	}
+
+    public function getParent()
+    {
+        if($this->parent_id != 0)   return Core::factory("Structure", $this->parent_id);
+        else return Core::factory("Structure");
+    }
+
+
+
+	public function save()
+	{
+        Core::notify(array(&$this), "beforeItemSave");
+        parent::save();
+        Core::notify(array(&$this), "afterItemSave");
+	}
 	
 
 }

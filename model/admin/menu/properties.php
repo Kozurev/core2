@@ -85,12 +85,15 @@ class Admin_Menu_Properties
             foreach ($aProperties as $property)
             {
                 if($property->getId() == $objProperty->getId())
+                {
                     $property->belongs = 1;
-                else
+                    $found = 1;
+                }
+
+                if($found != 1)
                     $property->belongs = 0;
             }
         }
-
 
         $oOutputEntity
             ->xsl($sXslPath)
