@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Апр 12 2018 г., 16:18
+-- Время создания: Апр 13 2018 г., 15:58
 -- Версия сервера: 5.7.16
 -- Версия PHP: 5.6.29
 
@@ -36,7 +36,7 @@ CREATE TABLE `Admin_Form` (
   `active` int(11) NOT NULL DEFAULT '1',
   `required` int(11) NOT NULL DEFAULT '0',
   `sorting` int(11) NOT NULL DEFAULT '0',
-  `list_name` varchar(50) NOT NULL DEFAULT '',
+  `list_name` varchar(50) DEFAULT NULL,
   `value` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -100,7 +100,8 @@ INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `t
 (56, 12, 'Сортировка', 'sorting', 0, 1, 1, 0, 70, '', ''),
 (57, 6, 'Путь', 'path', 255, 2, 1, 1, 30, '', ''),
 (58, 6, 'Дочерние объекты', 'children_name', 255, 2, 1, 0, 40, '', 'User'),
-(59, 1, 'Дочерние объекты', 'children_name', 255, 2, 1, 0, 7, '', 'Structure_Item');
+(59, 1, 'Дочерние объекты', 'children_name', 255, 2, 1, 0, 7, '', 'Structure_Item'),
+(61, 5, 'Группа', 'groupId', 0, 4, 1, 0, 32, 'UserGroups', '');
 
 -- --------------------------------------------------------
 
@@ -394,7 +395,10 @@ CREATE TABLE `Property_Int` (
 
 INSERT INTO `Property_Int` (`id`, `property_id`, `value`, `model_name`, `object_id`) VALUES
 (435, 2, 5, 'Structure_Item', 1),
-(436, 2, 6, 'Structure_Item', 2);
+(436, 2, 2, 'Structure_Item', 2),
+(437, 2, 3, 'User', 342),
+(438, 2, 111, 'Structure', 21),
+(439, 2, 0, 'Structure', 4);
 
 -- --------------------------------------------------------
 
@@ -416,7 +420,12 @@ CREATE TABLE `Property_Int_Assigment` (
 INSERT INTO `Property_Int_Assigment` (`id`, `property_id`, `object_id`, `model_name`) VALUES
 (1, 2, 1, 'Structure_Item'),
 (2, 2, 2, 'Structure_Item'),
-(5, 2, 4, 'Structure');
+(5, 2, 4, 'Structure'),
+(6, 2, 3, 'User_Group'),
+(7, 2, 338, 'User'),
+(8, 2, 339, 'User'),
+(9, 2, 340, 'User'),
+(10, 2, 342, 'User');
 
 -- --------------------------------------------------------
 
@@ -437,8 +446,12 @@ CREATE TABLE `Property_List` (
 --
 
 INSERT INTO `Property_List` (`id`, `property_id`, `model_name`, `object_id`, `value_id`) VALUES
-(4, 1, 'Structure_Item', 2, 7),
-(5, 1, 'Structure_Item', 1, 10);
+(4, 1, 'Structure_Item', 2, 12),
+(5, 1, 'Structure_Item', 1, 10),
+(6, 1, 'User', 342, 10),
+(7, 10, 'User', 342, 0),
+(8, 1, 'Structure', 21, 10),
+(9, 1, 'Structure', 4, 0);
 
 -- --------------------------------------------------------
 
@@ -459,7 +472,18 @@ CREATE TABLE `Property_List_Assigment` (
 
 INSERT INTO `Property_List_Assigment` (`id`, `property_id`, `object_id`, `model_name`) VALUES
 (1, 1, 1, 'Structure_Item'),
-(2, 1, 2, 'Structure_Item');
+(2, 1, 2, 'Structure_Item'),
+(3, 10, 5, 'User_Group'),
+(5, 10, 338, 'User'),
+(6, 1, 338, 'User'),
+(7, 1, 3, 'User_Group'),
+(8, 10, 339, 'User'),
+(9, 1, 339, 'User'),
+(10, 10, 340, 'User'),
+(11, 1, 340, 'User'),
+(12, 1, 342, 'User'),
+(13, 10, 342, 'User'),
+(14, 1, 4, 'Structure');
 
 -- --------------------------------------------------------
 
@@ -574,10 +598,12 @@ INSERT INTO `Property_String` (`id`, `property_id`, `value`, `model_name`, `obje
 (66, 9, '', 'User', 42),
 (67, 3, 'Параметр 1', 'Structure_Item', 1),
 (68, 3, 'Параметр 2', 'Structure_Item', 1),
-(69, 3, 'Параметр 3', 'Structure_Item', 2),
-(70, 3, 'Параметр 4', 'Structure_Item', 2),
-(71, 3, 'Параметр 5', 'Structure_Item', 2),
-(72, 9, 'vk.com/id6846535', 'User', 99);
+(71, 3, 'Параметр 3', 'Structure_Item', 2),
+(72, 9, 'vk.com/id6846535', 'User', 99),
+(73, 3, '2', 'User', 342),
+(74, 9, '', 'User', 342),
+(75, 3, '6546841654984', 'Structure', 21),
+(76, 3, '', 'Structure', 4);
 
 -- --------------------------------------------------------
 
@@ -850,7 +876,17 @@ INSERT INTO `Property_String_Assigment` (`id`, `property_id`, `object_id`, `mode
 (251, 9, 336, 'User'),
 (252, 3, 1, 'Structure_Item'),
 (253, 3, 2, 'Structure_Item'),
-(254, 9, 5, 'User_Group');
+(254, 9, 5, 'User_Group'),
+(255, 3, 3, 'User_Group'),
+(256, 9, 338, 'User'),
+(257, 3, 338, 'User'),
+(258, 9, 339, 'User'),
+(259, 3, 339, 'User'),
+(260, 9, 340, 'User'),
+(261, 3, 340, 'User'),
+(262, 3, 342, 'User'),
+(263, 9, 342, 'User'),
+(264, 3, 4, 'Structure');
 
 -- --------------------------------------------------------
 
@@ -873,7 +909,10 @@ CREATE TABLE `Property_Text` (
 INSERT INTO `Property_Text` (`id`, `property_id`, `value`, `model_name`, `object_id`) VALUES
 (1, 4, 'Описание футбольного мяча', 'Structure_Item', 1),
 (2, 4, 'Описание кросовок 1', 'Structure_Item', 2),
-(3, 4, 'Описание кросовок 2', 'Structure_Item', 2);
+(3, 4, 'Описание кросовок 2', 'Structure_Item', 2),
+(4, 4, '284849849', 'User', 342),
+(5, 4, 'jhvkjnbobnjinpun', 'Structure', 21),
+(6, 4, '', 'Structure', 4);
 
 -- --------------------------------------------------------
 
@@ -894,7 +933,13 @@ CREATE TABLE `Property_Text_Assigment` (
 
 INSERT INTO `Property_Text_Assigment` (`id`, `property_id`, `object_id`, `model_name`) VALUES
 (1, 4, 1, 'Structure_Item'),
-(2, 4, 2, 'Structure_Item');
+(2, 4, 2, 'Structure_Item'),
+(3, 4, 3, 'User_Group'),
+(4, 4, 338, 'User'),
+(5, 4, 339, 'User'),
+(6, 4, 340, 'User'),
+(7, 4, 342, 'User'),
+(8, 4, 4, 'Structure');
 
 -- --------------------------------------------------------
 
@@ -904,15 +949,15 @@ INSERT INTO `Property_Text_Assigment` (`id`, `property_id`, `object_id`, `model_
 
 CREATE TABLE `Structure` (
   `id` int(11) NOT NULL,
-  `title` varchar(150) NOT NULL,
+  `title` varchar(150) DEFAULT NULL,
   `parent_id` int(11) NOT NULL DEFAULT '0',
-  `path` varchar(100) NOT NULL,
-  `action` varchar(100) NOT NULL,
-  `template_id` int(11) NOT NULL,
-  `description` text NOT NULL,
+  `path` varchar(100) DEFAULT NULL,
+  `action` varchar(100) DEFAULT NULL,
+  `template_id` int(11) DEFAULT NULL,
+  `description` text,
   `children_name` varchar(255) DEFAULT NULL,
   `active` int(11) NOT NULL DEFAULT '1',
-  `sorting` int(11) NOT NULL,
+  `sorting` int(11) NOT NULL DEFAULT '0',
   `meta_title` varchar(100) DEFAULT NULL,
   `meta_description` text,
   `meta_keywords` varchar(100) DEFAULT NULL
@@ -949,14 +994,14 @@ INSERT INTO `Structure` (`id`, `title`, `parent_id`, `path`, `action`, `template
 CREATE TABLE `Structure_Item` (
   `id` int(11) NOT NULL,
   `title` varchar(150) NOT NULL,
-  `parent_id` int(11) NOT NULL,
+  `parent_id` int(11) NOT NULL DEFAULT '0',
   `description` text,
   `active` int(11) NOT NULL DEFAULT '1',
   `meta_title` varchar(100) DEFAULT NULL,
   `meta_description` text,
   `meta_keywords` varchar(100) DEFAULT NULL,
-  `path` varchar(50) NOT NULL,
-  `sorting` int(11) NOT NULL
+  `path` varchar(50) DEFAULT NULL,
+  `sorting` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1443,7 +1488,7 @@ ALTER TABLE `User_Group`
 -- AUTO_INCREMENT для таблицы `Admin_Form`
 --
 ALTER TABLE `Admin_Form`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Modelname`
 --
@@ -1508,22 +1553,22 @@ ALTER TABLE `Property_Dir`
 -- AUTO_INCREMENT для таблицы `Property_Int`
 --
 ALTER TABLE `Property_Int`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=437;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=440;
 --
 -- AUTO_INCREMENT для таблицы `Property_Int_Assigment`
 --
 ALTER TABLE `Property_Int_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 --
 -- AUTO_INCREMENT для таблицы `Property_List`
 --
 ALTER TABLE `Property_List`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 --
 -- AUTO_INCREMENT для таблицы `Property_List_Assigment`
 --
 ALTER TABLE `Property_List_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 --
 -- AUTO_INCREMENT для таблицы `Property_List_Values`
 --
@@ -1533,37 +1578,37 @@ ALTER TABLE `Property_List_Values`
 -- AUTO_INCREMENT для таблицы `Property_String`
 --
 ALTER TABLE `Property_String`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
 --
 -- AUTO_INCREMENT для таблицы `Property_String_Assigment`
 --
 ALTER TABLE `Property_String_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=255;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=265;
 --
 -- AUTO_INCREMENT для таблицы `Property_Text`
 --
 ALTER TABLE `Property_Text`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT для таблицы `Property_Text_Assigment`
 --
 ALTER TABLE `Property_Text_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 --
 -- AUTO_INCREMENT для таблицы `Structure`
 --
 ALTER TABLE `Structure`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 --
 -- AUTO_INCREMENT для таблицы `Structure_Item`
 --
 ALTER TABLE `Structure_Item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT для таблицы `User`
 --
 ALTER TABLE `User`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=339;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=343;
 --
 -- AUTO_INCREMENT для таблицы `User_Group`
 --
