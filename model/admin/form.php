@@ -157,6 +157,15 @@ class Admin_Form extends Admin_Form_Model
     }
 
 
+    public function getListUserGroups($aParams)
+    {
+        $aoGroups = Core::factory("User_Group")->findAll();
+        $this->value = Core_Array::getValue($aParams, "parent_id", 0);
+        if($this->value == 0)   $this->value = Core::factory("User", Core_Array::getValue($aParams, "model_id", 0))->groupId();
+        $this->addEntities($aoGroups, "item");
+    }
+
+
     public function getListPropertyDirs($aParms)
     {
         //TODO: Переработать формирование списка родительских директорий аналогично как у структур и констант
