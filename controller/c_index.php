@@ -2,7 +2,7 @@
 
 
 $oProperty = Core::factory("Property");
-$oUserGroup = Core::factory("User_Group", 5);
+$oUserGroup = Core::factory("Structure", 5);
 $aoGroupProperties = $oProperty->getPropertiesList($oUserGroup);
 
 echo "<pre>";
