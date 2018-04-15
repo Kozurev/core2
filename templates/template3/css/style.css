@@ -87,7 +87,8 @@ button a {
 
 .container {
 	//width: 1150px;
-	width: 75%;
+	//width: 75%;
+	width: 100%;
 	padding-top: 30px;
 }
 
@@ -155,7 +156,7 @@ button a {
 	display: inline-block;
 	height: 25px;
 	width: 25px;
-	background: url(../images/edit2.png);
+	background: url(../images/properties.png);
 	background-size: cover;
 }
 
