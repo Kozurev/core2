@@ -32,7 +32,7 @@ class Admin_Menu_Main
             if(method_exists($oUpdatingItem, $key)) $oUpdatingItem->$key($value);
         }
 
-/*        echo "<pre>";
+        /*echo "<pre>";
         print_r($oUpdatingItem);
         print_r($_GET);
         echo "</pre>";*/
@@ -45,7 +45,10 @@ class Admin_Menu_Main
         foreach ($aParams as $sFieldName => $aFieldValues)
         {
             //Получение id свойства
-            if(!stristr($sFieldName, "property_") || $aParams["modelName"] == "Property") continue;
+            if(!stristr($sFieldName, "property_")
+                || $aParams["modelName"] == "Property"
+                || $sFieldName == "property_id")
+                continue;
 
             $iPropertyId = explode("property_", $sFieldName)[1];
             $oProperty = Core::factory("Property", $iPropertyId);
@@ -158,13 +161,18 @@ class Admin_Menu_Main
 
         if($aParams["model"] != "Property")
         {
-            $parentName = Core_Array::getValue($aParams, "parent_name", null);
-            $parentId = Core_Array::getValue($aParams, "parent_id", null);
+            $parentModelName = Core_Array::getValue($aParams, "parent_name", null);
+            $parentModelId = Core_Array::getValue($aParams, "parent_id", 0);
 
-            if($parentId != null && $parentName != null)
-                $oParent = Core::factory($parentName, $parentId);
+
+            if($parentModelId != 0 && !is_null($parentModelName))
+            {
+                $oParent = Core::factory($parentModelName, $parentModelId);
+            }
             else
+            {
                 $oParent = $oUpdatingItem;
+            }
 
 
             //Получения списка дополнительных свойств объекта
@@ -185,11 +193,15 @@ class Admin_Menu_Main
                         ->where("property_id", "=", $oProperty->getId())
                         ->where("model_name", "=", $aParams["model"])
                         ->where("object_id", "=", $oUpdatingItem->getId())
-                        ->find();
+                        ->findAll();
 
-                    if($oPropertyList != false && $oUpdatingItem->getId())
-                        $oProperty->addEntity($oPropertyList, "property_value");
-                    $oProperty->addEntities($aoLitsValues, "item");
+                    if(count($oPropertyList) == 0)
+                        $oPropertyList = array(Core::factory("Property_List"));
+
+                    foreach ($oPropertyList as $prop)
+                        $prop->addEntities($aoLitsValues, "item");
+
+                        $oProperty->addEntities($oPropertyList, "property_value");
                 }
                 else
                 {
@@ -209,59 +221,7 @@ class Admin_Menu_Main
                 $oOutputXml->addEntity($oProperty);
             }
 
-
         }
-
-
-
-//        if($oUpdatingItem->getId() && $aParams["model"] != "Property")
-//        {
-//            $oOutputXml->addEntity($oUpdatingItem);
-//
-//            //Получения списка дополнительных свойств объекта
-//            $aoPropertiesList = Core::factory("Property")->getPropertiesList($oUpdatingItem);
-//
-//            //Поиск значений дополнительных свойств
-//            $aoPropertiesValues = array();
-//            foreach ($aoPropertiesList as $oProperty)
-//            {
-//                if($oProperty->active() == 0)   continue;
-//                if($oProperty->type() == "list")
-//                {
-//                    //Добавление значений свойства типа "список"
-//                    $aoLitsValues = Core::factory("Property_List_Values")
-//                        ->where("property_id", "=", $oProperty->getId())
-//                        ->findAll();
-//
-//                    $oPropertyList = Core::factory("Property_List")
-//                        ->where("property_id", "=", $oProperty->getId())
-//                        ->where("model_name", "=", $aParams["model"])
-//                        ->where("object_id", "=", $oUpdatingItem->getId())
-//                        ->find();
-//
-//                    if($oPropertyList != false)
-//                        $oProperty->addEntity($oPropertyList, "property_value");
-//                    $oProperty->addEntities($aoLitsValues, "item");
-//                }
-//                else
-//                {
-//                    $aoValues = $oProperty->getPropertyValues($oUpdatingItem);
-//
-//                    /*
-//                     * Если значения свойства отсутствуют тогда необходимо добавить пустое значение
-//                     * для корректного формирования пустого поля в админ панеле
-//                     */
-//                    count($aoValues) > 0
-//                        ?   $oProperty->addEntities($aoValues, "property_value")
-//                        :   $oProperty->addEntity(
-//                        Core::factory("Property_" . $oProperty->type()), "property_value"
-//                    );
-//                }
-//
-//                $oOutputXml->addEntity($oProperty);
-//            }
-//
-//        }
 
         //Поиск типов полей
         $aoFieldsTypes = Core::factory("Admin_Form_Type")
