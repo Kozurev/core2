@@ -87,11 +87,7 @@ class Admin_Menu_Properties
                 if($property->getId() == $objProperty->getId())
                 {
                     $property->belongs = 1;
-                    $found = 1;
                 }
-
-                if($found != 1)
-                    $property->belongs = 0;
             }
         }
 
