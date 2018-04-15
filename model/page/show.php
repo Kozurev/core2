@@ -296,6 +296,12 @@ class Page_Show extends Core
 
                 while($path != "")
                 {
+                    if(!isset($CFG->items_mapping[$children_name]))
+                    {
+                        $this->error404();
+                        exit;
+                    }
+
                     $this->oStructureItem = Core::factory($children_name);
 
                     $this->oStructureItem->queryBuilder();
