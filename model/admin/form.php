@@ -174,4 +174,29 @@ class Admin_Form extends Admin_Form_Model
         );
     }
 
+
+    public function getListMenu($aParams)
+    {
+        $aoMenus = Core::factory("Page_Menu")->findAll();
+        if(count($aoMenus) == 0)    return;
+
+        $modelId = Core_Array::getValue($aParams, "model_id", null);
+        if(!is_null($modelId))
+            $this->value = $oStructure = Core::factory("Structure", $modelId)->menuId();
+
+        $this->addEntities($aoMenus, "item");
+    }
+
+
+    public function getListProperties($aParams)
+    {
+        $aoListProperties = Core::factory("Property")
+            ->where("type", "=", "list")
+            ->findAll();
+
+        $this->addEntities($aoListProperties, "item");
+        $this->value = Core_Array::getValue($aParams, "parent_id", 0);
+    }
+
+
 }
