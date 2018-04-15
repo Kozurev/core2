@@ -6,13 +6,6 @@
 class Structure extends Structure_Model
 {
 
-//	public function save()
-//	{
-//		$this->properties_list = serialize($this->properties_list);
-//		parent::save();
-//		$this->properties_list = unserialize($this->properties_list);
-//	}
-
     /**
      * Возвращает объект родительской структуры
      * @return object
