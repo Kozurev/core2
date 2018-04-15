@@ -23,9 +23,9 @@ $CFG->items_mapping = array(
         "index"     =>  "path",
         "active"    =>  false
     ),
-    "User"  =>  array(
-        "parent"    => "group_id",
-        "index"     =>  "id",
-        "active"    =>  true
-    ),
+//    "User"  =>  array(
+//        "parent"    => "group_id",
+//        "index"     =>  "id",
+//        "active"    =>  true
+//    ),
 );

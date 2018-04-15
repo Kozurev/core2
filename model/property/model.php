@@ -9,6 +9,7 @@ class Property_Model extends Core_Entity
 	protected $title; //
 	protected $description; //
 	protected $type; //
+    protected $multiple;
 	protected $active; //
     protected $sorting;
     protected $dir;
@@ -32,6 +33,17 @@ class Property_Model extends Core_Entity
 
 		return $this;
 	}
+
+
+	public function multiple($val = null)
+    {
+        if(is_null($val))   return $this->multiple;
+
+        if($val == true)    $this->multiple = 1;
+        else                $this->multiple = 0;
+
+        return $this;
+    }
 
 
 	public function dir($val = null)
