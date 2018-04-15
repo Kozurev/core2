@@ -6,14 +6,13 @@
  * Time: 22:12
  */
 
-//$authorizeXslLink = "musadm/authorize_form.xsl";
-//
-//Core::factory("Entity")
-//    ->xsl($authorizeXslLink)
-//    ->show();
+
+global $CFG;
+$rootdir = "/" . $CFG->rootdir;
+$back = Core_Array::getValue($_GET, "back", $rootdir);
 ?>
 
-<form action="/authorize?back=<?=$_GET["back"]?>" method="post">
+<form action="<?=$rootdir?>authorize?back=<?=$back?>" method="post">
     <label for="name">Логин:</label>
     <input type="name" name="login"/>
 
