@@ -10,6 +10,7 @@
 
 	<xsl:template match="root">
 		<xsl:variable name="modelid" select="object_id" />
+		<xsl:variable name="modelname" select="model_name" />
 
 		<script>
 			$(function(){
@@ -29,7 +30,7 @@
 			}
 
 			.delete_block {
-				background: url("/templates/template3/images/delete.ico");
+				background: url("/templates/template3/images/delete.png");
 				height: 34px;
 				width: 34px;
 				background-size: cover;
@@ -131,7 +132,7 @@
 					</xsl:otherwise>
 				</xsl:choose>
 
-				<xsl:if test="/root/property/id">
+				<xsl:if test="/root/property/id and $modelname != 'Property'">
 					<h3>Дополнительные свойства</h3>
 					<xsl:apply-templates select="/root/property" />
 				</xsl:if>
@@ -266,17 +267,28 @@
 					</div>
 				</xsl:for-each>
 
-				<button class="add_new_value">Добавить значение</button>
+				<!--<button class="add_new_value">Добавить значение</button>-->
 			</xsl:if>
 
 			<xsl:if test="type='list'">
 				<!--id выбранного варианта в списке-->
-				<xsl:variable name="selected_option_id" select="property_value/value_id" />
 
-				<xsl:call-template name="select">
-					<xsl:with-param name="var_name" select="$var_name" />
-					<xsl:with-param name="value" select="$selected_option_id" />
-				</xsl:call-template>
+				<xsl:for-each select="property_value">
+					<xsl:variable name="selected_option_id" select="value_id" />
+					<div class="field">
+						<xsl:call-template name="select">
+							<xsl:with-param name="var_name" select="$var_name" />
+							<xsl:with-param name="value" select="$selected_option_id" />
+							<xsl:with-param name="addClass" select="$class_name" />
+						</xsl:call-template>
+
+						<xsl:if test="position() != 1">
+							<div class="delete_block"></div>
+						</xsl:if>
+					</div>
+
+				</xsl:for-each>
+				<!--<button class="add_new_value">Добавить значение</button>-->
 			</xsl:if>
 
 			<xsl:if test="type='text'">
@@ -299,6 +311,10 @@
 					</div>
 				</xsl:for-each>
 
+				<!--<button class="add_new_value">Добавить значение</button>-->
+			</xsl:if>
+
+			<xsl:if test="multiple = 1">
 				<button class="add_new_value">Добавить значение</button>
 			</xsl:if>
 
@@ -364,8 +380,9 @@
 	<xsl:template name="select">
 		<xsl:param name="var_name" />
 		<xsl:param name="value" />
+		<xsl:param name="addClass" />
 
-		<select name="{$var_name}" class="form-control">
+		<select name="{$var_name}" class="form-control {$addClass}">
 			<option value="0">...</option>
 			<xsl:for-each select="item">
 				<xsl:variable name="id" select="id" />
