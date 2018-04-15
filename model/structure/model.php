@@ -15,7 +15,8 @@ class Structure_Model extends Core_Entity
 	protected $description;
 	protected $children_name;
 	//protected $properties_list;
-	protected $active; 
+	protected $active;
+	protected $menu_id;
 	protected $meta_title; 
 	protected $meta_description; 
 	protected $meta_keywords; 
@@ -74,6 +75,17 @@ class Structure_Model extends Core_Entity
 		$this->parent_id = intval($val);
 		return $this;
 	}
+
+
+    public function menuId($val = null)
+    {
+        if(is_null($val)) 	return $this->menu_id;
+        if($val < 0)
+            die(Core::getMessage("UNSIGNED_VALUE", array("menu_id", "Structure")));
+
+        $this->menu_id = intval($val);
+        return $this;
+    }
 
 
 	public function template_id($val = null)
