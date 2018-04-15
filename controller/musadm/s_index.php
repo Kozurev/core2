@@ -16,6 +16,7 @@ if(!$oUser)
     $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
     $extra = "";
     header("Location: http://$host$uri/authorize?back=$host$uri/$extra");
+    exit;
 }
 
 if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
