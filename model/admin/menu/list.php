@@ -35,6 +35,7 @@ class Admin_Menu_List
                     ->name("title")
                     ->value($title)
             )
+            //->addEntity()
             ->addEntities($aoLists)
             ->xsl("admin/lists/lists.xsl")
             ->show();
