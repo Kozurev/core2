@@ -89,7 +89,6 @@ class Property extends Property_Model
         $sTableName = "Property_" . $oProperty->type() . "_Assigment";
 
         $assigment = Core::factory($sTableName)
-            //->select("id")
             ->where("object_id", "=", $obj->getId())
 	        ->where("property_id", "=", $propertyId)
             ->where("model_name", "=", get_class($obj))
