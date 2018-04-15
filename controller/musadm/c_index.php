@@ -1,20 +1,8 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Egor
+ * User: Kozurev Egor
  * Date: 18.03.2018
  * Time: 21:21
  */
-
-
-echo "<h1>Hello</h1>";
-
-
-
-
-
-
-
-
-
 
