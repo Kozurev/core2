@@ -16,12 +16,9 @@ if(isset($_POST["login"]) && isset($_POST["password"]))
 
     if($oUser->authorize())
     {
-        //header("Location: http://".$_GET["back"]);
-        ?>
-        <script>
-            window.location.href = "http://<?=$_GET["back"]?>";
-        </script>
-        <?
+        global $CFG;
+        $back = Core_Array::getValue($_GET, "back",  "/".$CFG->rootdir);
+        header("Location: http://".$back);
     }
 }
 
