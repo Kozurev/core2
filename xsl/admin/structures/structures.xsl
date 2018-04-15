@@ -78,7 +78,7 @@
 			<td><a href="admin?menuTab=Properties&amp;menuAction=show&amp;model_name=Structure&amp;model_id={id}" class="link propertiesLink" /></td>
 
 			<!--Редактирование-->
-			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
+			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}&amp;model_id={id}&amp;parent_name=Structure" class="link updateLink" /></td>
 
 			<!--Удаление-->
 			<td><a href="admin" data-model_name="Structure" data-model_id="{id}" class="delete deleteLink"></a></td>
@@ -109,7 +109,7 @@
 			<td></td>
 
 			<!--Редактирование-->
-			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
+			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}&amp;model_id={id}&amp;parent_name=Structure" class="link updateLink" /></td>
 
 			<!--Удаление-->
 			<td><a href="admin" data-model_name="Structure_Item" data-model_id="{id}" class="delete deleteLink"></a></td>
