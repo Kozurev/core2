@@ -70,14 +70,14 @@ class Admin_Form extends Admin_Form_Model
         if(isset($aParams["model_id"]) && $aParams["model_id"] != "")
             $this->value = Core::factory("Constant", $aParams["model_id"])->valueType();
 
-//        echo "<pre>";
-//        print_r(Core::factory("Constant", $aParams["model_id"]));
-//        echo "</pre>";
-
         $this->addEntities(Core::factory("Constant_Type")->findAll(), "item");
     }
 
 
+    /**
+     * Список директорий констант для директорий
+     * @param $aParams
+     */
     public function getListConstantDirsForD($aParams)
     {
         $this->value = Core_Array::getValue($aParams, "parent_id", 0);
@@ -99,6 +99,10 @@ class Admin_Form extends Admin_Form_Model
     }
 
 
+    /**
+     * Список директороий констант для констант
+     * @param $aParams
+     */
     public function getListConstantDirsForC($aParams)
     {
         $this->value = Core_Array::getValue($aParams, "parent_id", 0);
@@ -107,6 +111,10 @@ class Admin_Form extends Admin_Form_Model
     }
 
 
+    /**
+     * Список названий моделей
+     * @param $aParams
+     */
     public function getListAdminFormModelnames($aParams)
     {
         $parentId = Core_Array::getValue($aParams, "parent_id", null);
@@ -125,6 +133,10 @@ class Admin_Form extends Admin_Form_Model
     }
 
 
+    /**
+     * Список типов полей формы
+     * @param $aParams
+     */
     public function getListAdminFormTypes($aParams)
     {
         $aFormTypes = Core::factory("Admin_Form_Type")
@@ -133,12 +145,21 @@ class Admin_Form extends Admin_Form_Model
     }
 
 
+    /**
+     * Список типов констант
+     * @param $aParams
+     */
     public function getListPropertyTypes($aParams)
     {
         $int = new stdClass();
         $int->title = "Число";
         $int->id = "int";
         $this->addEntity($int, "item");
+
+        $bool = new stdClass();
+        $bool->title = "Флажок";
+        $bool->id = "bool";
+        $this->addEntity($bool, "item");
 
         $string = new stdClass();
         $string->title = "Строка";
