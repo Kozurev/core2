@@ -33,12 +33,33 @@ class Property extends Property_Model
 
 		if($this->type == "list")
 		{
-			return $this->getPropertyListValues($obj);
+			$result = $this->getPropertyListValues($obj);
 		}
 		else
 		{
-			return $aPropertyValues;
+			$result = $aPropertyValues;
 		}
+
+		if(count($result) == 0)
+        {
+            //echo $sTableName . " " . $sModelName . " " . $this->id . " " . $this->default_value . "<br>";
+            $emptyValue = Core::factory($sTableName)
+                ->property_id($this->id)
+                ->model_name($sModelName)
+                ->object_id($obj->getId())
+                ->value(strval($this->default_value));
+
+
+//            echo "<pre>";
+//            print_r($emptyValue);
+//            echo "</pre>";
+
+
+            return array(
+                $emptyValue
+            );
+        }
+        else return $result;
 	}
 
 
@@ -52,7 +73,7 @@ class Property extends Property_Model
 	    if(!is_object($obj) || !method_exists($obj, "getId"))
 	        die("Переданный объект не подходит для работы с доп. свойствами.");
 
-	    $types = array("Int", "String", "Text", "List"/*, "Bool"*/);
+	    $types = array("Int", "String", "Text", "List", "Bool");
         $aProperties = array();
 
         foreach($types as $type)
@@ -187,9 +208,19 @@ class Property extends Property_Model
     public function delete($obj = null)
     {
         $sTableName = "Property_".ucfirst($this->type());
+        $aoAssigments = Core::factory($sTableName . "_Assigment")
+            ->where("property_id", "=", $this->id)
+            ->findAll();
 
+        foreach ($aoAssigments as $assigment) $assigment->delete();
 
+        $aoValues = Core::factory($sTableName)
+            ->where("property_id", "=", $this->id)
+            ->findAll();
 
+        foreach ($aoValues as $value)   $value->delete();
+
+        parent::delete();
     }
 
 
