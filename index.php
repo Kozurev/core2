@@ -16,7 +16,7 @@ Core_Database::connect();
 //Подключение обязательных биьлиотек
 require_once ROOT . "/model/orm.php";
 require_once ROOT . "/model/core.php";
-require_once ROOT . "/config/observers.php";
+require_once ROOT . "/observers.php";
 require_once ROOT . "/model/core/array.php";
 require_once ROOT . "/model/core/entity/model.php";
 require_once ROOT . "/model/core/entity.php";
