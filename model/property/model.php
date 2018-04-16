@@ -13,6 +13,7 @@ class Property_Model extends Core_Entity
 	protected $active; //
     protected $sorting;
     protected $dir;
+    protected $default_value;
 
 	public function __construct()
 	{
@@ -22,6 +23,16 @@ class Property_Model extends Core_Entity
 
 	public function getId(){
 		return $this->id;}
+
+
+    public function defaultValue($val = null)
+    {
+        if(is_null($val))   return $this->default_value;
+
+        $this->default_value = $val;
+        return $this;
+    }
+
 
 
 	public function active($val = null)
