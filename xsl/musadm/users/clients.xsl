@@ -26,7 +26,7 @@
     <xsl:template match="user">
         <tr>
             <td>
-                <a href="../../?userid={id}">
+                <a href="../?userid={id}">
                     <xsl:value-of select="surname" />
                 </a>
             </td>

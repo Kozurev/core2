@@ -22,7 +22,7 @@
 
     <xsl:template match="user">
         <tr>
-            <td><a href="../../?userid={id}"><xsl:value-of select="surname" /></a></td>
+            <td><a href="../?userid={id}"><xsl:value-of select="surname" /></a></td>
             <td><xsl:value-of select="name" /></td>
             <td><xsl:value-of select="patronimyc" /></td>
             <td></td>
