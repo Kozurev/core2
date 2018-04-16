@@ -8,3 +8,7 @@ body {
 .container .navbar .container-fluid .navbar-right {
 	float: left;
 }
+
+#sortingTable {
+	font: 15px/22px Arial, Sans-serif !important;
+}
