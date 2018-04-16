@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Апр 16 2018 г., 02:01
--- Версия сервера: 5.5.53
--- Версия PHP: 7.0.14
+-- Время создания: Апр 16 2018 г., 17:32
+-- Версия сервера: 5.7.16
+-- Версия PHP: 5.6.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -107,7 +107,8 @@ INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `t
 (65, 14, 'id свойства', 'property_id', 0, 4, 1, 0, 0, 'Properties', ''),
 (66, 14, 'Значение', 'value', 100, 5, 1, 1, 0, '', ''),
 (67, 14, 'Сортировка', 'sorting', 0, 1, 1, 0, 0, '', ''),
-(68, 12, 'Множественное свойство', 'multiple', 0, 3, 1, 0, 42, '', '');
+(68, 12, 'Множественное свойство', 'multiple', 0, 3, 1, 0, 42, '', ''),
+(69, 12, 'Значение по умолчанию', 'defaultValue', 5000, 5, 1, 0, 43, '', '');
 
 -- --------------------------------------------------------
 
@@ -335,6 +336,7 @@ CREATE TABLE `Property` (
   `description` text NOT NULL,
   `type` varchar(50) NOT NULL,
   `multiple` int(11) NOT NULL DEFAULT '1',
+  `default_value` text NOT NULL,
   `active` int(11) NOT NULL DEFAULT '1',
   `dir` int(11) NOT NULL,
   `sorting` int(11) NOT NULL
@@ -344,19 +346,22 @@ CREATE TABLE `Property` (
 -- Дамп данных таблицы `Property`
 --
 
-INSERT INTO `Property` (`id`, `tag_name`, `title`, `description`, `type`, `multiple`, `active`, `dir`, `sorting`) VALUES
-(1, 'price', 'Цена', '', 'list', 1, 1, 0, 0),
-(2, 'count', 'Количество', '', 'int', 1, 1, 0, 0),
-(3, 'params', 'Параметры', '', 'string', 1, 1, 0, 0),
-(4, 'description', 'Описание', '', 'text', 1, 1, 0, 0),
-(9, 'vk', 'Ссылка вконтакте', '', 'string', 0, 1, 1, 0),
-(10, 'lesson_type', 'Тип урока', '', 'list', 0, 1, 1, 0),
-(11, 'test', 'test', '', 'int', 1, 1, 0, 0),
-(12, 'balance', 'Баланс', '', 'int', 0, 1, 1, 0),
-(13, 'indev_lessons', 'Кол-во индивидуальных занятий', '', 'int', 0, 1, 1, 0),
-(14, 'group_lessons', 'Кол-во групповых занятий', '', 'int', 0, 1, 1, 0),
-(15, '', 'Студия', '', 'list', 0, 1, 1, 0),
-(16, 'add_phone', 'Дополнительный телефон', '', 'string', 1, 1, 1, 0);
+INSERT INTO `Property` (`id`, `tag_name`, `title`, `description`, `type`, `multiple`, `default_value`, `active`, `dir`, `sorting`) VALUES
+(1, 'price', 'Цена', '', 'list', 1, '', 0, 0, 0),
+(2, 'count', 'Количество', '', 'int', 0, '', 0, 0, 0),
+(3, 'params', 'Параметры', '', 'string', 1, '', 0, 0, 0),
+(4, 'description', 'Описание', '', 'text', 1, '', 0, 0, 0),
+(9, 'vk', 'Ссылка вконтакте', '', 'string', 0, '', 1, 1, 0),
+(10, 'lesson_type', 'Тип урока', '', 'list', 0, '', 1, 1, 0),
+(11, 'test', 'Флажок (тест)', '', 'bool', 0, '', 1, 0, 0),
+(12, 'balance', 'Баланс', '', 'int', 0, '', 1, 1, 0),
+(13, 'indev_lessons', 'Кол-во индивидуальных занятий', '', 'int', 0, '', 1, 1, 0),
+(14, 'group_lessons', 'Кол-во групповых занятий', '', 'int', 0, '', 1, 1, 0),
+(15, '', 'Студия', '', 'list', 0, '', 1, 1, 0),
+(16, 'add_phone', 'Дополнительный телефон', '', 'string', 1, '', 1, 1, 0),
+(17, 'lesson_time', 'Длительность урока (мин)', '', 'int', 0, '', 1, 1, 0),
+(18, '', 'Соглашение подписано', '', 'bool', 0, '', 1, 1, 0),
+(21, 'ini', 'iunbuhn', '', 'int', 1, '0', 1, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -384,6 +389,13 @@ CREATE TABLE `Property_Bool_Assigment` (
   `object_id` int(11) NOT NULL,
   `model_name` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `Property_Bool_Assigment`
+--
+
+INSERT INTO `Property_Bool_Assigment` (`id`, `property_id`, `object_id`, `model_name`) VALUES
+(1, 18, 5, 'User_Group');
 
 -- --------------------------------------------------------
 
@@ -420,32 +432,6 @@ CREATE TABLE `Property_Int` (
   `object_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Дамп данных таблицы `Property_Int`
---
-
-INSERT INTO `Property_Int` (`id`, `property_id`, `value`, `model_name`, `object_id`) VALUES
-(435, 2, 5, 'Structure_Item', 1),
-(436, 2, 2, 'Structure_Item', 2),
-(437, 2, 3, 'User', 342),
-(438, 2, 111, 'Structure', 21),
-(439, 2, 0, 'Structure', 4),
-(440, 2, 11, 'Structure_Item', 7),
-(441, 2, 0, 'Structure', 5),
-(442, 2, 0, 'User', 343),
-(443, 12, 0, 'User', 95),
-(444, 13, 0, 'User', 95),
-(445, 14, 0, 'User', 95),
-(446, 12, 0, 'User', 96),
-(447, 13, 0, 'User', 96),
-(448, 14, 0, 'User', 96),
-(449, 12, 0, 'User', 98),
-(450, 13, 0, 'User', 98),
-(451, 14, 0, 'User', 98),
-(452, 12, 0, 'User', 104),
-(453, 13, 0, 'User', 104),
-(454, 14, 0, 'User', 104);
-
 -- --------------------------------------------------------
 
 --
@@ -464,31 +450,11 @@ CREATE TABLE `Property_Int_Assigment` (
 --
 
 INSERT INTO `Property_Int_Assigment` (`id`, `property_id`, `object_id`, `model_name`) VALUES
-(1, 2, 1, 'Structure_Item'),
-(2, 2, 2, 'Structure_Item'),
-(7, 2, 338, 'User'),
-(8, 2, 339, 'User'),
-(9, 2, 340, 'User'),
-(10, 2, 342, 'User'),
-(11, 2, 7, 'Structure_Item'),
-(13, 2, 4, 'Structure'),
-(19, 12, 5, 'User_Group'),
-(20, 13, 5, 'User_Group'),
-(21, 14, 5, 'User_Group'),
-(22, 2, 3, 'User_Group'),
-(23, 2, 343, 'User'),
-(24, 12, 95, 'User'),
-(25, 13, 95, 'User'),
-(26, 14, 95, 'User'),
-(27, 12, 96, 'User'),
-(28, 13, 96, 'User'),
-(29, 14, 96, 'User'),
-(30, 12, 98, 'User'),
-(31, 13, 98, 'User'),
-(32, 14, 98, 'User'),
-(33, 12, 104, 'User'),
-(34, 13, 104, 'User'),
-(35, 14, 104, 'User');
+(2, 12, 5, 'User_Group'),
+(3, 13, 5, 'User_Group'),
+(4, 14, 5, 'User_Group'),
+(5, 17, 5, 'User_Group'),
+(6, 21, 4, 'Structure');
 
 -- --------------------------------------------------------
 
@@ -503,30 +469,6 @@ CREATE TABLE `Property_List` (
   `object_id` int(11) NOT NULL,
   `value_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Дамп данных таблицы `Property_List`
---
-
-INSERT INTO `Property_List` (`id`, `property_id`, `model_name`, `object_id`, `value_id`) VALUES
-(4, 1, 'Structure_Item', 2, 12),
-(5, 1, 'Structure_Item', 1, 10),
-(6, 1, 'User', 342, 10),
-(7, 10, 'User', 342, 0),
-(8, 1, 'Structure', 21, 10),
-(9, 1, 'Structure', 4, 0),
-(10, 1, 'Structure_Item', 7, 7),
-(12, 1, 'User', 85, 0),
-(13, 1, 'Structure', 5, 0),
-(15, 1, 'User', 343, 9),
-(16, 10, 'User', 95, 14),
-(17, 15, 'User', 95, 22),
-(18, 10, 'User', 96, 0),
-(19, 15, 'User', 96, 0),
-(20, 10, 'User', 98, 0),
-(21, 15, 'User', 98, 0),
-(22, 10, 'User', 104, 14),
-(23, 15, 'User', 104, 23);
 
 -- --------------------------------------------------------
 
@@ -546,31 +488,8 @@ CREATE TABLE `Property_List_Assigment` (
 --
 
 INSERT INTO `Property_List_Assigment` (`id`, `property_id`, `object_id`, `model_name`) VALUES
-(1, 1, 1, 'Structure_Item'),
-(2, 1, 2, 'Structure_Item'),
 (3, 10, 5, 'User_Group'),
-(5, 10, 338, 'User'),
-(6, 1, 338, 'User'),
-(8, 10, 339, 'User'),
-(9, 1, 339, 'User'),
-(10, 10, 340, 'User'),
-(11, 1, 340, 'User'),
-(12, 1, 342, 'User'),
-(13, 10, 342, 'User'),
-(15, 1, 7, 'Structure_Item'),
-(16, 1, 4, 'Structure'),
-(19, 1, 343, 'User'),
-(20, 1, 85, 'User'),
-(28, 1, 3, 'User_Group'),
-(29, 15, 5, 'User_Group'),
-(30, 10, 95, 'User'),
-(31, 15, 95, 'User'),
-(32, 10, 96, 'User'),
-(33, 15, 96, 'User'),
-(34, 10, 98, 'User'),
-(35, 15, 98, 'User'),
-(36, 10, 104, 'User'),
-(37, 15, 104, 'User');
+(4, 15, 5, 'User_Group');
 
 -- --------------------------------------------------------
 
@@ -622,90 +541,6 @@ CREATE TABLE `Property_String` (
   `object_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Дамп данных таблицы `Property_String`
---
-
-INSERT INTO `Property_String` (`id`, `property_id`, `value`, `model_name`, `object_id`) VALUES
-(1, 9, 'https://vk.com/upstrocke', 'User', 95),
-(2, 9, 'https://vk.com/id129018334', 'User', 101),
-(3, 9, 'https://vk.com/id249437636', 'User', 103),
-(4, 9, 'https://vk.com/id371845369', 'User', 108),
-(5, 9, 'https://vk.com/id227312993', 'User', 112),
-(6, 9, 'https://vk.com/id114953549', 'User', 113),
-(7, 9, 'https://vk.com/sulzhenko22', 'User', 121),
-(8, 9, 'https://vk.com/i9936955', 'User', 125),
-(9, 9, 'https://vk.com/id147798154', 'User', 132),
-(10, 9, 'https://vk.com/pingvin997', 'User', 133),
-(11, 9, 'https://vk.com/zzzavarkina', 'User', 135),
-(12, 9, 'https://vk.com/id100971552', 'User', 145),
-(13, 9, 'https://vk.com/id35539072', 'User', 151),
-(14, 9, 'https://vk.com/id321516053', 'User', 154),
-(15, 9, 'https://vk.com/naty20213', 'User', 155),
-(16, 9, 'https://vk.com/n.mass', 'User', 157),
-(17, 9, 'https://vk.com/id_space_666', 'User', 159),
-(18, 9, 'https://vk.com/irena_shilova', 'User', 161),
-(19, 9, 'https://vk.com/mirdevshonok', 'User', 170),
-(20, 9, 'https://vk.com/grustnayann', 'User', 171),
-(21, 9, 'https://vk.com/donpad', 'User', 172),
-(22, 9, 'https://vk.com/id139766263', 'User', 177),
-(23, 9, 'https://vk.com/sergks', 'User', 178),
-(24, 9, 'https://vk.com/id218411690', 'User', 181),
-(25, 9, 'https://vk.com/id250401218', 'User', 195),
-(26, 9, 'https://vk.com/id138219513', 'User', 197),
-(27, 9, 'https://vk.com/a.paroeva', 'User', 200),
-(28, 9, 'https://vk.com/matheuscesaro', 'User', 214),
-(29, 9, 'https://vk.com/id52231178', 'User', 218),
-(30, 9, 'https://vk.com/djon_djon', 'User', 222),
-(31, 9, 'https://vk.com/w1n32', 'User', 258),
-(32, 9, 'https://vk.com/lusineshahverdian', 'User', 259),
-(33, 9, 'https://vk.com/dmitry_chablin', 'User', 270),
-(34, 9, 'https://vk.com/mari_marsi', 'User', 276),
-(35, 9, 'https://vk.com/viktoriya.bugaeva', 'User', 280),
-(36, 9, 'https://vk.com/lyakh_mary', 'User', 285),
-(37, 9, 'https://vk.com/ruzakin', 'User', 287),
-(38, 9, 'https://vk.com/masteeer', 'User', 290),
-(39, 9, 'https://vk.com/selse1', 'User', 295),
-(40, 9, 'https://vk.com/id185797429', 'User', 297),
-(41, 9, 'https://vk.com/angelina.statinova', 'User', 300),
-(42, 9, 'https://vk.com/id7232566', 'User', 302),
-(43, 9, 'https://vk.com/gudovilya', 'User', 311),
-(44, 9, 'https://vk.com/academy31', 'User', 313),
-(45, 9, 'https://vk.com/id38493200', 'User', 314),
-(47, 9, 'https://vk.com/prisiazhnyuk_a', 'User', 322),
-(48, 9, 'https://vk.com/ulysses2000', 'User', 325),
-(49, 9, 'https://vk.com/just.vika', 'User', 334),
-(51, 9, '', 'User', 98),
-(52, 9, '', 'User', 96),
-(53, 9, '', 'User', 97),
-(54, 9, '', 'User', 100),
-(55, 9, '', 'User', 102),
-(56, 9, '', 'User', 104),
-(57, 9, '', 'User', 105),
-(58, 9, '', 'User', 106),
-(59, 9, '', 'User', 107),
-(60, 9, '', 'User', 109),
-(61, 9, '', 'User', 110),
-(62, 9, '', 'User', 111),
-(63, 9, '', 'User', 114),
-(64, 9, '', 'User', 291),
-(65, 9, '', 'User', 46),
-(66, 9, '', 'User', 42),
-(67, 3, 'Параметр 1', 'Structure_Item', 1),
-(68, 3, 'Параметр 2', 'Structure_Item', 1),
-(71, 3, 'Параметр 3', 'Structure_Item', 2),
-(72, 9, 'vk.com/id6846535', 'User', 99),
-(73, 3, '2', 'User', 342),
-(74, 9, '', 'User', 342),
-(75, 3, '6546841654984', 'Structure', 21),
-(76, 3, '', 'Structure', 4),
-(77, 3, '22', 'Structure_Item', 7),
-(78, 3, '', 'Structure', 5),
-(79, 16, '', 'User', 95),
-(80, 16, '', 'User', 96),
-(81, 16, '', 'User', 98),
-(82, 16, '', 'User', 104);
-
 -- --------------------------------------------------------
 
 --
@@ -724,275 +559,8 @@ CREATE TABLE `Property_String_Assigment` (
 --
 
 INSERT INTO `Property_String_Assigment` (`id`, `property_id`, `object_id`, `model_name`) VALUES
-(1, 9, 42, 'User'),
-(2, 9, 46, 'User'),
-(3, 9, 83, 'User'),
-(4, 9, 85, 'User'),
-(5, 9, 86, 'User'),
-(6, 9, 87, 'User'),
-(7, 9, 88, 'User'),
-(8, 9, 89, 'User'),
-(9, 9, 90, 'User'),
-(10, 9, 91, 'User'),
-(11, 9, 92, 'User'),
-(12, 9, 93, 'User'),
-(13, 9, 94, 'User'),
-(14, 9, 95, 'User'),
-(15, 9, 96, 'User'),
-(16, 9, 97, 'User'),
-(17, 9, 98, 'User'),
-(18, 9, 99, 'User'),
-(19, 9, 100, 'User'),
-(20, 9, 101, 'User'),
-(21, 9, 102, 'User'),
-(22, 9, 103, 'User'),
-(23, 9, 104, 'User'),
-(24, 9, 105, 'User'),
-(25, 9, 106, 'User'),
-(26, 9, 107, 'User'),
-(27, 9, 108, 'User'),
-(28, 9, 109, 'User'),
-(29, 9, 110, 'User'),
-(30, 9, 111, 'User'),
-(31, 9, 112, 'User'),
-(32, 9, 113, 'User'),
-(33, 9, 114, 'User'),
-(34, 9, 115, 'User'),
-(35, 9, 116, 'User'),
-(36, 9, 117, 'User'),
-(37, 9, 118, 'User'),
-(38, 9, 119, 'User'),
-(39, 9, 120, 'User'),
-(40, 9, 121, 'User'),
-(41, 9, 122, 'User'),
-(42, 9, 123, 'User'),
-(43, 9, 124, 'User'),
-(44, 9, 125, 'User'),
-(45, 9, 126, 'User'),
-(46, 9, 127, 'User'),
-(47, 9, 128, 'User'),
-(48, 9, 129, 'User'),
-(49, 9, 130, 'User'),
-(50, 9, 131, 'User'),
-(51, 9, 132, 'User'),
-(52, 9, 133, 'User'),
-(53, 9, 134, 'User'),
-(54, 9, 135, 'User'),
-(55, 9, 136, 'User'),
-(56, 9, 137, 'User'),
-(57, 9, 138, 'User'),
-(58, 9, 139, 'User'),
-(59, 9, 140, 'User'),
-(60, 9, 141, 'User'),
-(61, 9, 142, 'User'),
-(62, 9, 143, 'User'),
-(63, 9, 144, 'User'),
-(64, 9, 145, 'User'),
-(65, 9, 146, 'User'),
-(66, 9, 147, 'User'),
-(67, 9, 148, 'User'),
-(68, 9, 149, 'User'),
-(69, 9, 150, 'User'),
-(70, 9, 151, 'User'),
-(71, 9, 152, 'User'),
-(72, 9, 153, 'User'),
-(73, 9, 154, 'User'),
-(74, 9, 155, 'User'),
-(75, 9, 156, 'User'),
-(76, 9, 157, 'User'),
-(77, 9, 158, 'User'),
-(78, 9, 159, 'User'),
-(79, 9, 160, 'User'),
-(80, 9, 161, 'User'),
-(81, 9, 162, 'User'),
-(82, 9, 163, 'User'),
-(83, 9, 164, 'User'),
-(84, 9, 165, 'User'),
-(85, 9, 166, 'User'),
-(86, 9, 167, 'User'),
-(87, 9, 168, 'User'),
-(88, 9, 169, 'User'),
-(89, 9, 170, 'User'),
-(90, 9, 171, 'User'),
-(91, 9, 172, 'User'),
-(92, 9, 174, 'User'),
-(93, 9, 175, 'User'),
-(94, 9, 176, 'User'),
-(95, 9, 177, 'User'),
-(96, 9, 178, 'User'),
-(97, 9, 179, 'User'),
-(98, 9, 180, 'User'),
-(99, 9, 181, 'User'),
-(100, 9, 182, 'User'),
-(101, 9, 183, 'User'),
-(102, 9, 184, 'User'),
-(103, 9, 185, 'User'),
-(104, 9, 186, 'User'),
-(105, 9, 187, 'User'),
-(106, 9, 188, 'User'),
-(107, 9, 189, 'User'),
-(108, 9, 190, 'User'),
-(109, 9, 191, 'User'),
-(110, 9, 192, 'User'),
-(111, 9, 193, 'User'),
-(112, 9, 194, 'User'),
-(113, 9, 195, 'User'),
-(114, 9, 196, 'User'),
-(115, 9, 197, 'User'),
-(116, 9, 198, 'User'),
-(117, 9, 199, 'User'),
-(118, 9, 200, 'User'),
-(119, 9, 201, 'User'),
-(120, 9, 202, 'User'),
-(121, 9, 203, 'User'),
-(122, 9, 204, 'User'),
-(123, 9, 205, 'User'),
-(124, 9, 206, 'User'),
-(125, 9, 207, 'User'),
-(126, 9, 208, 'User'),
-(127, 9, 209, 'User'),
-(128, 9, 210, 'User'),
-(129, 9, 211, 'User'),
-(130, 9, 212, 'User'),
-(131, 9, 213, 'User'),
-(132, 9, 214, 'User'),
-(133, 9, 215, 'User'),
-(134, 9, 216, 'User'),
-(135, 9, 217, 'User'),
-(136, 9, 218, 'User'),
-(137, 9, 219, 'User'),
-(138, 9, 220, 'User'),
-(139, 9, 221, 'User'),
-(140, 9, 222, 'User'),
-(141, 9, 223, 'User'),
-(142, 9, 224, 'User'),
-(143, 9, 225, 'User'),
-(144, 9, 226, 'User'),
-(145, 9, 227, 'User'),
-(146, 9, 228, 'User'),
-(147, 9, 229, 'User'),
-(148, 9, 230, 'User'),
-(149, 9, 232, 'User'),
-(150, 9, 233, 'User'),
-(151, 9, 234, 'User'),
-(152, 9, 235, 'User'),
-(153, 9, 236, 'User'),
-(154, 9, 237, 'User'),
-(155, 9, 238, 'User'),
-(156, 9, 241, 'User'),
-(157, 9, 242, 'User'),
-(158, 9, 243, 'User'),
-(159, 9, 244, 'User'),
-(160, 9, 245, 'User'),
-(161, 9, 246, 'User'),
-(162, 9, 247, 'User'),
-(163, 9, 248, 'User'),
-(164, 9, 249, 'User'),
-(165, 9, 250, 'User'),
-(166, 9, 251, 'User'),
-(167, 9, 252, 'User'),
-(168, 9, 253, 'User'),
-(169, 9, 254, 'User'),
-(170, 9, 255, 'User'),
-(171, 9, 256, 'User'),
-(172, 9, 257, 'User'),
-(173, 9, 258, 'User'),
-(174, 9, 259, 'User'),
-(175, 9, 260, 'User'),
-(176, 9, 261, 'User'),
-(177, 9, 262, 'User'),
-(178, 9, 263, 'User'),
-(179, 9, 264, 'User'),
-(180, 9, 265, 'User'),
-(181, 9, 266, 'User'),
-(182, 9, 267, 'User'),
-(183, 9, 268, 'User'),
-(184, 9, 269, 'User'),
-(185, 9, 270, 'User'),
-(186, 9, 271, 'User'),
-(187, 9, 272, 'User'),
-(188, 9, 273, 'User'),
-(189, 9, 274, 'User'),
-(190, 9, 275, 'User'),
-(191, 9, 276, 'User'),
-(192, 9, 277, 'User'),
-(193, 9, 278, 'User'),
-(194, 9, 279, 'User'),
-(195, 9, 280, 'User'),
-(196, 9, 281, 'User'),
-(197, 9, 282, 'User'),
-(198, 9, 283, 'User'),
-(199, 9, 284, 'User'),
-(200, 9, 285, 'User'),
-(201, 9, 286, 'User'),
-(202, 9, 287, 'User'),
-(203, 9, 288, 'User'),
-(204, 9, 289, 'User'),
-(205, 9, 290, 'User'),
-(206, 9, 291, 'User'),
-(207, 9, 292, 'User'),
-(208, 9, 293, 'User'),
-(209, 9, 294, 'User'),
-(210, 9, 295, 'User'),
-(211, 9, 296, 'User'),
-(212, 9, 297, 'User'),
-(213, 9, 298, 'User'),
-(214, 9, 299, 'User'),
-(215, 9, 300, 'User'),
-(216, 9, 301, 'User'),
-(217, 9, 302, 'User'),
-(218, 9, 303, 'User'),
-(219, 9, 304, 'User'),
-(220, 9, 305, 'User'),
-(221, 9, 306, 'User'),
-(222, 9, 307, 'User'),
-(223, 9, 308, 'User'),
-(224, 9, 309, 'User'),
-(225, 9, 310, 'User'),
-(226, 9, 311, 'User'),
-(227, 9, 312, 'User'),
-(228, 9, 313, 'User'),
-(229, 9, 314, 'User'),
-(230, 9, 315, 'User'),
-(231, 9, 316, 'User'),
-(232, 9, 317, 'User'),
-(233, 9, 318, 'User'),
-(234, 9, 319, 'User'),
-(235, 9, 320, 'User'),
-(236, 9, 321, 'User'),
-(237, 9, 322, 'User'),
-(238, 9, 323, 'User'),
-(239, 9, 324, 'User'),
-(240, 9, 325, 'User'),
-(241, 9, 326, 'User'),
-(242, 9, 327, 'User'),
-(243, 9, 328, 'User'),
-(244, 9, 329, 'User'),
-(245, 9, 330, 'User'),
-(246, 9, 331, 'User'),
-(247, 9, 332, 'User'),
-(248, 9, 333, 'User'),
-(249, 9, 334, 'User'),
-(250, 9, 335, 'User'),
-(251, 9, 336, 'User'),
-(252, 3, 1, 'Structure_Item'),
-(253, 3, 2, 'Structure_Item'),
-(254, 9, 5, 'User_Group'),
-(256, 9, 338, 'User'),
-(257, 3, 338, 'User'),
-(258, 9, 339, 'User'),
-(259, 3, 339, 'User'),
-(260, 9, 340, 'User'),
-(261, 3, 340, 'User'),
-(262, 3, 342, 'User'),
-(263, 9, 342, 'User'),
-(265, 3, 7, 'Structure_Item'),
-(267, 3, 4, 'Structure'),
-(273, 16, 5, 'User_Group'),
-(274, 16, 95, 'User'),
-(275, 16, 96, 'User'),
-(276, 16, 98, 'User'),
-(277, 16, 104, 'User');
+(1, 9, 5, 'User_Group'),
+(2, 16, 5, 'User_Group');
 
 -- --------------------------------------------------------
 
@@ -1008,20 +576,6 @@ CREATE TABLE `Property_Text` (
   `object_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Дамп данных таблицы `Property_Text`
---
-
-INSERT INTO `Property_Text` (`id`, `property_id`, `value`, `model_name`, `object_id`) VALUES
-(1, 4, 'Описание футбольного мяча', 'Structure_Item', 1),
-(2, 4, 'Описание кросовок 1', 'Structure_Item', 2),
-(3, 4, 'Описание кросовок 2', 'Structure_Item', 2),
-(4, 4, '284849849', 'User', 342),
-(5, 4, 'jhvkjnbobnjinpun', 'Structure', 21),
-(6, 4, '', 'Structure', 4),
-(7, 4, '33', 'Structure_Item', 7),
-(8, 4, '', 'Structure', 5);
-
 -- --------------------------------------------------------
 
 --
@@ -1034,20 +588,6 @@ CREATE TABLE `Property_Text_Assigment` (
   `object_id` int(11) NOT NULL,
   `model_name` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Дамп данных таблицы `Property_Text_Assigment`
---
-
-INSERT INTO `Property_Text_Assigment` (`id`, `property_id`, `object_id`, `model_name`) VALUES
-(1, 4, 1, 'Structure_Item'),
-(2, 4, 2, 'Structure_Item'),
-(4, 4, 338, 'User'),
-(5, 4, 339, 'User'),
-(6, 4, 340, 'User'),
-(7, 4, 342, 'User'),
-(9, 4, 7, 'Structure_Item'),
-(11, 4, 4, 'Structure');
 
 -- --------------------------------------------------------
 
@@ -1157,7 +697,7 @@ INSERT INTO `User` (`id`, `name`, `surname`, `patronimyc`, `phone_number`, `emai
 (42, 'Александр', 'Булгаков', '', '+79087801122', '', 'БА', 'd93591bdf7860e1e4ee2fca799911215', 4, '2018-03-20', 1, 0),
 (46, 'Оксана', 'Полтева', '', '+79205764079', '', 'ПО', 'd93591bdf7860e1e4ee2fca799911215', 4, '2018-03-20', 1, 0),
 (83, 'Алина', 'Романович', '', '+79192882062', '', 'РА', 'd93591bdf7860e1e4ee2fca799911215', 4, '2018-03-20', 1, 0),
-(85, 'Артур', 'Герус', '', '30-18-77', '', 'd', '8277e0910d750195b448797616e091ad', 3, '2018-03-20', 1, 0),
+(85, 'Артур', 'Герус', '', '30-18-77', '', 'd', '8277e0910d750195b448797616e091ad', 1, '2018-03-20', 1, 1),
 (86, 'Дарья', 'Черных', '', '+79155665673', '', 'ЧД', 'd93591bdf7860e1e4ee2fca799911215', 4, '2018-03-20', 1, 0),
 (87, 'Руслан', 'Галяутдинов', '', '+79202090014', '', 'ГР', 'd93591bdf7860e1e4ee2fca799911215', 4, '2018-03-20', 1, 0),
 (88, 'Карина', 'Белякова', '', '+79155601114', '', 'БК', 'd93591bdf7860e1e4ee2fca799911215', 4, '2018-03-20', 1, 0),
@@ -1429,7 +969,6 @@ CREATE TABLE `User_Group` (
 INSERT INTO `User_Group` (`id`, `title`, `path`, `children_name`, `sorting`) VALUES
 (1, 'Администраторы', 'admin', 'User', 0),
 (2, 'Менеджеры', 'manager', 'User', 10),
-(3, 'Директоры', 'director', 'User', 20),
 (4, 'Учителя', 'teacher', 'User', 30),
 (5, 'Клиенты', 'client', 'User', 40);
 
@@ -1607,7 +1146,7 @@ ALTER TABLE `User_Group`
 -- AUTO_INCREMENT для таблицы `Admin_Form`
 --
 ALTER TABLE `Admin_Form`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Modelname`
 --
@@ -1657,7 +1196,7 @@ ALTER TABLE `Page_Template_Dir`
 -- AUTO_INCREMENT для таблицы `Property`
 --
 ALTER TABLE `Property`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 --
 -- AUTO_INCREMENT для таблицы `Property_Bool`
 --
@@ -1667,7 +1206,7 @@ ALTER TABLE `Property_Bool`
 -- AUTO_INCREMENT для таблицы `Property_Bool_Assigment`
 --
 ALTER TABLE `Property_Bool_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT для таблицы `Property_Dir`
 --
@@ -1677,22 +1216,22 @@ ALTER TABLE `Property_Dir`
 -- AUTO_INCREMENT для таблицы `Property_Int`
 --
 ALTER TABLE `Property_Int`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=455;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT для таблицы `Property_Int_Assigment`
 --
 ALTER TABLE `Property_Int_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 --
 -- AUTO_INCREMENT для таблицы `Property_List`
 --
 ALTER TABLE `Property_List`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT для таблицы `Property_List_Assigment`
 --
 ALTER TABLE `Property_List_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT для таблицы `Property_List_Values`
 --
@@ -1702,22 +1241,22 @@ ALTER TABLE `Property_List_Values`
 -- AUTO_INCREMENT для таблицы `Property_String`
 --
 ALTER TABLE `Property_String`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT для таблицы `Property_String_Assigment`
 --
 ALTER TABLE `Property_String_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=278;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT для таблицы `Property_Text`
 --
 ALTER TABLE `Property_Text`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT для таблицы `Property_Text_Assigment`
 --
 ALTER TABLE `Property_Text_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT для таблицы `Structure`
 --
