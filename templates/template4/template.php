@@ -5,10 +5,16 @@
     <title><?=$this->title;?></title>
 
     <?$this
+        ->css("/templates/template4/lib/tablesorter/css/theme.default.css")
         ->showCss()
         ->js("/templates/template4/js/jquery.min.js")
+        ->js("/templates/template4/lib/tablesorter/js/jquery.tablesorter.js")
+        ->js("/templates/template4/lib/tablesorter/js/jquery.tablesorter.widgets.js")
+        ->js("/templates/template4/lib/tablesorter/addons/pager/jquery.tablesorter.pager.js")
+        ->js("/templates/template4/lib/tablesorter/beta-testing/pager-custom-controls.js")
         ->showJs();
     ?>
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
     <!-- Optional theme -->
@@ -16,16 +22,29 @@
 
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
 </head>
 <body>
     <?
     global $CFG;
     $oUser = Core::factory("User")->getCurent();
+    $pageUserId = Core_Array::getValue($_GET, "userid", 0); //id просматриваемого пользователя администратором
+    $rootdir = "/" . $CFG->rootdir;
+    $back = $_SERVER['HTTP_HOST'] . $rootdir;
+    $disauthorizeLink = $rootdir . "authorize?disauthorize=1&back=" . $back;
+
+    //Если администратор авторизован под учетной записью пользователя
+    if($oUser->groupId() < 4 && $pageUserId > 0)
+    {
+        $oUser = Core::factory("User", $pageUserId);
+        $oUserGroup = Core::factory("User_Group", $oUser->groupId());
+        $disauthorizeLink = $rootdir . "user/" . $oUserGroup->path();
+    }
+
     $name = $oUser->name();
     $surname = $oUser->surname();
     $isAdmin = $oUser->groupId() <= 3;
-    $rootdir = "/" . $CFG->rootdir;
-    $back = $_SERVER['HTTP_HOST'] . $rootdir;
+
     ?>
     <div class="container">
 
@@ -44,13 +63,16 @@
                         </ul>
                     </li>
                     <?
-                    if(!$isAdmin)
+                    //Пункты только для клиентов
+                    if(!$isAdmin && $oUserGroup->getId() == 5)
                     {
                         ?>
+                        <li><a href="#">Баланс</a></li>
                         <li><a href="#">Сменить логин или пароль</a></li>
                         <li><a href="#">Договор оферты</a></li>
                         <?
                     }
+                    //Пункты только для администратора, директора или менеджера
                     if($isAdmin)
                     {
                         ?>
@@ -73,7 +95,8 @@
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a><?echo $surname . " " . $name; ?></a></li>
-                    <li><a href="<?=$rootdir?>authorize?disauthorize=1&back=<?=$back?>">Выйти</a></li>
+<!--                    <li><a href="--><?//=$rootdir?><!--authorize?disauthorize=1&back=--><?//=$back?><!--">Выйти</a></li>-->
+                    <li><a href="<?=$disauthorizeLink?>">Выйти</a></li>
                 </ul>
             </div>
         </nav>
