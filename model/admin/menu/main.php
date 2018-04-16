@@ -53,6 +53,10 @@ class Admin_Menu_Main
             $iPropertyId = explode("property_", $sFieldName)[1];
             $oProperty = Core::factory("Property", $iPropertyId);
 
+            if($aFieldValues[0] == $oProperty->defaultValue()
+                || $aFieldValues[0] == "" && $oProperty->defaultValue() == 0)
+                continue;
+
             $oProperty->addToPropertiesList($oUpdatingItem, $iPropertyId);
 
             $oProperty->type() == "list"
@@ -189,33 +193,21 @@ class Admin_Menu_Main
                         ->where("property_id", "=", $oProperty->getId())
                         ->findAll();
 
-                    $oPropertyList = Core::factory("Property_List")
-                        ->where("property_id", "=", $oProperty->getId())
-                        ->where("model_name", "=", $aParams["model"])
-                        ->where("object_id", "=", $oUpdatingItem->getId())
-                        ->findAll();
+                        $oPropertyList = $oProperty->getPropertyValues($oUpdatingItem);
 
-                    if(count($oPropertyList) == 0)
-                        $oPropertyList = array(Core::factory("Property_List"));
+//                        echo "<pre>";
+//                        var_dump($oPropertyList);
+//                        echo "</pre>";
 
-                    foreach ($oPropertyList as $prop)
-                        $prop->addEntities($aoLitsValues, "item");
+                        foreach ($oPropertyList as $prop)
+                            $prop->addEntities($aoLitsValues, "item");
 
                         $oProperty->addEntities($oPropertyList, "property_value");
                 }
                 else
                 {
                     $aoValues = $oProperty->getPropertyValues($oUpdatingItem);
-
-                    /*
-                     * Если значения свойства отсутствуют тогда необходимо добавить пустое значение
-                     * для корректного формирования пустого поля в админ панеле
-                     */
-                    count($aoValues) > 0 && $oUpdatingItem->getId()
-                        ?   $oProperty->addEntities($aoValues, "property_value")
-                        :   $oProperty->addEntity(
-                        Core::factory("Property_" . $oProperty->type()), "property_value"
-                    );
+                    $oProperty->addEntities($aoValues, "property_value");
                 }
 
                 $oOutputXml->addEntity($oProperty);
@@ -306,8 +298,13 @@ class Admin_Menu_Main
         $modelName = $aParams["model_name"];
         $modelId = $aParams["model_id"];
 
-        Core::factory($modelName, $modelId)->delete();
+        $obj = Core::factory($modelName, $modelId);
 
+//        echo "<pre>";
+//        print_r($obj);
+//        echo "</pre>";
+
+        $obj->delete();
         echo 0;
     }
 
