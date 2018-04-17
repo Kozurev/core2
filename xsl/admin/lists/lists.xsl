@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE xsl:stylesheet>
-<xsl:stylesheet version="1.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:output xmlns="http://www.w3.org/TR/xhtml1/strict" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" encoding="utf-8" indent="yes" method="html" omit-xml-declaration="no" version="1.0" media-type="text/xml"/>
-
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
         <div class="in_main">
@@ -30,7 +27,7 @@
 
             <xsl:if test="count(property/id) = 0">
                 <button class="btn button" type="button">
-                    <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property_List_Values&amp;parent_id={//property_id}" class="link">
+                    <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property_List_Values&amp;parent_id={//parent_id}" class="link">
                         Добавть значение
                     </a>
                 </button>
