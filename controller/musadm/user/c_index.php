@@ -10,6 +10,8 @@
 //echo "<pre>";
 //print_r($this->oStructureItem);
 
+$oProperty = Core::factory("Property");
+
 $groupId = $this->oStructureItem->getId();
 $groupId == 5
     ?   $xsl = "musadm/users/clients.xsl"
@@ -21,6 +23,15 @@ $aoUsers = Core::factory("User")
     ->where("active", "=", 1)
     ->orderBy("id", "DESC")
     ->findAll();
+
+foreach ($aoUsers as $user)
+{
+    $aoPropertiesList = $oProperty->getPropertiesList($user);
+    foreach ($aoPropertiesList as $prop)
+    {
+        $user->addEntities($prop->getPropertyValues($user), "property_value");
+    }
+}
 
 $output = Core::factory("Core_Entity")
     ->xsl($xsl)
