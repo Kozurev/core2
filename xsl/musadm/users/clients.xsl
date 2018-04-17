@@ -13,6 +13,7 @@
                     <th class="header">Кол-во индив. занятий</th>
                     <th class="header">Кол-во групп. занятий</th>
                     <th class="header">Студия</th>
+                    <th>Действия</th>
                 </tr>
             </thead>
 
@@ -29,12 +30,27 @@
                 <a href="../?userid={id}">
                     <xsl:value-of select="surname" />
                 </a>
+                <!--Анкета (соглашение подписано)-->
+                <span class="anketa">
+                    <xsl:if test="property_value[property_id = 18]/value = '1'">
+                        Д+
+                    </xsl:if>
+                </span>
+
+                <!--Примечания-->
+                <div class="notes">
+                    <xsl:value-of select="property_value[property_id = 19]/value" />
+                </div>
             </td>
             <td><xsl:value-of select="name" /></td>
-            <td><xsl:value-of select="phone" /></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>
+                <xsl:value-of select="phone_number" />
+                <xsl:value-of select="property_value[property_id = 12]/value" />
+            </td>
+            <td><xsl:value-of select="property_value[property_id = 12]/value" /></td>
+            <td><xsl:value-of select="property_value[property_id = 13]/value" /></td>
+            <td><xsl:value-of select="property_value[property_id = 14]/value" /></td>
+            <td><xsl:value-of select="property_value[property_id = 15]/value" /></td>
             <td></td>
         </tr>
     </xsl:template>

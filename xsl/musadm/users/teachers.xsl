@@ -25,7 +25,7 @@
             <td><a href="../?userid={id}"><xsl:value-of select="surname" /></a></td>
             <td><xsl:value-of select="name" /></td>
             <td><xsl:value-of select="patronimyc" /></td>
-            <td></td>
+            <td><xsl:value-of select="property_value[property_id = 20]/value" /></td>
             <td></td>
         </tr>
     </xsl:template>
