@@ -12,7 +12,7 @@ class Admin_Menu_List
     {
         $title = "Списки";
         $oOutputXml = Core::factory("Core_Entity");
-        $properyId = Core_Array::getValue($aParams, "parent_id", null);
+        $properyId = Core_Array::getValue($aParams, "parent_id", 0);
 
         if($properyId == null)
         {
@@ -35,7 +35,11 @@ class Admin_Menu_List
                     ->name("title")
                     ->value($title)
             )
-            //->addEntity()
+            ->addEntity(
+                Core::factory("Core_Entity")
+                    ->name("parent_id")
+                    ->value($properyId)
+            )
             ->addEntities($aoLists)
             ->xsl("admin/lists/lists.xsl")
             ->show();
