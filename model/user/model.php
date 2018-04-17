@@ -55,8 +55,8 @@ class User_Model extends Core_Entity
 	public function password($val = null)
 	{
 		if(is_null($val)) 		return $this->password;
-		if(strlen($val) > 50)
-		    die(Core::getMessage("TOO_LARGE_VALUE", array("password", "User", 50)));
+		if(strlen($val) > 255)
+		    die(Core::getMessage("TOO_LARGE_VALUE", array("password", "User", 255)));
 
 		$this->password = md5($val);
 		return $this;
@@ -66,8 +66,8 @@ class User_Model extends Core_Entity
 	public function phoneNumber($val = null)
 	{
 		if(is_null($val))		return $this->phone_number;
-		if(strlen($val) > 100)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("phone_number", "User", 100)));
+		if(strlen($val) > 255)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("phone_number", "User", 255)));
 
 		$this->phone_number = $val;
 		return $this;
@@ -77,8 +77,8 @@ class User_Model extends Core_Entity
 	public function name($val = null)
 	{
 		if(is_null($val))		return $this->name;
-		if(strlen($val) > 50)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("name", "User", 50)));
+		if(strlen($val) > 255)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("name", "User", 255)));
 
 		$this->name = $val;
 		return $this;
@@ -88,8 +88,8 @@ class User_Model extends Core_Entity
 	public function surname($val = null)
 	{
 		if(is_null($val))		return $this->surname;
-		if(strlen($val) > 50)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("surname", "User", 50)));
+		if(strlen($val) > 255)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("surname", "User", 255)));
 
 		$this->surname = $val;
 		return $this;
@@ -99,8 +99,8 @@ class User_Model extends Core_Entity
 	public function patronimyc($val = null)
 	{
 		if(is_null($val))		return $this->patronimyc;
-		if(strlen($val) > 50)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("patronimyc", "User", 50)));
+		if(strlen($val) > 255)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("patronimyc", "User", 255)));
 
 		$this->patronimyc = $val;
 		return $this;
@@ -110,8 +110,8 @@ class User_Model extends Core_Entity
 	public function email($val = null)
 	{
 		if(is_null($val))		return $this->email;
-		if(strlen($val) > 20)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("email", "User", 20)));
+		if(strlen($val) > 255)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("email", "User", 255)));
 
 		$this->email = $val;
 		return $this;
@@ -121,8 +121,8 @@ class User_Model extends Core_Entity
 	public function login($val = null)
 	{
 		if(is_null($val)) 		return $this->login;
-		if(strlen($val) > 50)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("login", "User", 50)));
+		if(strlen($val) > 255)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("login", "User", 255)));
 
 		$this->login = $val;
 		return $this;
