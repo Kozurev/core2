@@ -12,3 +12,14 @@ body {
 #sortingTable {
 	font: 15px/22px Arial, Sans-serif !important;
 }
+
+.anketa {
+	font-size: 13px;
+	position: relative;
+	bottom: 5px;
+}
+
+.notes {
+	max-width: 275px;
+	font-size: 15px;
+}
