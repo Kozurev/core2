@@ -50,6 +50,14 @@ class User extends User_Model
 	}
 
 
+	public function delete($obj = null)
+    {
+        Core::notify(array(&$this), "beforeUserDelete");
+        parent::delete();
+        Core::notify(array(&$this), "afterUserDelete");
+    }
+
+
 	/**
 	*	Авторизация пользователя
 	*/
