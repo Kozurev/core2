@@ -42,7 +42,6 @@ class Property extends Property_Model
 
 		if(count($result) == 0)
         {
-            //echo $sTableName . " " . $sModelName . " " . $this->id . " " . $this->default_value . "<br>";
             $emptyValue = Core::factory($sTableName)
                 ->property_id($this->id)
                 ->model_name($sModelName)
@@ -155,6 +154,7 @@ class Property extends Property_Model
 	}
 
 
+
 	/**
 	*	Добавление нового значения свойства
 	*	@param $obj - объект, для которого добавляется новое значение
@@ -193,14 +193,15 @@ class Property extends Property_Model
 
 		$aoOutputData = array();
 
-		foreach ($aoPropertyList as $oPropertyList) 
+		foreach ($aoPropertyList as $oPropertyList)
 		{
 			$aoOutputData[] = Core::factory("Property_List_Values")
 				->where("property_id", "=", $this->id)
 				->where("id", "=", $oPropertyList->value())
-				->findAll();
+				->find();
 		}
 
+        //return $aoPropertyList;
 		return $aoOutputData;
 	}
 
