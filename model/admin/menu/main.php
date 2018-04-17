@@ -193,16 +193,41 @@ class Admin_Menu_Main
                         ->where("property_id", "=", $oProperty->getId())
                         ->findAll();
 
-                        $oPropertyList = $oProperty->getPropertyValues($oUpdatingItem);
+                    if($oUpdatingItem->getId() != "")
+                    {
+                        $oPropertyList = Core::factory("Property_List")
+                            ->where("property_id", "=", $oProperty->getId())
+                            ->where("model_name", "=", $oUpdatingItem->getTableName())
+                            ->where("object_id", "=", $oUpdatingItem->getId())
+                            ->findAll();
 
-//                        echo "<pre>";
-//                        var_dump($oPropertyList);
-//                        echo "</pre>";
+                        if(count($oPropertyList) == 0)
+                        {
+                            $oPropertyList = array(
+                                Core::factory("Property_List")
+                                    ->value($oProperty->defaultValue())
+                            );
+                        }
+                    }
+                    else
+                    {
+                        $oPropertyList = array(
+                            Core::factory("Property_List")
+                                ->value($oProperty->defaultValue())
+                        );
+                    }
 
-                        foreach ($oPropertyList as $prop)
-                            $prop->addEntities($aoLitsValues, "item");
 
-                        $oProperty->addEntities($oPropertyList, "property_value");
+
+
+//                    echo "<pre>";
+//                    print_r($oPropertyList);
+//                    echo "</pre>";
+
+                    foreach ($oPropertyList as $prop)
+                        $prop->addEntities($aoLitsValues, "item");
+
+                    $oProperty->addEntities($oPropertyList, "property_value");
                 }
                 else
                 {
