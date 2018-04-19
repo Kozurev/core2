@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE xsl:stylesheet>
-<xsl:stylesheet version="1.0"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output xmlns="http://www.w3.org/TR/xhtml1/strict" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" encoding="utf-8" indent="yes" method="html" omit-xml-declaration="no" version="1.0" media-type="text/xml"/>
-
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:template match="root">
 		<div class="in_main">
@@ -14,7 +11,6 @@
 				<th>id</th>
 				<th>Заголовок</th>
 				<th>Название</th>
-				<!--<th>Описание</th>-->
 				<th>Активность</th>
 				<th>Редактировать</th>
 				<th>Удалить</th>
@@ -39,11 +35,11 @@
 			</button>
 
 			<div class="pagination">
-				<a class="prev_page" href="admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
+				<a class="prev_page" href="admin?menuTab=Constant&amp;action=show&amp;parent_id={parent_id}"></a>
 				<span class="pages">Страница
 					<span id="current_page"><xsl:value-of select="pagination/current_page" /></span> из
 					<span id="count_pages"><xsl:value-of select="pagination/count_pages" /></span></span>
-				<a class="next_page" href="admin?menuTab=User&amp;action=show&amp;group_id={group_id}"></a>
+				<a class="next_page" href="admin?menuTab=Constant&amp;action=show&amp;parent_id={parent_id}"></a>
 				<span class="total_count">Всего элементов: <xsl:value-of select="pagination/total_count"/></span>
 			</div>
 		</div>
