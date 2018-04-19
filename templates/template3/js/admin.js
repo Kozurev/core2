@@ -1,3 +1,5 @@
+var loaderTime = 200;
+
 $(function(){
 
     if(window.location.hash == "")
@@ -69,6 +71,7 @@ $(function(){
         //Следующая страница
         .on("click", ".next_page", function(e){
             e.preventDefault();
+            var pageData = $(this).attr("href");
             var current_page = Number($("#current_page").text());
             var count_pages = Number($("#count_pages").text());
             if(current_page == count_pages)	return;
@@ -78,6 +81,7 @@ $(function(){
         //Предыдущая страница
         .on("click", ".prev_page", function(e){
             e.preventDefault();
+            var pageData = $(this).attr("href");
             var current_page = Number($("#current_page").text());
             var count_pages = Number($("#count_pages").text());
             if(current_page == 1)	return;
@@ -119,7 +123,7 @@ function reloadMain(hash){
         url: link + "&ajax=1",
         success: function(data){
             $(".main").html(data);
-            setTimeout("loaderOff()", 100);
+            setTimeout("loaderOff()", loaderTime);
             //loaderOff();
         }
     });
@@ -147,7 +151,7 @@ function updateActive(model_name, model_id, value){
         type: "GET",
         url: link,
         success: function(answer){
-            setTimeout("loaderOff()", 100);
+            setTimeout("loaderOff()", loaderTime);
             //loaderOff();
             if(answer != "0")
                 alert("Ошибка: " + answer);
@@ -175,7 +179,7 @@ function deleteItem(model_name, model_id){
         url: link,
         success: function(answer){
             reloadMain(window.location.hash);
-            setTimeout("loaderOff()", 100);
+            setTimeout("loaderOff()", loaderTime);
             //loaderOff();
             if(answer != "0")
                 alert("Ошибка: " + answer);
@@ -200,7 +204,7 @@ function updateItem(objectData, link){
         success: function(answer){
             //reloadMain("#" + link);
             window.history.back();
-            setTimeout("loaderOff()", 100);
+            setTimeout("loaderOff()", loaderTime);
             //loaderOff();
             if(answer != "0")
                 alert("Ошибка: " + answer);
@@ -225,14 +229,13 @@ function changePropertyForObject(obj_id, obj_name, prop_id, active) {
         },
         success: function(responce) {
             //reloadMain(window.location.hash);
-            setTimeout("loaderOff()", 100);
+            setTimeout("loaderOff()", loaderTime);
             if(responce != "0")
                 alert("Ошибка: " + responce);
         }
     });
 
 }
-
 
 window.onhashchange = function(){
     reloadMain(window.location.hash);
@@ -242,12 +245,28 @@ window.onload = function(){
     reloadMain(window.location.hash);
 }
 
+// //Запуск лоадера
+// function loaderOn(){
+//     $(".loader").show();
+// }
+//
+// //Отключение лоадера
+// function loaderOff(){
+//     $(".loader").hide();
+// }
+
+
 //Запуск лоадера
 function loaderOn(){
+    var bodyHeight = ($(window).height() - $(".loader").outerHeight()) / 2;
+    if(bodyHeight < window.innerHeight) bodyHeight = window.innerHeight;
+    $("body").addClass("bodyLoader");
+    $(".loader").css("height", bodyHeight);
     $(".loader").show();
 }
 
 //Отключение лоадера
 function loaderOff(){
+    $("body").removeClass("bodyLoader");
     $(".loader").hide();
 }

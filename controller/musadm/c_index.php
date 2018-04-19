@@ -10,6 +10,7 @@ $oCurentUser = Core::factory("User")->getCurent();
 $pageUserId = Core_Array::getValue($_GET, "userid", 0); //id просматриваемого пользователя администратором
 
 $bOnlyAdmin = false;
+$bOnlyUser = false;
 $bAdminWithUser = false;
 
 //Если администратор авторизован под учетной записью пользователя
@@ -27,10 +28,21 @@ if($oCurentUser->groupId() < 4 && $pageUserId)
     $bAdminWithUser = true;
     echo "<h1>Администратор под записью пользователя</h1>";
 }
-else
+elseif($oCurentUser->groupId() < 4)
 {
+    $bOnlyAdmin = true;
     echo "<h1>Только администратор</h1>";
 }
+elseif($oCurentUser->groupId() > 3 && !$pageUserId)
+{
+    $bOnlyUser = true;
+    echo "<h1>Только пользователь</h1>";
+}
+else
+{
+    $this->error404();
+}
+
 
 $oUserGroup = Core::factory("User_Group", $oUser->groupId());
 

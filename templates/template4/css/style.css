@@ -5,8 +5,28 @@ body {
 	overflow-x: hidden;
 }
 
-.container .navbar .container-fluid .navbar-right {
-	float: left;
+/*.bodyLoader {*/
+	/*background: grey;*/
+/*}*/
+
+.loader {
+	background: grey;
+	opacity: 0.8;
+	width: 100%;
+	position: fixed;
+	z-index: 10000;
+	background-image: url("../images/loader.gif");
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 50px;
+}
+
+.container {
+	padding: 0px;
+}
+
+nav {
+    font-size: 15px;
 }
 
 #sortingTable {
@@ -23,3 +43,5 @@ body {
 	max-width: 275px;
 	font-size: 15px;
 }
+
+

@@ -6,6 +6,7 @@ class Admin_Menu_Model extends Core_Entity
 	protected $title;
 	protected $model;
 	protected $parent_id;
+	protected $active;
 	protected $sorting;
 
 	public function __construct(){}
@@ -25,6 +26,15 @@ class Admin_Menu_Model extends Core_Entity
 	}
 
 
+	public function active($val = null)
+    {
+        if(is_null($val))   return $this->active;
+        if($val == true)    $this->active = 1;
+        elseif($val == false)$this->active = 0;
+        return $this;
+    }
+
+
 	public function model($val = null)
 	{
 		if(is_null($val)) return $this->model;
@@ -37,14 +47,16 @@ class Admin_Menu_Model extends Core_Entity
 	public function parentId($val = null)
     {
         if(is_null($val))   return $this->parent_id;
-        if(!is_int($val))   die(Core::getMessage("INVALID_TYPE", array("parent_id", "Admin_Menu", "integer")));
+        //if(!is_int($val))   die(Core::getMessage("INVALID_TYPE", array("parent_id", "Admin_Menu", "integer")));
+        $this->parent_id = intval($val);
+        return $this;
     }
 
 
 	public function sorting($val = null)
     {
         if(is_null($val))   return $this->sorting;
-        if(!is_int($val))   die(Core::getMessage("INVALID_TYPE", array("sorting", "Admin_Menu", "integer")));
+        //if(!is_int($val))   die(Core::getMessage("INVALID_TYPE", array("sorting", "Admin_Menu", "integer")));
         $this->sorting = $val;
         return $this;
     }

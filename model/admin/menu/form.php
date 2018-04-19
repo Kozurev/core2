@@ -19,6 +19,20 @@ class Admin_Menu_Form
 		if(!$parentId)		$title = "Список моделей";
 		elseif($parentId)	$title = Core::factory("Admin_Form_Modelname", $parentId)->model_name();
 
+
+        /**
+         * Пагинация
+         */
+        if($parentId)
+        {
+            $modelName = "Admin_Form";
+        }
+        else
+        {
+            $modelName = "Admin_Form_Modelname";
+        }
+
+
 		if($parentId)	
 		{
 			$aoData = Core::factory("Admin_Form")

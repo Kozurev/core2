@@ -13,9 +13,9 @@ class Page_Menu extends Page_Menu_Model
     }
 
 
-    public function showMenu1()
+    public function showMenu1($structureId)
     {
-        //$aoStructures
+
     }
 
 }

@@ -7,6 +7,7 @@ class Page_Template_Model extends Core_Entity
 	protected $id;
 	protected $title;
 	protected $parent_id;
+	protected $dir;
 
 	public function getId(){
 		return $this->id;}
@@ -14,61 +15,27 @@ class Page_Template_Model extends Core_Entity
 
 	public function title($val = null)
 	{
-		try
-		{
-			if(is_null($val))
-			{
-				return $this->title;
-			}
-			
-			if(!is_array($val) && !is_object($val))
-			{
-				if(strlen($val) <= 50)
-				{
-					$this->title = $val;
-					return $this;
-				}
-				else
-					throw new Exception(TOO_LARGE_VALUE);
-			}
-			throw new Exception(INVALID_TYPE);
-		}
-		catch(Exception $e)
-		{
-			echo "<br>".$e->getMessage();
-		}
+        if(is_null($val))   return $this->title;
+        if(strlen($val) > 255)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("title", "Page_Template", 255)));
+        $this->title = $val;
+        return $this;
 	}
 
 
 	public function parent_id($val = null)
 	{
-		try
-		{
-			if(is_null($val))
-			{
-				return $this->parent_id;
-			}
-			
-			if(is_integer($val))
-			{
-				$this->parent_id = $val;
-				return $this;
-			}
-			
-			throw new Exception(INVALID_TYPE);
-		}
-		catch(Exception $e)
-		{
-			echo "<br>".$e->getMessage();
-		}
+        if(is_null($val))   return $this->parent_id;
+        $this->parent_id = intval($val);
+        return $this;
 	}
 
 
-
-
-
-
-
-
+    public function dir($val = null)
+    {
+        if(is_null($val))   return $this->dir;
+        $this->dir = intval($val);
+        return $this;
+    }
 
 }

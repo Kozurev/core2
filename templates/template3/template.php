@@ -42,6 +42,7 @@ if($this->oStructure->path() == "admin")
         if($this->oStructure->path() == "admin")
         {
             $aoMenuItems = Core::factory("Admin_Menu")
+                ->where("active", "=", 1)
                 ->orderBy("sorting")
                 ->findAll();
 

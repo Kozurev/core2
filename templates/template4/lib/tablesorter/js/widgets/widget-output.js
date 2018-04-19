@@ -204,7 +204,7 @@ output = ts.output = {
 		} else {
 			result = result.replace(output.regexBR, '');
 		}
-		// extract img alt text
+		// extract images alt text
 		txt = result.match(output.regexIMG);
 		if (!wo.output_includeHTML && txt !== null) {
 			result = txt[1];

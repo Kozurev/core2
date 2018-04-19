@@ -50,7 +50,7 @@ ChiliBook.recipes[ "html.js" ] =
 			} 
 		}
 		// matches a starting tag of an element (with attrs)
-		// like "<div ... >" or "<img ... />"
+		// like "<div ... >" or "<images ... />"
 		, tag_start: { 
 			  _match: /(<\w+)((?:[?%]>|[\w\W])*?)(\/>|>)/ 
 			, _replace: function( all, open, content, close ) { 

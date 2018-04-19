@@ -21,6 +21,7 @@ class Admin_Menu_Property
         $page = intval(Core_Array::getValue($aParams, "page", 0));
         $dirOffset = $page * SHOW_LIMIT;
         $countDirs = Core::factory("Property_Dir")->where("dir", "=", $parentId)->getCount() - $dirOffset;
+        if($countDirs < 0)  $countDirs = 0;
 
         $totalCountProperties = Core::factory("Property")->where("dir", "=", $parentId)->getCount();
         $totalCountDirs = Core::factory("Property_Dir")->where("dir", "=", $parentId)->getCount();

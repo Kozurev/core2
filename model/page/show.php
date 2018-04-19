@@ -38,6 +38,7 @@ class Page_Show extends Core
     public function error404()
     {
         Core::getMessage("ERROR_404", array());
+        exit;
     }
 
 
@@ -278,6 +279,11 @@ class Page_Show extends Core
         while(count($segments) > 0)
         {   
             $path = array_shift($segments);
+//
+//            var_dump($this->oStructure->getId());
+//            is_null($this->oStructure->getId())
+//                ?   $parentId = 0
+//                :   $parentId = $this->oStructure->getId();
 
             $oTmpStructure = $this->oStructure
                 ->queryBuilder()
@@ -286,11 +292,15 @@ class Page_Show extends Core
                 ->where("active", "=", "1")
                 ->find();
 
+            //var_dump($oTmpStructure);
+
             if($oTmpStructure)
+            {
                 $this->oStructure = $oTmpStructure;
+            }
 
             //Поиск элемента структуры
-            if(!$oTmpStructure && $this->oStructure->children_name() != "")
+            if(!$oTmpStructure && $this->oStructure->getId() && $this->oStructure->children_name() != "")
             {
                 $children_name = $this->oStructure->children_name();
 
@@ -299,7 +309,6 @@ class Page_Show extends Core
                     if(!isset($CFG->items_mapping[$children_name]))
                     {
                         $this->error404();
-                        exit;
                     }
 
                     $this->oStructureItem = Core::factory($children_name);
@@ -325,7 +334,6 @@ class Page_Show extends Core
                     if(!$this->oStructureItem)
                     {
                         $this->error404();
-                        return;
                     }
 
                     if(method_exists($this->oStructureItem, "children_name")
@@ -338,6 +346,10 @@ class Page_Show extends Core
             }
 
         }
+
+        //print_r($this->oStructure);
+        if(!$this->oStructure->getId()) $this->error404();
+
 
         //Установка заголовка страницы
         $this->setTitle();

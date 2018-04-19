@@ -2028,7 +2028,7 @@
 			return $node.find('img').length > 0;
 		},
 		format: function(s, table, cell) {
-			return $(cell).find('img').attr(table.config.imgAttr || 'alt') || s;
+			return $(cell).find('images').attr(table.config.imgAttr || 'alt') || s;
 		},
 		parsed : true, // filter widget flag
 		type: 'text'
