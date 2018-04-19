@@ -63,6 +63,8 @@ class User extends User_Model
 	*/
 	public function authorize($remember = false)
 	{
+        Core::notify(array(&$this), "beforeUserAuthorize");
+
 		$result = $this->queryBuilder()
 			->where("login", "=", $this->login)
 			->where("password", "=", $this->password)
@@ -80,12 +82,10 @@ class User extends User_Model
                 setcookie("userdata", $cookieData, time() + $cookieTime, "/");
             }
             $_SESSION['core']['user'] = $result->getId();
-			return $this;
-		} 
-		else 
-		{
-			return false;
 		}
+
+        Core::notify(array(&$result), "afterUserAuthorize");
+		return $result;
 	}
 
 
