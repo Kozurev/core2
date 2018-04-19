@@ -220,4 +220,40 @@ class Admin_Form extends Admin_Form_Model
     }
 
 
+    /**
+     * Список "директорий" для пунктов меню
+     * @param $aParams
+     */
+    public function getListAdminMenuParent($aParams)
+    {
+        $aoTabs = Core::factory("Admin_Menu")
+            ->where("active", "=", "1")
+            ->where("parent_id", "=", "0")
+            ->orderBy("sorting")
+            ->findAll();
+
+        $this->value = Core_Array::getValue($aParams, "parent_id", 0);
+        $this->addEntities($aoTabs, "item");
+    }
+
+
+    public function getListPageTemplateDir($aParams)
+    {
+        $dirId = Core_Array::getValue($aParams, "dir_id", 0);
+        $this->value = $dirId;
+        //TODO: Переработать формирование списка родительских директорий аналогично как у структур и констант
+        $aoDirs = Core::factory("Page_Template_Dir")->findAll();
+        $this->addEntities($aoDirs, "item");
+    }
+
+
+    public function getListPageTemplate($aParams)
+    {
+        $parentId = Core_Array::getValue($aParams, "parent_id", 0);
+        $this->value = $parentId;
+        $aoTemplates = Core::factory("Page_Template")->findAll();
+        $this->addEntities($aoTemplates, "item");
+    }
+
+
 }
