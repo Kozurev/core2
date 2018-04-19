@@ -145,10 +145,10 @@ class Orm
 		*/
 		if(!$this->id)
 		{
-			$oLastItem = $this->queryBuilder()
-				->select("max(id)", "id")
-				->find();
-			$this->id = $oLastItem->id;
+			$lastInsertId = Core_Database::getConnect()->query("SELECT LAST_INSERT_ID() as id");
+            $lastInsertId->setFetchMode(PDO::FETCH_CLASS, "stdClass");
+            $lastInsertId = $lastInsertId->fetch();
+            $this->id = $lastInsertId->id;
 		}
 
 		return $this;
