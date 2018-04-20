@@ -61,10 +61,10 @@ class Admin_Menu_Main
 
             $oProperty->type() == "list"
                 ? $aoPropertyValues = Core::factory("Property_List")
-                ->where("model_name", "=", $oUpdatingItem->getTableName())
-                ->where("property_id", "=", $oProperty->getId())
-                ->where("object_id", "=", $oUpdatingItem->getId())
-                ->findAll()
+                    ->where("model_name", "=", $oUpdatingItem->getTableName())
+                    ->where("property_id", "=", $oProperty->getId())
+                    ->where("object_id", "=", $oUpdatingItem->getId())
+                    ->findAll()
                 : $aoPropertyValues = $oProperty->getPropertyValues($oUpdatingItem);
             //$aoPropertyValues = $oProperty->getPropertyValues($oUpdatingItem);
 
@@ -108,7 +108,7 @@ class Admin_Menu_Main
             //Обновление значений
             for($i = 0; $i < count($aFieldValues); $i++)
             {
-                $aoValuesList[$i]->value($aFieldValues[$i])->save();
+                $aoValuesList[$i]->object_id($oUpdatingItem->getId())->value($aFieldValues[$i])->save();
             }
         }
 
@@ -165,9 +165,9 @@ class Admin_Menu_Main
 
         if($aParams["model"] != "Property")
         {
-            $parentModelName = Core_Array::getValue($aParams, "parent_name", null);
-            $parentModelId = Core_Array::getValue($aParams, "parent_id", 0);
-
+            $parentModelName =  Core_Array::getValue($aParams, "parent_name", null);
+            $parentModelId =    Core_Array::getValue($aParams, "parent_id", 0);
+            //$curentModelName =  Core_Array::getValue($aParams, "model", "");
 
             if($parentModelId != 0 && !is_null($parentModelName))
             {
