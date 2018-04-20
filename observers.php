@@ -26,13 +26,36 @@ Core::attachObserver("beforeUserSave", function($args){
  */
 Core::attachObserver("beforeUserDelete", function($args){
     $oUser = $args[0];
-    $listValue = Core::factory("Property_List_Values")
-        ->where("property_id", "=", 21)
-        ->where("value", "like", "%".$oUser->name()."%")
-        ->where("value", "like", "%".$oUser->surname()."%")
-        ->find();
+    if($oUser->groupId() == 4)
+    {
+        $listValue = Core::factory("Property_List_Values")
+            ->where("property_id", "=", 21)
+            ->where("value", "like", "%".$oUser->name()."%")
+            ->where("value", "like", "%".$oUser->surname()."%")
+            ->find();
 
-    if($listValue) $listValue->delete();
+        if($listValue) $listValue->delete();
+    }
+
+
+    $aPropertiesTypes = array("Bool", "Int", "List", "String", "Text");
+
+    foreach ($aPropertiesTypes as $type)
+    {
+        $assigmentTableName = "Property_" . $type . "_Assigment";
+        $valuesTable = "Property_" . $type;
+
+        $assigments = Core::factory($assigmentTableName)
+            ->where("model_name", "=", "User")
+            ->findAll();
+        foreach ($assigments as $assigment) $assigment->delete();
+
+        $values = Core::factory($valuesTable)
+            ->where("model_name", "=", "User")
+            ->findAll();
+        foreach ($values as $value) $value->delete();
+    }
+
 });
 
 
@@ -76,3 +99,89 @@ Core::attachObserver("afterUserAuthorize", function($args){
         }
     }
 });
+
+
+/**
+ * Удаление всех связей и значений доп. свойств при удалении объекта структуры
+ */
+Core::attachObserver("beforeStructureDelete", function($args){
+    $oStructure = $args[0];
+    //$oProperty = Core::factory("Property");
+    $types = array("Int", "String", "Text", "List", "Bool");
+
+    foreach ($types as $type)
+    {
+        $tableName = "Property_" . $type . "_Assigment";
+
+        $assignments = Core::factory($tableName)
+            ->where("object_id", "=", $oStructure->getId())
+            ->where("model_name", "=", "Structure")
+            ->findAll();
+
+        foreach ($assignments as $assignment)
+        {
+            $oProperty = Core::factory("Property", $assignment->property_id());
+
+            if($oProperty->type() == "list")
+            {
+                $aoValues = Core::factory("Property_List")
+                    ->where("property_id", "=", $oProperty->getId())
+                    ->where("model_name", "=", "Structure")
+                    ->where("object_id", "=", $oStructure->getId())
+                    ->findAll();
+            }
+            else
+            {
+                $aoValues = $oProperty->getPropertyValues($oStructure);
+            }
+
+            foreach ($aoValues as $value)   $value->delete();
+
+            $assignment->delete();
+        }
+    }
+});
+
+
+/**
+ * Удаление всех связей и значений доп. свойств при удалении объекта Элемента структуры
+ */
+Core::attachObserver("beforeItemDelete", function($args){
+    $oStructure = $args[0];
+    //$oProperty = Core::factory("Property");
+    $types = array("Int", "String", "Text", "List", "Bool");
+
+    foreach ($types as $type)
+    {
+        $tableName = "Property_" . $type . "_Assigment";
+
+        $assignments = Core::factory($tableName)
+            ->where("object_id", "=", $oStructure->getId())
+            ->where("model_name", "=", "Structure")
+            ->findAll();
+
+        foreach ($assignments as $assignment)
+        {
+            $oProperty = Core::factory("Property", $assignment->property_id());
+
+            if($oProperty->type() == "list")
+            {
+                $aoValues = Core::factory("Property_List")
+                    ->where("property_id", "=", $oProperty->getId())
+                    ->where("model_name", "=", "Structure_Item")
+                    ->where("object_id", "=", $oStructure->getId())
+                    ->findAll();
+            }
+            else
+            {
+                $aoValues = $oProperty->getPropertyValues($oStructure);
+            }
+
+            foreach ($aoValues as $value)   $value->delete();
+
+            $assignment->delete();
+        }
+    }
+});
+
+
