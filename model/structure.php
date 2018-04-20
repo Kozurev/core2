@@ -63,6 +63,8 @@ class Structure extends Structure_Model
      */
     public function delete($obj = null)
     {
+        Core::notify(array(&$this), "beforeStructureDelete");
+
         $oStructureController = Core::factory("Structure_Controller");
         $aoItems = $oStructureController
             ->where("id", "=", $this->id)
@@ -75,6 +77,7 @@ class Structure extends Structure_Model
             Core::factory("Orm")->delete($oItem);
         }
 
+        Core::notify(array(&$this), "afterStructureDelete");
     }
 
 }
