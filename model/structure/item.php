@@ -13,8 +13,15 @@ class Structure_Item extends Structure_Item_Model
     }
 
 
+    public function delete($obj = null)
+    {
+        Core::notify(array(&$this), "beforeItemDelete");
+        parent::delete();
+        Core::notify(array(&$this), "afterItemDelete");
+    }
 
-	public function save()
+
+	public function save($obj = null)
 	{
         Core::notify(array(&$this), "beforeItemSave");
         parent::save();
