@@ -6,7 +6,11 @@ echo "<pre>";
 /**
  * Предварительная очистка таблиц
  */
+$aoUsers = Core::factory("User")->findAll();
+foreach ($aoUsers as $user) $user->delete();
+
 Core::factory("Orm")->executeQuery("TRUNCATE `User`");
+Core::factory("Orm")->executeQuery("TRUNCATE `Payment`");
 
 $oUser = Core::factory("User")
     ->login("alexoufx")
@@ -22,23 +26,7 @@ $oUser = Core::factory("User")
 $oUser->save();
 
 //Очистка связей и значений доп. свойств с пользователями
-$aPropertiesTypes = array("Bool", "Int", "List", "String", "Text");
 
-foreach ($aPropertiesTypes as $type)
-{
-    $assigmentTableName = "Property_" . $type . "_Assigment";
-    $valuesTable = "Property_" . $type;
-
-    $assigments = Core::factory($assigmentTableName)
-        ->where("model_name", "=", "User")
-        ->findAll();
-    foreach ($assigments as $assigment) $assigment->delete();
-
-    $values = Core::factory($valuesTable)
-        ->where("model_name", "=", "User")
-        ->findAll();
-    foreach ($values as $value) $value->delete();
-}
 
 
 
@@ -180,6 +168,24 @@ while($user = $aUsers->fetch_object())
         $oPropertyInstrument->addNewValue($oUser, $instrumentid);
     }
 
+
+    //Платежи
+    $sql = "SELECT * FROM payment WHERE userid = " . $user->id;
+    $payments = $dbh->query($sql);
+    while($payment = $payments->fetch_object())
+    {
+        $oPayment = Core::factory("Payment");
+        $oPayment->user($oUser->getId());
+        if($payment->type == "plus")
+            $oPayment->type(1);
+        else
+            $oPayment->type(0);
+
+        $oPayment->datetime(date('d-m-Y H:i:s',$payment->date));
+        $oPayment->value($payment->value);
+        $oPayment->description($payment->description);
+        $oPayment->save();
+    }
 
 }
 
