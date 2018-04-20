@@ -45,14 +45,7 @@ class Property extends Property_Model
             $emptyValue = Core::factory($sTableName)
                 ->property_id($this->id)
                 ->model_name($sModelName)
-                //->object_id($obj->getId())
                 ->value(strval($this->default_value));
-
-
-//            echo "<pre>";
-//            print_r($emptyValue);
-//            echo "</pre>";
-
 
             return array(
                 $emptyValue
