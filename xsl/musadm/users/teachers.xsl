@@ -26,7 +26,9 @@
             <td><xsl:value-of select="name" /></td>
             <td><xsl:value-of select="patronimyc" /></td>
             <td><xsl:value-of select="property_value[property_id = 20]/value" /></td>
-            <td></td>
+            <td>
+                <a class="user_action user_edit"        href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
+            </td>
         </tr>
     </xsl:template>
 
