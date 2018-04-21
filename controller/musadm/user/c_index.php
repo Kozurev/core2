@@ -17,7 +17,6 @@ $groupId == 5
     ?   $xsl = "musadm/users/clients.xsl"
     :   $xsl = "musadm/users/teachers.xsl";
 
-
 $aoUsers = Core::factory("User")
     ->where("group_id", "=", $groupId)
     ->where("active", "=", 1)
@@ -35,5 +34,10 @@ foreach ($aoUsers as $user)
 
 $output = Core::factory("Core_Entity")
     ->xsl($xsl)
+    ->addEntity(
+        Core::factory("Core_Entity")
+            ->name("table_type")
+            ->value("active")
+    )
     ->addEntities($aoUsers)
     ->show();
