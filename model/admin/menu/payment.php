@@ -12,7 +12,7 @@ class Admin_Menu_Payment
     public function show($aParams)
     {
         $page = Core_Array::getValue($aParams, "page", 0);
-        $totalCount = Core::factory("Payment")->getCount();
+        $totalCount = Core::factory("Payment")->where("value", ">", 1)->getCount();
         $offset = SHOW_LIMIT * $page;
         $countPages = intval($totalCount / SHOW_LIMIT);
         if($totalCount % SHOW_LIMIT)    $countPages++;
@@ -39,7 +39,8 @@ class Admin_Menu_Payment
         $aoPayments = Core::factory("Payment")
             ->limit(SHOW_LIMIT)
             ->offset($offset)
-            ->orderBy("Payment.id", "DESC")
+            ->orderBy("Payment.datetime", "DESC")
+            ->where("value", ">", "1")
             ->join("User", "User.id = Payment.user")
             ->findAll();
 
