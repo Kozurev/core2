@@ -38,22 +38,22 @@
 
 
     <xsl:template match="user">
+
+        <xsl:variable name="class" >
+            <xsl:choose>
+                <xsl:when test="property_value[property_id = 13]/value &lt; 0 or property_value[property_id = 14]/value &lt; 0">
+                    negative
+                </xsl:when>
+                <xsl:when test="property_value[property_id = 13]/value &gt; 2 or property_value[property_id = 14]/value &gt; 2">
+                    positive
+                </xsl:when>
+                <xsl:otherwise>
+                    neutral
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
         <tr>
-
-            <xsl:variable name="class" >
-                <xsl:choose>
-                    <xsl:when test="property_value[property_id = 13]/value &lt; 0 or property_value[property_id = 14]/value &lt; 0">
-                        negative
-                    </xsl:when>
-                    <xsl:when test="property_value[property_id = 13]/value &gt; 2 or property_value[property_id = 14]/value &gt; 2">
-                        positive
-                    </xsl:when>
-                    <xsl:otherwise>
-                        neutral
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:variable>
-
             <td>
                 <a href="../?userid={id}">
                     <xsl:value-of select="surname" />
@@ -78,8 +78,22 @@
             <td class="{$class}"><xsl:value-of select="property_value[property_id = 12]/value" /></td>
             <td class="{$class}"><xsl:value-of select="property_value[property_id = 13]/value" /></td>
             <td class="{$class}"><xsl:value-of select="property_value[property_id = 14]/value" /></td>
-            <td class="{$class}"><xsl:value-of select="property_value[property_id = 15]/value" /></td>
-            <td></td>
+            <td><xsl:value-of select="property_value[property_id = 15]/value" /></td>
+
+            <xsl:if test="//table_type = 'active'">
+                <td>
+                    <a class="user_action user_add_payment" href="#" data-userid="{id}"></a>
+                    <a class="user_action user_edit"        href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
+                    <a class="user_action user_archive"     href="#" data-userid="{id}"></a>
+                </td>
+            </xsl:if>
+
+            <xsl:if test="//table_type = 'archive'">
+                <td>
+                    <a class="user_action user_unarchive"   href="#" data-userid="{id}"></a>
+                    <a class="user_action user_delete"      href="#" data-userid="{id}"></a>
+                </td>
+            </xsl:if>
         </tr>
     </xsl:template>
 
