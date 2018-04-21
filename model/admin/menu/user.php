@@ -43,6 +43,7 @@ class Admin_Menu_User
         $aoUsers = Core::factory("User")
             ->where("group_id", "=", $groupId)
             ->limit(SHOW_LIMIT)
+            ->orderBy("id", "DESC")
             ->offset($offset)
             ->findAll();
 
@@ -97,7 +98,13 @@ class Admin_Menu_User
 
     public function updateForm($aParams)
     {
-        Core::factory("Admin_Menu_Main")->updateForm($aParams, "User");
+        Core::factory("Admin_Menu_Main")->updateForm($aParams, "User", "admin/main/update_form.xsl");
     }
+
+//
+//    public function updateFormForPopup($aParams)
+//    {
+//        Core::factory("Admin_Menu_Main")->updateForm($aParams, "User", "musadm/users/edit_popup.xsl");
+//    }
 
 }
