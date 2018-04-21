@@ -11,7 +11,7 @@
  */
 Core::attachObserver("beforeUserSave", function($args){
     $oUser = $args[0];
-    if($oUser->groupId() != 4 && $oUser->getId() == "") return;
+    if($oUser->groupId() != 4 || $oUser->getId() == "") return;
     $teacherFullName = $oUser->surname() . " " . $oUser->name();
 
     $listValue = Core::factory("Property_List_Values")
