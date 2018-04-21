@@ -108,7 +108,7 @@
 			</td>
 
 			<!--Редактирование-->
-			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=User&amp;model_id={id}&amp;parent_id={group_id}&amp;parent_name=User_Group" class="link updateLink" /></td>
+			<td><a href="admin?menuTab=User&amp;menuAction=updateForm&amp;model=User&amp;model_id={id}&amp;parent_id={group_id}&amp;parent_name=User_Group" class="link updateLink" /></td>
 
 			<!--Удаление-->
 			<td><a href="admin" data-model_name="User" data-model_id="{id}" class="delete deleteLink"></a></td>
