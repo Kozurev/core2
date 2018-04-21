@@ -103,7 +103,7 @@
 
 .balance_table {
     width: 80%;
-    position: relative;
-    left: 10%;
-    top: 50px;
+    margin-left: 10%;
+    margin-bottom: 30px;
+    margin-top: 50px;
 }

@@ -1,0 +1,42 @@
+.anketa {
+    font-size: 13px;
+    position: relative;
+    bottom: 5px;
+}
+
+.notes {
+    max-width: 275px;
+    font-size: 15px;
+}
+
+.user_action {
+    display: inline-block;
+    height: 25px;
+    width: 25px;
+    margin: 0px 2px 0px 2px;
+}
+
+.user_add_payment {
+    background: url(/templates/template4/images/money.png);
+    background-size: cover;
+}
+
+.user_edit {
+    background: url(/templates/template4/images/edit.png);
+    background-size: cover;
+}
+
+.user_archive {
+    background: url(/templates/template4/images/archive.png);
+    background-size: cover;
+}
+
+.user_unarchive {
+    background: url(/templates/template4/images/archiveminus.png);
+    background-size: cover;
+}
+
+.user_delete {
+    background: url(/templates/template4/images/delete.png);
+    background-size: cover;
+}

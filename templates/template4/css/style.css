@@ -3,6 +3,7 @@ body {
 	font-size: 20px;
 	font-weight: 300;
 	overflow-x: hidden;
+	background: url(../images/bg.png) repeat;
 }
 
 /*.bodyLoader {*/
@@ -33,15 +34,5 @@ nav {
 	font: 15px/22px Arial, Sans-serif !important;
 }
 
-.anketa {
-	font-size: 13px;
-	position: relative;
-	bottom: 5px;
-}
-
-.notes {
-	max-width: 275px;
-	font-size: 15px;
-}
 
 
