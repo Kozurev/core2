@@ -10,20 +10,28 @@
         ->css("/templates/template4/css/bootstrap-theme.min.css")
         ->css("/templates/template4/css/table.css")
         ->css("/templates/template4/css/buttons.css")
+        ->css("/templates/template4/css/users.css")
+        ->css("/templates/template4/css/popup.css")
         ->showCss()
         ->js("/templates/template4/js/jquery.min.js")
+        ->js("/templates/template4/js/jquery.validate.min.js")
         ->js("/templates/template4/js/bootstrap.min.js")
         ->js("/templates/template4/lib/tablesorter/js/jquery.tablesorter.js")
         ->js("/templates/template4/lib/tablesorter/js/jquery.tablesorter.widgets.js")
         ->js("/templates/template4/lib/tablesorter/addons/pager/jquery.tablesorter.pager.js")
         ->js("/templates/template4/lib/tablesorter/beta-testing/pager-custom-controls.js")
         ->js("/templates/template4/js/main.js")
+        ->js("/templates/template4/js/users.js")
         ->showJs();
     ?>
 
 </head>
 <body>
     <div class="loader" style="display: none"></div>
+
+    <div class="popup"></div>
+    <div class="overlay"></div>
+
         <?
         global $CFG;
         $oCurentUser = Core::factory("User")->getCurent();
@@ -94,7 +102,7 @@
                                 </ul>
                             </li>
                             <li><a href="#">Группы</a></li>
-                            <li><a href="#">Архив</a></li>
+                            <li><a href="<?=$rootdir?>user/archive">Архив</a></li>
                             <li><a href="#">Лиды</a></li>
                             <li><a href="#">Сертификаты</a></li>
                             <li><a href="#">Задачи</a></li>
