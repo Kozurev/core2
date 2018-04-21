@@ -53,9 +53,13 @@ class Admin_Menu_Main
             $iPropertyId = explode("property_", $sFieldName)[1];
             $oProperty = Core::factory("Property", $iPropertyId);
 
-            if($aFieldValues[0] == $oProperty->defaultValue()
-                || $aFieldValues[0] == "" && $oProperty->defaultValue() == 0)
-                continue;
+            if($aFieldValues[0] === $oProperty->defaultValue())
+            {
+                $aoPropertyValues = $oProperty->getPropertyValues($oUpdatingItem);
+                if(count($aoPropertyValues) > 0 && $aoPropertyValues[0]->value() === $aFieldValues[0])
+                    continue;
+            }
+
 
             $oProperty->addToPropertiesList($oUpdatingItem, $iPropertyId);
 
@@ -120,10 +124,8 @@ class Admin_Menu_Main
      *	Формирование формы для создания или редактирования объектов
      *	@param $aParams - array, массив параметров вывода информации
      */
-    public function updateForm($aParams, $saveTab = "Main")
+    public function updateForm($aParams, $saveTab = "Main", $usingXslLink = "admin/main/update_form.xsl")
     {
-        $usingXslLink = "admin/main/update_form.xsl";
-
         $oOutputXml = Core::factory("Core_Entity");
 
         //Получение значения id родительского объекта, если таков указан
