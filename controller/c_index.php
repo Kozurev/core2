@@ -37,14 +37,14 @@ $dbh->query("SET NAMES utf8");
 $aUsers = $dbh->query("SELECT * FROM users where id > 36");
 
 
-$oPropertyVk = Core::factory("Property", 9);
-$oPropertyAnketa = Core::factory("Property", 18);
-$oPropertyBalance = Core::factory("Property", 12);
-$oPropertyPrivate = Core::factory("Property", 13);
-$oPropertyGroup = Core::factory("Property", 14);
-$oPropertyNotes = Core::factory("Property", 19);
-$oPropertyInstrument = Core::factory("Property", 20);
-
+$oPropertyVk =          Core::factory("Property", 9);
+$oPropertyAnketa =      Core::factory("Property", 18);
+$oPropertyBalance =     Core::factory("Property", 12);
+$oPropertyPrivate =     Core::factory("Property", 13);
+$oPropertyGroup =       Core::factory("Property", 14);
+$oPropertyNotes =       Core::factory("Property", 19);
+$oPropertyInstrument =  Core::factory("Property", 20);
+$oPropertyLastEntry =   Core::factory("Property", 22);
 
 while($user = $aUsers->fetch_object())
 {
@@ -181,11 +181,20 @@ while($user = $aUsers->fetch_object())
         else
             $oPayment->type(0);
 
-        $oPayment->datetime(date('d-m-Y H:i:s',$payment->date));
+        $oPayment->datetime(date('Y-m-d H:i:s',$payment->date));
         $oPayment->value($payment->value);
         $oPayment->description($payment->description);
         $oPayment->save();
     }
+
+
+    //Дата последней авторизации
+    if($user->last_entry != null)
+    {
+        $lastEntry = date("d-m-Y H:i:s", $user->last_entry);
+        $oPropertyLastEntry->addNewValue($oUser, $lastEntry);
+    }
+
 
 }
 
