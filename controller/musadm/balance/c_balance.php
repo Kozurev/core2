@@ -19,6 +19,10 @@ else
     $oUser = Core::factory("User", $pageUserId);
 }
 
+
+/**
+ * Баланс, кол-во индивидуальных занятий, кол-во групповых занятий
+ */
 $oPropertyBalance           =   Core::factory("Property", 12);
 $oPropertyPrivateLessons    =   Core::factory("Property", 13);
 $oPropertyGroupLessons      =   Core::factory("Property", 14);
@@ -30,8 +34,21 @@ $groupLessons   =   $oPropertyGroupLessons->getPropertyValues($oUser)[0];
 Core::factory("Core_Entity")
     ->addEntity($oUser)
     ->addEntity($oCurenUserGroup)
-    ->addEntity($balance, "property")
-    ->addEntity($privateLessons, "property")
-    ->addEntity($groupLessons, "property")
+    ->addEntity($balance,           "property")
+    ->addEntity($privateLessons,    "property")
+    ->addEntity($groupLessons,      "property")
     ->xsl("musadm/balance/balance.xsl")
+    ->show();
+
+/**
+ * Платежи
+ */
+$aoUserPayments = Core::factory("Payment")
+    ->where("user", "=", $oUser->getId())
+    ->where("value", ">", "0")
+    ->findAll();
+
+Core::factory("Core_Entity")
+    ->addEntities($aoUserPayments)
+    ->xsl("musadm/balance/payments.xsl")
     ->show();
