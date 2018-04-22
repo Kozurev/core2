@@ -17,26 +17,26 @@
 }
 
 .user_add_payment {
-    background: url(/templates/template4/images/money.png);
+    background: url(../images/money.png);
     background-size: cover;
 }
 
 .user_edit {
-    background: url(/templates/template4/images/edit.png);
+    background: url(../images/edit.png);
     background-size: cover;
 }
 
 .user_archive {
-    background: url(/templates/template4/images/archive.png);
+    background: url(../images/archive.png);
     background-size: cover;
 }
 
 .user_unarchive {
-    background: url(/templates/template4/images/archiveminus.png);
+    background: url(../images/archiveminus.png);
     background-size: cover;
 }
 
 .user_delete {
-    background: url(/templates/template4/images/delete.png);
+    background: url(../images/delete.png);
     background-size: cover;
 }

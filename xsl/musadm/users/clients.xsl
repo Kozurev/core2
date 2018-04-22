@@ -72,7 +72,7 @@
             </td>
             <td><xsl:value-of select="name" /></td>
             <td>
-                <xsl:value-of select="phone_number" />
+                <xsl:value-of select="phone_number" /><br/>
                 <xsl:value-of select="property_value[property_id = 16]/value" />
             </td>
             <td class="{$class}"><xsl:value-of select="property_value[property_id = 12]/value" /></td>

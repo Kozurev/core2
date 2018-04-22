@@ -15,7 +15,7 @@ $(function(){
         .on("click", ".user_edit_submit", function(e){
             e.preventDefault();
             var form = $("#createData");
-            if(form.valid() == false)	return;
+            if(form.valid() == false)   return;
             var data = form.serialize();
             var aUnchecked = form.find("input[type=checkbox]:unchecked");
             for (var i = 0; i < aUnchecked.length; i++) {
@@ -87,7 +87,7 @@ function saveUserData(data) {
     loaderOn();
     $.ajax({
         type: "GET",
-        url: "../../admin?menuTab=Main&menuAction=updateAction&ajax=1",
+        url: "../admin?menuTab=Main&menuAction=updateAction&ajax=1",
         data: data,
         success: function(responce) {
             refreshTable("clients");
@@ -101,7 +101,7 @@ function saveUserData(data) {
 function changeUserActive(userid, status) {
     $.ajax({
         type: "GET",
-        url: "../../admin?menuTab=Main&menuAction=updateActive&ajax=1",
+        url: "../admin?menuTab=Main&menuAction=updateActive&ajax=1",
         data: {
             model_name: "User",
             model_id: userid,
