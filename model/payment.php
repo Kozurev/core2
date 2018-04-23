@@ -8,5 +8,19 @@
 
 class Payment extends Payment_Model
 {
+    public function save($obj = null)
+    {
+        Core::notify(array(&$this), "beforePaymentSave");
+        parent::save();
+        Core::notify(array(&$this), "afterPaymentSave");
+    }
+
+
+    public function delete($obj = null)
+    {
+        Core::notify(array(&$this), "beforePaymentDelete");
+        parent::delete();
+        Core::notify(array(&$this), "beforePaymentDelete");
+    }
 
 }
