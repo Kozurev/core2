@@ -38,7 +38,7 @@ Core::attachObserver("beforeUserDelete", function($args){
     }
 
 
-    $aPropertiesTypes = array("Bool", "Int", "List", "String", "Text");
+    $aPropertiesTypes = Core::factory("Property")->getPropertyTypes();
 
     foreach ($aPropertiesTypes as $type)
     {
@@ -106,40 +106,7 @@ Core::attachObserver("afterUserAuthorize", function($args){
  */
 Core::attachObserver("beforeStructureDelete", function($args){
     $oStructure = $args[0];
-    //$oProperty = Core::factory("Property");
-    $types = array("Int", "String", "Text", "List", "Bool");
-
-    foreach ($types as $type)
-    {
-        $tableName = "Property_" . $type . "_Assigment";
-
-        $assignments = Core::factory($tableName)
-            ->where("object_id", "=", $oStructure->getId())
-            ->where("model_name", "=", "Structure")
-            ->findAll();
-
-        foreach ($assignments as $assignment)
-        {
-            $oProperty = Core::factory("Property", $assignment->property_id());
-
-            if($oProperty->type() == "list")
-            {
-                $aoValues = Core::factory("Property_List")
-                    ->where("property_id", "=", $oProperty->getId())
-                    ->where("model_name", "=", "Structure")
-                    ->where("object_id", "=", $oStructure->getId())
-                    ->findAll();
-            }
-            else
-            {
-                $aoValues = $oProperty->getPropertyValues($oStructure);
-            }
-
-            foreach ($aoValues as $value)   $value->delete();
-
-            $assignment->delete();
-        }
-    }
+    $oProperty = Core::factory("Property")->clearForObject($oStructure);
 });
 
 
@@ -148,40 +115,7 @@ Core::attachObserver("beforeStructureDelete", function($args){
  */
 Core::attachObserver("beforeItemDelete", function($args){
     $oStructure = $args[0];
-    //$oProperty = Core::factory("Property");
-    $types = array("Int", "String", "Text", "List", "Bool");
-
-    foreach ($types as $type)
-    {
-        $tableName = "Property_" . $type . "_Assigment";
-
-        $assignments = Core::factory($tableName)
-            ->where("object_id", "=", $oStructure->getId())
-            ->where("model_name", "=", "Structure")
-            ->findAll();
-
-        foreach ($assignments as $assignment)
-        {
-            $oProperty = Core::factory("Property", $assignment->property_id());
-
-            if($oProperty->type() == "list")
-            {
-                $aoValues = Core::factory("Property_List")
-                    ->where("property_id", "=", $oProperty->getId())
-                    ->where("model_name", "=", "Structure_Item")
-                    ->where("object_id", "=", $oStructure->getId())
-                    ->findAll();
-            }
-            else
-            {
-                $aoValues = $oProperty->getPropertyValues($oStructure);
-            }
-
-            foreach ($aoValues as $value)   $value->delete();
-
-            $assignment->delete();
-        }
-    }
+    $oProperty = Core::factory("Property")->clearForObject($oStructure);
 });
 
 
