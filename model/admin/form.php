@@ -256,4 +256,47 @@ class Admin_Form extends Admin_Form_Model
     }
 
 
+    public function getListClientList($aParams)
+    {
+        $aoUsers = Core::factory("User")
+            ->orderBy("id", "DESC")
+            ->where("active", "=", 1)
+            ->where("group_id", "=", 5)
+            ->findAll();
+
+        foreach ($aoUsers as $user) $user->title = $user->surname() . " " . $user->name();
+
+        $modelId = Core_Array::getValue($aParams, "model_id", 0);
+
+        if($modelId != 0)
+        {
+            $oPayment = Core::factory("Payment", $modelId);
+            $this->value = $oPayment->user();
+        }
+
+        $this->addEntities($aoUsers, "item");
+    }
+
+
+    public function getListPaymentType($aParams)
+    {
+        $modelId = Core_Array::getValue($aParams, "model_id", 0);
+        if($modelId != 0)
+        {
+            $oPayment = Core::factory("Payment", $modelId);
+            $this->value = $oPayment->type();
+        }
+
+        $plus = new stdClass();
+        $plus->id = 1;
+        $plus->title = "Начисление";
+
+        $minus = new stdClass();
+        $minus->id = "0";
+        $minus->title = "Списание";
+
+        $this->addEntity($plus, "item");
+        $this->addEntity($minus, "item");
+    }
+
 }
