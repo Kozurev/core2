@@ -38,24 +38,7 @@ Core::attachObserver("beforeUserDelete", function($args){
     }
 
 
-    $aPropertiesTypes = Core::factory("Property")->getPropertyTypes();
-
-    foreach ($aPropertiesTypes as $type)
-    {
-        $assigmentTableName = "Property_" . $type . "_Assigment";
-        $valuesTable = "Property_" . $type;
-
-        $assigments = Core::factory($assigmentTableName)
-            ->where("model_name", "=", "User")
-            ->findAll();
-        foreach ($assigments as $assigment) $assigment->delete();
-
-        $values = Core::factory($valuesTable)
-            ->where("model_name", "=", "User")
-            ->findAll();
-        foreach ($values as $value) $value->delete();
-    }
-
+    Core::factory("Property")->clearForObject($oUser);
 });
 
 
@@ -164,6 +147,7 @@ Core::attachObserver("beforeStructureSave", function($args){
     if($countCoincidingItems > 0 || $countCoincidingStructures > 0) die("Дублирование путей");
     die("Дублирование не обнаружено");
 });
+
 
 Core::attachObserver("beforeItemSave", function($args){
     $oStructure = $args[0];
