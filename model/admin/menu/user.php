@@ -12,11 +12,31 @@ class Admin_Menu_User
         $oOutputEntity = Core::factory("Core_Entity");
         $title = "Пользователи";
 
+        $oUser = Core::factory("User");
+        $search = Core::factory("Core_Entity")->name("search");
+
+        $searchData = Core_Array::getValue($aParams, "search", "");
+        if($searchData != "")
+        {
+            $data = explode(" ", $searchData);
+
+            foreach ($data as $word)
+                $oUser
+                    ->where("name", "like", $word, "or")
+                    ->where("surname", "like", $word, "or");
+
+            $search->value($searchData);
+        }
+
+        $oUser->where("group_id", "=", $groupId);
+
+
         //Пагинация
         $page = intval(Core_Array::getValue($aParams, "page", 0));
         $offset = $page * SHOW_LIMIT;
-        $totalCount = count(Core::factory("User")->where("group_id", "=", $groupId)->findAll());
-        if($groupId =="0")  $totalCount += count(Core::factory("User_Group")->findAll());
+        $oUserCount = clone $oUser;
+        $totalCount = $oUserCount->getCount();
+        if($groupId =="0")  $totalCount += Core::factory("User_Group")->getCount();
         $countPages = intval($totalCount / SHOW_LIMIT);
         if($totalCount % SHOW_LIMIT != 0)   $countPages++;
         if($countPages == 0)    $countPages = 1;
@@ -40,8 +60,7 @@ class Admin_Menu_User
             );
 
 
-        $aoUsers = Core::factory("User")
-            ->where("group_id", "=", $groupId)
+        $aoUsers = $oUser
             ->limit(SHOW_LIMIT)
             ->orderBy("id", "DESC")
             ->offset($offset)
@@ -58,11 +77,14 @@ class Admin_Menu_User
         }
         elseif($groupId != "0")
         {
-            $title = Core::factory("User_Group", $groupId)->title();
+            $oUserGroup = Core::factory("User_Group", $groupId);
+            $title = $oUserGroup->title();
+            $oOutputEntity->addEntity($oUserGroup);
         }
 
         $oOutputEntity
             ->addEntity($oPagination)
+            ->addEntity($search)
             ->addEntity(
                 Core::factory("Core_Entity")
                     ->name("title")
