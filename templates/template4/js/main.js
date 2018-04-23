@@ -19,6 +19,32 @@ $(function() {
 
 
 /**
+ *	Удаление объекта
+ */
+function deleteItem(model_name, model_id, func){
+
+    var link = "./admin?menuTab=Main&menuAction=deleteAction&ajax=1";
+    link += "&model_name=" + model_name;
+    link += "&model_id=" + model_id;
+
+    var agree = confirm("Вы действительно хотите удалить объект?");
+    if(agree != true) return;
+
+
+    $.ajax({
+        type: "GET",
+        url: link,
+        success: function(answer){
+            func();
+            loaderOff();
+            if(answer != "0")
+                alert("Ошибка: " + answer);
+        }
+    });
+}
+
+
+/**
  *	Перезагрузка рабочей области административного раздела
  *	обработка перехода по ссылкам
  *	@param hash - хэш
