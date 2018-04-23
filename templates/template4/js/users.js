@@ -33,6 +33,11 @@ $(function(){
             var userid = $(this).data("userid");
             changeUserActive(userid, "true");
         })
+        .on("click", ".user_delete", function(e){
+            e.preventDefault();
+            var userid = $(this).data("userid");
+            deleteItem("User", userid, refreshArchiveTable);
+        })
         //Нажатие на кнопку закрытия высплывающего окна редактирования пользователя
         .on("click", ".popup_close", function(e){
             e.preventDefault();
@@ -50,8 +55,24 @@ function refreshUserTable(group, url) {
         type: "GET",
         url: url,
         data: {
-            action: "refreshTable",
+            action: "refreshTableUsers",
             group: groupid
+        },
+        success: function(responce) {
+            $(".page").empty();
+            $(".page").append(responce);
+            $("#sortingTable").tablesorter();
+        }
+    });
+}
+
+
+function refreshArchiveTable() {
+    $.ajax({
+        type: "GET",
+        url: "archive",
+        data: {
+            action: "refreshTableArchive"
         },
         success: function(responce) {
             $(".page").empty();
