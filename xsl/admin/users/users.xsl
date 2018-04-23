@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE xsl:stylesheet>
-<xsl:stylesheet version="1.0"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output xmlns="http://www.w3.org/TR/xhtml1/strict" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" encoding="utf-8" indent="yes" method="html" omit-xml-declaration="no" version="1.0" media-type="text/xml"/>
-
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:template match="root">
 		<div class="in_main">
@@ -11,7 +8,36 @@
 				<xsl:value-of select="title" />
 			</h3>
 
-			<xsl:if test="count(user_group/id) != 0">
+
+			<style>
+				.user_search_input {
+				width: 85%;
+				display: inline-block;
+				}
+				.user_search_submit {
+				width: 12%;
+				margin-left: 1%;
+				}
+				h1 {
+				color: black;
+				}
+			</style>
+
+
+			<xsl:if test="count(user_group/id) &gt; 0">
+				<div>
+					<input class="form-control user_search_input" name="user_search" placeholder="Фамилия, имя" value="{search}" />
+					<button class="btn button user_search_submit">Поиск</button>
+				</div>
+			</xsl:if>
+
+			<xsl:if test="count(user_group/id) = 1 and count(user/id) = 0">
+				<h1>По запросу "<xsl:value-of select="search" />" ничего не найдено</h1>
+			</xsl:if>
+
+			<input type="hidden" id="group_id" value="{user_group/id}" />
+
+			<xsl:if test="count(user_group/id) &gt; 1">
 				<table class="table">
 					<th>id</th>
 					<th>Название</th>
