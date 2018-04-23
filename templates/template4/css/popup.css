@@ -19,6 +19,7 @@
     left: 30%;
     top: 10%;
     display: none;
+    border-radius: 12px;
 }
 
 .popup_close {
@@ -64,6 +65,7 @@
 
 .popup .btn-default {
     position: relative;
-    left: 200px;
+    left: 30%;
+    width: 40%;
     margin: 15px;
 }
