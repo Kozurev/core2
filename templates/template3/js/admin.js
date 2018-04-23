@@ -116,7 +116,7 @@ function setPage(page) {
  */
 function reloadMain(hash){
     loaderOn();
-    link = hash.substr(6); //форматирование хеша (удаление из строки первого символа '#'')
+    link = hash.substr(6); //форматирование хеша (удаление из строки первого символа '#')
     //alert(link);
     $.ajax({
         type: "GET",
