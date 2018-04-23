@@ -336,34 +336,54 @@ class Orm
 	*/
 	public function where($row, $operation = null, $value = null, $or = null)
 	{
-		if(is_array($row))
-		{	
-			for($i = 0; $i < count($row); $i++)
-			{
-				$arSize = count($row[$i]);
-				//Если это не первое условие тогда доавляем логический оператор
-				if($this->where != "")
-					$arSize > 3
-					? $this->where .= "`" . $row[$i][3]."` "	
-					: $this->where .= "and ";
+        if(is_array($row))
+        {
+            for($i = 0; $i < count($row); $i++)
+            {
+                $arSize = count($row[$i]);
+                //Если это не первое условие тогда доавляем логический оператор
+                if($this->where != "")
+                    $arSize > 3
+                        ? $this->where .= "`" . $row[$i][3]."` "
+                        : $this->where .= "and ";
 
-				$this->where .= $row[$i][0]." ".$row[$i][1]." '".$row[$i][2]."' ";
-			}
-			return $this;
-		}
+                $this->where .= $row[$i][0]." ".$row[$i][1]." '".$row[$i][2]."' ";
+            }
+            return $this;
+        }
 
-		if(!is_null($row) && !is_null($operation) && !is_null($value))
-		{
-			//Если это не первое условие тогда доавляем логический оператор
-			if($this->where != "")
-				is_null($or)
-					? $this->where .= "and "
-					: $this->where .= $or." ";
+        if(($operation == "in" || $operation == "IN") && is_array($value))
+        {
+            if(count($value) == 0)  return $this;
 
-			$this->where .= $row." ".$operation." '".$value."' ";
-		}
+            if($this->where != "" && $or === null) $this->where .= "and ";
+            if($this->where != "" && $or !== null) $this->where .= "or ";
 
-		return $this;
+            $this->where .= $row . " in(";
+
+            for($i = 0; $i < count($value); $i++)
+            {
+                $i == 0
+                    ?   $this->where .= $value[$i]
+                    :   $this->where .= ", " . $value[$i];
+            }
+
+            $this->where .= ") ";
+            return $this;
+        }
+
+        if(!is_null($row) && !is_null($operation) && !is_null($value))
+        {
+            //Если это не первое условие тогда доавляем логический оператор
+            if($this->where != "")
+                is_null($or)
+                    ? $this->where .= "and "
+                    : $this->where .= $or." ";
+
+            $this->where .= $row." ".$operation." '".$value."' ";
+        }
+
+        return $this;
 	}
 
 
