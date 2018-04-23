@@ -20,6 +20,7 @@
                     <th class="header">Дата</th>
                     <th class="header">Сумма</th>
                     <th>Примечание</th>
+                    <th></th>
                 </tr>
             </thead>
 
@@ -43,7 +44,15 @@
         <tr>
             <td class="{$class}"><xsl:value-of select="datetime" /></td>
             <td class="{$class}"><xsl:value-of select="value" /></td>
-            <td class="{$class}"><xsl:value-of select="description" /></td>
+            <!--<td class="{$class}"><xsl:value-of select="description" /></td>-->
+            <td class="{$class}">
+                <xsl:for-each select="notes">
+                    <xsl:value-of select="value" /><br/>
+                </xsl:for-each>
+            </td>
+            <td class="{$class}" style="text-align:center">
+                <button class="btn btn-success payment_add_note" data-modelid="{./id}">Добавить примечание</button>
+            </td>
         </tr>
     </xsl:template>
 
