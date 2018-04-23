@@ -219,13 +219,6 @@ class Admin_Menu_Main
                         );
                     }
 
-
-
-
-//                    echo "<pre>";
-//                    print_r($oPropertyList);
-//                    echo "</pre>";
-
                     foreach ($oPropertyList as $prop)
                         $prop->addEntities($aoLitsValues, "item");
 
@@ -239,8 +232,9 @@ class Admin_Menu_Main
 
                 $oOutputXml->addEntity($oProperty);
             }
-
         }
+
+
 
         //Поиск типов полей
         $aoFieldsTypes = Core::factory("Admin_Form_Type")
