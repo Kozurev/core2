@@ -113,7 +113,7 @@ if($action == "updateFormTeacher")
 /**
  * Обновление таблиц
  */
-if($action == "refreshTable")
+if($action == "refreshTableUsers")
 {
     $groupId = Core_Array::getValue($_GET, "group", 0);
     $oProperty = Core::factory("Property");
