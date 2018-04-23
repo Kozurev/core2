@@ -177,7 +177,7 @@
 			<span><xsl:value-of select="title" /></span>
 
 			<!--Вызов подшаблона для формирования поля формата input-->
-			<xsl:if test="type_id = 1 or type_id = 2 or type_id = 3 or type_id = 6">
+			<xsl:if test="type_id = 1 or type_id = 2 or type_id = 3 or type_id = 6 or type_id = 7">
 				<xsl:call-template name="input">
 			        <xsl:with-param name="inp_type" select="$inp_type"/>
 			        <xsl:with-param name="maxlength" select="$maxlength"/>
