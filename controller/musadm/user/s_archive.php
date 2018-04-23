@@ -30,7 +30,7 @@ $action = Core_Array::getValue($_GET, "action", 0);
 /**
  * Обновление таблицы
  */
-if($action === "refreshTable")
+if($action === "refreshTableUsers")
 {
     $oProperty = Core::factory("Property");
     $xsl = "musadm/users/clients.xsl";
@@ -60,5 +60,11 @@ if($action === "refreshTable")
         ->addEntities($aoUsers)
         ->show();
 
+    exit;
+}
+
+if($action === "refreshTableArchive")
+{
+    $this->execute();
     exit;
 }
