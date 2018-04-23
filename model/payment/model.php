@@ -17,7 +17,7 @@ class Payment_Model extends Core_Entity
 
     public function __construct()
     {
-        $this->datetime = date("d-m-Y H:i:s");
+        $this->datetime = date("Y-m-d");
     }
 
 
