@@ -22,6 +22,7 @@
         ->js("/templates/template4/lib/tablesorter/beta-testing/pager-custom-controls.js")
         ->js("/templates/template4/js/main.js")
         ->js("/templates/template4/js/users.js")
+        ->js("/templates/template4/js/payments.js")
         ->showJs();
     ?>
 
