@@ -69,7 +69,7 @@
             <input type="hidden" name="modelName" value="User" />
 
 
-            <button class="user_edit_submit btn btn-default">Сохранить</button>
+            <button class="popop_user_submit btn btn-default">Сохранить</button>
         </form>
     </xsl:template>
 
