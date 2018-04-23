@@ -69,8 +69,38 @@ function loaderOff(){
     $("#sortingTable").tablesorter();
 }
 
-function isAdmin() {
-    // $.ajax({
-    //
-    // });
+
+function showPopup(data) {
+    $(".overlay").show();
+    $(".popup").empty();
+    $(".popup").append('<a href="#" class="popup_close"></a>');
+    $(".popup").append(data);
+    $(".popup").show("slow");
+}
+
+function closePopup() {
+    $(".overlay").hide();
+    $(".popup").hide("slow");
+    $(".popup").empty();
+}
+
+
+function saveData(link) {
+    var form = $("#createData");
+    if(form.valid() == false)   return;
+    var data = form.serialize();
+    var aUnchecked = form.find("input[type=checkbox]:unchecked");
+    for (var i = 0; i < aUnchecked.length; i++) {
+        data += "&" + $(aUnchecked[i]).attr("name") + "=0";
+    }
+
+    //alert(link + "?menuTab=Main&menuAction=updateAction&ajax=1");
+    $.ajax({
+        type: "GET",
+        url: link + "?menuTab=Main&menuAction=updateAction&ajax=1",
+        data: data,
+        success: function(responce) {
+            closePopup();
+        }
+    });
 }
