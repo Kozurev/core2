@@ -112,4 +112,10 @@ class Property_Model extends Core_Entity
         return $this;
     }
 
+
+    public function getPropertyTypes()
+    {
+        return array("Int", "String", "Text", "List", "Bool");
+    }
+
 }
