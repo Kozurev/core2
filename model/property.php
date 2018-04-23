@@ -65,7 +65,7 @@ class Property extends Property_Model
 	    if(!is_object($obj) || !method_exists($obj, "getId"))
 	        die("Переданный объект не подходит для работы с доп. свойствами.");
 
-	    $types = array("Int", "String", "Text", "List", "Bool");
+	    $types = $this->getPropertyTypes();
         $aProperties = array();
 
         foreach($types as $type)
@@ -218,6 +218,48 @@ class Property extends Property_Model
     }
 
 
+    public function clearForObject($obj)
+    {
+        if(!is_object($obj) || !method_exists($obj, "getId"))
+            die("Переданный объект не подходит для работы с доп. свойствами.");
+
+        $modelName =    $obj->getTableName();
+        $modelId =      $obj->getId();
+
+        $types =        $this->getPropertyTypes();
+        $aoProperties = $this->getPropertiesList($obj);
+
+
+        foreach ($aoProperties as $prop)
+        {
+            if($prop->type() == "list")
+            {
+                $aoValues = Core::factory("Property_List")
+                    ->where("model_name", "=", $modelName)
+                    ->where("object_id", "=", $modelId)
+                    ->findAll();
+            }
+            else
+            {
+                $aoValues = $prop->getPropertyValues($obj);
+            }
+
+            foreach ($aoValues as $value)   $value->delete();
+        }
+
+        foreach ($types as $type)
+        {
+            $tableName = "Property_" . $type . "_Assigment";
+            $assignments = Core::factory($tableName)
+                ->where("model_name", "=", $modelName)
+                ->where("object_id", "=", $modelId)
+                ->findAll();
+
+            foreach ($assignments as $assignment) $assignment->delete();
+        }
+
+        return $this;
+    }
 
 
 
