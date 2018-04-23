@@ -39,6 +39,8 @@ class Admin_Menu_Payment
         $aoPayments = Core::factory("Payment")
             ->limit(SHOW_LIMIT)
             ->offset($offset)
+            ->select(array("Payment.id as id", "Payment.datetime as datetime", "Payment.value as value",
+                "User.name", "User.surname", "Payment.type"))
             ->orderBy("Payment.datetime", "DESC")
             ->where("value", ">", "1")
             ->join("User", "User.id = Payment.user")
