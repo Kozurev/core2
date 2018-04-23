@@ -44,9 +44,16 @@ Core::factory("Core_Entity")
  * Платежи
  */
 $aoUserPayments = Core::factory("Payment")
+    ->orderBy("id", "DESC")
     ->where("user", "=", $oUser->getId())
-    ->where("value", ">", "0")
+    //->where("value", ">", "0")
     ->findAll();
+
+foreach ($aoUserPayments as $payment)
+{
+    $aoUserPaymentsNotes = Core::factory("Property", 26)->getPropertyValues($payment);
+    $payment->addEntities($aoUserPaymentsNotes, "notes");
+}
 
 Core::factory("Core_Entity")
     ->addEntities($aoUserPayments)
