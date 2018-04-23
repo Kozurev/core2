@@ -21,8 +21,19 @@ class Property extends Property_Model
 		if(!$this->active())
 			die('Свойство "'.$this->title().'" не активно');
 
-		$sTableName = "Property_".ucfirst($this->type()); 
-		$sModelName = $obj->getTableName();
+
+        $sTableName = "Property_".ucfirst($this->type());
+        $sModelName = $obj->getTableName();
+
+        $emptyValue = Core::factory($sTableName)
+            ->property_id($this->id)
+            ->model_name($sModelName)
+            ->value(strval($this->default_value));
+
+		if($obj->getId() == null)
+        {
+            return array($emptyValue);
+        }
 
 		$oPropertyValue = Core::factory($sTableName);
 		$aPropertyValues = $oPropertyValue->queryBuilder()
@@ -42,14 +53,7 @@ class Property extends Property_Model
 
 		if(count($result) == 0)
         {
-            $emptyValue = Core::factory($sTableName)
-                ->property_id($this->id)
-                ->model_name($sModelName)
-                ->value(strval($this->default_value));
-
-            return array(
-                $emptyValue
-            );
+            return array($emptyValue);
         }
         else return $result;
 	}
