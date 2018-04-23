@@ -11,17 +11,13 @@ $(function(){
             else
                 getTeacherPopup(userid);
         })
-        //Сохранение данных пользователя
-        .on("click", ".user_edit_submit", function(e){
+        //Сохранение данных
+        .on("click", ".popop_user_submit", function(e){
             e.preventDefault();
-            var form = $("#createData");
-            if(form.valid() == false)   return;
-            var data = form.serialize();
-            var aUnchecked = form.find("input[type=checkbox]:unchecked");
-            for (var i = 0; i < aUnchecked.length; i++) {
-                data += "&" + $(aUnchecked[i]).attr("name") + "=0";
-            }
-            saveUserData(data);
+            loaderOn();
+            saveData("../admin");
+            refreshUserTable("clients");
+            loaderOff();
         })
         //Добавление пользователя в архив
         .on("click", ".user_archive", function(){
@@ -45,23 +41,7 @@ $(function(){
 });
 
 
-function showPopup(data) {
-    $(".overlay").show();
-    $(".popup").empty();
-    $(".popup").append('<a href="#" class="popup_close"></a>');
-    $(".popup").append(data);
-    $(".popup").show("slow");
-}
-
-function closePopup() {
-    $(".overlay").hide();
-    $(".popup").hide("slow");
-    $(".popup").empty();
-}
-
-
-function refreshTable(group, url) {
-    loaderOn();
+function refreshUserTable(group, url) {
     var groupid;
     if(group == "clients")  groupid = 5;
     else groupid = 4;
@@ -77,22 +57,6 @@ function refreshTable(group, url) {
             $(".page").empty();
             $(".page").append(responce);
             $("#sortingTable").tablesorter();
-            loaderOff();
-        }
-    });
-}
-
-
-function saveUserData(data) {
-    loaderOn();
-    $.ajax({
-        type: "GET",
-        url: "../admin?menuTab=Main&menuAction=updateAction&ajax=1",
-        data: data,
-        success: function(responce) {
-            refreshTable("clients");
-            closePopup();
-            loaderOff();
         }
     });
 }
@@ -112,7 +76,7 @@ function changeUserActive(userid, status) {
             if(status == "false") url = "client";
             else url = "archive";
 
-            refreshTable("clients", url);
+            refreshUserTable("clients", url);
         }
     });
 }
