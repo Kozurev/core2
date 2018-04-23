@@ -45,6 +45,7 @@ $oPropertyGroup =       Core::factory("Property", 14);
 $oPropertyNotes =       Core::factory("Property", 19);
 $oPropertyInstrument =  Core::factory("Property", 20);
 $oPropertyLastEntry =   Core::factory("Property", 22);
+$oPropertyPaymentNote = Core::factory("Property", 26);
 
 while($user = $aUsers->fetch_object())
 {
@@ -183,6 +184,7 @@ while($user = $aUsers->fetch_object())
 
         $oPayment->datetime(date('Y-m-d H:i:s',$payment->date));
         $oPayment->value($payment->value);
+        Core::factory("Property")->addToPropertiesList($oPayment, 26);
         $oPayment->description($payment->description);
         $oPayment->save();
     }
