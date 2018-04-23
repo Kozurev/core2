@@ -21,16 +21,18 @@
                 <tr>
                     <th>id</th>
                     <th>ФИО</th>
-                    <th>Тип</th>
+                    <!--<th>Тип</th>-->
                     <th>Сумма</th>
                     <th>Дата</th>
-                    <th>Примечание</th>
+                    <th>Редактировать</th>
+                    <th>Удалить</th>
+                    <!--<th>Примечание</th>-->
                 </tr>
                 <xsl:apply-templates select="payment" />
             </table>
 
-            <button class="btn button" type="button" style="visibility:hidden">
-                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}&amp;parent_name=Structure" class="link">
+            <button class="btn button" type="button">
+                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Payment&amp;parent_id={0}&amp;parent_name=Payment" class="link">
                     Новый раздел
                 </a>
             </button>
@@ -64,13 +66,19 @@
                 <xsl:text>  </xsl:text>
                 <xsl:value-of select="name" />
             </td>
-            <td>
-                <xsl:if test="type = 0">Списание</xsl:if>
-                <xsl:if test="type = 1">Зачисление</xsl:if>
-            </td>
+            <!--<td>-->
+                <!--<xsl:if test="type = 0">Списание</xsl:if>-->
+                <!--<xsl:if test="type = 1">Зачисление</xsl:if>-->
+            <!--</td>-->
             <td><xsl:value-of select="value" /></td>
             <td><xsl:value-of select="datetime" /></td>
-            <td><xsl:value-of select="description" /></td>
+            <!--<td><xsl:value-of select="description" /></td>-->
+
+            <!--Редактирование-->
+            <td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Payment&amp;parent_id={0}&amp;model_id={id}&amp;parent_name=Payment" class="link updateLink" /></td>
+
+            <!--Удаление-->
+            <td><a href="admin" data-model_name="Payment" data-model_id="{id}" class="delete deleteLink"></a></td>
         </tr>
     </xsl:template>
 
