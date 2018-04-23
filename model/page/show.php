@@ -26,7 +26,6 @@ class Page_Show extends Core
         {
             $rootdir = $CFG->rootdir;
             $output = trim($_SERVER['REQUEST_URI'],  "/");
-            //echo "<h1>URI = $output <br></h1>";
             $output = explode("?", $output);
             $output = substr($output[0], strlen($rootdir));
             $output = trim($output, "/");
@@ -56,7 +55,6 @@ class Page_Show extends Core
 
         while($this->oTemplate->parent_id() != "0")
         {
-
             $oTmpTemplate = $this->oTemplate->queryBuilder()
                 ->where("id", "=", $this->oTemplate->parent_id())
                 ->find();
