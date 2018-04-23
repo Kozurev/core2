@@ -119,3 +119,74 @@ Core::attachObserver("beforeItemDelete", function($args){
 });
 
 
+/**
+ * Рекурсивное удаление всех дочерних структур и элементов всех уровней вложенности
+ */
+Core::attachObserver("beforeStructureDelete", function($args){
+    $id = $args[0]->getId();
+
+    $aoChildrenItems = Core::factory("Structure_Item")->where("parent_id", "=", $id)->findAll();
+    $aoChildrenStructures = Core::factory("Structure")->where("parent_id", "=", $id)->findAll();
+    $aoCHildren = array_merge($aoChildrenItems, $aoChildrenStructures);
+
+    foreach ($aoCHildren as $oChild)
+    {
+        $oChild->delete();
+    }
+});
+
+
+/**
+ * Проверка на совпадение пути структуры для избежания дублирования пути
+ */
+Core::attachObserver("beforeStructureSave", function($args){
+    $oStructure = $args[0];
+    //$oParentStructure = $oStructure->getParent();
+    $oRootStructure = Core::factory("Structure")->where("path", "=", "")->find();
+    $aParentId[] = $oStructure->parentId();
+
+    $aoCoincidingStructures = Core::factory("Structure")->where("path", "=", $oStructure->path());
+    $aoCoincidingItems = Core::factory("Structure_Item")->where("path", "=", $oStructure->getId());
+
+    if($oStructure->parentId() == 0)
+    {
+        $aParentId[] = $oRootStructure->getId();
+    }
+
+    $countCoincidingStructures = $aoCoincidingStructures
+        ->where("parent_id", "IN", $aParentId)
+        ->getCount();
+
+    $countCoincidingItems = $aoCoincidingItems
+        ->where("parent_id", "IN", $aParentId)
+        ->getCount();
+
+    if($countCoincidingItems > 0 || $countCoincidingStructures > 0) die("Дублирование путей");
+    die("Дублирование не обнаружено");
+});
+
+Core::attachObserver("beforeItemSave", function($args){
+    $oStructure = $args[0];
+    //$oParentStructure = $oStructure->getParent();
+    $oRootStructure = Core::factory("Structure")->where("path", "=", "")->find();
+    $aParentId[] = $oStructure->parentId();
+
+    $aoCoincidingStructures = Core::factory("Structure")->where("path", "=", $oStructure->path());
+    $aoCoincidingItems = Core::factory("Structure_Item")->where("path", "=", $oStructure->getId());
+
+    if($oStructure->parentId() == 0)
+    {
+        $aParentId[] = $oRootStructure->getId();
+    }
+
+    $countCoincidingStructures = $aoCoincidingStructures
+        ->where("parent_id", "IN", $aParentId)
+        ->getCount();
+
+    $countCoincidingItems = $aoCoincidingItems
+        ->where("parent_id", "IN", $aParentId)
+        ->getCount();
+
+    if($countCoincidingItems > 0 || $countCoincidingStructures > 0) die("Дублирование путей");
+    die("Дублирование не обнаружено");
+});
