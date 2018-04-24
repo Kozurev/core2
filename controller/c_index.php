@@ -11,6 +11,8 @@ foreach ($aoUsers as $user) $user->delete();
 
 Core::factory("Orm")->executeQuery("TRUNCATE `User`");
 Core::factory("Orm")->executeQuery("TRUNCATE `Payment`");
+//Core::factory("Orm")->executeQuery("TRUNCATE `Schedule_Group`");
+Core::factory("Orm")->executeQuery("TRUNCATE `Schedule_Group_Assignment`");
 
 $oUser = Core::factory("User")
     ->login("alexoufx")
@@ -196,6 +198,19 @@ while($user = $aUsers->fetch_object())
         $lastEntry = date("d-m-Y H:i:s", $user->last_entry);
         $oPropertyLastEntry->addNewValue($oUser, $lastEntry);
     }
+
+
+    //Группы и связи пользователей с ними
+    $aoGroupAssignments = $dbh->query("SELECT * FROM group_members WHERE clientid = " . $user->id);
+    if($aoGroupAssignments != false)
+    while($group_ass = $aoGroupAssignments->fetch_object())
+    {
+        Core::factory("Schedule_Group_Assignment")
+            ->userId($user->id)
+            ->groupId(intval($group_ass->groupid) - 10)
+            ->save();
+    }
+
 
 
 }
