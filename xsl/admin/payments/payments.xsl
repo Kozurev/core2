@@ -12,10 +12,33 @@
             .neutral {
             background-color:lightyellow !important;
             }
+            .payment_search_input {
+            width: 85%;
+            display: inline-block;
+            }
+            .payment_search_submit {
+            width: 12%;
+            margin-left: 1%;
+            }
+            h1 {
+            color: black;
+            }
         </style>
 
         <div class="in_main">
             <h3 class="main_title">Платежи</h3>
+
+            <div>
+                <input class="form-control payment_search_input" name="payment_search" placeholder="Фамилия, имя" value="{search}" />
+                <button class="btn button payment_search_submit">Поиск</button>
+            </div>
+
+
+            <xsl:if test="count(payment) = 0">
+                <h1>По запросу "<xsl:value-of select="search" />" ничего не найдено</h1>
+            </xsl:if>
+
+            <input type="hidden" id="group_id" value="{user_group/id}" />
 
             <table class="table">
                 <tr>
