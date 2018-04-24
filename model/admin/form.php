@@ -260,7 +260,7 @@ class Admin_Form extends Admin_Form_Model
     {
         $aoUsers = Core::factory("User")
             ->orderBy("id", "DESC")
-            ->where("active", "=", 1)
+            //->where("active", "=", 1)
             ->where("group_id", "=", 5)
             ->findAll();
 
