@@ -100,10 +100,10 @@
                                 <ul class="dropdown-menu">
                                     <li><a href="<?=$rootdir?>user/teacher" >Штат</a></li>
                                     <li><a href="<?=$rootdir?>user/client" >Клиенты</a></li>
+                                    <li><a href="<?=$rootdir?>user/archive">Архив</a></li>
                                 </ul>
                             </li>
                             <li><a href="#">Группы</a></li>
-                            <li><a href="<?=$rootdir?>user/archive">Архив</a></li>
                             <li><a href="#">Лиды</a></li>
                             <li><a href="#">Сертификаты</a></li>
                             <li><a href="#">Задачи</a></li>
