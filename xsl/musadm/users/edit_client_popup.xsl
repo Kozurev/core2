@@ -8,10 +8,33 @@
             $(function(){
                 $("#createData").validate({
                     rules: {
-
+                        surname:    {required: true, maxlength: 255},
+                        name:       {required: true, maxlength: 255},
+                        //phoneNumber:{required: true, maxlength: 255},
+                        login:      {required: true, maxlength: 255},
+                        <xsl:if test="count(user/id) = 0">
+                            password: {required: true, maxlength: 255}
+                        </xsl:if>
                     },
                     messages: {
-
+                        surname: {
+                            required: "Это поле обязательноое к заполнению",
+                            maxlength: "Длина значения не должна превышать 255 символов"
+                        },
+                        name: {
+                            required: "Это поле обязательноое к заполнению",
+                            maxlength: "Длина значения не должна превышать 255 символов"
+                        },
+                        login: {
+                            required: "Это поле обязательноое к заполнению",
+                            maxlength: "Длина значения не должна превышать 255 символов"
+                        },
+                        <xsl:if test="count(user/id) = 0">
+                        password: {
+                            required: "Это поле обязательно к заполнению",
+                            maxlength: "Длина значения не должна превышать 255 символов"
+                        }
+                        </xsl:if>
                     }
                 });
             });
@@ -110,6 +133,8 @@
             </div>
 
             <input type="hidden" name="id" value="{user/id}" />
+            <input type="hidden" name="groupId" value="5" />
+            <input type="hidden" name="active" value="1" />
             <input type="hidden" name="modelName" value="User" />
 
 

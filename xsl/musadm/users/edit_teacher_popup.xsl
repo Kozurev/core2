@@ -6,14 +6,28 @@
 
         <script>
             $(function(){
-            $("#createData").validate({
-            rules: {
-
-            },
-            messages: {
-
-            }
-            });
+                $("#createData").validate({
+                    rules: {
+                        surname:    {required: true, maxlength: 255},
+                        name:       {required: true, maxlength: 255},
+                        //phoneNumber:{required: true, maxlength: 255},
+                        login:      {required: true, maxlength: 255},
+                    },
+                    messages: {
+                        surname: {
+                            required: "Это поле обязательноое к заполнению",
+                            maxlength: "Длина значения не должна превышать 255 символов"
+                        },
+                        surname: {
+                            required: "Это поле обязательноое к заполнению",
+                            maxlength: "Длина значения не должна превышать 255 символов"
+                        },
+                        surname: {
+                            required: "Это поле обязательноое к заполнению",
+                            maxlength: "Длина значения не должна превышать 255 символов"
+                        },
+                    }
+                });
             });
         </script>
 
@@ -66,6 +80,8 @@
             </div>
 
             <input type="hidden" name="id" value="{user/id}" />
+            <input type="hidden" name="groupId" value="4" />
+            <input type="hidden" name="active" value="1" />
             <input type="hidden" name="modelName" value="User" />
 
 
