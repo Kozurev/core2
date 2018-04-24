@@ -103,7 +103,7 @@
                                     <li><a href="<?=$rootdir?>user/archive">Архив</a></li>
                                 </ul>
                             </li>
-                            <li><a href="#">Группы</a></li>
+                            <li><a href="<?=$rootdir?>groups">Группы</a></li>
                             <li><a href="#">Лиды</a></li>
                             <li><a href="#">Сертификаты</a></li>
                             <li><a href="#">Задачи</a></li>
