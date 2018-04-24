@@ -10,9 +10,11 @@
                 <textarea name="property_26[]"></textarea>
             </div>
 
-            <xsl:for-each select="notes">
-                <input type="hidden" name="property_26[]" value="{value}" />
-            </xsl:for-each>
+            <xsl:if test="count(notes/value) != 0">
+                <xsl:for-each select="notes">
+                    <input type="hidden" name="property_26[]" value="{value}" />
+                </xsl:for-each>
+            </xsl:if>
 
             <input type="hidden" name="id" value="{payment/id}" />
             <input type="hidden" name="modelName" value="Payment" />
