@@ -11,25 +11,36 @@ $(function(){
             else
                 getTeacherPopup(userid);
         })
+        .on("click", ".user_create", function(e){
+            e.preventDefault();
+            var userid = 0;
+            var usergroupid = $(this).data("usergroup");
+
+            if(usergroupid == 5)
+                getClientPopup(userid);
+            else
+                getTeacherPopup(userid);
+        })
         //Сохранение данных
         .on("click", ".popop_user_submit", function(e){
             e.preventDefault();
             loaderOn();
             saveData("../admin");
-            refreshUserTable("clients");
-            loaderOff();
+            refreshUserTable("clients", "", loaderOff);
         })
         //Добавление пользователя в архив
         .on("click", ".user_archive", function(){
             var agree = confirm("Перенести пользователя в архив?");
             if(agree != true) return;
             var userid = $(this).data("userid");
+            loaderOn();
             changeUserActive(userid, "false");
         })
         //"Разархивирование пользователя"
         .on("click", ".user_unarchive", function(){
             var agree = confirm("Убрать пользователя из архива?");
             if(agree != true) return;
+            loaderOn();
             var userid = $(this).data("userid");
             changeUserActive(userid, "true");
         })
@@ -46,7 +57,7 @@ $(function(){
 });
 
 
-function refreshUserTable(group, url) {
+function refreshUserTable(group, url, func) {
     var groupid;
     if(group == "clients")  groupid = 5;
     else groupid = 4;
@@ -62,12 +73,13 @@ function refreshUserTable(group, url) {
             $(".page").empty();
             $(".page").append(responce);
             $("#sortingTable").tablesorter();
+            func();
         }
     });
 }
 
 
-function refreshArchiveTable() {
+function refreshArchiveTable(func) {
     $.ajax({
         type: "GET",
         url: "archive",
@@ -78,6 +90,7 @@ function refreshArchiveTable() {
             $(".page").empty();
             $(".page").append(responce);
             $("#sortingTable").tablesorter();
+            if(func) func();
         }
     });
 }
@@ -97,7 +110,7 @@ function changeUserActive(userid, status) {
             if(status == "false") url = "client";
             else url = "archive";
 
-            refreshUserTable("clients", url);
+            refreshUserTable("clients", url, loaderOff);
         }
     });
 }
