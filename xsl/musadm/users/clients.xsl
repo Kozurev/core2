@@ -16,6 +16,12 @@
             }
         </style>
 
+        <xsl:if test="user/active = 1">
+            <div style="text-align: right">
+                <button class="btn btn-success user_create" data-usergroup="5">Создать пользователя</button>
+            </div>
+        </xsl:if>
+
         <table id="sortingTable" class="tablesorter">
             <thead>
                 <tr>
