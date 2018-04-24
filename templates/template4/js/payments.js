@@ -19,12 +19,12 @@ $(function(){
             loaderOn();
             var userid = $(this).data("userid");
             saveData("admin");
-            refreshPaymentsTable(userid);
+            refreshPaymentsTable(userid, loaderOff);
         });
 });
 
 
-function refreshPaymentsTable(userid) {
+function refreshPaymentsTable(userid, func) {
     $.ajax({
         type: "GET",
         url: "balance",
@@ -36,7 +36,7 @@ function refreshPaymentsTable(userid) {
             $("#sortingTable").remove();
             $(".page").append(responce);
             $("#sortingTable").tablesorter();
-            loaderOff();
+            func();
         }
     });
 }
