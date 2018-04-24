@@ -24,7 +24,7 @@
 			</style>
 
 
-			<xsl:if test="count(user_group/id) &gt; 0">
+			<xsl:if test="count(user_group/id) = 1">
 				<div>
 					<input class="form-control user_search_input" name="user_search" placeholder="Фамилия, имя" value="{search}" />
 					<button class="btn button user_search_submit">Поиск</button>
