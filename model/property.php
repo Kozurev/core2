@@ -35,6 +35,8 @@ class Property extends Property_Model
             return array($emptyValue);
         }
 
+        $emptyValue->object_id($obj->getId());
+
 		$oPropertyValue = Core::factory($sTableName);
 		$aPropertyValues = $oPropertyValue->queryBuilder()
 			->where("property_id", "=", $this->getId())
