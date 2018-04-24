@@ -11,13 +11,15 @@
  */
 Core::attachObserver("beforeUserSave", function($args){
     $oUser = $args[0];
-    if($oUser->groupId() != 4 || $oUser->getId() == "") return;
-    $teacherFullName = $oUser->surname() . " " . $oUser->name();
+    if($oUser->groupId() == 4 && $oUser->getId() == "")
+    {
+        $teacherFullName = $oUser->surname() . " " . $oUser->name();
 
-    $listValue = Core::factory("Property_List_Values")
-        ->property_id(21)
-        ->value($teacherFullName)
-        ->save();
+        $listValue = Core::factory("Property_List_Values")
+            ->property_id(21)
+            ->value($teacherFullName)
+            ->save();
+    }
 });
 
 
@@ -128,7 +130,9 @@ Core::attachObserver("beforeStructureSave", function($args){
     $oRootStructure = Core::factory("Structure")->where("path", "=", "")->find();
     $aParentId[] = $oStructure->parentId();
 
-    $aoCoincidingStructures = Core::factory("Structure")->where("path", "=", $oStructure->path());
+    $aoCoincidingStructures = Core::factory("Structure")
+        ->where("path", "=", $oStructure->path())
+        ->where("id", "<>", $oStructure->getId());
     $aoCoincidingItems = Core::factory("Structure_Item")->where("path", "=", $oStructure->getId());
 
     if($oStructure->parentId() == 0)
@@ -145,7 +149,7 @@ Core::attachObserver("beforeStructureSave", function($args){
         ->getCount();
 
     if($countCoincidingItems > 0 || $countCoincidingStructures > 0) die("Дублирование путей");
-    die("Дублирование не обнаружено");
+    //die("Дублирование не обнаружено");
 });
 
 
@@ -156,7 +160,9 @@ Core::attachObserver("beforeItemSave", function($args){
     $aParentId[] = $oStructure->parentId();
 
     $aoCoincidingStructures = Core::factory("Structure")->where("path", "=", $oStructure->path());
-    $aoCoincidingItems = Core::factory("Structure_Item")->where("path", "=", $oStructure->getId());
+    $aoCoincidingItems = Core::factory("Structure_Item")
+        ->where("path", "=", $oStructure->getId())
+        ->where("id", "<>", $oStructure->getId());
 
     if($oStructure->parentId() == 0)
     {
@@ -172,5 +178,14 @@ Core::attachObserver("beforeItemSave", function($args){
         ->getCount();
 
     if($countCoincidingItems > 0 || $countCoincidingStructures > 0) die("Дублирование путей");
-    die("Дублирование не обнаружено");
+    //die("Дублирование не обнаружено");
+});
+
+
+/**
+ * При создании лида присваивает ему дополнительное своство "Статус лида"
+ */
+Core::attachObserver("afterLidSave", function($args){
+    $oLid = $args[0];
+    Core::factory("Property")->addToPropertiesList($oLid, 27);
 });
