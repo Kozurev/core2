@@ -51,26 +51,31 @@ if($action == "updateFormClient")
         $aoProperties[] =   Core::factory("Property", 18)->getPropertyValues($oUser)[0];    //Соглашение подписано
         $aoProperties =   array_merge($aoProperties, Core::factory("Property", 21)->getPropertyValues($oUser));   //Учителя
 
-
-        $aoPropertyLists = Core::factory("Property_List_Values")
-            ->where("property_id", "=", 21)
-            ->orderBy("sorting")
-            ->findAll();
-
-        $aoPropertyLists = array_merge($aoPropertyLists,
-            Core::factory("Property_List_Values")
-                ->where("property_id", "=", 15)
-                ->orderBy("sorting")
-                ->findAll()
-        );
-
-        $output
-            ->addEntity($oUser)
-            ->addEntities($aoProperties,    "property_value")
-            ->addEntities($aoPropertyLists, "property_list");
+        //$output
+    }
+    else
+    {
+        $oUser = Core::factory("User");
+        $aoProperties[] =   Core::factory("Property_Int")
+            ->value(Core::factory("Property", 17)->defaultValue());
     }
 
+    $aoPropertyLists = Core::factory("Property_List_Values")
+        ->where("property_id", "=", 21)
+        ->orderBy("sorting")
+        ->findAll();
+
+    $aoPropertyLists = array_merge($aoPropertyLists,
+        Core::factory("Property_List_Values")
+            ->where("property_id", "=", 15)
+            ->orderBy("sorting")
+            ->findAll()
+    );
+
     $output
+        ->addEntity($oUser)
+        ->addEntities($aoProperties,    "property_value")
+        ->addEntities($aoPropertyLists, "property_list")
         ->xsl("musadm/users/edit_client_popup.xsl")
         ->show();
 
@@ -91,18 +96,22 @@ if($action == "updateFormTeacher")
         $oUser =            Core::factory("User", $userid);
         $aoProperties[] =   Core::factory("Property", 20)->getPropertyValues($oUser)[0];    //Инструмент
 
-        $aoPropertyLists =  Core::factory("Property_List_Values")
-            ->where("property_id", "=", 20)
-            ->orderBy("sorting")
-            ->findAll();
-
         $output
-            ->addEntity($oUser)
-            ->addEntities($aoProperties,    "property_value")
-            ->addEntities($aoPropertyLists, "property_list");
+            ->addEntities($aoProperties,    "property_value");
+    }
+    else
+    {
+        $oUser = Core::factory("User");
     }
 
+    $aoPropertyLists =  Core::factory("Property_List_Values")
+        ->where("property_id", "=", 20)
+        ->orderBy("sorting")
+        ->findAll();
+
     $output
+        ->addEntity($oUser)
+        ->addEntities($aoPropertyLists, "property_list")
         ->xsl("musadm/users/edit_teacher_popup.xsl")
         ->show();
 
