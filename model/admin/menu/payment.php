@@ -11,8 +11,50 @@ class Admin_Menu_Payment
 {
     public function show($aParams)
     {
+        $output = Core::factory("Core_Entity");
+
+
+        $aoPayments = Core::factory("Payment")
+            ->select(array("Payment.id as id", "Payment.datetime as datetime", "Payment.value as value",
+                "User.name", "User.surname", "Payment.type"))
+            ->join("User", "User.id = Payment.user")
+            ->orderBy("Payment.datetime", "DESC")
+            ->where("value", ">", "1");
+
+
+        /**
+         * Поиск
+         */
+        $search = Core::factory("Core_Entity")->name("search");
+        $searchData = Core_Array::getValue($aParams, "search", "");
+        if($searchData != "")
+        {
+            $data = explode(" ", $searchData);
+            $aoUsersId = Core::factory("User");
+
+            foreach ($data as $word)
+                $aoUsersId
+                    ->where("name", "like", $word)
+                    ->where("surname", "like", $word, "or");
+
+            $aoUsers = $aoUsersId->select("id")->findAll();
+            $aoUsersId = array();
+            foreach ($aoUsers as $user)
+            {
+                $aoUsersId[] = $user->getId();
+            }
+
+            $aoPayments->where("User.id", "in", $aoUsersId);
+            $search->value($searchData);
+        }
+
+
+        /**
+         * Пагинация
+         */
+        $paginationPayments = clone $aoPayments;
         $page = Core_Array::getValue($aParams, "page", 0);
-        $totalCount = Core::factory("Payment")->where("value", ">", 1)->getCount();
+        $totalCount = $paginationPayments->getCount();
         $offset = SHOW_LIMIT * $page;
         $countPages = intval($totalCount / SHOW_LIMIT);
         if($totalCount % SHOW_LIMIT)    $countPages++;
@@ -36,17 +78,16 @@ class Admin_Menu_Payment
                     ->value($totalCount)
             );
 
-        $aoPayments = Core::factory("Payment")
+
+
+        $aoPayments = $aoPayments
             ->limit(SHOW_LIMIT)
             ->offset($offset)
-            ->select(array("Payment.id as id", "Payment.datetime as datetime", "Payment.value as value",
-                "User.name", "User.surname", "Payment.type"))
-            ->orderBy("Payment.datetime", "DESC")
-            ->where("value", ">", "1")
-            ->join("User", "User.id = Payment.user")
             ->findAll();
 
-        Core::factory("Core_Entity")
+
+        $output
+            ->addEntity($search)
             ->addEntity($oPagination)
             ->addEntities($aoPayments)
             ->xsl("admin/payments/payments.xsl")
