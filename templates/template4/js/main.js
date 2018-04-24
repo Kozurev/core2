@@ -23,7 +23,7 @@ $(function() {
  */
 function deleteItem(model_name, model_id, func){
 
-    var link = "./admin?menuTab=Main&menuAction=deleteAction&ajax=1";
+    var link = "../admin?menuTab=Main&menuAction=deleteAction&ajax=1";
     link += "&model_name=" + model_name;
     link += "&model_id=" + model_id;
 
