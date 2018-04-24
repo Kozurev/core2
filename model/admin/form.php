@@ -256,11 +256,10 @@ class Admin_Form extends Admin_Form_Model
     }
 
 
-    public function getListClientList($aParams)
+    public function getListClientListPayments($aParams)
     {
         $aoUsers = Core::factory("User")
             ->orderBy("id", "DESC")
-            //->where("active", "=", 1)
             ->where("group_id", "=", 5)
             ->findAll();
 
@@ -297,6 +296,59 @@ class Admin_Form extends Admin_Form_Model
 
         $this->addEntity($plus, "item");
         $this->addEntity($minus, "item");
+    }
+
+
+    public function getListTeachers($aParams)
+    {
+        $aoTeachers = Core::factory("User")
+            ->where("active", "=", 1)
+            ->where("group_id", "=", 4)
+            ->findAll();
+
+        foreach ($aoTeachers as $teacher)
+            $teacher->title = $teacher->surname() . " " . $teacher->name();
+
+        $this->addEntities($aoTeachers, "item");
+
+        $modelId = Core_Array::getValue($aParams, "model_id", 0);
+        if($modelId != 0)
+        {
+            $this->value = Core::factory("Schedule_Group", $modelId)->teacherId();
+        }
+    }
+
+
+    public function getListScheduleGroups($aParams)
+    {
+        $aoGroups = Core::factory("Schedule_Group")->findAll();
+        $this->addEntities($aoGroups, "item");
+        $parentId = Core_Array::getValue($aParams, "parent_id", 0);
+        if($parentId != 0)
+        {
+            $this->value = $parentId;
+        }
+    }
+
+
+    public function getListClientListScheduleGroups($aParams)
+    {
+        $aoUsers = Core::factory("User")
+            ->orderBy("id", "DESC")
+            ->where("group_id", "=", 5)
+            ->findAll();
+
+        foreach ($aoUsers as $user) $user->title = $user->surname() . " " . $user->name();
+
+        $modelId = Core_Array::getValue($aParams, "model_id", 0);
+
+        if($modelId != 0)
+        {
+            $oGroup = Core::factory("Schedule_Group_Assignment", $modelId);
+            $this->value = $oGroup->userId();
+        }
+
+        $this->addEntities($aoUsers, "item");
     }
 
 }
