@@ -6,7 +6,7 @@ class Property_List_Values_Model extends Core_Entity
 	protected $id;
 	protected $property_id;
 	protected $value;
-    protected $sorting;
+    protected $sorting = 0;
 
 	public function getId(){
 		return $this->id;}
