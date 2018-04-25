@@ -88,16 +88,16 @@
 
             <xsl:if test="//table_type = 'active'">
                 <td>
-                    <a class="user_action user_add_payment" href="#" data-userid="{id}"></a>
-                    <a class="user_action user_edit"        href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
-                    <a class="user_action user_archive"     href="#" data-userid="{id}"></a>
+                    <a class="action add_payment user_add_payment" href="#" data-userid="{id}"></a>
+                    <a class="action edit user_edit"        href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
+                    <a class="action archive user_archive"     href="#" data-userid="{id}"></a>
                 </td>
             </xsl:if>
 
             <xsl:if test="//table_type = 'archive'">
                 <td>
-                    <a class="user_action user_unarchive"   href="#" data-userid="{id}"></a>
-                    <a class="user_action user_delete"      href="#" data-userid="{id}"></a>
+                    <a class="action unarchive user_unarchive"   href="#" data-userid="{id}"></a>
+                    <a class="action delete user_delete"      href="#" data-model_id="{id}" data-model_name="User"></a>
                 </td>
             </xsl:if>
         </tr>

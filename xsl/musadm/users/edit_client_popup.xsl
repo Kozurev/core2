@@ -73,9 +73,16 @@
                 <span>Пароль</span>
             </div>
             <div class="column">
-                <input class="form-control" type="text" value="" name="password" />
+                <input class="form-control" type="password" value="" name="pass1" />
             </div>
                 <hr/>
+            <div class="column">
+                <span>Повторите пароль</span>
+            </div>
+            <div class="column">
+                <input class="form-control" type="password" value="" name="pass2" />
+            </div>
+            <hr/>
             <div class="column">
                 <span>Дополнительный телефон</span>
             </div>
