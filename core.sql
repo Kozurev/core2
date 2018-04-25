@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Апр 25 2018 г., 01:21
+-- Время создания: Апр 26 2018 г., 02:05
 -- Версия сервера: 5.5.53
 -- Версия PHP: 7.0.14
 
@@ -130,7 +130,11 @@ INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `t
 (86, 19, 'Название группы', 'title', 255, 2, 1, 1, 0, '', ''),
 (87, 19, 'Учитель', 'teacherId', 0, 4, 1, 0, 0, 'Teachers', ''),
 (88, 20, 'Группа', 'groupId', 0, 4, 1, 0, 0, 'ScheduleGroups', ''),
-(89, 20, 'Ученик', 'userId', 0, 4, 1, 0, 0, 'ClientListScheduleGroups', '');
+(89, 20, 'Ученик', 'userId', 0, 4, 1, 0, 0, 'ClientListScheduleGroups', ''),
+(90, 13, 'Название', 'title', 150, 2, 1, 1, 10, '', ''),
+(91, 13, 'Описание', 'description', 5000, 5, 1, 0, 20, '', ''),
+(92, 13, 'Родительская директория', 'dir', 0, 4, 1, 0, 30, 'PropertyDirs', ''),
+(93, 13, 'Сортировка', 'sorting', 0, 1, 1, 0, 40, '', '0');
 
 -- --------------------------------------------------------
 
@@ -5162,7 +5166,7 @@ CREATE TABLE `Property` (
 --
 
 INSERT INTO `Property` (`id`, `tag_name`, `title`, `description`, `type`, `multiple`, `default_value`, `active`, `dir`, `sorting`) VALUES
-(4, 'description', 'Описание', '', 'text', 1, '', 1, 0, 0),
+(4, 'description', 'Описание', '', 'text', 1, '', 1, 6, 0),
 (9, 'vk', 'Ссылка вконтакте', '', 'string', 0, '', 1, 2, 0),
 (10, 'lesson_type', 'Тип урока', '', 'list', 0, '', 1, 2, 0),
 (12, 'balance', 'Баланс', '', 'int', 0, '0', 1, 2, 0),
@@ -5173,14 +5177,14 @@ INSERT INTO `Property` (`id`, `tag_name`, `title`, `description`, `type`, `multi
 (17, 'lesson_time', 'Длительность урока (мин)', '', 'int', 0, '55', 1, 2, 0),
 (18, '', 'Соглашение подписано', '', 'bool', 0, '', 1, 2, 0),
 (19, 'notes', 'Примечание', '', 'text', 0, '', 1, 2, 0),
-(20, 'instrument', 'Инструмент', '', 'list', 0, '0', 1, 3, 0),
+(20, 'instrument', 'Инструмент', '', 'list', 0, '0', 1, 0, 0),
 (21, 'teachers', 'Учителя', 'Принадлежность ученика к разным учителям', 'list', 1, '', 1, 2, 0),
 (22, 'last_entry', 'Последняя авторизация', '', 'string', 0, '', 1, 2, 0),
-(23, 'count', 'Количество', '', 'int', 1, '', 1, 0, 0),
-(24, 'param', 'Параметры', '', 'string', 1, '', 1, 0, 0),
-(25, 'list', 'Список', '', 'list', 1, '', 1, 0, 0),
-(26, 'payment_comment', 'Комментарий', '', 'string', 1, '', 1, 4, 0),
-(27, 'lid_status', 'Статус лида', '', 'list', 0, '', 1, 1, 0);
+(23, 'count', 'Количество', '', 'int', 1, '', 1, 6, 0),
+(24, 'param', 'Параметры', '', 'string', 1, '', 1, 6, 0),
+(25, 'list', 'Список', '', 'list', 1, '', 1, 6, 0),
+(26, 'payment_comment', 'Комментарий', 'Комментарий к платежу', 'string', 1, '', 1, 0, 0),
+(27, 'lid_status', 'Статус лида', '', 'list', 0, '', 1, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -5243,7 +5247,8 @@ INSERT INTO `Property_Bool` (`id`, `property_id`, `value`, `model_name`, `object
 (629, 18, 1, 'User', 291),
 (630, 18, 1, 'User', 293),
 (631, 18, 1, 'User', 295),
-(632, 18, 1, 'User', 298);
+(632, 18, 1, 'User', 298),
+(633, 18, 0, 'User', 300);
 
 -- --------------------------------------------------------
 
@@ -5306,7 +5311,8 @@ INSERT INTO `Property_Bool_Assigment` (`id`, `property_id`, `object_id`, `model_
 (628, 18, 291, 'User'),
 (629, 18, 293, 'User'),
 (630, 18, 295, 'User'),
-(631, 18, 298, 'User');
+(631, 18, 298, 'User'),
+(632, 18, 300, 'User');
 
 -- --------------------------------------------------------
 
@@ -5327,11 +5333,8 @@ CREATE TABLE `Property_Dir` (
 --
 
 INSERT INTO `Property_Dir` (`id`, `title`, `description`, `dir`, `sorting`) VALUES
-(1, 'musadm', '', 0, 0),
-(2, 'Ученики', '', 1, 10),
-(3, 'Учителя', '', 1, 20),
-(4, 'Платежи', 'Комментарии к платежам', 1, 30),
-(5, 'Расписание', '', 1, 0);
+(2, 'Ученики', '', 0, 10),
+(6, 'Тестовые свойства', 'Свойства для тестирования различного рода функционала', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -6232,9 +6235,6 @@ INSERT INTO `Property_Int` (`id`, `property_id`, `value`, `model_name`, `object_
 (13979, 12, 0, 'User', 291),
 (13980, 13, 6, 'User', 291),
 (13981, 14, 0, 'User', 291),
-(13982, 12, 0, 'User', 292),
-(13983, 13, 0, 'User', 292),
-(13984, 14, 0, 'User', 292),
 (13985, 12, 0, 'User', 293),
 (13986, 13, 7, 'User', 293),
 (13987, 14, 0, 'User', 293),
@@ -6258,7 +6258,8 @@ INSERT INTO `Property_Int` (`id`, `property_id`, `value`, `model_name`, `object_
 (14005, 14, 0, 'User', 299),
 (14006, 12, 0, 'User', 300),
 (14007, 13, 0, 'User', 300),
-(14008, 14, 0, 'User', 300);
+(14008, 14, 0, 'User', 300),
+(14009, 17, 55, 'User', 300);
 
 -- --------------------------------------------------------
 
@@ -7154,9 +7155,6 @@ INSERT INTO `Property_Int_Assigment` (`id`, `property_id`, `object_id`, `model_n
 (13947, 12, 291, 'User'),
 (13948, 13, 291, 'User'),
 (13949, 14, 291, 'User'),
-(13950, 12, 292, 'User'),
-(13951, 13, 292, 'User'),
-(13952, 14, 292, 'User'),
 (13953, 12, 293, 'User'),
 (13954, 13, 293, 'User'),
 (13955, 14, 293, 'User'),
@@ -7180,7 +7178,8 @@ INSERT INTO `Property_Int_Assigment` (`id`, `property_id`, `object_id`, `model_n
 (13973, 14, 299, 'User'),
 (13974, 12, 300, 'User'),
 (13975, 13, 300, 'User'),
-(13976, 14, 300, 'User');
+(13976, 14, 300, 'User'),
+(13977, 17, 300, 'User');
 
 -- --------------------------------------------------------
 
@@ -8667,7 +8666,8 @@ INSERT INTO `Property_String` (`id`, `property_id`, `value`, `model_name`, `obje
 (3747, 9, 'https://vk.com/katyushka_denchik', 'User', 284),
 (3748, 9, 'https://vk.com/kit_van', 'User', 286),
 (3749, 9, 'null', 'User', 287),
-(3750, 9, 'null', 'User', 298);
+(3750, 9, 'null', 'User', 298),
+(3751, 22, '26-04-2018 01:16:25', 'User', 300);
 
 -- --------------------------------------------------------
 
@@ -10224,7 +10224,8 @@ INSERT INTO `Property_String_Assigment` (`id`, `property_id`, `object_id`, `mode
 (3593, 9, 284, 'User'),
 (3594, 9, 286, 'User'),
 (3595, 9, 287, 'User'),
-(3596, 9, 298, 'User');
+(3596, 9, 298, 'User'),
+(3597, 22, 300, 'User');
 
 -- --------------------------------------------------------
 
@@ -10439,7 +10440,7 @@ INSERT INTO `Schedule_Group` (`id`, `title`, `teacher_id`) VALUES
 (7, 'Гитара Харченко и Салтыкова', 2),
 (8, 'Котельниковы. Гитара', 14),
 (9, 'Гитара Никита+ДБ', 162),
-(10, 'Тестовая группа', 182);
+(14, 'Тест 456', 9);
 
 -- --------------------------------------------------------
 
@@ -10472,8 +10473,9 @@ INSERT INTO `Schedule_Group_Assignment` (`id`, `group_id`, `user_id`) VALUES
 (12, 9, 308),
 (15, 8, 285),
 (16, 8, 291),
-(18, 10, 287),
-(19, 10, 145);
+(46, 14, 297),
+(47, 14, 295),
+(48, 14, 291);
 
 -- --------------------------------------------------------
 
@@ -10515,7 +10517,7 @@ INSERT INTO `Structure` (`id`, `title`, `parent_id`, `path`, `action`, `template
 (14, 'Вход', 5, 'authorize', 'musadm/authorize', 1, '', '', 1, 0, 0, '', '', ''),
 (19, 'Скрипт обновления данных о пользователях', 0, 'refreshusers', 'index', 5, 'Раздел для тестирования различного функционала или отладки ', '', 1, 0, 1000, NULL, NULL, NULL),
 (20, 'Авторизация', 6, 'authorize', 'admin/auth', 3, 'Страница авторизации для административного раздела', '', 1, 0, 0, NULL, NULL, NULL),
-(22, 'Группы', 5, 'groups', 'musadm/group', 4, '', 'Structure_Item', 1, 1, 20, NULL, NULL, NULL),
+(22, 'Группы', 5, 'groups', 'musadm/group/group', 4, '', 'Structure_Item', 1, 1, 20, NULL, NULL, NULL),
 (23, 'Расписание', 5, 'schedule', 'musadm/index', 4, '', 'Structure_Item', 1, 1, 30, NULL, NULL, NULL),
 (24, 'Баланс', 5, 'balance', 'musadm/balance/balance', 4, '', 'Structure_Item', 1, 1, 0, NULL, NULL, NULL),
 (26, 'test', 0, 'test', 'test', 5, '', 'Structure_Item', 1, 0, 1000, NULL, NULL, NULL),
@@ -10763,7 +10765,7 @@ INSERT INTO `User` (`id`, `name`, `surname`, `patronimyc`, `phone_number`, `emai
 (186, 'Дмитрий', 'Чаблин', '', '', '', 'ЧаДм', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 0, 0),
 (187, 'Максим', 'Перепелица', '', '9155600680', '', 'ПеМа', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 0, 0),
 (188, 'Александр', 'Щипцов', '', '9202003900, папа9250429770', '', 'ЩиАл', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 1, 0),
-(189, 'Подготовка', 'Само', '', '', '', 'Само', 'efbab39a1edd45d202bb5add9a9df753', 4, '2018-04-24', 1, 0),
+(189, 'Подготовка', 'Само', '', '', '', 'Само', 'd41d8cd98f00b204e9800998ecf8427e', 4, '2018-04-24', 1, 0),
 (190, 'Павел', 'Логвинов', '', '89192871619 мама', '', 'НоПа', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 1, 0),
 (191, 'Анна', 'Зинькова', '', '9102251201', '', 'ЗиАн', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 1, 0),
 (192, 'Марина', 'Субботина ', '', '89205536278', '', 'СуМа', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 1, 0),
@@ -10866,7 +10868,6 @@ INSERT INTO `User` (`id`, `name`, `surname`, `patronimyc`, `phone_number`, `emai
 (289, 'Ярослава', 'Крысенко ', '', '89092068385', '', 'КрЯр', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 1, 0),
 (290, 'Вячеслав', 'Флоринский ', '', '89103603958', '', 'флвя', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 1, 0),
 (291, 'Анна', 'Красноперова', '', '89803728486', '', 'КрАн', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 1, 0),
-(292, 'Денис', 'Третьяков', '', '89103653092', '', 'ТрДе', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 0, 0),
 (293, 'Наталья', 'Колесник', '', '89202054165', '', 'КоНа', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 1, 0),
 (294, 'Сергей', 'Дробот', '', '+79511393505', '', 'ДрСе', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 1, 0),
 (295, 'Виталия', 'Прилищ ', '', '', '', 'ПрВи', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 1, 0),
@@ -11104,7 +11105,7 @@ ALTER TABLE `User_Group`
 -- AUTO_INCREMENT для таблицы `Admin_Form`
 --
 ALTER TABLE `Admin_Form`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=94;
 
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Modelname`
@@ -11188,31 +11189,31 @@ ALTER TABLE `Property`
 -- AUTO_INCREMENT для таблицы `Property_Bool`
 --
 ALTER TABLE `Property_Bool`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=633;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=634;
 
 --
 -- AUTO_INCREMENT для таблицы `Property_Bool_Assigment`
 --
 ALTER TABLE `Property_Bool_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=632;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=633;
 
 --
 -- AUTO_INCREMENT для таблицы `Property_Dir`
 --
 ALTER TABLE `Property_Dir`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT для таблицы `Property_Int`
 --
 ALTER TABLE `Property_Int`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14009;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14010;
 
 --
 -- AUTO_INCREMENT для таблицы `Property_Int_Assigment`
 --
 ALTER TABLE `Property_Int_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13977;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13978;
 
 --
 -- AUTO_INCREMENT для таблицы `Property_List`
@@ -11236,13 +11237,13 @@ ALTER TABLE `Property_List_Values`
 -- AUTO_INCREMENT для таблицы `Property_String`
 --
 ALTER TABLE `Property_String`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3751;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3752;
 
 --
 -- AUTO_INCREMENT для таблицы `Property_String_Assigment`
 --
 ALTER TABLE `Property_String_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3597;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3598;
 
 --
 -- AUTO_INCREMENT для таблицы `Property_Text`
@@ -11260,13 +11261,13 @@ ALTER TABLE `Property_Text_Assigment`
 -- AUTO_INCREMENT для таблицы `Schedule_Group`
 --
 ALTER TABLE `Schedule_Group`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT для таблицы `Schedule_Group_Assignment`
 --
 ALTER TABLE `Schedule_Group_Assignment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT для таблицы `Structure`
