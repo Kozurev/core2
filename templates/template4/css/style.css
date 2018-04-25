@@ -39,3 +39,36 @@ nav {
 }
 
 
+.action {
+	display: inline-block;
+	height: 25px;
+	width: 25px;
+	margin: 0px 2px 0px 2px;
+}
+
+.add_payment {
+	background: url(../images/money.png);
+	background-size: cover;
+}
+
+.edit {
+	background: url(../images/edit.png);
+	background-size: cover;
+}
+
+.archive {
+	background: url(../images/archive.png);
+	background-size: cover;
+}
+
+.unarchive {
+	background: url(../images/archiveminus.png);
+	background-size: cover;
+}
+
+.delete {
+	background: url(../images/delete.png);
+	background-size: cover;
+}
+
+
