@@ -41,7 +41,7 @@ class Property_Dir_Model extends Core_Entity
     public function dir($val = null)
     {
         if(is_null($val))   return $this->dir;
-        if(intval($val) <= 0)   die(Core::getMessage("UNSIGNED_VALUE", array("dir", "Property_Dir")));
+        if(intval($val) < 0)   die(Core::getMessage("UNSIGNED_VALUE", array("dir", "Property_Dir")));
         $this->dir = intval($val);
         return $this;
     }
@@ -50,7 +50,7 @@ class Property_Dir_Model extends Core_Entity
     public function sorting($val = null)
     {
         if(is_null($val))   return $this->sorting;
-        if(intval($val) <= 0)   die(Core::getMessage("UNSIGNED_VALUE", array("sorting", "Property_Dir")));
+        if(intval($val) < 0)   die(Core::getMessage("UNSIGNED_VALUE", array("sorting", "Property_Dir")));
         $this->sorting = intval($val);
         return $this;
     }
