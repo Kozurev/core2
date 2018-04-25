@@ -21,19 +21,18 @@ $(function() {
 /**
  *	Удаление объекта
  */
-function deleteItem(model_name, model_id, func){
+function deleteItem(model_name, model_id, link, func){
 
-    var link = "../admin?menuTab=Main&menuAction=deleteAction&ajax=1";
-    link += "&model_name=" + model_name;
-    link += "&model_id=" + model_id;
+    var url = link;
+    url += "&model_name=" + model_name;
+    url += "&model_id=" + model_id;
 
     var agree = confirm("Вы действительно хотите удалить объект?");
     if(agree != true) return;
 
-
     $.ajax({
         type: "GET",
-        url: link,
+        url: url,
         success: function(answer){
             func();
             loaderOff();
@@ -111,7 +110,7 @@ function closePopup() {
 }
 
 
-function saveData(link) {
+function saveData(link, func) {
     var form = $("#createData");
     if(form.valid() == false)   return;
     var data = form.serialize();
@@ -123,10 +122,12 @@ function saveData(link) {
     //alert(link + "?menuTab=Main&menuAction=updateAction&ajax=1");
     $.ajax({
         type: "GET",
-        url: link + "?menuTab=Main&menuAction=updateAction&ajax=1",
+        url: link,
         data: data,
         success: function(responce) {
             closePopup();
+            if($.isFunction(func))
+                func();
         }
     });
 }

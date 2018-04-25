@@ -1,6 +1,6 @@
 $(function(){
     $("body")
-        //Открытие всплывающего окна редактирования пользователя
+    //Открытие всплывающего окна редактирования пользователя
         .on("click", ".user_edit", function(e){
             e.preventDefault();
             var userid = $(this).data("userid");
@@ -25,8 +25,8 @@ $(function(){
         .on("click", ".popop_user_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("../admin");
-            refreshUserTable("clients", "", loaderOff);
+            saveData("../admin?menuTab=User&menuAction=updateAction&ajax=1", refreshUserTable);
+            //refreshUserTable();
         })
         //Добавление пользователя в архив
         .on("click", ".user_archive", function(){
@@ -46,8 +46,8 @@ $(function(){
         })
         .on("click", ".user_delete", function(e){
             e.preventDefault();
-            var userid = $(this).data("userid");
-            deleteItem("User", userid, refreshArchiveTable);
+            var userid = $(this).data("model_id");
+            deleteItem("User", userid, "../admin?menuTab=Main&menuAction=deleteAction&ajax=1", refreshArchiveTable);
         })
         //Нажатие на кнопку закрытия высплывающего окна редактирования пользователя
         .on("click", ".popup_close", function(e){
@@ -57,23 +57,19 @@ $(function(){
 });
 
 
-function refreshUserTable(group, url, func) {
-    var groupid;
-    if(group == "clients")  groupid = 5;
-    else groupid = 4;
-
+function refreshUserTable() {
     $.ajax({
         type: "GET",
-        url: url,
+        url: "",
         data: {
             action: "refreshTableUsers",
-            group: groupid
+            //group: groupid
         },
         success: function(responce) {
             $(".page").empty();
             $(".page").append(responce);
             $("#sortingTable").tablesorter();
-            func();
+            loaderOff();
         }
     });
 }
