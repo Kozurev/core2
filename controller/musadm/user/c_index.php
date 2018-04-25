@@ -23,9 +23,11 @@ $aoUsers = Core::factory("User")
     ->orderBy("id", "DESC")
     ->findAll();
 
+$oUserGroup = Core::factory("User_Group", $groupId);
+
 foreach ($aoUsers as $user)
 {
-    $aoPropertiesList = $oProperty->getPropertiesList($user);
+    $aoPropertiesList = $oProperty->getPropertiesList($oUserGroup);
     foreach ($aoPropertiesList as $prop)
     {
         $user->addEntities($prop->getPropertyValues($user), "property_value");
