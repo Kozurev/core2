@@ -23,6 +23,7 @@
         ->js("/templates/template4/js/main.js")
         ->js("/templates/template4/js/users.js")
         ->js("/templates/template4/js/payments.js")
+        ->js("/templates/template4/js/groups.js")
         ->showJs();
     ?>
 
