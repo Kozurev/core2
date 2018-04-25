@@ -39,7 +39,6 @@ Core::attachObserver("beforeUserDelete", function($args){
         if($listValue) $listValue->delete();
     }
 
-
     Core::factory("Property")->clearForObject($oUser);
 });
 
