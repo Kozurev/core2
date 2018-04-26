@@ -1,0 +1,19 @@
+.lids {
+    font-size: 14px;
+    background-color: white;
+}
+
+.lids .block {
+    background-color: #E8E8E8;
+}
+
+.lids .author {
+    font-size: 10px;
+    display: inline;
+}
+
+.lids .date {
+    font-size: 10px;
+    display: inline;
+    float: right;
+}
