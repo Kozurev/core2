@@ -12,6 +12,7 @@
         ->css("/templates/template4/css/buttons.css")
         ->css("/templates/template4/css/users.css")
         ->css("/templates/template4/css/popup.css")
+        ->css("/templates/template4/css/lids.css")
         ->showCss()
         ->js("/templates/template4/js/jquery.min.js")
         ->js("/templates/template4/js/jquery.validate.min.js")
@@ -24,6 +25,7 @@
         ->js("/templates/template4/js/users.js")
         ->js("/templates/template4/js/payments.js")
         ->js("/templates/template4/js/groups.js")
+        ->js("/templates/template4/js/lids.js")
         ->showJs();
     ?>
 
@@ -87,8 +89,6 @@
                             ?>
                             <li><a href="<?=$rootdir?>balance<?=$userId?>" >Баланс</a></li>
                             <li><a href="#" >Сменить логин или пароль</a></li>
-<!--                            <li><a href="#" >Договор оферты</a></li>-->
-<!--                            <li><a href="#" >Инструкция</a></li>-->
                             <?
                         }
                         //Пункты только для администратора, директора или менеджера
@@ -105,7 +105,7 @@
                                 </ul>
                             </li>
                             <li><a href="<?=$rootdir?>groups">Группы</a></li>
-                            <li><a href="#">Лиды</a></li>
+                            <li><a href="<?=$rootdir?>lids">Лиды</a></li>
                             <li><a href="#">Сертификаты</a></li>
                             <li><a href="#">Задачи</a></li>
                             <?
