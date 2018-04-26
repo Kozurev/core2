@@ -15,9 +15,13 @@ class Lid_Model extends Core_Entity
     protected $vk;
     protected $status = 1;
     protected $source;
+    protected $control_date;
+    protected $active = 1;
 
-
-    public function __construct(){}
+    public function __construct()
+    {
+        if($this->control_date == null) $this->control_date = date("Y-m-d");
+    }
 
     public function getId()
     {
@@ -80,6 +84,23 @@ class Lid_Model extends Core_Entity
         if(is_null($val))   return $this->status;
         $this->status = intval($val);
         return $this;
+    }
+
+
+    public function active($val = null)
+    {
+        if(is_null($val))   return $this->active;
+
+        if($val == true)        $this->active = 1;
+        elseif($val == false)   $this->active = 0;
+
+        return $this;
+    }
+
+
+    public function controlDate($val = null)
+    {
+
     }
 
 }
