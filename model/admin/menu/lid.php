@@ -20,7 +20,7 @@ class Admin_Menu_Lid
 
         if($parentId == 0)
         {
-            $aoLids = Core::factory("Lid")->findAll();
+            $aoLids = Core::factory("Lid")->orderBy("id", "DESC")->findAll();
             $oStatus = Core::factory("Property", 27);
 
             foreach ($aoLids as $oLid)
