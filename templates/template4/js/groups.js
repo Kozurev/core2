@@ -4,7 +4,7 @@ $(function(){
             e.preventDefault();
             loaderOn();
             var groupid = $(this).data("groupid");
-            deleteItem("Schedule_Group", groupid, refreshGroupTable);
+            deleteItem("Schedule_Group", groupid, "../admin?menuTab=Main&menuAction=deleteAction&ajax=1", refreshGroupTable);
         })
         .on("click", ".group_edit", function(e){
             e.preventDefault();

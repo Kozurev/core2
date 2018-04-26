@@ -19,31 +19,6 @@ $(function() {
 
 
 /**
- *	Удаление объекта
- */
-function deleteItem(model_name, model_id, link, func){
-
-    var url = link;
-    url += "&model_name=" + model_name;
-    url += "&model_id=" + model_id;
-
-    var agree = confirm("Вы действительно хотите удалить объект?");
-    if(agree != true) return;
-
-    $.ajax({
-        type: "GET",
-        url: url,
-        success: function(answer){
-            func();
-            loaderOff();
-            if(answer != "0")
-                alert("Ошибка: " + answer);
-        }
-    });
-}
-
-
-/**
  *	Перезагрузка рабочей области административного раздела
  *	обработка перехода по ссылкам
  *	@param hash - хэш
@@ -112,7 +87,11 @@ function closePopup() {
 
 function saveData(link, func) {
     var form = $("#createData");
-    if(form.valid() == false)   return;
+    if(form.valid() == false)
+    {
+        loaderOff();
+        return;
+    }
     var data = form.serialize();
     var aUnchecked = form.find("input[type=checkbox]:unchecked");
     for (var i = 0; i < aUnchecked.length; i++) {
@@ -128,6 +107,31 @@ function saveData(link, func) {
             closePopup();
             if($.isFunction(func))
                 func();
+        }
+    });
+}
+
+
+/**
+ *	Удаление объекта
+ */
+function deleteItem(model_name, model_id, link, func){
+
+    var url = link;
+    url += "&model_name=" + model_name;
+    url += "&model_id=" + model_id;
+
+    var agree = confirm("Вы действительно хотите удалить объект?");
+    if(agree != true) return;
+
+    $.ajax({
+        type: "GET",
+        url: url,
+        success: function(answer){
+            func();
+            loaderOff();
+            if(answer != "0")
+                alert("Ошибка: " + answer);
         }
     });
 }
