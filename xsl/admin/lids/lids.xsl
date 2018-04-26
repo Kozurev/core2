@@ -12,6 +12,7 @@
                 <th>ФИО</th>
                 <th>Телефон</th>
                 <th>ВК</th>
+                <th>Дата</th>
                 <th>Статус</th>
                 <th></th>
                 <th></th>
@@ -74,6 +75,7 @@
 
             <td><xsl:value-of select="number" /></td>
             <td><xsl:value-of select="vk" /></td>
+            <td><xsl:value-of select="control_date" /></td>
             <td><xsl:value-of select="status/value" /></td>
 
             <!--Редактирование-->
