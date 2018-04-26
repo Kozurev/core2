@@ -1,15 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.0.1
+-- version 4.6.5.2
 -- https://www.phpmyadmin.net/
 --
--- Хост: localhost
--- Время создания: Апр 26 2018 г., 02:05
--- Версия сервера: 5.5.53
--- Версия PHP: 7.0.14
+-- Хост: 127.0.0.1:3306
+-- Время создания: Апр 26 2018 г., 15:54
+-- Версия сервера: 5.7.16
+-- Версия PHP: 5.6.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -134,7 +132,14 @@ INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `t
 (90, 13, 'Название', 'title', 150, 2, 1, 1, 10, '', ''),
 (91, 13, 'Описание', 'description', 5000, 5, 1, 0, 20, '', ''),
 (92, 13, 'Родительская директория', 'dir', 0, 4, 1, 0, 30, 'PropertyDirs', ''),
-(93, 13, 'Сортировка', 'sorting', 0, 1, 1, 0, 40, '', '0');
+(93, 13, 'Сортировка', 'sorting', 0, 1, 1, 0, 40, '', '0'),
+(94, 21, 'Фамилия', 'surname', 255, 2, 1, 0, 10, '', ''),
+(95, 21, 'Имя', 'name', 255, 2, 1, 0, 20, '', ''),
+(96, 21, 'Телефон', 'number', 255, 2, 1, 0, 30, '', ''),
+(97, 21, 'Ссылка ВК', 'vk', 255, 2, 1, 0, 40, '', ''),
+(99, 21, 'Дата контроля', 'controlDate', 0, 7, 1, 0, 50, '', ''),
+(100, 21, 'Активность', 'active', 0, 3, 1, 0, 60, '', ''),
+(101, 21, 'Источник', 'source', 255, 2, 1, 0, 60, '', '');
 
 -- --------------------------------------------------------
 
@@ -171,7 +176,9 @@ INSERT INTO `Admin_Form_Modelname` (`id`, `model_name`, `model_title`, `model_so
 (17, 'Page_Template_Dir', 'Директория макетов', 23, 1),
 (18, 'Payment', 'Платежи', 110, 1),
 (19, 'Schedule_Group', 'Группа (расписание)', 120, 1),
-(20, 'Schedule_Group_Assignment', 'Принадлежность клиента группе (рассписание)', 130, 1);
+(20, 'Schedule_Group_Assignment', 'Принадлежность клиента группе (рассписание)', 130, 1),
+(21, 'Lid', 'Лиды', 140, 1),
+(22, 'Lid_Comment', 'Комментарии к лидам', 160, 1);
 
 -- --------------------------------------------------------
 
@@ -319,52 +326,54 @@ CREATE TABLE `Lid` (
   `surname` varchar(255) NOT NULL DEFAULT '',
   `number` varchar(255) NOT NULL DEFAULT '',
   `vk` varchar(255) NOT NULL DEFAULT '',
-  `source` varchar(255) NOT NULL DEFAULT ''
+  `source` varchar(255) NOT NULL DEFAULT '',
+  `control_date` date NOT NULL,
+  `active` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `Lid`
 --
 
-INSERT INTO `Lid` (`id`, `name`, `surname`, `number`, `vk`, `source`) VALUES
-(1, '', '', '8952433007', '', ''),
-(2, 'Диана', 'Адиятуллина', '9205828904', 'https://vk.com/id153654371', ''),
-(3, '', '', '89805288059', '', ''),
-(4, 'Екатерина ', 'денисова', '89606299236', 'https://vk.com/katyushka_denchik', ''),
-(5, 'Фарида', 'Победимова', '89205543915', '', ''),
-(6, 'Марина', '', '89155773341', '', ''),
-(7, '', '', '89155286269', '', ''),
-(8, 'яна', '', '89155741671', '', ''),
-(9, 'primavera', '', '89511339371', 'https://vk.com/id4138438', ''),
-(10, '', '', '89155625903', '', ''),
-(11, '', '', '89524330073', '', ''),
-(12, '', '', '89202045657', '', ''),
-(13, '', '', '89202054165', '', ''),
-(14, 'Никита', 'Усачев', '+79997002498', 'https://vk.com/kit_van', ''),
-(15, 'Татьяна', 'Долщенко ', '89524379867', '', ''),
-(16, 'Ярослава', 'Христенко?', '89092068385', '-', ''),
-(17, 'Валерий', '', '89056795800', '', ''),
-(18, 'Дина Борисовна', '', '89803762501', '', ''),
-(19, 'Вячеслав', 'Флоринский', '89103603958', '', ''),
-(20, 'Елена', '', '89611786258', '', ''),
-(21, 'Анна', '', '89803728486', '', ''),
-(22, '', '', '89205999998', '', ''),
-(23, 'Денис', '', '89103653092', '', ''),
-(24, 'Сергей', 'Дробот', '+79511393505', '', ''),
-(25, 'Сона', '', '89205693248', '', ''),
-(26, '', '', '89155614421', '', ''),
-(27, '', '', '89192247996', '', ''),
-(28, '', '', '89507196302', '', ''),
-(29, '', '', '', 'https://vk.com/id31794633', ''),
-(30, '', '', '89606356824', '', ''),
-(31, 'Дмитрий', '', '89511351045', '', ''),
-(32, 'Надежда Анатольевна', '', '89205683403, папа89205683404', '', ''),
-(33, 'Александр', 'Черемисин', '', 'https://vk.com/cheremisinsasha', ''),
-(34, 'Арина', '', '89290227731', '', ''),
-(35, 'Говорил  непонятно', '', '89065680443', '', ''),
-(36, 'Дарья', '', '89803845927', '', ''),
-(37, 'Дарья', '', '89103201004', '', ''),
-(38, 'Валерия ', 'Свищева', '', 'vk.com/id133265736', '');
+INSERT INTO `Lid` (`id`, `name`, `surname`, `number`, `vk`, `source`, `control_date`, `active`) VALUES
+(1, '', '', '8952433007', '', '', '0000-00-00', 1),
+(2, 'Диана', 'Адиятуллина', '9205828904', 'https://vk.com/id153654371', '', '0000-00-00', 1),
+(3, '', '', '89805288059', '', '', '0000-00-00', 1),
+(4, 'Екатерина ', 'денисова', '89606299236', 'https://vk.com/katyushka_denchik', '', '0000-00-00', 1),
+(5, 'Фарида', 'Победимова', '89205543915', '', '', '0000-00-00', 1),
+(6, 'Марина', '', '89155773341', '', '', '0000-00-00', 1),
+(7, '', '', '89155286269', '', '', '0000-00-00', 1),
+(8, 'яна', '', '89155741671', '', '', '0000-00-00', 1),
+(9, 'primavera', '', '89511339371', 'https://vk.com/id4138438', '', '0000-00-00', 1),
+(10, '', '', '89155625903', '', '', '0000-00-00', 1),
+(11, '', '', '89524330073', '', '', '0000-00-00', 1),
+(12, '', '', '89202045657', '', '', '0000-00-00', 1),
+(13, '', '', '89202054165', '', '', '0000-00-00', 1),
+(14, 'Никита', 'Усачев', '+79997002498', 'https://vk.com/kit_van', '', '0000-00-00', 1),
+(15, 'Татьяна', 'Долщенко ', '89524379867', '', '', '0000-00-00', 1),
+(16, 'Ярослава', 'Христенко?', '89092068385', '-', '', '0000-00-00', 1),
+(17, 'Валерий', '', '89056795800', '', '', '0000-00-00', 1),
+(18, 'Дина Борисовна', '', '89803762501', '', '', '0000-00-00', 1),
+(19, 'Вячеслав', 'Флоринский', '89103603958', '', '', '0000-00-00', 1),
+(20, 'Елена', '', '89611786258', '', '', '0000-00-00', 1),
+(21, 'Анна', '', '89803728486', '', '', '0000-00-00', 1),
+(22, '', '', '89205999998', '', '', '0000-00-00', 1),
+(23, 'Денис', '', '89103653092', '', '', '0000-00-00', 1),
+(24, 'Сергей', 'Дробот', '+79511393505', '', '', '0000-00-00', 1),
+(25, 'Сона', '', '89205693248', '', '', '0000-00-00', 1),
+(26, '', '', '89155614421', '', '', '0000-00-00', 1),
+(27, '', '', '89192247996', '', '', '0000-00-00', 1),
+(28, '', '', '89507196302', '', '', '0000-00-00', 1),
+(29, '', '', '', 'https://vk.com/id31794633', '', '0000-00-00', 1),
+(30, '', '', '89606356824', '', '', '0000-00-00', 1),
+(31, 'Дмитрий', '', '89511351045', '', '', '0000-00-00', 1),
+(32, 'Надежда Анатольевна', '', '89205683403, папа89205683404', '', '', '0000-00-00', 1),
+(33, 'Александр', 'Черемисин', '', 'https://vk.com/cheremisinsasha', '', '0000-00-00', 1),
+(34, 'Арина', '', '89290227731', '', '', '0000-00-00', 1),
+(35, 'Говорил  непонятно', '', '89065680443', '', '', '0000-00-00', 1),
+(36, 'Дарья', '', '89803845927', '', '', '0000-00-00', 1),
+(37, 'Дарья', '', '89103201004', '', '', '0000-00-00', 1),
+(38, 'Валерия ', 'Свищева', '', 'vk.com/id133265736', '', '0000-00-00', 1);
 
 -- --------------------------------------------------------
 
@@ -7390,10 +7399,9 @@ INSERT INTO `Property_List_Values` (`id`, `property_id`, `value`, `sorting`) VAL
 (78, 21, 'Тест Тест', 0),
 (79, 21, 'Само Подготовка', 0),
 (80, 27, 'Не определен', 10),
-(81, 27, 'Определяется', 20),
+(81, 27, 'Был на консультации', 20),
 (82, 27, 'Ждем на консультацию', 30),
-(83, 27, 'Записать', 40),
-(84, 27, 'Удалить', 50);
+(83, 27, 'Записался', 40);
 
 -- --------------------------------------------------------
 
@@ -10474,8 +10482,7 @@ INSERT INTO `Schedule_Group_Assignment` (`id`, `group_id`, `user_id`) VALUES
 (15, 8, 285),
 (16, 8, 291),
 (46, 14, 297),
-(47, 14, 295),
-(48, 14, 291);
+(47, 14, 295);
 
 -- --------------------------------------------------------
 
@@ -10521,7 +10528,8 @@ INSERT INTO `Structure` (`id`, `title`, `parent_id`, `path`, `action`, `template
 (23, 'Расписание', 5, 'schedule', 'musadm/index', 4, '', 'Structure_Item', 1, 1, 30, NULL, NULL, NULL),
 (24, 'Баланс', 5, 'balance', 'musadm/balance/balance', 4, '', 'Structure_Item', 1, 1, 0, NULL, NULL, NULL),
 (26, 'test', 0, 'test', 'test', 5, '', 'Structure_Item', 1, 0, 1000, NULL, NULL, NULL),
-(27, 'Архив', 7, 'archive', 'musadm/user/archive', 4, '', 'Structure_Item', 1, 1, 0, NULL, NULL, NULL);
+(27, 'Архив', 7, 'archive', 'musadm/user/archive', 4, '', 'Structure_Item', 1, 1, 0, NULL, NULL, NULL),
+(28, 'Лиды', 5, 'lids', 'musadm/lid/lid', 4, '', 'Structure_Item', 1, 1, 0, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -11105,195 +11113,162 @@ ALTER TABLE `User_Group`
 -- AUTO_INCREMENT для таблицы `Admin_Form`
 --
 ALTER TABLE `Admin_Form`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=94;
-
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Modelname`
 --
 ALTER TABLE `Admin_Form_Modelname`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
-
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Type`
 --
 ALTER TABLE `Admin_Form_Type`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
 --
 -- AUTO_INCREMENT для таблицы `Admin_Menu`
 --
 ALTER TABLE `Admin_Menu`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
-
 --
 -- AUTO_INCREMENT для таблицы `Constant`
 --
 ALTER TABLE `Constant`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
 --
 -- AUTO_INCREMENT для таблицы `Constant_Dir`
 --
 ALTER TABLE `Constant_Dir`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
 --
 -- AUTO_INCREMENT для таблицы `Constant_Type`
 --
 ALTER TABLE `Constant_Type`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
 --
 -- AUTO_INCREMENT для таблицы `Lid`
 --
 ALTER TABLE `Lid`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
-
 --
 -- AUTO_INCREMENT для таблицы `Lid_Comment`
 --
 ALTER TABLE `Lid_Comment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
-
 --
 -- AUTO_INCREMENT для таблицы `Page_Menu`
 --
 ALTER TABLE `Page_Menu`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
 --
 -- AUTO_INCREMENT для таблицы `Page_Template`
 --
 ALTER TABLE `Page_Template`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
 --
 -- AUTO_INCREMENT для таблицы `Page_Template_Dir`
 --
 ALTER TABLE `Page_Template_Dir`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
 --
 -- AUTO_INCREMENT для таблицы `Payment`
 --
 ALTER TABLE `Payment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4632;
-
 --
 -- AUTO_INCREMENT для таблицы `Property`
 --
 ALTER TABLE `Property`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_Bool`
 --
 ALTER TABLE `Property_Bool`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=634;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_Bool_Assigment`
 --
 ALTER TABLE `Property_Bool_Assigment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=633;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_Dir`
 --
 ALTER TABLE `Property_Dir`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_Int`
 --
 ALTER TABLE `Property_Int`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14010;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_Int_Assigment`
 --
 ALTER TABLE `Property_Int_Assigment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13978;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_List`
 --
 ALTER TABLE `Property_List`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=623;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_List_Assigment`
 --
 ALTER TABLE `Property_List_Assigment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=354;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_List_Values`
 --
 ALTER TABLE `Property_List_Values`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_String`
 --
 ALTER TABLE `Property_String`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3752;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_String_Assigment`
 --
 ALTER TABLE `Property_String_Assigment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3598;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_Text`
 --
 ALTER TABLE `Property_Text`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=998;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_Text_Assigment`
 --
 ALTER TABLE `Property_Text_Assigment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1003;
-
 --
 -- AUTO_INCREMENT для таблицы `Schedule_Group`
 --
 ALTER TABLE `Schedule_Group`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
-
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 --
 -- AUTO_INCREMENT для таблицы `Schedule_Group_Assignment`
 --
 ALTER TABLE `Schedule_Group_Assignment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
-
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 --
 -- AUTO_INCREMENT для таблицы `Structure`
 --
 ALTER TABLE `Structure`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
-
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 --
 -- AUTO_INCREMENT для таблицы `Structure_Item`
 --
 ALTER TABLE `Structure_Item`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
 --
 -- AUTO_INCREMENT для таблицы `User`
 --
 ALTER TABLE `User`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=301;
-
 --
 -- AUTO_INCREMENT для таблицы `User_Group`
 --
 ALTER TABLE `User_Group`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-COMMIT;
-
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
