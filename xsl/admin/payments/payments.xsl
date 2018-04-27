@@ -55,8 +55,8 @@
             </table>
 
             <button class="btn button" type="button">
-                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Payment&amp;parent_id={0}&amp;parent_name=Payment" class="link">
-                    Новый раздел
+                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Payment&amp;properties[]=26" class="link">
+                    Новый платеж
                 </a>
             </button>
 

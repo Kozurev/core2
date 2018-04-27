@@ -31,13 +31,13 @@
 				</div>
 			</xsl:if>
 
-			<xsl:if test="count(user_group/id) = 1 and count(user/id) = 0">
+			<xsl:if test="count(user_group/id) = 1 and count(user/id) = 0 and search != ''">
 				<h1>По запросу "<xsl:value-of select="search" />" ничего не найдено</h1>
 			</xsl:if>
 
 			<input type="hidden" id="group_id" value="{user_group/id}" />
 
-			<xsl:if test="count(user_group/id) &gt; 1">
+			<xsl:if test="group_id = 0">
 				<table class="table">
 					<th>id</th>
 					<th>Название</th>
@@ -49,7 +49,7 @@
 				</table>
 			</xsl:if>
 
-			<xsl:if test="count(user/id) != 0">
+			<xsl:if test="group_id &gt;= 1">
 				<table class="table">
 					<th>id</th>
 					<th>Логин</th>
@@ -63,7 +63,7 @@
 			</xsl:if>
 
 			<xsl:choose>
-				<xsl:when test="count(user/id) = 0">
+				<xsl:when test="group_id = 0">
 					<button class="btn button" type="button">
 						<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=User_Group&amp;parent_id={group_id}" class="link">
 							Создать группу

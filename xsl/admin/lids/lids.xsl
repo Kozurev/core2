@@ -20,7 +20,7 @@
             </table>
 
             <button class="btn button" type="button">
-                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Lid" class="link">
+                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Lid&amp;properties[]=27" class="link">
                     Добавить лида
                 </a>
             </button>
@@ -36,7 +36,7 @@
                 </table>
 
                 <button class="btn button" type="button">
-                    <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Lid_Comment" class="link">
+                    <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Lid_Comment&amp;parent_id={parent_id}" class="link">
                         Добавить комментарий
                     </a>
                 </button>
@@ -104,7 +104,7 @@
             <td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Lid&amp;model_id={id}" class="link updateLink" /></td>
 
             <!--Удаление-->
-            <td><a href="admin" data-model_name="Lid" data-model_id="{id}" class="delete deleteLink"></a></td>
+            <td><a href="admin" data-model_name="Lid_Comment" data-model_id="{id}" class="delete deleteLink"></a></td>
         </tr>
     </xsl:template>
 
