@@ -188,3 +188,5 @@ Core::attachObserver("afterLidSave", function($args){
     $oLid = $args[0];
     Core::factory("Property")->addToPropertiesList($oLid, 27);
 });
+
+
