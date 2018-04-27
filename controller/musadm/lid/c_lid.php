@@ -13,6 +13,7 @@ $aoLids = Core::factory("Lid")
 
 $aoComments = array();
 $authorsId  = array();
+$status = Core::factory("Property", 27);
 
 foreach ($aoLids as $lid)
 {
@@ -22,6 +23,9 @@ foreach ($aoLids as $lid)
         if(!in_array($comment->authorId(), $authorsId)) $authorsId[] = $comment->authorId();
     }
     $lid->addEntities($lidComments);
+    $lid->addEntity(
+        $status->getPropertyValues($lid)[0], "property_value"
+    );
 }
 
 $aoAuthors = Core::factory("User")
