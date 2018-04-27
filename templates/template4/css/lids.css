@@ -1,10 +1,22 @@
 .lids {
     font-size: 14px;
     background-color: white;
+    width: 1366px !important;
 }
+
+.lids td {
+    padding-left: 3px   !important;
+    padding-right: 3px  !important;
+}
+
+/*.lids td {*/
+    /*padding-left: 0px !important;*/
+    /*padding-right: 0px !important;*/
+/*}*/
 
 .lids .block {
     background-color: #E8E8E8;
+    margin-bottom: 5px;
 }
 
 .lids .author {
@@ -12,8 +24,30 @@
     display: inline;
 }
 
-.lids .date {
+.lids .comment_date {
     font-size: 10px;
     display: inline;
     float: right;
+}
+
+.lids .string {
+    width: 10%;
+}
+
+.lids .date {
+    padding-left: 5px !important;
+    width: 10%;
+}
+
+.lids .date_inp {
+    width: 87% !important;
+}
+
+.lids .last {
+    padding-right: 5px !important;
+    width: 15%;
+}
+
+.lids .btn {
+    width: 100%
 }
