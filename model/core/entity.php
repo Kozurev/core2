@@ -128,7 +128,7 @@ class Core_Entity extends Core_Entity_Model
 					$objTag->appendChild($objChildTag);
 				}
 			}
-			else
+			elseif($val !== "" && !is_null($val))
 			{
 				$objTag->appendChild($xml->createElement($key, strval($val)));
 			}
