@@ -18,9 +18,46 @@ class Admin_Menu_Lid
                 ->value($parentId)
         );
 
+
+        $parentId == 0
+            ?   $modelName = "Lid"
+            :   $modelName = "Lid_Comment";
+
+        $page = Core_Array::getValue($aParams, "page", 0);
+        $totalCount = Core::factory($modelName);
+        if($parentId != 0)  $totalCount->where("lid_id", "=", $parentId);
+        $totalCount = $totalCount->getCount();
+        $offset = SHOW_LIMIT * $page;
+        $countPages = intval($totalCount / SHOW_LIMIT);
+        if($totalCount % SHOW_LIMIT)    $countPages++;
+        if($countPages == 0) $countPages++;
+
+        $oPagination = Core::factory("Core_Entity")
+            ->name("pagination")
+            ->addEntity(
+                Core::factory("Core_Entity")
+                    ->name("count_pages")
+                    ->value($countPages)
+            )
+            ->addEntity(
+                Core::factory("Core_Entity")
+                    ->name("current_page")
+                    ->value(++$page)
+            )
+            ->addEntity(
+                Core::factory("Core_Entity")
+                    ->name("total_count")
+                    ->value($totalCount)
+            );
+
+
         if($parentId == 0)
         {
-            $aoLids = Core::factory("Lid")->orderBy("id", "DESC")->findAll();
+            $aoLids = Core::factory("Lid")
+                ->limit(SHOW_LIMIT)
+                ->offset($offset)
+                ->orderBy("id", "DESC")
+                ->findAll();
             $oStatus = Core::factory("Property", 27);
 
             foreach ($aoLids as $oLid)
@@ -41,6 +78,8 @@ class Admin_Menu_Lid
                 ->join("User", "User.id = Lid_Comment.author_id")
                 ->where("lid_id", "=", $parentId)
                 ->orderBy("datetime", "DESC")
+                ->limit(SHOW_LIMIT)
+                ->offset($offset)
                 ->findAll();
 
             $oParentLid = Core::factory("Lid", $parentId);
@@ -54,7 +93,15 @@ class Admin_Menu_Lid
                     ->name("title")
                     ->value($title)
             )
+            ->addEntity($oPagination)
             ->xsl("admin/lids/lids.xsl")
             ->show();
     }
+
+
+//    public function updateFormComment($aParams)
+//    {
+//        Core::factory("Admin_Menu_Main")->updateForm($aParams, "Lid", "admin/lids/update_form.xsl");
+//    }
+
 }
