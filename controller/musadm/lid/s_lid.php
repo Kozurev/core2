@@ -25,6 +25,7 @@ $action = Core_Array::getValue($_GET, "action", 0);
 if($action === "refreshLidTable")
 {
     $this->execute();
+    exit;
 }
 
 if($action === "add_note_popup")
@@ -85,7 +86,7 @@ if($action === "changeStatus")
     if(!$oLidStatus)
     {
         $oPropertyStatus = Core::factory("Property", 27);
-        $oLidStatus = Core::factory("Property_Int")
+        $oLidStatus = Core::factory("Property_List")
             ->property_id(27)
             ->model_name("Lid")
             ->object_id($modelId);
