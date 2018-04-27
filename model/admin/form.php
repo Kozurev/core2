@@ -351,4 +351,18 @@ class Admin_Form extends Admin_Form_Model
         $this->addEntities($aoUsers, "item");
     }
 
+
+    public function getListLids($aParams)
+    {
+        $aoLids = Core::factory("Lid")
+            ->where("active", "=", 1)
+            ->orderBy("id", "DESC")
+            ->findAll();
+
+        foreach ($aoLids as $lid)   $lid->title = $lid->surname() . " " . $lid->name();
+
+        $this->value = Core_Array::getValue($aParams, "parent_id", 0);
+        $this->addEntities($aoLids, "item");
+    }
+
 }
