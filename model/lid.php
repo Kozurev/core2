@@ -8,6 +8,14 @@
 
 class Lid extends Lid_Model
 {
+
+    public function __construct()
+    {
+        if($this->control_date == null) $this->control_date = date("Y-m-d");
+        //$this->lid_id = Core_Array::getValue($_GET, "parent_id", 0);
+    }
+
+
     public function save($obj = null)
     {
         Core::notify(array(&$this), "beforeLidSave");
@@ -42,6 +50,7 @@ class Lid extends Lid_Model
 
         $aoComments = Core::factory("Lid_Comment")
             ->where("lid_id", "=", $this->id)
+            ->orderBy("datetime", "DESC")
             ->findAll();
 
         return $aoComments;
