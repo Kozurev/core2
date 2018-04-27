@@ -1,5 +1,11 @@
 <?php
 
+if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
+{
+    $this->execute();
+    exit;
+}
+
 /*
 *	Блок проверки авторизации
 */
@@ -10,11 +16,6 @@ if(User::checkUserAccess(array("superuser" => 1)) != true)
     exit;
 }
 
-if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
-{
-	$this->execute();
-	exit;
-}
 
 //echo "<pre>";
 //print_r($_COOKIE);

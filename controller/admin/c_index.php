@@ -1,7 +1,7 @@
 <?php
 
 $oUser = Core::factory("User");
-$aAccessParams = array("superuser" => 1, "groups" => array(1));
+$aAccessParams = array("groups" => array(1, 2));
 if($oUser::checkUserAccess($aAccessParams) != true)
     die(Core::getMessage("ACCESS_DENIED", array()));
 
