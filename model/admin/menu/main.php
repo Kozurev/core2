@@ -171,18 +171,29 @@ class Admin_Menu_Main
             $parentModelId =    Core_Array::getValue($aParams, "parent_id", 0);
             //$curentModelName =  Core_Array::getValue($aParams, "model", "");
 
-            if($parentModelId != 0 && !is_null($parentModelName))
+            if(Core_Array::getValue($aParams, "properties", null) !== null)
+            {
+                $aoPropertiesId = Core_Array::getValue($aParams, "properties", null);
+
+                foreach ($aoPropertiesId as $id)
+                    $aoPropertiesList[] = Core::factory("Property", $id);
+
+                //$aoPropertiesList = Core::factory("Property")->getPropertiesList($oParent);
+            }
+            elseif($parentModelId != 0 && !is_null($parentModelName))
             {
                 $oParent = Core::factory($parentModelName, $parentModelId);
+                $aoPropertiesList = Core::factory("Property")->getPropertiesList($oParent);
             }
             else
             {
                 $oParent = $oUpdatingItem;
+                $aoPropertiesList = Core::factory("Property")->getPropertiesList($oParent);
             }
 
 
             //Получения списка дополнительных свойств объекта
-            $aoPropertiesList = Core::factory("Property")->getPropertiesList($oParent);
+
 
             //Поиск значений дополнительных свойств
             foreach ($aoPropertiesList as $oProperty)
