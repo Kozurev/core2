@@ -1,12 +1,11 @@
 .lids {
-    font-size: 14px;
-    background-color: white;
-    width: 1366px !important;
+    font-size: 17px;
+    //background-color: white;
 }
 
 .lids td {
-    padding-left: 3px   !important;
-    padding-right: 3px  !important;
+    padding-left: 5px   !important;
+    padding-right: 5px  !important;
 }
 
 /*.lids td {*/
@@ -15,7 +14,8 @@
 /*}*/
 
 .lids .block {
-    background-color: #E8E8E8;
+    //background-color: #E8E8E8;
+    border: 1px solid;
     margin-bottom: 5px;
 }
 
@@ -27,27 +27,25 @@
 .lids .comment_date {
     font-size: 10px;
     display: inline;
-    float: right;
+    margin-left: 15px;
 }
 
-.lids .string {
-    width: 10%;
+.lids .lid_submit {
+    width: 100%;
 }
 
-.lids .date {
-    padding-left: 5px !important;
-    width: 10%;
+.lids .not_choose {
+    background-color: white;
 }
 
-.lids .date_inp {
-    width: 87% !important;
+.lids .consult_wait {
+    background-color: #F4FF77;
 }
 
-.lids .last {
-    padding-right: 5px !important;
-    width: 15%;
+.lids .consult_was {
+    background-color: #985f0d;
 }
 
-.lids .btn {
-    width: 100%
+.lids .agree {
+    background-color: #5cb85c;
 }
