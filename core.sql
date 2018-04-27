@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Апр 26 2018 г., 15:54
+-- Время создания: Апр 27 2018 г., 17:45
 -- Версия сервера: 5.7.16
 -- Версия PHP: 5.6.29
 
@@ -139,7 +139,9 @@ INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `t
 (97, 21, 'Ссылка ВК', 'vk', 255, 2, 1, 0, 40, '', ''),
 (99, 21, 'Дата контроля', 'controlDate', 0, 7, 1, 0, 50, '', ''),
 (100, 21, 'Активность', 'active', 0, 3, 1, 0, 60, '', ''),
-(101, 21, 'Источник', 'source', 255, 2, 1, 0, 60, '', '');
+(101, 21, 'Источник', 'source', 255, 2, 1, 0, 60, '', ''),
+(102, 22, 'Лид', 'lidId', 0, 4, 1, 0, 10, 'Lids', ''),
+(103, 22, 'Комментарий', 'text', 5000, 5, 1, 1, 20, '', '');
 
 -- --------------------------------------------------------
 
@@ -373,7 +375,7 @@ INSERT INTO `Lid` (`id`, `name`, `surname`, `number`, `vk`, `source`, `control_d
 (35, 'Говорил  непонятно', '', '89065680443', '', '', '0000-00-00', 1),
 (36, 'Дарья', '', '89803845927', '', '', '0000-00-00', 1),
 (37, 'Дарья', '', '89103201004', '', '', '0000-00-00', 1),
-(38, 'Валерия ', 'Свищева', '', 'vk.com/id133265736', '', '0000-00-00', 1);
+(38, 'Валерия ', 'Свищева', '8-888-888-88-88', 'vk.com/id133265736', 'друзья рассказали', '2018-04-30', 1);
 
 -- --------------------------------------------------------
 
@@ -431,7 +433,9 @@ INSERT INTO `Lid_Comment` (`id`, `author_id`, `lid_id`, `text`, `datetime`) VALU
 (35, 1, 35, 'поставил конс на 24.04.18 на 18:00 к карине. мичурина', '2018-04-25 00:58:06'),
 (36, 1, 36, 'Записалась на конс. 29.04 Романович. 13:00. В будние после 16:00. вск любое время. ', '2018-04-25 00:58:06'),
 (37, 1, 37, 'оператор отвечает. неправильно набран номер. информатор в смс', '2018-04-25 00:58:06'),
-(38, 1, 38, 'ведется переписка в Vk сообщения сообщества', '2018-04-25 00:58:06');
+(38, 1, 38, 'ведется переписка в Vk сообщения сообщества', '2018-04-25 00:58:06'),
+(39, 1, 38, 'Тестовый коммент 1', '2018-04-27 15:16:56'),
+(40, 1, 38, 'Тестовый коммент 2', '2018-04-27 15:17:03');
 
 -- --------------------------------------------------------
 
@@ -5193,7 +5197,7 @@ INSERT INTO `Property` (`id`, `tag_name`, `title`, `description`, `type`, `multi
 (24, 'param', 'Параметры', '', 'string', 1, '', 1, 6, 0),
 (25, 'list', 'Список', '', 'list', 1, '', 1, 6, 0),
 (26, 'payment_comment', 'Комментарий', 'Комментарий к платежу', 'string', 1, '', 1, 0, 0),
-(27, 'lid_status', 'Статус лида', '', 'list', 0, '', 1, 0, 0);
+(27, 'lid_status', 'Статус лида', '', 'list', 0, '80', 1, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -7263,7 +7267,7 @@ INSERT INTO `Property_List` (`id`, `property_id`, `model_name`, `object_id`, `va
 (619, 27, 'Lid', 35, 80),
 (620, 27, 'Lid', 36, 82),
 (621, 27, 'Lid', 37, 80),
-(622, 27, 'Lid', 38, 80);
+(622, 27, 'Lid', 38, 82);
 
 -- --------------------------------------------------------
 
@@ -10883,7 +10887,8 @@ INSERT INTO `User` (`id`, `name`, `surname`, `patronimyc`, `phone_number`, `emai
 (297, 'Елена', 'Руднева', '', '89803787063', '', 'РуЕл', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 1, 0),
 (298, 'Артем', 'Уваров ', '', '89102280212 89507196302 мама89511349074', '', 'УвАр', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 1, 0),
 (299, 'Сергей', 'Толстой', '', '89606356824', '', 'ТоСе', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 1, 0),
-(300, 'Максат', 'Тулекеев', '', '89065680443', '', 'ТуМа', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 1, 0);
+(300, 'Максат', 'Тулекеев', '', '89065680443', '', 'ТуМа', '81dc9bdb52d04dc20036dbd8313ed055', 5, '2018-04-24', 1, 0),
+(301, 'Менеджер', 'Менеджер', '', '5261256561256', '', 'manager', '4a7d1ed414474e4033ac29ccb8653d9b', 2, '2018-04-27', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -11113,7 +11118,7 @@ ALTER TABLE `User_Group`
 -- AUTO_INCREMENT для таблицы `Admin_Form`
 --
 ALTER TABLE `Admin_Form`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=104;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Modelname`
 --
@@ -11148,12 +11153,12 @@ ALTER TABLE `Constant_Type`
 -- AUTO_INCREMENT для таблицы `Lid`
 --
 ALTER TABLE `Lid`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 --
 -- AUTO_INCREMENT для таблицы `Lid_Comment`
 --
 ALTER TABLE `Lid_Comment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 --
 -- AUTO_INCREMENT для таблицы `Page_Menu`
 --
@@ -11183,12 +11188,12 @@ ALTER TABLE `Property`
 -- AUTO_INCREMENT для таблицы `Property_Bool`
 --
 ALTER TABLE `Property_Bool`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=634;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=635;
 --
 -- AUTO_INCREMENT для таблицы `Property_Bool_Assigment`
 --
 ALTER TABLE `Property_Bool_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=633;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=634;
 --
 -- AUTO_INCREMENT для таблицы `Property_Dir`
 --
@@ -11198,27 +11203,27 @@ ALTER TABLE `Property_Dir`
 -- AUTO_INCREMENT для таблицы `Property_Int`
 --
 ALTER TABLE `Property_Int`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14010;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14011;
 --
 -- AUTO_INCREMENT для таблицы `Property_Int_Assigment`
 --
 ALTER TABLE `Property_Int_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13978;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13979;
 --
 -- AUTO_INCREMENT для таблицы `Property_List`
 --
 ALTER TABLE `Property_List`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=623;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=626;
 --
 -- AUTO_INCREMENT для таблицы `Property_List_Assigment`
 --
 ALTER TABLE `Property_List_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=354;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=360;
 --
 -- AUTO_INCREMENT для таблицы `Property_List_Values`
 --
 ALTER TABLE `Property_List_Values`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
 --
 -- AUTO_INCREMENT для таблицы `Property_String`
 --
@@ -11243,12 +11248,12 @@ ALTER TABLE `Property_Text_Assigment`
 -- AUTO_INCREMENT для таблицы `Schedule_Group`
 --
 ALTER TABLE `Schedule_Group`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 --
 -- AUTO_INCREMENT для таблицы `Schedule_Group_Assignment`
 --
 ALTER TABLE `Schedule_Group_Assignment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 --
 -- AUTO_INCREMENT для таблицы `Structure`
 --
@@ -11263,7 +11268,7 @@ ALTER TABLE `Structure_Item`
 -- AUTO_INCREMENT для таблицы `User`
 --
 ALTER TABLE `User`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=301;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=303;
 --
 -- AUTO_INCREMENT для таблицы `User_Group`
 --
