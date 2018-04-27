@@ -19,6 +19,9 @@ $back = Core_Array::getValue($_GET, "back", $rootdir);
     <label for="password">Пароль:</label>
     <input type="password" name="password"/>
 
+    <label for="remember">Запомнить меня</label>
+    <input type="checkbox" name="remember"/>
+
     <div id="lower">
         <input type="submit" value="Войти"/>
     </div>
