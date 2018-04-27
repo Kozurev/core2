@@ -22,7 +22,7 @@ $(function(){
             loaderOn();
             var lidid = $(this).data("lidid");
             var statusid = $(this).val();
-            changeStatus(lidid, statusid, loaderOff);
+            changeStatus(lidid, statusid, refreshLidTable);
         })
         .on("change", ".lid_date", function(){
             loaderOn();
