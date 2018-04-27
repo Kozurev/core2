@@ -10,11 +10,13 @@ $oUser = Core::factory("User");
 
 if(isset($_POST["login"]) && isset($_POST["password"]))
 {
+    $rememberMe = Core_Array::getValue($_POST, "remember", false);
+
     $oUser
         ->login($_POST["login"])
         ->password($_POST["password"]);
 
-    if($oUser->authorize())
+    if($oUser->authorize($rememberMe))
     {
         global $CFG;
         $back = Core_Array::getValue($_GET, "back",  "/".$CFG->rootdir);
