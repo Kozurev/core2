@@ -162,7 +162,51 @@ if($action == "refreshTableUsers")
 }
 
 
+if($action == "getPaymentPopup")
+{
+    $userId =   Core_Array::getValue($_GET, "userid", 0);
+    $oUser =    Core::factory("User", $userId);
 
+    Core::factory("Core_Entity")
+        ->addEntity($oUser)
+        ->xsl("musadm/users/edit_payment_popup.xsl")
+        ->show();
+
+    exit;
+}
+
+
+if($action == "savePayment")
+{
+    $userid =       Core_Array::getValue($_GET, "userid", 0);
+    $value  =       Core_Array::getValue($_GET, "value", 0);
+    $description =  Core_Array::getValue($_GET, "description", "");
+    $type =         Core_Array::getValue($_GET, "type", 0);
+
+    $payment = Core::factory("Payment")
+        ->user($userid)
+        ->type($type)
+        ->value($value)
+        ->description($description)
+        ->save();
+
+    /**
+     * Корректировка баланса ученика
+     */
+    $oUser =        Core::factory("User", $userid);
+    $oUserBalance = Core::factory("Property", 12);
+    $oUserBalance = $oUserBalance->getPropertyValues($oUser)[0];
+    $balanceOld =   intval($oUserBalance->value());
+
+    $type == 1
+        ?   $balanceNew =   $balanceOld + intval($value)
+        :   $balanceNew =   $balanceOld - intval($value);
+    $oUserBalance->value($balanceNew);
+    $oUserBalance->save();
+
+    echo 0;
+    exit;
+}
 
 
 
