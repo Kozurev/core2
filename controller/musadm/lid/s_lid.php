@@ -44,6 +44,7 @@ if($action === "add_note_popup")
 
 if($action === "save_lid")
 {
+
     $oLid =     Core::factory("Lid");
     $surname =  Core_Array::getValue($_GET, "surname", null);
     $name =     Core_Array::getValue($_GET, "name", null);
