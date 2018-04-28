@@ -135,3 +135,24 @@ function deleteItem(model_name, model_id, link, func){
         }
     });
 }
+
+
+function savePayment(userid, value, description, type, url, func) {
+    //alert(userid + " " + value + " " + description);
+    $.ajax({
+        type: "GET",
+        url: url,
+        data: {
+            action: "savePayment",
+            userid: userid,
+            value: value,
+            type: type,
+            description: description
+        },
+        success: function(responce){
+            if(responce != "0") alert("Ошибка: " + responce);
+            func();
+            closePopup();
+        }
+    });
+}
