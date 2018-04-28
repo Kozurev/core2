@@ -52,6 +52,7 @@ $aoUserPayments = Core::factory("Payment")
 foreach ($aoUserPayments as $payment)
 {
     $aoUserPaymentsNotes = Core::factory("Property", 26)->getPropertyValues($payment);
+    $aoUserPaymentsNotes = array_reverse($aoUserPaymentsNotes);
     $payment->addEntities($aoUserPaymentsNotes, "notes");
 }
 
