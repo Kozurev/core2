@@ -53,8 +53,44 @@ $(function(){
         .on("click", ".popup_close", function(e){
             e.preventDefault();
             closePopup();
+        })
+        //Начисление платежа пользователю (форма)
+        .on("click", ".add_payment", function(e){
+            e.preventDefault();
+            var userid = $(this).data("userid");
+            getPaymentPopup(userid, "client");
+        })
+        .on("click", ".popop_payment_submit", function(e){
+            e.preventDefault();
+            loaderOn();
+            var form = $("#createData");
+            if($(form).valid() == false)
+            {
+                loaderOff();
+                return;
+            }
+            var userid = $(this).data("userid");
+            var value = $(form).find("input[name=value]").val();
+            var description = $(form).find("textarea[name=description]").val();
+            var type = $(form).find("input[name=type]:checked").val();
+            savePayment(userid, value, description, type, "client", refreshUserTable);
         });
 });
+
+
+function getPaymentPopup(userid, url) {
+    $.ajax({
+        type: "GET",
+        url: url,
+        data: {
+            action: "getPaymentPopup",
+            userid: userid
+        },
+        success: function(responce) {
+            showPopup(responce);
+        }
+    });
+}
 
 
 function refreshUserTable() {
