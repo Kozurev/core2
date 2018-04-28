@@ -3,10 +3,18 @@ $(function(){
         .on("click", ".lid_submit", function(e){
             e.preventDefault();
             loaderOn();
-            var form = $("form[name='lid_form']");
-            var data = $(form).serialize();
-            //saveData("./admin?menuTab=User&menuAction=updateAction&ajax=1", refreshLidTable);
-            saveLid(data);
+            //Неработает serialize после перезагрузки контента
+            //var form = $("form[name='lid_form']");
+            //var data = $(form).serialize();
+            var data = "";
+            data += "surname="+$("input[name=surname]").val();
+            data += "&comment="+$("input[name=comment]").val();
+            data += "&name="+$("input[name=name]").val();
+            data += "&number="+$("input[name=number]").val();
+            data += "&vk="+$("input[name=vk]").val();
+            data += "&control_date="+$("input[name=control_date]").val();
+            data += "&source="+$("input[name=source]").val();
+            saveLid(data, refreshLidTable);
         })
         .on("click", ".add_lid_comment", function(e){
             e.preventDefault();
@@ -63,13 +71,13 @@ function getCommentPopup(lidid){
 }
 
 
-function saveLid(data){
+function saveLid(data, func){
     $.ajax({
         type: "GET",
         url: "lids?action=save_lid",
         data: data,
         success: function(responce){
-            refreshLidTable();
+            func();
         }
     });
 }
