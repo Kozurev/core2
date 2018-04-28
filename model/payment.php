@@ -11,6 +11,7 @@ class Payment extends Payment_Model
     public function save($obj = null)
     {
         Core::notify(array(&$this), "beforePaymentSave");
+        if($this->datetime == "")   $this->datetime = date("Y-m-d");
         parent::save();
         Core::notify(array(&$this), "afterPaymentSave");
     }
