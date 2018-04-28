@@ -18,8 +18,8 @@ class Admin_Menu_Payment
             ->select(array("Payment.id as id", "Payment.datetime as datetime", "Payment.value as value",
                 "User.name", "User.surname", "Payment.type"))
             ->join("User", "User.id = Payment.user")
-            ->orderBy("Payment.datetime", "DESC")
-            ->where("value", ">", "1");
+            ->orderBy("Payment.datetime", "DESC");
+            //->where("value", ">", "1");
 
 
         /**
