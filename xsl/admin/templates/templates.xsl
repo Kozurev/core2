@@ -12,8 +12,9 @@
                     <th>id</th>
                     <th>Название</th>
                     <th>Описание</th>
-                    <th>Редактировать</th>
-                    <th>Удалить</th>
+                    <th>Действия</th>
+                    <!--<th>Редактировать</th>-->
+                    <!--<th>Удалить</th>-->
                 </tr>
                 <xsl:apply-templates select="page_template_dir" />
                 <xsl:apply-templates select="page_template" />
@@ -54,11 +55,13 @@
 
             <td></td>
 
-            <!--Редактирование-->
-            <td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Page_Template&amp;parent_id={parent_id}&amp;dir_id={//dir_id}&amp;model_id={id}" class="link updateLink" /></td>
 
-            <!--Удаление-->
-            <td><a href="admin" data-model_name="Page_Template" data-model_id="{id}" class="delete deleteLink"></a></td>
+            <td>
+                <!--Редактирование-->
+                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Page_Template&amp;parent_id={parent_id}&amp;dir_id={//dir_id}&amp;model_id={id}" class="link updateLink" />
+                <!--Удаление-->
+                <a href="admin" data-model_name="Page_Template" data-model_id="{id}" class="delete deleteLink"></a>
+            </td>
         </tr>
     </xsl:template>
 
@@ -74,11 +77,12 @@
 
             <td></td>
 
-            <!--Редактирование-->
-            <td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Page_Template_Dir&amp;parent_id=0&amp;dir_id={id}&amp;model_id={id}" class="link updateLink" /></td>
-
-            <!--Удаление-->
-            <td><a href="admin" data-model_name="Page_Template_Dir" data-model_id="{id}" class="delete deleteLink"></a></td>
+            <td>
+                <!--Редактирование-->
+                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Page_Template_Dir&amp;parent_id=0&amp;dir_id={id}&amp;model_id={id}" class="link updateLink" />
+                <!--Удаление-->
+                <a href="admin" data-model_name="Page_Template_Dir" data-model_id="{id}" class="delete deleteLink"></a>
+            </td>
         </tr>
     </xsl:template>
 

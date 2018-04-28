@@ -18,8 +18,9 @@
                     <xsl:otherwise>
                         <th>id</th>
                         <th>Значение</th>
-                        <th>Редактировать</th>
-                        <th>Удалить</th>
+                        <th>Действия</th>
+                        <!--<th>Редактировать</th>-->
+                        <!--<th>Удалить</th>-->
                         <xsl:apply-templates select="property_list_values" />
                     </xsl:otherwise>
                 </xsl:choose>
@@ -66,10 +67,13 @@
         <tr>
             <td><xsl:value-of select="id" /></td>
             <td><xsl:value-of select="value" /></td>
-            <!--Редактирование-->
-            <td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property_List_Values&amp;model_id={id}&amp;parent_id={property_id}" class="link updateLink" /></td>
-            <!--Удаление-->
-            <td><a href="admin" data-model_name="Property_List_Values" data-model_id="{id}" class="delete deleteLink"></a></td>
+
+            <td>
+                <!--Редактирование-->
+                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property_List_Values&amp;model_id={id}&amp;parent_id={property_id}" class="link updateLink" />
+                <!--Удаление-->
+                <a href="admin" data-model_name="Property_List_Values" data-model_id="{id}" class="delete deleteLink"></a>
+            </td>
         </tr>
     </xsl:template>
 

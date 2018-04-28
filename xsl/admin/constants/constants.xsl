@@ -12,8 +12,9 @@
 				<th>Заголовок</th>
 				<th>Название</th>
 				<th>Активность</th>
-				<th>Редактировать</th>
-				<th>Удалить</th>
+				<th>Действия</th>
+				<!--<th>Редактировать</th>-->
+				<!--<th>Удалить</th>-->
 				<xsl:apply-templates select="constant_dir" />
 				<xsl:apply-templates select="constant" />
 			</table>
@@ -72,11 +73,13 @@
 			<!--Активность-->
 			<td></td>
 
-			<!--Редактирование-->
-			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant_Dir&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
 
-			<!--Удаление-->
-			<td><a href="admin" data-model_name="Constant_Dir" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td>
+				<!--Редактирование-->
+				<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant_Dir&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" />
+				<!--Удаление-->
+				<a href="admin" data-model_name="Constant_Dir" data-model_id="{id}" class="delete deleteLink"></a>
+			</td>
 		</tr>
 	</xsl:template>
 

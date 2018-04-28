@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE xsl:stylesheet>
-<xsl:stylesheet version="1.0"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output xmlns="http://www.w3.org/TR/xhtml1/strict" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" encoding="utf-8" indent="yes" method="html" omit-xml-declaration="no" version="1.0" media-type="text/xml"/>
-
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:template match="root">
 		<div class="in_main">
@@ -45,8 +42,10 @@
 			</td>
 
 			<td><xsl:value-of select="model_name" /></td>
-			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Admin_Form_Modelname&amp;model_id={id}" class="link updateLink" /></td>
-			<td><a href="admin" data-model_name="Admin_Form_Modelname" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td>
+				<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Admin_Form_Modelname&amp;model_id={id}" class="link updateLink" />
+				<a href="admin" data-model_name="Admin_Form_Modelname" data-model_id="{id}" class="delete deleteLink"></a>
+			</td>
 		</tr>
 	</xsl:template>
 
@@ -66,8 +65,10 @@
 				</input>
 			</td>
 
-			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Admin_Form&amp;model_id={id}" class="link updateLink" /></td>
-			<td><a href="admin" data-model_name="Admin_Form" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td>
+				<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Admin_Form&amp;model_id={id}" class="link updateLink" />
+				<a href="admin" data-model_name="Admin_Form" data-model_id="{id}" class="delete deleteLink"></a>
+			</td>
 		</tr>
 	</xsl:template>
 

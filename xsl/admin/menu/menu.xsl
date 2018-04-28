@@ -13,8 +13,9 @@
                     <th>Название</th>
                     <th>Модель</th>
                     <th>Активность</th>
-                    <th>Редактировать</th>
-                    <th>Удалить</th>
+                    <th>Действия</th>
+                    <!--<th>Редактировать</th>-->
+                    <!--<th>Удалить</th>-->
                 </tr>
                 <xsl:apply-templates select="admin_menu" />
             </table>
@@ -49,10 +50,10 @@
                 </input>
             </td>
 
-            <td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Admin_Menu&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" /></td>
-
-            <!--Удаление-->
-            <td><a href="admin" data-model_name="Admin_Menu" data-model_id="{id}" class="delete deleteLink"></a></td>
+            <td>
+                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Admin_Menu&amp;parent_id={parent_id}&amp;model_id={id}" class="link updateLink" />
+                <a href="admin" data-model_name="Admin_Menu" data-model_id="{id}" class="delete deleteLink"></a>
+            </td>
         </tr>
     </xsl:template>
 

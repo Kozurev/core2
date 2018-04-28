@@ -46,8 +46,9 @@
             <td class="{$class}"><xsl:value-of select="value" /></td>
             <!--<td class="{$class}"><xsl:value-of select="description" /></td>-->
             <td class="{$class}">
+                <xsl:value-of select="description" />
                 <xsl:for-each select="notes">
-                    <xsl:value-of select="value" /><br/>
+                    <br/><xsl:value-of select="value" />
                 </xsl:for-each>
             </td>
             <td class="{$class}" style="text-align:center">

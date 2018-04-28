@@ -2,26 +2,13 @@
 
     <xsl:template match="root">
 
-        <script>
-            $(function(){
-                $("#createData").validate({
-                    rules: {
-
-                    },
-                    messages: {
-
-                    }
-                });
-            });
-        </script>
-
         <table class="table lids">
             <form name="lid_form">
                 <tr>
                     <td class="date"><input type="date" class="form-control date_inp"    name="control_date"/></td>
                     <td class="string"><input type="text" class="form-control" name="surname"  placeholder="Фамилия"/></td>
                     <td class="string"><input type="text" class="form-control" name="name"     placeholder="Имя"/></td>
-                    <td class="string"><input type="text" class="form-control" name="phone"    placeholder="Телефон"/></td>
+                    <td class="string"><input type="text" class="form-control" name="number"   placeholder="Телефон"/></td>
                     <td class="string"><input type="text" class="form-control" name="vk"       placeholder="Ссылка вк"/></td>
                     <td class="string"><input type="text" class="form-control" name="source"   placeholder="Источник"/></td>
                     <td class="last"><button class="btn btn-success lid_submit">Добавить</button></td>
@@ -54,17 +41,17 @@
 
         <xsl:variable name="status">
             <xsl:choose>
-                <xsl:when test="property_value/id = 80">
-                    not_choose
+                <xsl:when test="property_value/id = '83'">
+                    agree
                 </xsl:when>
-                <xsl:when test="property_value/id = 81">
+                <xsl:when test="property_value/id = '81'">
                     consult_wait
                 </xsl:when>
-                <xsl:when test="property_value/id = 82">
+                <xsl:when test="property_value/id = '82'">
                     consult_was
                 </xsl:when>
                 <xsl:otherwise>
-                    agree
+                    not_choose
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
@@ -77,7 +64,7 @@
             </td>
             <td class="string"><xsl:value-of select="surname" /></td>
             <td class="string"><xsl:value-of select="name" /></td>
-            <td class="string"><xsl:value-of select="phone" /></td>
+            <td class="string"><xsl:value-of select="number" /></td>
             <td class="string"><xsl:value-of select="vk" /></td>
             <td class="string"><xsl:value-of select="source" /></td>
             <td class="last">

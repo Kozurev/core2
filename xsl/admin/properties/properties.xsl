@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE xsl:stylesheet>
-<xsl:stylesheet version="1.0"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output xmlns="http://www.w3.org/TR/xhtml1/strict" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" encoding="utf-8" indent="yes" method="html" omit-xml-declaration="no" version="1.0" media-type="text/xml"/>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 
 	<xsl:template match="root">
@@ -17,8 +15,9 @@
 				<th>Описание</th>
 				<th>Тип</th>
 				<th>Активность</th>
-				<th>Редактировать</th>
-				<th>Удалить</th>
+				<th>Действия</th>
+				<!--<th>Редактировать</th>-->
+				<!--<th>Удалить</th>-->
 				<xsl:apply-templates select="property_dir" />
 				<xsl:apply-templates select="property" />
 			</table>
@@ -65,10 +64,13 @@
 			<td></td>
 			<!--Активность-->
 			<td></td>
-			<!--Редактирование-->
-			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property_Dir&amp;model_id={id}" class="link updateLink" /></td>
-			<!--Удаление-->
-			<td><a href="admin" data-model_name="Property_Dir" data-model_id="{id}" class="delete deleteLink"></a></td>
+
+			<td>
+				<!--Редактирование-->
+				<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property_Dir&amp;model_id={id}" class="link updateLink" />
+				<!--Удаление-->
+				<a href="admin" data-model_name="Property_Dir" data-model_id="{id}" class="delete deleteLink"></a>
+			</td>
 		</tr>
 	</xsl:template>
 
@@ -90,11 +92,13 @@
 				</input>
 			</td>
 
-			<!--Редактирование-->
-			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property&amp;model_id={id}" class="link updateLink" /></td>
 
-			<!--Удаление-->
-			<td><a href="admin" data-model_name="Property" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td>
+				<!--Редактирование-->
+				<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Property&amp;model_id={id}" class="link updateLink" />
+				<!--Удаление-->
+				<a href="admin" data-model_name="Property" data-model_id="{id}" class="delete deleteLink"></a>
+			</td>
 		</tr>
 	</xsl:template>
 

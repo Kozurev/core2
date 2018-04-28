@@ -13,9 +13,10 @@
 				<th>Название</th>
 				<th>Активность</th>
 				<th>Путь</th>
-				<th>Доп. св-ва</th>
-				<th>Редактировать</th>
-				<th>Удалить</th>
+				<th>Действия</th>
+				<!--<th>Доп. св-ва</th>-->
+				<!--<th>Редактировать</th>-->
+				<!--<th>Удалить</th>-->
 				<xsl:apply-templates select="structure" />
 				<xsl:apply-templates select="structure_item" />
 			</table>
@@ -72,13 +73,14 @@
 			<!--Путь-->
 			<td><xsl:value-of select="path" /></td>
 
-			<td><a href="admin?menuTab=Properties&amp;menuAction=show&amp;model_name=Structure&amp;model_id={id}" class="link propertiesLink" /></td>
-
-			<!--Редактирование-->
-			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}&amp;model_id={id}&amp;parent_name=Structure" class="link updateLink" /></td>
-
-			<!--Удаление-->
-			<td><a href="admin" data-model_name="Structure" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td>
+				<!--Доп свойства-->
+				<a href="admin?menuTab=Properties&amp;menuAction=show&amp;model_name=Structure&amp;model_id={id}" class="link propertiesLink" />
+				<!--Редактирование-->
+				<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure&amp;parent_id={parent_id}&amp;model_id={id}&amp;parent_name=Structure" class="link updateLink" />
+				<!--Удаление-->
+				<a href="admin" data-model_name="Structure" data-model_id="{id}" class="delete deleteLink"></a>
+			</td>
 		</tr>
 	</xsl:template>
 
@@ -103,13 +105,13 @@
 
 			<td><xsl:value-of select="path" /></td>
 
-			<td></td>
 
-			<!--Редактирование-->
-			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}&amp;model_id={id}&amp;parent_name=Structure" class="link updateLink" /></td>
-
-			<!--Удаление-->
-			<td><a href="admin" data-model_name="Structure_Item" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td>
+				<!--Редактирование-->
+				<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Structure_Item&amp;parent_id={parent_id}&amp;model_id={id}&amp;parent_name=Structure" class="link updateLink" />
+				<!--Удаление-->
+				<a href="admin" data-model_name="Structure_Item" data-model_id="{id}" class="delete deleteLink"></a>
+			</td>
 		</tr>
 	</xsl:template>
 

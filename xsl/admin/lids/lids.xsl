@@ -14,8 +14,7 @@
                 <th>ВК</th>
                 <th>Дата</th>
                 <th>Статус</th>
-                <th></th>
-                <th></th>
+                <th>Действия</th>
                 <xsl:apply-templates select="lid" />
             </table>
 
@@ -32,6 +31,7 @@
                     <th>Автор</th>
                     <th>Дата</th>
                     <th>Текст</th>
+                    <th>Действия</th>
                     <xsl:apply-templates select="lid_comment" />
                 </table>
 
@@ -78,11 +78,13 @@
             <td><xsl:value-of select="control_date" /></td>
             <td><xsl:value-of select="status/value" /></td>
 
-            <!--Редактирование-->
-            <td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Lid&amp;model_id={id}" class="link updateLink" /></td>
 
-            <!--Удаление-->
-            <td><a href="admin" data-model_name="Lid" data-model_id="{id}" class="delete deleteLink"></a></td>
+            <td>
+                <!--Редактирование-->
+                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Lid&amp;model_id={id}" class="link updateLink" />
+                <!--Удаление-->
+                <a href="admin" data-model_name="Lid" data-model_id="{id}" class="delete deleteLink"></a>
+            </td>
         </tr>
     </xsl:template>
 
@@ -100,11 +102,12 @@
             <td><xsl:value-of select="datetime" /></td>
             <td><xsl:value-of select="text" /></td>
 
-            <!--Редактирование-->
-            <td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Lid&amp;model_id={id}" class="link updateLink" /></td>
-
-            <!--Удаление-->
-            <td><a href="admin" data-model_name="Lid_Comment" data-model_id="{id}" class="delete deleteLink"></a></td>
+            <td>
+                <!--Редактирование-->
+                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Lid&amp;model_id={id}" class="link updateLink" />
+                <!--Удаление-->
+                <a href="admin" data-model_name="Lid_Comment" data-model_id="{id}" class="delete deleteLink"></a>
+            </td>
         </tr>
     </xsl:template>
 

@@ -11,8 +11,9 @@
                 <tr>
                     <th>id</th>
                     <th>Название</th>
-                    <th>Редактирование</th>
-                    <th>Удаление</th>
+                    <th>Действия</th>
+                    <!--<th>Редактирование</th>-->
+                    <!--<th>Удаление</th>-->
                 </tr>
                 <xsl:apply-templates select="schedule_group" />
             </table>
@@ -29,7 +30,7 @@
                 <tr>
                     <th>id</th>
                     <th>ФИО</th>
-                    <th>Удалить</th>
+                    <th>Действия</th>
                 </tr>
                 <xsl:apply-templates select="schedule_group_assignment" />
             </table>
@@ -64,10 +65,13 @@
                 </a>
             </td>
 
-            <!--Редактирование-->
-            <td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Schedule_Group&amp;model_id={id}" class="link updateLink" /></td>
-            <!--Удаление-->
-            <td><a href="admin" data-model_name="Schedule_Group" data-model_id="{id}" class="delete deleteLink"></a></td>
+
+            <td>
+                <!--Редактирование-->
+                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Schedule_Group&amp;model_id={id}" class="link updateLink" />
+                <!--Удаление-->
+                <a href="admin" data-model_name="Schedule_Group" data-model_id="{id}" class="delete deleteLink"></a>
+            </td>
         </tr>
     </xsl:template>
 
