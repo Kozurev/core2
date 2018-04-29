@@ -142,6 +142,7 @@ function savePayment(userid, value, description, type, url, func) {
     $.ajax({
         type: "GET",
         url: url,
+        async: false,
         data: {
             action: "savePayment",
             userid: userid,
@@ -151,8 +152,8 @@ function savePayment(userid, value, description, type, url, func) {
         },
         success: function(responce){
             if(responce != "0") alert("Ошибка: " + responce);
-            func();
             closePopup();
+            func();
         }
     });
 }

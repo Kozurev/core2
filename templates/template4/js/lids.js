@@ -44,6 +44,7 @@ function refreshLidTable(){
     $.ajax({
         type: "GET",
         url: "lids",
+        async: false,
         data: {
             action: "refreshLidTable"
         },
@@ -75,6 +76,7 @@ function saveLid(data, func){
     $.ajax({
         type: "GET",
         url: "lids?action=save_lid",
+        async: false,
         data: data,
         success: function(responce){
             func();

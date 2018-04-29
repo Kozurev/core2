@@ -28,6 +28,7 @@ function refreshGroupTable(){
     $.ajax({
         type: "GET",
         url: "groups",
+        async: false,
         data: {
             action: "refreshGroupTable",
         },
