@@ -10,12 +10,11 @@
                     </xsl:call-template>
                 </td>
                 <td>
-                    <button class="btn btn-success btn_balance" data-userid="{user/id}">
-                        <xsl:if test="user_group/id = 5">
-                            <xsl:attribute name="disabled">disabled</xsl:attribute>
-                        </xsl:if>
-                        Пополнить баланс
-                    </button>
+                    <xsl:if test="user_group/id != 5">
+                        <button class="btn btn-success btn_balance" data-userid="{user/id}">
+                            Пополнить баланс
+                        </button>
+                    </xsl:if>
                 </td>
             </tr>
 
