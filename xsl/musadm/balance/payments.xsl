@@ -20,7 +20,9 @@
                     <th class="header">Дата</th>
                     <th class="header">Сумма</th>
                     <th>Примечание</th>
-                    <th></th>
+                    <xsl:if test="user_group/id != 5">
+                        <th></th>
+                    </xsl:if>
                 </tr>
             </thead>
 
@@ -51,9 +53,13 @@
                     <br/><xsl:value-of select="value" />
                 </xsl:for-each>
             </td>
-            <td class="{$class}" style="text-align:center">
-                <button class="btn btn-success payment_add_note" data-modelid="{./id}">Добавить примечание</button>
-            </td>
+            <xsl:if test="//user_group/id != 5">
+                <td class="{$class}" style="text-align:center">
+                    <button class="btn btn-success payment_add_note" data-modelid="{./id}">
+                        Добавить примечание
+                    </button>
+                </td>
+            </xsl:if>
         </tr>
     </xsl:template>
 
