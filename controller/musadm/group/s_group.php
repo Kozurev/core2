@@ -62,6 +62,7 @@ if($action == "saveGroup")
 {
     $modelId =      Core_Array::getValue($_GET, "id", 0);
     $teacherId =    Core_Array::getValue($_GET, "teacher_id", 0);
+    $duration =     Core_Array::getValue($_GET, "duration", "00:00");
     $aClientIds =   Core_Array::getValue($_GET, "clients", null);
     $title =        Core_Array::getValue($_GET, "title", null);
 
@@ -77,8 +78,11 @@ if($action == "saveGroup")
 
     $oGroup
         ->title($title)
+        ->duration($duration)
         ->teacherId($teacherId);
     $oGroup->save();
 
+    if(!is_null($aClientIds))
     foreach ($aClientIds as $clientid)  $oGroup->appendClient($clientid);
+    exit;
 }

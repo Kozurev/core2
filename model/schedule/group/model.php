@@ -11,6 +11,7 @@ class Schedule_Group_Model extends Core_Entity
     protected $id;
     protected $teacher_id;
     protected $title;
+    protected $duration;
 
 
     public function __construct(){}
@@ -35,6 +36,14 @@ class Schedule_Group_Model extends Core_Entity
         if(strlen($val) > 255)
             die(Core::getMessage("TOO_LARGE_VALUE", array("title", "Schedule_Group", 255)));
         $this->title = strval($val);
+        return $this;
+    }
+
+
+    public function duration($val = null)
+    {
+        if(is_null($val))   return $this->duration;
+        $this->duration = $val;
         return $this;
     }
 
