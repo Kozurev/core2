@@ -60,7 +60,7 @@ $(function(){
             var userid = $(this).data("userid");
             getPaymentPopup(userid, "client");
         })
-        .on("click", ".popop_payment_submit", function(e){
+        .on("click", ".popop_user_payment_submit", function(e){
             e.preventDefault();
             loaderOn();
             var form = $("#createData");
@@ -74,8 +74,31 @@ $(function(){
             var description = $(form).find("textarea[name=description]").val();
             var type = $(form).find("input[name=type]:checked").val();
             savePayment(userid, value, description, type, "client", refreshUserTable);
+        })
+        .on("blur", "#client_notes", function(){
+            loaderOn();
+            var note = $(this).val();
+            var userid = $(this).data("userid");
+            updateUserNote(userid, note, loaderOff);
         });
 });
+
+
+function updateUserNote(userid, note, func) {
+    $.ajax({
+        type: "GET",
+        url: "balance",
+        data: {
+            action: "updateNote",
+            userid: userid,
+            note: note
+        },
+        success: function(responce){
+            func();
+            if(responce != "")  alert(responce);
+        }
+    });
+}
 
 
 function getPaymentPopup(userid, url) {
@@ -97,6 +120,7 @@ function refreshUserTable() {
     $.ajax({
         type: "GET",
         url: "",
+        async: false,
         data: {
             action: "refreshTableUsers",
             //group: groupid
