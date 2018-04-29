@@ -34,8 +34,8 @@ class Admin_Menu_Payment
 
             foreach ($data as $word)
                 $aoUsersId
-                    ->where("name", "like", $word)
-                    ->where("surname", "like", $word, "or");
+                    ->where("`name`", "like", "%".$word."%")
+                    ->where("`surname`", "like", "%".$word."%", "or");
 
             $aoUsers = $aoUsersId->select("id")->findAll();
             $aoUsersId = array();
