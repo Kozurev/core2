@@ -46,6 +46,15 @@
                 </select>
             </div>
             <hr/>
+
+            <div class="column">
+                <span>Длительность урока</span>
+            </div>
+            <div class="column">
+                <input type="time" name="duration" class="form-control" value="{schedule_group/duration}" />
+            </div>
+            <hr/>
+
             <div class="column">
                 <span>Состав группы</span>
             </div>
