@@ -12,6 +12,7 @@
                     <th>id</th>
                     <th class="header">Название</th>
                     <th>Учитель</th>
+                    <th>Длительность</th>
                     <th>Состав группы</th>
                     <th>Действия</th>
                 </tr>
@@ -35,6 +36,7 @@
                     <xsl:value-of select="user[id = $teacher]/name" />
                 </a>
             </td>
+            <td><xsl:value-of select="duration" /></td>
             <td>
                 <xsl:for-each select="user[id != $teacher]" >
                     <a href="./?userid={id}">
