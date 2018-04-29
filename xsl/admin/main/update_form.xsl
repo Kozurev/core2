@@ -177,13 +177,38 @@
 			<span><xsl:value-of select="title" /></span>
 
 			<!--Вызов подшаблона для формирования поля формата input-->
-			<xsl:if test="type_id = 1 or type_id = 2 or type_id = 3 or type_id = 6 or type_id = 7">
+			<xsl:choose>
+				<xsl:when test="type_id = 4">
+					<xsl:call-template name="select">
+				        <xsl:with-param name="var_name" select="$var_name"/>
+				        <xsl:with-param name="value" select="$value" />
+				     </xsl:call-template>
+				</xsl:when>
+				<xsl:when test="type_id = 5">
+					<xsl:call-template name="textarea">
+				        <xsl:with-param name="maxlength" select="$maxlength"/>
+				        <xsl:with-param name="var_name" select="$var_name"/>
+				        <xsl:with-param name="value" select="$value" />
+				     </xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:call-template name="input">
+				        <xsl:with-param name="inp_type" select="$inp_type"/>
+				        <xsl:with-param name="maxlength" select="$maxlength"/>
+				        <xsl:with-param name="var_name" select="$var_name"/>
+				        <xsl:with-param name="value" select="$value" />
+				     </xsl:call-template>
+				</xsl:otherwise>
+			</xsl:choose>
+
+
+			
+<!-- 			<xsl:if test="type_id = 1 or type_id = 2 or type_id = 3 or type_id = 6 or type_id = 7">
 				<xsl:call-template name="input">
 			        <xsl:with-param name="inp_type" select="$inp_type"/>
 			        <xsl:with-param name="maxlength" select="$maxlength"/>
 			        <xsl:with-param name="var_name" select="$var_name"/>
 			        <xsl:with-param name="value" select="$value" />
-			        <!--<xsl:with-param name="required" select="$required" />-->
 			     </xsl:call-template>
 			</xsl:if>
 
@@ -192,7 +217,6 @@
 			        <xsl:with-param name="maxlength" select="$maxlength"/>
 			        <xsl:with-param name="var_name" select="$var_name"/>
 			        <xsl:with-param name="value" select="$value" />
-					<!--<xsl:with-param name="required" select="$required" />-->
 			     </xsl:call-template>
 			</xsl:if>
 
@@ -201,7 +225,7 @@
 			        <xsl:with-param name="var_name" select="$var_name"/>
 			        <xsl:with-param name="value" select="$value" />
 			     </xsl:call-template>
-			</xsl:if>
+			</xsl:if> -->
 
 		</div>
 	</xsl:template>
@@ -244,7 +268,67 @@
 		<div class="form_block">
 			<span><xsl:value-of select="title" /></span><br/>
 
-			<xsl:if test="type='int' or type='float' or type='string' or type='bool'">
+
+			<xsl:choose>
+				<xsl:when test="type='list'">
+					<xsl:for-each select="property_value">
+						<xsl:variable name="selected_option_id" select="value_id" />
+						<div class="field">
+							<xsl:call-template name="select">
+								<xsl:with-param name="var_name" select="$var_name" />
+								<xsl:with-param name="value" select="$selected_option_id" />
+								<xsl:with-param name="addClass" select="$class_name" />
+							</xsl:call-template>
+
+							<xsl:if test="position() != 1">
+								<div class="delete_block"></div>
+							</xsl:if>
+						</div>
+					</xsl:for-each>
+				</xsl:when>
+				<xsl:when test="type='text'">
+					<xsl:for-each select="property_value">
+						<xsl:variable name="value" select="value" />
+						<xsl:variable name="appendedClass">property_field</xsl:variable>
+						<div class="field">
+							<xsl:call-template name="textarea">
+								<xsl:with-param name="maxlength" select="$maxlength"/>
+								<xsl:with-param name="var_name" select="$var_name"/>
+								<xsl:with-param name="value" select="$value" />
+								<xsl:with-param name="addClass" select="$appendedClass" />
+							</xsl:call-template>
+						    <xsl:if test="position() != 1">
+								<div class="delete_block"></div>
+						    </xsl:if>
+						</div>
+					</xsl:for-each>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:for-each select="property_value">
+						<xsl:variable name="value" select="value" />
+						<div class="field">
+							<xsl:call-template name="input">
+								<xsl:with-param name="inp_type" select="$inp_type"/>
+						        <xsl:with-param name="maxlength" select="$maxlength"/>
+						        <xsl:with-param name="var_name" select="$var_name"/>
+						        <xsl:with-param name="value" select="$value" />
+						        <xsl:with-param name="class" select="$class_name" />
+						     </xsl:call-template>
+						     
+						     <xsl:if test="position() != 1">
+								<div class="delete_block"></div>
+						     </xsl:if>
+						</div>
+					</xsl:for-each>
+				</xsl:otherwise>
+
+				<xsl:if test="multiple = 1">
+					<button class="add_new_value">Добавить значение</button>
+				</xsl:if>
+			</xsl:choose>
+
+
+		<!-- 	<xsl:if test="type='int' or type='float' or type='string' or type='bool'">
 				<xsl:for-each select="property_value">
 					<xsl:variable name="value" select="value" />
 					<div class="field">
@@ -255,20 +339,15 @@
 					        <xsl:with-param name="value" select="$value" />
 					        <xsl:with-param name="class" select="$class_name" />
 					     </xsl:call-template>
-
-					     <!--Кнопка удаления свойства-->
+					     
 					     <xsl:if test="position() != 1">
 							<div class="delete_block"></div>
 					     </xsl:if>
 					</div>
 				</xsl:for-each>
-
-				<!--<button class="add_new_value">Добавить значение</button>-->
 			</xsl:if>
 
 			<xsl:if test="type='list'">
-				<!--id выбранного варианта в списке-->
-
 				<xsl:for-each select="property_value">
 					<xsl:variable name="selected_option_id" select="value_id" />
 					<div class="field">
@@ -282,16 +361,13 @@
 							<div class="delete_block"></div>
 						</xsl:if>
 					</div>
-
 				</xsl:for-each>
-				<!--<button class="add_new_value">Добавить значение</button>-->
 			</xsl:if>
 
 			<xsl:if test="type='text'">
 				<xsl:for-each select="property_value">
 					<xsl:variable name="value" select="value" />
 					<xsl:variable name="appendedClass">property_field</xsl:variable>
-
 					<div class="field">
 						<xsl:call-template name="textarea">
 							<xsl:with-param name="maxlength" select="$maxlength"/>
@@ -299,20 +375,16 @@
 							<xsl:with-param name="value" select="$value" />
 							<xsl:with-param name="addClass" select="$appendedClass" />
 						</xsl:call-template>
-
-						<!--Кнопка удаления свойства-->
 					    <xsl:if test="position() != 1">
 							<div class="delete_block"></div>
 					    </xsl:if>
 					</div>
 				</xsl:for-each>
-
-				<!--<button class="add_new_value">Добавить значение</button>-->
 			</xsl:if>
 
 			<xsl:if test="multiple = 1">
 				<button class="add_new_value">Добавить значение</button>
-			</xsl:if>
+			</xsl:if> -->
 
 		</div>
 	</xsl:template>
