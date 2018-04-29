@@ -365,4 +365,42 @@ class Admin_Form extends Admin_Form_Model
         $this->addEntities($aoLids, "item");
     }
 
+
+    public function getListTarifAccess($aParams)
+    {
+        $dmin = new stdClass();
+        $dmin->title = "Только администратор";
+        $dmin->id = "0";
+        $this->addEntity($dmin, "item");
+
+        $all = new stdClass();
+        $all->title = "Все";
+        $all->id = "1";
+        $this->addEntity($all, "item");
+
+        $modelId = Core_Array::getValue($aParams, "model_id", 0);
+        if($modelId != 0)
+        {
+            $oTarif = Core::factory("Payment_Tarif", $modelId);
+            $this->value = $oTarif->access();
+        }
+        
+    }
+
+
+    public function getListLessonsTypes($aParams)
+    {
+        $indiv = new stdClass();
+        $indiv->title = "Индивидуальные";
+        $indiv->id = "1";
+        $this->addEntity($indiv, "item");
+
+        $group = new stdClass();
+        $group->title = "Групповые";
+        $group->id = "2";
+        $this->addEntity($group, "item");
+    }
+
+
+
 }
