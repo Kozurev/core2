@@ -129,20 +129,20 @@
             <div class="page">
 
         <?
-            if($oCurentUser->getId() < 4 && $oUser->groupId() == 5)
-            {
-                $oPropertyNotes = Core::factory("Property", 19);
-                $clienNotes = $oPropertyNotes->getPropertyValues($oUser);
+            // if($oCurentUser->getId() < 4 && $oUser->groupId() == 5)
+            // {
+            //     $oPropertyNotes = Core::factory("Property", 19);
+            //     $clienNotes = $oPropertyNotes->getPropertyValues($oUser);
 
-                $oPropertyLastEntry = Core::factory("Property", 22);
-                $lastEntry = $oPropertyLastEntry->getPropertyValues($oUser);
+            //     $oPropertyLastEntry = Core::factory("Property", 22);
+            //     $lastEntry = $oPropertyLastEntry->getPropertyValues($oUser);
 
-                Core::factory("Core_Entity")
-                    ->addEntities($clienNotes, "note")
-                    ->addEntities($lastEntry, "entry")
-                    ->xsl("musadm/client_notes.xsl")
-                    ->show();
-            }
+            //     Core::factory("Core_Entity")
+            //         ->addEntities($clienNotes, "note")
+            //         ->addEntities($lastEntry, "entry")
+            //         ->xsl("musadm/client_notes.xsl")
+            //         ->show();
+            // }
         ?>
 
                 <?$this->execute();?>
