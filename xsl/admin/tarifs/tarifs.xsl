@@ -40,13 +40,33 @@
         <tr>
             <td><xsl:value-of select="id" /></td>
             <td><xsl:value-of select="title" /></td>
+            <td><xsl:value-of select="price" /></td>
+            <td><xsl:value-of select="lessons_count" /></td>
 
+            <xsl:choose>
+                <xsl:when test="lessons_type = 1">
+                    <td>Индивидуальные</td>
+                </xsl:when>
+                <xsl:otherwise>
+                    <td>Групповые</td>
+                </xsl:otherwise>
+            </xsl:choose>
+            <!-- <td><xsl:value-of select="lessons_count" /></td> -->
+
+            <xsl:choose>
+                <xsl:when test="access = 0">
+                    <td>Администратор</td>
+                </xsl:when>
+                <xsl:otherwise>
+                    <td>Все пользователи</td>
+                </xsl:otherwise>
+            </xsl:choose>
 
             <td>
                 <!--Редактирование-->
-                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Lid&amp;model_id={id}" class="link updateLink" />
+                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Payment_Tarif&amp;model_id={id}" class="link updateLink" />
                 <!--Удаление-->
-                <a href="admin" data-model_name="Lid" data-model_id="{id}" class="delete deleteLink"></a>
+                <a href="admin" data-model_name="Payment_Tarif" data-model_id="{id}" class="delete deleteLink"></a>
             </td>
         </tr>
     </xsl:template>
