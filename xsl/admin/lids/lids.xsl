@@ -104,7 +104,7 @@
 
             <td>
                 <!--Редактирование-->
-                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Lid&amp;model_id={id}" class="link updateLink" />
+                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Lid_Comment&amp;model_id={id}&amp;parent_id={//parent_id}" class="link updateLink" />
                 <!--Удаление-->
                 <a href="admin" data-model_name="Lid_Comment" data-model_id="{id}" class="delete deleteLink"></a>
             </td>
