@@ -16,11 +16,17 @@ if(isset($_POST["login"]) && isset($_POST["password"]))
         ->login($_POST["login"])
         ->password($_POST["password"]);
 
-    if($oUser->authorize($rememberMe))
+    $oUser = $oUser->authorize($rememberMe);
+    if($oUser)
     {
         global $CFG;
-        $back = Core_Array::getValue($_GET, "back",  "/".$CFG->rootdir);
-        header("Location: http://".$back);
+
+        if($oUser->groupId() > 3)   $back = "/".$CFG->rootdir."schedule";
+        elseif($oUser->groupId() < 3)   $back = "/".$CFG->rootdir."user/client";
+
+
+        //$back = Core_Array::getValue($_GET, "back",  "/".$CFG->rootdir);
+        header("Location: ".$back);
     }
 }
 
