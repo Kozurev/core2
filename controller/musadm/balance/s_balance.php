@@ -27,6 +27,10 @@ if(!$oUser)
 
 $action = Core_Array::getValue($_GET, "action", "");
 
+
+/**
+ * Добавление комментария к платежу 
+ */
 if($action == "add_note")
 {
     $modelId = Core_Array::getValue($_GET,"model_id", 0);
@@ -36,12 +40,16 @@ if($action == "add_note")
     Core::factory("Core_Entity")
         ->addEntity($oPayment)
         ->addEntities($aoNotes, "notes")
-        ->xsl("musadm/balance/add_payment_note.xsl")
+        ->xsl("musadm/users/balance/add_payment_note.xsl")
         ->show();
 
     exit;
 }
 
+
+/**
+ * Обновление сожержимого страницы
+*/
 if($action == "refreshTablePayments")
 {
     $this->execute();
@@ -49,6 +57,9 @@ if($action == "refreshTablePayments")
 }
 
 
+/**
+ * Открытие 
+ */
 if($action == "getPaymentPopup")
 {
     $userId =   Core_Array::getValue($_GET, "userid", 0);
@@ -56,7 +67,7 @@ if($action == "getPaymentPopup")
 
     Core::factory("Core_Entity")
         ->addEntity($oUser)
-        ->xsl("musadm/balance/edit_payment_popup.xsl")
+        ->xsl("musadm/users/balance/edit_payment_popup.xsl")
         ->show();
 
     exit;
@@ -78,7 +89,7 @@ if($action == "getTarifPopup")
     Core::factory("Core_Entity")
         ->addEntity($oUser)
         ->addEntities($aoTarifs)
-        ->xsl("musadm/balance/buy_tarif_popup.xsl")
+        ->xsl("musadm/users/balance/buy_tarif_popup.xsl")
         ->show();
 
     exit;
