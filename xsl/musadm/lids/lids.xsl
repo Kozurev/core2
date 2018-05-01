@@ -2,6 +2,12 @@
 
     <xsl:template match="root">
 
+        <style>
+            .block {
+                border: 1px solid;
+            }
+        </style>
+
         <table class="table lids">
             <form name="lid_form">
                 <tr>
@@ -82,7 +88,7 @@
                 </select>
             </td>
         </tr>
-        <tr>
+        <tr class="{$status}">
             <td colspan="7">
                 <xsl:for-each select="lid_comment">
                     <xsl:variable name="author" select="author_id" />
@@ -103,6 +109,7 @@
                 <button class="btn btn-success add_lid_comment" data-lidid="{id}">Добавить комментарий</button>
             </td>
         </tr>
+
     </xsl:template>
 
 </xsl:stylesheet>

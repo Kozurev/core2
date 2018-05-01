@@ -26,6 +26,7 @@
         ->js("/templates/template4/js/payments.js")
         ->js("/templates/template4/js/groups.js")
         ->js("/templates/template4/js/lids.js")
+        ->js("/templates/template4/js/schedule.js")
         ->showJs();
     ?>
 
@@ -51,14 +52,16 @@
             $oUser = Core::factory("User", $pageUserId);
             $oUserGroup = Core::factory("User_Group", $oUser->groupId());
             $disauthorizeLink = $rootdir . "user/" . $oUserGroup->path();
-            $userId = "?userid=" . $oUser->getId();
+            $sUserId = "?userid=" . $oUser->getId();
+            $iUserId = $oUser->getId();
         }
         else
         {
             $oUser = $oCurentUser;
             $oUserGroup = Core::factory("User_Group", $oUser->groupId());
             $disauthorizeLink = $rootdir . "authorize?disauthorize=1&back=" . $back;
-            $userId = "";
+            $sUserId = "";
+            $iUserId = 0;
         }
 
 
@@ -78,8 +81,19 @@
                             <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$rootdir?>user">Расписание
                                 <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#" >Мичурина</a></li>
-                                <li><a href="#" >Щорса</a></li>
+<!--                                <li><a href="--><?//=$rootdir?><!--schedule?area=1" >Мичурина</a></li>-->
+<!--                                <li><a href="--><?//=$rootdir?><!--schedule?area=2" >Щорса</a></li>-->
+                                <?
+                                $aoAreas = Core::factory("Schedule_Area")->findAll();
+                                foreach ($aoAreas as $area)
+                                {
+                                    $href = $rootdir . "schedule?area=" . $area->getId();
+                                    if($iUserId != 0)   $href .= "&userid=" . $iUserId;
+                                    echo "<li><a href='".$href."'>";
+                                    echo $area->title();
+                                    echo "</a></li>";
+                                }
+                                ?>
                             </ul>
                         </li>
                         <?
@@ -87,7 +101,7 @@
                         if(!$isAdmin && $oUserGroup->getId() == 5)
                         {
                             ?>
-                            <li><a href="<?=$rootdir?>balance<?=$userId?>" >Баланс</a></li>
+                            <li><a href="<?=$rootdir?>user/balance<?=$sUserId?>" >Баланс</a></li>
                             <li><a href="#" >Сменить логин или пароль</a></li>
                             <?
                         }
@@ -127,24 +141,6 @@
             </nav>
 
             <div class="page">
-
-        <?
-            // if($oCurentUser->getId() < 4 && $oUser->groupId() == 5)
-            // {
-            //     $oPropertyNotes = Core::factory("Property", 19);
-            //     $clienNotes = $oPropertyNotes->getPropertyValues($oUser);
-
-            //     $oPropertyLastEntry = Core::factory("Property", 22);
-            //     $lastEntry = $oPropertyLastEntry->getPropertyValues($oUser);
-
-            //     Core::factory("Core_Entity")
-            //         ->addEntities($clienNotes, "note")
-            //         ->addEntities($lastEntry, "entry")
-            //         ->xsl("musadm/client_notes.xsl")
-            //         ->show();
-            // }
-        ?>
-
                 <?$this->execute();?>
             </div>
         </div>
