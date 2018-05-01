@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Апр 29 2018 г., 14:54
+-- Время создания: Май 02 2018 г., 01:20
 -- Версия сервера: 5.5.53
 -- Версия PHP: 7.0.14
 
@@ -149,7 +149,19 @@ INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `t
 (106, 23, 'Цена', 'price', 0, 1, 1, 1, 20, '', ''),
 (107, 23, 'Кол-во уроков', 'lessonsCount', 0, 1, 1, 1, 30, '', ''),
 (108, 23, 'Видимость', 'access', 0, 4, 1, 0, 50, 'TarifAccess', ''),
-(109, 23, 'Тип уроков', 'lessonsType', 0, 4, 1, 0, 50, 'LessonsTypes', '');
+(109, 23, 'Тип уроков', 'lessonsType', 0, 4, 1, 0, 50, 'LessonsTypes', ''),
+(110, 24, 'Название', 'title', 255, 2, 1, 1, 10, '', ''),
+(111, 24, 'Количество классов', 'countClassess', 0, 1, 1, 1, 20, '', ''),
+(112, 25, 'Дата добавление (с какого числа урок актуален)', 'insertDate', 0, 7, 1, 0, 10, '', ''),
+(113, 25, 'Дата удаления (с какого числа урок не актуален)', 'deleteDate', 0, 7, 1, 0, 20, '', ''),
+(114, 25, 'Время начала урока', 'timeFrom', 0, 8, 1, 1, 30, '', ''),
+(115, 25, 'Время конца урока', 'timeTo', 0, 8, 1, 1, 40, '', ''),
+(116, 25, 'Название дня недели', 'dayName', 0, 4, 1, 0, 50, 'DayNames', ''),
+(117, 25, 'Филлиал', 'areaId', 0, 4, 1, 0, 60, 'Areas', ''),
+(118, 25, 'Номер класса', 'classId', 0, 1, 1, 1, 70, '', ''),
+(119, 25, 'Учитель', 'teacherId', 0, 4, 1, 0, 80, 'Teachers', ''),
+(120, 25, 'Ученик', 'clientId', 0, 4, 1, 0, 90, 'Clients', ''),
+(121, 25, 'Группа', 'groupId', 0, 4, 1, 0, 100, 'Groups', '');
 
 -- --------------------------------------------------------
 
@@ -189,7 +201,9 @@ INSERT INTO `Admin_Form_Modelname` (`id`, `model_name`, `model_title`, `model_so
 (20, 'Schedule_Group_Assignment', 'Принадлежность клиента группе (рассписание)', 130, 1),
 (21, 'Lid', 'Лиды', 140, 1),
 (22, 'Lid_Comment', 'Комментарии к лидам', 160, 1),
-(23, 'Payment_Tarif', 'Тарифы', 115, 1);
+(23, 'Payment_Tarif', 'Тарифы', 115, 1),
+(24, 'Schedule_Area', 'Филлиал', 170, 1),
+(25, 'Schedule_Lesson', 'Расписание \"Основное\"', 180, 1);
 
 -- --------------------------------------------------------
 
@@ -246,15 +260,19 @@ INSERT INTO `Admin_Menu` (`id`, `title`, `model`, `parent_id`, `active`, `sortin
 (8, 'Musicmethod', 'Musicmethod', 0, 1, 10),
 (9, 'Платежи', 'Payment', 8, 1, 10),
 (11, 'Лиды', 'Lid', 8, 1, 30),
-(12, 'Сертификаты', 'Sertificates', 8, 0, 40),
+(12, 'Сертификаты', 'Sertificates', 8, 1, 40),
 (13, 'Дополнительные свойства', 'Property', 7, 1, 45),
 (14, 'Списки', 'List', 7, 1, 42),
-(15, 'Задачи', 'Task', 8, 0, 20),
-(16, 'Журнал изменений', 'Log', 8, 0, 50),
+(15, 'Задачи', 'Task', 8, 1, 20),
+(16, 'Журнал изменений', 'Log', 8, 1, 50),
 (17, 'Пункты админ. меню', 'Menu', 7, 1, 60),
-(18, 'Статистика', 'Statistic', 8, 0, 5),
-(19, 'Группы', 'Groups', 8, 1, 35),
-(20, 'Тарифы', 'Tarif', 8, 1, 15);
+(18, 'Статистика', 'Statistic', 8, 1, 5),
+(19, 'Группы', 'Groups', 21, 1, 35),
+(20, 'Тарифы', 'Tarif', 8, 1, 15),
+(21, 'Расписание', 'Schedule', 0, 1, 30),
+(22, 'Основное', 'Schedule', 21, 1, 10),
+(23, 'Филлиалы', 'Fillial', 21, 1, 30),
+(24, 'Текущее', 'ScheduleCommon', 21, 1, 20);
 
 -- --------------------------------------------------------
 
@@ -487,7 +505,9 @@ INSERT INTO `Page_Template` (`id`, `title`, `parent_id`, `dir`) VALUES
 (1, 'Авторизация ', 0, 1),
 (3, 'Административный раздел', 0, 0),
 (4, 'Главный макет musadm', 0, 1),
-(5, 'Пустой макет', 0, 0);
+(5, 'Пустой макет', 0, 0),
+(6, 'Макет для раздела \"Пользователи\"', 4, 0),
+(7, 'Макет для раздела \"Расписание\"', 4, 0);
 
 -- --------------------------------------------------------
 
@@ -1821,7 +1841,13 @@ INSERT INTO `Payment` (`id`, `user`, `type`, `datetime`, `value`, `description`)
 (4670, 298, 0, '2018-04-29', 400, 'Оплата группового пакета'),
 (4671, 298, 0, '2018-04-29', 200, 'Оплата группового пакета'),
 (4672, 298, 0, '2018-04-29', 200, 'Оплата группового пакета'),
-(4673, 298, 1, '2018-04-29', 1000, 'Зачисление со страницы клинтов');
+(4673, 298, 1, '2018-04-29', 1000, 'Зачисление со страницы клинтов'),
+(4674, 298, 1, '2018-04-29', 500, 'dhnjety'),
+(4675, 298, 1, '2018-04-29', 500, 'yrj,mtufi,kuy'),
+(4676, 298, 1, '2018-04-29', 100, 'srfgbnrwy'),
+(4677, 298, 0, '2018-04-29', 300, 'drbthrwstgh'),
+(4678, 300, 1, '2018-05-01', 100, 'Примечание'),
+(4679, 300, 0, '2018-05-01', 200, 'Оплата группового пакета');
 
 -- --------------------------------------------------------
 
@@ -2990,15 +3016,15 @@ INSERT INTO `Property_Int` (`id`, `property_id`, `value`, `model_name`, `object_
 (13997, 12, 0, 'User', 297),
 (13998, 13, 4, 'User', 297),
 (13999, 14, 0, 'User', 297),
-(14000, 12, 1000, 'User', 298),
+(14000, 12, 1800, 'User', 298),
 (14001, 13, 1, 'User', 298),
 (14002, 14, 4, 'User', 298),
 (14003, 12, 2000, 'User', 299),
 (14004, 13, 0, 'User', 299),
 (14005, 14, 0, 'User', 299),
-(14006, 12, 100, 'User', 300),
+(14006, 12, 0, 'User', 300),
 (14007, 13, 9, 'User', 300),
-(14008, 14, 18, 'User', 300),
+(14008, 14, 19, 'User', 300),
 (14009, 17, 55, 'User', 300);
 
 -- --------------------------------------------------------
@@ -5227,7 +5253,7 @@ INSERT INTO `Property_String` (`id`, `property_id`, `value`, `model_name`, `obje
 (3396, 26, 'Оплата индивидуального пакета', 'Payment', 4489),
 (3403, 26, 'первая оплата', 'Payment', 4485),
 (3404, 26, 'Вторая оплата', 'Payment', 4485),
-(3414, 22, '22-04-2018 02:01:08', 'User', 15),
+(3414, 22, '01-05-2018 10:57:24', 'User', 15),
 (3415, 22, '07-04-2018 17:15:43', 'User', 20),
 (3419, 22, '10-04-2018 08:27:40', 'User', 27),
 (3422, 22, '16-04-2018 22:07:18', 'User', 32),
@@ -5406,7 +5432,7 @@ INSERT INTO `Property_String` (`id`, `property_id`, `value`, `model_name`, `obje
 (3748, 9, 'https://vk.com/kit_van', 'User', 286),
 (3749, 9, 'null', 'User', 287),
 (3750, 9, 'null', 'User', 298),
-(3751, 22, '29-04-2018 14:20:28', 'User', 300),
+(3751, 22, '01-05-2018 15:45:23', 'User', 300),
 (3752, 26, 'Тестовый коммент', 'Payment', 4631),
 (3753, 26, 'гнпгнмглн', 'Payment', 4631),
 (3754, 26, 'ормшлгнмгн', 'Payment', 4631),
@@ -6970,7 +6996,8 @@ INSERT INTO `Property_String_Assigment` (`id`, `property_id`, `object_id`, `mode
 (3596, 9, 298, 'User'),
 (3597, 22, 300, 'User'),
 (3598, 26, 4631, 'Payment'),
-(3599, 26, 4652, 'Payment');
+(3599, 26, 4652, 'Payment'),
+(3600, 22, 15, 'User');
 
 -- --------------------------------------------------------
 
@@ -7163,6 +7190,26 @@ INSERT INTO `Property_Text_Assigment` (`id`, `property_id`, `object_id`, `model_
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `Schedule_Area`
+--
+
+CREATE TABLE `Schedule_Area` (
+  `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `count_classess` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `Schedule_Area`
+--
+
+INSERT INTO `Schedule_Area` (`id`, `title`, `count_classess`) VALUES
+(1, 'Щорса', 2),
+(2, 'Мичурина', 5);
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `Schedule_Group`
 --
 
@@ -7180,7 +7227,7 @@ CREATE TABLE `Schedule_Group` (
 INSERT INTO `Schedule_Group` (`id`, `title`, `teacher_id`, `duration`) VALUES
 (1, 'курс теории', 2, '01:30:00'),
 (2, 'Гитара Диля+Маша', 2, '01:00:00'),
-(3, 'Групповое скрипка', 6, '00:00:00'),
+(3, 'Групповое скрипка', 6, '01:30:00'),
 (4, 'Гитара группа', 2, '00:00:00'),
 (5, 'Гитара Вика+Игорь', 2, '00:00:00'),
 (6, 'Лисуненко и Курлюкова', 14, '00:00:00'),
@@ -7207,7 +7254,6 @@ CREATE TABLE `Schedule_Group_Assignment` (
 --
 
 INSERT INTO `Schedule_Group_Assignment` (`id`, `group_id`, `user_id`) VALUES
-(3, 3, 176),
 (4, 4, 201),
 (5, 5, 257),
 (6, 5, 258),
@@ -7220,7 +7266,40 @@ INSERT INTO `Schedule_Group_Assignment` (`id`, `group_id`, `user_id`) VALUES
 (15, 8, 285),
 (16, 8, 291),
 (52, 2, 123),
-(53, 2, 116);
+(53, 2, 116),
+(54, 15, 297),
+(55, 15, 295),
+(56, 15, 293),
+(57, 14, 298);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `Schedule_Lesson`
+--
+
+CREATE TABLE `Schedule_Lesson` (
+  `id` int(11) NOT NULL,
+  `insert_date` date NOT NULL,
+  `delete_date` date NOT NULL,
+  `time_from` time NOT NULL,
+  `time_to` time NOT NULL,
+  `day_name` varchar(255) NOT NULL,
+  `area_id` int(11) NOT NULL,
+  `class_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `client_id` int(11) NOT NULL,
+  `group_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `Schedule_Lesson`
+--
+
+INSERT INTO `Schedule_Lesson` (`id`, `insert_date`, `delete_date`, `time_from`, `time_to`, `day_name`, `area_id`, `class_id`, `teacher_id`, `client_id`, `group_id`) VALUES
+(1, '2018-05-01', '0000-00-00', '10:00:00', '10:55:00', 'Tuesday', 2, 1, 182, 298, 0),
+(2, '2018-05-01', '0000-00-00', '11:00:00', '11:55:00', 'Tuesday', 2, 1, 0, 0, 8),
+(3, '2018-05-01', '0000-00-00', '12:00:00', '12:55:00', 'Tuesday', 2, 1, 0, 0, 14);
 
 -- --------------------------------------------------------
 
@@ -7256,15 +7335,15 @@ INSERT INTO `Structure` (`id`, `title`, `parent_id`, `path`, `action`, `template
 (4, 'Футбол', 2, 'football', 'catalog', 5, '', 'Structure_Item', 1, 0, 0, '', '', ''),
 (5, 'Панель управления musadm', 0, '', 'musadm/index', 4, '', '', 1, 1, 10, '', '', ''),
 (6, 'Административный раздел', 0, 'admin', 'admin/index', 3, '', '', 1, 0, 0, '', '', ''),
-(7, 'Пользователи', 5, 'user', 'musadm/user/index', 4, '', 'User_Group', 1, 1, 10, '', '', ''),
+(7, 'Пользователи', 5, 'user', 'musadm/user/index', 6, '', 'User_Group', 1, 1, 10, '', '', ''),
 (8, 'Иерархия классов', 9, 'models', 'documentation/models', 1, 'Общая структура системы. Описание стандартных классов, их свойств и методов.', '', 1, 0, 0, '', '', ''),
 (9, 'Документация', 0, 'documentation', 'documentation/index', 1, 'Руководство по использованию системы', '', 1, 0, 100, '', '', ''),
 (14, 'Вход', 5, 'authorize', 'musadm/authorize', 1, '', '', 1, 0, 0, '', '', ''),
 (19, 'Скрипт обновления данных о пользователях', 0, 'refreshusers', 'index', 5, 'Раздел для тестирования различного функционала или отладки ', '', 1, 0, 1000, NULL, NULL, NULL),
 (20, 'Авторизация', 6, 'authorize', 'admin/auth', 3, 'Страница авторизации для административного раздела', '', 1, 0, 0, NULL, NULL, NULL),
 (22, 'Группы', 5, 'groups', 'musadm/group/group', 4, '', 'Structure_Item', 1, 1, 20, NULL, NULL, NULL),
-(23, 'Расписание', 5, 'schedule', 'musadm/index', 4, '', 'Structure_Item', 1, 1, 30, NULL, NULL, NULL),
-(24, 'Баланс', 5, 'balance', 'musadm/balance/balance', 4, '', 'Structure_Item', 1, 1, 0, NULL, NULL, NULL),
+(23, 'Расписание', 5, 'schedule', 'musadm/schedule/schedule', 7, '', 'Structure_Item', 1, 1, 30, NULL, NULL, NULL),
+(24, 'Баланс', 7, 'balance', 'musadm/balance/balance', 6, '', 'Structure_Item', 1, 1, 0, NULL, NULL, NULL),
 (26, 'test', 0, 'test', 'test', 5, '', 'Structure_Item', 1, 0, 1000, NULL, NULL, NULL),
 (27, 'Архив', 7, 'archive', 'musadm/user/archive', 4, '', 'Structure_Item', 1, 1, 0, NULL, NULL, NULL),
 (28, 'Лиды', 5, 'lids', 'musadm/lid/lid', 4, '', 'Structure_Item', 1, 1, 0, NULL, NULL, NULL),
@@ -7816,6 +7895,12 @@ ALTER TABLE `Property_Text_Assigment`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Индексы таблицы `Schedule_Area`
+--
+ALTER TABLE `Schedule_Area`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Индексы таблицы `Schedule_Group`
 --
 ALTER TABLE `Schedule_Group`
@@ -7825,6 +7910,12 @@ ALTER TABLE `Schedule_Group`
 -- Индексы таблицы `Schedule_Group_Assignment`
 --
 ALTER TABLE `Schedule_Group_Assignment`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `Schedule_Lesson`
+--
+ALTER TABLE `Schedule_Lesson`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -7859,13 +7950,13 @@ ALTER TABLE `User_Group`
 -- AUTO_INCREMENT для таблицы `Admin_Form`
 --
 ALTER TABLE `Admin_Form`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=122;
 
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Modelname`
 --
 ALTER TABLE `Admin_Form_Modelname`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Type`
@@ -7877,7 +7968,7 @@ ALTER TABLE `Admin_Form_Type`
 -- AUTO_INCREMENT для таблицы `Admin_Menu`
 --
 ALTER TABLE `Admin_Menu`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT для таблицы `Constant`
@@ -7901,13 +7992,13 @@ ALTER TABLE `Constant_Type`
 -- AUTO_INCREMENT для таблицы `Lid`
 --
 ALTER TABLE `Lid`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT для таблицы `Lid_Comment`
 --
 ALTER TABLE `Lid_Comment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT для таблицы `Page_Menu`
@@ -7919,7 +8010,7 @@ ALTER TABLE `Page_Menu`
 -- AUTO_INCREMENT для таблицы `Page_Template`
 --
 ALTER TABLE `Page_Template`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT для таблицы `Page_Template_Dir`
@@ -7931,7 +8022,7 @@ ALTER TABLE `Page_Template_Dir`
 -- AUTO_INCREMENT для таблицы `Payment`
 --
 ALTER TABLE `Payment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4674;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4680;
 
 --
 -- AUTO_INCREMENT для таблицы `Payment_Tarif`
@@ -7979,13 +8070,13 @@ ALTER TABLE `Property_Int_Assigment`
 -- AUTO_INCREMENT для таблицы `Property_List`
 --
 ALTER TABLE `Property_List`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=626;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=623;
 
 --
 -- AUTO_INCREMENT для таблицы `Property_List_Assigment`
 --
 ALTER TABLE `Property_List_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=383;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=354;
 
 --
 -- AUTO_INCREMENT для таблицы `Property_List_Values`
@@ -8003,7 +8094,7 @@ ALTER TABLE `Property_String`
 -- AUTO_INCREMENT для таблицы `Property_String_Assigment`
 --
 ALTER TABLE `Property_String_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3600;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3601;
 
 --
 -- AUTO_INCREMENT для таблицы `Property_Text`
@@ -8018,6 +8109,12 @@ ALTER TABLE `Property_Text_Assigment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1003;
 
 --
+-- AUTO_INCREMENT для таблицы `Schedule_Area`
+--
+ALTER TABLE `Schedule_Area`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT для таблицы `Schedule_Group`
 --
 ALTER TABLE `Schedule_Group`
@@ -8027,7 +8124,13 @@ ALTER TABLE `Schedule_Group`
 -- AUTO_INCREMENT для таблицы `Schedule_Group_Assignment`
 --
 ALTER TABLE `Schedule_Group_Assignment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+
+--
+-- AUTO_INCREMENT для таблицы `Schedule_Lesson`
+--
+ALTER TABLE `Schedule_Lesson`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `Structure`
