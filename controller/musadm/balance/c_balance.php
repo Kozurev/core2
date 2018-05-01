@@ -14,24 +14,6 @@ if($oCurentUser->groupId() < 4 && $pageUserId > 0)
 else
     $oUser = $oCurentUser;
 
-/**
- * Пользовательские примечания и дата последней авторизации
- */
-if($oCurentUser->getId() < 4 && $oUser->groupId() == 5)
-{
-    $oPropertyNotes = Core::factory("Property", 19);
-    $clienNotes = $oPropertyNotes->getPropertyValues($oUser);
-
-    $oPropertyLastEntry = Core::factory("Property", 22);
-    $lastEntry = $oPropertyLastEntry->getPropertyValues($oUser);
-
-    Core::factory("Core_Entity")
-        ->addEntities($clienNotes, "note")
-        ->addEntities($lastEntry, "entry")
-        ->xsl("musadm/client_notes.xsl")
-        ->show();
-}
-
 $oCurenUserGroup = Core::factory("User_Group", $oCurentUser->groupId());
 
 
@@ -52,7 +34,7 @@ Core::factory("Core_Entity")
     ->addEntity($balance,           "property")
     ->addEntity($privateLessons,    "property")
     ->addEntity($groupLessons,      "property")
-    ->xsl("musadm/balance/balance.xsl")
+    ->xsl("musadm/users/balance/balance.xsl")
     ->show();
 
 /**
@@ -74,5 +56,5 @@ foreach ($aoUserPayments as $payment)
 Core::factory("Core_Entity")
     ->addEntity($oCurenUserGroup)
     ->addEntities($aoUserPayments)
-    ->xsl("musadm/balance/payments.xsl")
+    ->xsl("musadm/users/balance/payments.xsl")
     ->show();
