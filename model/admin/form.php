@@ -314,7 +314,8 @@ class Admin_Form extends Admin_Form_Model
         $modelId = Core_Array::getValue($aParams, "model_id", 0);
         if($modelId != 0)
         {
-            $this->value = Core::factory("Schedule_Group", $modelId)->teacherId();
+            $modelName = Core_Array::getValue($aParams, "model", "");
+            $this->value = Core::factory($modelName, $modelId)->teacherId();
         }
     }
 
@@ -402,5 +403,100 @@ class Admin_Form extends Admin_Form_Model
     }
 
 
+    public function getListDayNames($aParams)
+    {
+        $mon = new stdClass();
+        $mon->title = "Понедельник";
+        $mon->id = "Monday";
+
+        $tue = new stdClass();
+        $tue->title = "Вторник";
+        $tue->id = "Tuesday";
+
+        $wed = new stdClass();
+        $wed->title = "Среда";
+        $wed->id = "Wednesday";
+
+        $thu = new stdClass();
+        $thu->title = "Четверг";
+        $thu->id = "Thursday";
+
+        $fri = new stdClass();
+        $fri->title = "Пятница";
+        $fri->id = "Friday";
+
+        $sat = new stdClass();
+        $sat->title = "Суббота";
+        $sat->id = "Saturday";
+
+        $sun = new stdClass();
+        $sun->title = "Воскресенье";
+        $sun->id = "Sunday";
+
+        $this
+            ->addEntity($mon, "item")
+            ->addEntity($tue, "item")
+            ->addEntity($wed, "item")
+            ->addEntity($thu, "item")
+            ->addEntity($fri, "item")
+            ->addEntity($sat, "item")
+            ->addEntity($sun, "item");
+
+        $modelId = Core_Array::getValue($aParams, "model_id", 0);
+        $modelName = Core_Array::getValue($aParams, "model", "");
+        if($modelId > 0)
+        {
+            $this->value = Core::factory($modelName, $modelId)->dayName();
+        }
+    }
+
+
+    public function getListAreas($aParams)
+    {
+        $aoAreas = Core::factory("Schedule_Area")->findAll();
+        $this->addEntities($aoAreas, "item");
+
+        $modelId = Core_Array::getValue($aParams, "model_id", 0);
+        $modelName = Core_Array::getValue($aParams, "model", "");
+        if($modelId > 0)
+        {
+            $this->value = Core::factory($modelName, $modelId)->areaId();
+        }
+    }
+
+
+    public function getListClients($aParams)
+    {
+        $aoUsers = Core::factory("User")
+            ->orderBy("id", "DESC")
+            ->where("group_id", "=", 5)
+            ->where("active", "=", 1)
+            ->findAll();
+
+        foreach ($aoUsers as $user)   $user->title = $user->surname() . " " . $user->name();
+
+        $this->addEntities($aoUsers, "item");
+
+        $modelId = Core_Array::getValue($aParams, "model_id", 0);
+        $modelName = Core_Array::getValue($aParams, "model", "");
+        if($modelId > 0)
+        {
+            $this->value = Core::factory($modelName, $modelId)->clientId();
+        }
+    }
+
+
+    public function getListGroups($aParams)
+    {
+        $aoGroups = Core::factory("Schedule_Group")->findAll();
+        $this->addEntities($aoGroups, "item");
+
+        $modelId = Core_Array::getValue($aParams, "model_id", 0);
+        $modelName = Core_Array::getValue($aParams, "model", "");
+        if($modelId > 0)
+        {
+            $this->value = Core::factory($modelName, $modelId)->groupId();
+        }
+    }
 
 }
