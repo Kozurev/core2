@@ -13,7 +13,8 @@ class Orm
     private $having;
     private $groupby;
     private $offset;
-
+    private $open = 0;
+    private $close = 0;
 
 	public function __construct()
 	{
@@ -39,6 +40,20 @@ class Orm
 	}
 
 
+	public function open()
+    {
+        $this->open = 1;
+        return $this;
+    }
+
+
+    public function close()
+    {
+        $this->close = 1;
+        return $this;
+    }
+
+
 	/**
 	*	Формирует из не пустых свойств объекта ассоциативный массив 
 	*	@return array
@@ -47,9 +62,10 @@ class Orm
 	{
 		$result = array();
 		$aVars = get_object_vars($this);
+		$aForbidden = array("open", "close");
 		foreach ($aVars as $key => $value) 
 		{
-			if(is_string($value) || is_numeric($value))
+			if((is_string($value) || is_numeric($value)) && !in_array($key, $aForbidden))
 				$result[$key] = $value;
 		}
 		return $result;
@@ -240,6 +256,8 @@ class Orm
         $this->having = "";
         $this->orderBy = "";
         $this->offset = "";
+        $this->open = 0;
+        $this->close = 0;
         return $this;
     }
 
@@ -376,10 +394,23 @@ class Orm
         {
             //Если это не первое условие тогда доавляем логический оператор
             if($this->where != "")
-                is_null($or)
-                    ? $this->where .= "and "
-                    : $this->where .= $or." ";
+                $condition = is_null($or)   ? "and " : $or . " ";
+            else
+                $condition = "";
 
+            if($this->open == 1)
+            {
+                $condition .= " (";
+                $this->open = 0;
+            }
+
+            if($this->close == 1)
+            {
+                $condition = ")" . $condition;
+                $this->close = 0;
+            }
+
+            $this->where .= $condition;
             $this->where .= $row." ".$operation." '".$value."' ";
         }
 
