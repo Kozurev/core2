@@ -20,8 +20,8 @@ $(function(){
 
     var result = year + "-" + month + "-" + day;
     $(".schedule_calendar").val(result);
-    $(".schedule_calendar").trigger("change");
-    $(".schedule_calendar").change();
+    //$(".schedule_calendar").trigger("change");
+    //$(".schedule_calendar").change();
 
 });
 
@@ -35,7 +35,7 @@ function getSchedule(userid, areaid, date, func) {
             action: "getSchedule",
             userid: userid,
             date: date,
-            areaid: areaid
+            area: areaid
         },
         success: function(responce){
             $(".schedule").empty();

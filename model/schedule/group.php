@@ -45,7 +45,7 @@ class Schedule_Group extends Schedule_Group_Model
 
     public function getTeacher()
     {
-        if($this->id == null)   return false;
+        //if($this->id == null)   return false;
         return Core::factory("User", $this->teacher_id);
     }
 

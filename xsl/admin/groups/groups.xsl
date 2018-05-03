@@ -83,7 +83,7 @@
             <td>
                 <xsl:value-of select="surname" />
                 <xsl:text> </xsl:text>
-                <xsl:value-of select="surname" />
+                <xsl:value-of select="name" />
             </td>
             <!--Удаление-->
             <td><a href="admin" data-model_name="Schedule_Group_Assignment" data-model_id="{id}" class="delete deleteLink"></a></td>
