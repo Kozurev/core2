@@ -1,5 +1,10 @@
 <?php
 
+if($this->oStructureItem == false)
+{
+    $this->error404();
+}
+
 $oUser = Core::factory("User")->getCurent();
 
 if($oUser != true)
