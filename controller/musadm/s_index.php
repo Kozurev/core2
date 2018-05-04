@@ -46,7 +46,8 @@ else
 
 if($oCurentUser->groupId() < 4 && $pageUserId)
 {
-    header("Location: http://$host$uri/schedule?area=2&userid=".$pageUserId);
+    $oArea = Core::factory("Schedule_Area")->orderBy("sorting")->find();
+    header("Location: http://$host$uri/schedule/".$oArea->path()."?userid=".$pageUserId);
     exit;
     //echo "<h1>Администратор под записью пользователя</h1>";
 }
