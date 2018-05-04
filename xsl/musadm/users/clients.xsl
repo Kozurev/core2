@@ -4,18 +4,6 @@
 
     <xsl:template match="root">
 
-        <style>
-            .positive {
-                background-color:palegreen !important;
-            }
-            .negative {
-                background-color:indianred !important;
-            }
-            .neutral {
-                background-color:lightyellow !important;
-            }
-        </style>
-
         <xsl:if test="user/active = 1">
             <div style="text-align: right">
                 <button class="btn btn-success user_create" data-usergroup="5">Создать пользователя</button>
