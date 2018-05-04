@@ -5,8 +5,8 @@ $(function(){
             loaderOn();
             var date = $(this).val();
             var userid = $("#userid").val();
-            var areaid = $("#areaid").val();
-            getSchedule(userid, areaid, date, loaderOff);
+            //var areaid = $("#areaid").val();
+            getSchedule(userid, date, loaderOff);
         });
 
 
@@ -26,16 +26,16 @@ $(function(){
 });
 
 
-function getSchedule(userid, areaid, date, func) {
+function getSchedule(userid, date, func) {
     $.ajax({
         type: "GET",
-        url: "schedule",
+        url: "",
         async: false,
         data: {
             action: "getSchedule",
             userid: userid,
             date: date,
-            area: areaid
+            //area: areaid
         },
         success: function(responce){
             $(".schedule").empty();
