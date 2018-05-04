@@ -310,9 +310,7 @@ class Page_Show extends Core
                     }
 
                     $this->oStructureItem = Core::factory($children_name);
-
                     $this->oStructureItem->queryBuilder();
-
                     $this->oStructureItem != false
                         ?   $parentId = $this->oStructureItem->getId()
                         :   $parentId = $this->oStructure->getId();
