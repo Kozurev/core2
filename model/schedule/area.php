@@ -11,6 +11,8 @@ class Schedule_Area extends Core_Entity
     protected $id;
     protected $title;
     protected $count_classess;
+    protected $path;
+    protected $sorting;
 
     public function __construct(){}
 
@@ -34,6 +36,25 @@ class Schedule_Area extends Core_Entity
     {
         if(is_null($val))   return $this->count_classess;
         $this->count_classess = intval($val);
+        return $this;
+    }
+
+
+    public function path($val = null)
+    {
+        if(is_null($val))  return $this->path;
+        if(strlen($val) > 255)
+            die(Core::getMessage("TOO_LARGE_VALUE", array("path", "Schedule_Area", 255)));
+        $this->path = strval($val);
+        return $this;
+    }
+
+
+    public function sorting($val = null)
+    {
+        if(is_null($val))	return $this->sorting;
+        //if(!is_int($val))   die(Core::getMessage("INVALID_TYPE", array("sorting", "Structure", "int")));
+        $this->sorting = intval($val);
         return $this;
     }
 
