@@ -1,13 +1,3 @@
-.calendar_small {
-	text-align: center;
-}
-
-.schedule_calendar {
-	width: 14%;
-	position: relative;
-	left: 43%;
-}
-
 .schedule {
 	font-size: 15px;
 }
@@ -17,22 +7,16 @@
 	margin-bottom: 10px;
 }
 
-.schedule div {
-	padding: 0px;
+.schedule_calendar {
+	width: 14%;
+	position: relative;
+	left: 43%;
 }
 
-.schedule .head {
-	text-align: center;
-	font-size: 20px;
-	border: 1px solid;
-}
 
-.schedule .body {
-	text-align: center;
-	font-size: 12px;
-	border: 1px solid;
-}
-
+/**
+ * Таблица >>
+ */
 table {
 	margin-top: 20px;
 	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
@@ -41,25 +25,99 @@ table {
 	text-align: center;
 	width: 100%;
 }
-th, td:first-child {
-	background: #AFCDE7;
-	color: white;
+
+.head {
+	background: #ccc;
+	color: black;
 	padding: 2px 4px;
+	font-weight: 400;
 }
+
+th, td:first-child {
+	background: #ccc;
+	color: black;
+	padding: 2px 4px;
+	font-weight: 400;
+}
+
 th, td {
 	border-style: solid;
 	border-width: 0 1px 1px 0;
 	border-color: white;
 }
+
 td {
 	background: #D8E6F3;
 }
+
 th:first-child, td:first-child {
 	text-align: left;
 }
 
 .empty {
-	background-color: inherit;
+	background-color: inherit !important;
 	//border-color: inherit;
 }
+/**
+ * << Таблица
+ */
 
+
+
+/**
+ * Выпадающее меню >
+ */
+ul {
+	margin-left: 0; /* Отступ слева в браузере IE и Opera */
+	padding-left: 0; /* Отступ слева в браузере Firefox, Safari, Chrome */
+}
+
+.dropdown {
+	position: absolute;
+	display: none;
+}
+
+.submenu {
+	position:relative;
+	display:inline-block;
+}
+
+.submenu li {
+	list-style-type: none;
+}
+
+.submenu > li > a {
+	display: inline-block;
+	height: 25px;
+	width: 25px;
+	background: url(../../template3/images/edit2.png) no-repeat;
+	background-size: 20px 20px;
+	background-color: white;
+	border-radius: 24px;
+	background-position-x: 3px;
+	background-position-y: 3px;
+}
+
+.submenu li:hover > ul {
+	display: block;
+	width: 176px;
+	right: -36px;
+}
+
+.submenu .dropdown li a {
+	display: block;
+	padding: 5px;
+	text-decoration: none;
+	color: #666;
+	border: 1px solid #ccc;
+	background-color: #f0f0f0;
+	border-bottom: none;
+}
+
+.submenu .dropdown li a:hover {
+	color: #ffe;
+	background-color: #5488af;
+}
+/**
+ * << Выпадающее меню
+ */
