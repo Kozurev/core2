@@ -4,7 +4,7 @@ $this->css("/templates/template7/css/style.css");
 
 <?php
 
-    $oCurentUser = Core::factory("User")->getCurent();
+    $oCurentUser = Core::factory("User")->getCurrent();
     $pageUserId = Core_Array::getValue($_GET, "userid", 0);
     if($pageUserId > 0)
     {

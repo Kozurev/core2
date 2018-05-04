@@ -15,7 +15,7 @@ if(!$this->oStructureItem)
 /*
 *	Блок проверки авторизации
 */
-$oUser = Core::factory("User")->getCurent();
+$oUser = Core::factory("User")->getCurrent();
 
 if($oUser != true)
 {

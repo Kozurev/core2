@@ -3,7 +3,7 @@
 /**
  * Вывод панели с заметками пользователя и датой последней авторизации 
  */
-$oCurentUser = Core::factory("User")->getCurent();
+$oCurentUser = Core::factory("User")->getCurrent();
 $pageUserId = Core_Array::getValue($_GET, "userid", 0);
 
 if($oCurentUser->groupId() < 4 && $pageUserId > 0)

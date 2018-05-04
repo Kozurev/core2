@@ -9,7 +9,7 @@
 /*
 *	Блок проверки авторизации
 */
-$oUser = Core::factory("User")->getCurent();
+$oUser = Core::factory("User")->getCurrent();
 if(!$oUser)
 {
     $host  = $_SERVER['HTTP_HOST'];
@@ -31,7 +31,7 @@ if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
 $host  = $_SERVER['HTTP_HOST'];
 $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
 
-$oCurentUser = Core::factory("User")->getCurent();
+$oCurentUser = Core::factory("User")->getCurrent();
 $pageUserId = Core_Array::getValue($_GET, "userid", 0); //id просматриваемого пользователя администратором
 
 //Если администратор авторизован под учетной записью пользователя

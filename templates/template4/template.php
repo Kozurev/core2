@@ -39,7 +39,7 @@
 
         <?
         global $CFG;
-        $oCurentUser = Core::factory("User")->getCurent();
+        $oCurentUser = Core::factory("User")->getCurrent();
         $pageUserId = Core_Array::getValue($_GET, "userid", 0); //id просматриваемого пользователя администратором
         $rootdir = "/" . $CFG->rootdir;
         $back = $_SERVER['HTTP_HOST'] . $rootdir;

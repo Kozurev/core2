@@ -6,7 +6,7 @@
  * Time: 19:46
  */
 
-$oUser = Core::factory("User")->getCurent();
+$oUser = Core::factory("User")->getCurrent();
 
 if($oUser != true)
 {

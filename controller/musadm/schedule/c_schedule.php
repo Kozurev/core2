@@ -13,7 +13,7 @@ $oArea = $this->oStructureItem;
 $areaId = $oArea->getId();
 
 $userId =   Core_Array::getValue($_GET, "userid", null);
-if(is_null($userId))    $oUser = Core::factory("User")->getCurent();
+if(is_null($userId))    $oUser = Core::factory("User")->getCurrent();
 else                    $oUser = Core::factory("User", $userId);
 
 if($oUser->groupId() == 5)
@@ -101,8 +101,8 @@ echo "<tr>";
 for ($i = 0; $i < $oArea->countClassess(); $i++)
 {
     echo "<th>Время</th>";
-    echo "<th>Основной график</th>";
-    echo "<th>Текущий график</th>";
+    echo "<th class='add_lesson' data-schedule_type='Schedule_Lesson'>Основной график</th>";
+    echo "<th class='add_lesson' data-schedule_type='Schedule_Current_Lesson'>Текущий график</th>";
 }
 echo "</tr>";
 

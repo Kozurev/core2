@@ -5,7 +5,7 @@ if($this->oStructureItem == false)
     $this->error404();
 }
 
-$oUser = Core::factory("User")->getCurent();
+$oUser = Core::factory("User")->getCurrent();
 
 if($oUser != true)
 {

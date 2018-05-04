@@ -15,7 +15,7 @@ if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
 /*
 *	Блок проверки авторизации
 */
-$oUser = Core::factory("User")->getCurent();
+$oUser = Core::factory("User")->getCurrent();
 if(!$oUser)
 {
     $host  = $_SERVER['HTTP_HOST'];
@@ -78,7 +78,7 @@ if($action == "getTarifPopup")
 {
     $userId =       Core_Array::getValue($_GET, "userid", 0);
     $typeLessons =  Core_Array::getValue($_GET, "type", 0);
-    $userAccess =   Core::factory("User")->getCurent()->groupId() == 5;
+    $userAccess =   Core::factory("User")->getCurrent()->groupId() == 5;
 
     $aoTarifs =     Core::factory("Payment_Tarif")->where("lessons_type", "=", $typeLessons);
     if($userAccess != 0) $aoTarifs->where("access", "=", "1");

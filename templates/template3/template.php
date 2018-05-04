@@ -24,7 +24,7 @@
 
 if($this->oStructure->path() == "admin")
 {
-    $oUser = Core::factory("User")->getCurent();
+    $oUser = Core::factory("User")->getCurrent();
     Core::factory("Core_Entity")
         ->addEntity($oUser)
         ->xsl("admin/top_bar.xsl")

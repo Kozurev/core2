@@ -9,7 +9,7 @@ if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
 /*
 *	Блок проверки авторизации
 */
-$oUser = Core::factory("User")->getCurent();
+$oUser = Core::factory("User")->getCurrent();
 if(User::checkUserAccess(array("superuser" => 1)) != true)
 {
     header('Location: admin/authorize');

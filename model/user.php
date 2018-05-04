@@ -93,7 +93,7 @@ class User extends User_Model
 	*	Метод возвращает авторизованного пользователя, если такой есть
 	*	@return object or false
 	*/	
-	public function getCurent()
+	public function getCurrent()
 	{
 	    if(isset($_COOKIE["userdata"]))
         {
@@ -136,7 +136,7 @@ class User extends User_Model
     {
         $aGroups = Core_Array::getValue($aParams, "groups", null);
         $bOnlyForSuperuser = Core_Array::getValue($aParams, "superuser", null);
-        $oCurentUser = Core::factory("User")->getCurent();
+        $oCurentUser = Core::factory("User")->getCurrent();
 
         if($oCurentUser == false)
         {
