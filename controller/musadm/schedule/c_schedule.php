@@ -1,8 +1,6 @@
 <?php
 
 $aoLessons =    Core::factory("Schedule_Lesson");
-$output =       Core::factory("Core_Entity");
-
 
 $date =     Core_Array::getValue($_GET, "date", null);
 if(is_null($date))      $date = date("Y-m-d");
@@ -10,8 +8,9 @@ if(is_null($date))      $date = date("Y-m-d");
 $dayName =  new DateTime($date);
 $dayName =  $dayName->format("l");
 
-$areaId =   Core_Array::getValue($_GET, "area", null);
-if(is_null($areaId))    $areaId = Core::factory("Schedule_Area")->find()->getId();
+
+$oArea = $this->oStructureItem;
+$areaId = $oArea->getId();
 
 $userId =   Core_Array::getValue($_GET, "userid", null);
 if(is_null($userId))    $oUser = Core::factory("User")->getCurent();
@@ -88,40 +87,6 @@ foreach ($aoLessons as $lesson)
 }
 
 
-$oArea = Core::factory("Schedule_Area", $areaId);
-
-
-
-
-//for($i = 0; $i < $oArea->countClassess(); $i++)
-//{
-//    $class = new stdClass();
-//    $class->id = $i+1;
-//
-//
-//    $output->addEntity($class, "class");
-//}
-//
-//
-//$oUser->groupId() < 3
-//    ?   $xsl = "musadm/schedule/for_admin.xsl"
-//    :   $xsl = "musadm/schedule/for_user.xsl";
-//
-//$output
-//    ->addEntities($aoLessons)
-//    ->xsl($xsl)
-//    ->show();
-
-
-//echo "<pre>";
-//print_r($aoLessons);
-//echo "</pre>";
-//exit;
-
-
-
-
-
 echo "<table class='schedule_table'>";
 
 echo "<tr>";
@@ -162,30 +127,62 @@ while(count($aoLessons) > 0)
         if($oLesson != false)
         {
             echo "<th>";
-            echo $oLesson->timeFrom() . "<br>" . $oLesson->timeTo();
+            echo refactorTimeFormat($oLesson->timeFrom()) . "<br>" . refactorTimeFormat($oLesson->timeTo());
             echo "</th>";
 
             if($lesson->groupId() != 0)
             {
-                $oGroup = $lesson->getGroup();
-                $oTeacher = $oGroup->getTeacher();
-                $teacher = $oTeacher->surname() . " " . $oTeacher->name();
-                $client = $oGroup->title();
+                $oGroup =       $lesson->getGroup();
+                $oTeacher =     $oGroup->getTeacher();
+                $teacher =      $oTeacher->surname() . " " . $oTeacher->name();
+                $client =       $oGroup->title();
+                $clientStatus = "group";
             }
             else
             {
-                $oTeacher = $lesson->getTeacher();
-                $oClient = $lesson->getClient();
-                $teacher = $oTeacher->surname() . " " . $oTeacher->name();
-                $client = $oClient->surname() . " " . $oClient->name();
+                $oTeacher =     $lesson->getTeacher();
+                $oClient =      $lesson->getClient();
+                $teacher =      $oTeacher->surname() . " " . $oTeacher->name();
+                $client =       $oClient->surname() . " " . $oClient->name();
+
+                /**
+                 * Определение цвета "подцветки" занятия
+                 */
+                $countPrivateLessons =  Core::factory("Property", 13)->getPropertyValues($oClient)[0]->value();
+                $countGroupLessons =    Core::factory("Property", 14)->getPropertyValues($oClient)[0]->value();
+                if($countGroupLessons < 0 || $countPrivateLessons < 0)    $clientStatus = "negative";
+                elseif($countPrivateLessons > 2 || $countGroupLessons > 2)$clientStatus = "positive";
+                else $clientStatus = "neutral";
+
+                $vk = Core::factory("Property", 9)->getPropertyValues($oClient)[0]->value();
+                if($vk != "")   $clientStatus .= " vk";
             }
 
-            echo "<td>";
-            echo "преп. " . $teacher . "<hr>" . $client;
+            echo "<td class='".$clientStatus."'>";
+            echo "<span class='teacher'>преп. " . $teacher . "</span><hr><span class='client'>" . $client . "</span><hr>";
+            echo "<ul class=\"submenu\">
+                    <li>
+                        <a href=\"#\"></a>
+                        <ul class=\"dropdown\">
+                            <li><a href=\"#\">Временно отсутствует</a></li>
+                            <li><a href=\"#\">Удалить из основного графика</a></li>
+                        </ul>
+                    </li>
+                </ul>";
             echo "</td>";
 
-            echo "<td>";
-            echo "преп. " . $teacher . "<hr>" . $client;
+            echo "<td class='".$clientStatus."'>";
+            echo "<span class='teacher'>преп. " . $teacher . "</span><hr><span class='client'>" . $client . "</span><hr>";
+            echo "<ul class=\"submenu\">
+                    <li>
+                        <a href=\"#\"></a>
+                        <ul class=\"dropdown\">
+                            <li><a href=\"#\">Отсутствует сегодня</a></li>
+                            <li><a href=\"#\">Изменить на сегодня время</a></li>
+                            <li><a href=\"#\">Поставить пропуск</a></li>
+                        </ul>
+                    </li>
+                </ul>";
             echo "</td>";
         }
         else
@@ -200,3 +197,11 @@ echo "</table>";
 
 
 
+
+
+
+function refactorTimeFormat($time) {
+    $aSegments = explode(":", $time);
+    $result = $aSegments[0] . ":" . $aSegments[1];
+    return $result;
+}
