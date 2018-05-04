@@ -23,6 +23,10 @@ $CFG->items_mapping = array(
         "index"     =>  "path",
         "active"    =>  false
     ),
+    "Schedule_Area" =>  array(
+        "index"     =>  "path",
+        "active"    =>  false
+    )
 //    "User"  =>  array(
 //        "parent"    => "group_id",
 //        "index"     =>  "id",
