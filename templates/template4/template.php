@@ -84,11 +84,11 @@
 <!--                                <li><a href="--><?//=$rootdir?><!--schedule?area=1" >Мичурина</a></li>-->
 <!--                                <li><a href="--><?//=$rootdir?><!--schedule?area=2" >Щорса</a></li>-->
                                 <?
-                                $aoAreas = Core::factory("Schedule_Area")->findAll();
+                                $aoAreas = Core::factory("Schedule_Area")->orderBy("sorting")->findAll();
                                 foreach ($aoAreas as $area)
                                 {
-                                    $href = $rootdir . "schedule?area=" . $area->getId();
-                                    if($iUserId != 0)   $href .= "&userid=" . $iUserId;
+                                    $href = $rootdir . "schedule/" . $area->path();
+                                    if($iUserId != 0)   $href .= "?userid=" . $iUserId;
                                     echo "<li><a href='".$href."'>";
                                     echo $area->title();
                                     echo "</a></li>";
