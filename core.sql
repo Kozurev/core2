@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Май 03 2018 г., 16:02
+-- Время создания: Май 04 2018 г., 15:29
 -- Версия сервера: 5.7.16
 -- Версия PHP: 5.6.29
 
@@ -159,7 +159,9 @@ INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `t
 (118, 25, 'Номер класса', 'classId', 0, 1, 1, 1, 70, '', ''),
 (119, 25, 'Учитель', 'teacherId', 0, 4, 1, 0, 80, 'Teachers', ''),
 (120, 25, 'Ученик', 'clientId', 0, 4, 1, 0, 90, 'Clients', ''),
-(121, 25, 'Группа', 'groupId', 0, 4, 1, 0, 100, 'Groups', '');
+(121, 25, 'Группа', 'groupId', 0, 4, 1, 0, 100, 'Groups', ''),
+(122, 24, 'Путь', 'path', 255, 2, 1, 1, 30, '', ''),
+(123, 24, 'Сортировка', 'sorting', 0, 1, 1, 0, 40, '', '0');
 
 -- --------------------------------------------------------
 
@@ -200,7 +202,7 @@ INSERT INTO `Admin_Form_Modelname` (`id`, `model_name`, `model_title`, `model_so
 (21, 'Lid', 'Лиды', 140, 1),
 (22, 'Lid_Comment', 'Комментарии к лидам', 160, 1),
 (23, 'Payment_Tarif', 'Тарифы', 115, 1),
-(24, 'Schedule_Area', 'Филлиал', 170, 1),
+(24, 'Schedule_Area', 'Филиал', 170, 1),
 (25, 'Schedule_Lesson', 'Расписание \"Основное\"', 180, 1);
 
 -- --------------------------------------------------------
@@ -7194,16 +7196,18 @@ INSERT INTO `Property_Text_Assigment` (`id`, `property_id`, `object_id`, `model_
 CREATE TABLE `Schedule_Area` (
   `id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
-  `count_classess` int(11) NOT NULL
+  `count_classess` int(11) NOT NULL,
+  `path` varchar(255) NOT NULL DEFAULT '',
+  `sorting` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `Schedule_Area`
 --
 
-INSERT INTO `Schedule_Area` (`id`, `title`, `count_classess`) VALUES
-(1, 'Щорса', 2),
-(2, 'Мичурина', 5);
+INSERT INTO `Schedule_Area` (`id`, `title`, `count_classess`, `path`, `sorting`) VALUES
+(1, 'Щорса', 2, 'shorsa', 20),
+(2, 'Мичурина', 5, 'michurina', 10);
 
 -- --------------------------------------------------------
 
@@ -7295,14 +7299,15 @@ CREATE TABLE `Schedule_Lesson` (
 --
 
 INSERT INTO `Schedule_Lesson` (`id`, `insert_date`, `delete_date`, `time_from`, `time_to`, `day_name`, `area_id`, `class_id`, `teacher_id`, `client_id`, `group_id`) VALUES
-(1, '2018-05-03', '2001-01-01', '10:00:00', '10:55:00', 'Thursday', 2, 1, 182, 298, 0),
+(1, '2018-05-03', '2001-01-01', '10:00:00', '10:55:00', 'Friday', 2, 1, 182, 298, 0),
 (2, '2018-05-02', '2001-01-01', '11:00:00', '11:55:00', 'Wednesday', 2, 1, 0, 0, 8),
 (3, '2018-05-02', '2001-01-01', '12:00:00', '12:55:00', 'Wednesday', 2, 1, 0, 0, 14),
-(4, '2018-05-03', '2001-01-01', '09:00:00', '09:55:00', 'Thursday', 2, 1, 13, 287, 0),
-(5, '2018-05-03', '2001-01-01', '11:00:00', '11:55:00', 'Thursday', 2, 1, 14, 284, 0),
-(6, '2018-05-03', '2001-01-01', '09:00:00', '09:55:00', 'Thursday', 2, 2, 11, 286, 0),
-(7, '2018-05-03', '2001-01-01', '14:00:00', '14:55:00', 'Thursday', 2, 3, 0, 0, 5),
-(8, '2018-05-03', '2001-01-01', '15:00:00', '15:55:00', 'Thursday', 2, 3, 112, 287, 0);
+(4, '2018-05-03', '2001-01-01', '09:00:00', '09:55:00', 'Friday', 2, 1, 13, 287, 0),
+(5, '2018-05-03', '2001-01-01', '11:00:00', '11:55:00', 'Friday', 2, 1, 14, 284, 0),
+(6, '2018-05-03', '2001-01-01', '09:00:00', '09:55:00', 'Friday', 2, 2, 11, 286, 0),
+(7, '2018-05-03', '2001-01-01', '14:00:00', '14:55:00', 'Friday', 2, 3, 0, 0, 5),
+(8, '2018-05-03', '2001-01-01', '15:00:00', '15:55:00', 'Friday', 2, 3, 112, 287, 0),
+(9, '2018-05-04', '2001-01-01', '10:00:00', '10:55:00', 'Friday', 2, 4, 10, 294, 0);
 
 -- --------------------------------------------------------
 
@@ -7345,7 +7350,7 @@ INSERT INTO `Structure` (`id`, `title`, `parent_id`, `path`, `action`, `template
 (19, 'Скрипт обновления данных о пользователях', 0, 'refreshusers', 'index', 5, 'Раздел для тестирования различного функционала или отладки ', '', 1, 0, 1000, NULL, NULL, NULL),
 (20, 'Авторизация', 6, 'authorize', 'admin/auth', 3, 'Страница авторизации для административного раздела', '', 1, 0, 0, NULL, NULL, NULL),
 (22, 'Группы', 5, 'groups', 'musadm/group/group', 4, '', 'Structure_Item', 1, 1, 20, NULL, NULL, NULL),
-(23, 'Расписание', 5, 'schedule', 'musadm/schedule/schedule', 7, '', 'Structure_Item', 1, 1, 30, NULL, NULL, NULL),
+(23, 'Расписание', 5, 'schedule', 'musadm/schedule/schedule', 7, '', 'Schedule_Area', 1, 1, 30, NULL, NULL, NULL),
 (24, 'Баланс', 7, 'balance', 'musadm/balance/balance', 6, '', 'Structure_Item', 1, 1, 0, NULL, NULL, NULL),
 (26, 'test', 0, 'test', 'test', 5, '', 'Structure_Item', 1, 0, 1000, NULL, NULL, NULL),
 (27, 'Архив', 7, 'archive', 'musadm/user/archive', 4, '', 'Structure_Item', 1, 1, 0, NULL, NULL, NULL),
@@ -7953,7 +7958,7 @@ ALTER TABLE `User_Group`
 -- AUTO_INCREMENT для таблицы `Admin_Form`
 --
 ALTER TABLE `Admin_Form`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=122;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=124;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Modelname`
 --
@@ -8103,7 +8108,7 @@ ALTER TABLE `Schedule_Group_Assignment`
 -- AUTO_INCREMENT для таблицы `Schedule_Lesson`
 --
 ALTER TABLE `Schedule_Lesson`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 --
 -- AUTO_INCREMENT для таблицы `Structure`
 --
