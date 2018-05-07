@@ -19,57 +19,27 @@ if($oUser != true)
 
 $action = Core_Array::getValue($_GET, "action", null);
 
+
+if($action === "getScheduleAbsentPopup")
+{
+    $clientId = Core_Array::getValue($_GET, "client_id", 0);
+
+    Core::factory("Core_Entity")
+        ->addEntity(
+            Core::factory("Core_Entity")
+                ->name("clientid")
+                ->value($clientId)
+        )
+        ->xsl("musadm/schedule/absent_popup.xsl")
+        ->show();
+
+    exit;
+}
+
 if($action === "getSchedule")
 {
     $this->execute();
     exit;
-//    $aoLessons = Core::factory("Schedule_Lesson");
-//
-//    $date = Core_Array::getValue($_GET, "date", null);
-//    $dayName = new DateTime($date);
-//    $dayName = $dayName->format("l");
-//    $areaId = Core_Array::getValue($_GET, "areaid", null);
-//    $userId = Core_Array::getValue($_GET, "userid", 0);
-//    $oUser = Core::factory("User", $userId);
-//
-//    if($oUser->groupId() == 5)
-//    {
-//        $aoClientGroups = Core::factory("Schedule_Group_Assignment")
-//            ->where("user_id", "=", $userId)
-//            ->findAll();
-//        $aUserGroups = array();
-//        foreach ($aoClientGroups as $group) $aUserGroups[] = $group->groupId();
-//
-//        $aoLessons
-//            ->where("client_id", "=", $userId)
-//            ->where("group_id", "in", $aUserGroups, "or");
-//    }
-//    elseif($oUser->groupId() == 4)
-//    {
-//        $aoTeachergroups = Core::factory("Schedule_Group")
-//            ->where("teacher_id", "=", $userId)
-//            ->findAll();
-//        $aTeacherGroups = array();
-//        foreach ($aoTeachergroups as $group) $aTeacherGroups[] = $group->getId();
-//
-//        $aoLessons
-//            ->where("teacher_id", "=", $userId)
-//            ->where("group_id", "in", $aTeacherGroups, "or");
-//    }
-//
-//    $aoLessons
-//        ->where("insert_date", "<=", $date)
-//        ->open()
-//        ->where("delete_date", ">=", $date)
-//        ->where("delete_date", "=", "0000-00-00", "or")
-//        ->close()
-//        ->where("area_id", "=", $areaId)
-//        ->where("day_name", "=", $dayName);
-//
-//    $aoLessons = $aoLessons->findAll();
-//
-//    echo "<pre>";
-//    print_r($aoLessons);
-//    echo "</pre>";
-//    exit;
 }
+
+

@@ -21,7 +21,6 @@ class Admin_Menu_Payment
             ->orderBy("Payment.datetime", "DESC");
             //->where("value", ">", "1");
 
-
         /**
          * Поиск
          */
@@ -85,6 +84,10 @@ class Admin_Menu_Payment
             ->offset($offset)
             ->findAll();
 
+        foreach ($aoPayments as $payment)
+        {
+            $payment->datetime(refactorDateFormat($payment->datetime()));
+        }
 
         $output
             ->addEntity($search)

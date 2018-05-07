@@ -53,7 +53,7 @@ class Constant extends Constant_Model
 
                 default:
                     {
-                        define($sConstName, strval($val));
+                        define($sConstName, $val);
                     }
             }
 		}

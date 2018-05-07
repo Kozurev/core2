@@ -2,17 +2,16 @@
 /**
  * Created by PhpStorm.
  * User: Kozurev Egor
- * Date: 01.05.2018
- * Time: 11:44
+ * Date: 07.05.2018
+ * Time: 11:49
  */
 
-class Admin_Menu_Schedule
+class Admin_Menu_Absent
 {
     public function show($aParams)
     {
-
         $page = Core_Array::getValue($aParams, "page", 0);
-        $totalCount = Core::factory("Schedule_Lesson")->getCount();
+        $totalCount = Core::factory("Schedule_Absent")->getCount();
         $offset = SHOW_LIMIT * $page;
         $countPages = intval($totalCount / SHOW_LIMIT);
         if($totalCount % SHOW_LIMIT)    $countPages++;
@@ -36,22 +35,29 @@ class Admin_Menu_Schedule
                     ->value($totalCount)
             );
 
-        $aoLessons = Core::factory("Schedule_Lesson")
-            ->limit(SHOW_LIMIT)
+
+        $aoPeriods = Core::factory("Schedule_Absent")
             ->offset($offset)
+            ->limit(SHOW_LIMIT)
+            ->orderBy("id", "DESC")
             ->findAll();
 
-        foreach ($aoLessons as $lesson)
+        foreach ($aoPeriods as $period)
         {
-            $lesson->addEntity($lesson->getTeacher(), "teacher");
-            $lesson->addEntity($lesson->getClient(), "client");
-            $lesson->addEntity($lesson->getGroup(), "group");
+            $period->dateFrom(refactorDateFormat($period->dateFrom()));
+            $period->dateTo(refactorDateFormat($period->dateTo()));
+            $period->addEntity(
+                $period->getClient(), "client"
+            );
         }
 
         Core::factory("Core_Entity")
             ->addEntity($oPagination)
-            ->addEntities($aoLessons)
-            ->xsl("admin/schedule/schedule.xsl")
+            ->addEntities($aoPeriods)
+            ->xsl("admin/schedule/absents.xsl")
             ->show();
+
+
     }
+
 }

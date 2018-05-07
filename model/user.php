@@ -132,27 +132,31 @@ class User extends User_Model
 	/**
      * Проверка авторизации пользователя (объявляется в самом начале страницы)
      */
-	static public function checkUserAccess($aParams)
+	static public function checkUserAccess($aParams, $oUser = null)
     {
         $aGroups = Core_Array::getValue($aParams, "groups", null);
         $bOnlyForSuperuser = Core_Array::getValue($aParams, "superuser", null);
-        $oCurentUser = Core::factory("User")->getCurrent();
+
+        if(is_null($oUser) )
+            $oCurentUser = Core::factory("User")->getCurrent();
+        else
+            $oCurentUser = $oUser;
 
         if($oCurentUser == false)
         {
-            //echo "не авторизован<br>";
+            echo "не авторизован<br>";
             return false;
         }
 
         if(!is_null($aGroups) && !in_array($oCurentUser->groupId(), $aGroups))
         {
-            //echo "Не подходит группа";
+            echo "Не подходит группа";
             return false;
         }
 
         if(!is_null($bOnlyForSuperuser) && $oCurentUser->superuser() != 1)
         {
-            //echo "Пользователь не суппер)";
+            echo "Пользователь не суппер :)";
             return false;
         }
 

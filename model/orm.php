@@ -49,7 +49,8 @@ class Orm
 
     public function close()
     {
-        $this->close = 1;
+        //$this->close = 1;
+        $this->where .= ") ";
         return $this;
     }
 

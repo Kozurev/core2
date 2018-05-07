@@ -131,7 +131,7 @@ function getHours( $time )
  * @param $time2
  * @return bool; true - если первое значение больше второго
  */
-function compareTime( $time1, $time2 )
+function compareTime( $time1, $condition, $time2 )
 {
     $aTime1 = explode( ":", $time1 );
     $aTime2 = explode( ":", $time2 );
@@ -145,15 +145,98 @@ function compareTime( $time1, $time2 )
     $seconds1 = intval( $aTime1[2] );
     $seconds2 = intval( $aTime2[2] );
 
-    //if( $time1 == $time2 )          return false;
-    if( $hours1 > $hours2 )         return true;
-    elseif( $hours1 < $hours2 )     return false;
-    elseif( $minutes1 > $minutes2 ) return true;
-    elseif( $minutes1 < $minutes2 ) return false;
-    elseif( $seconds1 > $seconds2 ) return true;
-    elseif( $seconds1 < $seconds2 ) return false;
+    $totalCountSeconds1 = $hours1 * 60 * 60;
+    $totalCountSeconds1 += $minutes1 * 60;
+    $totalCountSeconds1 += $seconds1;
 
-    return true;
+    $totalCountSeconds2 = $hours2 * 60 * 60;
+    $totalCountSeconds2 += $minutes2 * 60;
+    $totalCountSeconds2 += $seconds2;
+
+    switch ( $condition )
+    {
+        case ">":
+        {
+            if( $totalCountSeconds1 > $totalCountSeconds2 )   return true;
+            else    return false;
+        }
+        case ">=":
+        {
+            if( $totalCountSeconds1 >= $totalCountSeconds2 )  return true;
+            else    return false;
+        }
+        case "<":
+        {
+            if( $totalCountSeconds1 < $totalCountSeconds2 )   return true;
+            else    return false;
+        }
+        case "<=":
+        {
+            if( $totalCountSeconds1 <= $totalCountSeconds2 )  return true;
+            else    return false;
+        }
+        case "==":
+        {
+            if( $totalCountSeconds1 == $totalCountSeconds2 )  return true;
+            else    return false;
+        }
+        default: return false;
+    }
+}
+
+
+function divTime( $time1, $time2, $divType )
+{
+    $aTime1 = explode( ":", $time1 );
+    $aTime2 = explode( ":", $time2 );
+
+    $hours1 = intval( $aTime1[0] );
+    $hours2 = intval( $aTime2[0] );
+
+    $minutes1 = intval( $aTime1[1] );
+    $minutes2 = intval( $aTime2[1] );
+
+    $seconds1 = intval( $aTime1[2] );
+    $seconds2 = intval( $aTime2[2] );
+
+    $totalCountSeconds1 = $hours1 * 60 * 60;
+    $totalCountSeconds1 += $minutes1 * 60;
+    $totalCountSeconds1 += $seconds1;
+
+    $totalCountSeconds2 = $hours2 * 60 * 60;
+    $totalCountSeconds2 += $minutes2 * 60;
+    $totalCountSeconds2 += $seconds2;
+
+    //echo toTime($totalCountSeconds1) . " " . toTime($totalCountSeconds2) ;
+
+    if( $divType == "/" )       return intval( $totalCountSeconds1 / $totalCountSeconds2 );
+    elseif ( $divType == "%" )  return intval( $totalCountSeconds1 % $totalCountSeconds2 );
+}
+
+
+function toTime( $seconds )
+{
+    $hours = intval($seconds / (60 * 60));
+    $seconds -= intval($seconds / (60 * 60));
+
+    //echo $seconds;
+
+    $minutes = intval( $seconds / 60 );
+    $seconds -= $minutes *  60;
+
+    //echo $seconds;
+
+    $aSegments = array();
+
+    if($hours < 10)     $hours = "0" . $hours;
+    if($minutes < 10)   $minutes = "0" . $minutes;
+    if($seconds < 10)   $seconds = "0" . $seconds;
+
+    $aSegments[] = $hours;
+    $aSegments[] = $minutes;
+    $aSegments[] = $seconds;
+
+    return implode(":", $aSegments);
 }
 
 function refactorTimeFormat( $time )
@@ -161,4 +244,11 @@ function refactorTimeFormat( $time )
     $aSegments = explode(":", $time);
     $result = $aSegments[0] . ":" . $aSegments[1];
     return $result;
+}
+
+
+function refactorDateFormat ( $date )
+{
+    $aSegments = explode("-", $date);
+    return $aSegments[2] . "-". $aSegments[1] . "-" . $aSegments[0];
 }

@@ -13,6 +13,7 @@
 				<th>Название</th>
 				<th>Активность</th>
 				<th>Действия</th>
+				<th>Описание</th>
 				<!--<th>Редактировать</th>-->
 				<!--<th>Удалить</th>-->
 				<xsl:apply-templates select="constant_dir" />
@@ -68,7 +69,7 @@
 			<td></td>
 
 			<!--Описание-->
-			<!--<td><xsl:value-of select="description" /></td>-->
+			<td><xsl:value-of select="description" /></td>
 
 			<!--Активность-->
 			<td></td>
@@ -96,7 +97,7 @@
 			<td><xsl:value-of select="name" /></td>
 
 			<!--Описание-->
-			<!--<td><xsl:value-of select="description" /></td>-->
+			<td><xsl:value-of select="description" /></td>
 
 			<!--Активность-->
 			<td>
@@ -109,11 +110,12 @@
 				</input>
 			</td>
 
-			<!--Редактирование-->
-			<td><a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant&amp;parent_id={dir}&amp;model_id={id}" class="link updateLink" /></td>
-
-			<!--Удаление-->
-			<td><a href="admin" data-model_name="Constant" data-model_id="{id}" class="delete deleteLink"></a></td>
+			<td>
+				<!--Редактирование-->
+				<a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Constant&amp;parent_id={dir}&amp;model_id={id}" class="link updateLink" />
+				<!--Удаление-->
+				<a href="admin" data-model_name="Constant" data-model_id="{id}" class="delete deleteLink"></a>
+			</td>
 		</tr>
 	</xsl:template>
 

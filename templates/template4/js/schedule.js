@@ -5,8 +5,18 @@ $(function(){
             loaderOn();
             var date = $(this).val();
             var userid = $("#userid").val();
-            //var areaid = $("#areaid").val();
             getSchedule(userid, date, loaderOff);
+        })
+        .on("click", ".schedule_absent", function(e){
+            e.preventDefault();
+            var clientid = $(this).parent().parent().data("clientid");
+            getScheduleAbsentPopup(clientid);
+            //showPopup("<h2>Hello</h2>");
+        })
+        .on("click", ".popop_schedule_absent_submit", function(e){
+            e.preventDefault();
+            loaderOn();
+            saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", loaderOff);
         });
 
 
@@ -20,8 +30,6 @@ $(function(){
 
     var result = year + "-" + month + "-" + day;
     $(".schedule_calendar").val(result);
-    //$(".schedule_calendar").trigger("change");
-    //$(".schedule_calendar").change();
 
 });
 
@@ -41,6 +49,22 @@ function getSchedule(userid, date, func) {
             $(".schedule").empty();
             $(".schedule").append(responce);
             func();
+        }
+    });
+}
+
+
+function getScheduleAbsentPopup(clientid) {
+    $.ajax({
+        type: "GET",
+        url: "",
+        async: false,
+        data: {
+            action: "getScheduleAbsentPopup",
+            client_id: clientid,
+        },
+        success: function(responce){
+            showPopup(responce);
         }
     });
 }
