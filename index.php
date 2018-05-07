@@ -11,6 +11,7 @@ define('ROOT', dirname(__FILE__));
 //Установление соединения с базой данных
 require_once ROOT."/model/database.php";
 require_once ROOT."/config/config.php";
+require_once ROOT."/lib/functions.php";
 Core_Database::connect();
 
 //Подключение обязательных биьлиотек
