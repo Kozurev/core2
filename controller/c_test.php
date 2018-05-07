@@ -23,67 +23,10 @@ $dbh->query("SET NAMES utf8");
 //        ->save();
 //}
 
-?>
 
-<style>
-    ul {
-        margin-left: 0; /* Отступ слева в браузере IE и Opera */
-        padding-left: 0; /* Отступ слева в браузере Firefox, Safari, Chrome */
-    }
+$time1 = "10:00:00";
+$time2 = "10:00:00";
 
-    .dropdown {
-        position: absolute;
-        display: none;
-        //background: #555;
-    }
+$time = compareTime( $time1, $time2 );
+var_dump($time);
 
-    .submenu {
-        position:relative;
-        display:inline-block;
-    }
-
-    .submenu li {
-        list-style-type: none;
-    }
-
-    .submenu li:hover > ul {
-        display: block;
-    }
-
-    .submenu .dropdown li a {
-        display: block;
-        padding: 5px;
-        text-decoration: none;
-        color: #666;
-        border: 1px solid #ccc;
-        background-color: #f0f0f0;
-        border-bottom: none;
-    }
-
-    .submenu .dropdown li a:hover {
-        color: #ffe;
-        background-color: #5488af;
-    }
-</style>
-
-
-<ul class="submenu">
-    <li>
-        <a href="#">Пример</a>
-        <ul class="dropdown">
-            <li><a href="#">uygerth</a></li>
-            <li><a href="#">uygerth</a></li>
-            <li><a href="#">uygerth</a></li>
-            <li><a href="#">uygerth</a></li>
-            <li><a href="#">uygerth</a></li>
-        </ul>
-    </li>
-</ul>
-
-<?
-$oUser = Core::factory("User", 297);
-$oProperty = Core::factory("Property", 9);
-
-echo "<pre>";
-print_r($oProperty->getPropertyValues($oUser));
-echo "</pre>";
