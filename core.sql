@@ -1,15 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.0.1
+-- version 4.6.5.2
 -- https://www.phpmyadmin.net/
 --
--- Хост: localhost
--- Время создания: Май 07 2018 г., 07:56
--- Версия сервера: 5.5.53
--- Версия PHP: 7.0.14
+-- Хост: 127.0.0.1:3306
+-- Время создания: Май 07 2018 г., 16:40
+-- Версия сервера: 5.7.16
+-- Версия PHP: 5.6.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -163,7 +161,15 @@ INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `t
 (120, 25, 'Ученик', 'clientId', 0, 4, 1, 0, 90, 'Clients', ''),
 (121, 25, 'Группа', 'groupId', 0, 4, 1, 0, 100, 'Groups', ''),
 (122, 24, 'Путь', 'path', 255, 2, 1, 1, 30, '', ''),
-(123, 24, 'Сортировка', 'sorting', 0, 1, 1, 0, 40, '', '0');
+(123, 24, 'Сортировка', 'sorting', 0, 1, 1, 0, 40, '', '0'),
+(124, 26, 'Дата', 'date', 0, 7, 1, 1, 10, '', ''),
+(125, 26, 'Время \"С\"', 'timeFrom', 0, 8, 1, 1, 20, '', ''),
+(126, 26, 'Время \"По\"', 'timeTo', 0, 8, 1, 1, 30, '', ''),
+(127, 26, 'Филиал', 'areaId', 0, 4, 1, 0, 40, 'Areas', ''),
+(128, 26, 'Номер класса', 'classId', 0, 1, 1, 1, 50, '', ''),
+(129, 26, 'Преподаватель', 'teacherId', 0, 4, 1, 0, 60, 'Teachers', ''),
+(130, 26, 'Клиент', 'clientId', 0, 4, 1, 0, 0, 'Clients', ''),
+(131, 26, 'Группа', 'groupId', 0, 4, 1, 0, 60, 'Groups', '');
 
 -- --------------------------------------------------------
 
@@ -205,7 +211,9 @@ INSERT INTO `Admin_Form_Modelname` (`id`, `model_name`, `model_title`, `model_so
 (22, 'Lid_Comment', 'Комментарии к лидам', 160, 1),
 (23, 'Payment_Tarif', 'Тарифы', 115, 1),
 (24, 'Schedule_Area', 'Филиал', 170, 1),
-(25, 'Schedule_Lesson', 'Расписание \"Основное\"', 180, 1);
+(25, 'Schedule_Lesson', 'Расписание \"Основное\"', 180, 1),
+(26, 'Schedule_Current_Lesson', 'Расписание \"Текущее\"', 190, 1),
+(27, 'Schedule_Absent', 'Период отсутствия', 200, 1);
 
 -- --------------------------------------------------------
 
@@ -274,7 +282,8 @@ INSERT INTO `Admin_Menu` (`id`, `title`, `model`, `parent_id`, `active`, `sortin
 (21, 'Расписание', 'Schedule', 0, 1, 30),
 (22, 'Основное', 'Schedule', 21, 1, 10),
 (23, 'Филлиалы', 'Fillial', 21, 1, 30),
-(24, 'Текущее', 'ScheduleCommon', 21, 1, 20);
+(24, 'Текущее', 'ScheduleCurrent', 21, 1, 20),
+(25, 'Период отсутствие', 'Absent', 21, 1, 40);
 
 -- --------------------------------------------------------
 
@@ -301,7 +310,8 @@ CREATE TABLE `Constant` (
 INSERT INTO `Constant` (`id`, `title`, `name`, `description`, `value`, `value_type`, `dir`, `active`, `sorting`) VALUES
 (4, 'Пагинация в админ. разделе', 'SHOW_LIMIT', 'Лимит показов количества структур и объектов структур', '10', 1, 1, 1, 0),
 (5, 'kjn', 'knmlkm', '', '2', 1, 4, 1, 0),
-(6, 'Время запоминания пользователя', 'REMEMBER_USER_TIME', 'Значение константы указывает количество дней, на которое будет \"запомнен\" пользователь при авторизации. При отсутствии данной константы или её значения будет использовано время по умолчанию (10 дней).', '10', 1, 1, 1, 0);
+(6, 'Время запоминания пользователя', 'REMEMBER_USER_TIME', 'Значение константы указывает количество дней, на которое будет \"запомнен\" пользователь при авторизации. При отсутствии данной константы или её значения будет использовано время по умолчанию (10 дней).', '10', 1, 1, 1, 0),
+(7, 'Частота ', 'SCHEDULE_DELIMITER', 'Размер по времени одной ячейки в расписании. При отсутствии данной константы частота будет составлять 15 минут (\"00:15:00\")', '00:15:00', 4, 0, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -345,7 +355,8 @@ CREATE TABLE `Constant_Type` (
 INSERT INTO `Constant_Type` (`id`, `title`) VALUES
 (1, 'int'),
 (2, 'float'),
-(3, 'bool');
+(3, 'bool'),
+(4, 'string');
 
 -- --------------------------------------------------------
 
@@ -7192,6 +7203,26 @@ INSERT INTO `Property_Text_Assigment` (`id`, `property_id`, `object_id`, `model_
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `Schedule_Absent`
+--
+
+CREATE TABLE `Schedule_Absent` (
+  `id` int(11) NOT NULL,
+  `date_from` date NOT NULL,
+  `date_to` date NOT NULL,
+  `client_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `Schedule_Absent`
+--
+
+INSERT INTO `Schedule_Absent` (`id`, `date_from`, `date_to`, `client_id`) VALUES
+(1, '2018-05-07', '2018-05-14', 287);
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `Schedule_Area`
 --
 
@@ -7210,6 +7241,31 @@ CREATE TABLE `Schedule_Area` (
 INSERT INTO `Schedule_Area` (`id`, `title`, `count_classess`, `path`, `sorting`) VALUES
 (1, 'Щорса', 2, 'shorsa', 20),
 (2, 'Мичурина', 5, 'michurina', 10);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `Schedule_Current_Lesson`
+--
+
+CREATE TABLE `Schedule_Current_Lesson` (
+  `id` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `time_from` time NOT NULL,
+  `time_to` time NOT NULL,
+  `area_id` int(11) NOT NULL,
+  `class_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `client_id` int(11) NOT NULL,
+  `group_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `Schedule_Current_Lesson`
+--
+
+INSERT INTO `Schedule_Current_Lesson` (`id`, `date`, `time_from`, `time_to`, `area_id`, `class_id`, `teacher_id`, `client_id`, `group_id`) VALUES
+(1, '2018-05-07', '09:00:00', '09:55:00', 2, 1, 11, 293, 0);
 
 -- --------------------------------------------------------
 
@@ -7301,13 +7357,15 @@ CREATE TABLE `Schedule_Lesson` (
 --
 
 INSERT INTO `Schedule_Lesson` (`id`, `insert_date`, `delete_date`, `time_from`, `time_to`, `day_name`, `area_id`, `class_id`, `teacher_id`, `client_id`, `group_id`) VALUES
-(1, '2018-05-03', '2001-01-01', '10:00:00', '10:55:00', 'Friday', 2, 1, 182, 298, 0),
-(4, '2018-05-03', '2001-01-01', '09:00:00', '09:55:00', 'Friday', 2, 1, 13, 287, 0),
-(5, '2018-05-03', '2001-01-01', '11:00:00', '11:55:00', 'Friday', 2, 1, 14, 284, 0),
-(6, '2018-05-03', '2001-01-01', '09:00:00', '09:55:00', 'Friday', 2, 2, 11, 286, 0),
-(7, '2018-05-03', '2001-01-01', '14:00:00', '14:55:00', 'Friday', 2, 3, 0, 0, 5),
-(8, '2018-05-03', '2001-01-01', '16:00:00', '16:55:00', 'Friday', 2, 3, 112, 287, 0),
-(9, '2018-05-04', '2001-01-01', '10:00:00', '10:55:00', 'Friday', 2, 4, 10, 294, 0);
+(1, '2018-04-30', '2001-01-01', '10:00:00', '10:55:00', 'Monday', 2, 1, 182, 298, 0),
+(4, '2018-04-30', '2001-01-01', '09:00:00', '09:55:00', 'Monday', 2, 1, 13, 287, 0),
+(5, '2018-04-30', '2001-01-01', '11:00:00', '11:55:00', 'Monday', 2, 1, 14, 284, 0),
+(6, '2018-04-30', '2001-01-01', '09:00:00', '09:55:00', 'Monday', 2, 2, 11, 286, 0),
+(7, '2018-04-30', '2001-01-01', '14:00:00', '14:55:00', 'Monday', 2, 3, 0, 0, 5),
+(8, '2018-04-30', '2001-01-01', '16:00:00', '16:55:00', 'Monday', 2, 3, 112, 287, 0),
+(9, '2018-04-30', '2018-05-07', '10:00:00', '10:55:00', 'Monday', 2, 4, 10, 294, 0),
+(10, '2018-05-06', '2001-01-01', '09:00:00', '10:30:00', 'Monday', 2, 5, 0, 0, 7),
+(11, '2018-05-07', '2001-01-01', '09:30:00', '10:25:00', 'Monday', 2, 3, 9, 287, 0);
 
 -- --------------------------------------------------------
 
@@ -7903,9 +7961,21 @@ ALTER TABLE `Property_Text_Assigment`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Индексы таблицы `Schedule_Absent`
+--
+ALTER TABLE `Schedule_Absent`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Индексы таблицы `Schedule_Area`
 --
 ALTER TABLE `Schedule_Area`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `Schedule_Current_Lesson`
+--
+ALTER TABLE `Schedule_Current_Lesson`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -7958,213 +8028,187 @@ ALTER TABLE `User_Group`
 -- AUTO_INCREMENT для таблицы `Admin_Form`
 --
 ALTER TABLE `Admin_Form`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=124;
-
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=132;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Modelname`
 --
 ALTER TABLE `Admin_Form_Modelname`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
-
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Type`
 --
 ALTER TABLE `Admin_Form_Type`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
 --
 -- AUTO_INCREMENT для таблицы `Admin_Menu`
 --
 ALTER TABLE `Admin_Menu`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
-
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 --
 -- AUTO_INCREMENT для таблицы `Constant`
 --
 ALTER TABLE `Constant`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 --
 -- AUTO_INCREMENT для таблицы `Constant_Dir`
 --
 ALTER TABLE `Constant_Dir`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
 --
 -- AUTO_INCREMENT для таблицы `Constant_Type`
 --
 ALTER TABLE `Constant_Type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT для таблицы `Lid`
 --
 ALTER TABLE `Lid`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
-
 --
 -- AUTO_INCREMENT для таблицы `Lid_Comment`
 --
 ALTER TABLE `Lid_Comment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
-
 --
 -- AUTO_INCREMENT для таблицы `Page_Menu`
 --
 ALTER TABLE `Page_Menu`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
 --
 -- AUTO_INCREMENT для таблицы `Page_Template`
 --
 ALTER TABLE `Page_Template`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
 --
 -- AUTO_INCREMENT для таблицы `Page_Template_Dir`
 --
 ALTER TABLE `Page_Template_Dir`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
 --
 -- AUTO_INCREMENT для таблицы `Payment`
 --
 ALTER TABLE `Payment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4680;
-
 --
 -- AUTO_INCREMENT для таблицы `Payment_Tarif`
 --
 ALTER TABLE `Payment_Tarif`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
-
 --
 -- AUTO_INCREMENT для таблицы `Property`
 --
 ALTER TABLE `Property`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_Bool`
 --
 ALTER TABLE `Property_Bool`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=634;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_Bool_Assigment`
 --
 ALTER TABLE `Property_Bool_Assigment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=633;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_Dir`
 --
 ALTER TABLE `Property_Dir`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_Int`
 --
 ALTER TABLE `Property_Int`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14010;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_Int_Assigment`
 --
 ALTER TABLE `Property_Int_Assigment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13978;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_List`
 --
 ALTER TABLE `Property_List`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=623;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_List_Assigment`
 --
 ALTER TABLE `Property_List_Assigment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=354;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_List_Values`
 --
 ALTER TABLE `Property_List_Values`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_String`
 --
 ALTER TABLE `Property_String`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3756;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_String_Assigment`
 --
 ALTER TABLE `Property_String_Assigment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3601;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_Text`
 --
 ALTER TABLE `Property_Text`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=999;
-
 --
 -- AUTO_INCREMENT для таблицы `Property_Text_Assigment`
 --
 ALTER TABLE `Property_Text_Assigment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1003;
-
+--
+-- AUTO_INCREMENT для таблицы `Schedule_Absent`
+--
+ALTER TABLE `Schedule_Absent`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT для таблицы `Schedule_Area`
 --
 ALTER TABLE `Schedule_Area`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
+--
+-- AUTO_INCREMENT для таблицы `Schedule_Current_Lesson`
+--
+ALTER TABLE `Schedule_Current_Lesson`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT для таблицы `Schedule_Group`
 --
 ALTER TABLE `Schedule_Group`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
-
 --
 -- AUTO_INCREMENT для таблицы `Schedule_Group_Assignment`
 --
 ALTER TABLE `Schedule_Group_Assignment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
-
 --
 -- AUTO_INCREMENT для таблицы `Schedule_Lesson`
 --
 ALTER TABLE `Schedule_Lesson`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 --
 -- AUTO_INCREMENT для таблицы `Structure`
 --
 ALTER TABLE `Structure`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
-
 --
 -- AUTO_INCREMENT для таблицы `Structure_Item`
 --
 ALTER TABLE `Structure_Item`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
 --
 -- AUTO_INCREMENT для таблицы `User`
 --
 ALTER TABLE `User`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=302;
-
 --
 -- AUTO_INCREMENT для таблицы `User_Group`
 --
 ALTER TABLE `User_Group`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-COMMIT;
-
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
