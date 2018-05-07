@@ -95,10 +95,10 @@ nav {
 .vk .client:after {
 	content: "";
 	display: inline-block;
-	height: 25px;
-	width: 25px;
+	height: 17px;
+	width: 16px;
 	background: url(../images/vk.png) no-repeat;
 	background-position-x: -6px;
-	background-size: 40px;
+	background-size: 30px;
 }
 
