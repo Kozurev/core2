@@ -10,9 +10,16 @@ class Admin_Menu_Schedule
 {
     public function show($aParams)
     {
+        $parentId = Core_Array::getValue($aParams, "parent_id", 0);
+        if($parentId != 0)  $modelName = "Schedule_Lesson";
+        else                $modelName = "Schedule_Area";
 
         $page = Core_Array::getValue($aParams, "page", 0);
-        $totalCount = Core::factory("Schedule_Lesson")->getCount();
+
+        $totalCount = Core::factory($modelName);
+        if($parentId != 0)  $totalCount->where("area_id", "=", $parentId);
+        $totalCount = $totalCount->getCount();
+
         $offset = SHOW_LIMIT * $page;
         $countPages = intval($totalCount / SHOW_LIMIT);
         if($totalCount % SHOW_LIMIT)    $countPages++;
@@ -36,21 +43,53 @@ class Admin_Menu_Schedule
                     ->value($totalCount)
             );
 
-        $aoLessons = Core::factory("Schedule_Lesson")
-            ->limit(SHOW_LIMIT)
-            ->offset($offset)
-            ->findAll();
-
-        foreach ($aoLessons as $lesson)
+        if($parentId != 0)
         {
-            $lesson->addEntity($lesson->getTeacher(), "teacher");
-            $lesson->addEntity($lesson->getClient(), "client");
-            $lesson->addEntity($lesson->getGroup(), "group");
+            $aoItems = Core::factory($modelName)
+                ->limit(SHOW_LIMIT)
+                ->offset($offset)
+                ->where("area_id", "=", $parentId)
+                ->findAll();
+
+            foreach ($aoItems as $lesson)
+            {
+                $lesson->addEntity($lesson->getTeacher(), "teacher");
+                $lesson->addEntity($lesson->getClient(), "client");
+                $lesson->addEntity($lesson->getGroup(), "group");
+            }
+
+            $title = "Основное расписание. " . Core::factory("Schedule_Area", $parentId)->title();
+        }
+        else
+        {
+            $aoItems = Core::factory($modelName)
+                ->limit(SHOW_LIMIT)
+                ->offset($offset)
+                ->orderBy("sorting")
+                ->findAll();
+
+            $title = "Основное расписание";
         }
 
+
         Core::factory("Core_Entity")
+            ->addEntity(
+                Core::factory("Core_Entity")
+                    ->name("parent_id")
+                    ->value($parentId)
+            )
+            ->addEntity(
+                Core::factory("Core_Entity")
+                    ->name("title")
+                    ->value($title)
+            )
+            ->addEntity(
+                Core::factory("Core_Entity")
+                    ->name("model_name")
+                    ->value($modelName)
+            )
             ->addEntity($oPagination)
-            ->addEntities($aoLessons)
+            ->addEntities($aoItems)
             ->xsl("admin/schedule/schedule.xsl")
             ->show();
     }
