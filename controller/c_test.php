@@ -24,10 +24,15 @@
 //}
 
 
-$time1 = "00:55:00";
-$time2 = "00:05:00";
+$time1 = "16:30:00";
+$time2 = "17:25:00";
+$period = "00:15:00";
 
-$time = divTime( $time1, $time2, "/" );
-//$time = toTime(135);
-var_dump(toTime($time));
+
+$minutes = deductTime( $time2, $time1 );
+$rowspan = divTime( $minutes, $period, "/" );
+if( divTime( $minutes, $period, "%" ) ) $rowspan++;
+
+//$time = deductTime( $time2, $time1 );
+var_dump($rowspan);
 
