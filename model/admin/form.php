@@ -462,6 +462,12 @@ class Admin_Form extends Admin_Form_Model
         {
             $this->value = Core::factory($modelName, $modelId)->areaId();
         }
+
+        $areaId = Core_Array::getValue($aParams, "parent_id", 0);
+        if($areaId != 0 && $modelId == 0)
+        {
+            $this->value = $areaId;
+        }
     }
 
 
