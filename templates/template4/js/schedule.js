@@ -17,6 +17,18 @@ $(function(){
             e.preventDefault();
             loaderOn();
             saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", loaderOff);
+        })
+        .on("click", ".add_lesson", function(){
+            var type = $(this).data("schedule_type");
+            var class_id = $(this).data("class_id");
+            var date = $(this).data("date");
+            var area_id = $(this).data("area_id");
+            getScheduleLessonPopup(class_id, date, area_id, type);
+        })
+        .on("click", ".popop_schedule_lesson_submit", function(e){
+            e.preventDefault();
+            loaderOn();
+            saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", refreshSchedule);
         });
 
 
@@ -34,6 +46,12 @@ $(function(){
 });
 
 
+function refreshSchedule() {
+    $(".schedule_calendar").trigger("change");
+    loaderOff();
+}
+
+
 function getSchedule(userid, date, func) {
     $.ajax({
         type: "GET",
@@ -43,7 +61,6 @@ function getSchedule(userid, date, func) {
             action: "getSchedule",
             userid: userid,
             date: date,
-            //area: areaid
         },
         success: function(responce){
             $(".schedule").empty();
@@ -62,6 +79,24 @@ function getScheduleAbsentPopup(clientid) {
         data: {
             action: "getScheduleAbsentPopup",
             client_id: clientid,
+        },
+        success: function(responce){
+            showPopup(responce);
+        }
+    });
+}
+
+
+function getScheduleLessonPopup(class_id, date, area_id, type) {
+    $.ajax({
+        type: "GET",
+        url: "",
+        data: {
+            action: "getScheduleLessonPopup",
+            class_id: class_id,
+            date: date,
+            model_name: type,
+            area_id: area_id
         },
         success: function(responce){
             showPopup(responce);
