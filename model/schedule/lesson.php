@@ -33,7 +33,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     public function save($obj = null)
     {
         Core::notify(array(&$this), "beforeScheduleLessonSave");
-        if($this->delete_date == "")    $this->delete_date = "2001-01-01";
+        if($this->delete_date == "" || $this->delete_date == "0000-00-00")    $this->delete_date = "2001-01-01";
         parent::save();
         Core::notify(array(&$this), "afterScheduleLessonSave");
     }
