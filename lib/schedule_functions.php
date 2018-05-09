@@ -8,6 +8,8 @@
 
 function array_pop_lesson( $aoLessons, $time, $classId )
 {
+    if(!is_array($aoLessons))   return false;
+
     foreach ( $aoLessons as $key => $lesson )
     {
         if( compareTime( $lesson->timeFrom(), "==", $time ) && $lesson->classId() == $classId )
