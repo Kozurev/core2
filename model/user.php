@@ -144,19 +144,19 @@ class User extends User_Model
 
         if($oCurentUser == false)
         {
-            echo "не авторизован<br>";
+            //echo "не авторизован<br>";
             return false;
         }
 
         if(!is_null($aGroups) && !in_array($oCurentUser->groupId(), $aGroups))
         {
-            echo "Не подходит группа";
+            //echo "Не подходит группа";
             return false;
         }
 
         if(!is_null($bOnlyForSuperuser) && $oCurentUser->superuser() != 1)
         {
-            echo "Пользователь не суппер :)";
+            //echo "Пользователь не суппер :)";
             return false;
         }
 
