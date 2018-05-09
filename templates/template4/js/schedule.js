@@ -11,12 +11,11 @@ $(function(){
             e.preventDefault();
             var clientid = $(this).parent().parent().data("clientid");
             getScheduleAbsentPopup(clientid);
-            //showPopup("<h2>Hello</h2>");
         })
         .on("click", ".popop_schedule_absent_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", loaderOff);
+            saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", refreshSchedule);
         })
         .on("click", ".add_lesson", function(){
             var type = $(this).data("schedule_type");
@@ -33,9 +32,9 @@ $(function(){
 
 
     var today = new Date();
-    var day = today.getDate();
+    var day =   today.getDate();
     var month = today.getMonth() + 1;
-    var year = today.getFullYear();
+    var year =  today.getFullYear();
 
     if(day < 10)    day = "0" + day;
     if(month < 10)  month = "0" + month;
