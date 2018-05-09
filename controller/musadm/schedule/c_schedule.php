@@ -16,7 +16,9 @@ $userId =   Core_Array::getValue($_GET, "userid", null);
 if(is_null($userId))    $oUser = Core::factory("User")->getCurrent();
 else                    $oUser = Core::factory("User", $userId);
 
-//Поиск по ученикам
+/**
+ * Если страница клиента
+ */
 if($oUser->groupId() == 5)
 {
     $aoClientGroups = Core::factory("Schedule_Group_Assignment")
@@ -33,8 +35,17 @@ if($oUser->groupId() == 5)
         ->where("client_id", "=", $userId)
         ->where("group_id", "in", $aUserGroups, "or")
         ->close();
+
+    $aoCurrentLessons
+        ->open()
+        ->where("client_id", "=", $userId)
+        ->where("group_id", "in", $aUserGroups, "or")
+        ->close();
+
 }
-//Поиск по учителям
+/**
+ * Если страница учителя
+ */
 elseif($oUser->groupId() == 4)
 {
     $aoTeachergroups = Core::factory("Schedule_Group")
@@ -46,6 +57,12 @@ elseif($oUser->groupId() == 4)
     $aoMainLessons
         ->open()
         ->where("teacher_id", "=", $userId)
+        ->where("group_id", "in", $aTeacherGroups, "or")
+        ->close();
+
+    $aoCurrentLessons
+        ->open()
+        ->where("teaacher_id", "=", $userId)
         ->where("group_id", "in", $aTeacherGroups, "or")
         ->close();
 }
@@ -86,7 +103,10 @@ echo "<tr>";
 for ($i = 1; $i <= $oArea->countClassess(); $i++)
 {
     echo "<th>Время</th>";
-    echo "<th class='add_lesson' 
+    echo "<th";
+    if(User::checkUserAccess(array("groups" => array(1, 2)), $oUser))
+        echo " class='add_lesson' ";
+    echo "
         data-schedule_type='Schedule_Lesson' 
         data-class_id='".$i."' 
         data-date='".$date."' 
@@ -94,7 +114,10 @@ for ($i = 1; $i <= $oArea->countClassess(); $i++)
         data-dayName='".$dayName."'
         >Основной график</th>";
     //echo "<th>Время</th>";
-    echo "<th class='add_lesson' 
+    echo "<th";
+    if(User::checkUserAccess(array("groups" => array(1, 2)), $oUser))
+        echo " class='add_lesson' ";
+    echo "
         data-schedule_type='Schedule_Current_Lesson' 
         data-class_id='".$i."' 
         data-date='".$date."' 
@@ -185,19 +208,25 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                 echo "<span class='teacher'>преп. " . $aMainLessonData["teacher"] . "</span><hr><span class='client'>" . $aMainLessonData["client"] . "</span>";
 
                 if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) )
-                echo "<ul class=\"submenu\">
+                {
+                    echo "<ul class=\"submenu\">
                         <li>
                             <a href=\"#\"></a>
                             <ul class=\"dropdown\"";
-                            if($oMainLesson->groupId() == 0) echo "data-clientid='".$oMainLesson->clientId()."'";
-                            echo " data-lessonid='".$oMainLesson->getId()."'>";
-                            if($oMainLesson->groupId() == 0)
-                                echo "<li><a href=\"#\" class='schedule_absent'>Временно отсутствует</a></li>";
-                            echo "
-                                <li><a href=\"#\" class='schedule_delete_main'>Удалить из основного графика</a></li>
+                    if($oMainLesson->groupId() == 0) echo "data-clientid='".$oMainLesson->clientId()."'";
+                    echo " data-lessonid='".$oMainLesson->getId()."'>";
+                    if($oMainLesson->groupId() == 0)
+                        echo "<li><a href=\"#\" class='schedule_absent'>Временно отсутствует</a></li>";
+                    echo "
+                                <li>
+                                    <a href=\"#\" class='schedule_delete_main' data-date='".$date."' data-id='".$oMainLesson->getId()."'>
+                                        Удалить из основного графика
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     </ul>";
+                }
                 echo "</td>";
             }
         }
@@ -261,6 +290,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                 echo "<span class='teacher'>преп. " . $aMainLessonData["teacher"] . "</span><hr><span class='client'>" . $aMainLessonData["client"] . "</span>";
 
                 if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) )
+                {
                     echo "<ul class=\"submenu\">
                         <li>
                             <a href=\"#\"></a>
@@ -271,6 +301,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                             </ul>
                         </li>
                     </ul>";
+                }
                 echo "</td>";
             }
             /**
