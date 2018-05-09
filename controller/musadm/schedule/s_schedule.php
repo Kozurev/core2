@@ -56,11 +56,11 @@ if($action === "getScheduleLessonPopup")
                 ->name("class_id")
                 ->value($classId)
         )
-        ->addEntity(
-            Core::factory("Core_Entity")
-                ->name("model_name")
-                ->value($modelName)
-        )
+//        ->addEntity(
+//            Core::factory("Core_Entity")
+//                ->name("model_name")
+//                ->value($modelName)
+//        )
         ->addEntity(
             Core::factory("Core_Entity")
                 ->name("date")
