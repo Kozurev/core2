@@ -146,6 +146,8 @@ function toSeconds( $time )
 {
     $aSegments = explode(":", $time);
 
+    if(!is_array($aSegments) || count($aSegments) < 3) return "";
+
     $hours =    intval( $aSegments[0] );
     $minutes =  intval( $aSegments[1] );
     $seconds =  intval( $aSegments[2] );
@@ -166,8 +168,11 @@ function refactorTimeFormat( $time )
 }
 
 
-function refactorDateFormat ( $date )
+function refactorDateFormat ( $date, $glue = ".", $type = "full")
 {
     $aSegments = explode("-", $date);
-    return $aSegments[2] . "-". $aSegments[1] . "-" . $aSegments[0];
+    //$aSegments[2] . ".". $aSegments[1] . "." . $aSegments[0];
+    if( $type === "short" ) unset($aSegments[0]);
+    $aSegments = array_reverse($aSegments);
+    return implode($glue, $aSegments);
 }
