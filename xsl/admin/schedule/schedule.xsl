@@ -67,6 +67,10 @@
             </td>
             <td><xsl:value-of select="count_classess" /></td>
             <td>
+                <!--Редактирование-->
+                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Schedule_Area&amp;model_id={id}" class="link updateLink" />
+                <!--Удаление-->
+                <a href="admin" data-model_name="Schedule_Area" data-model_id="{id}" class="delete deleteLink"></a>
             </td>
         </tr>
     </xsl:template>
