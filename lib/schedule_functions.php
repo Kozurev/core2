@@ -12,6 +12,7 @@ function array_pop_lesson( $aoLessons, $time, $classId )
 
     foreach ( $aoLessons as $key => $lesson )
     {
+        //if( compareTime( $lesson->timeFrom(), ">=", $time ) && compareTime( $lesson->timeFrom(), "<=", addTime($time, SCHEDULE_DELIMITER) ) && $lesson->classId() == $classId )
         if( compareTime( $lesson->timeFrom(), "==", $time ) && $lesson->classId() == $classId )
         {
             $temp = $aoLessons[$key];
@@ -58,7 +59,10 @@ function getLessonData( $oLesson )
     if ($oLesson->groupId() != 0)
     {
         $oGroup = $oLesson->getGroup();
-        $oTeacher = $oGroup->getTeacher();
+
+        if($oLesson->teacherId() == 0)  $oTeacher = $oGroup->getTeacher();
+        else $oTeacher = $oLesson->getTeacher();
+
         $output["teacher"] = $oTeacher->surname() . "<br>" . $oTeacher->name();
         $output["client"] = $oGroup->title();
         $output["client_status"] = "group";
