@@ -42,6 +42,7 @@ class Orm
 
 	public function open()
     {
+        //$this->where .= " (";
         $this->open = 1;
         return $this;
     }
@@ -349,6 +350,22 @@ class Orm
 	}
 
 
+	public function between($param, $val1, $val2, $condition = "and")
+    {
+        if( $this->where != "" )
+            $this->where .= " " . $condition . " ";
+
+        if( $this->open == 1 )
+        {
+            $this->where .= "(";
+            $this->open = 0;
+        }
+
+        $this->where .= $param . " BETWEEN '" . $val1 . "' AND '" . $val2 . "' ";
+        return $this;
+    }
+
+
 	/**
 	*	Метод задающий условия выборки данных
 	* 	@return self
@@ -405,11 +422,11 @@ class Orm
                 $this->open = 0;
             }
 
-            if($this->close == 1)
-            {
-                $condition = ")" . $condition;
-                $this->close = 0;
-            }
+//            if($this->close == 1)
+//            {
+//                $condition = ")" . $condition;
+//                $this->close = 0;
+//            }
 
             $this->where .= $condition;
             $this->where .= $row." ".$operation." '".$value."' ";
