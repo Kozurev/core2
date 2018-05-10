@@ -352,6 +352,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
 
 
                 echo "<td class='" . $aCurrentLessonData["client_status"] . "' rowspan='" . $rowspan . "'>";
+                if( isset($oCurrentLesson->oldid) ) echo "<span><b>Временно</b></span><hr>";
                 echo "<span class='teacher'>преп. " . $aCurrentLessonData["teacher"] . "</span><hr><span class='client'>" . $aCurrentLessonData["client"] . "</span>";
 
                 if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) ) {
