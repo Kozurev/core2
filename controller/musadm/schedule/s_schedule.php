@@ -56,11 +56,6 @@ if($action === "getScheduleLessonPopup")
                 ->name("class_id")
                 ->value($classId)
         )
-//        ->addEntity(
-//            Core::factory("Core_Entity")
-//                ->name("model_name")
-//                ->value($modelName)
-//        )
         ->addEntity(
             Core::factory("Core_Entity")
                 ->name("date")
@@ -95,25 +90,77 @@ if($action === "getScheduleLessonPopup")
         ->addEntities($aoUsers)
         ->addEntities($aoGroups);
 
-//    $aoTeachers = Core::factory("User")
-//        ->where("active", "=", 1)
-//        ->where("group_id", "=", 4)
-//        ->findAll();
-//
-//    $output->addEntities($aoTeachers, "teachers");
-//
-//
-//    $aoClients = Core::factory("User")
-//        ->where("active", "=", 1)
-//        ->where("group_id", "=", 5)
-//        ->findAll();
-//
-//    $output->addEntities($aoClients, "clients");
-
     if($modelName == "Schedule_Current_Lesson") $output->xsl("musadm/schedule/new_current_lesson_popup.xsl");
     elseif($modelName == "Schedule_Lesson")     $output->xsl("musadm/schedule/new_lesson_popup.xsl");
 
     $output->show();
+
+    exit;
+}
+
+
+if($action === "markDeleted")
+{
+    $lessonId = Core_Array::getValue($_GET, "lessonid", 0);
+    $deleteDate = Core_Array::getValue($_GET, "deletedate", "");
+
+    $oLesson = Core::factory("Schedule_Lesson", $lessonId);
+    $oLesson->markDeleted($deleteDate);
+    exit;
+}
+
+
+if($action === "markAbsent")
+{
+    $lessonId = Core_Array::getValue($_GET, "lessonid", 0);
+    $date = Core_Array::getValue($_GET, "date", "");
+
+    Core::factory("Schedule_Lesson", $lessonId)->setAbsent($date);
+    exit;
+}
+
+
+if($action === "getScheduleChangeTimePopup")
+{
+    $id = Core_Array::getValue($_GET, "id", 0);
+    $type = Core_Array::getValue($_GET, "type", "");
+    $date = Core_Array::getValue($_GET, "date", "");
+
+    $output = Core::factory("Core_Entity");
+
+    if($type == "Schedule_Lesson")
+    {
+        $modelName = "Schedule_Lesson_TimeModified";
+        $oModify = Core::factory($modelName)
+            ->where("lesson_id", "=", $id)
+            ->where("date", "=", $date)
+            ->find();
+
+        if($oModify == false)
+            $oModify = Core::factory($modelName)->lessonId($id);
+
+        $output->addEntity(
+            Core::factory("Core_Entity")
+                ->name("lesson_id")
+                ->value($id)
+        )
+        ->addEntity($oModify);
+    }
+    else
+    {
+        $modelName = $type;
+        $oCurrentLesson = Core::factory("Schedule_Current_Lesson", $id);
+        $output->addEntity($oCurrentLesson);
+    }
+
+    $output
+        ->addEntity(
+            Core::factory("Core_Entity")
+                ->name("model_name")
+                ->value("$modelName")
+        )
+        ->xsl("musadm/schedule/time_modify_popup.xsl")
+        ->show();
 
     exit;
 }

@@ -62,7 +62,7 @@ elseif($oUser->groupId() == 4)
 
     $aoCurrentLessons
         ->open()
-        ->where("teaacher_id", "=", $userId)
+        ->where("teacher_id", "=", $userId)
         ->where("group_id", "in", $aTeacherGroups, "or")
         ->close();
 }
@@ -80,6 +80,7 @@ $aoMainLessons
 $aoCurrentLessons
     ->where("date", "=", $date)
     ->where("area_id", "=", $areaId);
+
 
 $aoCurrentLessons = $aoCurrentLessons->findAll();
 $aoMainLessons = $aoMainLessons->findAll();
@@ -141,19 +142,20 @@ $period = "00:15:00";       //Временной промежуток (врем�
 if(defined("SCHEDULE_DELIMITER") != "")   $period = SCHEDULE_DELIMITER;
 $time = $timeStart;
 
-$maxLessonTime[0][1] = "00:00:00";
-$maxLessonTime[0][2] = "00:00:00";
-$maxLessonTime[0][3] = "00:00:00";
-$maxLessonTime[0][4] = "00:00:00";
-$maxLessonTime[0][5] = "00:00:00";
+$maxLessonTime = array();
 
-$maxLessonTime[1][1] = "00:00:00";
-$maxLessonTime[1][2] = "00:00:00";
-$maxLessonTime[1][3] = "00:00:00";
-$maxLessonTime[1][4] = "00:00:00";
-$maxLessonTime[1][5] = "00:00:00";
+for ($i = 0; $i <= 1; $i++)
+{
+    for ($class = 1; $class <= $oArea->countClassess(); $class++)
+    {
+        $maxLessonTime[$i][$class] = "00:00:00";
+    }
+}
 
-
+/**
+ * Формирование таблицы
+ * Начало >>
+ */
 while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
 {
     echo "<tr>";
@@ -180,6 +182,35 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
             //Урок из основного расписания
             $oMainLesson = array_pop_lesson( $aoMainLessons, $time, $class );
 
+
+            /**
+             * Если у занятия изменено время на текущую дату то необходимо добавить
+             * его в список занятий текущего расписания
+             */
+            if( $oMainLesson != false && $oMainLesson->isTimeModified( $date ) )
+            {
+                $oModify = Core::factory("Schedule_Lesson_TimeModified")
+                    ->where("lesson_id", "=", $oMainLesson->getId())
+                    ->where("date", "=", $date)
+                    ->find();
+
+                $oNewCurrentLesson = Core::factory("Schedule_Current_Lesson")
+                    ->date($date)
+                    ->timeFrom($oModify->timeFrom())
+                    ->timeTo($oModify->timeTo())
+                    ->classId($oMainLesson->classId())
+                    ->areaId($oMainLesson->areaId())
+                    ->teacherId($oMainLesson->teacherId())
+                    ->clientId($oMainLesson->clientId())
+                    ->groupId($oMainLesson->groupId());
+
+                $oNewCurrentLesson->lessonType = "main";
+                $oNewCurrentLesson->oldid = $oMainLesson->getId();
+
+                $aoCurrentLessons[] = $oNewCurrentLesson;
+            }
+
+
             if( $oMainLesson == false )
             {
                 echo "<th>".refactorTimeFormat( $time )."</th>";
@@ -197,6 +228,29 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                 }
                 $maxLessonTime[0][$class] = $tmpTime;
 
+
+                /**
+                 * Проверка периода отсутствия
+                 * false - период отсутствия не найден
+                 * true - период отсутсвия найден
+                 */
+                if( $oMainLesson != false )
+                {
+                    if( $oMainLesson->groupId() != 0 )
+                    {
+                        $checkClientAbsent = false;
+                    }
+                    else
+                    {
+                        $checkClientAbsent = Core::factory("Schedule_Absent")
+                            ->where("client_id", "=", $oMainLesson->clientId())
+                            ->where("date_from", "<=", $date)
+                            ->where("date_to", ">=", $date)
+                            ->find();
+                    }
+                }
+
+
                 /**
                  * Получение информации об уроке (учитель, клиент, цвет фона)
                  * и формирование HTML-кода
@@ -205,6 +259,17 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
 
                 echo "<th>" . refactorTimeFormat( $time ) . "</th>";
                 echo "<td class='" . $aMainLessonData["client_status"] . "' rowspan='" . $rowspan . "'>";
+
+                if( $checkClientAbsent == true)
+                {
+                    echo "<span><b>Отсутствует с ".refactorDateFormat($checkClientAbsent->dateFrom(), ".", "short")." 
+                    по ".refactorDateFormat($checkClientAbsent->dateTo(), ".", "short")."</b></span><hr>";
+                }
+                elseif( $oMainLesson->isAbsent($date) )
+                {
+                    echo "<span><b>Отсутствует сегодня</b></span><hr>";
+                }
+
                 echo "<span class='teacher'>преп. " . $aMainLessonData["teacher"] . "</span><hr><span class='client'>" . $aMainLessonData["client"] . "</span>";
 
                 if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) )
@@ -240,52 +305,20 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
          * Текущее расписание
          * Начало >>
          */
-        if( !compareTime($time, ">=", $maxLessonTime[1][$class]) )
-        {
-            //echo "<th>" . refactorTimeFormat( $time ) . "</th>";
-        }
-        else
+        if(compareTime($time, ">=", $maxLessonTime[1][$class]))
         {
             //Урок из текущего расписания
             $oCurrentLesson = array_pop_lesson( $aoCurrentLessons, $time, $class );
 
 
             /**
-             * Проверка периода отсутствия
-             * false - период отсутствия не найден
-             * true - период отсутсвия найден
-             * Начало >>
-             */
-            if( $oMainLesson != false )
-            {
-                if( $oMainLesson->groupId() != 0 )
-                {
-                    $checkClientAbsent = false;
-                }
-                else
-                {
-                    $checkClientAbsent = Core::factory("Schedule_Absent")
-                        ->where("client_id", "=", $oMainLesson->clientId())
-                        ->where("date_from", "<=", $date)
-                        ->where("date_to", ">=", $date)
-                        ->find();
-                }
-            }
-            /**
-             * << Конец
-             * Поиск периода отсутствия
-             */
-
-
-            /**
              * Дублирование из основного графика
              */
-            if( $oMainLesson != false && $checkClientAbsent == false )
+            if( $oMainLesson != false && $checkClientAbsent == false && !$oMainLesson->isAbsent($date) && !$oMainLesson->isTimeModified($date) )
             {
                 //Поиск высоты ячейки (значение тэга rowspan) и обновление $maxLessonTime
                 $rowspan = updateLastLessonTime( $oMainLesson, $maxLessonTime[1][$class], $time, $period );
 
-                //echo "<th>" . refactorTimeFormat( $time ) . "</th>";
                 echo "<td class='" . $aMainLessonData["client_status"] . "' rowspan='" . $rowspan . "'>";
                 echo "<span class='teacher'>преп. " . $aMainLessonData["teacher"] . "</span><hr><span class='client'>" . $aMainLessonData["client"] . "</span>";
 
@@ -294,10 +327,9 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                     echo "<ul class=\"submenu\">
                         <li>
                             <a href=\"#\"></a>
-                            <ul class=\"dropdown\" data-userid='".$oUser->getId()." data-id='".$oMainLesson->getId()."'>
-                                <li><a href=\"#\" class='schedule_delete_current'>Отсутствует сегодня</a></li>
-                                <li><a href=\"#\" class='schedule_update_current'>Изменить на сегодня время</a></li>
-                                <li><a href=\"#\">Поставить пропуск</a></li>
+                            <ul class=\"dropdown\" data-userid='".$oUser->getId()."' data-id='".$oMainLesson->getId()."' data-date='".$date."' data-type='Schedule_Lesson'>
+                                <li><a href=\"#\" class='schedule_today_absent'>Отсутствует сегодня</a></li>
+                                <li><a href=\"#\" class='schedule_update_time'>Изменить на сегодня время</a></li>
                             </ul>
                         </li>
                     </ul>";
@@ -307,7 +339,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
             /**
              * Текущий урок
              */
-            elseif( ($oMainLesson == false || $checkClientAbsent == true) && $oCurrentLesson != false )
+            elseif( ($oMainLesson == false || $checkClientAbsent == true || $oMainLesson->isAbsent($date)) && $oCurrentLesson != false )
             {
                 //Поиск высоты ячейки (значение тэга rowspan) и обновление $maxLessonTime
                 $rowspan = updateLastLessonTime( $oCurrentLesson, $maxLessonTime[1][$class], $time, $period );
@@ -319,29 +351,32 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                 $aCurrentLessonData = getLessonData( $oCurrentLesson );
 
 
-                //echo "<th>" . refactorTimeFormat( $time ) . "</th>";
                 echo "<td class='" . $aCurrentLessonData["client_status"] . "' rowspan='" . $rowspan . "'>";
                 echo "<span class='teacher'>преп. " . $aCurrentLessonData["teacher"] . "</span><hr><span class='client'>" . $aCurrentLessonData["client"] . "</span>";
 
-                if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) )
+                if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) ) {
                     echo "<ul class=\"submenu\">
                         <li>
                             <a href=\"#\"></a>
-                            <ul class=\"dropdown\" data-userid='".$oUser->getId()." data-id='".$oCurrentLesson->getId()."'>
-                                <li><a href=\"#\" class='schedule_delete_current'>Отсутствует сегодня</a></li>
-                                <li><a href=\"#\" class='schedule_update_current'>Изменить на сегодня время</a></li>
-                                <li><a href=\"#\">Поставить пропуск</a></li>
+                            <ul class=\"dropdown\" data-userid='" . $oUser->getId() . "' data-date='" . $date . "' ";
+
+                    if (isset($oCurrentLesson->oldid)) echo "data-id='" . $oCurrentLesson->oldid . "' data-type='Schedule_Lesson'> ";
+                    else                                echo "data-id='" . $oCurrentLesson->getId() . "' data-type='Schedule_Current_Lesson'> ";
+
+                    echo "
+                                <li><a href=\"#\" class='schedule_today_absent'>Отсутствует сегодня</a></li>
+                                <li><a href=\"#\" class='schedule_update_time'>Изменить на сегодня время</a></li>
                             </ul>
                         </li>
                     </ul>";
-                echo "</td>";
+                    echo "</td>";
+                }
             }
             /**
              * Занятие отсутствует
              */
             else
             {
-                //echo "<th>".refactorTimeFormat( $time )."</th>";
                 echo "<td class='clear'></td>";
             }
         }
@@ -359,4 +394,8 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
     $time = addTime( $time, $period );
     echo "</tr>";
 }
+/**
+ * << Конец
+ * Формирование таблицы
+ */
 echo "<table>";
