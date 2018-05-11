@@ -8,6 +8,12 @@
 
 class Schedule_Group extends Schedule_Group_Model
 {
+
+    /**
+     * Получение списка клиентов группы
+     *
+     * @return array
+     */
     public function getClientList()
     {
         if($this->id == null)   return array();
@@ -31,6 +37,9 @@ class Schedule_Group extends Schedule_Group_Model
     }
 
 
+    /**
+     * Очистка списка клиентов группы
+     */
     public function clearClientList()
     {
         if($this->id == null)   return;
@@ -43,13 +52,22 @@ class Schedule_Group extends Schedule_Group_Model
     }
 
 
+    /**
+     * Получение объекта учителя
+     *
+     * @return object
+     */
     public function getTeacher()
     {
-        //if($this->id == null)   return false;
         return Core::factory("User", $this->teacher_id);
     }
 
 
+    /**
+     * Добавление пользователя в список клиентов
+     *
+     * @param $userid
+     */
     public function appendClient($userid)
     {
         if($this->id == null)   return;
@@ -64,7 +82,6 @@ class Schedule_Group extends Schedule_Group_Model
     public function delete($obj = null)
     {
         Core::notify(array(&$this), "beforeScheduleGroupDelete");
-        $this->clearClientList();
         parent::delete();
         Core::notify(array(&$this), "ScheduleGroupDelete");
     }
