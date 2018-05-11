@@ -10,10 +10,12 @@ function array_pop_lesson( $aoLessons, $time, $classId )
 {
     if(!is_array($aoLessons))   return false;
 
+    $timeMax = addTime($time, SCHEDULE_DELIMITER);
+        
     foreach ( $aoLessons as $key => $lesson )
     {
-        //if( compareTime( $lesson->timeFrom(), ">=", $time ) && compareTime( $lesson->timeFrom(), "<=", addTime($time, SCHEDULE_DELIMITER) ) && $lesson->classId() == $classId )
-        if( compareTime( $lesson->timeFrom(), "==", $time ) && $lesson->classId() == $classId )
+        if( compareTime( $lesson->timeFrom(), ">=", $time ) && compareTime( $lesson->timeFrom(), "<", $timeMax ) && $lesson->classId() == $classId )
+        //if( compareTime( $lesson->timeFrom(), "==", $time ) && $lesson->classId() == $classId )
         {
             $temp = $aoLessons[$key];
             unset($aoLessons[$key]);
@@ -74,6 +76,8 @@ function getLessonData( $oLesson )
         $output["teacher"] = $oTeacher->surname() . "<br>" . $oTeacher->name();
         $output["client"] = $oClient->surname() . "<br>" . $oClient->name();
 
+        //if($oLesson->getId() == 19 && get_class($oLesson) == "Schedule_Current_Lesson") debug($output);
+
         /**
          * Определение цвета "подцветки" занятия
          */
@@ -88,5 +92,29 @@ function getLessonData( $oLesson )
         if ($vk != "") $output["client_status"] .= " vk";
     }
 
+
     return $output;
+}
+
+
+/**
+ * Сортировка массива по времени
+ *
+ * @param $arr
+ * @param $prop
+ */
+function sortByTime( &$arr, $prop )
+{
+    for ( $i = 0; $i < count($arr) - 1; $i++ )
+    {
+        for ( $j = 0; $j < count($arr) - 1; $j++ )
+        {
+            if( compareTime( $arr[$j]->$prop(), ">", $arr[$j+1]->$prop() ) )
+            {
+                $tmp = $arr[$j];
+                $arr[$j] = $arr[$j + 1];
+                $arr[$j + 1] = $tmp;
+            }
+        }
+    }
 }
