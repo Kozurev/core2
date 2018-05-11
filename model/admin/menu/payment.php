@@ -17,7 +17,7 @@ class Admin_Menu_Payment
         $aoPayments = Core::factory("Payment")
             ->select(array("Payment.id as id", "Payment.datetime as datetime", "Payment.value as value",
                 "User.name", "User.surname", "Payment.type"))
-            ->join("User", "User.id = Payment.user")
+            ->leftJoin("User", "User.id = Payment.user")
             ->orderBy("Payment.datetime", "DESC");
             //->where("value", ">", "1");
 
@@ -76,8 +76,6 @@ class Admin_Menu_Payment
                     ->name("total_count")
                     ->value($totalCount)
             );
-
-
 
         $aoPayments = $aoPayments
             ->limit(SHOW_LIMIT)
