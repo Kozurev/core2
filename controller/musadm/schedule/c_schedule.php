@@ -85,7 +85,7 @@ $aoCurrentLessons
 $aoCurrentLessons = $aoCurrentLessons->findAll();
 $aoMainLessons = $aoMainLessons->findAll();
 
-
+$aoTeacherLessons = array_merge($aoCurrentLessons, $aoMainLessons);
 
 echo "<table class='schedule_table'>";
 
@@ -153,7 +153,7 @@ for ($i = 0; $i <= 1; $i++)
 }
 
 /**
- * Формирование таблицы
+ * Формирование таблицы расписания
  * Начало >>
  */
 while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
@@ -270,7 +270,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                     echo "<span><b>Отсутствует сегодня</b></span><hr>";
                 }
 
-                echo "<span class='teacher'>преп. " . $aMainLessonData["teacher"] . "</span><hr><span class='client'>" . $aMainLessonData["client"] . "</span>";
+                echo "<span class='client'>" . $aMainLessonData["client"] . "</span><hr><span class='teacher'>преп. " . $aMainLessonData["teacher"] . "</span>";
 
                 if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) )
                 {
@@ -320,7 +320,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                 $rowspan = updateLastLessonTime( $oMainLesson, $maxLessonTime[1][$class], $time, $period );
 
                 echo "<td class='" . $aMainLessonData["client_status"] . "' rowspan='" . $rowspan . "'>";
-                echo "<span class='teacher'>преп. " . $aMainLessonData["teacher"] . "</span><hr><span class='client'>" . $aMainLessonData["client"] . "</span>";
+                echo "<span class='client'>" . $aMainLessonData["client"] . "</span><hr><span class='teacher'>преп. " . $aMainLessonData["teacher"] . "</span>";
 
                 if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) )
                 {
@@ -353,7 +353,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
 
                 echo "<td class='" . $aCurrentLessonData["client_status"] . "' rowspan='" . $rowspan . "'>";
                 if( isset($oCurrentLesson->oldid) ) echo "<span><b>Временно</b></span><hr>";
-                echo "<span class='teacher'>преп. " . $aCurrentLessonData["teacher"] . "</span><hr><span class='client'>" . $aCurrentLessonData["client"] . "</span>";
+                echo "<span class='client'>" . $aCurrentLessonData["client"] . "</span><hr><span class='teacher'>преп. " . $aCurrentLessonData["teacher"] . "</span>";
 
                 if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) ) {
                     echo "<ul class=\"submenu\">
@@ -397,6 +397,31 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
 }
 /**
  * << Конец
- * Формирование таблицы
+ * Формирование таблицы расписания
  */
 echo "<table>";
+
+
+if( $oUser->groupId() == 4 )
+{
+    sortByTime($aoTeacherLessons, "timeFrom");
+
+    foreach ($aoTeacherLessons as $lesson)
+    {
+        $lesson->timeFrom(refactorTimeFormat($lesson->timeFrom()));
+        $lesson->timeTo(refactorTimeFormat($lesson->timeTo()));
+        $lesson->addEntity($lesson->getClient(), "client");
+        $lesson->disabled = 1;
+    }
+
+    Core::factory("Core_Entity")
+        ->addEntity(
+            Core::factory("Core_Entity")
+                ->name("date")
+                ->value(refactorDateFormat( $date ))
+        )
+        ->addEntity($oUser)
+        ->addEntities($aoTeacherLessons, "lesson")
+        ->xsl("musadm/schedule/teacher_table.xsl")
+        ->show();
+}
