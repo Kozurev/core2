@@ -2,41 +2,46 @@
 
 echo "<pre>";
 
+$limit = 10;
+$offset = Core_Array::getValue($_GET, "offset", 0);
+if($offset > 400) die("Выполнение скрипта окончено");
 
 /**
  * Предварительная очистка таблиц
  */
-$aoUsers = Core::factory("User")->findAll();
-foreach ($aoUsers as $user) $user->delete();
+if($offset == 0)
+{
+    $aoUsers = Core::factory("User")->findAll();
+    foreach ($aoUsers as $user) $user->delete();
 
-Core::factory("Orm")->executeQuery("TRUNCATE `User`");
-Core::factory("Orm")->executeQuery("TRUNCATE `Payment`");
+    Core::factory("Orm")->executeQuery("TRUNCATE `User`");
+    Core::factory("Orm")->executeQuery("TRUNCATE `Payment`");
 //Core::factory("Orm")->executeQuery("TRUNCATE `Schedule_Group`");
-Core::factory("Orm")->executeQuery("TRUNCATE `Schedule_Group_Assignment`");
+    Core::factory("Orm")->executeQuery("TRUNCATE `Schedule_Group_Assignment`");
 
-$oUser = Core::factory("User")
-    ->login("alexoufx")
-    ->password("0000")
-    ->surname("Козырев")
-    ->name("Егор")
-    ->patronimyc("Алексеевич")
-    ->phoneNumber("8-980-378-28-56")
-    ->email("creative27016@gmail.com")
-    ->groupId(1)
-    ->superuser(1)
-    ->active(1);
-$oUser->save();
+    $oUser = Core::factory("User")
+        ->login("alexoufx")
+        ->password("0000")
+        ->surname("Козырев")
+        ->name("Егор")
+        ->patronimyc("Алексеевич")
+        ->phoneNumber("8-980-378-28-56")
+        ->email("creative27016@gmail.com")
+        ->groupId(1)
+        ->superuser(1)
+        ->active(1);
+    $oUser->save();
 
-//Очистка связей и значений доп. свойств с пользователями
+    $dbh->query("SELECT * FROM users where id > 36 LIMIT $limit OFFSET $offset");
 
-
+}
 
 
 //Выгрузка (обновление) пользователей с основной БД
 $dbh = new mysqli("37.140.192.32:3306", "u4834_ADMIN", "big#psKT", "u4834955_musbase");
 $dbh->query("SET NAMES utf8");
 
-$aUsers = $dbh->query("SELECT * FROM users where id > 36");
+$aUsers = $dbh->query("SELECT * FROM users where id > 36 LIMIT $limit OFFSET $offset");
 
 
 $oPropertyVk =          Core::factory("Property", 9);
@@ -210,9 +215,14 @@ while($user = $aUsers->fetch_object())
             ->groupId(intval($group_ass->groupid) - 10)
             ->save();
     }
-
-
-
 }
 
+$offset += $limit;
+echo "Обработано " . $offset . " записей ";
 
+
+?>
+
+<script>
+    location.href='/refreshusers?offset=<?=$offset?>';
+</script>
