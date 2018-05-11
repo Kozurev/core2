@@ -10,6 +10,7 @@ class Orm
     private $order;
     private $limit;
     private $join;
+    private $leftJoin;
     private $having;
     private $groupby;
     private $offset;
@@ -192,6 +193,9 @@ class Orm
         if($this->join != "")
             $this->queryString .= $this->join;
 
+        if($this->leftJoin != "")
+            $this->queryString .= $this->leftJoin;
+
         if($this->where != "")
             $this->queryString .= " WHERE ".$this->where;
 
@@ -258,6 +262,7 @@ class Orm
         $this->having = "";
         $this->orderBy = "";
         $this->offset = "";
+        $this->leftJoin = "";
         $this->open = 0;
         $this->close = 0;
         return $this;
@@ -508,6 +513,12 @@ class Orm
 		return $this;
 	}
 
+
+	public function leftJoin($table, $condition)
+    {
+        $this->leftJoin = " LEFT JOIN " . $table . " ON " . $condition;
+        return $this;
+    }
 
     public function having($row, $operation, $value)
     {
