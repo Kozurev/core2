@@ -137,7 +137,7 @@ if($action === "getScheduleChangeTimePopup")
             ->find();
 
         if($oModify == false)
-            $oModify = Core::factory($modelName)->lessonId($id);
+            $oModify = Core::factory($modelName)->lessonId($id)->date($date);
 
         $output->addEntity(
             Core::factory("Core_Entity")
