@@ -46,6 +46,7 @@
                 <xsl:otherwise>
                     <input type="hidden" name="id" value="{schedule_lesson_timeModified/id}" />
                     <input type="hidden" name="lessonId" value="{schedule_lesson_timeModified/lesson_id}" />
+                    <input type="hidden" name="date" value="{schedule_lesson_timeModified/date}"/>
                 </xsl:otherwise>
             </xsl:choose>
 
