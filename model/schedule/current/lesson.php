@@ -25,8 +25,10 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
 
     public function getClient()
     {
-        if($this->client_id != "")
+        if($this->client_id)
             return Core::factory("User", $this->client_id);
+        if($this->group_id)
+            return Core::factory("Schedule_Group", $this->group_id);
     }
 
 
@@ -70,9 +72,28 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
             ->where("class_id", "=", $this->class_id)
             ->findAll();
 
+        $iModifies = Core::factory("Schedule_Lesson")
+            ->select("st.id")
+            ->select("st.time_from")
+            ->select("st.time_to")
+            ->join("Schedule_Lesson_TimeModified as st", "st.lesson_id = Schedule_Lesson.id")
+            ->where("Schedule_Lesson.area_id", "=", $this->area_id)
+            ->open()
+            ->between("st.time_from", $this->time_from, $this->time_to)
+            ->between("st.time_to", $this->time_from, $this->time_to, "OR")
+            ->close()
+            ->where("Schedule_Lesson.class_id", "=", $this->class_id)
+            ->where("date", "=", $this->date)
+            ->getCount();
+
+        if( $iModifies > 0 )
+        {
+            die("Добавление невозможно по причине пересечения с другим занятием");
+        }
+
+
         if( $aoLessons == false || count($aoLessons) == 0 )
         {
-            //echo "Добавление возможно";
             parent::save();
             return $this;
         }
@@ -106,10 +127,9 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
                 }
             }
 
-            if($clientAbsent == false)
+            if($clientAbsent == false && !$lesson->isAbsent($this->date))
             {
-                echo "Добавление невозможно по причине пересечения с другим занятием";
-                return $this;
+                die("Добавление невозможно по причине пересечения с другим занятием");
             }
             else
             {

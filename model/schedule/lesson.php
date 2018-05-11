@@ -24,8 +24,10 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
     public function getClient()
     {
-        if($this->client_id != "")
+        if($this->client_id)
             return Core::factory("User", $this->client_id);
+        if($this->group_id)
+            return Core::factory("Schedule_Group", $this->group_id);
     }
 
 
@@ -121,30 +123,41 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         if ($this->delete_date == "" || $this->delete_date == "0000-00-00") $this->delete_date = "2001-01-01";
 
         /**
-         * Проверка на пересечение добавляемого занятия с другими по времени
+         * Проверка на пересечение добавляемого занятия с другими (из основного расписания) по времени
          */
-        $oLesson = Core::factory("Schedule_Lesson")
+        $iLessons = Core::factory("Schedule_Lesson")
             ->where("id", "<>", $this->id)
             ->where("day_name", "=", $this->day_name)
             ->where("insert_date", "<=", $this->insert_date)
             ->open()
-            ->where("delete_date", ">", $this->delete_date)
-            ->where("delete_date", "=", "2001-01-01", "or")
+            ->where("delete_date", ">", $this->insert_date)
+            ->where("delete_date", "=", "2001-01-01", "OR")
             ->close()
             ->where("area_id", "=", $this->area_id)
             ->open()
             ->between("time_from", $this->time_from, $this->time_to)
-            ->between("time_to", $this->time_from, $this->time_to, "or")
+            ->between("time_to", $this->time_from, $this->time_to, "OR")
             ->close()
             ->where("class_id", "=", $this->class_id)
             ->getCount();
 
-        if ($oLesson > 0)
-        {
-            //echo "Добавление невозможно по причине пересечения с другим занятием";
-            return $this;
-        }
+        /**
+         * Проверка на пересечение добавляемого занятия с другими (из текущего расписания) по времени
+         */
+        $iCurrentLessons = Core::factory("Schedule_Current_Lesson")
+            ->where("date", "=", $this->insert_date)
+            ->where("class_id", "=", $this->class_id)
+            ->where("area_id", "=", $this->area_id)
+            ->open()
+            ->between("time_from", $this->time_from, $this->time_to)
+            ->between("time_to", $this->time_from, $this->time_to, "OR")
+            ->close()
+            ->getCount();
 
+        if ($iLessons > 0 || $iCurrentLessons > 0)
+        {
+            die("Добавление невозможно по причине пересечения с другим занятием");
+        }
 
         parent::save();
 
