@@ -44,6 +44,48 @@ Core::attachObserver("beforeUserDelete", function($args){
 
 
 /**
+ * Удаление всех занятий и связей с группами, принадлежащие этому пользователю
+ */
+Core::attachObserver("beforeUserDelete", function($args){
+    $oUser = $args[0];
+
+    /**
+     * Удаление принадлежности к группам
+     */
+    $aoGroupsAssignments = Core::factory("Schedule_Group_Assignment")
+        ->where("user_id", "=", $oUser->getId())
+        ->findAll();
+
+    foreach ($aoGroupsAssignments as $oAssignment)  $oAssignment->delete();
+
+    /**
+     * Если пользователь был учителем одной из групп необъодимо откорректировать свойство teracher_id
+     */
+    $aoGroups = Core::factory("Schedule_Group")
+        ->where("teacher_id", "=", $oUser->getId())
+        ->findAll();
+
+    foreach ($aoGroups as $oGroup)  $oGroup->teacherId("0")->save();
+
+    /**
+     * Поиск занятий, с которымисвязан пользователь и удаление
+     */
+    $aoLessons = Core::factory("Schedule_Lesson")
+        ->where("client_id", "=", $oUser->getId())
+        ->where("teacher_id", "=", $oUser->getId(), "OR")
+        ->findAll();
+
+    $aoCurrentLessons = Core::factory("Schedule_Current_Lesson")
+        ->where("client_id", "=", $oUser->getId())
+        ->where("teacher_id", "=", $oUser->getId(), "OR")
+        ->findALl();
+
+    $aoLessons = array_merge($aoLessons, $aoCurrentLessons);
+    foreach ($aoLessons as $oLesson)    $oLesson->delete();
+});
+
+
+/**
  * Рекурсивное удаление вложенных макетов и диекторий при удалении директории
  */
 Core::attachObserver("beforeTemplateDirDelete", function($args){
@@ -152,9 +194,11 @@ Core::attachObserver("beforeStructureSave", function($args){
 });
 
 
+/**
+ * Проверка на совпадение пути элемента структуры для избежания дублирования пути
+ */
 Core::attachObserver("beforeItemSave", function($args){
     $oStructure = $args[0];
-    //$oParentStructure = $oStructure->getParent();
     $oRootStructure = Core::factory("Structure")->where("path", "=", "")->find();
     $aParentId[] = $oStructure->parentId();
 
@@ -177,7 +221,6 @@ Core::attachObserver("beforeItemSave", function($args){
         ->getCount();
 
     if($countCoincidingItems > 0 || $countCoincidingStructures > 0) die("Дублирование путей");
-    //die("Дублирование не обнаружено");
 });
 
 
@@ -188,5 +231,53 @@ Core::attachObserver("afterLidSave", function($args){
     $oLid = $args[0];
     Core::factory("Property")->addToPropertiesList($oLid, 27);
 });
+
+
+/**
+ * Удаление всех занятий в расписании, с которыми была связана данная группа
+ */
+Core::attachObserver("beforeScheduleGroupDelete", function($args){
+    $oGroup = $args[0];
+    $oGroup->clearClientList();
+
+    $aoLessons = Core::factory("Schedule_Lesson")
+        ->where("group_id", "=", $oGroup->getId())
+        ->findAll();
+
+    $aoCurrentLessons = Core::factory("Schedule_Lesson")
+        ->where("group_id", "=", $oGroup->getId())
+        ->findAll();
+
+    $aoLessons = array_merge($aoLessons, $aoCurrentLessons);
+
+    foreach ($aoLessons as $oLesson)    $oLesson->delete();
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
