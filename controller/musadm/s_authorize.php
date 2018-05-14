@@ -21,11 +21,9 @@ if(isset($_POST["login"]) && isset($_POST["password"]))
     {
         global $CFG;
 
-        if($oUser->groupId() > 3)   $back = "/".$CFG->rootdir."schedule";
+        if($oUser->groupId() > 3)   $back = "/".$CFG->rootdir."schedule/michurina";
         elseif($oUser->groupId() < 3)   $back = "/".$CFG->rootdir."user/client";
 
-
-        //$back = Core_Array::getValue($_GET, "back",  "/".$CFG->rootdir);
         header("Location: ".$back);
     }
 }

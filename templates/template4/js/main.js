@@ -53,7 +53,7 @@ function saveData(link, func) {
         data: data,
         success: function(responce) {
             closePopup();
-            if(responce != "0") alert(responce);
+            if(responce != "0" && responce != "") alert(responce);
             if($.isFunction(func)) func();
         }
     });

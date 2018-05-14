@@ -10,10 +10,10 @@ class Schedule_Lesson_Report extends Core_Entity
 {
     protected $id;
     protected $teacher_id;
-    protected $client_id = 0;
-    protected $group_id = 0;
+    protected $client_id;
     protected $attendance = 0;
     protected $lesson_id;
+    protected $type_id;
     protected $date;
 
 
@@ -23,6 +23,14 @@ class Schedule_Lesson_Report extends Core_Entity
     public function getId()
     {
         return $this->id;
+    }
+
+
+    public function typeId($val = null)
+    {
+        if(is_null($val))   return $this->type_id;
+        $this->type_id = intval($val);
+        return $this;
     }
 
 

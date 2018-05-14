@@ -483,6 +483,9 @@ class Admin_Form extends Admin_Form_Model
 
         $this->addEntities($aoUsers, "item");
 
+        $aoGroups = Core::factory("Schedule_Group")->findAll();
+        $this->addEntities($aoGroups, "item");
+
         $modelId = Core_Array::getValue($aParams, "model_id", 0);
         $modelName = Core_Array::getValue($aParams, "model", "");
         if($modelId > 0)
@@ -503,6 +506,19 @@ class Admin_Form extends Admin_Form_Model
         {
             $this->value = Core::factory($modelName, $modelId)->groupId();
         }
+    }
+
+
+    public function getListLessonTypes($aParams)
+    {
+        $aoTypes = Core::factory("Schedule_Lesson_Type")->findAll();
+        $modelId = Core_Array::getValue($aParams, "model_id", 0);
+        if($modelId > 0)
+        {
+            $this->value = Core::factory("Schedule_Lesson_Type", $modelId)->typeId();
+        }
+
+        $this->addEntities($aoTypes, "item");
     }
 
 }

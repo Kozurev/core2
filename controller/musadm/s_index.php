@@ -59,7 +59,7 @@ elseif($oCurentUser->groupId() < 4)
 }
 elseif($oCurentUser->groupId() > 3 && !$pageUserId)
 {
-	header("Location: http://$host$uri/schedule");
+	header("Location: http://$host$uri/schedule/michurina");
 	exit;
     //echo "<h1>Только пользователь</h1>";
 }

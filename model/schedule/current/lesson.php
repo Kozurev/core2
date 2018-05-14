@@ -11,26 +11,36 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
 
     public function getGroup()
     {
-        if($this->group_id != "")
-            return Core::factory("Schedule_Group", $this->group_id);
+        $oGroup = Core::factory("Schedule_Group", $this->client_id);
+        return $oGroup;
     }
 
 
     public function getTeacher()
     {
-        if($this->teacher_id != "")
-            return Core::factory("User", $this->teacher_id);
+        return Core::factory("User", $this->teacher_id);
     }
 
 
     public function getClient()
     {
-        if($this->client_id)
+        if($this->type_id != 2)
             return Core::factory("User", $this->client_id);
-        if($this->group_id)
-            return Core::factory("Schedule_Group", $this->group_id);
+        else
+            return Core::factory("Schedule_Group", $this->client_id);
     }
 
+
+    public function isReported($date)
+    {
+        $report = Core::factory("Schedule_Lesson_Report")
+            ->where("date", "=", $date)
+            ->where("lesson_id", "=", $this->id)
+            ->where("type_id", "=", $this->type_id)
+            ->find();
+
+        return $report;
+    }
 
 
     public function save($obj = null)
@@ -102,7 +112,7 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
         {
             $clientAbsent = false;
 
-            if( $lesson->groupId() != 0 )
+            if( $lesson->typeId() == 2 )
             {
                 $clientAbsent = false;
             }

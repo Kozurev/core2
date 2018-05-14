@@ -74,7 +74,7 @@
             <nav class="navbar navbar-default">
                 <div class="container-fluid">
                     <div class="navbar-header">
-                        <a class="navbar-brand" href="<?=$rootdir?>" >Musicmethod</a>
+                        <a class="navbar-brand" href="<?=$rootdir?>" >Musicmetod</a>
                     </div>
                     <ul class="nav navbar-nav">
                         <li class="dropdown">
@@ -119,7 +119,7 @@
                                 </ul>
                             </li>
                             <li><a href="<?=$rootdir?>groups">Группы</a></li>
-                            <li><a href="<?=$rootdir?>tarif" >Тарифы</a></li>
+<!--                            <li><a href="--><?//=$rootdir?><!--tarif" >Тарифы</a></li>-->
                             <li><a href="<?=$rootdir?>lids">Лиды</a></li>
                             <li><a href="#">Сертификаты</a></li>
                             <li><a href="#">Задачи</a></li>

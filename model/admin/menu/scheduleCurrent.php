@@ -55,7 +55,12 @@ class Admin_Menu_ScheduleCurrent
             {
                 $lesson->addEntity($lesson->getTeacher(), "teacher");
                 $lesson->addEntity($lesson->getClient(), "client");
-                $lesson->addEntity($lesson->getGroup(), "group");
+                $oClient = $lesson->getClient();
+                if($lesson->typeId() == 2)
+                    $clientType = "group";
+                else
+                    $clientType = "client";
+                $lesson->addEntity($oClient, $clientType);
             }
 
             $title = "Текущее расписание. " . Core::factory("Schedule_Area", $parentId)->title();

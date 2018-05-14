@@ -29,8 +29,7 @@ class Property_Int extends Core_Entity
 	public function value($val = null)
 	{
 		if(is_null($val))	return $this->value;
-
-		$this->value = intval($val);
+		$this->value = floatval($val);
 		return $this;
 	}
 

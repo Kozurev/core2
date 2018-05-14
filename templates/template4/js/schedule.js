@@ -69,6 +69,100 @@ $(function(){
             e.preventDefault();
             loaderOn();
             saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", refreshSchedule);
+        })
+        .on("change", "select[name=typeId]", function(){
+            loaderOn();
+            var type = $(this).val();
+            var select = $(".clients");
+
+            if(type != 0) select.show();
+            else select.hide();
+
+            $.ajax({
+                type: "GET",
+                url: "",
+                data: {action: "getclientList", type: type},
+                success: function(responce){
+                    var select = $("select[name=clientId]");
+                    select.empty();
+                    select.append(responce);
+                    loaderOff();
+                }
+            });
+        })
+        .on("click", ".send_report", function(e){
+            e.preventDefault();
+            loaderOn();
+            var tr = $(this).parent().parent();
+            var modelName = "Schedule_Lesson_Report";
+            var id = "";
+            var lesson_id = tr.find("input[name=lessonId]").val();
+            var teacher_id = tr.find("input[name=teacherId]").val();
+            var client_id = tr.find("input[name=clientId]").val();
+            var type_id = tr.find("input[name=typeId]").val();
+            var date = tr.find("input[name=date]").val();
+            var attendance = tr.find("input[name=attendance]").is(':checked');
+            if(attendance == true) attendance = 1;
+            else attendance = 0;
+
+            $.ajax({
+                type: "GET",
+                url: "../admin?menuTab=Main&menuAction=updateAction&ajax=1",
+                data: {
+                    id: id,
+                    modelName: modelName,
+                    lessonId: lesson_id,
+                    teacherId: teacher_id,
+                    clientId: client_id,
+                    typeId: type_id,
+                    date: date,
+                    attendance: attendance,
+                },
+                success: function(responce) {
+                    if(responce != "0" && responce != "") alert(responce);
+                    refreshSchedule();
+                }
+            });
+
+            var lessonModelName = tr.find("input[name=lessonName]").val();
+
+            $.ajax({
+                type: "GET",
+                url: "",
+                data: {
+                    action: "teacherReport",
+                    lesson_id: lesson_id,
+                    model_name: lessonModelName,
+                    attendance: attendance
+                },
+                success: function(responce){
+                    if(responce != "0") alert(responce);
+                }
+            });
+        })
+        .on("click", ".delete_report", function(e){
+            e.preventDefault();
+            loaderOn();
+            var tr = $(this).parent().parent();
+            var id = tr.find("input[name=reportId]").val();
+            var lessonId = tr.find("input[name=lessonId]").val();
+            var lessonModelName = tr.find("input[name=lessonName]").val();
+
+            $.ajax({
+                type: "GET",
+                url: "",
+                data: {
+                    action: "deleteReport",
+                    lesson_id: lessonId,
+                    model_name: lessonModelName,
+                    report_id: id,
+                },
+                success: function(responce) {
+                    if(responce != "0") alert(responce);
+                    refreshSchedule();
+                }
+            });
+            //deleteItem("Schedule_Lesson_Report", id, "../admin?menuTab=Main&menuAction=deleteAction&ajax=1", refreshSchedule);
         });
 
 

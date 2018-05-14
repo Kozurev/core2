@@ -58,7 +58,8 @@ function getLessonData( $oLesson )
         "client_status" =>  "",
     );
 
-    if ($oLesson->groupId() != 0)
+
+    if ($oLesson->typeId() == 2)
     {
         $oGroup = $oLesson->getGroup();
 

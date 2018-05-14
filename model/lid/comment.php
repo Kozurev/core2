@@ -17,7 +17,7 @@ class Lid_Comment extends Core_Entity
 
     public function __construct()
     {
-        $this->author_id = Core::factory("User")->getCurrent()->getId();
+        //$this->author_id = Core::factory("User")->getCurrent()->getId();
         //$this->datetime = date("Y-m-d H:i:s");
     }
 
@@ -64,7 +64,7 @@ class Lid_Comment extends Core_Entity
     {
         Core::notify(array(&$this), "beforeLidCommentSave");
         $oUser = Core::factory("User")->getCurrent();
-        if($oUser && $this->author_id == "")  $this->author_id = $oUser->getId();
+        if($this->author_id == "")  $this->author_id = $oUser->getId();
         if($this->datetime == "")   $this->datetime = date("Y-m-d H:i:s");
         parent::save();
         Core::notify(array(&$this), "afterLidCommentSave");

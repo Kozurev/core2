@@ -8,12 +8,16 @@
                     rules: {
                         timeFrom:    {required: true},
                         timeTo:      {required: true},
+                        typeId:      {required: true, min: 1},
                     },
                     messages: {
                         timeFrom:   { required: "Это поле обязательноое к заполнению", },
                         timeTo:     { required: "Это поле обязательноое к заполнению", },
+                        typeId:     { min: "Это поле обязательноое к заполнению"},
                     }
                 });
+
+
             });
         </script>
 
@@ -40,33 +44,25 @@
             <hr/>
 
             <div class="column">
-                <span>Ученик</span>
+                <span>Тип урока</span>
             </div>
             <div class="column">
-                <select class="form-control" name="clientId" >
+                <select class="form-control" name="typeId" >
                     <option value="0">...</option>
-                    <xsl:for-each select="user[group_id = 5]">
+                    <xsl:for-each select="schedule_lesson_type">
                         <option value="{id}">
-                            <xsl:value-of select="surname" />
-                            <xsl:text> </xsl:text>
-                            <xsl:value-of select="name" />
+                            <xsl:value-of select="title" />
                         </option>
                     </xsl:for-each>
                 </select>
             </div>
             <hr/>
 
-            <div class="column">
-                <span>Группа</span>
+            <div class="column clients" style="display:none">
+                <span>Ученик</span>
             </div>
-            <div class="column">
-                <select class="form-control" name="groupId" >
-                    <option value="0">...</option>
-                    <xsl:for-each select="schedule_group">
-                        <option value="{id}">
-                            <xsl:value-of select="title" />
-                        </option>
-                    </xsl:for-each>
+            <div class="column clients" style="display:none">
+                <select class="form-control" name="clientId" >
                 </select>
             </div>
             <hr/>

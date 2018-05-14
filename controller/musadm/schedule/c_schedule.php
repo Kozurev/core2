@@ -15,6 +15,7 @@ $areaId = $oArea->getId();
 $userId =   Core_Array::getValue($_GET, "userid", null);
 if(is_null($userId))    $oUser = Core::factory("User")->getCurrent();
 else                    $oUser = Core::factory("User", $userId);
+$userId = $oUser->getId();
 
 /**
  * Если страница клиента
@@ -85,7 +86,8 @@ $aoCurrentLessons
 $aoCurrentLessons = $aoCurrentLessons->findAll();
 $aoMainLessons = $aoMainLessons->findAll();
 
-$aoTeacherLessons = array_merge($aoCurrentLessons, $aoMainLessons);
+if($oUser->groupId() == 4)
+    $aoTeacherLessons = array_merge($aoCurrentLessons, $aoMainLessons);
 
 echo "<table class='schedule_table'>";
 
@@ -202,7 +204,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                     ->areaId($oMainLesson->areaId())
                     ->teacherId($oMainLesson->teacherId())
                     ->clientId($oMainLesson->clientId())
-                    ->groupId($oMainLesson->groupId());
+                    ->typeId($oMainLesson->typeId());
 
                 $oNewCurrentLesson->lessonType = "main";
                 $oNewCurrentLesson->oldid = $oMainLesson->getId();
@@ -236,7 +238,8 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                  */
                 if( $oMainLesson != false )
                 {
-                    if( $oMainLesson->groupId() != 0 )
+                    //$checkClientAbsent = $oMainLesson->isAbsent($date);
+                    if( $oMainLesson->typeId() == 2 )
                     {
                         $checkClientAbsent = false;
                     }
@@ -249,6 +252,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                             ->find();
                     }
                 }
+
 
 
                 /**
@@ -278,9 +282,9 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                         <li>
                             <a href=\"#\"></a>
                             <ul class=\"dropdown\"";
-                    if($oMainLesson->groupId() == 0) echo "data-clientid='".$oMainLesson->clientId()."'";
+                    if($oMainLesson->typeId() != 2) echo "data-clientid='".$oMainLesson->clientId()."'";
                     echo " data-lessonid='".$oMainLesson->getId()."'>";
-                    if($oMainLesson->groupId() == 0)
+                    if($oMainLesson->typeId() != 2)
                         echo "<li><a href=\"#\" class='schedule_absent'>Временно отсутствует</a></li>";
                     echo "
                                 <li>
@@ -305,6 +309,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
          * Текущее расписание
          * Начало >>
          */
+
         if(compareTime($time, ">=", $maxLessonTime[1][$class]))
         {
             //Урок из текущего расписания
@@ -314,7 +319,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
             /**
              * Дублирование из основного графика
              */
-            if( $oMainLesson != false && $checkClientAbsent == false && !$oMainLesson->isAbsent($date) && !$oMainLesson->isTimeModified($date) )
+            if( $oMainLesson != false && /*$checkClientAbsent == false &&*/ !$oMainLesson->isAbsent($date) && !$oMainLesson->isTimeModified($date) )
             {
                 //Поиск высоты ячейки (значение тэга rowspan) и обновление $maxLessonTime
                 $rowspan = updateLastLessonTime( $oMainLesson, $maxLessonTime[1][$class], $time, $period );
@@ -339,7 +344,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
             /**
              * Текущий урок
              */
-            elseif( ($oMainLesson == false || $checkClientAbsent == true || $oMainLesson->isAbsent($date)) && $oCurrentLesson != false )
+            elseif( ($oMainLesson == false || /*$checkClientAbsent == true ||*/ $oMainLesson->isAbsent($date)) && $oCurrentLesson != false )
             {
                 //Поиск высоты ячейки (значение тэга rowspan) и обновление $maxLessonTime
                 $rowspan = updateLastLessonTime( $oCurrentLesson, $maxLessonTime[1][$class], $time, $period );
@@ -406,22 +411,67 @@ if( $oUser->groupId() == 4 )
 {
     sortByTime($aoTeacherLessons, "timeFrom");
 
-    foreach ($aoTeacherLessons as $lesson)
+    foreach ($aoTeacherLessons as $key => $lesson)
     {
+        if( get_class($lesson) == "Schedule_Lesson" && $lesson->isAbsent($date) )
+        {
+            unset($aoTeacherLessons[$key]);
+            continue;
+        }
         $lesson->timeFrom(refactorTimeFormat($lesson->timeFrom()));
         $lesson->timeTo(refactorTimeFormat($lesson->timeTo()));
         $lesson->addEntity($lesson->getClient(), "client");
-        $lesson->disabled = 1;
+        $lesson->addEntity(
+            Core::factory("Core_Entity")
+                ->name("lesson_name")
+                ->value($lesson->getTableName())
+        );
+
+        $oReported = $lesson->isReported($date);
+        if($oReported != false)
+        {
+            $lesson->addEntity($oReported, "report");
+        }
     }
 
-    Core::factory("Core_Entity")
+
+    $output = Core::factory("Core_Entity")
         ->addEntity(
             Core::factory("Core_Entity")
                 ->name("date")
                 ->value(refactorDateFormat( $date ))
         )
+        ->addEntity(
+            Core::factory("Core_Entity")
+                ->name("real_date")
+                ->value($date)
+        )
         ->addEntity($oUser)
-        ->addEntities($aoTeacherLessons, "lesson")
+        ->addEntities($aoTeacherLessons, "lesson");
+
+    $oCurrentUser = Core::factory("User")->getCurrent();
+
+    $output
+        ->addEntity($oCurrentUser, "admin")
         ->xsl("musadm/schedule/teacher_table.xsl")
         ->show();
+
+    $dateFrom = substr($date, 2) . "01";
+    $currentMonth = intval(substr($date, 5, 3));
+    $currentYear = intval(substr($date, 0, 4));
+    $countDays = cal_days_in_month(CAL_GREGORIAN, $currentMonth, $currentYear);
+    $dateTo = $currentYear . "-" . $currentMonth . "-" . $countDays;
+
+    $aoTeacherReports = Core::factory("Schedule_Lesson_Report")
+        ->where("teacher_id", "=", $oUser->getId())
+        ->where("date", ">=", $dateFrom)
+        ->where("date", "<=", $dateTo);
+
+    $totalCount = clone $aoTeacherReports;
+    $totalCount = $totalCount->getCount();
+    $attendenceCount = clone $aoTeacherReports;
+    $attendenceCount = $attendenceCount->where("attendance", "=", "1")->getCount();
+
+    echo "<center style='font-size: 17px;'>В этом месяце проведено " . $totalCount . " занятий. Из них явилось " . $attendenceCount . "</center>";
+
 }

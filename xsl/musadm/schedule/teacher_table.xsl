@@ -17,73 +17,64 @@
 
     <xsl:template match="lesson">
         <tr>
-            <form>
-                <td><xsl:value-of select="/root/date" /></td>
+            <td><xsl:value-of select="/root/date" /></td>
 
-                <td>
-                    <xsl:value-of select="time_from" /><br/>
-                    <xsl:value-of select="time_to" />
-                </td>
+            <td>
+                <xsl:value-of select="time_from" /><br/>
+                <xsl:value-of select="time_to" />
+            </td>
 
-                <td>
-                    <xsl:value-of select="../user/surname" />
-                    <xsl:text> </xsl:text>
-                    <xsl:value-of select="../user/name" />
-                </td>
+            <td>
+                <xsl:value-of select="../user/surname" />
+                <xsl:text> </xsl:text>
+                <xsl:value-of select="../user/name" />
+            </td>
 
-                <td>
-                    <xsl:apply-templates select="client" />
-                </td>
+            <td>
+                <xsl:apply-templates select="client" />
+            </td>
 
-                <td>
-                    <input type="checkbox" name="attendance" >
-                        <xsl:if test="disabled = 1">
-                            <xsl:attribute name="disabled">
-                                disabled
-                            </xsl:attribute>
-                        </xsl:if>
-                    </input>
-                </td>
+            <td>
+                <input type="checkbox" name="attendance" >
+                    <xsl:if test="count(report/id) != 0">
+                        <xsl:attribute name="disabled">
+                            disabled
+                        </xsl:attribute>
+                    </xsl:if>
 
-                <input type="hidden" name="teacherId" value="{../user/id}" />
-
-                <input type="hidden" name="clientId" >
-                    <xsl:attribute name="value">
-                        <xsl:choose>
-                            <xsl:when test="client/title != ''">
-                                0
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="client/id" />
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:attribute>
+                    <xsl:if test="report/attendance = 1">
+                        <xsl:attribute name="checked" >
+                            checked
+                        </xsl:attribute>
+                    </xsl:if>
                 </input>
+            </td>
 
-                <input type="hidden" name="groupId" >
-                    <xsl:attribute name="value">
-                        <xsl:choose>
-                            <xsl:when test="client/title != ''">
-                                <xsl:value-of select="client/id" />
-                            </xsl:when>
-                            <xsl:otherwise>
-                                0
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:attribute>
-                </input>
+            <input type="hidden" name="teacherId" value="{../user/id}" />
+            <input type="hidden" name="typeId" value="{type_id}"/>
+            <input type="hidden" name="clientId" value="{client_id}"/>
+            <input type="hidden" name="date" value="{//real_date}"/>
+            <input type="hidden" name="lessonId" value="{id}"/>
+            <input type="hidden" name="reportId" value="{report/id}" />
+            <input type="hidden" name="lessonName" value="{lesson_name}" />
 
-                <td>
-                    <button class="btn send_report" >
-                        <xsl:if test="disabled = 1">
-                            <xsl:attribute name="disabled">
-                                disabled
-                            </xsl:attribute>
-                        </xsl:if>
-                        Отправить данные
+            <td>
+                <button class="btn send_report" >
+                    <xsl:if test="count(report/id) != 0">
+                        <xsl:attribute name="disabled">
+                            disabled
+                        </xsl:attribute>
+                    </xsl:if>
+                    Отправить данные
+                </button>
+
+                <xsl:if test="count(report/id) != 0 and /root/admin/group_id = 1">
+                    <button class="btn btn-danger delete_report">
+                        Отменить
                     </button>
-                </td>
-            </form>
+                </xsl:if>
+
+            </td>
         </tr>
     </xsl:template>
 

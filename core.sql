@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Май 11 2018 г., 16:48
+-- Время создания: Май 14 2018 г., 18:04
 -- Версия сервера: 5.7.16
 -- Версия PHP: 5.6.29
 
@@ -159,7 +159,7 @@ INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `t
 (118, 25, 'Номер класса', 'classId', 0, 1, 1, 1, 70, '', ''),
 (119, 25, 'Учитель', 'teacherId', 0, 4, 1, 0, 80, 'Teachers', ''),
 (120, 25, 'Ученик', 'clientId', 0, 4, 1, 0, 90, 'Clients', ''),
-(121, 25, 'Группа', 'groupId', 0, 4, 1, 0, 100, 'Groups', ''),
+(121, 25, 'Тип', 'typeId', 0, 4, 1, 0, 100, 'LessonTypes', ''),
 (122, 24, 'Путь', 'path', 255, 2, 1, 1, 30, '', ''),
 (123, 24, 'Сортировка', 'sorting', 0, 1, 1, 0, 40, '', '0'),
 (124, 26, 'Дата', 'date', 0, 7, 1, 1, 10, '', ''),
@@ -169,10 +169,12 @@ INSERT INTO `Admin_Form` (`id`, `model_id`, `title`, `var_name`, `maxlength`, `t
 (128, 26, 'Номер класса', 'classId', 0, 1, 1, 1, 50, '', ''),
 (129, 26, 'Преподаватель', 'teacherId', 0, 4, 1, 0, 60, 'Teachers', ''),
 (130, 26, 'Клиент', 'clientId', 0, 4, 1, 1, 70, 'Clients', ''),
-(131, 26, 'Группа', 'groupId', 0, 4, 1, 0, 60, 'Groups', ''),
+(131, 26, 'Тип занятия', 'typeId', 0, 4, 1, 0, 60, 'LessonTypes', ''),
 (132, 27, 'Клиент', 'clientId', 0, 4, 1, 0, 10, 'Clients', ''),
 (133, 27, 'Период \"С\"', 'dateFrom', 0, 7, 1, 1, 20, '', ''),
-(134, 27, 'Период \"По\"', 'dateTo', 0, 7, 1, 1, 30, '', '');
+(134, 27, 'Период \"По\"', 'dateTo', 0, 7, 1, 1, 30, '', ''),
+(135, 28, 'Название', 'title', 255, 2, 1, 1, 10, '', ''),
+(136, 28, 'Отображение данных в статистике', 'statistic', 0, 3, 1, 0, 20, '', '');
 
 -- --------------------------------------------------------
 
@@ -216,7 +218,8 @@ INSERT INTO `Admin_Form_Modelname` (`id`, `model_name`, `model_title`, `model_so
 (24, 'Schedule_Area', 'Филиал', 170, 1),
 (25, 'Schedule_Lesson', 'Расписание \"Основное\"', 180, 1),
 (26, 'Schedule_Current_Lesson', 'Расписание \"Текущее\"', 190, 1),
-(27, 'Schedule_Absent', 'Период отсутствия', 200, 1);
+(27, 'Schedule_Absent', 'Период отсутствия', 200, 1),
+(28, 'Schedule_Lesson_Type', 'Тип занятия', 210, 1);
 
 -- --------------------------------------------------------
 
@@ -276,17 +279,18 @@ INSERT INTO `Admin_Menu` (`id`, `title`, `model`, `parent_id`, `active`, `sortin
 (12, 'Сертификаты', 'Sertificates', 8, 0, 40),
 (13, 'Дополнительные свойства', 'Property', 7, 1, 45),
 (14, 'Списки', 'List', 7, 1, 42),
-(15, 'Задачи', 'Task', 8, 0, 20),
+(15, 'Задачи', 'Task', 8, 1, 20),
 (16, 'Журнал изменений', 'Log', 8, 0, 50),
 (17, 'Пункты админ. меню', 'Menu', 7, 1, 60),
-(18, 'Статистика', 'Statistic', 8, 0, 5),
+(18, 'Статистика', 'Statistic', 8, 1, 5),
 (19, 'Группы', 'Groups', 21, 1, 35),
 (20, 'Тарифы', 'Tarif', 8, 1, 15),
 (21, 'Расписание', 'Schedule', 0, 1, 30),
 (22, 'Основное', 'Schedule', 21, 1, 10),
 (23, 'Филлиалы', 'Fillial', 21, 0, 30),
 (24, 'Текущее', 'ScheduleCurrent', 21, 1, 20),
-(25, 'Период отсутствия', 'Absent', 21, 1, 40);
+(25, 'Период отсутствия', 'Absent', 21, 1, 40),
+(26, 'Тип занятия', 'LessonType', 21, 1, 50);
 
 -- --------------------------------------------------------
 
@@ -420,7 +424,8 @@ INSERT INTO `Lid` (`id`, `name`, `surname`, `number`, `vk`, `source`, `control_d
 (35, 'Говорил  непонятно', '', '89065680443', '', '', '0000-00-00', 1),
 (36, 'Дарья', '', '89803845927', '', '', '0000-00-00', 1),
 (37, 'Дарья', '', '89103201004', '', '', '0000-00-00', 1),
-(38, 'Валерия ', 'Свищева', '8-888-888-88-88', 'vk.com/id133265736', 'друзья рассказали', '2018-04-30', 1);
+(38, 'Валерия ', 'Свищева', '8-888-888-88-88', 'vk.com/id133265736', 'друзья рассказали', '2018-04-30', 1),
+(39, 'Имя', 'Фамилия', '8-888-888-88-88', 'vk.com/id133265736', 'Какой-то источник', '2018-05-25', 1);
 
 -- --------------------------------------------------------
 
@@ -480,7 +485,9 @@ INSERT INTO `Lid_Comment` (`id`, `author_id`, `lid_id`, `text`, `datetime`) VALU
 (37, 1, 37, 'оператор отвечает. неправильно набран номер. информатор в смс', '2018-04-25 00:58:06'),
 (38, 1, 38, 'ведется переписка в Vk сообщения сообщества', '2018-04-25 00:58:06'),
 (44, 1, 38, 'Тестовый коммент 1', '2018-04-28 13:10:22'),
-(45, 1, 38, 'Тестовый коммент 2', '2018-04-28 13:10:28');
+(45, 1, 38, 'Тестовый коммент 2', '2018-04-28 13:10:28'),
+(46, 1, 39, 'Примечание 1', '2018-05-14 09:25:42'),
+(47, 5, 39, 'Коммент директора', '2018-05-14 12:43:40');
 
 -- --------------------------------------------------------
 
@@ -5792,7 +5799,9 @@ INSERT INTO `Payment` (`id`, `user`, `type`, `datetime`, `value`, `description`)
 (5219, 305, 0, '2018-05-10', 400, 'Оплата индивидуального пакета'),
 (5220, 306, 1, '2018-05-10', 500, 'поурочно'),
 (5221, 306, 0, '2018-05-10', 500, 'Оплата индивидуального пакета'),
-(5222, 306, 0, '2018-05-10', 0, 'Присутствовал на занятии');
+(5222, 306, 0, '2018-05-10', 0, 'Присутствовал на занятии'),
+(5223, 257, 1, '2018-05-14', 200, 'Компенсация'),
+(5224, 257, 0, '2018-05-14', 200, 'Оплата группового пакета');
 
 -- --------------------------------------------------------
 
@@ -6872,7 +6881,7 @@ INSERT INTO `Property_Int` (`id`, `property_id`, `value`, `model_name`, `object_
 (15779, 14, 0, 'User', 257),
 (15780, 12, 0, 'User', 258),
 (15781, 13, 0, 'User', 258),
-(15782, 14, 0, 'User', 258),
+(15782, 14, -1, 'User', 258),
 (15783, 12, 0, 'User', 259),
 (15784, 13, 0, 'User', 259),
 (15785, 14, 0, 'User', 259),
@@ -6961,7 +6970,7 @@ INSERT INTO `Property_Int` (`id`, `property_id`, `value`, `model_name`, `object_
 (15868, 13, 0, 'User', 286),
 (15869, 14, 2, 'User', 286),
 (15870, 12, 0, 'User', 287),
-(15871, 13, 0, 'User', 287),
+(15871, 13, -1, 'User', 287),
 (15872, 14, 1, 'User', 287),
 (15873, 12, 0, 'User', 288),
 (15874, 13, 4, 'User', 288),
@@ -8026,8 +8035,8 @@ INSERT INTO `Property_List` (`id`, `property_id`, `model_name`, `object_id`, `va
 (615, 27, 'Lid', 31, 80),
 (616, 27, 'Lid', 32, 80),
 (617, 27, 'Lid', 33, 80),
-(618, 27, 'Lid', 34, 80),
-(619, 27, 'Lid', 35, 80),
+(618, 27, 'Lid', 34, 83),
+(619, 27, 'Lid', 35, 81),
 (620, 27, 'Lid', 36, 82),
 (621, 27, 'Lid', 37, 80),
 (622, 27, 'Lid', 38, 82),
@@ -8125,7 +8134,8 @@ INSERT INTO `Property_List_Assigment` (`id`, `property_id`, `object_id`, `model_
 (394, 20, 112, 'User'),
 (395, 20, 162, 'User'),
 (396, 20, 182, 'User'),
-(397, 20, 189, 'User');
+(397, 20, 189, 'User'),
+(398, 27, 39, 'Lid');
 
 -- --------------------------------------------------------
 
@@ -9549,7 +9559,9 @@ INSERT INTO `Property_String` (`id`, `property_id`, `value`, `model_name`, `obje
 (3987, 9, 'https://vk.com/id153654371', 'User', 283),
 (3988, 9, 'https://vk.com/katyushka_denchik', 'User', 284),
 (3989, 9, 'https://vk.com/kit_van', 'User', 286),
-(3990, 9, 'null', 'User', 287);
+(3990, 9, 'null', 'User', 287),
+(3991, 22, '14-05-2018 16:31:45', 'User', 308),
+(3992, 22, '14-05-2018 16:35:17', 'User', 303);
 
 -- --------------------------------------------------------
 
@@ -11108,7 +11120,9 @@ INSERT INTO `Property_String_Assigment` (`id`, `property_id`, `object_id`, `mode
 (3740, 9, 283, 'User'),
 (3741, 9, 284, 'User'),
 (3742, 9, 286, 'User'),
-(3743, 9, 287, 'User');
+(3743, 9, 287, 'User'),
+(3744, 22, 308, 'User'),
+(3745, 22, 303, 'User');
 
 -- --------------------------------------------------------
 
@@ -11353,15 +11367,6 @@ CREATE TABLE `Schedule_Absent` (
   `client_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Дамп данных таблицы `Schedule_Absent`
---
-
-INSERT INTO `Schedule_Absent` (`id`, `date_from`, `date_to`, `client_id`) VALUES
-(1, '2018-05-07', '2018-05-15', 287),
-(4, '2018-05-07', '2018-05-09', 286),
-(5, '2018-05-11', '2018-05-18', 16);
-
 -- --------------------------------------------------------
 
 --
@@ -11399,17 +11404,15 @@ CREATE TABLE `Schedule_Current_Lesson` (
   `class_id` int(11) NOT NULL,
   `teacher_id` int(11) NOT NULL,
   `client_id` int(11) NOT NULL,
-  `group_id` int(11) NOT NULL
+  `type_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `Schedule_Current_Lesson`
 --
 
-INSERT INTO `Schedule_Current_Lesson` (`id`, `date`, `time_from`, `time_to`, `area_id`, `class_id`, `teacher_id`, `client_id`, `group_id`) VALUES
-(8, '2018-05-11', '13:30:00', '14:25:00', 2, 3, 11, 23, 0),
-(16, '2018-05-18', '12:00:00', '12:55:00', 2, 1, 162, 0, 6),
-(21, '2018-05-11', '11:00:00', '11:55:00', 2, 2, 6, 0, 8);
+INSERT INTO `Schedule_Current_Lesson` (`id`, `date`, `time_from`, `time_to`, `area_id`, `class_id`, `teacher_id`, `client_id`, `type_id`) VALUES
+(1, '2018-05-14', '11:30:00', '12:25:00', 2, 1, 6, 287, 3);
 
 -- --------------------------------------------------------
 
@@ -11488,31 +11491,16 @@ CREATE TABLE `Schedule_Lesson` (
   `class_id` int(11) NOT NULL,
   `teacher_id` int(11) NOT NULL,
   `client_id` int(11) NOT NULL,
-  `group_id` int(11) NOT NULL
+  `type_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `Schedule_Lesson`
 --
 
-INSERT INTO `Schedule_Lesson` (`id`, `insert_date`, `delete_date`, `time_from`, `time_to`, `day_name`, `area_id`, `class_id`, `teacher_id`, `client_id`, `group_id`) VALUES
-(14, '2018-05-08', '2001-01-01', '09:00:00', '09:30:00', 'Friday', 2, 4, 0, 0, 2),
-(16, '2018-05-08', '2001-01-01', '12:00:00', '12:55:00', 'Friday', 2, 4, 0, 0, 3),
-(18, '2018-05-11', '2001-01-01', '09:00:00', '09:55:00', 'Friday', 2, 1, 8, 286, 0),
-(19, '2018-05-11', '2001-01-01', '10:00:00', '10:55:00', 'Friday', 2, 1, 6, 222, 0),
-(20, '2018-05-11', '2001-01-01', '11:00:00', '11:55:00', 'Friday', 2, 1, 2, 282, 0),
-(21, '2018-05-11', '2001-01-01', '09:00:00', '09:55:00', 'Friday', 2, 2, 112, 227, 0),
-(22, '2018-05-11', '2001-01-01', '10:00:00', '10:55:00', 'Friday', 2, 2, 189, 0, 8),
-(23, '2018-05-11', '2001-01-01', '11:30:00', '12:25:00', 'Friday', 2, 2, 10, 0, 9),
-(24, '2018-05-11', '2018-05-11', '13:30:00', '13:55:00', 'Friday', 2, 2, 13, 303, 0),
-(25, '2018-05-11', '2001-01-01', '09:00:00', '09:55:00', 'Friday', 2, 3, 12, 262, 0),
-(26, '2018-05-11', '2001-01-01', '10:30:00', '11:55:00', 'Friday', 2, 3, 8, 286, 0),
-(27, '2018-05-11', '2001-01-01', '13:30:00', '14:25:00', 'Friday', 2, 3, 8, 206, 0),
-(28, '2018-05-11', '2001-01-01', '10:00:00', '10:55:00', 'Friday', 2, 4, 12, 300, 0),
-(29, '2018-05-11', '2001-01-01', '11:00:00', '11:55:00', 'Friday', 2, 4, 12, 16, 0),
-(30, '2018-05-11', '2001-01-01', '13:30:00', '14:25:00', 'Friday', 2, 2, 112, 0, 9),
-(31, '2018-05-11', '2001-01-01', '13:00:00', '13:55:00', 'Friday', 2, 4, 6, 282, 0),
-(32, '2018-05-11', '2001-01-01', '12:00:00', '12:55:00', 'Friday', 2, 3, 6, 299, 0);
+INSERT INTO `Schedule_Lesson` (`id`, `insert_date`, `delete_date`, `time_from`, `time_to`, `day_name`, `area_id`, `class_id`, `teacher_id`, `client_id`, `type_id`) VALUES
+(1, '2018-05-14', '2001-01-01', '09:00:00', '09:55:00', 'Monday', 2, 1, 6, 5, 2),
+(2, '2018-05-14', '2001-01-01', '10:00:00', '10:55:00', 'Monday', 2, 1, 6, 303, 1);
 
 -- --------------------------------------------------------
 
@@ -11526,21 +11514,6 @@ CREATE TABLE `Schedule_Lesson_Absent` (
   `lesson_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Дамп данных таблицы `Schedule_Lesson_Absent`
---
-
-INSERT INTO `Schedule_Lesson_Absent` (`id`, `date`, `lesson_id`) VALUES
-(1, '2018-05-10', 5),
-(2, '2018-05-10', 13),
-(3, '2018-05-10', 15),
-(4, '2018-05-11', 27),
-(5, '2018-05-11', 27),
-(6, '2018-05-11', 27),
-(7, '2018-05-11', 27),
-(8, '2018-05-11', 27),
-(9, '2018-05-11', 23);
-
 -- --------------------------------------------------------
 
 --
@@ -11551,11 +11524,18 @@ CREATE TABLE `Schedule_Lesson_Report` (
   `id` int(11) NOT NULL,
   `teacher_id` int(11) NOT NULL,
   `client_id` int(11) NOT NULL,
-  `group_id` int(11) NOT NULL,
   `attendance` int(11) NOT NULL,
   `lesson_id` int(11) NOT NULL,
+  `type_id` int(11) NOT NULL,
   `date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `Schedule_Lesson_Report`
+--
+
+INSERT INTO `Schedule_Lesson_Report` (`id`, `teacher_id`, `client_id`, `attendance`, `lesson_id`, `type_id`, `date`) VALUES
+(22, 6, 287, 1, 1, 3, '2018-05-14');
 
 -- --------------------------------------------------------
 
@@ -11576,7 +11556,29 @@ CREATE TABLE `Schedule_Lesson_TimeModified` (
 --
 
 INSERT INTO `Schedule_Lesson_TimeModified` (`id`, `lesson_id`, `date`, `time_from`, `time_to`) VALUES
-(2, 20, '2018-05-11', '11:30:00', '12:25:00');
+(1, 2, '2018-05-14', '11:00:00', '11:30:00');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `Schedule_Lesson_Type`
+--
+
+CREATE TABLE `Schedule_Lesson_Type` (
+  `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `statistic` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `Schedule_Lesson_Type`
+--
+
+INSERT INTO `Schedule_Lesson_Type` (`id`, `title`, `statistic`) VALUES
+(1, 'Индивидуальное занятие', 1),
+(2, 'Групповое занятие', 1),
+(3, 'Консультация', 0),
+(4, 'Самоподготовка', 0);
 
 -- --------------------------------------------------------
 
@@ -11685,7 +11687,7 @@ INSERT INTO `User` (`id`, `name`, `surname`, `patronimyc`, `phone_number`, `emai
 (3, 'Оксана', 'Полтева', '', '+79205764079', '', 'ПО', 'd93591bdf7860e1e4ee2fca799911215', 4, '2018-05-11', 1, 0),
 (4, 'Алина', 'Романович', '', '+79192882062', '', 'РА', 'd93591bdf7860e1e4ee2fca799911215', 4, '2018-05-11', 1, 0),
 (5, 'Артур', 'Герус', 'Андреевич', '30-18-77', '', 'd', '8277e0910d750195b448797616e091ad', 1, '2018-05-11', 1, 1),
-(6, 'Дарья', 'Черных', '', '+79155665673', '', 'ЧД', '01cfcd4f6b8770febfb40cb906715822', 4, '2018-05-11', 1, 0),
+(6, 'Дарья', 'Черных', '', '+79155665673', '', 'ЧД', '81dc9bdb52d04dc20036dbd8313ed055', 4, '2018-05-11', 1, 0),
 (7, 'Руслан', 'Галяутдинов', '', '+79202090014', '', 'ГР', 'd93591bdf7860e1e4ee2fca799911215', 4, '2018-05-11', 1, 0),
 (8, 'Карина', 'Белякова', '', '+79155601114', '', 'БК', 'd93591bdf7860e1e4ee2fca799911215', 4, '2018-05-11', 1, 0),
 (9, 'Владимир', 'Варжавинов', '', '+79606336651', '', 'ВВ', 'd93591bdf7860e1e4ee2fca799911215', 4, '2018-05-11', 1, 0),
@@ -12234,6 +12236,12 @@ ALTER TABLE `Schedule_Lesson_TimeModified`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Индексы таблицы `Schedule_Lesson_Type`
+--
+ALTER TABLE `Schedule_Lesson_Type`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Индексы таблицы `Structure`
 --
 ALTER TABLE `Structure`
@@ -12265,12 +12273,12 @@ ALTER TABLE `User_Group`
 -- AUTO_INCREMENT для таблицы `Admin_Form`
 --
 ALTER TABLE `Admin_Form`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=135;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=137;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Modelname`
 --
 ALTER TABLE `Admin_Form_Modelname`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 --
 -- AUTO_INCREMENT для таблицы `Admin_Form_Type`
 --
@@ -12280,7 +12288,7 @@ ALTER TABLE `Admin_Form_Type`
 -- AUTO_INCREMENT для таблицы `Admin_Menu`
 --
 ALTER TABLE `Admin_Menu`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 --
 -- AUTO_INCREMENT для таблицы `Constant`
 --
@@ -12300,12 +12308,12 @@ ALTER TABLE `Constant_Type`
 -- AUTO_INCREMENT для таблицы `Lid`
 --
 ALTER TABLE `Lid`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 --
 -- AUTO_INCREMENT для таблицы `Lid_Comment`
 --
 ALTER TABLE `Lid_Comment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 --
 -- AUTO_INCREMENT для таблицы `Page_Menu`
 --
@@ -12325,7 +12333,7 @@ ALTER TABLE `Page_Template_Dir`
 -- AUTO_INCREMENT для таблицы `Payment`
 --
 ALTER TABLE `Payment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5223;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5225;
 --
 -- AUTO_INCREMENT для таблицы `Payment_Tarif`
 --
@@ -12370,7 +12378,7 @@ ALTER TABLE `Property_List`
 -- AUTO_INCREMENT для таблицы `Property_List_Assigment`
 --
 ALTER TABLE `Property_List_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=398;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=399;
 --
 -- AUTO_INCREMENT для таблицы `Property_List_Values`
 --
@@ -12380,12 +12388,12 @@ ALTER TABLE `Property_List_Values`
 -- AUTO_INCREMENT для таблицы `Property_String`
 --
 ALTER TABLE `Property_String`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3991;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3993;
 --
 -- AUTO_INCREMENT для таблицы `Property_String_Assigment`
 --
 ALTER TABLE `Property_String_Assigment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3744;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3746;
 --
 -- AUTO_INCREMENT для таблицы `Property_Text`
 --
@@ -12410,7 +12418,7 @@ ALTER TABLE `Schedule_Area`
 -- AUTO_INCREMENT для таблицы `Schedule_Current_Lesson`
 --
 ALTER TABLE `Schedule_Current_Lesson`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT для таблицы `Schedule_Group`
 --
@@ -12425,22 +12433,27 @@ ALTER TABLE `Schedule_Group_Assignment`
 -- AUTO_INCREMENT для таблицы `Schedule_Lesson`
 --
 ALTER TABLE `Schedule_Lesson`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT для таблицы `Schedule_Lesson_Absent`
 --
 ALTER TABLE `Schedule_Lesson_Absent`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT для таблицы `Schedule_Lesson_Report`
 --
 ALTER TABLE `Schedule_Lesson_Report`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 --
 -- AUTO_INCREMENT для таблицы `Schedule_Lesson_TimeModified`
 --
 ALTER TABLE `Schedule_Lesson_TimeModified`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+--
+-- AUTO_INCREMENT для таблицы `Schedule_Lesson_Type`
+--
+ALTER TABLE `Schedule_Lesson_Type`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT для таблицы `Structure`
 --

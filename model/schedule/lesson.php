@@ -10,24 +10,22 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 {
     public function getGroup()
     {
-        if($this->group_id != "")
-            return Core::factory("Schedule_Group", $this->group_id);
+        return Core::factory("Schedule_Group", $this->client_id);
     }
 
 
     public function getTeacher()
     {
-        if($this->teacher_id != "")
-            return Core::factory("User", $this->teacher_id);
+        return Core::factory("User", $this->teacher_id);
     }
 
 
     public function getClient()
     {
-        if($this->client_id)
+        if($this->type_id != 2)
             return Core::factory("User", $this->client_id);
-        if($this->group_id)
-            return Core::factory("Schedule_Group", $this->group_id);
+        if($this->type_id == 2)
+            return Core::factory("Schedule_Group", $this->client_id);
     }
 
 
@@ -72,10 +70,35 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->where("lesson_id", "=", $this->id)
             ->find();
 
-        if($oAbsent == false)
+        if($this->type_id != 2)
+        {
+            $oClientAbsent = Core::factory("Schedule_Absent")
+                ->where("client_id", "=", $this->client_id)
+                ->where("date_from", "<=", $date)
+                ->where("date_to", ">=", $date)
+                ->find();
+        }
+        else
+        {
+            $oClientAbsent = false;
+        }
+
+        if($oAbsent == false && $oClientAbsent == false)
             return false;
         else
             return true;
+    }
+
+
+    public function isReported($date)
+    {
+        $report = Core::factory("Schedule_Lesson_Report")
+            ->where("date", "=", $date)
+            ->where("lesson_id", "=", $this->id)
+            ->where("type_id", "=", $this->type_id)
+            ->find();
+
+        return $report;
     }
 
 

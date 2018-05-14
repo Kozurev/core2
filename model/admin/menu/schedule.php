@@ -54,8 +54,12 @@ class Admin_Menu_Schedule
             foreach ($aoItems as $lesson)
             {
                 $lesson->addEntity($lesson->getTeacher(), "teacher");
-                $lesson->addEntity($lesson->getClient(), "client");
-                $lesson->addEntity($lesson->getGroup(), "group");
+                $oClient = $lesson->getClient();
+                if($lesson->typeId() == 2)
+                    $clientType = "group";
+                else
+                    $clientType = "client";
+                $lesson->addEntity($oClient, $clientType);
             }
 
             $title = "Основное расписание. " . Core::factory("Schedule_Area", $parentId)->title();

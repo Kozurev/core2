@@ -14,9 +14,9 @@ class Schedule_Current_Lesson_Model extends Core_Entity
     protected $time_to;
     protected $area_id;
     protected $class_id;
-    protected $teacher_id = 0;
-    protected $client_id = 0;
-    protected $group_id = 0;
+    protected $teacher_id;
+    protected $client_id;
+    protected $type_id;
 
     public function __construct(){}
 
@@ -83,10 +83,10 @@ class Schedule_Current_Lesson_Model extends Core_Entity
     }
 
 
-    public function groupId($val = null)
+    public function typeId($val = null)
     {
-        if(is_null($val))   return $this->group_id;
-        $this->group_id = intval($val);
+        if(is_null($val))   return $this->type_id;
+        $this->type_id = intval($val);
         return $this;
     }
 }

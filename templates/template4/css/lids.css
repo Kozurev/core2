@@ -35,7 +35,7 @@
 }
 
 .lids .not_choose {
-    background-color: white;
+    background-color: #FFFFF0;
 }
 
 .lids .consult_wait {
@@ -43,7 +43,7 @@
 }
 
 .lids .consult_was {
-    background-color: #985f0d;
+    background-color: #FF8C00;
 }
 
 .lids .agree {
