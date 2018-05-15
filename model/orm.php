@@ -377,22 +377,6 @@ class Orm
 	*/
 	public function where($row, $operation = null, $value = null, $or = null)
 	{
-        if(is_array($row))
-        {
-            for($i = 0; $i < count($row); $i++)
-            {
-                $arSize = count($row[$i]);
-                //Если это не первое условие тогда доавляем логический оператор
-                if($this->where != "")
-                    $arSize > 3
-                        ? $this->where .= "`" . $row[$i][3]."` "
-                        : $this->where .= "and ";
-
-                $this->where .= $row[$i][0]." ".$row[$i][1]." '".$row[$i][2]."' ";
-            }
-            return $this;
-        }
-
         if(($operation == "in" || $operation == "IN") && is_array($value))
         {
             if(count($value) == 0)  return $this;
@@ -426,12 +410,6 @@ class Orm
                 $condition .= " (";
                 $this->open = 0;
             }
-
-//            if($this->close == 1)
-//            {
-//                $condition = ")" . $condition;
-//                $this->close = 0;
-//            }
 
             $this->where .= $condition;
             $this->where .= $row." ".$operation." '".$value."' ";
