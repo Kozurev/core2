@@ -47,6 +47,11 @@ nav {
 	margin: 0px 2px 0px 2px;
 }
 
+.save {
+	background-image: url(../images/save.png);
+	background-size: cover;
+}
+
 .add_payment {
 	background: url(../images/money.png);
 	background-size: cover;

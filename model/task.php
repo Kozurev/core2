@@ -11,12 +11,20 @@ class Task extends Task_Model
     public function __construct(){}
 
 
+    public function getNotes()
+    {
+        $aoNotes = Core::factory("Task_Note")->where("task_id", "=", $this->id)->findAll();
+        return $aoNotes;
+    }
+
+
     public function save($obj = null)
     {
         Core::notify(array(&$this), "beforeTaskSave");
         if($this->date == "")   $this->date = date("Y-m-d");
         parent::save();
         Core::notify(array(&$this), "afterTaskSave");
+        return $this;
     }
 
 
