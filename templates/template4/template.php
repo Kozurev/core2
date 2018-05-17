@@ -27,6 +27,7 @@
         ->js("/templates/template4/js/groups.js")
         ->js("/templates/template4/js/lids.js")
         ->js("/templates/template4/js/schedule.js")
+        ->js("/templates/template4/js/tasks.js")
         ->showJs();
     ?>
 
@@ -122,7 +123,15 @@
 <!--                            <li><a href="--><?//=$rootdir?><!--tarif" >Тарифы</a></li>-->
                             <li><a href="<?=$rootdir?>lids">Лиды</a></li>
                             <li><a href="#">Сертификаты</a></li>
-                            <li><a href="#">Задачи</a></li>
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$rootdir?>tasks">Задачи
+                                    <span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="<?=$rootdir?>tasks/all" >Общий список задач</a></li>
+                                    <li><a href="<?=$rootdir?>tasks/today" >Список задач "на сегодня"</a></li>
+                                    <li><a href="<?=$rootdir?>tasks/active" >Актуальные задачи</a></li>
+                                </ul>
+                            </li>
                             <?
                         }
                         ?>
