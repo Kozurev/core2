@@ -2,17 +2,30 @@
 /**
  * Created by PhpStorm.
  * User: Kozurev Egor
- * Date: 16.05.2018
- * Time: 17:12
+ * Date: 18.05.2018
+ * Time: 11:13
  */
 
 $currentDate = date("Y-m-d");
 
-$aoTasks = Core::factory("Task")
-//    ->where("done_date", "IS", Core::unchanged("NULL"))
-//    ->where("done_date", "=", $currentDate, "OR")
+$aoTasksToday = Core::factory("Task")
+    ->where("type", "=", 3)
+    ->where("date", ">=", $currentDate)
     ->orderBy("date", "DESC")
     ->findAll();
+
+$aoTasksOther = Core::factory("Task")
+    ->where("type", "=", 2)
+    ->open()
+    ->where("done_date", "IS", Core::unchanged("NULL"))
+    ->where("done_date", "=", $currentDate, "OR")
+    ->close()
+    ->orderBy("date", "DESC")
+    ->findAll();
+
+
+$aoTasks = array_merge($aoTasksToday, $aoTasksOther);
+
 $aoTypes = Core::factory("Task_Type")->findAll();
 
 foreach ($aoTasks as $task)
@@ -21,7 +34,6 @@ foreach ($aoTasks as $task)
     foreach ($aoTaskNotes as $note)
     {
         $note->addEntity($note->getAuthor());
-        //$note->date(refactorDateFormat($note->date()));
     }
     $task->addEntities($aoTaskNotes);
     $task->date(refactorDateFormat($task->date()));
@@ -33,7 +45,7 @@ Core::factory("Core_Entity")
     ->addEntity(
         Core::factory("Core_Entity")
             ->name("table_name")
-            ->value("all")
+            ->value("active")
     )
     ->xsl("musadm/tasks/all.xsl")
     ->show();

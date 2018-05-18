@@ -128,7 +128,13 @@ class Core //extends Orm
     }
 
 
-
+    public static function unchanged($val)
+    {
+        $result = new stdClass;
+        $result->type = "unchanged";
+        $result->val = $val;
+        return $result;
+    }
 
 
 

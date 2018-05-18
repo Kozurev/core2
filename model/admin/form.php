@@ -521,4 +521,17 @@ class Admin_Form extends Admin_Form_Model
         $this->addEntities($aoTypes, "item");
     }
 
+
+    public function getListTaskTypes($aParams)
+    {
+        $aoTypes = Core::factory("Task_Type")->findALl();
+        $modelId = Core_Array::getValue($aParams, "model_id", 0);
+        if($modelId > 0)
+        {
+            $this->value = Core::factory("Task", $modelId)->type();
+        }
+
+        $this->addEntities($aoTypes, "item");
+    }
+
 }

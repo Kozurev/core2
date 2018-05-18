@@ -57,6 +57,16 @@ nav {
 	background-size: cover;
 }
 
+.append_done {
+	background-image: url("../images/append_ok.png");
+	background-size: cover;
+}
+
+.ok {
+	background-image: url("../images/ok.png");
+	background-size: cover;
+}
+
 .edit {
 	background: url(../images/edit.png);
 	background-size: cover;

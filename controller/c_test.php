@@ -6,33 +6,24 @@
  * Time: 1:02
  */
 
-//$dbh = new mysqli("37.140.192.32:3306", "u4834_ADMIN", "big#psKT", "u4834955_musbase");
-//$dbh->query("SET NAMES utf8");
+$dbh = new mysqli("37.140.192.32:3306", "u4834_ADMIN", "big#psKT", "u4834955_musbase");
+$dbh->query("SET NAMES utf8");
 
-//Core::factory("Orm")->executeQuery("TRUNCATE Payment_Tarif");
-//$aoTarifs = $dbh->query("SELECT * FROM `ref_packet`");
-//
-//while ($tarif = $aoTarifs->fetch_object())
-//{
-//    Core::factory("Payment_Tarif")
-//        ->title($tarif->name)
-//        ->price($tarif->price)
-//        ->lessonsCount($tarif->numberlesson)
-//        ->lessonsType($tarif->typelessonid)
-//        ->access(!intval($tarif->onlyadmin))
-//        ->save();
-//}
+Core::factory("Orm")->executeQuery("TRUNCATE Task");
+Core::factory("Orm")->executeQuery("TRUNCATE Task_Note");
+$aoTasks = $dbh->query("SELECT * FROM `admin_notes` WHERE date >= '2018-01-01'");
 
+while ($task = $aoTasks->fetch_object())
+{
+    $oTask = Core::factory("Task")
+        ->date($task->date)
+        ->type($task->type + 1)
+        ->done($task->done);
 
-$time1 = "16:30:00";
-$time2 = "17:25:00";
-$period = "00:15:00";
+    $oTask = $oTask->save();
+
+    $oTask->addNote($task->note);
+}
 
 
-$minutes = deductTime( $time2, $time1 );
-$rowspan = divTime( $minutes, $period, "/" );
-if( divTime( $minutes, $period, "%" ) ) $rowspan++;
-
-//$time = deductTime( $time2, $time1 );
-var_dump($rowspan);
 

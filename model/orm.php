@@ -389,8 +389,8 @@ class Orm
             for($i = 0; $i < count($value); $i++)
             {
                 $i == 0
-                    ?   $this->where .= $value[$i]
-                    :   $this->where .= ", " . $value[$i];
+                    ?   $this->where .= "'" . $value[$i] . "' "
+                    :   $this->where .= ", '" . $value[$i] . "' ";
             }
 
             $this->where .= ") ";
@@ -412,7 +412,17 @@ class Orm
             }
 
             $this->where .= $condition;
-            $this->where .= $row." ".$operation." '".$value."' ";
+            $this->where .= $row." ".$operation." ";
+
+            if(is_object($value) && $value->type == "unchanged")
+            {
+                $val = $value->val . " ";
+            }
+            else
+            {
+                $val = "'".$value."' ";
+            }
+            $this->where .= $val;
         }
 
         return $this;

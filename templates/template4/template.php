@@ -13,6 +13,7 @@
         ->css("/templates/template4/css/users.css")
         ->css("/templates/template4/css/popup.css")
         ->css("/templates/template4/css/lids.css")
+        ->css("/templates/template4/css/tasks.css")
         ->showCss()
         ->js("/templates/template4/js/jquery.min.js")
         ->js("/templates/template4/js/jquery.validate.min.js")

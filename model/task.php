@@ -13,8 +13,27 @@ class Task extends Task_Model
 
     public function getNotes()
     {
-        $aoNotes = Core::factory("Task_Note")->where("task_id", "=", $this->id)->findAll();
+        $aoNotes = Core::factory("Task_Note")->where("task_id", "=", $this->id)->orderBy("date", "DESC")->findAll();
         return $aoNotes;
+    }
+
+
+    public function addNote($text)
+    {
+        $oNote = Core::factory("Task_Note");
+
+        $authorId = Core::factory("User")->getCurrent()->getId();
+        $oNote->authorId($authorId);
+
+        $currentDate = date("Y-m-d H:i:s");
+        $oNote->date($currentDate);
+
+        $oNote->taskId($this->id);
+        $oNote->text($text);
+
+        $oNote->save();
+
+        return $this;
     }
 
 

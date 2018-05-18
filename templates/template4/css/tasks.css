@@ -1,0 +1,17 @@
+.task .block {
+//background-color: #E8E8E8;
+    border: 1px solid;
+    margin-bottom: 5px;
+}
+
+.task .author {
+    font-size: 10px;
+    display: inline;
+}
+
+.task .comment_date {
+    font-size: 10px;
+    display: inline;
+    margin-left: 15px;
+    float: right;
+}

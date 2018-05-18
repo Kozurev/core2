@@ -12,6 +12,7 @@ class Task_Model extends Core_Entity
     protected $date;
     protected $type;
     protected $done = 0;
+    protected $done_date;
 
     public function getId()
     {
@@ -38,8 +39,18 @@ class Task_Model extends Core_Entity
     public function done($val = null)
     {
         if(is_null($val))   return $this->done;
-        if($val == true)    $this->done = 1;
-        elseif($val == false)$this->done = 0;
+
+        if($val == true)
+        {
+            $this->done = 1;
+            $this->done_date = date("Y-m-d");
+        }
+        elseif($val == false)
+        {
+            $this->done = 0;
+        }
+        return $this;
     }
+
 
 }

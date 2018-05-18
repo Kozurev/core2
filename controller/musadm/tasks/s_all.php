@@ -7,7 +7,6 @@
  */
 
 
-
 $oUser = Core::factory("User")->getCurrent();
 
 $accessRules = array(
@@ -30,6 +29,18 @@ $action = Core_Array::getValue($_GET, "action", null);
 if($action === "refresh_table")
 {
     $this->execute();
+    exit;
+}
+
+
+if($action === "markAsDone")
+{
+    $taskId = Core_Array::getValue($_GET, "task_id", 0);
+    Core::factory("Task", $taskId)
+        ->done(1)
+        ->save();
+
+    echo "0";
     exit;
 }
 

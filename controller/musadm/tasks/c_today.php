@@ -2,16 +2,16 @@
 /**
  * Created by PhpStorm.
  * User: Kozurev Egor
- * Date: 16.05.2018
- * Time: 17:12
+ * Date: 18.05.2018
+ * Time: 10:34
  */
 
 $currentDate = date("Y-m-d");
 
 $aoTasks = Core::factory("Task")
-//    ->where("done_date", "IS", Core::unchanged("NULL"))
-//    ->where("done_date", "=", $currentDate, "OR")
-    ->orderBy("date", "DESC")
+    ->where("type", "=", 3)
+    ->where("date", ">=", $currentDate)
+    ->orderBy("date")
     ->findAll();
 $aoTypes = Core::factory("Task_Type")->findAll();
 
@@ -33,7 +33,7 @@ Core::factory("Core_Entity")
     ->addEntity(
         Core::factory("Core_Entity")
             ->name("table_name")
-            ->value("all")
+            ->value("today")
     )
     ->xsl("musadm/tasks/all.xsl")
     ->show();
