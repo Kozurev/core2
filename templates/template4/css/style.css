@@ -23,7 +23,8 @@ body {
 }
 
 .container {
-	width: 1300px !important;
+	//width: 1300px !important;
+	width: 90%;
 	padding: 0px;
 }
 
@@ -115,5 +116,68 @@ nav {
 	background: url(../images/vk.png) no-repeat;
 	background-position-x: -6px;
 	background-size: 30px;
+}
+
+.tablesorter-default td {
+	vertical-align: middle;
+	background-color: #F2F2F2;
+	border-right: 1px solid #d1d5da;
+}
+
+.tablesorter-default td:first-child {
+	border-left: 1px solid #d1d5da;
+	border-right: 1px solid #d1d5da;
+}
+
+/**
+ * Верстка комментариев>>
+ */
+.block {
+	margin-top: 15px;
+	margin-bottom: 15px;
+	border-top: 1px solid;
+	border-left: 1px solid;
+	border-right: 1px solid;
+	border-color: #d1d5da;
+	border-radius: 3px;
+}
+
+.block .comment_header {
+	background-color: #f6f8fa;
+	border-bottom: 1px solid #d1d5da;
+	padding-right: 15px;
+	padding-left: 15px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	color: #586069;
+}
+
+.block .comment_header .author {
+	font-size: 14px;
+	font-weight: 600;
+	display: inline;
+}
+
+.block .comment_header .date {
+	font-size: 14px;
+	display: inline;
+	padding-left: 15px;
+}
+
+.block .comment_body {
+	background-color: white;
+	border-bottom: 1px solid #d1d5da;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+/**
+ * <<Верстка комментариев
+ */
+
+
+.finances_add_payment {
+	float: right;
 }
 

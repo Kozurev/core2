@@ -1,17 +1,13 @@
+
 .task .block {
-//background-color: #E8E8E8;
-    border: 1px solid;
-    margin-bottom: 5px;
+    position: relative;
+    top: -15px !important;
+    bottom: -15px !important;
+    //margin-top: 0px !important;
+    //margin-bottom: 0px !important;
 }
 
-.task .author {
-    font-size: 10px;
-    display: inline;
-}
-
-.task .comment_date {
-    font-size: 10px;
-    display: inline;
-    margin-left: 15px;
-    float: right;
+.task td {
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
 }

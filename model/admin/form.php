@@ -260,7 +260,7 @@ class Admin_Form extends Admin_Form_Model
     {
         $aoUsers = Core::factory("User")
             ->orderBy("id", "DESC")
-            ->where("group_id", "=", 5)
+            //->where("group_id", "=", 5)
             ->findAll();
 
         foreach ($aoUsers as $user) $user->title = $user->surname() . " " . $user->name();
@@ -286,16 +286,8 @@ class Admin_Form extends Admin_Form_Model
             $this->value = $oPayment->type();
         }
 
-        $plus = new stdClass();
-        $plus->id = 1;
-        $plus->title = "Начисление";
-
-        $minus = new stdClass();
-        $minus->id = "0";
-        $minus->title = "Списание";
-
-        $this->addEntity($plus, "item");
-        $this->addEntity($minus, "item");
+        $aoTypes = Core::factory("Payment_Type")->findALl();
+        $this->addEntities($aoTypes, "item");
     }
 
 
@@ -515,7 +507,7 @@ class Admin_Form extends Admin_Form_Model
         $modelId = Core_Array::getValue($aParams, "model_id", 0);
         if($modelId > 0)
         {
-            $this->value = Core::factory("Schedule_Lesson_Type", $modelId)->typeId();
+            $this->value = Core::factory("Schedule_Lesson", $modelId)->typeId();
         }
 
         $this->addEntities($aoTypes, "item");
@@ -533,5 +525,6 @@ class Admin_Form extends Admin_Form_Model
 
         $this->addEntities($aoTypes, "item");
     }
+
 
 }

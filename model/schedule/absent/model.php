@@ -12,6 +12,7 @@ class Schedule_Absent_Model extends Core_Entity
     protected $client_id;
     protected $date_from;
     protected $date_to;
+    protected $type_id;
 
     public function __construct(){}
 
@@ -42,6 +43,14 @@ class Schedule_Absent_Model extends Core_Entity
     {
         if(is_null($val))   return $this->date_to;
         $this->date_to = strval($val);
+        return $this;
+    }
+
+
+    public function typeId($val = null)
+    {
+        if(is_null($val))   return $this->type_id;
+        $this->type_id = intval($val);
         return $this;
     }
 

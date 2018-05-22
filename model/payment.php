@@ -8,6 +8,12 @@
 
 class Payment extends Payment_Model
 {
+
+    public function getUser()
+    {
+        return Core::factory("User", $this->user);
+    }
+
     public function save($obj = null)
     {
         Core::notify(array(&$this), "beforePaymentSave");

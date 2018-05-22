@@ -13,17 +13,6 @@
                 .neutral {
                 background-color:lightyellow !important;
                 }
-                .payment_search_input {
-                width: 85%;
-                display: inline-block;
-                }
-                .payment_search_submit {
-                width: 12%;
-                margin-left: 1%;
-                }
-                h1 {
-                color: black;
-                }
             </style>
 
             <h3 class="main_title">

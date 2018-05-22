@@ -3,31 +3,20 @@
     //background-color: white;
 }
 
+.lids .td:first-child {
+    border-left: 1px solid #d1d5da;
+    border-right: 1px solid #d1d5da;
+}
+
 .lids td {
-    padding-left: 5px   !important;
-    padding-right: 5px  !important;
+    vertical-align: middle;
+    border-right: 1px solid #d1d5da;
 }
 
-/*.lids td {*/
-    /*padding-left: 0px !important;*/
-    /*padding-right: 0px !important;*/
-/*}*/
-
-.lids .block {
-    //background-color: #E8E8E8;
-    border: 1px solid;
-    margin-bottom: 5px;
-}
-
-.lids .author {
-    font-size: 10px;
-    display: inline;
-}
-
-.lids .comment_date {
-    font-size: 10px;
-    display: inline;
-    margin-left: 15px;
+.lids th {
+    vertical-align: middle;
+    border-right: 1px solid #d1d5da;
+    background-color: #F2F2F2;
 }
 
 .lids .lid_submit {

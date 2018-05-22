@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: Kozurev Egor
- * Date: 18.05.2018
- * Time: 11:13
+ * Date: 21.05.2018
+ * Time: 10:01
  */
 
 $oUser = Core::factory("User")->getCurrent();
@@ -23,10 +23,9 @@ if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
 }
 
 
-$action = Core_Array::getValue($_GET, "action", null);
+$action = Core_Array::getValue($_GET, "action", "");
 
-
-if($action === "refresh_table")
+if($action === "refreshCertificatesTable")
 {
     $this->execute();
     exit;

@@ -2,7 +2,7 @@
 
 echo "<pre>";
 
-$limit = 10;
+$limit = 20;
 $offset = Core_Array::getValue($_GET, "offset", 0);
 if($offset > 400) die("Выполнение скрипта окончено");
 
@@ -32,7 +32,7 @@ if($offset == 0)
         ->active(1);
     $oUser->save();
 
-    $dbh->query("SELECT * FROM users where id > 36 LIMIT $limit OFFSET $offset");
+    //$dbh->query("SELECT * FROM users where id > 36 LIMIT $limit OFFSET $offset");
 
 }
 

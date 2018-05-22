@@ -2,16 +2,10 @@
 
     <xsl:template match="root">
 
-        <style>
-            .block {
-                border: 1px solid;
-            }
-        </style>
-
         <table class="table lids">
             <form name="lid_form">
                 <tr>
-                    <td class="date"><input type="date" class="form-control date_inp"    name="control_date"/></td>
+                    <td class="date" colspan="2"><input type="date" class="form-control date_inp"    name="control_date"/></td>
                     <td class="string"><input type="text" class="form-control" name="surname"  placeholder="Фамилия"/></td>
                     <td class="string"><input type="text" class="form-control" name="name"     placeholder="Имя"/></td>
                     <td class="string"><input type="text" class="form-control" name="number"   placeholder="Телефон"/></td>
@@ -20,22 +14,21 @@
                     <td class="last"><button class="btn btn-success lid_submit">Добавить</button></td>
                 </tr>
                 <tr>
-                    <td colspan="7">
+                    <td colspan="8">
                         <input type="text" class="form-control" name="comment"  placeholder="Комментарий"/>
                     </td>
                 </tr>
             </form>
 
             <tr>
+                <th>№</th>
                 <th class="date">Дата</th>
                 <th class="string">Фамилия</th>
                 <th class="string">Имя</th>
                 <th class="string">Телефон</th>
                 <th class="string">VK</th>
-                <!--<th class="comment">Комментарии</th>-->
                 <th class="string">Источник</th>
                 <th class="last">Статус</th>
-                <!--<th>Действие</th>-->
             </tr>
 
             <xsl:apply-templates select="lid" />
@@ -63,6 +56,7 @@
         </xsl:variable>
 
         <tr class="{$status}">
+            <td><xsl:value-of select="position()" /></td>
             <td class="date">
                 <input type="date" class="form-control date_inp lid_date" data-lidid="{id}" >
                     <xsl:attribute name="value"><xsl:value-of select="control_date" /></xsl:attribute>
@@ -89,19 +83,23 @@
             </td>
         </tr>
         <tr class="{$status}">
+            <td></td>
             <td colspan="7">
                 <xsl:for-each select="lid_comment">
                     <xsl:variable name="author" select="author_id" />
                     <div class="block">
-                        <div class="author">
-                            <xsl:value-of select="//user[id = $author]/surname" />
-                            <xsl:text> </xsl:text>
-                            <xsl:value-of select="//user[id = $author]/name" />
+                        <div class="comment_header">
+                            <div class="author">
+                                <xsl:value-of select="//user[id = $author]/surname" />
+                                <xsl:text> </xsl:text>
+                                <xsl:value-of select="//user[id = $author]/name" />
+                            </div>
+                            <div class="date">
+                                <xsl:value-of select="datetime" />
+                            </div>
                         </div>
-                        <div class="comment_date">
-                            <xsl:value-of select="datetime" />
-                        </div>
-                        <div class="comment">
+
+                        <div class="comment_body">
                             <xsl:value-of select="text" />
                         </div>
                     </div>

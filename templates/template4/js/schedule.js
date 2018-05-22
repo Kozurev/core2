@@ -12,7 +12,8 @@ $(function(){
         .on("click", ".schedule_absent", function(e){
             e.preventDefault();
             var clientid = $(this).parent().parent().data("clientid");
-            getScheduleAbsentPopup(clientid);
+            var typeid = $(this).parent().parent().data("typeid");
+            getScheduleAbsentPopup(clientid, typeid);
         })
         //Сохранение периода отсутствия
         .on("click", ".popop_schedule_absent_submit", function(e){
@@ -163,6 +164,32 @@ $(function(){
                 }
             });
             //deleteItem("Schedule_Lesson_Report", id, "../admin?menuTab=Main&menuAction=deleteAction&ajax=1", refreshSchedule);
+        })
+        .on("click", ".schedule_task_create", function(){
+            newScheduleTaskPopup();
+        })
+        .on("click", ".popop_schedule_task_submit", function(e){
+            e.preventDefault();
+            loaderOn();
+            var form = $("#createData");
+
+            if(form.valid())
+            {
+                var formData = form.serialize();
+                saveScheduleTask(formData, loaderOff);
+            }
+            else
+            {
+                loaderOff();
+            }
+        })
+        .on("click", ".add_teacher_payment", function(e){
+            e.preventDefault();
+            loaderOn();
+            var date = $(".teacher_payments").find("input[name=date]").val();
+            var summ = $(".teacher_payments").find("input[name=summ]").val();
+            var user = $(".teacher_payments").find("input[name=userid]").val();
+            savePayment(user, summ, "Выплата преподавателю", 3, "../../user/client", refreshSchedule);
         });
 
 
@@ -178,6 +205,37 @@ $(function(){
     $(".schedule_calendar").val(result);
 
 });
+
+
+function newScheduleTaskPopup() {
+    $.ajax({
+        type: "GET",
+        url: "",
+        data: {
+            action: "new_task_popup",
+        },
+        success: function(responce){
+            showPopup(responce);
+        }
+    });
+}
+
+
+function saveScheduleTask(formData, func) {
+    formData += "&action=save_task";
+
+    $.ajax({
+        type: "GET",
+        url: "",
+        data: formData,
+        success: function(responce){
+            if(responce != "0") alert(responce);
+            closePopup();
+            func();
+            loaderOff();
+        }
+    });
+}
 
 
 function refreshSchedule() {
@@ -205,7 +263,7 @@ function getSchedule(userid, date, func) {
 }
 
 
-function getScheduleAbsentPopup(clientid) {
+function getScheduleAbsentPopup(clientid, typeid) {
     $.ajax({
         type: "GET",
         url: "",
@@ -213,6 +271,7 @@ function getScheduleAbsentPopup(clientid) {
         data: {
             action: "getScheduleAbsentPopup",
             client_id: clientid,
+            type_id: typeid
         },
         success: function(responce){
             showPopup(responce);

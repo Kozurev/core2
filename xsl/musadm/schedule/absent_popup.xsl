@@ -34,6 +34,7 @@
 
             <input type="hidden" name="id" value="" />
             <input type="hidden" value="{//clientid}" name="clientId" />
+            <input type="hidden" value="{//typeid}" name="typeId" />
             <input type="hidden" value="Schedule_Absent" name="modelName" />
 
             <button class="popop_schedule_absent_submit btn btn-default">Сохранить</button>

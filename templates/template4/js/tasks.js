@@ -90,7 +90,7 @@ $(function(){
         .on("click", ".popop_task_note_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("../admin?menuTab=User&menuAction=updateAction&ajax=1", refreshTableAll);
+            saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", refreshTableAll);
         });
 });
 
@@ -175,7 +175,7 @@ function newTaskPopup() {
         type: "GET",
         url: "all",
         data: {
-            action: "new_task_popup"
+            action: "new_task_popup",
         },
         success: function(responce){
             showPopup(responce);

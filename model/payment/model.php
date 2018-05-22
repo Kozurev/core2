@@ -9,8 +9,8 @@
 class Payment_Model extends Core_Entity
 {
     protected $id;
-    protected $user;
-    protected $type;
+    protected $user = 0;
+    protected $type = 0;
     protected $datetime;
     protected $value;
     protected $description;
@@ -39,8 +39,9 @@ class Payment_Model extends Core_Entity
     public function type($val = null)
     {
         if(is_null($val))   return $this->type;
-        if($val == true)    $this->type = 1;
-        elseif($val == false)$this->type = 0;
+        $this->type = intval($val);
+//        if($val == true)    $this->type = 1;
+//        elseif($val == false)$this->type = 0;
         return $this;
     }
 

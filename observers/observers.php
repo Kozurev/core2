@@ -248,9 +248,13 @@ Core::attachObserver("beforeScheduleGroupDelete", function($args){
         ->where("group_id", "=", $oGroup->getId())
         ->findAll();
 
-    $aoLessons = array_merge($aoLessons, $aoCurrentLessons);
+    $lessons = array();
+    if(is_array($aoLessons))    $lessons = array_merge($lessons, $aoLessons);
+    if(is_array($aoCurrentLessons)) $lessons = array_merge($lessons, $aoCurrentLessons);
 
-    foreach ($aoLessons as $oLesson)    $oLesson->delete();
+    //$aoLessons = array_merge($aoLessons, $aoCurrentLessons);
+
+    foreach ($lessons as $oLesson)    $oLesson->delete();
 });
 
 

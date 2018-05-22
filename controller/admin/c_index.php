@@ -1,9 +1,9 @@
 <?php
 
 $oUser = Core::factory("User");
-$aAccessParams = array("groups" => array(1, 2));
-if($oUser::checkUserAccess($aAccessParams) != true)
-    die(Core::getMessage("ACCESS_DENIED", array()));
+//$aAccessParams = array("groups" => array(1, 2));
+//if($oUser::checkUserAccess($aAccessParams) != true)
+//    die(Core::getMessage("ACCESS_DENIED", array()));
 
 if(isset($_GET["menuTab"]) && isset($_GET["menuAction"]))
 {

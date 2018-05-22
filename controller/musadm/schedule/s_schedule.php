@@ -23,12 +23,18 @@ $action = Core_Array::getValue($_GET, "action", null);
 if($action === "getScheduleAbsentPopup")
 {
     $clientId = Core_Array::getValue($_GET, "client_id", 0);
+    $typeid = Core_Array::getValue($_GET, "type_id", 0);
 
     Core::factory("Core_Entity")
         ->addEntity(
             Core::factory("Core_Entity")
                 ->name("clientid")
                 ->value($clientId)
+        )
+        ->addEntity(
+            Core::factory("Core_Entity")
+                ->name("typeid")
+                ->value($typeid)
         )
         ->xsl("musadm/schedule/absent_popup.xsl")
         ->show();
@@ -81,7 +87,7 @@ if($action === "getScheduleLessonPopup")
     $aoUsers = Core::factory("User")
         ->where("active", "=", 1)
         ->where("group_id", ">", 3)
-        ->orderBy("id", "DESC")
+        ->orderBy("surname", "ASC")
         ->findAll();
 
     $aoGroups = Core::factory("Schedule_Group")->findAll();
@@ -193,7 +199,7 @@ if($action === "getclientList")
     $type = Core_Array::getValue($_GET, "type", 0);
     if($type == 2)
     {
-        $aoGroups = Core::factory("Schedule_Group")->findAll();
+        $aoGroups = Core::factory("Schedule_Group")->orderBy("title")->findAll();
         foreach ($aoGroups as $group)
             echo "<option value='".$group->getId()."'>" . $group->title() . "</option>";
     }
@@ -202,7 +208,7 @@ if($action === "getclientList")
         $aoUsers = Core::factory("User")
             ->where("active", "=", 1)
             ->where("group_id", "=", 5)
-            ->orderBy("id", "DESC")
+            ->orderBy("surname", "ASC")
             ->findAll();
 
         foreach ($aoUsers as $user)
@@ -276,6 +282,52 @@ if($action === "getScheduleChangeTimePopup")
         ->xsl("musadm/schedule/time_modify_popup.xsl")
         ->show();
 
+    exit;
+}
+
+
+if($action === "new_task_popup")
+{
+    $aoTaskTypes = Core::factory("Task_Type")->findAll();
+    $date = date("Y-m-d");
+
+    Core::factory("Core_Entity")
+        ->addEntities($aoTaskTypes)
+        ->addEntity(
+            Core::factory("Core_Entity")
+                ->name("date")
+                ->value($date)
+        )
+        ->xsl("musadm/schedule/new_task_popup.xsl")
+        ->show();
+
+    exit;
+}
+
+
+if($action === "save_task")
+{
+    $date = Core_Array::getValue($_GET, "date", "");
+    $type = Core_Array::getValue($_GET, "type", 0);
+    $note = Core_Array::getValue($_GET, "text", "");
+
+    $authorId = $oUser->getId();
+    $noteDate = date("Y-m-d");
+
+    $oTask = Core::factory("Task")
+        ->type($type)
+        ->date($date);
+
+    $oTask = $oTask->save();
+
+    Core::factory("Task_Note")
+        ->authorId($authorId)
+        ->date($noteDate)
+        ->text($note)
+        ->taskId($oTask->getId())
+        ->save();
+
+    echo "0";
     exit;
 }
 

@@ -34,13 +34,19 @@ if($oUser->groupId() == 5)
     $aoMainLessons
         ->open()
         ->where("client_id", "=", $userId)
-        ->where("group_id", "in", $aUserGroups, "or")
+        ->open()
+        ->where("client_id", "in", $aUserGroups, "or")
+        ->where("type_id", "=", 2)
+        ->close()
         ->close();
 
     $aoCurrentLessons
         ->open()
         ->where("client_id", "=", $userId)
-        ->where("group_id", "in", $aUserGroups, "or")
+        ->open()
+        ->where("client_id", "in", $aUserGroups, "or")
+        ->where("type_id", "=", 2)
+        ->close()
         ->close();
 
 }
@@ -49,23 +55,17 @@ if($oUser->groupId() == 5)
  */
 elseif($oUser->groupId() == 4)
 {
-    $aoTeachergroups = Core::factory("Schedule_Group")
-        ->where("teacher_id", "=", $userId)
-        ->findAll();
-    $aTeacherGroups = array();
-    foreach ($aoTeachergroups as $group) $aTeacherGroups[] = $group->getId();
+//    $aoTeachergroups = Core::factory("Schedule_Group")
+//        ->where("teacher_id", "=", $userId)
+//        ->findAll();
+//    $aTeacherGroups = array();
+//    foreach ($aoTeachergroups as $group) $aTeacherGroups[] = $group->getId();
 
     $aoMainLessons
-        ->open()
-        ->where("teacher_id", "=", $userId)
-        ->where("group_id", "in", $aTeacherGroups, "or")
-        ->close();
+        ->where("teacher_id", "=", $userId);
 
     $aoCurrentLessons
-        ->open()
-        ->where("teacher_id", "=", $userId)
-        ->where("group_id", "in", $aTeacherGroups, "or")
-        ->close();
+        ->where("teacher_id", "=", $userId);
 }
 
 $aoMainLessons
@@ -86,8 +86,14 @@ $aoCurrentLessons
 $aoCurrentLessons = $aoCurrentLessons->findAll();
 $aoMainLessons = $aoMainLessons->findAll();
 
+
 if($oUser->groupId() == 4)
-    $aoTeacherLessons = array_merge($aoCurrentLessons, $aoMainLessons);
+{
+    $aoTeacherLessons = array();//array_merge($aoCurrentLessons, $aoMainLessons);
+    if(is_array($aoCurrentLessons)) $aoTeacherLessons = array_merge($aoCurrentLessons);
+    if(is_array($aoMainLessons)) $aoTeacherLessons = array_merge($aoTeacherLessons, $aoMainLessons);
+}
+
 
 echo "<table class='schedule_table'>";
 
@@ -139,7 +145,7 @@ echo "</tr>";
  * Установка первоначальных значений
  */
 $timeStart = "09:00:00";    //Начальная отметка временного промежутка
-$timeEnd = "20:00:00";      //Конечная отметка временного промежутка
+$timeEnd = "21:00:00";      //Конечная отметка временного промежутка
 $period = "00:15:00";       //Временной промежуток (временное значение одной ячейки)
 if(defined("SCHEDULE_DELIMITER") != "")   $period = SCHEDULE_DELIMITER;
 $time = $timeStart;
@@ -167,7 +173,6 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
         if( !compareTime($time, ">=", $maxLessonTime[0][$class]) && !compareTime($time, ">=", $maxLessonTime[1][$class]) )
         {
             echo "<th>" . refactorTimeFormat( $time ) . "</th>";
-            //echo "<th>" . refactorTimeFormat( $time ) . "</th>";
             continue;
         }
 
@@ -238,19 +243,12 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                  */
                 if( $oMainLesson != false )
                 {
-                    //$checkClientAbsent = $oMainLesson->isAbsent($date);
-                    if( $oMainLesson->typeId() == 2 )
-                    {
-                        $checkClientAbsent = false;
-                    }
-                    else
-                    {
-                        $checkClientAbsent = Core::factory("Schedule_Absent")
-                            ->where("client_id", "=", $oMainLesson->clientId())
-                            ->where("date_from", "<=", $date)
-                            ->where("date_to", ">=", $date)
-                            ->find();
-                    }
+                    $checkClientAbsent = Core::factory("Schedule_Absent")
+                        ->where("client_id", "=", $oMainLesson->clientId())
+                        ->where("date_from", "<=", $date)
+                        ->where("date_to", ">=", $date)
+                        ->where("type_id", "=", $oMainLesson->typeId())
+                        ->find();
                 }
 
 
@@ -282,10 +280,9 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                         <li>
                             <a href=\"#\"></a>
                             <ul class=\"dropdown\"";
-                    if($oMainLesson->typeId() != 2) echo "data-clientid='".$oMainLesson->clientId()."'";
+                    echo "data-clientid='".$oMainLesson->clientId()."' data-typeid='".$oMainLesson->typeId()."'";
                     echo " data-lessonid='".$oMainLesson->getId()."'>";
-                    if($oMainLesson->typeId() != 2)
-                        echo "<li><a href=\"#\" class='schedule_absent'>Временно отсутствует</a></li>";
+                    echo "<li><a href=\"#\" class='schedule_absent'>Временно отсутствует</a></li>";
                     echo "
                                 <li>
                                     <a href=\"#\" class='schedule_delete_main' data-date='".$date."' data-id='".$oMainLesson->getId()."'>
@@ -407,8 +404,14 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
 echo "<table>";
 
 
+/**
+ * Формирование таблицы с отметками и выплатами для учителей>>
+ */
 if( $oUser->groupId() == 4 )
 {
+    /**
+     * Формирование таблицы с отметками о явке/неявке>>
+     */
     sortByTime($aoTeacherLessons, "timeFrom");
 
     foreach ($aoTeacherLessons as $key => $lesson)
@@ -473,5 +476,38 @@ if( $oUser->groupId() == 4 )
     $attendenceCount = $attendenceCount->where("attendance", "=", "1")->getCount();
 
     echo "<center style='font-size: 17px;'>В этом месяце проведено " . $totalCount . " занятий. Из них явилось " . $attendenceCount . "</center>";
+    /**
+     * <<Формирование таблицы с отметками о явке/неявке
+     */
+
+
+    /**
+     * Формирование таблицы с выплатами>>
+     */
+    $aoPayments = Core::factory("Payment")
+        ->where("type", "=", 3)
+        ->where("user", "=", $oUser->getId())
+        ->findAll();
+
+    Core::factory("Core_Entity")
+        ->addEntities($aoPayments)
+        ->addEntity(
+            Core::factory("Core_Entity")
+                ->name("userid")
+                ->value($oUser->getId())
+        )
+        ->addEntity(
+            Core::factory("Core_Entity")
+                ->name("date")
+                ->value(date("Y-m-d"))
+        )
+        ->xsl("musadm/finances/teacher_payments.xsl")
+        ->show();
+    /**
+     * <<Формирование таблицы с выплатами
+     */
 
 }
+/**
+ * <<Формирование таблицы с отметками и выплатами для учителей
+ */

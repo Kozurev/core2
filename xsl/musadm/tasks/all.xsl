@@ -52,13 +52,20 @@
             <td class="{$class}">
                 <xsl:for-each select="task_note" >
                     <div class="block">
-                        <div class="author">
-                            <xsl:value-of select="user/surname" />
-                            <xsl:text> </xsl:text>
-                            <xsl:value-of select="user/name" />
+                        <div class="comment_header">
+                            <div class="author">
+                                <xsl:value-of select="user/surname" />
+                                <xsl:text> </xsl:text>
+                                <xsl:value-of select="user/name" />
+                            </div>
+                            <div class="date">
+                                <xsl:value-of select="date" />
+                            </div>
                         </div>
-                        <div class="comment_date"><xsl:value-of select="date" /></div>
-                        <div class="comment"><xsl:value-of select="text" /></div>
+
+                        <div class="comment_body">
+                            <xsl:value-of select="text" />
+                        </div>
                     </div>
                 </xsl:for-each>
             </td>

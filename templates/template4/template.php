@@ -14,6 +14,8 @@
         ->css("/templates/template4/css/popup.css")
         ->css("/templates/template4/css/lids.css")
         ->css("/templates/template4/css/tasks.css")
+        ->css("/templates/template4/css/certificates.css")
+        ->css("/templates/template4/css/finances.css")
         ->showCss()
         ->js("/templates/template4/js/jquery.min.js")
         ->js("/templates/template4/js/jquery.validate.min.js")
@@ -29,6 +31,8 @@
         ->js("/templates/template4/js/lids.js")
         ->js("/templates/template4/js/schedule.js")
         ->js("/templates/template4/js/tasks.js")
+        ->js("/templates/template4/js/certificates.js")
+        ->js("/templates/template4/js/finances.js")
         ->showJs();
     ?>
 
@@ -123,7 +127,8 @@
                             <li><a href="<?=$rootdir?>groups">Группы</a></li>
 <!--                            <li><a href="--><?//=$rootdir?><!--tarif" >Тарифы</a></li>-->
                             <li><a href="<?=$rootdir?>lids">Лиды</a></li>
-                            <li><a href="#">Сертификаты</a></li>
+                            <li><a href="<?=$rootdir?>certificates">Сертификаты</a></li>
+                            <li><a href="<?=$rootdir?>finances">Финансы</a></li>
                             <li class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$rootdir?>tasks">Задачи
                                     <span class="caret"></span></a>

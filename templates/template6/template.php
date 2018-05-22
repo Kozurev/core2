@@ -14,7 +14,7 @@ else
 /**
  * Пользовательские примечания и дата последней авторизации
  */
-if($oCurentUser->getId() < 4 && $oUser->groupId() == 5)
+if($oCurentUser->groupId() < 4 && $oUser->groupId() == 5)
 {
     $oPropertyNotes = Core::factory("Property", 19);
     $clienNotes = $oPropertyNotes->getPropertyValues($oUser);

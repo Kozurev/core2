@@ -1,0 +1,74 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: User
+ * Date: 21.05.2018
+ * Time: 10:07
+ */
+
+class Certificate extends Core_Entity
+{
+    protected $id;
+    protected $sell_date;
+    protected $number;
+    protected $active_to;
+    protected $note;
+
+    public function __construct(){}
+
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+
+    public function sellDate($val = null)
+    {
+        if(is_null($val))   return $this->sell_date;
+        $this->sell_date = strval($val);
+        return $this;
+    }
+
+
+    public function number($val =  null)
+    {
+        if(is_null($val))   return $this->number;
+        $this->number = strval($val);
+        return $this;
+    }
+
+
+    public function activeTo($val = null)
+    {
+        if(is_null($val))   return $this->active_to;
+        $this->active_to = strval($val);
+        return $this;
+    }
+
+
+    public function note($val = null)
+    {
+        if(is_null($val))   return $this->note;
+        $this->note = strval($val);
+        return $this;
+    }
+
+
+    public function save($obj = null)
+    {
+        Core::notify(array(&$this), "beforeCertificateSave");
+        if($this->sell_date == "")  $this->sell_date = date("Y-m-d");
+        parent::save();
+        Core::notify(array(&$this), "afterCertificateSave");
+    }
+
+    public function delete($obj = null)
+    {
+        Core::notify(array(&$this), "beforeCertificateDelete");
+        parent::delete();
+        Core::notify(array(&$this), "afterCertificateDelete");
+    }
+
+
+}
