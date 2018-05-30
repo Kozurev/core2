@@ -87,6 +87,37 @@ $aoCurrentLessons = $aoCurrentLessons->findAll();
 $aoMainLessons = $aoMainLessons->findAll();
 
 
+foreach ( $aoMainLessons as $oMainLesson )
+{
+    /**
+     * Если у занятия изменено время на текущую дату то необходимо добавить
+     * его в список занятий текущего расписания
+     */
+    if( $oMainLesson != false && $oMainLesson->isTimeModified( $date ) )
+    {
+        $oModify = Core::factory("Schedule_Lesson_TimeModified")
+            ->where("lesson_id", "=", $oMainLesson->getId())
+            ->where("date", "=", $date)
+            ->find();
+
+        $oNewCurrentLesson = Core::factory("Schedule_Current_Lesson")
+            ->date($date)
+            ->timeFrom($oModify->timeFrom())
+            ->timeTo($oModify->timeTo())
+            ->classId($oMainLesson->classId())
+            ->areaId($oMainLesson->areaId())
+            ->teacherId($oMainLesson->teacherId())
+            ->clientId($oMainLesson->clientId())
+            ->typeId($oMainLesson->typeId());
+
+        $oNewCurrentLesson->lessonType = "main";
+        $oNewCurrentLesson->oldid = $oMainLesson->getId();
+
+        $aoCurrentLessons[] = $oNewCurrentLesson;
+    }
+}
+
+
 if($oUser->groupId() == 4)
 {
     $aoTeacherLessons = array();//array_merge($aoCurrentLessons, $aoMainLessons);
@@ -190,34 +221,6 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
             $oMainLesson = array_pop_lesson( $aoMainLessons, $time, $class );
 
 
-            /**
-             * Если у занятия изменено время на текущую дату то необходимо добавить
-             * его в список занятий текущего расписания
-             */
-            if( $oMainLesson != false && $oMainLesson->isTimeModified( $date ) )
-            {
-                $oModify = Core::factory("Schedule_Lesson_TimeModified")
-                    ->where("lesson_id", "=", $oMainLesson->getId())
-                    ->where("date", "=", $date)
-                    ->find();
-
-                $oNewCurrentLesson = Core::factory("Schedule_Current_Lesson")
-                    ->date($date)
-                    ->timeFrom($oModify->timeFrom())
-                    ->timeTo($oModify->timeTo())
-                    ->classId($oMainLesson->classId())
-                    ->areaId($oMainLesson->areaId())
-                    ->teacherId($oMainLesson->teacherId())
-                    ->clientId($oMainLesson->clientId())
-                    ->typeId($oMainLesson->typeId());
-
-                $oNewCurrentLesson->lessonType = "main";
-                $oNewCurrentLesson->oldid = $oMainLesson->getId();
-
-                $aoCurrentLessons[] = $oNewCurrentLesson;
-            }
-
-
             if( $oMainLesson == false )
             {
                 echo "<th>".refactorTimeFormat( $time )."</th>";
@@ -306,7 +309,6 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
          * Текущее расписание
          * Начало >>
          */
-
         if(compareTime($time, ">=", $maxLessonTime[1][$class]))
         {
             //Урок из текущего расписания
