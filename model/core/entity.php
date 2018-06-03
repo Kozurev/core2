@@ -71,6 +71,17 @@ class Core_Entity extends Core_Entity_Model
 	}
 
 
+	public function addSimpleEntity($name, $value)
+    {
+        $this->addEntity(
+            Core::factory("Core_Entity")
+                ->name($name)
+                ->value($value)
+        );
+        return $this;
+    }
+
+
 	/**
 	*	Преобразование объекта в XML-сущьность
 	*	так же выполняется рекурсивное преобразование дочерних сущьностей

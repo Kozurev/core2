@@ -16,6 +16,7 @@
         ->css("/templates/template4/css/tasks.css")
         ->css("/templates/template4/css/certificates.css")
         ->css("/templates/template4/css/finances.css")
+        ->css("/templates/template4/css/statistic.css")
         ->showCss()
         ->js("/templates/template4/js/jquery.min.js")
         ->js("/templates/template4/js/jquery.validate.min.js")
@@ -139,6 +140,10 @@
                                 </ul>
                             </li>
                             <?
+                            if($oUser->superuser() == 1)
+                            {
+                                echo "<li><a href='".$rootdir."statistic'>Статистика</a></li>";
+                            }
                         }
                         ?>
                     </ul>
