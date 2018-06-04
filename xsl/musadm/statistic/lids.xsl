@@ -1,8 +1,8 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <div class="col-lg-4">
-        <h2>Статистика по лидам</h2>
+        <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+        <h3>Лиды</h3>
             <table class="simple-little-table statistic_lids_table">
                 <tr>
                     <th>Всего:</th>
