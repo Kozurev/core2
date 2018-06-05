@@ -34,6 +34,7 @@
         ->js("/templates/template4/js/tasks.js")
         ->js("/templates/template4/js/certificates.js")
         ->js("/templates/template4/js/finances.js")
+        ->js("/templates/template4/js/statistic.js")
         ->showJs();
     ?>
 

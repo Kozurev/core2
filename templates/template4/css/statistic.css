@@ -1,3 +1,14 @@
 .simple-little-table {
     width: 100%;
 }
+
+.statistic_calendar {
+    text-align: center;
+}
+
+.statistic_calendar .form-control {
+    width: 150px;
+    display: inline-block;
+    margin-top: 20px;
+    margin-right: 15px;
+}
