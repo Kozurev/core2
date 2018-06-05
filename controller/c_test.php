@@ -26,4 +26,25 @@ while ($task = $aoTasks->fetch_object())
 }
 
 
+Core::factory("Orm")->executeQuery("TRUNCATE Lid");
+Core::factory("Orm")->executeQuery("TRUNCATE Lid_Comment");
+$aoLids = $dbh->query("SELECT * FROM `lids`");
 
+while ($lid = $aoLids->fetch_object())
+{
+	$Lid = Core::factory("Lid")
+		->name($lid->name)
+		->surname($lid->surname)
+		->number($lid->phone)
+		->vk($lid->vk)
+		->controlDate($lid->date);
+
+	$Lid->save();
+
+	Core::factory("Property", 27)->addNewValue($Lid, $lid->status + 79);
+
+	Core::factory("Lid_Comment")
+		->lidId($Lid->getId())
+		->text($lid->note)
+		->save();
+}
