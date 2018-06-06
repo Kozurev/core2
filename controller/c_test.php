@@ -28,6 +28,9 @@ while ($task = $aoTasks->fetch_object())
 
 Core::factory("Orm")->executeQuery("TRUNCATE Lid");
 Core::factory("Orm")->executeQuery("TRUNCATE Lid_Comment");
+Core::factory("Orm")->executeQuery("DELETE FROM Property_List WHERE model_name = 'Lid'");
+Core::factory("Orm")->executeQuery("DELETE FROM Property_List_Assigment WHERE model_name = 'Lid'");
+
 $aoLids = $dbh->query("SELECT * FROM `lids`");
 
 while ($lid = $aoLids->fetch_object())
