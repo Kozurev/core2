@@ -107,44 +107,79 @@ Core::factory("Core_Entity")
 /**
  * Статистика по лидам
  */
-$Orm = Core::factory("Orm");
 $oLidsOutput = Core::factory("Core_Entity");
-
-$Orm
-    ->select("count(lid.id)", "count")
-    ->select("val.value", "status")
-    ->from("Lid AS lid")
-    ->join("Property_List AS pl", "pl.object_id = lid.id")
-    ->join("Property_List_Values AS val", "pl.value_id = val.id")
-    ->where("pl.model_name = 'Lid'")
-    ->where("pl.property_id", "=", 27)
-    ->between("control_date", $dateFrom, $dateTo)
-    ->groupBy("val.value");
 
 $totalCount = Core::factory("Lid")
     ->between("control_date", $dateFrom, $dateTo)
     ->getCount();
 
-$queryString = $Orm->getQueryString();
-$aoResults = $Orm->executeQuery($queryString);
 
-if($aoResults != false)
-{
-    $aoResults = $aoResults->fetchAll();
+$aoStatuses = Core::factory("Property_List_Values")
+	->where("property_id", "=", 27)
+	->findAll();
 
-    foreach ($aoResults as $res)
-    {
-        $oStatus = new stdClass();
-        $oStatus->name = $res["status"];
+	if(count($aoStatuses) > 0)
+	{
+		foreach ($aoStatuses as $status) 
+		{
+			$queryString = Core::factory("Orm")
+				->select("count(Lid.id)", "count")
+				->from("Lid")
+				->join("Property_List AS pl", "pl.object_id = Lid.id")
+				->between("control_date", $dateFrom, $dateTo)
+				->where("pl.value_id", "=", $status->getId())
+				->getQueryString();
 
-        if($totalCount != 0)
-            $oStatus->percents = intval($res["count"] * 100 / $totalCount);
-        else
-            $oStatus->percents = 0;
+			$Result = Core::factory("Orm")->executeQuery($queryString);
 
-        $oLidsOutput->addEntity($oStatus, "status");
-    }
-}
+			if($Result != false)
+			{
+				$Result = $Result->fetch();
+				$count = $Result["count"];	
+				$percents = $count * 100 / $totalCount;
+			}
+			else 
+			{
+				$count = 0;
+				$percents = 0;
+			}
+
+			$status->addSimpleEntity("count", $count);
+			$status->addSimpleEntity("percents", $percents);
+			$oLidsOutput->addEntity($status, "status");
+		}
+	}
+
+// $Orm
+//     ->select("count(lid.id)", "count")
+//     ->select("val.value", "status")
+//     ->from("Lid AS lid")
+//     ->join("Property_List AS pl", "pl.object_id = lid.id")
+//     ->join("Property_List_Values AS val", "pl.value_id = val.id")
+//     ->where("pl.model_name = 'Lid'")
+//     ->where("pl.property_id", "=", 27)
+//     ->between("control_date", $dateFrom, $dateTo)
+//     ->groupBy("val.value");
+// $queryString = $Orm->getQueryString();
+// $aoResults = $Orm->executeQuery($queryString);
+
+// if($aoResults != false)
+// {
+//     $aoResults = $aoResults->fetchAll();
+
+//     foreach ($aoResults as $res)
+//     {
+//         $oStatus = new stdClass();
+//         $oStatus->name = $res["status"];
+
+//         if($totalCount != 0)
+//             $oStatus->percents = intval($res["count"] * 100 / $totalCount);
+//         else
+//             $oStatus->percents = 0;
+
+//         $oLidsOutput->addEntity($oStatus, "status");
+//     }
+// }
 
 $oLidsOutput
     ->addSimpleEntity("total", $totalCount)

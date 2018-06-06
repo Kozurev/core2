@@ -16,8 +16,10 @@
 
     <xsl:template match="status">
         <tr>
-            <td><xsl:value-of select="name" /></td>
-            <td><xsl:value-of select="percents" />%</td>
+            <td><xsl:value-of select="value" /></td>
+            <td>
+                <xsl:value-of select="count" /> (<xsl:value-of select="percents" />%)
+            </td>
         </tr>
     </xsl:template>
 
