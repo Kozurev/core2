@@ -89,8 +89,6 @@
                             <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$rootdir?>user">Расписание
                                 <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-<!--                                <li><a href="--><?//=$rootdir?><!--schedule?area=1" >Мичурина</a></li>-->
-<!--                                <li><a href="--><?//=$rootdir?><!--schedule?area=2" >Щорса</a></li>-->
                                 <?
                                 $aoAreas = Core::factory("Schedule_Area")->orderBy("sorting")->findAll();
                                 foreach ($aoAreas as $area)
@@ -110,7 +108,7 @@
                         {
                             ?>
                             <li><a href="<?=$rootdir?>user/balance<?=$sUserId?>" >Баланс</a></li>
-                            <li><a href="#" >Сменить логин или пароль</a></li>
+                            <li><a href="<?=$rootdir?>user/changelogin" >Сменить логин или пароль</a></li>
                             <?
                         }
                         //Пункты только для администратора, директора или менеджера

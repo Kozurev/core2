@@ -171,8 +171,28 @@ function refactorTimeFormat( $time )
 function refactorDateFormat ( $date, $glue = ".", $type = "full")
 {
     $aSegments = explode("-", $date);
-    //$aSegments[2] . ".". $aSegments[1] . "." . $aSegments[0];
     if( $type === "short" ) unset($aSegments[0]);
     $aSegments = array_reverse($aSegments);
     return implode($glue, $aSegments);
+}
+
+
+function getMonth($date)
+{
+    $month = substr( $date, 5 );
+    $month = intval( substr( $month, 0, 3 ) );
+    return $month;
+}
+
+
+function getYear($date)
+{
+    return substr($date, 0, 4);
+}
+
+
+function getMonthName($date)
+{
+    $mouthes = array("Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь");
+    return $mouthes[getMonth($date) - 1];
 }

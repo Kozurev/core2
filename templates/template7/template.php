@@ -21,7 +21,7 @@ $this->css("/templates/template7/css/style.css");
     </div>
 
     <div style="text-align: right">
-        <button class="btn btn-success schedule_task_create">Добавить задачу</button>
+        <button class="btn btn-success schedule_task_create">Написать администратору</button>
     </div>
 
     <input type="hidden" id="userid" value="<?=$oUser->getId()?>">

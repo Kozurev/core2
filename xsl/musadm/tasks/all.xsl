@@ -12,7 +12,7 @@
             <thead>
                 <tr>
                     <th class="header">№</th>
-                    <th class="header">Дата</th>
+                    <th class="header">Дата контроля</th>
                     <th>Примечания</th>
                     <th class="header">Тип</th>
                     <th class="header">Статус</th>

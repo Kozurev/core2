@@ -80,6 +80,13 @@ $(function(){
             var note = $(this).val();
             var userid = $(this).data("userid");
             updateUserNote(userid, note, loaderOff);
+        })
+        .on("click", ".change_login_submit", function(e){
+            e.preventDefault();
+            loaderOn();
+            saveData("../admin?menuTab=User&menuAction=updateAction&ajax=1", loaderOff);
+            $("input[name=pass1]").val('');
+            $("input[name=pass2]").val('');
         });
 });
 

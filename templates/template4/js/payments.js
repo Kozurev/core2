@@ -20,7 +20,7 @@ $(function(){
             e.preventDefault();
             loaderOn();
             var userid = $(this).data("userid");
-            saveData("admin?menuTab=Main&menuAction=updateAction&ajax=1", loaderOff);
+            saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", loaderOff);
             refreshPaymentsTable(userid, loaderOff);
         })
         //Открытие формы пополнения баланса

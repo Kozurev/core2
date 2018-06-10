@@ -22,6 +22,7 @@ $aoPayments = Core::factory("Payment")
     ->where("type", "=", 1)
     ->where("type", "=", 3, "OR")
     ->where("type", "=", 4, "OR")
+    ->where("type", "=", 5, "OR")
     ->close()
     ->orderBy("datetime", "DESC");
 
@@ -47,32 +48,28 @@ $summ = Core::factory("Orm")
     ->close()
     ->find();
 
+$minus = Core::factory("Orm")
+    ->select("sum(value)", "value")
+    ->from("Payment")
+    ->where("type", "=", 5)
+    ->open()
+    ->where("datetime", ">=", $dateFrom)
+    ->where("datetime", "<=", $dateTo)
+    ->close()
+    ->find();
 
 foreach ($aoPayments as $payment)
 {
     $payment->addEntity(
         $payment->getUser()
     );
-    //$payment->datetime(refactorDateFormat($payment->datetime()));
 }
 
 
 Core::factory("Core_Entity")
     ->addEntities($aoPayments)
-    ->addEntity(
-        Core::factory("Core_Entity")
-            ->name("date_from")
-            ->value($dateFrom)
-    )
-    ->addEntity(
-        Core::factory("Core_Entity")
-            ->name("date_to")
-            ->value($dateTo)
-    )
-    ->addEntity(
-        Core::factory("Core_Entity")
-            ->name("total_summ")
-            ->value($summ->value)
-    )
+    ->addSimpleEntity("date_from", $dateFrom)
+    ->addSimpleEntity("date_to", $dateTo)
+    ->addSimpleEntity("total_summ", intval($summ->value) - intval($minus->value))
     ->xsl("musadm/finances/client_payments.xsl")
     ->show();

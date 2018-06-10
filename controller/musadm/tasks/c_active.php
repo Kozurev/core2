@@ -11,7 +11,7 @@ $currentDate = date("Y-m-d");
 $aoTasksToday = Core::factory("Task")
     ->where("type", "=", 3)
     ->where("date", "=", $currentDate)
-    ->orderBy("date", "DESC")
+    ->orderBy("id", "DESC")
     ->findAll();
 
 $aoTasksOther = Core::factory("Task")
@@ -21,7 +21,7 @@ $aoTasksOther = Core::factory("Task")
     ->where("done_date", "IS", Core::unchanged("NULL"))
     ->where("done_date", "=", $currentDate, "OR")
     ->close()
-    ->orderBy("date", "DESC")
+    ->orderBy("id", "DESC")
     ->findAll();
 
 

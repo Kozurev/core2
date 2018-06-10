@@ -2,6 +2,8 @@
 
     <xsl:template match="root">
 
+
+
         <table class="table lids">
             <form name="lid_form">
                 <tr>
@@ -20,7 +22,7 @@
                 </tr>
             </form>
 
-            <tr>
+            <!-- <tr>
                 <th>№</th>
                 <th class="date">Дата</th>
                 <th class="string">Фамилия</th>
@@ -29,10 +31,14 @@
                 <th class="string">VK</th>
                 <th class="string">Источник</th>
                 <th class="last">Статус</th>
-            </tr>
+            </tr> -->
 
-            <xsl:apply-templates select="lid" />
         </table>
+
+        <div class="row lids">
+            <xsl:apply-templates select="lid" />
+        </div>
+
     </xsl:template>
 
 
@@ -55,8 +61,8 @@
             </xsl:choose>
         </xsl:variable>
 
-        <tr class="{$status}">
-            <td><xsl:value-of select="position()" /></td>
+<!--         <tr class="{$status}">
+            <td><xsl:value-of select="id" /></td>
             <td class="date">
                 <input type="date" class="form-control date_inp lid_date" data-lidid="{id}" >
                     <xsl:attribute name="value"><xsl:value-of select="control_date" /></xsl:attribute>
@@ -82,7 +88,7 @@
                 </select>
             </td>
         </tr>
-        <tr class="{$status}">
+        <tr>
             <td></td>
             <td colspan="7">
                 <xsl:for-each select="lid_comment">
@@ -106,7 +112,74 @@
                 </xsl:for-each>
                 <button class="btn btn-success add_lid_comment" data-lidid="{id}">Добавить комментарий</button>
             </td>
-        </tr>
+        </tr> -->
+
+        <div class="card">
+            <div class="{$status}">
+                <div>
+                    <xsl:value-of select="id" />
+                    <xsl:text> </xsl:text>
+                    <xsl:value-of select="surname" />
+                    <xsl:text> </xsl:text>
+                    <xsl:value-of select="name" />
+                </div>
+
+                <div>
+                    <xsl:value-of select="number" />
+                    <xsl:text> </xsl:text>
+                    <xsl:value-of select="vk" />
+                    <xsl:text> </xsl:text>
+                    <xsl:value-of select="source" />
+                </div>
+
+                <div class="date">
+                    <input type="date" class="form-control date_inp lid_date" data-lidid="{id}" >
+                        <xsl:attribute name="value"><xsl:value-of select="control_date" /></xsl:attribute>
+                    </input>
+                </div>
+
+                <div class="comments">
+                    <xsl:for-each select="lid_comment">
+                        <xsl:variable name="author" select="author_id" />
+                        <div class="block">
+                            <div class="comment_header">
+                                <div class="author">
+                                    <xsl:value-of select="//user[id = $author]/surname" />
+                                    <xsl:text> </xsl:text>
+                                    <xsl:value-of select="//user[id = $author]/name" />
+                                </div>
+                                <div class="date">
+                                    <xsl:value-of select="datetime" />
+                                </div>
+                            </div>
+
+                            <div class="comment_body">
+                                <xsl:value-of select="text" />
+                            </div>
+                        </div>
+                    </xsl:for-each>
+                </div>
+
+                <div class="comment_button_box">
+                    <button class="btn btn-default add_lid_comment" data-lidid="{id}">Добавить комментарий</button>
+                </div>
+
+                <div>
+                    <select name="status" class="form-control lid_status" data-lidid="{id}">
+                        <xsl:variable name="status_id" select="property_value/id" />
+                        <xsl:for-each select="/root/status">
+                            <xsl:variable name="id" select="id" />
+                            <option value="{$id}">
+                                <xsl:if test="$id = $status_id">
+                                    <xsl:attribute name="selected">selected</xsl:attribute>
+                                </xsl:if>
+                                <xsl:value-of select="value" />
+                            </option>
+                        </xsl:for-each>
+                    </select>
+                </div>
+            </div>
+        </div>
 
     </xsl:template>
 

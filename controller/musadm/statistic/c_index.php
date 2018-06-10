@@ -126,6 +126,7 @@ $totalCount = Core::factory("Lid")
     ->getCount();
 
 $queryString = $Orm->getQueryString();
+//echo $queryString;
 $aoResults = $Orm->executeQuery($queryString);
 
 if($aoResults != false)
@@ -158,7 +159,6 @@ echo "<div class=\"col-lg-4 col-md-6 col-sm-6 col-xs-12\">";
  * Статистика по выплатам преподавателям
  */
 $queryString = Core::factory("Orm")
-    //->select("count(id)", "count")
     ->select("sum(value)", "sum")
     ->from("Payment")
     ->between("datetime", $dateFrom, $dateTo)
