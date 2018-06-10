@@ -113,7 +113,7 @@ $totalCount = Core::factory("Lid")
     ->between("control_date", $dateFrom, $dateTo)
     ->getCount();
 
-<<<<<<< HEAD
+$Orm = Core::factory("Orm");
 $queryString = $Orm->getQueryString();
 //echo $queryString;
 $aoResults = $Orm->executeQuery($queryString);
@@ -121,8 +121,7 @@ $aoResults = $Orm->executeQuery($queryString);
 if($aoResults != false)
 {
     $aoResults = $aoResults->fetchAll();
-=======
->>>>>>> a2c46bc65ae0fd24ee33342886701afc2eb0ec47
+}
 
 $aoStatuses = Core::factory("Property_List_Values")
 	->where("property_id", "=", 27)
@@ -155,7 +154,7 @@ $aoStatuses = Core::factory("Property_List_Values")
 			}
 
 			$status->addSimpleEntity("count", $count);
-			$status->addSimpleEntity("percents", $percents);
+			$status->addSimpleEntity("percents", round($percents, 2));
 			$oLidsOutput->addEntity($status, "status");
 		}
 	}
