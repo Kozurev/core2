@@ -29,7 +29,12 @@ while ($task = $aoTasks->fetch_object())
 Core::factory("Orm")->executeQuery("TRUNCATE Lid");
 Core::factory("Orm")->executeQuery("TRUNCATE Lid_Comment");
 Core::factory("Orm")->executeQuery("DELETE FROM Property_List WHERE model_name = 'Lid'");
+<<<<<<< HEAD
 Core::factory("Orm")->executeQuery("DELETE FROM Property_List_Assignment WHERE model_name = 'Lid'");
+=======
+Core::factory("Orm")->executeQuery("DELETE FROM Property_List_Assigment WHERE model_name = 'Lid'");
+
+>>>>>>> a2c46bc65ae0fd24ee33342886701afc2eb0ec47
 $aoLids = $dbh->query("SELECT * FROM `lids`");
 
 while ($lid = $aoLids->fetch_object())
