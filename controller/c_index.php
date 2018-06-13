@@ -199,7 +199,7 @@ while($user = $aUsers->fetch_object())
 
         $oPayment->datetime(date('Y-m-d H:i:s',$payment->date));
         $oPayment->value($payment->value);
-        Core::factory("Property")->addToPropertiesList($oPayment, 26);
+        //Core::factory("Property")->addToPropertiesList($oPayment, 26);
         $oPayment->description($payment->description);
         $oPayment->save();
     }
