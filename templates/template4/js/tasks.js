@@ -91,6 +91,12 @@ $(function(){
             e.preventDefault();
             loaderOn();
             saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", refreshTableAll);
+        })
+        .on("click", ".tasks_show", function(){
+            loaderOn();
+            var dateFrom = $("input[name=date_from]").val();
+            var dateTo = $("input[name=date_to]").val();
+            refreshTableAll(dateFrom, dateTo);
         });
 });
 
@@ -152,14 +158,16 @@ function updateTaskDate(taskId, taskDate) {
 }
 
 
-function refreshTableAll() {
+function refreshTableAll(from, to) {
     var url = $("table_type").val();
 
     $.ajax({
         type: "GET",
         url: url,
         data: {
-            action: "refresh_table"
+            action: "refresh_table",
+            date_from: from,
+            date_to: to
         },
         success: function(responce){
             $(".page").empty();

@@ -2,7 +2,14 @@
 
     <xsl:template match="root">
 
-
+        <xsl:if test="structure_type = 'all'">
+            <div class="finances_calendar">
+                Период
+                с: <input type="date" class="form-control" name="date_from" value="{date_from}"/>
+                по: <input type="date" class="form-control" name="date_to" value="{date_to}"/>
+                <button class="btn btn-success lids_show" >Показать</button>
+            </div>
+        </xsl:if>
 
         <table class="table lids">
             <form name="lid_form">

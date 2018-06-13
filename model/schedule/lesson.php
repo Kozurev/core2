@@ -147,6 +147,14 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     }
 
 
+    public function delete($obj = null)
+    {
+        Core::notify(array(&$this), "beforeScheduleLessonDelete");
+        parent::delete();
+        Core::notify(array(&$this), "afterScheduleLessonDelete");
+    }
+
+
     public function save($obj = null)
     {
         Core::notify(array(&$this), "beforeScheduleLessonSave");

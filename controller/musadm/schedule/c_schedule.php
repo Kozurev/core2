@@ -175,8 +175,13 @@ $timeEnd = "21:00:00";      //Конечная отметка временног
 $period = "00:15:00";       //Временной промежуток (временное значение одной ячейки)
 if(defined("SCHEDULE_DELIMITER") != "")   $period = SCHEDULE_DELIMITER;
 $time = $timeStart;
-
 $maxLessonTime = array();
+
+$LessonDate = new DateTime($date);
+$CurrentDate = new DateTime($today);
+$lessonTime = $LessonDate->format("U");
+$currentTime = $CurrentDate->format("U");
+
 
 for ($i = 0; $i <= 1; $i++)
 {
@@ -262,7 +267,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
 
                 if( $checkClientAbsent == true)
                 {
-                    echo "<span><b>Отсутствует с ".refactorDateFormat($checkClientAbsent->dateFrom(), ".", "short")." 
+                    echo "<span><b>Отсутствует <br> с ".refactorDateFormat($checkClientAbsent->dateFrom(), ".", "short")." 
                     по ".refactorDateFormat($checkClientAbsent->dateTo(), ".", "short")."</b></span><hr>";
                 }
                 elseif( $oMainLesson->isAbsent($date) )
@@ -272,7 +277,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
 
                 echo "<span class='client'>" . $aMainLessonData["client"] . "</span><hr><span class='teacher'>преп. " . $aMainLessonData["teacher"] . "</span>";
 
-                if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) )
+                if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) && $lessonTime >= $currentTime )
                 {
                     echo "<ul class=\"submenu\">
                         <li>
@@ -313,7 +318,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
             /**
              * Дублирование из основного графика
              */
-            if( $oMainLesson != false && /*$checkClientAbsent == false &&*/ !$oMainLesson->isAbsent($date) && !$oMainLesson->isTimeModified($date) )
+            if( $oMainLesson != false && !$oMainLesson->isAbsent($date) && !$oMainLesson->isTimeModified($date) )
             {
                 //Поиск высоты ячейки (значение тэга rowspan) и обновление $maxLessonTime
                 $rowspan = updateLastLessonTime( $oMainLesson, $maxLessonTime[1][$class], $time, $period );
@@ -321,7 +326,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                 echo "<td class='" . $aMainLessonData["client_status"] . "' rowspan='" . $rowspan . "'>";
                 echo "<span class='client'>" . $aMainLessonData["client"] . "</span><hr><span class='teacher'>преп. " . $aMainLessonData["teacher"] . "</span>";
 
-                if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) )
+                if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) && !$oMainLesson->isReported($date) && $lessonTime >= $currentTime )
                 {
                     echo "<ul class=\"submenu\">
                         <li>
@@ -457,10 +462,36 @@ if( $oUser->groupId() == 4 )
 
     $totalCount = clone $aoTeacherReports;
     $totalCount = $totalCount->getCount();
-    $attendenceCount = clone $aoTeacherReports;
-    $attendenceCount = $attendenceCount->where("attendance", "=", "1")->getCount();
 
-    echo "<center style='font-size: 17px;'>В этом месяце проведено " . $totalCount . " занятий. Из них явилось " . $attendenceCount . "</center>";
+    $attendenceIndivCount = clone $aoTeacherReports;
+    $attendenceIndivCount = $attendenceIndivCount
+        ->where("type_id", "=", 1)
+        ->where("attendance", "=", "1")
+        ->getCount();
+
+    $disAttendenceIndivCount = clone $aoTeacherReports;
+    $disAttendenceIndivCount = $disAttendenceIndivCount
+        ->where("type_id", "=", 1)
+        ->where("attendance", "=", "0")
+        ->getCount();
+
+
+    $attendenceGroupCount = clone $aoTeacherReports;
+    $attendenceGroupCount = $attendenceGroupCount
+        ->where("type_id", "=", 2)
+        ->where("attendance", "=", "1")
+        ->getCount();
+
+    $disAttendenceGroupCount = clone $aoTeacherReports;
+    $disAttendenceGroupCount = $disAttendenceGroupCount
+        ->where("type_id", "=", 2)
+        ->where("attendance", "=", "0")
+        ->getCount();
+
+
+    echo "<div class='teacher_footer'>Общее число проведенных занятий в этом месяце: $totalCount <br>
+            из них явки/неявки: $attendenceIndivCount / $disAttendenceIndivCount (индивидуальные), $attendenceGroupCount / $disAttendenceGroupCount (групповые).
+        </div>";
     /**
      * <<Формирование таблицы с отметками о явке/неявке
      */
@@ -491,10 +522,7 @@ if( $oUser->groupId() == 4 )
         $aoMonthesPayments[$index]->addEntity($payment);
     }
 
-    //debug($aoMonthesPayments);
-
     Core::factory("Core_Entity")
-        //->addEntities($aoPayments)
         ->addEntities($aoMonthesPayments)
         ->addSimpleEntity("userid", $oUser->getId())
         ->addSimpleEntity("user_group", Core::factory("User")->getCurrent()->groupId())

@@ -190,7 +190,6 @@ Core::attachObserver("beforeStructureSave", function($args){
         ->getCount();
 
     if($countCoincidingItems > 0 || $countCoincidingStructures > 0) die("Дублирование путей");
-    //die("Дублирование не обнаружено");
 });
 
 
@@ -257,6 +256,21 @@ Core::attachObserver("beforeScheduleGroupDelete", function($args){
     foreach ($lessons as $oLesson)    $oLesson->delete();
 });
 
+
+/**
+ *  При удалении занятия также удаляются все отчеты по нему
+ */
+Core::attachObserver("beforeLessonDelete", function($args){
+    $Reports = Core::factory("Schedule_Lesson_Report")
+        ->where("lesson_id", "=", $args[0]->getId())
+        ->findAll();
+
+    if( is_array( $Reports ) && count( $Reports ) > 0 )
+        foreach ($Reports as $Report) 
+        {
+            $Report->delete();
+        }
+});
 
 
 

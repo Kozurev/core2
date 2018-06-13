@@ -23,9 +23,16 @@ $(function(){
         })
         //Окно добавления урока в расписание
         .on("click", ".add_lesson", function(){
+            var date = $(this).data("date");
+
+            var today = new Date();
+            var lessonDate = new Date(date);
+            var currentDate = new Date(getCurrentDate());
+
+            if(lessonDate.valueOf() < currentDate.valueOf())    return false;
+
             var type = $(this).data("schedule_type");
             var class_id = $(this).data("class_id");
-            var date = $(this).data("date");
             var area_id = $(this).data("area_id");
             getScheduleLessonPopup(class_id, date, area_id, type);
         })

@@ -43,6 +43,16 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
     }
 
 
+    public function delete($obj = null)
+    {
+        Core::notify(array(&$this), "beforeScheduleCurrentLessonDelete");
+        Core::notify(array(&$this), "beforeLessonDelete");
+        parent::delete();
+        Core::notify(array(&$this), "beforeScheduleCurrentLessonDelete");
+        Core::notify(array(&$this), "beforeLessonDelete");
+    }
+
+
     public function save($obj = null)
     {
         Core::notify(array(&$this), "beforeScheduleCurrentLessonSave");

@@ -4,6 +4,15 @@
 
         <input id="table_type" type="hidden" value="{table_name}" />
 
+        <xsl:if test="table_name = 'all'">
+            <div class="finances_calendar">
+                Период
+                с: <input type="date" class="form-control" name="date_from" value="{date_from}"/>
+                по: <input type="date" class="form-control" name="date_to" value="{date_to}"/>
+                <button class="btn btn-success tasks_show" >Показать</button>
+            </div>
+        </xsl:if>
+
         <div style="text-align: right">
             <button class="btn btn-success task_create">Добавить задачу</button>
         </div>
@@ -39,14 +48,6 @@
                 <xsl:if test="type = 3">
                     <a href="#" class="action edit task_date_edit" data-task_id="{id}"></a>
                 </xsl:if>
-                <!--<xsl:choose>-->
-                    <!--<xsl:when test="type = 3">-->
-                        <!--<input type="date" class="form-control" style="max-width: 150px;" data-task_id="{id}" value="{date}" />-->
-                    <!--</xsl:when>-->
-                    <!--<xsl:otherwise>-->
-                        <!--<xsl:value-of select="date" />-->
-                    <!--</xsl:otherwise>-->
-                <!--</xsl:choose>-->
             </td>
 
             <td class="{$class}">

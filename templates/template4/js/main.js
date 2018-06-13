@@ -1,18 +1,30 @@
 var loaderTime = 0;
 
 
+
+function getCurrentDate() {
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var day = date.getDate();
+
+    if(month < 10)  month = "0" + month;
+    if(day < 10)    day = "0" + day;
+
+    var today = year + "-" + month + "-" + day;
+    return today;
+}
+
 //Запуск лоадера
 function loaderOn(){
     var bodyHeight = ($(window).height() - $(".loader").outerHeight()) / 2;
     if(bodyHeight < window.innerHeight) bodyHeight = window.innerHeight;
-    //$("body").addClass("bodyLoader");
     $(".loader").css("height", bodyHeight);
     $(".loader").show();
 }
 
 //Отключение лоадера
 function loaderOff(){
-    //$("body").removeClass("bodyLoader");
     $(".loader").hide();
     $("#sortingTable").tablesorter();
 }

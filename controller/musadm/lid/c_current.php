@@ -2,23 +2,13 @@
 /**
  * Created by PhpStorm.
  * User: Kozurev Egor
- * Date: 26.04.2018
- * Time: 14:23
+ * Date: 13.06.2018
+ * Time: 14:21
  */
 
-$dateFormat = "Y-m-d";
-$oDate = new DateTime(date($dateFormat));
-$interval = new DateInterval("P1M");
-$defaultDateFrom = $oDate->sub($interval)->format($dateFormat);
-$defaultDateTo = date($dateFormat);
-
-$dateFrom = Core_Array::getValue($_GET, "date_from", $defaultDateFrom);
-$dateTo = Core_Array::getValue($_GET, "date_to", $defaultDateTo);
-
-
 $aoLids = Core::factory("Lid")
-    ->between("control_date", $dateFrom, $dateTo)
     ->where("active", "=", 1)
+    ->where("control_date", "=", date("Y-m-d"))
     ->orderBy("id", "DESC")
     ->findAll();
 
@@ -45,9 +35,6 @@ $aoAuthors = Core::factory("User")
 
 
 $output = Core::factory("Core_Entity")
-    ->addSimpleEntity("date_from", $dateFrom)
-    ->addSimpleEntity("date_to", $dateTo)
-    ->addSimpleEntity("structure_type", "all")
     ->addEntities(
         Core::factory("Lid")->getStatusList(), "status"
     )

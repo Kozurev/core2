@@ -126,7 +126,14 @@
                             </li>
                             <li><a href="<?=$rootdir?>groups">Группы</a></li>
 <!--                            <li><a href="--><?//=$rootdir?><!--tarif" >Тарифы</a></li>-->
-                            <li><a href="<?=$rootdir?>lids">Лиды</a></li>
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$rootdir?>lids">Лиды
+                                    <span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="<?=$rootdir?>lids/current" >На сегодня</a></li>
+                                    <li><a href="<?=$rootdir?>lids/all" >Общий список</a></li>
+                                </ul>
+                            </li>
                             <li><a href="<?=$rootdir?>certificates">Сертификаты</a></li>
                             <li><a href="<?=$rootdir?>finances">Финансы</a></li>
                             <li class="dropdown">

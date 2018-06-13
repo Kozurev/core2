@@ -24,7 +24,7 @@ $(function(){
         .on("click", ".popop_lid_comment_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("./admin?menuTab=Main&menuAction=updateAction&ajax=1", refreshLidTable);
+            saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", refreshLidTable);
         })
         .on("change", ".lid_status", function(){
             loaderOn();
@@ -37,21 +37,28 @@ $(function(){
             var lidid = $(this).data("lidid");
             var date = $(this).val();
             changeDate(lidid, date, loaderOff);
+        })
+        .on("click", ".lids_show", function(){
+            loaderOn();
+            var dateFrom = $("input[name=date_from]").val();
+            var dateTo = $("input[name=date_to]").val();
+            refreshLidTable(dateFrom, dateTo);
         });
 });
 
-function refreshLidTable(){
+function refreshLidTable(from, to) {
     $.ajax({
         type: "GET",
-        url: "lids",
+        url: "",
         async: false,
         data: {
-            action: "refreshLidTable"
+            action: "refreshLidTable",
+            date_from: from,
+            date_to: to
         },
         success: function(responce){
             $(".page").empty();
             $(".page").append(responce);
-            //$("#sortingTable").tablesorter();
             loaderOff();
         }
     });
@@ -60,7 +67,7 @@ function refreshLidTable(){
 function getCommentPopup(lidid){
     $.ajax({
         type: "GET",
-        url: "lids",
+        url: "../lids",
         data: {
             action: "add_note_popup",
             model_id: lidid
@@ -75,7 +82,7 @@ function getCommentPopup(lidid){
 function saveLid(data, func){
     $.ajax({
         type: "GET",
-        url: "lids?action=save_lid",
+        url: "../lids?action=save_lid",
         async: false,
         data: data,
         success: function(responce){
@@ -87,7 +94,7 @@ function saveLid(data, func){
 function changeStatus(lidid, statusid, func){
     $.ajax({
         type: "GET",
-        url: "lids",
+        url: "../lids",
         data: {
             action: "changeStatus",
             model_id: lidid,
@@ -102,7 +109,7 @@ function changeStatus(lidid, statusid, func){
 function changeDate(lidid, date, func){
     $.ajax({
         type: "GET",
-        url: "lids",
+        url: "../lids",
         data: {
             action: "changeDate",
             model_id: lidid,

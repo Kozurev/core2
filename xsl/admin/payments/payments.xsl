@@ -100,7 +100,7 @@
 
             <td>
                 <!--Редактирование-->
-                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Payment&amp;parent_id={0}&amp;model_id={id}&amp;parent_name=Payment" class="link updateLink" />
+                <a href="admin?menuTab=Main&amp;menuAction=updateForm&amp;model=Payment&amp;parent_id={0}&amp;model_id={id}&amp;parent_name=Payment&amp;properties[]=26" class="link updateLink" />
                 <!--Удаление-->
                 <a href="admin" data-model_name="Payment" data-model_id="{id}" class="delete deleteLink"></a>
             </td>

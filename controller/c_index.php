@@ -16,8 +16,16 @@ if($offset == 0)
 
     Core::factory("Orm")->executeQuery("TRUNCATE `User`");
     Core::factory("Orm")->executeQuery("TRUNCATE `Payment`");
-//Core::factory("Orm")->executeQuery("TRUNCATE `Schedule_Group`");
     Core::factory("Orm")->executeQuery("TRUNCATE `Schedule_Group_Assignment`");
+    Core::factory("Orm")->executeQuery("TRUNCATE `Property_Int`");
+    Core::factory("Orm")->executeQuery("TRUNCATE `Property_Int_Assigment`");
+    Core::factory("Orm")->executeQuery("TRUNCATE `Property_List`");
+    Core::factory("Orm")->executeQuery("TRUNCATE `Property_List_Assigment`");
+    Core::factory("Orm")->executeQuery("TRUNCATE `Property_String`");
+    Core::factory("Orm")->executeQuery("TRUNCATE `Property_String_Assignment`");
+    Core::factory("Orm")->executeQuery("TRUNCATE `Property_Text`");
+    Core::factory("Orm")->executeQuery("TRUNCATE `Property_Text_Assignment`");
+
 
     $oUser = Core::factory("User")
         ->login("alexoufx")

@@ -505,9 +505,11 @@ class Admin_Form extends Admin_Form_Model
     {
         $aoTypes = Core::factory("Schedule_Lesson_Type")->findAll();
         $modelId = Core_Array::getValue($aParams, "model_id", 0);
+        $modelName = Core_Array::getValue($aParams, "model", "");
+
         if($modelId > 0)
         {
-            $this->value = Core::factory("Schedule_Lesson", $modelId)->typeId();
+            $this->value = Core::factory($modelName, $modelId)->typeId();
         }
 
         $this->addEntities($aoTypes, "item");
