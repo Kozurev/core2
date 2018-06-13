@@ -136,7 +136,7 @@ $aoStatuses = Core::factory("Property_List_Values")
 			{
 				$Result = $Result->fetch();
 				$count = $Result["count"];	
-				$percents = $count * 100 / $totalCount;
+				$percents = round($count * 100 / $totalCount, 1);
 			}
 			else 
 			{

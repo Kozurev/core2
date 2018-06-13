@@ -189,7 +189,7 @@ function saveTask(formData, func) {
 
     $.ajax({
         type: "GET",
-        url: "",
+        url: "all",
         data: formData,
         success: function(responce){
             if(responce != "0") alert(responce);
