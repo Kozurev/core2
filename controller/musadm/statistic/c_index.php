@@ -113,6 +113,15 @@ $totalCount = Core::factory("Lid")
     ->between("control_date", $dateFrom, $dateTo)
     ->getCount();
 
+$Orm = Core::factory("Orm");
+$queryString = $Orm->getQueryString();
+//echo $queryString;
+$aoResults = $Orm->executeQuery($queryString);
+
+if($aoResults != false)
+{
+    $aoResults = $aoResults->fetchAll();
+}
 
 $aoStatuses = Core::factory("Property_List_Values")
 	->where("property_id", "=", 27)
@@ -145,7 +154,7 @@ $aoStatuses = Core::factory("Property_List_Values")
 			}
 
 			$status->addSimpleEntity("count", $count);
-			$status->addSimpleEntity("percents", $percents);
+			$status->addSimpleEntity("percents", round($percents, 2));
 			$oLidsOutput->addEntity($status, "status");
 		}
 	}
@@ -193,7 +202,6 @@ echo "<div class=\"col-lg-4 col-md-6 col-sm-6 col-xs-12\">";
  * Статистика по выплатам преподавателям
  */
 $queryString = Core::factory("Orm")
-    //->select("count(id)", "count")
     ->select("sum(value)", "sum")
     ->from("Payment")
     ->between("datetime", $dateFrom, $dateTo)

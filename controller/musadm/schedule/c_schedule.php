@@ -4,7 +4,8 @@ $aoMainLessons =    Core::factory("Schedule_Lesson");
 $aoCurrentLessons = Core::factory("Schedule_Current_Lesson");
 
 $date =     Core_Array::getValue($_GET, "date", null);
-if(is_null($date))      $date = date("Y-m-d");
+$today =    date("Y-m-d");
+if(is_null($date))      $date = $today;
 
 $dayName =  new DateTime($date);
 $dayName =  $dayName->format("l");
@@ -55,12 +56,6 @@ if($oUser->groupId() == 5)
  */
 elseif($oUser->groupId() == 4)
 {
-//    $aoTeachergroups = Core::factory("Schedule_Group")
-//        ->where("teacher_id", "=", $userId)
-//        ->findAll();
-//    $aTeacherGroups = array();
-//    foreach ($aoTeachergroups as $group) $aTeacherGroups[] = $group->getId();
-
     $aoMainLessons
         ->where("teacher_id", "=", $userId);
 
@@ -163,7 +158,7 @@ for ($i = 1; $i <= $oArea->countClassess(); $i++)
         data-date='".$date."' 
         data-area_id='".$areaId."'
         data-dayName='".$dayName."'
-        >Текущий график</th>";
+        >Актуальный график</th>";
 }
 echo "</tr>";
 /**
@@ -426,11 +421,7 @@ if( $oUser->groupId() == 4 )
         $lesson->timeFrom(refactorTimeFormat($lesson->timeFrom()));
         $lesson->timeTo(refactorTimeFormat($lesson->timeTo()));
         $lesson->addEntity($lesson->getClient(), "client");
-        $lesson->addEntity(
-            Core::factory("Core_Entity")
-                ->name("lesson_name")
-                ->value($lesson->getTableName())
-        );
+        $lesson->addSimpleEntity("lesson_name", $lesson->getTableName());
 
         $oReported = $lesson->isReported($date);
         if($oReported != false)
@@ -441,16 +432,8 @@ if( $oUser->groupId() == 4 )
 
 
     $output = Core::factory("Core_Entity")
-        ->addEntity(
-            Core::factory("Core_Entity")
-                ->name("date")
-                ->value(refactorDateFormat( $date ))
-        )
-        ->addEntity(
-            Core::factory("Core_Entity")
-                ->name("real_date")
-                ->value($date)
-        )
+        ->addSimpleEntity("date", refactorDateFormat( $date ))
+        ->addSimpleEntity("real_date", $date)
         ->addEntity($oUser)
         ->addEntities($aoTeacherLessons, "lesson");
 
@@ -491,18 +474,31 @@ if( $oUser->groupId() == 4 )
         ->where("user", "=", $oUser->getId())
         ->findAll();
 
+    $aoMonthesPayments = array();
+    $prevMonth = 0;
+    $index = 0;
+    foreach ($aoPayments as $payment) 
+    {
+        if( getMonth( $payment->datetime() ) != $prevMonth )
+        {
+            $monthName = getMonthName( $payment->datetime() ) . " " . getYear( $payment->datetime() );
+            $index++;
+            $prevMonth = getMonth( $payment->datetime() );
+            $aoMonthesPayments[$index] = Core::factory("Core_Entity")->name("month");
+            $aoMonthesPayments[$index]->addSimpleEntity("month_name", $monthName);
+        }
+
+        $aoMonthesPayments[$index]->addEntity($payment);
+    }
+
+    //debug($aoMonthesPayments);
+
     Core::factory("Core_Entity")
-        ->addEntities($aoPayments)
-        ->addEntity(
-            Core::factory("Core_Entity")
-                ->name("userid")
-                ->value($oUser->getId())
-        )
-        ->addEntity(
-            Core::factory("Core_Entity")
-                ->name("date")
-                ->value(date("Y-m-d"))
-        )
+        //->addEntities($aoPayments)
+        ->addEntities($aoMonthesPayments)
+        ->addSimpleEntity("userid", $oUser->getId())
+        ->addSimpleEntity("user_group", Core::factory("User")->getCurrent()->groupId())
+        ->addSimpleEntity("date", date("Y-m-d"))
         ->xsl("musadm/finances/teacher_payments.xsl")
         ->show();
     /**

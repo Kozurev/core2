@@ -7,11 +7,11 @@
                 $("#createData").validate({
                     rules: {
                         value:   { required: true },
-                        description: { required: true },
+                        
                     },
                     messages: {
                         value:   { required: "Это поле обязательноое к заполнению" },
-                        description: { required: "Это поле обязательноое к заполнению" }
+                        
                     }
                 });
             });
@@ -37,7 +37,7 @@
             </div>
             <div class="column">
                 <p><input type="radio" name="type" value="1" style="height: auto" checked="checked" /><span>Зачисление</span></p>
-                <p><input type="radio" name="type" value="0" style="height: auto"/><span>Списание</span></p>
+                <p><input type="radio" name="type" value="5" style="height: auto"/><span>Списание</span></p>
             </div>
 
             <!--<input type="hidden" name="user" value="{user/id}" />-->
