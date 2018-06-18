@@ -109,6 +109,7 @@ $(function(){
             var client_id = tr.find("input[name=clientId]").val();
             var type_id = tr.find("input[name=typeId]").val();
             var date = tr.find("input[name=date]").val();
+            var lesson_name = tr.find("input[name=lessonName]").val();
             var attendance = tr.find("input[name=attendance]").is(':checked');
             if(attendance == true) attendance = 1;
             else attendance = 0;
@@ -125,6 +126,7 @@ $(function(){
                     typeId: type_id,
                     date: date,
                     attendance: attendance,
+                    lessonName: lesson_name
                 },
                 success: function(responce) {
                     if(responce != "0" && responce != "") alert(responce);

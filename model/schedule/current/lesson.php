@@ -37,6 +37,7 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
             ->where("date", "=", $date)
             ->where("lesson_id", "=", $this->id)
             ->where("type_id", "=", $this->type_id)
+            ->where("lesson_name", "=", get_class($this))
             ->find();
 
         return $report;

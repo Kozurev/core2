@@ -46,7 +46,7 @@ class Payment_Tarif_Model extends Core_Entity
     public function lessonsCount($val = null)
     {
         if(is_null($val))       return $this->lessons_count;
-        $this->lessons_count =  intval($val);
+        $this->lessons_count =  floatval($val);
         return $this;
     }
 

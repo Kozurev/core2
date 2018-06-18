@@ -15,6 +15,7 @@ class Schedule_Lesson_Report extends Core_Entity
     protected $lesson_id;
     protected $type_id;
     protected $date;
+    protected $lesson_name;
 
 
     public function __construct(){}
@@ -23,6 +24,14 @@ class Schedule_Lesson_Report extends Core_Entity
     public function getId()
     {
         return $this->id;
+    }
+
+
+    public function lessonName($val = null)
+    {
+        if(is_null($val))   return $this->lesson_name;
+        $this->lesson_name = strval($val);
+        return false;
     }
 
 
