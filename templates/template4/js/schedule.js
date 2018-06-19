@@ -198,7 +198,7 @@ $(function(){
             var date = $(".teacher_payments").find("input[name=date]").val();
             var summ = $(".teacher_payments").find("input[name=summ]").val();
             var user = $(".teacher_payments").find("input[name=userid]").val();
-            savePayment(user, summ, "Выплата преподавателю", 3, "../../user/client", refreshSchedule);
+            saveTeacherPayment(user, summ, date, "Выплата преподавателю", refreshSchedule);
         });
 
 
@@ -214,6 +214,29 @@ $(function(){
     $(".schedule_calendar").val(result);
 
 });
+
+
+function saveTeacherPayment(user, summ, date, description, func) {
+    $.ajax({
+        type: "GET",
+        url: "../admin?menuTab=Main&menuAction=updateAction&ajax=1",
+        async: false,
+        data: {
+            id: "",
+            modelName: "Payment",
+            user: user,
+            value: summ,
+            type: 3,
+            datetime: date,
+            description: description
+        },
+        success: function(responce){
+            if(responce != "0") alert("Ошибка: " + responce);
+            closePopup();
+            func();
+        }
+    });
+}
 
 
 function newScheduleTaskPopup() {
