@@ -77,9 +77,9 @@ $aoCurrentLessons
     ->where("date", "=", $date)
     ->where("area_id", "=", $areaId);
 
-
 $aoCurrentLessons = $aoCurrentLessons->findAll();
 $aoMainLessons = $aoMainLessons->findAll();
+
 
 
 foreach ( $aoMainLessons as $oMainLesson )
@@ -314,7 +314,6 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
             //Урок из текущего расписания
             $oCurrentLesson = array_pop_lesson( $aoCurrentLessons, $time, $class );
 
-
             /**
              * Дублирование из основного графика
              */
@@ -340,10 +339,17 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                 }
                 echo "</td>";
             }
+
+            // if($time == "14:00:00")
+            // {
+            //     debug($oCurrentLesson);
+            //     var_dump($oCurrentLesson != false);
+            // }
+
             /**
              * Текущий урок
              */
-            elseif( ($oMainLesson == false || /*$checkClientAbsent == true ||*/ $oMainLesson->isAbsent($date)) && $oCurrentLesson != false )
+            elseif( /*($oMainLesson == false || $oMainLesson->isAbsent($date) || $oMainLesson->isTimeModified($date) ) &&*/ $oCurrentLesson != false )
             {
                 //Поиск высоты ячейки (значение тэга rowspan) и обновление $maxLessonTime
                 $rowspan = updateLastLessonTime( $oCurrentLesson, $maxLessonTime[1][$class], $time, $period );
@@ -354,6 +360,8 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                  */
                 $aCurrentLessonData = getLessonData( $oCurrentLesson );
 
+                // if($time == "14:00:00")
+                //     debug($oCurrentLesson);
 
                 echo "<td class='" . $aCurrentLessonData["client_status"] . "' rowspan='" . $rowspan . "'>";
                 if( isset($oCurrentLesson->oldid) ) echo "<span><b>Временно</b></span><hr>";
