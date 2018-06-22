@@ -91,8 +91,6 @@ $aoCurrentLessons = $aoCurrentLessons->findAll();
 $aoMainLessons = $aoMainLessons->findAll();
 
 
-<<<<<<< HEAD
-=======
 if($oUser->groupId() == 4)
 {
     $aoTeacherLessons = array();//array_merge($aoCurrentLessons, $aoMainLessons);
@@ -100,10 +98,11 @@ if($oUser->groupId() == 4)
     if(is_array($aoMainLessons)) $aoTeacherLessons = array_merge($aoTeacherLessons, $aoMainLessons);
 }
 
->>>>>>> 6d27a666c8f5f8b8062afcb2d4e01ae0ffb05174
 
 foreach ( $aoMainLessons as $oMainLesson )
 {
+    if( $oMainLesson->isAbsent( $date ) )   continue;
+
     /**
      * Если у занятия изменено время на текущую дату то необходимо добавить
      * его в список занятий текущего расписания
