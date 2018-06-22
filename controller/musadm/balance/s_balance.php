@@ -127,8 +127,8 @@ if($action == "buyTarif")
     $oUserBalance->value($newBalance)->save();
 
     //Корректировка кол-ва занятий
-    $oldCountLessons = intval($oCountLessons->value());
-    $newCountLessons = $oldCountLessons + intval($oTarif->lessonsCount());
+    $oldCountLessons = floatval($oCountLessons->value());
+    $newCountLessons = $oldCountLessons + floatval($oTarif->lessonsCount());
     $oCountLessons->value($newCountLessons)->save();
 
     //Создание платежа

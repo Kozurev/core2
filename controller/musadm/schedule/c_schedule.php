@@ -34,20 +34,30 @@ if($oUser->groupId() == 5)
 
     $aoMainLessons
         ->open()
-        ->where("client_id", "=", $userId)
-        ->open()
-        ->where("client_id", "in", $aUserGroups, "or")
-        ->where("type_id", "=", 2)
-        ->close()
+        ->where("client_id", "=", $userId);
+
+    if( count( $aUserGroups) > 0 )
+        $aoMainLessons
+            ->open()
+            ->where("client_id", "in", $aUserGroups, "or")
+            ->where("type_id", "=", 2)
+            ->close();
+
+    $aoMainLessons
         ->close();
 
     $aoCurrentLessons
         ->open()
-        ->where("client_id", "=", $userId)
-        ->open()
-        ->where("client_id", "in", $aUserGroups, "or")
-        ->where("type_id", "=", 2)
-        ->close()
+        ->where("client_id", "=", $userId);
+
+    if( count( $aUserGroups ) > 0 )
+        $aoCurrentLessons
+            ->open()
+            ->where("client_id", "in", $aUserGroups, "or")
+            ->where("type_id", "=", 2)
+            ->close();
+
+    $aoCurrentLessons
         ->close();
 
 }
@@ -81,6 +91,16 @@ $aoCurrentLessons = $aoCurrentLessons->findAll();
 $aoMainLessons = $aoMainLessons->findAll();
 
 
+<<<<<<< HEAD
+=======
+if($oUser->groupId() == 4)
+{
+    $aoTeacherLessons = array();//array_merge($aoCurrentLessons, $aoMainLessons);
+    if(is_array($aoCurrentLessons)) $aoTeacherLessons = array_merge($aoCurrentLessons);
+    if(is_array($aoMainLessons)) $aoTeacherLessons = array_merge($aoTeacherLessons, $aoMainLessons);
+}
+
+>>>>>>> 6d27a666c8f5f8b8062afcb2d4e01ae0ffb05174
 
 foreach ( $aoMainLessons as $oMainLesson )
 {
@@ -110,14 +130,6 @@ foreach ( $aoMainLessons as $oMainLesson )
 
         $aoCurrentLessons[] = $oNewCurrentLesson;
     }
-}
-
-
-if($oUser->groupId() == 4)
-{
-    $aoTeacherLessons = array();//array_merge($aoCurrentLessons, $aoMainLessons);
-    if(is_array($aoCurrentLessons)) $aoTeacherLessons = array_merge($aoCurrentLessons);
-    if(is_array($aoMainLessons)) $aoTeacherLessons = array_merge($aoTeacherLessons, $aoMainLessons);
 }
 
 
@@ -367,7 +379,7 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                 if( isset($oCurrentLesson->oldid) ) echo "<span><b>Временно</b></span><hr>";
                 echo "<span class='client'>" . $aCurrentLessonData["client"] . "</span><hr><span class='teacher'>преп. " . $aCurrentLessonData["teacher"] . "</span>";
 
-                if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) ) {
+                if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) && !$oCurrentLesson->isReported($date) ) {
                     echo "<ul class=\"submenu\">
                         <li>
                             <a href=\"#\"></a>
@@ -426,7 +438,7 @@ if( $oUser->groupId() == 4 )
 
     foreach ($aoTeacherLessons as $key => $lesson)
     {
-        if( get_class($lesson) == "Schedule_Lesson" && $lesson->isAbsent($date) )
+        if( get_class($lesson) == "Schedule_Lesson" && $lesson->isAbsent($date)  )
         {
             unset($aoTeacherLessons[$key]);
             continue;
@@ -442,6 +454,8 @@ if( $oUser->groupId() == 4 )
             $lesson->addEntity($oReported, "report");
         }
     }
+
+    echo count($aoTeacherLessons);
 
 
     $output = Core::factory("Core_Entity")
@@ -516,7 +530,7 @@ if( $oUser->groupId() == 4 )
     $aoMonthesPayments = array();
     $prevMonth = 0;
     $index = 0;
-    foreach ($aoPayments as $payment) 
+    foreach ($aoPayments as $payment)
     {
         if( getMonth( $payment->datetime() ) != $prevMonth )
         {
