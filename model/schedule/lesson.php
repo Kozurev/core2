@@ -70,6 +70,19 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->where("lesson_id", "=", $this->id)
             ->find();
 
+//        if($this->type_id != 2)
+//        {
+//            $oClientAbsent = Core::factory("Schedule_Absent")
+//                ->where("client_id", "=", $this->client_id)
+//                ->where("date_from", "<=", $date)
+//                ->where("date_to", ">=", $date)
+//                ->find();
+//        }
+//        else
+//        {
+//            $oClientAbsent = false;
+//        }
+
         $oClientAbsent = Core::factory("Schedule_Absent")
             ->where("client_id", "=", $this->client_id)
             ->where("date_from", "<=", $date)

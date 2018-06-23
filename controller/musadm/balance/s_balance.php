@@ -29,7 +29,7 @@ $action = Core_Array::getValue($_GET, "action", "");
 
 
 /**
- * Добавление комментария к платежу 
+ * Добавление комментария к платежу
  */
 if($action == "add_note")
 {
@@ -49,7 +49,7 @@ if($action == "add_note")
 
 /**
  * Обновление сожержимого страницы
-*/
+ */
 if($action == "refreshTablePayments")
 {
     $this->execute();
@@ -58,7 +58,7 @@ if($action == "refreshTablePayments")
 
 
 /**
- * Открытие 
+ * Открытие
  */
 if($action == "getPaymentPopup")
 {
@@ -141,7 +141,7 @@ if($action == "buyTarif")
         $oPayment->description("Оплата индивидуального пакета");
     elseif($oTarif->lessonsType() == 2)
         $oPayment->description("Оплата группового пакета");
-    else 
+    else
         $oPayment->description("Покупка тарифа");
 
     $oPayment->save();

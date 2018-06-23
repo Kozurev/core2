@@ -260,17 +260,17 @@ Core::attachObserver("beforeScheduleGroupDelete", function($args){
 /**
  *  При удалении занятия также удаляются все отчеты по нему
  */
-Core::attachObserver("beforeLessonDelete", function($args){
-    $Reports = Core::factory("Schedule_Lesson_Report")
-        ->where("lesson_id", "=", $args[0]->getId())
-        ->findAll();
-
-    if( is_array( $Reports ) && count( $Reports ) > 0 )
-        foreach ($Reports as $Report) 
-        {
-            $Report->delete();
-        }
-});
+//Core::attachObserver("beforeLessonDelete", function($args){
+//    $Reports = Core::factory("Schedule_Lesson_Report")
+//        ->where("lesson_id", "=", $args[0]->getId())
+//        ->findAll();
+//
+//    if( is_array( $Reports ) && count( $Reports ) > 0 )
+//        foreach ($Reports as $Report)
+//        {
+//            $Report->delete();
+//        }
+//});
 
 
 

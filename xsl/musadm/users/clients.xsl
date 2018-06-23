@@ -38,7 +38,7 @@
                 <xsl:when test="property_value[property_id = 13]/value &lt; 0 or property_value[property_id = 14]/value &lt; 0">
                     negative
                 </xsl:when>
-                <xsl:when test="property_value[property_id = 13]/value &gt; 2 or property_value[property_id = 14]/value &gt; 2">
+                <xsl:when test="property_value[property_id = 13]/value &gt; 1 or property_value[property_id = 14]/value &gt; 1">
                     positive
                 </xsl:when>
                 <xsl:otherwise>

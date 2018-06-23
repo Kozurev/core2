@@ -1,22 +1,22 @@
-.container .pagination {
+.container .middle .in_main .pagination {
     float: right;
     position: relative;
     bottom: 25px;
 }
 
-.container .pagination .total_count {
+.container .middle .in_main .pagination .total_count {
     display: block;
     position: relative;
     left: 25px;
 }
 
-.container .pagination .pages {
+.container .middle .in_main .pagination .pages {
     padding: 0px 10px 0px 10px;
     position: relative;
     bottom: 7px;
 }
 
-.container .pagination .prev_page {
+.container .middle .in_main .pagination .prev_page {
     display: inline-block;
     height: 25px;
     width: 25px;
@@ -24,7 +24,7 @@
     background-size: cover;
 }
 
-.container .pagination .next_page {
+.container .middle .in_main .pagination .next_page {
     display: inline-block;
     height: 25px;
     width: 25px;

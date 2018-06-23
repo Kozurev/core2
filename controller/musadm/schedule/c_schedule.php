@@ -371,14 +371,14 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                  */
                 $aCurrentLessonData = getLessonData( $oCurrentLesson );
 
-                 if($time == "16:30:00")
-                     debug($oCurrentLesson->isReported($date));
+                // if($time == "14:00:00")
+                //     debug($oCurrentLesson);
 
                 echo "<td class='" . $aCurrentLessonData["client_status"] . "' rowspan='" . $rowspan . "'>";
                 if( isset($oCurrentLesson->oldid) ) echo "<span><b>Временно</b></span><hr>";
                 echo "<span class='client'>" . $aCurrentLessonData["client"] . "</span><hr><span class='teacher'>преп. " . $aCurrentLessonData["teacher"] . "</span>";
 
-                if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) && !$oCurrentLesson->isReported($date) && $lessonTime >= $currentTime ) {
+                if( User::checkUserAccess(array("groups" => array(1, 2)), $oUser ) && !$oCurrentLesson->isReported($date) ) {
                     echo "<ul class=\"submenu\">
                         <li>
                             <a href=\"#\"></a>

@@ -59,6 +59,7 @@ function refreshLidTable(from, to) {
         success: function(responce){
             $(".page").empty();
             $(".page").append(responce);
+            //$("#sortingTable").tablesorter();
             loaderOff();
         }
     });
