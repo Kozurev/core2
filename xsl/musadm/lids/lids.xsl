@@ -2,48 +2,55 @@
 
     <xsl:template match="root">
 
-        <xsl:if test="structure_type = 'all'">
-            <div class="finances_calendar">
-                Период
-                с: <input type="date" class="form-control" name="date_from" value="{date_from}"/>
-                по: <input type="date" class="form-control" name="date_to" value="{date_to}"/>
-                <button class="btn btn-success lids_show" >Показать</button>
-            </div>
-        </xsl:if>
+        <div class="lids">
+            <xsl:if test="structure_type = 'all'">
+                <div class="finances_calendar">
+                    Период
+                    с: <input type="date" class="form-control" name="date_from" value="{date_from}"/>
+                    по: <input type="date" class="form-control" name="date_to" value="{date_to}"/>
+                    <a class="btn btn-purple lids_show" >Показать</a>
+                </div>
+            </xsl:if>
 
-        <table class="table lids">
-            <form name="lid_form">
-                <tr>
-                    <td class="date" colspan="2"><input type="date" class="form-control date_inp"    name="control_date"/></td>
-                    <td class="string"><input type="text" class="form-control" name="surname"  placeholder="Фамилия"/></td>
-                    <td class="string"><input type="text" class="form-control" name="name"     placeholder="Имя"/></td>
-                    <td class="string"><input type="text" class="form-control" name="number"   placeholder="Телефон"/></td>
-                    <td class="string"><input type="text" class="form-control" name="vk"       placeholder="Ссылка вк"/></td>
-                    <td class="string"><input type="text" class="form-control" name="source"   placeholder="Источник"/></td>
-                    <td class="last"><button class="btn btn-success lid_submit">Добавить</button></td>
-                </tr>
-                <tr>
-                    <td colspan="8">
-                        <input type="text" class="form-control" name="comment"  placeholder="Комментарий"/>
-                    </td>
-                </tr>
-            </form>
+            <table class="table lids">
+                <form name="lid_form">
+                    <tr>
+                        <td class="date" colspan="2"><input type="date" class="form-control date_inp"    name="control_date"/></td>
+                        <td class="string"><input type="text" class="form-control" name="surname"  placeholder="Фамилия"/></td>
+                        <td class="string"><input type="text" class="form-control" name="name"     placeholder="Имя"/></td>
+                        <td class="string"><input type="text" class="form-control" name="number"   placeholder="Телефон"/></td>
+                        <td class="string"><input type="text" class="form-control" name="vk"       placeholder="Ссылка вк"/></td>
+                        <td class="string"><input type="text" class="form-control" name="source"   placeholder="Источник"/></td>
+                        <td class="last">
+                            <a class="btn btn-purple lid_submit">Добавить</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="8">
+                            <input type="text" class="form-control" name="comment"  placeholder="Комментарий"/>
+                        </td>
+                    </tr>
+                </form>
+            </table>
 
-            <!-- <tr>
-                <th>№</th>
-                <th class="date">Дата</th>
-                <th class="string">Фамилия</th>
-                <th class="string">Имя</th>
-                <th class="string">Телефон</th>
-                <th class="string">VK</th>
-                <th class="string">Источник</th>
-                <th class="last">Статус</th>
-            </tr> -->
+            <!-- <div class="row lids">
+                <xsl:apply-templates select="lid" />
+            </div> -->
 
-        </table>
-
-        <div class="row lids">
-            <xsl:apply-templates select="lid" />
+            <section class="cards-section text-center">
+                <!-- <div class="container"> -->
+                    <div id="cards-wrapper" class="cards-wrapper row">
+                        <xsl:choose>
+                            <xsl:when test="count(lid) != 0">
+                                <xsl:apply-templates select="lid" />
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <h2 class="section-title">Ничего не найдено</h2>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </div>
+                <!-- </div> -->
+            </section>
         </div>
 
     </xsl:template>
@@ -53,64 +60,68 @@
 
         <xsl:variable name="status">
             <xsl:choose>
-                <xsl:when test="property_value/id = '83'">agree</xsl:when>
-                <xsl:when test="property_value/id = '81'">consult_wait</xsl:when>
-                <xsl:when test="property_value/id = '82'">consult_was</xsl:when>
+                <xsl:when test="property_value/id = '83'">green</xsl:when>
+                <xsl:when test="property_value/id = '81'">blue</xsl:when>
+                <xsl:when test="property_value/id = '82'">orange</xsl:when>
                 <xsl:otherwise>not_choose</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
 
-        <div class="card {$status}">
-            <div>
-                <xsl:value-of select="id" />
-                <xsl:text> </xsl:text>
-                <xsl:value-of select="surname" />
-                <xsl:text> </xsl:text>
-                <xsl:value-of select="name" />
-            </div>
+        <div class="item item-{$status} col-md-4 col-sm-6 col-xs-6">
+            <div class="item-inner">
+                <h3 class="title">
+                    <xsl:value-of select="surname" /><xsl:text> </xsl:text>
+                    <xsl:value-of select="name" /><xsl:text> </xsl:text>
+                    <xsl:value-of select="patronimyc" /><xsl:text> </xsl:text>
+                </h3>
+                
+                <xsl:if test="number != ''">
+                    <p class="intro">
+                        <span>Телефон: </span><xsl:value-of select="number" />
+                    </p>
+                </xsl:if>
 
-            <div>
-                <xsl:value-of select="number" />
-                <xsl:text> </xsl:text>
-                <xsl:value-of select="vk" />
-                <xsl:text> </xsl:text>
-                <xsl:value-of select="source" />
-            </div>
+                <xsl:if test="vk != ''">
+                    <p class="intro">
+                        <span>ВК: </span><xsl:value-of select="vk" />
+                    </p>
+                </xsl:if>
 
-            <div class="date">
-                <input type="date" class="form-control date_inp lid_date" data-lidid="{id}" >
-                    <xsl:attribute name="value"><xsl:value-of select="control_date" /></xsl:attribute>
-                </input>
-            </div>
+                <xsl:if test="source != ''">
+                    <p class="intro">
+                        <span>Источник: </span><xsl:value-of select="source" />
+                    </p>
+                </xsl:if>
 
-            <div class="comments">
-                <input type="hidden" value="KOCTb|J|b" />
-                <xsl:for-each select="lid_comment">
-                    <xsl:variable name="author" select="author_id" />
-                    <div class="block">
-                        <div class="comment_header">
-                            <div class="author">
-                                <xsl:value-of select="//user[id = $author]/surname" />
-                                <xsl:text> </xsl:text>
-                                <xsl:value-of select="//user[id = $author]/name" />
+                <p class="date">
+                    <input type="date" class="form-control date_inp lid_date" data-lidid="{id}" >
+                        <xsl:attribute name="value"><xsl:value-of select="control_date" /></xsl:attribute>
+                    </input>
+                </p>
+
+                <div class="comments">
+                    <input type="hidden" value="KOCTb|J|b" />
+                    <xsl:for-each select="lid_comment">
+                        <xsl:variable name="author" select="author_id" />
+                        <div class="block">
+                            <div class="comment_header">
+                                <div class="author">
+                                    <xsl:value-of select="//user[id = $author]/surname" />
+                                    <xsl:text> </xsl:text>
+                                    <xsl:value-of select="//user[id = $author]/name" />
+                                </div>
+                                <div class="date">
+                                    <xsl:value-of select="datetime" />
+                                </div>
                             </div>
-                            <div class="date">
-                                <xsl:value-of select="datetime" />
+
+                            <div class="comment_body">
+                                <xsl:value-of select="text" />
                             </div>
                         </div>
+                    </xsl:for-each>
+                </div>
 
-                        <div class="comment_body">
-                            <xsl:value-of select="text" />
-                        </div>
-                    </div>
-                </xsl:for-each>
-            </div>
-
-            <div class="comment_button_box">
-                <button class="btn btn-default add_lid_comment" data-lidid="{id}">Добавить комментарий</button>
-            </div>
-
-            <div>
                 <select name="status" class="form-control lid_status" data-lidid="{id}">
                     <xsl:variable name="status_id" select="property_value/id" />
                     <xsl:for-each select="/root/status">
@@ -123,8 +134,14 @@
                         </option>
                     </xsl:for-each>
                 </select>
-            </div>
-        </div>
+
+                <div class="comment_button_box">
+                    <a class="btn btn-purple add_lid_comment" data-lidid="{id}">Добавить комментарий</a>
+                </div>
+
+                <!-- <a class="link" href="license.html"><span></span></a> -->
+            </div><!--//item-inner-->
+        </div><!--//item-->
 
     </xsl:template>
 

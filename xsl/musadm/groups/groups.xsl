@@ -6,11 +6,11 @@
             <button class="btn btn-success group_create">Создать группу</button>
         </div>
 
-        <table id="sortingTable" class="tablesorter">
+        <table id="sortingTable" class="table ">
             <thead>
                 <tr>
                     <th>id</th>
-                    <th class="header">Название</th>
+                    <th>Название</th>
                     <th>Учитель</th>
                     <th>Длительность</th>
                     <th>Состав группы</th>

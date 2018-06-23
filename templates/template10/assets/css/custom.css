@@ -1,0 +1,442 @@
+
+.error {
+    color: red;
+}
+
+.default {
+    color: black;
+}
+
+.container {
+    min-width: 420px;
+}
+
+.left {
+    text-align: left;
+}
+
+.right {
+    text-align: right;
+}
+
+.center {
+    text-align: center;
+}
+
+
+.navbar-inverse {
+    background-color: #494d55 !important;
+    border-color: #494d55 !important;
+}
+
+header {
+    margin-bottom: 20px;
+}
+
+.lids .cards-section .item-inner {
+    padding: 45px 15px;
+    height: 250px !important;
+    overflow-y: scroll;
+}
+
+.lids .cards-section .cards-wrapper {
+    max-width: 100%;
+}
+
+/**
+ *  Верстка комментариев
+ *  Начало>>
+ */
+.block {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 1px solid;
+    border-left: 1px solid;
+    border-right: 1px solid;
+    border-color: #d1d5da;
+    border-radius: 5px;
+}
+
+.block .comment_header {
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    padding-right: 5px;
+    padding-left: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    color: #586069;
+}
+
+.block .comment_header .author {
+    font-size: 11px;
+    font-weight: 600;
+    display: inline;
+}
+
+.block .comment_header .date {
+    font-size: 11px;
+    display: inline;
+    padding-left: 15px;
+}
+
+.block .comment_body {
+    font-size: 17px;
+    background-color: white;
+    border-bottom: 1px solid #d1d5da;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+/**
+ *  <<Конец
+ *  Верстка комментариев
+ */
+
+
+/**
+ *  Иконки действий
+ *  Начало>>
+ */
+.action {
+    display: inline-block;
+    height: 25px;
+    width: 25px;
+    margin: 0px 2px 0px 2px;
+}
+
+.save {
+    background-image: url(../images/save.png);
+    background-size: cover;
+}
+
+.add_payment {
+    background: url(../images/money.png);
+    background-size: cover;
+}
+
+.append_done {
+    background-image: url("../images/append_ok.png");
+    background-size: cover;
+}
+
+.ok {
+    background-image: url("../images/ok.png");
+    background-size: cover;
+}
+
+.edit {
+    background: url(../images/edit.png);
+    background-size: cover;
+}
+
+.archive {
+    background: url(../images/archive.png);
+    background-size: cover;
+}
+
+.unarchive {
+    background: url(../images/archiveminus.png);
+    background-size: cover;
+}
+
+.delete {
+    background: url(../images/delete.png);
+    background-size: cover;
+}
+/**
+ *  <<Конец
+ *  Иконки действий
+ */
+
+
+/**
+ *  Блок с временным периодом
+ *  Начало>>
+ */
+.finances_calendar {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.finances_calendar .form-control {
+    width: 150px;
+    display: inline-block;
+    margin-top: 20px;
+    margin-right: 15px;
+}
+
+.finances_total {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.finances_add_payment {
+    float: right;
+}
+ /**
+  * <<Конец
+  * Блок с временным периодом
+  */
+
+
+/**
+ *  Подсветка пользователей 
+ *  Начало>>
+ */
+.positive {
+    background-color:palegreen !important;
+}
+.negative {
+    background-color:indianred !important;
+}
+.neutral {
+    background-color:lightyellow !important;
+}
+
+.group {
+    background: lightblue !important;
+}
+/**
+ *  <<Конец 
+ *  Подсветка пользователей
+ */
+
+
+.loader {
+    background: grey;
+    opacity: 0.8;
+    width: 100%;
+    position: fixed;
+    z-index: 10000;
+    background-image: url("../images/loader.gif");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 50px;
+}
+
+
+#ekkoLightbox-640 {
+    width: 30%;
+    left: 35%;
+    top: 15%;
+}
+
+
+/*.breadcrumb li a {
+    color: rgba(255, 255, 255, 0.5);
+}*/
+
+
+/**
+ * Карточки навигации
+ * Начало>>
+ */
+section .container .cards-wrapper .item .item-inner {
+    height: auto;
+    min-height: 225px;
+}
+
+section .container .cards-wrapper .item .icon-holder {
+    text-align: center;
+}
+
+/*section .container .cards-wrapper .item .icon-holder .icon {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    left: 43%;
+    background-size: cover;
+}*/
+
+section .container .cards-wrapper .item .icon-holder .people {
+    background-image: url("../images/people.png");
+}
+
+section .container .cards-wrapper .item .icon-holder .email {
+    background-image: url("../images/mail.png");
+}
+
+section .container .cards-wrapper .item .icon-holder .instructions {
+    background-image: url("../images/instructions.png");
+}
+
+section .container .cards-wrapper .item .icon-holder .schedule {
+    background-image: url("../images/schedule.png");
+}
+
+section .container .cards-wrapper .item .icon-holder .phone {
+    background-image: url("../images/phone.png");
+}
+
+section .container .cards-wrapper .item .icon-holder .forum {
+    background-image: url("../images/forum.png");
+}
+/**
+ * <<Конец
+ * Карточки навигации
+ */
+
+
+/**
+ * Форум
+ * Начало>>
+ */
+
+section .container .search {
+    margin-bottom: 30px;
+}
+
+section .container .search span {
+    font-size: 30px;
+}
+
+section .container .search .btn {
+    width: 100%;
+}
+
+section .container .forum {
+    color: inherit;
+    background-color: #eee;
+    border-radius: 5px;
+    margin-bottom: 30px;
+    margin-top: 30px;
+    padding-top: 5px;
+    padding-bottom: 30px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+section .container .forum .message {
+    border-radius: 10px;
+    margin-bottom: 30px;
+    background-color: #F6F6F6;
+    text-align: left;
+}
+
+section .container .forum .message .head {
+    display: block;
+    border: 1px solid;
+    border-color: #F6F6F0;
+    border-bottom-color: #E8E8E8;
+    border-radius: 10px 10px 0px 0px;
+    font-size: 15px;
+    padding-left: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+section .container .forum .message .body {
+    display: block;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-left: 15px;
+    padding-bottom: 10px;
+}
+
+section .container .forum .message .head .username {
+    display: inline-block;
+}
+
+section .container .forum .message .head .datetime {
+    display: inline-block;
+    margin-left: 15px;
+}
+
+section .container .forum .comment-form {
+    text-align: left;
+    background-color: #F6F6F6;
+    margin-left: 15px;
+    border-radius: 10px;
+    padding-bottom: 20px;
+}
+
+section .container .forum .comment-form textarea {
+    min-height: 100px;
+}
+
+section .container .forum .comment-form .comment-buttons {
+    text-align: right;
+    padding-top: 10px;
+}
+
+/**
+ * <<Конец
+ * Форум
+ */
+
+
+/**
+ * Форма обращения в поддержку
+ * Начало>>
+ */
+.application_popup .row {
+    text-align: right;
+    padding-top: 10px;
+}
+
+.application_popup span {
+    font-size: 17px;
+    line-height: 2;
+}
+
+.application_popup .required::before {
+    content: "* ";
+    color: red;
+}
+
+.application_popup .title {
+    text-align: center;
+    padding-top: 10px;
+}
+
+.application_popup .checkbox {
+    height: 30px;
+    width: 17px;
+}
+
+.application_popup .textarea {
+    min-height: 85px;
+}
+
+/**
+ * <<Конец
+ * Форма обращения в поддержку
+ */
+
+
+/**
+ * Страница заявки обращения
+ * Начало>>
+ */
+.application {
+    font-size: 19px;
+}
+
+.application .criterias div {
+    min-height: 70px;
+}
+
+.application .criterias div span {
+    display: block;
+    margin-top: 10px;
+}
+
+.application .white_bg {
+    background-color: white;
+}
+
+.application .subject {
+    padding: 15px;
+    background-color: white;
+}
+
+.application .buttons {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+/**
+ * <<Конец
+ * Страница заявки обращения
+ */

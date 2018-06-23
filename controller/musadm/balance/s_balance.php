@@ -6,6 +6,20 @@
  * Time: 23:18
  */
 
+
+$breadcumbs[0] = new stdClass();
+$breadcumbs[0]->title = $this->oStructure->getParent()->title();
+$breadcumbs[0]->active = 1;
+$breadcumbs[1] = new stdClass();
+$breadcumbs[1]->title = $this->oStructure->title();
+$breadcumbs[1]->active = 1;
+
+$this->setParam( "body-class", "body-orange" );
+$this->setParam( "title-first", "ЛИЧНЫЙ" );
+$this->setParam( "title-second", "КАБИНЕТ" );
+$this->setParam( "breadcumbs", $breadcumbs );
+
+
 if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
 {
     $this->execute();

@@ -4,17 +4,17 @@
 
     <xsl:template match="root">
 
-        <div style="text-align: right">
-            <button class="btn btn-success user_create" data-usergroup="4">Создать пользователя</button>
+        <div style="text-align: right; margin: 20px 0px">
+            <a class="btn btn-primary user_create" data-usergroup="4">Создать пользователя</a>
         </div>
 
-        <table id="sortingTable" class="tablesorter">
+        <table id="sortingTable" class="table">
             <thead>
                 <tr>
-                    <th class="header">Фамилия</th>
-                    <th class="header">Имя</th>
-                    <th class="header">Отчество</th>
-                    <th class="header">Инструмент</th>
+                    <th>Фамилия</th>
+                    <th>Имя</th>
+                    <th>Отчество</th>
+                    <th>Инструмент</th>
                     <th>Действия</th>
                 </tr>
             </thead>

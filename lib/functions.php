@@ -7,10 +7,11 @@
  */
 
 
-function debug( $val )
+function debug( $val, $type = 0 )
 {
     echo "<pre>";
-    print_r($val);
+    if( $type == false )    print_r($val);
+    else                    var_dump($val);
     echo "</pre>";
 }
 

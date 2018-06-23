@@ -3,6 +3,58 @@
 class Property extends Property_Model
 {
 
+	public function getPropertyValuesArr( $arr )
+	{
+		$ids = array();
+		foreach ($arr as $val)	$ids[] = $val->getId();
+		if( count( $ids ) == 0 ) return array();
+		$modelName = get_class( $arr[0] ); 
+		$valueType = "Property_".ucfirst($this->type());
+
+		$emptyValue = Core::factory( $valueType )
+            ->property_id($this->id)
+            ->model_name($modelName)
+            ->value(strval($this->default_value));
+
+		$aoValues = Core::factory( "Orm" )
+			->select(array( 
+				"User.id AS real_id",
+				"val.id", 
+				"val.property_id", 
+				"val.model_name", 
+				"val.object_id", 
+			))
+			->from( $modelName ) 
+			->leftJoin( $valueType . " AS val", $modelName . ".id = val.object_id AND val.model_name = '" . $modelName . "' AND val.property_id = " . $this->id )
+			->where( $modelName . ".id", "IN", $ids );
+
+		if( $this->type == "list" )
+		{
+			$aoValues
+				->select( "val.value_id" )
+				->select( "plv.value" )
+				->leftJoin( "Property_List_Values AS plv", "plv.id = val.value_id" );
+		}
+		else 
+		{
+			$aoValues->select( "val.value" );
+		}
+
+		$aoValues = $aoValues->findAll( $valueType );
+
+		foreach ( $aoValues as $key => $value ) 
+		{
+			if( $value->getId() == "" )
+			{
+				$aoValues[$key] = $emptyValue;
+				$aoValues[$key]->object_id( $value->real_id );
+			}
+		}
+
+		return $aoValues;
+	}
+
+
 	/**
 	*	Возвращает список значений свойства объекта
 	*	@param $obj - объект, значения свойства которого будет возвращено

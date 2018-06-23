@@ -1,7 +1,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <table class="simple-little-table balance_table" cellspacing='0'>
+        <table class="table" cellspacing='0'>
             <tr>
                 <td>Баланс</td>
                 <td>
@@ -11,9 +11,9 @@
                 </td>
                 <td>
                     <xsl:if test="user_group/id != 5">
-                        <button class="btn btn-success btn_balance" data-userid="{user/id}">
+                        <a class="btn btn-orange btn_balance" data-userid="{user/id}">
                             Пополнить баланс
-                        </button>
+                        </a>
                     </xsl:if>
                 </td>
             </tr>
@@ -26,12 +26,12 @@
                     </xsl:call-template>
                 </td>
                 <td>
-                    <button class="btn btn-success btn_private_lessons" data-userid="{user/id}">
+                    <a class="btn btn-orange btn_private_lessons" data-userid="{user/id}">
                         <!-- <xsl:if test="property[property_id='12']/value = 0 and user_group/id != 5">
                             <xsl:attribute name="disabled">disabled</xsl:attribute>
                         </xsl:if> -->
                         Купить индивидуальные занятия
-                    </button></td>
+                    </a></td>
             </tr>
 
             <tr>
@@ -42,12 +42,12 @@
                     </xsl:call-template>
                 </td>
                 <td>
-                    <button class="btn btn-success btn_group_lessons" data-userid="{user/id}">
+                    <a class="btn btn-orange btn_group_lessons" data-userid="{user/id}">
                         <!-- <xsl:if test="property[property_id='12']/value = 0">
                             <xsl:attribute name="disabled">disabled</xsl:attribute>
                         </xsl:if> -->
                         Купить групповые занятия
-                    </button>
+                    </a>
                 </td>
             </tr>
         </table>

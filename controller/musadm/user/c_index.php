@@ -43,3 +43,12 @@ $output = Core::factory("Core_Entity")
     )
     ->addEntities($aoUsers)
     ->show();
+
+// Core::factory( "User_Controller_Show" )
+//     ->properties( array(12, 13, 14, 15, 16, 18, 19) )
+//     ->where( "group_id", "=", $groupId )
+//     ->where( "active", "=", 1 )
+//     ->addSimpleEntity( "table_type", "active" )
+//     ->orderBy( "id", "DESC" )
+//     ->xsl( $xsl )
+//     ->show();

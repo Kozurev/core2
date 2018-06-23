@@ -13,6 +13,19 @@ class Page_Show extends Core
     private $meta_description;
     private $meta_keywords;
     private $action;
+    private $params = array();
+
+
+    public function getParam( $key, $default = "" )
+    {
+        return Core_Array::getValue( $this->params, $key, $default );
+    }
+
+
+    public function setParam( $key, $value )
+    {
+        $this->params[$key] = $value;
+    }
 
 
     /**

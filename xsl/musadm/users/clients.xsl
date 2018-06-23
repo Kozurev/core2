@@ -5,21 +5,21 @@
     <xsl:template match="root">
 
         <xsl:if test="user/active = 1">
-            <div style="text-align: right">
-                <button class="btn btn-success user_create" data-usergroup="5">Создать пользователя</button>
+            <div style="text-align: right; margin: 20px 0px">
+                <a href="#" class="btn btn-primary user_create" data-usergroup="5">Создать пользователя</a>
             </div>
         </xsl:if>
 
-        <table id="sortingTable" class="tablesorter">
+        <table id="sortingTable" class="table">
             <thead>
                 <tr>
-                    <th class="header">Фамилия</th>
-                    <th class="header">Имя</th>
+                    <th>Фамилия</th>
+                    <th>Имя</th>
                     <th>Телефон</th>
-                    <th class="header">Баланс</th>
-                    <th class="header">Кол-во индив. занятий</th>
-                    <th class="header">Кол-во групп. занятий</th>
-                    <th class="header">Студия</th>
+                    <th>Баланс</th>
+                    <th>Кол-во индив. занятий</th>
+                    <th>Кол-во групп. занятий</th>
+                    <th>Студия</th>
                     <th>Действия</th>
                 </tr>
             </thead>

@@ -14,11 +14,11 @@
             }
         </style>
 
-        <table id="sortingTable" class="tablesorter">
+        <table id="sortingTable" class="table">
             <thead>
                 <tr>
-                    <th class="header">Дата</th>
-                    <th class="header">Сумма</th>
+                    <th>Дата</th>
+                    <th>Сумма</th>
                     <th>Примечание</th>
                     <xsl:if test="user_group/id != 5">
                         <th></th>
@@ -55,9 +55,9 @@
             </td>
             <xsl:if test="//user_group/id != 5">
                 <td class="{$class}" style="text-align:center">
-                    <button class="btn btn-success payment_add_note" data-modelid="{./id}">
+                    <a class="btn btn-orange payment_add_note" data-modelid="{./id}">
                         Добавить примечание
-                    </button>
+                    </a>
                 </td>
             </xsl:if>
         </tr>

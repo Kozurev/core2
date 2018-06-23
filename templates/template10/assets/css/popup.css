@@ -1,0 +1,71 @@
+.overlay {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: none;
+    background: #000;
+    opacity: 0.8;
+    z-index: 999;
+}
+
+.popup {
+    position: fixed;
+    font-size: 14px;
+    background-color: #FCFBFB;
+    width: 40%;
+    z-index: 1000;
+    left: 30%;
+    top: 10%;
+    display: none;
+    border-radius: 12px;
+}
+
+.popup_close {
+    float: right;
+    margin: 10px;
+    width: 20px;
+    height: 20px;
+    background: url(../images/close.png);
+    background-size: cover;
+    display: block;
+}
+
+.popup hr {
+     margin-top: 0px;
+     margin-bottom: 0px;
+}
+
+.popup form {
+    margin-top: 40px;
+}
+
+.popup .column {
+    width: 50%;
+    vertical-align: middle;
+    padding-right: 15px;
+    display: inline-block;
+    text-align: center;
+}
+
+.popup .column span {
+    font-size: 17px;
+}
+
+.popup .column input {
+    height: 28px;
+}
+
+.popup .column textarea {
+    width: 100%;
+    border-radius: 5px;
+    padding: 6px 12px;
+}
+
+.popup .btn-default {
+    position: relative;
+    left: 30%;
+    width: 40%;
+    margin: 15px;
+}

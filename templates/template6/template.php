@@ -28,6 +28,6 @@ if($oCurentUser->groupId() < 4 && $oUser->groupId() == 5)
         ->xsl("musadm/client_notes.xsl")
         ->show();
 }
-	
-    $this->execute();
+
+$this->execute();
 ?>

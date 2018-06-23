@@ -57,8 +57,8 @@ function refreshLidTable(from, to) {
             date_to: to
         },
         success: function(responce){
-            $(".page").empty();
-            $(".page").append(responce);
+            $(".lids").empty();
+            $(".lids").append(responce);
             //$("#sortingTable").tablesorter();
             loaderOff();
         }
@@ -111,6 +111,7 @@ function changeDate(lidid, date, func){
     $.ajax({
         type: "GET",
         url: "../lids",
+        async: false,
         data: {
             action: "changeDate",
             model_id: lidid,

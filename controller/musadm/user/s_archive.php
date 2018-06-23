@@ -6,6 +6,19 @@
  * Time: 23:36
  */
 
+$breadcumbs[0] = new stdClass();
+$breadcumbs[0]->title = $this->oStructure->title();
+$breadcumbs[0]->active = 1;
+$breadcumbs[1] = new stdClass();
+$breadcumbs[1]->title = "Архив пользователей";
+$breadcumbs[1]->active = 1;
+
+$this->setParam( "body-class", "body-blue" );
+$this->setParam( "title-first", "АРХИВ" );
+$this->setParam( "title-second", "ПОЛЬЗОВАТЕЛЕЙ" );
+$this->setParam( "breadcumbs", $breadcumbs );
+
+
 /*
 *	Блок проверки авторизации
 */

@@ -6,6 +6,29 @@
  * Time: 22:16
  */
 
+if( $this->oStructureItem->getId() == 5 )
+{
+    $title2 = "КЛИЕНТОВ";
+    $breadcumb = "клиентов";
+}
+else 
+{
+    $title2 = "ПРЕПОДАВАТЕЛЕЙ";
+    $breadcumb = "преподавателей";
+}
+
+$breadcumbs[0] = new stdClass();
+$breadcumbs[0]->title = "Список " . $breadcumb;
+$breadcumbs[0]->active = 1;
+
+$this->setParam( "body-class", "body-blue" );
+$this->setParam( "title-first", "СПИСОК" );
+$this->setParam( "title-second", $title2 );
+$this->setParam( "breadcumbs", $breadcumbs );
+
+
+
+
 if(!$this->oStructureItem)
 {
     $this->error404();
@@ -24,10 +47,6 @@ $accessRules = array(
 if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
 {
     $this->error404();
-//    $host  = $_SERVER['HTTP_HOST'];
-//    $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-//    $extra = $_SERVER["REQUEST_URI"];
-//    header("Location: http://$host$uri/authorize?back=$host$uri"."$extra");
     exit;
 }
 

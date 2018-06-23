@@ -479,7 +479,7 @@ class Orm
 		if(!is_numeric($count))
 			return $this;
 
-		$this->limit .= $count;
+		$this->limit = $count;
 		return $this;
 	}
 
@@ -504,7 +504,7 @@ class Orm
 
 	public function leftJoin($table, $condition)
     {
-        $this->leftJoin = " LEFT JOIN " . $table . " ON " . $condition;
+        $this->leftJoin .= " LEFT JOIN " . $table . " ON " . $condition;
         return $this;
     }
 
@@ -529,7 +529,7 @@ class Orm
 	*	Метод выполняющий запрос к бд
 	*	@return array of objects
 	*/
-	public function findAll()
+	public function findAll( $modelName = null )
 	{
 		$this->setQueryString();
 
@@ -545,7 +545,8 @@ class Orm
 			if(!$result)
 				return false;
 
-			$result->setFetchMode(PDO::FETCH_CLASS, $this->getTableName());
+			if( is_null( $modelName ) )	$modelName = $this->getTableName();
+			$result->setFetchMode(PDO::FETCH_CLASS, $modelName);
 			return $result->fetchAll();
 		}
 		catch(PDOException $Exception)

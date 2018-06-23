@@ -18,7 +18,7 @@
 		    		<input type="password" name="pass2" class="form-control" />
 		    		<input type="hidden" name="id" value="{user/id}" />
 		    		<input type="hidden" name="modelName" value="User" />
-		    		<button class="change_login_submit btn btn-default">Сохранить изменения</button>
+		    		<a class="change_login_submit btn btn-orange">Сохранить изменения</a>
 		    	</form>
     		</div>
     	</div>
