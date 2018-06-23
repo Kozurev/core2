@@ -33,9 +33,12 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
 
     public function isReported($date)
     {
+        if(isset($this->oldid)) $id = $this->oldid;
+        else $id = $this->id;
+
         $report = Core::factory("Schedule_Lesson_Report")
             ->where("date", "=", $date)
-            ->where("lesson_id", "=", $this->id)
+            ->where("lesson_id", "=", $id)
             ->where("type_id", "=", $this->type_id)
             ->where("lesson_name", "=", get_class($this))
             ->find();
