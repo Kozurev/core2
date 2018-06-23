@@ -101,6 +101,8 @@ if($oUser->groupId() == 4)
 
 foreach ( $aoMainLessons as $oMainLesson )
 {
+    if( $oMainLesson->isAbsent( $date ) )   continue;
+
     /**
      * Если у занятия изменено время на текущую дату то необходимо добавить
      * его в список занятий текущего расписания

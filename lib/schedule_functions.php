@@ -86,7 +86,7 @@ function getLessonData( $oLesson )
         $countGroupLessons = Core::factory("Property", 14)->getPropertyValues($oClient)[0]->value();
 
         if ($countGroupLessons < 0 || $countPrivateLessons < 0) $output["client_status"] = "negative";
-        elseif ($countPrivateLessons > 2 || $countGroupLessons > 2) $output["client_status"] = "positive";
+        elseif ($countPrivateLessons > 1 || $countGroupLessons > 1) $output["client_status"] = "positive";
         else $output["client_status"] = "neutral";
 
         $vk = Core::factory("Property", 9)->getPropertyValues($oClient)[0]->value();
