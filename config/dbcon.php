@@ -1,8 +1,8 @@
 <?php
 return array(
-	"host"	=>	"localhost",
-	"db" 	=>	"core",
-	"user"	=>	"root",
-	"pass"	=>	"",
+    "host"	=>	"localhost",
+    "db" 	=>	"musadm",
+    "user"	=>	"root",
+    "pass"	=>	"",
     "charset" => "utf8"
-	);
+);
