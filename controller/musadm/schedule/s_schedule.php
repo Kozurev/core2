@@ -17,6 +17,19 @@ if($oUser != true)
 }
 
 
+$breadcumbs[0] = new stdClass();
+$breadcumbs[0]->title = "Расписание";
+$breadcumbs[0]->active = 1;
+$breadcumbs[1] = new stdClass();
+$breadcumbs[1]->title = $this->oStructureItem->title();
+$breadcumbs[1]->active = 1;
+
+$this->setParam( "body-class", "body-green" );
+$this->setParam( "title-first", "РАСПИСАНИЕ" );
+$this->setParam( "title-second", $this->oStructureItem->title() );
+$this->setParam( "breadcumbs", $breadcumbs );
+
+
 $action = Core_Array::getValue($_GET, "action", null);
 
 
@@ -112,6 +125,22 @@ if($action === "teacherReport")
     $lessonId = Core_Array::getValue($_GET, "lesson_id", 0);
     $lessonName = Core_Array::getValue($_GET, "model_name", "");
     $attendance = Core_Array::getValue($_GET, "attendance", 0);
+    $teacherId = Core_Array::getValue($_GET, "teacher_id", 0);
+    $clientId = Core_Array::getValue($_GET, "client_id", 0);
+    $typeId = Core_Array::getValue($_GET, "type_id", 0);
+    $date = Core_Array::getValue($_GET, "date", 0);
+
+    /**
+     * Создание отчета
+     */
+    $Report = Core::factory("Schedule_Lesson_Report")
+        ->lessonId($lessonId)
+        ->teacherId($teacherId)
+        ->typeId($typeId)
+        ->date($date)
+        ->attendance($attendance)
+        ->lessonName($lessonName);
+    $Report->save();
 
     $oLesson = Core::factory($lessonName, $lessonId);
     $clients = array();
