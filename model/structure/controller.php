@@ -54,7 +54,7 @@ class Structure_Controller extends Structure_Controller_Model
     }
 
 
-	public function findAll()
+	public function findAll( $modelName = null )
 	{
 		$outputData = parent::findAll();
 
