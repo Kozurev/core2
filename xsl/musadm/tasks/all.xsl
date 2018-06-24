@@ -9,22 +9,22 @@
                 Период
                 с: <input type="date" class="form-control" name="date_from" value="{date_from}"/>
                 по: <input type="date" class="form-control" name="date_to" value="{date_to}"/>
-                <button class="btn btn-success tasks_show" >Показать</button>
+                <a class="btn btn-red tasks_show" >Показать</a>
             </div>
         </xsl:if>
 
-        <div style="text-align: right">
-            <button class="btn btn-success task_create">Добавить задачу</button>
+        <div style="text-align: right; margin-bottom:20px">
+            <a class="btn btn-red task_create">Добавить задачу</a>
         </div>
 
-        <table id="sortingTable" class="tablesorter task">
+        <table id="sortingTable" class="table table-bordered task">
             <thead>
-                <tr>
-                    <th class="header">№</th>
-                    <th class="header">Дата контроля</th>
+                <tr class="header">
+                    <th>№</th>
+                    <th>Дата контроля</th>
                     <th>Примечания</th>
-                    <th class="header">Тип</th>
-                    <th class="header">Статус</th>
+                    <th>Тип</th>
+                    <th>Статус</th>
                     <th>Добавить</th>
                 </tr>
             </thead>
@@ -87,7 +87,7 @@
                 </xsl:choose>
             </td>
             <td class="{$class}">
-                <button data-task_id="{id}" class="btn btn-primary task_add_note" data-table_type="{/root/table_name}">Добавить примечание</button>
+                <a data-task_id="{id}" class="btn btn-red task_add_note" data-table_type="{/root/table_name}">Добавить примечание</a>
             </td>
         </tr>
     </xsl:template>

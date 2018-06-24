@@ -21,7 +21,7 @@ $breadcumbs[0] = new stdClass();
 $breadcumbs[0]->title = "Список " . $breadcumb;
 $breadcumbs[0]->active = 1;
 
-$this->setParam( "body-class", "body-blue" );
+$this->setParam( "body-class", "body-primary" );
 $this->setParam( "title-first", "СПИСОК" );
 $this->setParam( "title-second", $title2 );
 $this->setParam( "breadcumbs", $breadcumbs );

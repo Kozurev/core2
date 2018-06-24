@@ -2,8 +2,8 @@ $(function(){
     $("body")
         .on("click", ".statistic_show", function(e){
             e.preventDefault();
-            var from = $(".statistic_calendar").find("input[name=date_from]").val();
-            var to = $(".statistic_calendar").find("input[name=date_to]").val();
+            var from = $(".finances_calendar").find("input[name=date_from]").val();
+            var to = $(".finances_calendar").find("input[name=date_to]").val();
             loaderOn();
             showStatistic(from, to);
         });

@@ -8,9 +8,9 @@
             <a class="btn btn-primary user_create" data-usergroup="4">Создать пользователя</a>
         </div>
 
-        <table id="sortingTable" class="table">
+        <table id="sortingTable" class="table table-striped">
             <thead>
-                <tr>
+                <tr class="header">
                     <th>Фамилия</th>
                     <th>Имя</th>
                     <th>Отчество</th>

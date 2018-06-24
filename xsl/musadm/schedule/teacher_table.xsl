@@ -1,8 +1,8 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <table class="table teacher_table">
-            <tr>
+        <table class="table table-striped teacher_table">
+            <tr class="header">
                 <th>Дата</th>
                 <th>Время</th>
                 <th>Преподаватель</th>
@@ -59,14 +59,14 @@
             <input type="hidden" name="lessonName" value="{lesson_name}" />
 
             <td>
-                <button class="btn send_report" >
+                <a class="btn btn-green send_report" >
                     <xsl:if test="count(report/id) != 0">
                         <xsl:attribute name="disabled">
                             disabled
                         </xsl:attribute>
                     </xsl:if>
                     Отправить данные
-                </button>
+                </a>
 
                 <xsl:if test="count(report/id) != 0 and /root/admin/group_id = 1">
                     <button class="btn btn-danger delete_report">

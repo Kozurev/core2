@@ -114,39 +114,44 @@ $(function(){
             if(attendance == true) attendance = 1;
             else attendance = 0;
 
-            $.ajax({
-                type: "GET",
-                url: "../admin?menuTab=Main&menuAction=updateAction&ajax=1",
-                data: {
-                    id: id,
-                    modelName: modelName,
-                    lessonId: lesson_id,
-                    teacherId: teacher_id,
-                    clientId: client_id,
-                    typeId: type_id,
-                    date: date,
-                    attendance: attendance,
-                    lessonName: lesson_name
-                },
-                success: function(responce) {
-                    if(responce != "0" && responce != "") alert(responce);
-                    refreshSchedule();
-                }
-            });
+            // $.ajax({
+            //     type: "GET",
+            //     url: "../admin?menuTab=Main&menuAction=updateAction&ajax=1",
+            //     data: {
+            //         id: id,
+            //         modelName: modelName,
+            //         lessonId: lesson_id,
+            //         teacherId: teacher_id,
+            //         clientId: client_id,
+            //         typeId: type_id,
+            //         date: date,
+            //         attendance: attendance,
+            //         lessonName: lesson_name
+            //     },
+            //     success: function(responce) {
+            //         if(responce != "0" && responce != "") alert(responce);
+            //         refreshSchedule();
+            //     }
+            // });
 
-            var lessonModelName = tr.find("input[name=lessonName]").val();
+            //var lessonModelName = tr.find("input[name=lessonName]").val();
 
             $.ajax({
                 type: "GET",
                 url: "",
                 data: {
                     action: "teacherReport",
+                    teacher_id: teacher_id,
+                    client_id: client_id,
+                    type_id: type_id,
+                    date: date,
                     lesson_id: lesson_id,
-                    model_name: lessonModelName,
+                    model_name: lesson_name,
                     attendance: attendance
                 },
                 success: function(responce){
                     if(responce != "0") alert(responce);
+                    refreshSchedule();
                 }
             });
         })

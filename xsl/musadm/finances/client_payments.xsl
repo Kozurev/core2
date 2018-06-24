@@ -6,11 +6,11 @@
             Период
             с: <input type="date" class="form-control" name="date_from" value="{date_from}"/>
             по: <input type="date" class="form-control" name="date_to" value="{date_to}"/>
-            <button class="btn btn-success finances_show" >Показать</button>
+            <a class="btn btn-green finances_show" >Показать</a>
         </div>
 
         <div class="finances_add_payment">
-            <button class="btn btn-success finances_payment">Хозрасходы</button>
+            <a class="btn btn-green finances_payment">Хозрасходы</a>
         </div>
         <br/>
 
@@ -18,14 +18,14 @@
             За данный период суммарный доход составил <xsl:value-of select="total_summ" /> руб.
         </div>
 
-        <table id="sortingTable" class="tablesorter task">
+        <table id="sortingTable" class="table table-striped task">
             <thead>
-                <tr>
-                    <th class="header">№</th>
-                    <th class="header">ФИО</th>
-                    <th class="header">Сумма</th>
-                    <th class="header">Примечание</th>
-                    <th class="header">Дата</th>
+                <tr class="header">
+                    <th>№</th>
+                    <th>ФИО</th>
+                    <th>Сумма</th>
+                    <th>Примечание</th>
+                    <th>Дата</th>
                 </tr>
             </thead>
 

@@ -13,7 +13,7 @@ $breadcumbs[1] = new stdClass();
 $breadcumbs[1]->title = "Архив пользователей";
 $breadcumbs[1]->active = 1;
 
-$this->setParam( "body-class", "body-blue" );
+$this->setParam( "body-class", "body-primary" );
 $this->setParam( "title-first", "АРХИВ" );
 $this->setParam( "title-second", "ПОЛЬЗОВАТЕЛЕЙ" );
 $this->setParam( "breadcumbs", $breadcumbs );

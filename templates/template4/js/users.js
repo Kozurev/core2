@@ -133,8 +133,8 @@ function refreshUserTable() {
             //group: groupid
         },
         success: function(responce) {
-            $(".page").empty();
-            $(".page").append(responce);
+            $(".users").empty();
+            $(".users").append(responce);
             $("#sortingTable").tablesorter();
             loaderOff();
         }

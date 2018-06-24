@@ -1,18 +1,18 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <div style="text-align: right">
-            <button class="btn btn-success certificate_create">Добавить сертификат</button>
+        <div style="text-align: right; margin-bottom:20px">
+            <a class="btn btn-pink certificate_create">Добавить сертификат</a>
         </div>
 
-        <table id="sortingTable" class="tablesorter certificate">
+        <table id="sortingTable" class="table table-striped certificate">
             <thead>
-                <tr>
-                    <th class="header">№</th>
-                    <th class="header">Дата продажи</th>
-                    <th class="header">Действителен до</th>
-                    <th class="header">Номер</th>
-                    <th class="header">Примечание</th>
+                <tr class="header">
+                    <th>№</th>
+                    <th>Дата продажи</th>
+                    <th>Действителен до</th>
+                    <th>Номер</th>
+                    <th>Примечание</th>
                     <th>Удаление</th>
                 </tr>
             </thead>
@@ -32,7 +32,7 @@
             <td><xsl:value-of select="number" /></td>
             <td><xsl:value-of select="note" /></td>
             <td>
-                <button class="btn btn-danger certificate_delete" data-id="{id}">Удалить</button>
+                <a class="btn btn-pink certificate_delete" data-id="{id}">Удалить</a>
             </td>
         </tr>
     </xsl:template>

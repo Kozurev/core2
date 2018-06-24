@@ -70,19 +70,6 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->where("lesson_id", "=", $this->id)
             ->find();
 
-//        if($this->type_id != 2)
-//        {
-//            $oClientAbsent = Core::factory("Schedule_Absent")
-//                ->where("client_id", "=", $this->client_id)
-//                ->where("date_from", "<=", $date)
-//                ->where("date_to", ">=", $date)
-//                ->find();
-//        }
-//        else
-//        {
-//            $oClientAbsent = false;
-//        }
-
         $oClientAbsent = Core::factory("Schedule_Absent")
             ->where("client_id", "=", $this->client_id)
             ->where("date_from", "<=", $date)
@@ -178,8 +165,6 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->where("time_from", "<", $this->time_to)
             ->where("time_to", ">", $this->time_from, "OR")
             ->where("time_to", "<", $this->time_to)
-            //->between("time_from", $this->time_from, $this->time_to)
-            //->between("time_to", $this->time_from, $this->time_to, "OR")
             ->close()
             ->where("class_id", "=", $this->class_id)
             ->getCount();
@@ -196,12 +181,10 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->where("time_from", "<", $this->time_to)
             ->where("time_to", ">", $this->time_from, "OR")
             ->where("time_to", "<", $this->time_to)
-            //->between("time_from", $this->time_from, $this->time_to)
-            //->between("time_to", $this->time_from, $this->time_to, "OR")
             ->close()
             ->getCount();
 
-        if ($iLessons > 0 || $iCurrentLessons > 0)
+        if ($iLessons > 0 || $iCurrentLessons > 0 && $this->id == null )
         {
             die("Добавление невозможно по причине пересечения с другим занятием");
         }

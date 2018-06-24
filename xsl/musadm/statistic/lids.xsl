@@ -3,8 +3,8 @@
     <xsl:template match="root">
         <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
         <h3>Лиды</h3>
-            <table class="simple-little-table statistic_lids_table">
-                <tr>
+            <table class="table table-bordered statistic_lids_table">
+                <tr class="header">
                     <th>Всего:</th>
                     <th><xsl:value-of select="total" /></th>
                 </tr>

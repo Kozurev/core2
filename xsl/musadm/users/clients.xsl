@@ -10,9 +10,9 @@
             </div>
         </xsl:if>
 
-        <table id="sortingTable" class="table">
+        <table id="sortingTable" class="table table-striped">
             <thead>
-                <tr>
+                <tr class="header">
                     <th>Фамилия</th>
                     <th>Имя</th>
                     <th>Телефон</th>

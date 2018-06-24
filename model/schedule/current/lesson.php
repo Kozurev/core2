@@ -60,6 +60,7 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
     public function save($obj = null)
     {
         Core::notify(array(&$this), "beforeScheduleCurrentLessonSave");
+        if( $this->id == null ) parent::save();
 
         $oLesson = Core::factory("Schedule_Current_Lesson")
             ->where("id", "<>", $this->id)
@@ -71,8 +72,6 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
             ->where("time_from", "<", $this->time_to)
             ->where("time_to", ">", $this->time_from, "OR")
             ->where("time_to", "<", $this->time_to)
-            //->between("time_from", $this->time_from, $this->time_to)
-            //->between("time_to", $this->time_from, $this->time_to, "OR")
             ->close()
             ->getCount();
 
@@ -98,8 +97,6 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
             ->where("time_from", "<", $this->time_to)
             ->where("time_to", ">", $this->time_from, "OR")
             ->where("time_to", "<", $this->time_to)
-            //->between("time_from", $this->time_from, $this->time_to)
-            //->between("time_to", $this->time_from, $this->time_to, "or")
             ->close()
             ->where("class_id", "=", $this->class_id)
             ->findAll();
@@ -115,8 +112,6 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
             ->where("time_from", "<", $this->time_to)
             ->where("time_to", ">", $this->time_from, "OR")
             ->where("time_to", "<", $this->time_to)
-            //->between("st.time_from", $this->time_from, $this->time_to)
-            //->between("st.time_to", $this->time_from, $this->time_to, "OR")
             ->close()
             ->where("Schedule_Lesson.class_id", "=", $this->class_id)
             ->where("date", "=", $this->date)

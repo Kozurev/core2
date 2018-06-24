@@ -29,5 +29,7 @@ if($oCurentUser->groupId() < 4 && $oUser->groupId() == 5)
         ->show();
 }
 
+echo "<div class='users'>";
 $this->execute();
+echo "</div>";
 ?>

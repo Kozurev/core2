@@ -23,6 +23,17 @@ if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
 }
 
 
+$breadcumbs[0] = new stdClass();
+$breadcumbs[0]->title = "Финансы";
+$breadcumbs[0]->active = 1;
+
+$this->setParam( "body-class", "body-green" );
+$this->setParam( "title-first", "ФИНАНСОВЫЕ" );
+$this->setParam( "title-second", "ОПЕРАЦИИ" );
+$this->setParam( "breadcumbs", $breadcumbs );
+
+
+
 $action = Core_Array::getValue($_GET, "action", "");
 
 if($action === "show")

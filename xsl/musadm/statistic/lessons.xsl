@@ -3,8 +3,8 @@
     <xsl:template match="root">
         <div class="col-lg-12">
             <h3>Занятия</h3>
-            <table class="simple-little-table statistic_lessons_table">
-                <tr>
+            <table class="table table-bordered statistic_lessons_table">
+                <tr class="header">
                     <td>Всего проведено занятий:</td>
                     <td><xsl:value-of select="total_count" /></td>
                 </tr>

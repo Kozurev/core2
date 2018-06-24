@@ -2,13 +2,13 @@
 
     <xsl:template match="root">
 
-        <div style="text-align: right">
-            <button class="btn btn-success group_create">Создать группу</button>
+        <div style="text-align: right; margin-bottom: 20px">
+            <a class="btn btn-blue group_create">Создать группу</a>
         </div>
 
-        <table id="sortingTable" class="table ">
+        <table id="sortingTable" class="table table-striped">
             <thead>
-                <tr>
+                <tr class="header">
                     <th>id</th>
                     <th>Название</th>
                     <th>Учитель</th>

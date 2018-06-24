@@ -23,6 +23,19 @@ if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
 }
 
 
+$breadcumbs[0] = new stdClass();
+$breadcumbs[0]->title = "Задачи";
+$breadcumbs[0]->active = 1;
+$breadcumbs[1] = new stdClass();
+$breadcumbs[1]->title = "На сегодня";
+$breadcumbs[1]->active = 1;
+
+$this->setParam( "body-class", "body-red" );
+$this->setParam( "title-first", "ЗАДАЧИ" );
+$this->setParam( "title-second", "НА СЕГОДНЯ" );
+$this->setParam( "breadcumbs", $breadcumbs );
+
+
 $action = Core_Array::getValue($_GET, "action", null);
 
 

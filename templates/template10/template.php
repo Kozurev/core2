@@ -162,7 +162,7 @@
                 </div><!--//container-->
             </header>
 
-            <div class="container">
+            <div class="container page">
                 <?php $this->execute();?>
             </div>
 
@@ -186,7 +186,8 @@
 
 <footer class="footer text-center">
     <div class="container">
-        <small class="copyright"><a href="https://www.bsu.edu.ru/bsu/structure/detail.php?ID=2263" target="_blank">Ресурс образовательной политики</a></small>
+        <small class="copyright"><a href="http://musicmetod.ru/" target="_blank">ООО"Мьюзикметод"</a></small>
+        <small class="copyright">Щорса 54, оф.307 37-42-11, +79092012550</small>
     </div><!--//container-->
 </footer><!--//footer-->
 
@@ -211,7 +212,6 @@ $this
     ->js( "/templates/template4/lib/tablesorter/js/jquery.tablesorter.widgets.js" )
     ->js( "/templates/template4/lib/tablesorter/addons/pager/jquery.tablesorter.pager.js" )
     ->js( "/templates/template4/lib/tablesorter/beta-testing/pager-custom-controls.js" )
-    //->js( "/templates/template3/js/admin.js" )
     ->js( "/templates/template4/js/main.js" )
     ->js( "/templates/template4/js/users.js" )
     ->js( "/templates/template4/js/payments.js" )

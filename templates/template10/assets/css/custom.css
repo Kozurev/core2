@@ -23,6 +23,13 @@
     text-align: center;
 }
 
+#client_notes {
+    margin-bottom: 20px;
+}
+
+.comment_button_box {
+    margin-top: 10px;
+}
 
 .navbar-inverse {
     background-color: #494d55 !important;
@@ -34,7 +41,7 @@ header {
 }
 
 .lids .cards-section .item-inner {
-    padding: 45px 15px;
+    padding: 15px 15px;
     height: 250px !important;
     overflow-y: scroll;
 }
@@ -185,13 +192,13 @@ header {
  *  Начало>>
  */
 .positive {
-    background-color:palegreen !important;
+    background-color:#78FC5A !important;
 }
 .negative {
-    background-color:indianred !important;
+    background-color:#f77b6b !important;
 }
 .neutral {
-    background-color:lightyellow !important;
+    background-color:#F0EDEA !important;
 }
 
 .group {

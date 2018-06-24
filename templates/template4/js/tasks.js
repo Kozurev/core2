@@ -131,7 +131,8 @@ function markAsDone(task_id, func) {
                 loaderOff();
                 return;
             }
-            var clickedLink = $("a[data-task_id='"+task_id+"']");
+            var clickedLink = $(".append_done[data-task_id='"+task_id+"']");
+            //var clickedLink = $(this);
             var td = clickedLink.parent();
             td.append("<a href=\"#\" class=\"action ok\"></a>");
             td.parent().find("td").each(function(){

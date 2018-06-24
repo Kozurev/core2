@@ -22,6 +22,17 @@ if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
     exit;
 }
 
+
+$breadcumbs[0] = new stdClass();
+$breadcumbs[0]->title = "Список групп";
+$breadcumbs[0]->active = 1;
+
+$this->setParam( "body-class", "body-blue" );
+$this->setParam( "title-first", "СПИСОК" );
+$this->setParam( "title-second", "ГРУПП" );
+$this->setParam( "breadcumbs", $breadcumbs );
+
+
 $action = Core_Array::getValue($_GET, "action", null);
 
 

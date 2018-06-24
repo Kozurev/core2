@@ -3,8 +3,8 @@
     <xsl:template match="root">
         <div class="col-lg-4">
             <h3>Баланс и кол-во занятий</h3>
-            <table class="simple-little-table statistic_lessons_table">
-                <tr>
+            <table class="table table-bordered statistic_lessons_table">
+                <tr class="header">
                     <td>Общий баланс средств всех учащихся:</td>
                     <td><xsl:value-of select="balance" /> руб.</td>
                 </tr>

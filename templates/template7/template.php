@@ -14,19 +14,19 @@ $this->css("/templates/template7/css/style.css");
     {
         $oUser = $oCurentUser;
     }
-?>
+//?>
 
     <div class="calendar_small">
         <input type="date" class="form-control schedule_calendar" />
     </div>
 
     <div style="text-align: right">
-        <button class="btn btn-success schedule_task_create">Написать администратору</button>
+        <a class="btn btn-green schedule_task_create">Написать администратору</a>
     </div>
 
-    <input type="hidden" id="userid" value="<?=$oUser->getId()?>">
-    <input type="hidden" id="areaid" value="<?=$_GET['area']?>">
+    <input type="hidden" id="userid" value="<?=$oUser->getId()?>" />
+    <input type="hidden" id="areaid" value="<?=$this->oStructureItem->getId()?>" />
 
     <div class="schedule">
-    <?$this->execute();?>
+    <?php $this->execute();?>
     </div>

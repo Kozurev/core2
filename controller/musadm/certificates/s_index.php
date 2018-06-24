@@ -23,6 +23,16 @@ if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
 }
 
 
+$breadcumbs[0] = new stdClass();
+$breadcumbs[0]->title = "Список сертификатов";
+$breadcumbs[0]->active = 1;
+
+$this->setParam( "body-class", "body-pink" );
+$this->setParam( "title-first", "СПИСОК" );
+$this->setParam( "title-second", "СЕРТИФИКАТОВ" );
+$this->setParam( "breadcumbs", $breadcumbs );
+
+
 $action = Core_Array::getValue($_GET, "action", "");
 
 if($action === "refreshCertificatesTable")

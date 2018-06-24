@@ -31,7 +31,7 @@ class Schedule_Lesson_Report extends Core_Entity
     {
         if(is_null($val))   return $this->lesson_name;
         $this->lesson_name = strval($val);
-        return false;
+        return $this;
     }
 
 

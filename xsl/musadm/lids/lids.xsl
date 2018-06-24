@@ -14,7 +14,7 @@
 
             <table class="table lids">
                 <form name="lid_form">
-                    <tr>
+                    <tr class="header">
                         <td class="date" colspan="2"><input type="date" class="form-control date_inp"    name="control_date"/></td>
                         <td class="string"><input type="text" class="form-control" name="surname"  placeholder="Фамилия"/></td>
                         <td class="string"><input type="text" class="form-control" name="name"     placeholder="Имя"/></td>
@@ -25,7 +25,7 @@
                             <a class="btn btn-purple lid_submit">Добавить</a>
                         </td>
                     </tr>
-                    <tr>
+                    <tr class="header">
                         <td colspan="8">
                             <input type="text" class="form-control" name="comment"  placeholder="Комментарий"/>
                         </td>
