@@ -15,7 +15,7 @@ class Structure extends Structure_Model
         if($this->parentId() != 0)
             return Core::factory("Structure", $this->parent_id);
         else
-            return $this;
+            return false;
     }
 
 

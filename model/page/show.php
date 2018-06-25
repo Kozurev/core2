@@ -62,6 +62,19 @@ class Page_Show extends Core
     */
     private function serchTemplatesPath($id)
     {
+        $oStructure = $this->oStructure;
+
+        while( $id == 0 && $oStructure != false )
+        {
+            $oStructure = $oStructure->getParent();
+            if( $oStructure != false )
+            {
+                $id = $oStructure->template_id();
+            }
+
+        }
+        if( $id == 0 ) die( "Макет не найден" );
+
         $aTemplates = array();
         $this->oTemplate = Core::factory('Page_Template', $id);
         $this->aTemplatesPath[] = $this->oTemplate;
