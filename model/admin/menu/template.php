@@ -71,6 +71,7 @@ class Admin_Menu_Template
         {
             $totalCountTemplates = Core::factory("Page_Template")
                 ->where("parent_id", "=", $parentId)
+                ->where("dir", "=", 0)
                 ->getCount();
 
             $countPages = intval($totalCountTemplates / SHOW_LIMIT);
@@ -132,8 +133,8 @@ class Admin_Menu_Template
             ->limit($countTemplates)
             ->offset($templatesOffset);
 
-        if($parentId != 0) $aTempltes->where("parent_id", "=", $parentId);
-        else $aTempltes->where("dir", "=", $dirId);
+        if($parentId != 0) $aTempltes->where("parent_id", "=", $parentId)->where("dir", "=", 0);
+        else $aTempltes->where("dir", "=", $dirId)->where("parent_id", "=", 0);
 
         $output->addEntities(
             $aTempltes->findAll()
