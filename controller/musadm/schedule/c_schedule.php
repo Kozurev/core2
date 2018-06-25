@@ -346,9 +346,10 @@ while ( !compareTime( $time, ">=", addTime( $timeEnd, $period )) )
                             <a href=\"#\"></a>
                             <ul class=\"dropdown\" data-userid='" . $oUser->getId() . "' data-date='" . $date . "' ";
 
-                    if (isset($oCurrentLesson->oldid)) echo "data-id='" . $oCurrentLesson->oldid . "' data-type='Schedule_Lesson'> ";
-                    else                                echo "data-id='" . $oCurrentLesson->getId() . "' data-type='Schedule_Current_Lesson'> ";
+                    if (isset($oCurrentLesson->oldid)) echo "data-id='" . $oCurrentLesson->oldid;
+                    else                                echo "data-id='" . $oCurrentLesson->getId();
 
+                    echo "' data-type='" . get_class( $oCurrentLesson ) . "'>";
                     echo "
                                 <li><a href=\"#\" class='schedule_today_absent'>Отсутствует сегодня</a></li>
                                 <li><a href=\"#\" class='schedule_update_time'>Изменить на сегодня время</a></li>
