@@ -230,6 +230,11 @@ header {
 }
 
 
+.schedule .date {
+    font-size: 11px;
+    color: #D1D1D1;
+}
+
 /*.breadcrumb li a {
     color: rgba(255, 255, 255, 0.5);
 }*/

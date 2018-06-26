@@ -9,7 +9,7 @@
 $oUser = Core::factory("User")->getCurrent();
 
 $accessRules = array(
-    "groups"    => array(1)
+    "groups"    => array(1, 2)
 );
 
 if($oUser == false || !User::checkUserAccess($accessRules, $oUser))

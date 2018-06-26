@@ -182,7 +182,7 @@ $(function(){
             var user = $(".teacher_payments").find("input[name=userid]").val();
             saveTeacherPayment(user, summ, date, "Выплата преподавателю", refreshSchedule);
         })
-        .on("change", "select", function(){
+        .on("change", ".client_schedule", function(){
             loaderOn();
 
             var month = $("#month").val();

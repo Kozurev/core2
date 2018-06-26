@@ -50,6 +50,11 @@ function updateLastLessonTime( $oLesson, &$maxTime, $time, $period )
 }
 
 
+/**
+ * Получение данных о занятии
+ * @param $oLesson
+ * @return array
+ */
 function getLessonData( $oLesson )
 {
     $output = array(
@@ -119,3 +124,127 @@ function sortByTime( &$arr, $prop )
         }
     }
 }
+
+
+/**
+ *  Получение списка занятий на определенную дату
+ */
+function getLessons( $date, $userId = 0 )
+{
+    $dayName =  new DateTime($date);
+    $dayName =  $dayName->format("l");
+
+    $aoMainLessons = Core::factory( "Schedule_Lesson" )
+        ->where("insert_date", "<=", $date)
+        ->open()
+        ->where("delete_date", ">", $date)
+        ->where("delete_date", "=", "2001-01-01", "or")
+        ->close()
+        //->where("area_id", "=", $areaId)
+        ->where("day_name", "=", $dayName)
+        ->orderBy("time_from");
+
+    $aoCurrentLessons = Core::factory( "Schedule_Current_Lesson" )
+        ->where("date", "=", $date);
+        //->where("area_id", "=", $areaId);
+
+    if( $userId != 0 )
+    {
+        $oUser = Core::factory( "User", $userId );
+
+        /**
+         * Если страница клиента
+         */
+        if($oUser->groupId() == 5)
+        {
+            $aoClientGroups = Core::factory("Schedule_Group_Assignment")
+                ->where("user_id", "=", $userId)
+                ->findAll();
+            $aUserGroups = array();
+            foreach ($aoClientGroups as $group)
+            {
+                $aUserGroups[] = $group->groupId();
+            }
+
+            $aoMainLessons
+                ->open()
+                ->where("client_id", "=", $userId);
+
+            if( count( $aUserGroups) > 0 )
+                $aoMainLessons
+                    ->open()
+                    ->where("client_id", "in", $aUserGroups, "or")
+                    ->where("type_id", "=", 2)
+                    ->close();
+
+            $aoMainLessons
+                ->close();
+
+            $aoCurrentLessons
+                ->open()
+                ->where("client_id", "=", $userId);
+
+            if( count( $aUserGroups ) > 0 )
+                $aoCurrentLessons
+                    ->open()
+                    ->where("client_id", "in", $aUserGroups, "or")
+                    ->where("type_id", "=", 2)
+                    ->close();
+
+            $aoCurrentLessons
+                ->close();
+
+        }
+        /**
+         * Если страница учителя
+         */
+        elseif($oUser->groupId() == 4)
+        {
+            $aoMainLessons
+                ->where("teacher_id", "=", $userId);
+
+            $aoCurrentLessons
+                ->where("teacher_id", "=", $userId);
+        }
+    }
+
+
+    $aoMainLessons = $aoMainLessons->findAll();
+    $aoCurrentLessons = $aoCurrentLessons->findAll();
+
+    foreach ( $aoMainLessons as $oMainLesson )
+    {
+        if( $oMainLesson->isAbsent( $date ) )   continue;
+
+        /**
+         * Если у занятия изменено время на текущую дату то необходимо добавить
+         * его в список занятий текущего расписания
+         */
+        if( $oMainLesson->isTimeModified( $date ) )
+        {
+            $oModify = Core::factory("Schedule_Lesson_TimeModified")
+                ->where("lesson_id", "=", $oMainLesson->getId())
+                ->where("date", "=", $date)
+                ->find();
+
+            $oMainLesson
+                ->timeFrom($oModify->timeFrom())
+                ->timeTo($oModify->timeTo());
+        }
+
+        $aoCurrentLessons[] = $oMainLesson;
+    }
+
+    sortByTime($aoCurrentLessons, "timeFrom");
+
+    return $aoCurrentLessons;
+
+}
+
+
+
+
+
+
+
+

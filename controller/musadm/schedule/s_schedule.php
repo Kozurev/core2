@@ -26,6 +26,7 @@ $breadcumbs[1]->active = 1;
 
 $this->setParam( "body-class", "body-green" );
 $this->setParam( "title-first", "РАСПИСАНИЕ" );
+if( Core_Array::getValue( $_GET, "userid", null )   ==  null )
 $this->setParam( "title-second", $this->oStructureItem->title() );
 $this->setParam( "breadcumbs", $breadcumbs );
 

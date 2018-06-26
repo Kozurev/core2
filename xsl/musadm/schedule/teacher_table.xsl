@@ -1,7 +1,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <table class="table table-striped teacher_table">
+        <table class="table table-bordered teacher_table">
             <tr class="header">
                 <th>Дата</th>
                 <th>Время</th>
