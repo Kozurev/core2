@@ -57,7 +57,7 @@ $(function(){
             var lessonid = $(this).parent().parent().data("id");
             var date = $(this).parent().parent().data("date");
             var type = $(this).parent().parent().data("type");
-
+            
             if(type == "Schedule_Lesson")
                 markAbsent(lessonid, date, refreshSchedule);
             if(type == "Schedule_Current_Lesson")
