@@ -114,28 +114,6 @@ $(function(){
             if(attendance == true) attendance = 1;
             else attendance = 0;
 
-            // $.ajax({
-            //     type: "GET",
-            //     url: "../admin?menuTab=Main&menuAction=updateAction&ajax=1",
-            //     data: {
-            //         id: id,
-            //         modelName: modelName,
-            //         lessonId: lesson_id,
-            //         teacherId: teacher_id,
-            //         clientId: client_id,
-            //         typeId: type_id,
-            //         date: date,
-            //         attendance: attendance,
-            //         lessonName: lesson_name
-            //     },
-            //     success: function(responce) {
-            //         if(responce != "0" && responce != "") alert(responce);
-            //         refreshSchedule();
-            //     }
-            // });
-
-            //var lessonModelName = tr.find("input[name=lessonName]").val();
-
             $.ajax({
                 type: "GET",
                 url: "",
@@ -177,7 +155,6 @@ $(function(){
                     refreshSchedule();
                 }
             });
-            //deleteItem("Schedule_Lesson_Report", id, "../admin?menuTab=Main&menuAction=deleteAction&ajax=1", refreshSchedule);
         })
         .on("click", ".schedule_task_create", function(){
             newScheduleTaskPopup();
@@ -204,6 +181,33 @@ $(function(){
             var summ = $(".teacher_payments").find("input[name=summ]").val();
             var user = $(".teacher_payments").find("input[name=userid]").val();
             saveTeacherPayment(user, summ, date, "Выплата преподавателю", refreshSchedule);
+        })
+        .on("change", "select", function(){
+            loaderOn();
+
+            var month = $("#month").val();
+            var year = $("#year").val();
+            var userid = $("#userid").val();
+            var areaid = $("#areaid").val();
+
+            $.ajax({
+                type: "GET",
+                url: "",
+                data: {
+                    action: "getSchedule",
+                    year: year,
+                    month: month,
+                    userid: userid,
+                    areaid: areaid
+                },
+                success: function(responce){
+                    $(".schedule").empty();
+                    $(".schedule").html(responce);
+                    $("#year").val(year);
+                    $("#month").val(month);
+                    loaderOff();
+                }
+            });
         });
 
 
@@ -277,8 +281,8 @@ function saveScheduleTask(formData, func) {
 
 function refreshSchedule() {
     $(".schedule_calendar").trigger("change");
+    $("#month").trigger("change");
 }
-
 
 function getSchedule(userid, date, func) {
     $.ajax({
