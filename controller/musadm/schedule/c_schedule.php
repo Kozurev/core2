@@ -264,8 +264,7 @@ if( $oUser->groupId() < 3 ) {
                 ->where("date", "=", $date)
                 ->find();
 
-            $oNewCurrentLesson = Core::factory("Schedule_Current_Lesson")
-                ->date($date)
+            $oNewCurrentLesson = Core::factory("Schedule_Lesson")
                 ->timeFrom($oModify->timeFrom())
                 ->timeTo($oModify->timeTo())
                 ->classId($oMainLesson->classId())
@@ -274,7 +273,6 @@ if( $oUser->groupId() < 3 ) {
                 ->clientId($oMainLesson->clientId())
                 ->typeId($oMainLesson->typeId());
 
-            $oNewCurrentLesson->lessonType = "main";
             $oNewCurrentLesson->oldid = $oMainLesson->getId();
             $aoCurrentLessons[] = $oNewCurrentLesson;
         } else {
