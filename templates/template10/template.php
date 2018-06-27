@@ -70,6 +70,9 @@
                             <a class="navbar-brand" href="<?=$rootdir?>" >Musicmetod</a>
                         </div>
                         <ul class="nav navbar-nav">
+                            <?
+                            if( $isAdmin )
+                            { ?>
                             <li class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$rootdir?>user">Расписание
                                     <span class="caret"></span></a>
@@ -87,7 +90,13 @@
                                     ?>
                                 </ul>
                             </li>
-                            <?
+                            <? } else {
+                                    $href = "schedule/michurina";
+                                    if($iUserId != 0)   $href .= "?userid=" . $iUserId;
+                                ?>
+                            <li><a href="<?=$rootdir?><?=$href?>">Расписание</a></li>
+                            <? }
+
                             //Пункты только для клиентов
                             if(!$isAdmin && $oUserGroup->getId() == 5)
                             {
