@@ -534,11 +534,6 @@ if( $oUser->groupId() == 4 )
 
     foreach ($aoTeacherLessons as $key => $lesson)
     {
-        if( get_class($lesson) == "Schedule_Lesson" && $lesson->isAbsent($date)  )
-        {
-            unset($aoTeacherLessons[$key]);
-            continue;
-        }
         $lesson->timeFrom(refactorTimeFormat($lesson->timeFrom()));
         $lesson->timeTo(refactorTimeFormat($lesson->timeTo()));
         $lesson->addEntity($lesson->getClient(), "client");

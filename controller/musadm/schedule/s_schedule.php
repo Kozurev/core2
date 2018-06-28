@@ -140,7 +140,8 @@ if($action === "teacherReport")
         ->typeId($typeId)
         ->date($date)
         ->attendance($attendance)
-        ->lessonName($lessonName);
+        ->lessonName($lessonName)
+        ->clientId($clientId);
     $Report->save();
 
     $oLesson = Core::factory($lessonName, $lessonId);

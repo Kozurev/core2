@@ -87,6 +87,26 @@ $(function(){
             saveData("../admin?menuTab=User&menuAction=updateAction&ajax=1", loaderOff);
             $("input[name=pass1]").val('');
             $("input[name=pass2]").val('');
+        })
+        .on("click", ".balance_show", function(e){
+            e.preventDefault();
+            loaderOn();
+            var date_from = $("input[name=date_from]").val();
+            var date_to = $("input[name=date_to]").val();
+            $.ajax({
+                type: "GET",
+                url: "",
+                data: {
+                    //ajax: 1,
+                    date_from: date_from,
+                    date_to: date_to
+                },
+                success: function(responce){
+                    $("body").empty();
+                    $("body").html(responce);
+                    loaderOff();
+                }
+            });
         });
 });
 

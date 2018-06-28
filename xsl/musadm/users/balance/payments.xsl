@@ -14,13 +14,14 @@
             }
         </style>
 
+        <h3>Список платежей</h3>
         <table id="sortingTable" class="table">
             <thead>
                 <tr>
                     <th>Дата</th>
                     <th>Сумма</th>
-                    <th>Примечание</th>
                     <xsl:if test="user_group/id != 5">
+                        <th>Примечание</th>
                         <th></th>
                     </xsl:if>
                 </tr>
@@ -47,13 +48,14 @@
             <td class="{$class}"><xsl:value-of select="datetime" /></td>
             <td class="{$class}"><xsl:value-of select="value" /></td>
             <!--<td class="{$class}"><xsl:value-of select="description" /></td>-->
-            <td class="{$class}">
-                <xsl:value-of select="description" />
-                <xsl:for-each select="notes">
-                    <br/><xsl:value-of select="value" />
-                </xsl:for-each>
-            </td>
+
             <xsl:if test="//user_group/id != 5">
+                <td class="{$class}">
+                    <xsl:value-of select="description" />
+                    <xsl:for-each select="notes">
+                        <br/><xsl:value-of select="value" />
+                    </xsl:for-each>
+                </td>
                 <td class="{$class}" style="text-align:center">
                     <a class="btn btn-orange payment_add_note" data-modelid="{./id}">
                         Добавить примечание
