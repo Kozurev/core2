@@ -16,7 +16,7 @@ $userId = $oUser->getId();
  * Формирование таблицы расписания для преподавателей и клиентов
  * Начало>>
  */
-if( $oUser->groupId() > 3 )
+if( $oUser->groupId() == 5 )
 {
     ?>
         <select class="form-control client_schedule" id="month">
@@ -225,7 +225,7 @@ if( $oUser->groupId() > 3 )
  * Формирование таблицы расписания для менеджеров
  * Начало >>
  */
-if( $oUser->groupId() < 3 ) {
+if( $oUser->groupId() < 5 ) {
     $date = Core_Array::getValue($_GET, "date", null);
     $today = date("Y-m-d");
     if (is_null($date)) $date = $today;
@@ -247,11 +247,18 @@ if( $oUser->groupId() < 3 ) {
         ->where("date", "=", $date)
         ->where("area_id", "=", $areaId);
 
+    if( $oUser->groupId() == 4 )
+    {
+        $aoMainLessons->where( "teacher_id", "=", $oUser->getId() );
+        $aoCurrentLessons->where( "teacher_id", "=", $oUser->getId() );
+    }
+
     $aoCurrentLessons = $aoCurrentLessons->findAll();
     $aoMainLessons = $aoMainLessons->findAll();
 
 
-    foreach ($aoMainLessons as $oMainLesson) {
+    foreach ($aoMainLessons as $oMainLesson)
+    {
         if ($oMainLesson->isAbsent($date)) continue;
 
         /**
@@ -279,6 +286,8 @@ if( $oUser->groupId() < 3 ) {
             $aoCurrentLessons[] = $oMainLesson;
         }
     }
+
+    $aoTeacherLessons = $aoCurrentLessons;
 
     echo "<table class='table table-bordered'>";
 

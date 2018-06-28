@@ -71,7 +71,7 @@
                         </div>
                         <ul class="nav navbar-nav">
                             <?
-                            if( $isAdmin )
+                            if( $oUser->groupId() != 5 )
                             { ?>
                             <li class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$rootdir?>user">Расписание

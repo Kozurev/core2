@@ -11,10 +11,10 @@
         $oUser = $oCurentUser;
     }
 
-    if( $oUser->groupId() < 3 )
+    if( $oUser->groupId() < 5 )
         $this->css("/templates/template7/css/style.css");
 
-    if( $oUser->groupId() < 3 ) { ?>
+    if( $oUser->groupId() < 5 ) { ?>
 
         <div class="calendar_small">
             <input type="date" class="form-control schedule_calendar" />
