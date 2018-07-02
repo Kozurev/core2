@@ -2,15 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0e9b67c4-a6a1-4b7e-a8c4-08c782e4c07a" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/xsl/musadm/users/balance/attendance_report.xsl" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/controller/musadm/balance/c_balance.php" afterPath="$PROJECT_DIR$/controller/musadm/balance/c_balance.php" />
-      <change beforePath="$PROJECT_DIR$/controller/musadm/schedule/c_schedule.php" afterPath="$PROJECT_DIR$/controller/musadm/schedule/c_schedule.php" />
-      <change beforePath="$PROJECT_DIR$/controller/musadm/schedule/s_schedule.php" afterPath="$PROJECT_DIR$/controller/musadm/schedule/s_schedule.php" />
-      <change beforePath="$PROJECT_DIR$/model/admin/menu/schedule.php" afterPath="$PROJECT_DIR$/model/admin/menu/schedule.php" />
       <change beforePath="$PROJECT_DIR$/model/admin/menu/scheduleCurrent.php" afterPath="$PROJECT_DIR$/model/admin/menu/scheduleCurrent.php" />
-      <change beforePath="$PROJECT_DIR$/templates/template4/js/users.js" afterPath="$PROJECT_DIR$/templates/template4/js/users.js" />
-      <change beforePath="$PROJECT_DIR$/xsl/musadm/users/balance/payments.xsl" afterPath="$PROJECT_DIR$/xsl/musadm/users/balance/payments.xsl" />
+      <change beforePath="$PROJECT_DIR$/xml.xml" afterPath="$PROJECT_DIR$/xml.xml" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -31,11 +25,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="scheduleCurrent.php" pinned="false" current-in-tab="true">
+      <file leaf-file-name="scheduleCurrent.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/model/admin/menu/scheduleCurrent.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="697">
-              <caret line="73" column="36" lean-forward="true" selection-start-line="73" selection-start-column="36" selection-end-line="73" selection-end-column="36" />
+            <state relative-caret-position="323">
+              <caret line="51" column="32" lean-forward="false" selection-start-line="51" selection-start-column="32" selection-end-line="51" selection-end-column="32" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="schedule.php" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/model/admin/menu/schedule.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="578">
+              <caret line="51" column="30" lean-forward="false" selection-start-line="51" selection-start-column="30" selection-end-line="51" selection-end-column="30" />
               <folding />
             </state>
           </provider>
@@ -100,8 +104,8 @@
         <option value="$PROJECT_DIR$/controller/musadm/balance/c_balance.php" />
         <option value="$USER_HOME$/AppData/Local/Temp/fz3temp-2/c_balance.php" />
         <option value="$PROJECT_DIR$/index.php" />
-        <option value="$PROJECT_DIR$/model/admin/menu/schedule.php" />
         <option value="$PROJECT_DIR$/model/admin/menu/scheduleCurrent.php" />
+        <option value="$PROJECT_DIR$/model/admin/menu/schedule.php" />
       </list>
     </option>
   </component>
@@ -207,7 +211,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="39548000" />
+    <option name="totallyTimeSpent" value="39675000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -535,14 +539,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/model/admin/menu/schedule.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="578">
-          <caret line="51" column="16" lean-forward="true" selection-start-line="51" selection-start-column="16" selection-end-line="51" selection-end-column="41" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/controller/musadm/schedule/c_schedule.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="539">
@@ -581,8 +577,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/model/admin/menu/scheduleCurrent.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="697">
-          <caret line="73" column="36" lean-forward="true" selection-start-line="73" selection-start-column="36" selection-end-line="73" selection-end-column="36" />
+        <state relative-caret-position="323">
+          <caret line="51" column="32" lean-forward="false" selection-start-line="51" selection-start-column="32" selection-end-line="51" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/model/admin/menu/schedule.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="578">
+          <caret line="51" column="30" lean-forward="false" selection-start-line="51" selection-start-column="30" selection-end-line="51" selection-end-column="30" />
           <folding />
         </state>
       </provider>
