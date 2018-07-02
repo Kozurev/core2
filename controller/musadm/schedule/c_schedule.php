@@ -279,6 +279,7 @@ if( $oUser->groupId() < 5 ) {
                 ->teacherId($oMainLesson->teacherId())
                 ->clientId($oMainLesson->clientId())
                 ->typeId($oMainLesson->typeId());
+            $oNewCurrentLesson->oldid = $oMainLesson->getId();
 
             $oNewCurrentLesson->oldid = $oMainLesson->getId();
             $aoCurrentLessons[] = $oNewCurrentLesson;
@@ -540,6 +541,7 @@ if( $oUser->groupId() == 4 )
         $lesson->addSimpleEntity("lesson_name", $lesson->getTableName());
 
         $oReported = $lesson->isReported($date);
+
         if($oReported != false)
         {
             $lesson->addEntity($oReported, "report");
@@ -559,10 +561,13 @@ if( $oUser->groupId() == 4 )
         ->xsl("musadm/schedule/teacher_table.xsl")
         ->show();
 
-    $dateFrom = substr($date, 2) . "01";
-    $currentMonth = intval(substr($date, 5, 3));
-    $currentYear = intval(substr($date, 0, 4));
+    $dateFrom = substr($date, 0, 8) . "01";
+    $currentMonth = intval( substr($date, 5, 2) );
+    $currentYear = intval( substr($date, 0, 4) );
     $countDays = cal_days_in_month(CAL_GREGORIAN, $currentMonth, $currentYear);
+
+    if( $currentMonth < 10 )    $currentMonth = "0" . $currentMonth;
+
     $dateTo = $currentYear . "-" . $currentMonth . "-" . $countDays;
 
     $aoTeacherReports = Core::factory("Schedule_Lesson_Report")

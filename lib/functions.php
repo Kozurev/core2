@@ -164,6 +164,7 @@ function toSeconds( $time )
 function refactorTimeFormat( $time )
 {
     $aSegments = explode(":", $time);
+    if( count($aSegments) != 3 )    return $time;
     $result = $aSegments[0] . ":" . $aSegments[1];
     return $result;
 }

@@ -7,8 +7,9 @@
       <change beforePath="$PROJECT_DIR$/controller/musadm/balance/c_balance.php" afterPath="$PROJECT_DIR$/controller/musadm/balance/c_balance.php" />
       <change beforePath="$PROJECT_DIR$/controller/musadm/schedule/c_schedule.php" afterPath="$PROJECT_DIR$/controller/musadm/schedule/c_schedule.php" />
       <change beforePath="$PROJECT_DIR$/controller/musadm/schedule/s_schedule.php" afterPath="$PROJECT_DIR$/controller/musadm/schedule/s_schedule.php" />
+      <change beforePath="$PROJECT_DIR$/model/admin/menu/schedule.php" afterPath="$PROJECT_DIR$/model/admin/menu/schedule.php" />
+      <change beforePath="$PROJECT_DIR$/model/admin/menu/scheduleCurrent.php" afterPath="$PROJECT_DIR$/model/admin/menu/scheduleCurrent.php" />
       <change beforePath="$PROJECT_DIR$/templates/template4/js/users.js" afterPath="$PROJECT_DIR$/templates/template4/js/users.js" />
-      <change beforePath="$PROJECT_DIR$/xml.xml" afterPath="$PROJECT_DIR$/xml.xml" />
       <change beforePath="$PROJECT_DIR$/xsl/musadm/users/balance/payments.xsl" afterPath="$PROJECT_DIR$/xsl/musadm/users/balance/payments.xsl" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,75 +21,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="c_balance.php" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/controller/musadm/balance/c_balance.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="75" column="1" lean-forward="true" selection-start-line="75" selection-start-column="1" selection-end-line="75" selection-end-column="1" />
-              <folding>
-                <element signature="e#6#94#0#PHP" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/index.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="14" column="25" lean-forward="true" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="c_schedule.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/controller/musadm/schedule/c_schedule.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="539">
-              <caret line="620" column="60" lean-forward="true" selection-start-line="620" selection-start-column="60" selection-end-line="620" selection-end-column="60" />
-              <folding>
-                <marker date="1530175853296" expanded="true" signature="1916:2107" ph="..." />
-                <marker date="1530175853296" expanded="true" signature="4626:4651" ph="..." />
-                <marker date="1530175853296" expanded="true" signature="13052:13251" ph="..." />
-                <marker date="1530175853296" expanded="true" signature="13055:13244" ph="..." />
-                <marker date="1530175853296" expanded="true" signature="13758:13885" ph="..." />
-                <marker date="1530175853296" expanded="true" signature="13787:13885" ph="..." />
-                <marker date="1530175853296" expanded="true" signature="14265:14559" ph="..." />
-                <marker date="1530175853296" expanded="true" signature="14411:14521" ph="..." />
-                <marker date="1530175853296" expanded="true" signature="16279:16457" ph="..." />
-                <marker date="1530175853296" expanded="true" signature="16308:16457" ph="..." />
-                <marker date="1530175853296" expanded="true" signature="20320:20559" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="s_schedule.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/controller/musadm/schedule/s_schedule.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="144" column="20" lean-forward="true" selection-start-line="144" selection-start-column="20" selection-end-line="144" selection-end-column="20" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="attendance_report.xsl" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/xsl/musadm/users/balance/attendance_report.xsl">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="697">
-              <caret line="47" column="28" lean-forward="false" selection-start-line="47" selection-start-column="28" selection-end-line="47" selection-end-column="28" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="users.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/template4/js/users.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="123">
               <caret line="81" column="52" lean-forward="true" selection-start-line="81" selection-start-column="52" selection-end-line="81" selection-end-column="52" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="scheduleCurrent.php" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/model/admin/menu/scheduleCurrent.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="697">
+              <caret line="73" column="36" lean-forward="true" selection-start-line="73" selection-start-column="36" selection-end-line="73" selection-end-column="36" />
               <folding />
             </state>
           </provider>
@@ -153,6 +100,8 @@
         <option value="$PROJECT_DIR$/controller/musadm/balance/c_balance.php" />
         <option value="$USER_HOME$/AppData/Local/Temp/fz3temp-2/c_balance.php" />
         <option value="$PROJECT_DIR$/index.php" />
+        <option value="$PROJECT_DIR$/model/admin/menu/schedule.php" />
+        <option value="$PROJECT_DIR$/model/admin/menu/scheduleCurrent.php" />
       </list>
     </option>
   </component>
@@ -184,7 +133,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
@@ -196,30 +144,26 @@
             <path>
               <item name="musadm" type="b2602c69:ProjectViewProjectNode" />
               <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="controller" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="musadm" type="b2602c69:ProjectViewProjectNode" />
-              <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="controller" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="musadm" type="b2602c69:ProjectViewProjectNode" />
-              <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="controller" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="schedule" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="model" type="2a2b976b:PhpTreeStructureProvider$1" />
             </path>
             <path>
               <item name="musadm" type="b2602c69:ProjectViewProjectNode" />
               <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
               <item name="model" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="admin" type="2a2b976b:PhpTreeStructureProvider$1" />
+            </path>
+            <path>
+              <item name="musadm" type="b2602c69:ProjectViewProjectNode" />
+              <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="model" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="admin" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="menu" type="2a2b976b:PhpTreeStructureProvider$1" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -263,7 +207,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="39472000" />
+    <option name="totallyTimeSpent" value="39548000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -281,12 +225,23 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -300,20 +255,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/model/admin/menu/template.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1071">
-          <caret line="68" column="9" lean-forward="false" selection-start-line="68" selection-start-column="9" selection-end-line="68" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/controller/musadm/schedule/c_schedule.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/model/schedule/lesson/report.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1020">
@@ -466,7 +407,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="204">
           <caret line="12" column="14" lean-forward="true" selection-start-line="12" selection-start-column="14" selection-end-line="12" selection-end-column="14" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -474,7 +414,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
           <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -482,7 +421,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
           <caret line="71" column="43" lean-forward="true" selection-start-line="71" selection-start-column="43" selection-end-line="71" selection-end-column="43" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -490,7 +428,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="476">
           <caret line="73" column="28" lean-forward="false" selection-start-line="73" selection-start-column="28" selection-end-line="73" selection-end-column="56" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -498,19 +435,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
           <caret line="535" column="5" lean-forward="false" selection-start-line="535" selection-start-column="5" selection-end-line="535" selection-end-column="5" />
-          <folding>
-            <marker date="1530175898769" expanded="true" signature="1840:2031" ph="..." />
-            <marker date="1530175898769" expanded="true" signature="4550:4575" ph="..." />
-            <marker date="1530175898769" expanded="true" signature="12976:13175" ph="..." />
-            <marker date="1530175898769" expanded="true" signature="12979:13168" ph="..." />
-            <marker date="1530175898769" expanded="true" signature="13682:13809" ph="..." />
-            <marker date="1530175898769" expanded="true" signature="13711:13809" ph="..." />
-            <marker date="1530175898769" expanded="true" signature="14189:14483" ph="..." />
-            <marker date="1530175898769" expanded="true" signature="14335:14445" ph="..." />
-            <marker date="1530175898769" expanded="true" signature="16203:16381" ph="..." />
-            <marker date="1530175898769" expanded="true" signature="16232:16381" ph="..." />
-            <marker date="1530175898769" expanded="true" signature="20244:20483" ph="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -518,7 +442,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="493">
           <caret line="212" column="0" lean-forward="true" selection-start-line="212" selection-start-column="0" selection-end-line="212" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -526,7 +449,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -534,7 +456,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -542,7 +463,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
           <caret line="22" column="20" lean-forward="false" selection-start-line="22" selection-start-column="16" selection-end-line="22" selection-end-column="20" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -550,7 +470,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="709">
           <caret line="57" column="21" lean-forward="false" selection-start-line="57" selection-start-column="21" selection-end-line="57" selection-end-column="21" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -558,15 +477,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="782">
           <caret line="109" column="11" lean-forward="false" selection-start-line="109" selection-start-column="11" selection-end-line="109" selection-end-column="11" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/template4/js/users.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="123">
-          <caret line="81" column="52" lean-forward="true" selection-start-line="81" selection-start-column="52" selection-end-line="81" selection-end-column="52" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -574,6 +484,45 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="561">
           <caret line="125" column="8" lean-forward="false" selection-start-line="125" selection-start-column="8" selection-end-line="127" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/schedule_functions.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="528">
+          <caret line="176" column="46" lean-forward="true" selection-start-line="176" selection-start-column="46" selection-end-line="176" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Temp/fz3temp-2/c_balance.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="726">
+          <caret line="122" column="57" lean-forward="true" selection-start-line="122" selection-start-column="57" selection-end-line="122" selection-end-column="57" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Temp/fz3temp-2/s_schedule.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="130" column="53" lean-forward="true" selection-start-line="130" selection-start-column="53" selection-end-line="130" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/controller/musadm/balance/c_balance.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="75" column="1" lean-forward="true" selection-start-line="75" selection-start-column="1" selection-end-line="75" selection-end-column="1" />
+          <folding>
+            <element signature="e#6#94#0#PHP" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/index.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" column="25" lean-forward="false" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
           <folding />
         </state>
       </provider>
@@ -586,10 +535,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/schedule_functions.php">
+    <entry file="file://$PROJECT_DIR$/model/admin/menu/schedule.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="528">
-          <caret line="176" column="46" lean-forward="true" selection-start-line="176" selection-start-column="46" selection-end-line="176" selection-end-column="46" />
+        <state relative-caret-position="578">
+          <caret line="51" column="16" lean-forward="true" selection-start-line="51" selection-start-column="16" selection-end-line="51" selection-end-column="41" />
           <folding />
         </state>
       </provider>
@@ -597,19 +546,19 @@
     <entry file="file://$PROJECT_DIR$/controller/musadm/schedule/c_schedule.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="539">
-          <caret line="620" column="60" lean-forward="true" selection-start-line="620" selection-start-column="60" selection-end-line="620" selection-end-column="60" />
+          <caret line="620" column="33" lean-forward="false" selection-start-line="620" selection-start-column="33" selection-end-line="620" selection-end-column="33" />
           <folding>
-            <marker date="1530175853296" expanded="true" signature="1916:2107" ph="..." />
-            <marker date="1530175853296" expanded="true" signature="4626:4651" ph="..." />
-            <marker date="1530175853296" expanded="true" signature="13052:13251" ph="..." />
-            <marker date="1530175853296" expanded="true" signature="13055:13244" ph="..." />
-            <marker date="1530175853296" expanded="true" signature="13758:13885" ph="..." />
-            <marker date="1530175853296" expanded="true" signature="13787:13885" ph="..." />
-            <marker date="1530175853296" expanded="true" signature="14265:14559" ph="..." />
-            <marker date="1530175853296" expanded="true" signature="14411:14521" ph="..." />
-            <marker date="1530175853296" expanded="true" signature="16279:16457" ph="..." />
-            <marker date="1530175853296" expanded="true" signature="16308:16457" ph="..." />
-            <marker date="1530175853296" expanded="true" signature="20320:20559" ph="..." />
+            <marker date="1530441950000" expanded="true" signature="1916:2107" ph="..." />
+            <marker date="1530441950000" expanded="true" signature="4626:4651" ph="..." />
+            <marker date="1530441950000" expanded="true" signature="13115:13314" ph="..." />
+            <marker date="1530441950000" expanded="true" signature="13118:13307" ph="..." />
+            <marker date="1530441950000" expanded="true" signature="13821:13948" ph="..." />
+            <marker date="1530441950000" expanded="true" signature="13850:13948" ph="..." />
+            <marker date="1530441950000" expanded="true" signature="14328:14622" ph="..." />
+            <marker date="1530441950000" expanded="true" signature="14474:14584" ph="..." />
+            <marker date="1530441950000" expanded="true" signature="16342:16520" ph="..." />
+            <marker date="1530441950000" expanded="true" signature="16371:16520" ph="..." />
+            <marker date="1530441950000" expanded="true" signature="20462:20701" ph="..." />
           </folding>
         </state>
       </provider>
@@ -622,39 +571,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Temp/fz3temp-2/c_balance.php">
+    <entry file="file://$PROJECT_DIR$/templates/template4/js/users.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="726">
-          <caret line="122" column="57" lean-forward="true" selection-start-line="122" selection-start-column="57" selection-end-line="122" selection-end-column="57" />
-          <folding>
-            <element signature="e#6#94#0#PHP" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/index.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" column="25" lean-forward="true" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
+        <state relative-caret-position="123">
+          <caret line="81" column="52" lean-forward="true" selection-start-line="81" selection-start-column="52" selection-end-line="81" selection-end-column="52" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Temp/fz3temp-2/s_schedule.php">
+    <entry file="file://$PROJECT_DIR$/model/admin/menu/scheduleCurrent.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="130" column="53" lean-forward="true" selection-start-line="130" selection-start-column="53" selection-end-line="130" selection-end-column="53" />
+        <state relative-caret-position="697">
+          <caret line="73" column="36" lean-forward="true" selection-start-line="73" selection-start-column="36" selection-end-line="73" selection-end-column="36" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/controller/musadm/balance/c_balance.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="75" column="1" lean-forward="true" selection-start-line="75" selection-start-column="1" selection-end-line="75" selection-end-column="1" />
-          <folding>
-            <element signature="e#6#94#0#PHP" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>

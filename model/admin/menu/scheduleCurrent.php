@@ -49,6 +49,7 @@ class Admin_Menu_ScheduleCurrent
                 ->limit(SHOW_LIMIT)
                 ->offset($offset)
                 ->where("area_id", "=", $parentId)
+                ->orderBy( "id", "DESC" )
                 ->findAll();
 
             foreach ($aoItems as $lesson)

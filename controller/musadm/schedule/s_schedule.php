@@ -132,6 +132,12 @@ if($action === "teacherReport")
     $date = Core_Array::getValue($_GET, "date", 0);
 
     /**
+     * Проверка во избежание дублирование отчетов
+     */
+    $Lesson = Core::factory( $lessonName, $lessonId );
+    if( $Lesson->isReported( $date ) )  exit;
+
+    /**
      * Создание отчета
      */
     $Report = Core::factory("Schedule_Lesson_Report")

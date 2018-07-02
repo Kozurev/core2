@@ -88,10 +88,13 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     {
         $report = Core::factory("Schedule_Lesson_Report")
             ->where("date", "=", $date)
-            ->where("lesson_id", "=", $this->id)
             ->where("type_id", "=", $this->type_id)
-            ->where("lesson_name", "=", get_class($this))
-            ->find();
+            ->where("lesson_name", "=", get_class($this));
+
+            if( isset( $this->oldid ) ) $report->where( "lesson_id", "=", $this->oldid );
+            else $report->where( "lesson_id", "=", $this->id );
+
+        $report = $report->find();   
 
         return $report;
     }

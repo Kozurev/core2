@@ -60,7 +60,7 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
     public function save($obj = null)
     {
         Core::notify(array(&$this), "beforeScheduleCurrentLessonSave");
-        if( $this->id == null ) parent::save();
+        //if( $this->id == null ) parent::save();
 
         $oLesson = Core::factory("Schedule_Current_Lesson")
             ->where("id", "<>", $this->id)
@@ -77,8 +77,8 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
 
         if ($oLesson > 0)
         {
-            echo "Добавление невозможно по причине пересечения с другим занятием (текущее расписание) ";
-            return $this;
+            die( "Добавление невозможно по причине пересечения с другим занятием (текущее расписание) ");
+            //return $this;
         }
 
         $dayName =  new DateTime($this->date);
@@ -123,12 +123,6 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
         }
 
 
-        if( $aoLessons == false || count($aoLessons) == 0 )
-        {
-            parent::save();
-            return $this;
-        }
-
         foreach ($aoLessons as $lesson)
         {
             $clientAbsent = false;
@@ -160,7 +154,7 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
 
             if($clientAbsent == false && !$lesson->isAbsent($this->date))
             {
-                die("Добавление невозможно по причине пересечения с другим занятием");
+                die("Добавление невозможно по причине пересечения с другим занятием ");
             }
             else
             {
@@ -169,6 +163,7 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
             }
         }
 
+        parent::save();
         Core::notify(array(&$this), "afterScheduleCurrentLessonSave");
         return $this;
     }

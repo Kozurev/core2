@@ -54,19 +54,28 @@
             <input type="hidden" name="typeId" value="{type_id}"/>
             <input type="hidden" name="clientId" value="{client_id}"/>
             <input type="hidden" name="date" value="{//real_date}"/>
-            <input type="hidden" name="lessonId" value="{id}"/>
+            
+            <xsl:choose>
+                <xsl:when test="oldid != ''">
+                    <input type="hidden" name="lessonId" value="{oldid}"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <input type="hidden" name="lessonId" value="{id}"/>
+                </xsl:otherwise>
+            </xsl:choose>
+
             <input type="hidden" name="reportId" value="{report/id}" />
             <input type="hidden" name="lessonName" value="{lesson_name}" />
 
             <td>
-                <a class="btn btn-green send_report" >
+                <button class="btn btn-green send_report" >
                     <xsl:if test="count(report/id) != 0">
                         <xsl:attribute name="disabled">
                             disabled
                         </xsl:attribute>
                     </xsl:if>
                     Отправить данные
-                </a>
+                </button>
 
                 <xsl:if test="count(report/id) != 0 and /root/admin/group_id = 1">
                     <button class="btn btn-danger delete_report">
