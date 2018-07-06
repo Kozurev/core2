@@ -77,11 +77,16 @@ else
 
 $UserReports = $UserReports->findAll();
 
-
 foreach ( $UserReports as $rep )
 {
     $rep->date( refactorDateFormat( $rep->date() ) );
+
+    if( $rep->lessonName() == null )    $rep->lessonName( "Schedule_Current_Lesson" );
+
     $RepLesson = Core::factory( $rep->lessonName(), $rep->lessonId() );
+
+    if( $RepLesson == false )   { debug($RepLesson, 1); debug($rep);  }
+
     if( $rep->lessonName() == "Schedule_Lesson" && $RepLesson->isTimeModified( $rep->date() ) )
     {
         $Modified = Core::factory("Schedule_Lesson_TimeModified")
