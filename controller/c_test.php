@@ -56,9 +56,6 @@
 
 
 
+$oLesson = Core::factory( "Schedule_Lesson", 238 );
 
-Core::factory( "User_Controller_Show" )
-	->properties( array(12, 13, 14, 15, 16, 18, 19) )
-	->limit( 15 )
-	->xsl( "musadm/users/clients_new.xsl" )
-	->show();
+debug( $oLesson->isAbsent("2018-07-10"), 1 );
