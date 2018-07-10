@@ -12,15 +12,19 @@ $interval = new DateInterval("P1M");
 $defaultDateFrom = $oDate->sub($interval)->format($dateFormat);
 $defaultDateTo = date($dateFormat);
 
-$dateFrom = Core_Array::getValue($_GET, "date_from", $defaultDateFrom);
-$dateTo = Core_Array::getValue($_GET, "date_to", $defaultDateTo);
+$dateFrom = Core_Array::getValue($_GET, "date_from", "");
+$dateTo = Core_Array::getValue($_GET, "date_to", "");
 
 
 $aoLids = Core::factory("Lid")
-    ->between("control_date", $dateFrom, $dateTo)
+    //->between("control_date", $dateFrom, $dateTo)
     ->where("active", "=", 1)
-    ->orderBy("id", "DESC")
-    ->findAll();
+    ->orderBy("id", "DESC");
+
+if( $dateFrom != "" )   $aoLids->where( "control_date", ">=", $dateFrom );
+if( $dateTo != "" )     $aoLids->where( "control_date", "<=", $dateTo );
+
+$aoLids = $aoLids->findAll();
 
 $aoComments = array();
 $authorsId  = array();

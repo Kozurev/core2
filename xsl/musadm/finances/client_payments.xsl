@@ -15,7 +15,7 @@
         <br/>
 
         <div class="finances_total">
-            За данный период суммарный доход составил <xsl:value-of select="total_summ" /> руб.
+            За данный период суммарные поступления составили <xsl:value-of select="total_summ" /> руб.
         </div>
 
         <table id="sortingTable" class="table table-striped task">
@@ -26,6 +26,7 @@
                     <th>Сумма</th>
                     <th>Примечание</th>
                     <th>Дата</th>
+                    <th>Студия</th>
                 </tr>
             </thead>
 
@@ -54,6 +55,7 @@
             <td><xsl:value-of select="value" /></td>
             <td><xsl:value-of select="description" /></td>
             <td><xsl:value-of select="datetime" /></td>
+            <td><xsl:value-of select="area" /></td>
         </tr>
     </xsl:template>
 

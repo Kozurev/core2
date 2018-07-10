@@ -31,6 +31,16 @@
     margin-top: 10px;
 }
 
+.balance-lessons {
+    height: 430px;
+    overflow: scroll;
+}
+
+.balance-payments {
+    height: 590px;
+    overflow: scroll;
+}
+
 .navbar-inverse {
     background-color: #494d55 !important;
     border-color: #494d55 !important;
@@ -42,7 +52,7 @@ header {
 
 .lids .cards-section .item-inner {
     padding: 15px 15px;
-    height: 250px !important;
+    height: 330px !important;
     overflow-y: scroll;
 }
 

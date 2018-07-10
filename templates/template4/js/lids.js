@@ -49,7 +49,7 @@ $(function(){
 function refreshLidTable(from, to) {
     $.ajax({
         type: "GET",
-        url: "",
+        url: "all",
         async: false,
         data: {
             action: "refreshLidTable",

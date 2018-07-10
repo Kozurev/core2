@@ -49,7 +49,7 @@
 
         <tr>
             <td>
-                <a href="../?userid={id}">
+                <a href="balance?userid={id}">
                     <xsl:value-of select="surname" />
                 </a>
                 <!--Анкета (соглашение подписано)-->

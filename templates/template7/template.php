@@ -15,15 +15,14 @@
         $this->css("/templates/template7/css/style.css");
 
     if( $oUser->groupId() < 5 ) { ?>
-
         <div class="calendar_small">
             <input type="date" class="form-control schedule_calendar" />
+            <span class="day_name"></span>
         </div>
 
         <div style="text-align: right">
             <a class="btn btn-green schedule_task_create">Написать администратору</a>
         </div>
-
     <? }else { ?>
         <script>
             $(function(){

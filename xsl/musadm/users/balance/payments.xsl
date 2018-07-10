@@ -15,22 +15,25 @@
         </style>
 
         <h3>Список платежей</h3>
-        <table id="sortingTable" class="table">
-            <thead>
-                <tr>
-                    <th>Дата</th>
-                    <th>Сумма</th>
-                    <xsl:if test="user_group/id != 5">
-                        <th>Примечание</th>
-                        <th></th>
-                    </xsl:if>
-                </tr>
-            </thead>
 
-            <tbody>
-                <xsl:apply-templates select="payment" />
-            </tbody>
-        </table>
+        <div class="balance-payments">
+            <table id="sortingTable" class="table">
+                <thead>
+                    <tr class="header">
+                        <th>Дата</th>
+                        <th>Сумма</th>
+                        <xsl:if test="user_group/id != 5">
+                            <th>Примечание</th>
+                            <th></th>
+                        </xsl:if>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <xsl:apply-templates select="payment" />
+                </tbody>
+            </table>
+        </div>
     </xsl:template>
 
 
@@ -51,9 +54,10 @@
 
             <xsl:if test="//user_group/id != 5">
                 <td class="{$class}">
-                    <xsl:value-of select="description" />
+                    <xsl:if test="description != ''"><xsl:value-of select="description" /><br/></xsl:if>
                     <xsl:for-each select="notes">
-                        <br/><xsl:value-of select="value" />
+                        <!--<xsl:if test="position() != 1"><br/></xsl:if>-->
+                        <xsl:value-of select="value" /><br/>
                     </xsl:for-each>
                 </td>
                 <td class="{$class}" style="text-align:center">

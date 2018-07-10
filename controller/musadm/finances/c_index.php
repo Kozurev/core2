@@ -60,9 +60,16 @@ $minus = Core::factory("Orm")
 
 foreach ($aoPayments as $payment)
 {
-    $payment->addEntity(
-        $payment->getUser()
-    );
+    $oPaymentUser = $payment->getUser();
+
+    $payment->addEntity( $oPaymentUser );
+    if( $oPaymentUser->groupId() == 5 )
+    {
+        $oProperty = Core::factory( "Property", 15 );
+        $userAreaName = $oProperty->getPropertyValues( $oPaymentUser )[0]->value();
+        if( $userAreaName != $oProperty->defaultValue() )
+            $payment->addSimpleEntity( "area", $userAreaName );
+    }
 }
 
 

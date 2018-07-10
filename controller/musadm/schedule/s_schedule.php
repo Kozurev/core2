@@ -37,19 +37,11 @@ $action = Core_Array::getValue($_GET, "action", null);
 if($action === "getScheduleAbsentPopup")
 {
     $clientId = Core_Array::getValue($_GET, "client_id", 0);
-    $typeid = Core_Array::getValue($_GET, "type_id", 0);
+    $typeId = Core_Array::getValue($_GET, "type_id", 0);
 
     Core::factory("Core_Entity")
-        ->addEntity(
-            Core::factory("Core_Entity")
-                ->name("clientid")
-                ->value($clientId)
-        )
-        ->addEntity(
-            Core::factory("Core_Entity")
-                ->name("typeid")
-                ->value($typeid)
-        )
+        ->addSimpleEntity( "clientid", $clientId )
+        ->addSimpleEntity( "typeid", $typeId )
         ->xsl("musadm/schedule/absent_popup.xsl")
         ->show();
 
@@ -71,32 +63,11 @@ if($action === "getScheduleLessonPopup")
     if(defined("SCHEDULE_DELIMITER") != "")   $period = SCHEDULE_DELIMITER;
 
     $output = Core::factory("Core_Entity")
-        ->addEntity(
-            Core::factory("Core_Entity")
-                ->name("class_id")
-                ->value($classId)
-        )
-        ->addEntity(
-            Core::factory("Core_Entity")
-                ->name("date")
-                ->value($date)
-        )
-        ->addEntity(
-            Core::factory("Core_Entity")
-                ->name("area_id")
-                ->value($areaId)
-        )
-        ->addEntity(
-            Core::factory("Core_Entity")
-                ->name("day_name")
-                ->value($dayName)
-        )
-        ->addEntity(
-            Core::factory("Core_Entity")
-                ->name("period")
-                ->value($period)
-        );
-
+        ->addSimpleEntity( "class_id", $classId )
+        ->addSimpleEntity( "date", $date )
+        ->addSimpleEntity( "area_id", $areaId )
+        ->addSimpleEntity( "day_name", $dayName )
+        ->addSimpleEntity( "period", $period);
 
     $aoUsers = Core::factory("User")
         ->where("active", "=", 1)
@@ -296,12 +267,9 @@ if($action === "getScheduleChangeTimePopup")
         if($oModify == false)
             $oModify = Core::factory($modelName)->lessonId($id)->date($date);
 
-        $output->addEntity(
-            Core::factory("Core_Entity")
-                ->name("lesson_id")
-                ->value($id)
-        )
-        ->addEntity($oModify);
+        $output
+            ->addSimpleEntity( "lesson_id", $id )
+            ->addEntity($oModify);
     }
     else
     {
@@ -311,11 +279,7 @@ if($action === "getScheduleChangeTimePopup")
     }
 
     $output
-        ->addEntity(
-            Core::factory("Core_Entity")
-                ->name("model_name")
-                ->value("$modelName")
-        )
+        ->addSimpleEntity( "model_name", $modelName )
         ->xsl("musadm/schedule/time_modify_popup.xsl")
         ->show();
 
@@ -330,11 +294,7 @@ if($action === "new_task_popup")
 
     Core::factory("Core_Entity")
         ->addEntities($aoTaskTypes)
-        ->addEntity(
-            Core::factory("Core_Entity")
-                ->name("date")
-                ->value($date)
-        )
+        ->addSimpleEntity( "date", $date )
         ->xsl("musadm/schedule/new_task_popup.xsl")
         ->show();
 
@@ -365,6 +325,25 @@ if($action === "save_task")
         ->save();
 
     echo "0";
+    exit;
+}
+
+
+if( $action === "addAbsentTask" )
+{
+    $dateTo =   Core_Array::getValue( $_GET, "date_to", "" );
+    $clientId = Core_Array::getValue( $_GET, "client_id", 0 );
+
+    $oTask = Core::factory( "Task" )
+        ->date( $dateTo )
+        ->type( 3 );
+
+    $oTask = $oTask->save();
+
+    $oAuthor = Core::factory( "User", $clientId );
+    $fio = $oAuthor->surname() . " " . $oAuthor->name();
+    $text = $fio . ", отсутствовал. Уточнить насчет дальнейшего графика.";
+    $oTask->addNote( $text );
     exit;
 }
 

@@ -90,7 +90,7 @@
                                     ?>
                                 </ul>
                             </li>
-                            <? } else {
+                            <? } elseif( $oUser->groupId() == 4 ) {
                                     $href = "schedule/michurina";
                                     if($iUserId != 0)   $href .= "?userid=" . $iUserId;
                                 ?>
@@ -119,25 +119,10 @@
                                     </ul>
                                 </li>
                                 <li><a href="<?=$rootdir?>groups">Группы</a></li>
-                                <li class="dropdown">
-                                    <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$rootdir?>lids">Лиды
-                                        <span class="caret"></span></a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="<?=$rootdir?>lids/current" >На сегодня</a></li>
-                                        <li><a href="<?=$rootdir?>lids/all" >Общий список</a></li>
-                                    </ul>
-                                </li>
+                                <li><a href="<?=$rootdir?>lids/current">Лиды</a></li>
                                 <li><a href="<?=$rootdir?>certificates">Сертификаты</a></li>
                                 <li><a href="<?=$rootdir?>finances">Финансы</a></li>
-                                <li class="dropdown">
-                                    <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$rootdir?>tasks">Задачи
-                                        <span class="caret"></span></a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="<?=$rootdir?>tasks/all" >Общий список задач</a></li>
-                                        <li><a href="<?=$rootdir?>tasks/today" >Список задач "на сегодня"</a></li>
-                                        <li><a href="<?=$rootdir?>tasks/active" >Актуальные задачи</a></li>
-                                    </ul>
-                                </li>
+                                <li><a href="<?=$rootdir?>tasks/active">Задачи</a></li>
                                 <?
                                 if($oUser->superuser() == 1)
                                 {

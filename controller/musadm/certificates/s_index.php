@@ -15,10 +15,6 @@ $accessRules = array(
 if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
 {
     $this->error404();
-//    $host  = $_SERVER['HTTP_HOST'];
-//    $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-//    $extra = $_SERVER["REQUEST_URI"];
-//    header("Location: http://$host$uri/authorize?back=$host$uri"."$extra");
     exit;
 }
 
@@ -35,8 +31,45 @@ $this->setParam( "breadcumbs", $breadcumbs );
 
 $action = Core_Array::getValue($_GET, "action", "");
 
-if($action === "refreshCertificatesTable")
+if( $action === "refreshCertificatesTable" )
 {
     $this->execute();
+    exit;
+}
+
+
+if( $action === "saveCertificate" )
+{
+    $sellDate = Core_Array::getValue( $_GET, "sellDate", date( "Y-m-d" ) );
+    $activeTo = Core_Array::getValue( $_GET, "activeTo", "" );
+    $number =   Core_Array::getValue( $_GET, "number", "000" );
+    $note =     Core_Array::getValue( $_GET, "note", "" );
+
+    $oCertificate = Core::factory( "Certificate" )
+        ->sellDate( $sellDate )
+        ->activeTo( $activeTo )
+        ->number( $number );
+
+    $oCertificate->save();
+
+    $oCertificateNote = Core::factory( "Certificate_Note" )
+        ->text( $note )
+        ->certificateId( $oCertificate->getId() )
+        ->save();
+
+    exit;
+}
+
+
+if( $action === "saveCertificateNote" )
+{
+    $note = Core_Array::getValue( $_GET, "note", "" );
+    $certId = Core_Array::getValue( $_GET, "certificate_id", 0 );
+
+    $oCertificateNote = Core::factory( "Certificate_Note" )
+        ->text( $note )
+        ->certificateId( $certId )
+        ->save();
+
     exit;
 }

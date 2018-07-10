@@ -1,11 +1,16 @@
 $(function(){
 
+    var days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
+
     $("body")
         //Изменение даты на календаре
         .on("change", ".schedule_calendar", function(){
             loaderOn();
             var date = $(this).val();
             var userid = $("#userid").val();
+            var newDate = new Date( $(".schedule_calendar").val() );
+            var dayName = days[newDate.getDay() - 1];
+            $(".day_name").text( dayName );
             getSchedule(userid, date, loaderOff);
         })
         //Открытие окна с выставлением периода отсутствия
@@ -19,6 +24,14 @@ $(function(){
         .on("click", ".popop_schedule_absent_submit", function(e){
             e.preventDefault();
             loaderOn();
+
+            if( $("#absent_add_task").is(":checked") )
+            {
+                var dateTo = $("input[name=dateTo]").val();
+                var clientId = $("input[name=clientId]").val();
+                addAbsentTask(dateTo, clientId);
+            }
+
             saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", refreshSchedule);
         })
         //Окно добавления урока в расписание
@@ -188,23 +201,19 @@ $(function(){
             var month = $("#month").val();
             var year = $("#year").val();
             var userid = $("#userid").val();
-            var areaid = $("#areaid").val();
 
             $.ajax({
                 type: "GET",
                 url: "",
                 data: {
-                    action: "getSchedule",
+                    ajax: 1,
                     year: year,
                     month: month,
                     userid: userid,
-                    areaid: areaid
                 },
                 success: function(responce){
-                    $(".schedule").empty();
-                    $(".schedule").html(responce);
-                    $("#year").val(year);
-                    $("#month").val(month);
+                    $(".page").empty();
+                    $(".page").html(responce);
                     loaderOff();
                 }
             });
@@ -215,6 +224,8 @@ $(function(){
     var day =   today.getDate();
     var month = today.getMonth() + 1;
     var year =  today.getFullYear();
+
+    $(".day_name").text( days[today.getDay() - 1] );
 
     if(day < 10)    day = "0" + day;
     if(month < 10)  month = "0" + month;
@@ -334,6 +345,8 @@ function getScheduleLessonPopup(class_id, date, area_id, type) {
         },
         success: function(responce){
             showPopup(responce);
+            $("select[name=typeId]").val("1");
+            $("select[name=typeId]").trigger("change");
         }
     });
 }
@@ -348,7 +361,6 @@ function markDeleted(lessonid, deletedate, func) {
             deletedate: deletedate
         },
         success: function(responce){
-            //alert(responce);
             func();
         }
     });
@@ -370,11 +382,6 @@ function markAbsent(lessonid, date, func) {
 }
 
 
-function changeTime(lessonid, model_name, time1, time2) {
-
-}
-
-
 function getScheduleChangeTimePopup(lessonid, model_name, date) {
     $.ajax({
         type: "GET",
@@ -387,6 +394,23 @@ function getScheduleChangeTimePopup(lessonid, model_name, date) {
         },
         success: function(responce){
             showPopup(responce)
+        }
+    });
+}
+
+
+function addAbsentTask(dateTo, clientId) {
+    $.ajax({
+        type: "GET",
+        url: "",
+        data: {
+            action: "addAbsentTask",
+            date_to: dateTo,
+            client_id: clientId
+        },
+        success: function(responce){
+            if(responce != "")  alert(responce);
+
         }
     });
 }

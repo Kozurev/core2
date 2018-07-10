@@ -31,6 +31,12 @@
             <div class="column">
                 <input class="form-control" type="date" name="dateTo"  />
             </div>
+            <div class="column">
+                <span>Напомнить администратору о выходе ученика</span>
+            </div>
+            <div class="column">
+                <input type="checkbox" id="absent_add_task" />
+            </div>
 
             <input type="hidden" name="id" value="" />
             <input type="hidden" value="{//clientid}" name="clientId" />

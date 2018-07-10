@@ -3,14 +3,12 @@
     <xsl:template match="root">
 
         <div class="lids">
-            <xsl:if test="structure_type = 'all'">
-                <div class="finances_calendar">
-                    Период
-                    с: <input type="date" class="form-control" name="date_from" value="{date_from}"/>
-                    по: <input type="date" class="form-control" name="date_to" value="{date_to}"/>
-                    <a class="btn btn-purple lids_show" >Показать</a>
-                </div>
-            </xsl:if>
+            <div class="finances_calendar">
+                Период
+                с: <input type="date" class="form-control" name="date_from" value="{date_from}"/>
+                по: <input type="date" class="form-control" name="date_to" value="{date_to}"/>
+                <a class="btn btn-purple lids_show" >Показать</a>
+            </div>
 
             <table class="table lids">
                 <form name="lid_form">
@@ -67,7 +65,7 @@
             </xsl:choose>
         </xsl:variable>
 
-        <div class="item item-{$status} col-md-4 col-sm-6 col-xs-6">
+        <div class="item item-{$status} col-md-6 col-sm-12 col-xs-12">
             <div class="item-inner">
                 <h3 class="title">
                     <xsl:value-of select="surname" /><xsl:text> </xsl:text>
@@ -99,6 +97,23 @@
                     </input>
                 </p>
 
+                <select name="status" class="form-control lid_status" data-lidid="{id}">
+                    <xsl:variable name="status_id" select="property_value/id" />
+                    <xsl:for-each select="/root/status">
+                        <xsl:variable name="id" select="id" />
+                        <option value="{$id}">
+                            <xsl:if test="$id = $status_id">
+                                <xsl:attribute name="selected">selected</xsl:attribute>
+                            </xsl:if>
+                            <xsl:value-of select="value" />
+                        </option>
+                    </xsl:for-each>
+                </select>
+
+                <div class="comment_button_box">
+                    <a class="btn btn-purple add_lid_comment" data-lidid="{id}">Добавить комментарий</a>
+                </div>
+
                 <div class="comments">
                     <input type="hidden" value="KOCTb|J|b" />
                     <xsl:for-each select="lid_comment">
@@ -120,23 +135,6 @@
                             </div>
                         </div>
                     </xsl:for-each>
-                </div>
-
-                <select name="status" class="form-control lid_status" data-lidid="{id}">
-                    <xsl:variable name="status_id" select="property_value/id" />
-                    <xsl:for-each select="/root/status">
-                        <xsl:variable name="id" select="id" />
-                        <option value="{$id}">
-                            <xsl:if test="$id = $status_id">
-                                <xsl:attribute name="selected">selected</xsl:attribute>
-                            </xsl:if>
-                            <xsl:value-of select="value" />
-                        </option>
-                    </xsl:for-each>
-                </select>
-
-                <div class="comment_button_box">
-                    <a class="btn btn-purple add_lid_comment" data-lidid="{id}">Добавить комментарий</a>
                 </div>
 
                 <!-- <a class="link" href="license.html"><span></span></a> -->

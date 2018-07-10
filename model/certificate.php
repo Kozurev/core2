@@ -71,4 +71,14 @@ class Certificate extends Core_Entity
     }
 
 
+    public function getNotes()
+    {
+        return Core::factory( "Certificate_Note" )
+            ->select( array( "Certificate_Note.id", "date", "certificate_id", "author_id", "text", "usr.surname", "usr.name" ) )
+            ->join( "User as usr", "author_id = usr.id" )
+            ->where( "certificate_id", "=", $this->id )
+            ->findAll();
+
+    }
+
 }

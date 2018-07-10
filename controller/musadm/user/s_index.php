@@ -29,11 +29,11 @@ $this->setParam( "breadcumbs", $breadcumbs );
 
 
 
-if(!$this->oStructureItem)
-{
-    $this->error404();
-    exit;
-}
+//if(!$this->oStructureItem)
+//{
+//    $this->error404();
+//    exit;
+//}
 
 /*
 *	Блок проверки авторизации
@@ -44,16 +44,16 @@ $accessRules = array(
     "groups"    => array(1, 2)
 );
 
-if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
-{
-    $this->error404();
-    exit;
-}
+//if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
+//{
+//    $this->error404();
+//    exit;
+//}
 
-if(is_object($oUser) && $oUser->groupId() > 3)
-{
-    $this->error404();
-}
+//if(is_object($oUser) && $oUser->groupId() > 3)
+//{
+//    $this->error404();
+//}
 
 $action = Core_Array::getValue($_GET, "action", null);
 
@@ -148,39 +148,6 @@ if($action == "updateFormTeacher")
  */
 if($action == "refreshTableUsers")
 {
-//    $groupId = Core_Array::getValue($_GET, "group", 0);
-//    $oProperty = Core::factory("Property");
-//
-//    $groupId = $this->oStructureItem->getId();
-//    $groupId == 5
-//        ?   $xsl = "musadm/users/clients.xsl"
-//        :   $xsl = "musadm/users/teachers.xsl";
-//
-//
-//    $aoUsers = Core::factory("User")
-//        ->where("group_id", "=", $groupId)
-//        ->where("active", "=", 1)
-//        ->orderBy("id", "DESC")
-//        ->findAll();
-//
-//    foreach ($aoUsers as $user)
-//    {
-//        $aoPropertiesList = $oProperty->getPropertiesList($user);
-//        foreach ($aoPropertiesList as $prop)
-//        {
-//            $user->addEntities($prop->getPropertyValues($user), "property_value");
-//        }
-//    }
-//
-//    $output = Core::factory("Core_Entity")
-//        ->addEntity(
-//            Core::factory("Core_Entity")
-//                ->name("table_type")
-//                ->value("active")
-//        )
-//        ->xsl($xsl)
-//        ->addEntities($aoUsers)
-//        ->show();
     $this->execute();
     exit;
 }
@@ -229,6 +196,24 @@ if($action == "savePayment")
     $oUserBalance->save();
 
     echo 0;
+    exit;
+}
+
+
+if( $action == "checkLoginExists" )
+{
+    $userid = Core_Array::getValue( $_GET, "userid", 0 );
+    $login = Core_Array::getValue( $_GET, "login", "" );
+
+    if( $login == "" )  die("Логин не может быть пустым");
+
+    $oUser = Core::factory( "User" )
+        ->where( "id", "<>", $userid )
+        ->where( "login", "=", $login )
+        ->find();
+
+    if( $oUser != false )   die("Пользователь с таким логином уже существует");
+
     exit;
 }
 

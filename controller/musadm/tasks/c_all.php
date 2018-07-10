@@ -7,20 +7,22 @@
  */
 
 $dateFormat = "Y-m-d";
-$oDate = new DateTime(date($dateFormat));
-$interval = new DateInterval("P1M");
-$defaultDateFrom = $oDate->sub($interval)->format($dateFormat);
-$defaultDateTo = date($dateFormat);
+//$oDate = new DateTime(date($dateFormat));
+//$interval = new DateInterval("P1M");
+//$defaultDateFrom = $oDate->sub($interval)->format($dateFormat);
+//$defaultDateTo = date($dateFormat);
 
-
-$dateFrom = Core_Array::getValue($_GET, "date_from", $defaultDateFrom);
-$dateTo = Core_Array::getValue($_GET, "date_to", $defaultDateTo);
+$dateFrom = Core_Array::getValue($_GET, "date_from", "");
+$dateTo = Core_Array::getValue($_GET, "date_to", "");
 
 $aoTasks = Core::factory("Task")
-    ->between("date", $dateFrom, $dateTo)
+    //->between("date", $dateFrom, $dateTo)
     ->orderBy("date", "DESC")
-    ->orderBy("id", "DESC")
-    ->findAll();
+    ->orderBy("id", "DESC");
+if( $dateFrom != "" )   $aoTasks->where( "date", ">=", $dateFrom );
+if( $dateTo != "" )     $aoTasks->where( "date", "<=", $dateTo );
+$aoTasks = $aoTasks->findAll();
+
 $aoTypes = Core::factory("Task_Type")->findAll();
 
 foreach ($aoTasks as $task)

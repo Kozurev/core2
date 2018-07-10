@@ -25,7 +25,7 @@ $(function(){
         .on("click", ".popop_user_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("../admin?menuTab=User&menuAction=updateAction&ajax=1", refreshUserTable);
+            userSave(refreshUserTable);
             //refreshUserTable();
         })
         //Добавление пользователя в архив
@@ -44,6 +44,7 @@ $(function(){
             var userid = $(this).data("userid");
             changeUserActive(userid, "true");
         })
+        //Удаление пользователя
         .on("click", ".user_delete", function(e){
             e.preventDefault();
             var userid = $(this).data("model_id");
@@ -60,6 +61,7 @@ $(function(){
             var userid = $(this).data("userid");
             getPaymentPopup(userid, "client");
         })
+        //Сохранение платежа
         .on("click", ".popop_user_payment_submit", function(e){
             e.preventDefault();
             loaderOn();
@@ -75,16 +77,19 @@ $(function(){
             var type = $(form).find("input[name=type]:checked").val();
             savePayment(userid, value, description, type, "client", refreshUserTable);
         })
+        //Сохранение заметок клиента
         .on("blur", "#client_notes", function(){
             loaderOn();
             var note = $(this).val();
             var userid = $(this).data("userid");
             updateUserNote(userid, note, loaderOff);
         })
+        //Сохранение логина клиента в личном кабинете
         .on("click", ".change_login_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("../admin?menuTab=User&menuAction=updateAction&ajax=1", loaderOff);
+            userSave(loaderOff);
+            //saveData("../admin?menuTab=User&menuAction=updateAction&ajax=1", loaderOff);
             $("input[name=pass1]").val('');
             $("input[name=pass2]").val('');
         })
@@ -97,7 +102,6 @@ $(function(){
                 type: "GET",
                 url: "",
                 data: {
-                    //ajax: 1,
                     date_from: date_from,
                     date_to: date_to
                 },
@@ -109,6 +113,36 @@ $(function(){
             });
         });
 });
+
+
+function userSave(func) {
+    var login = $("input[name=login]").val();
+    var userid = $("input[name=id]").val();
+
+    $.ajax({
+        type: "GET",
+        url: "client",
+        data: {
+            action: "checkLoginExists",
+            login: login,
+            userid: userid
+        },
+        success: function(responce){
+            if(responce != "")
+            {
+                alert(responce);
+                loaderOff();
+            }
+            else
+            {
+                if( $("#createData").valid() )
+                    saveData("../admin?menuTab=User&menuAction=updateAction&ajax=1", func);
+                else
+                    loaderOff();
+            }
+        }
+    });
+}
 
 
 function updateUserNote(userid, note, func) {

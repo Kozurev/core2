@@ -54,8 +54,17 @@
 // }
 
 
+//$aoCertificates = Core::factory( "Certificate" )->findAll();
+//
+//foreach ( $aoCertificates as $certificate )
+//{
+//    $oCertificateNote = Core::factory( "Certificate_Note" )
+//        ->authorId( 5 )
+//        ->certificateId( $certificate->getId() )
+//        ->text( $certificate->note() );
+//
+//    $oCertificateNote->save();
+//}
 
-
-$oLesson = Core::factory( "Schedule_Lesson", 238 );
-
-debug( $oLesson->isAbsent("2018-07-10"), 1 );
+$oCertificate = Core::factory( "Certificate", 5 );
+debug( $oCertificate->getNotes() );

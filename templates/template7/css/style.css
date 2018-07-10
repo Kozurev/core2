@@ -11,11 +11,18 @@
 	width: 14%;
 	position: relative;
 	left: 43%;
+	display: inline-block;
 }
 
 .schedule .teacher_footer {
 	font-size: 17px;
 	text-align: center;
+}
+
+.day_name {
+	position: relative;
+	left: 500px;
+	font-size: 18px;
 }
 
 

@@ -18,6 +18,11 @@
                         <xsl:text>%)</xsl:text>
                     </td>
                 </tr>
+
+                <tr>
+                    <td>Дневной индекс</td>
+                    <td><xsl:value-of select="day_index" /></td>
+                </tr>
             </table>
         </div>
     </xsl:template>

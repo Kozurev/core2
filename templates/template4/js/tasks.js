@@ -160,7 +160,7 @@ function updateTaskDate(taskId, taskDate) {
 
 
 function refreshTableAll(from, to) {
-    var url = $("table_type").val();
+    var url = "all";//$("table_type").val();
 
     $.ajax({
         type: "GET",

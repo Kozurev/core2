@@ -125,19 +125,36 @@ class Schedule_Current_Lesson extends Schedule_Current_Lesson_Model
 
         foreach ($aoLessons as $lesson)
         {
-            if( !$lesson->isAbsent($this->date) )
-            {
-                $iModified = Core::factory("Schedule_Lesson_TimeModified")
-                    ->where( "lesson_id", "=", $lesson->getId() )
-                    ->where( "date", "=", $this->date )
-                    ->open()
-                    ->between( "time_from", $this->time_from, $this->time_to )
-                    ->between( "timw_from", $this->time_from, $this->time_to, "OR" )
-                    ->close()
-                    ->getCount();
+            $clientAbsent = false;
 
-                if( $iModified > 0 )
-                    die("Добавление невозможно по причине пересечения с другим занятием 123");
+            if( $lesson->typeId() == 2 )
+            {
+                $clientAbsent = false;
+            }
+            else
+            {
+                $oClientAbsent = Core::factory("Schedule_Absent")
+                    ->where("id", "<>", $this->id)
+                    ->where("client_id", "=", $lesson->clientId())
+                    ->open()
+                    ->where("date_from", "<=", $this->date)
+                    ->where("date_to", ">=", $this->date)
+                    ->close()
+                    ->find();
+
+                if( $oClientAbsent != false )
+                {
+                    $clientAbsent = true;
+                }
+                else
+                {
+                    $clientAbsent = false;
+                }
+            }
+
+            if($clientAbsent == false && !$lesson->isAbsent($this->date))
+            {
+                die("Добавление невозможно по причине пересечения с другим занятием ");
             }
             else
             {

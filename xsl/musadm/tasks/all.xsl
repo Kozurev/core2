@@ -4,14 +4,12 @@
 
         <input id="table_type" type="hidden" value="{table_name}" />
 
-        <xsl:if test="table_name = 'all'">
-            <div class="finances_calendar">
-                Период
-                с: <input type="date" class="form-control" name="date_from" value="{date_from}"/>
-                по: <input type="date" class="form-control" name="date_to" value="{date_to}"/>
-                <a class="btn btn-red tasks_show" >Показать</a>
-            </div>
-        </xsl:if>
+        <div class="finances_calendar">
+            Период
+            с: <input type="date" class="form-control" name="date_from" value="{date_from}"/>
+            по: <input type="date" class="form-control" name="date_to" value="{date_to}"/>
+            <a class="btn btn-red tasks_show" >Показать</a>
+        </div>
 
         <div style="text-align: right; margin-bottom:20px">
             <a class="btn btn-red task_create">Добавить задачу</a>

@@ -11,22 +11,24 @@
 
         <div class="attendance">
             <h3>История занятий</h3>
-            <div class="finances_calendar">
-                Период
-                с: <input type="date" class="form-control" name="date_from" value="{date_from}"/>
-                по: <input type="date" class="form-control" name="date_to" value="{date_to}"/>
-                <a class="btn btn-orange balance_show">Показать</a>
-            </div>
+            <!--<div class="finances_calendar">-->
+                <!--Период-->
+                <!--с: <input type="date" class="form-control" name="date_from" value="{date_from}"/>-->
+                <!--по: <input type="date" class="form-control" name="date_to" value="{date_to}"/>-->
+                <!--<a class="btn btn-orange balance_show">Показать</a>-->
+            <!--</div>-->
 
-            <table class="table table-bordered">
-                <tr class="header">
-                    <th>Дата</th>
-                    <th>Время</th>
-                    <th>Статус</th>
-                    <th>Преподаватель</th>
-                </tr>
-                <xsl:apply-templates select="schedule_lesson_report" />
-            </table>
+            <div class="balance-lessons">
+                <table class="table table-bordered">
+                    <tr class="header">
+                        <th>Дата</th>
+                        <th>Время</th>
+                        <th>Статус</th>
+                        <th>Преподаватель</th>
+                    </tr>
+                    <xsl:apply-templates select="schedule_lesson_report" />
+                </table>
+            </div>
 
             <p>Всего занятий за данный период: <xsl:value-of select="count(schedule_lesson_report)" /></p>
             <p>Из них явки/неявки:

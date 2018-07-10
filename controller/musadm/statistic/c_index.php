@@ -160,37 +160,6 @@ $aoStatuses = Core::factory("Property_List_Values")
 		}
 	}
 
-// $Orm
-//     ->select("count(lid.id)", "count")
-//     ->select("val.value", "status")
-//     ->from("Lid AS lid")
-//     ->join("Property_List AS pl", "pl.object_id = lid.id")
-//     ->join("Property_List_Values AS val", "pl.value_id = val.id")
-//     ->where("pl.model_name = 'Lid'")
-//     ->where("pl.property_id", "=", 27)
-//     ->between("control_date", $dateFrom, $dateTo)
-//     ->groupBy("val.value");
-// $queryString = $Orm->getQueryString();
-// $aoResults = $Orm->executeQuery($queryString);
-
-// if($aoResults != false)
-// {
-//     $aoResults = $aoResults->fetchAll();
-
-//     foreach ($aoResults as $res)
-//     {
-//         $oStatus = new stdClass();
-//         $oStatus->name = $res["status"];
-
-//         if($totalCount != 0)
-//             $oStatus->percents = intval($res["count"] * 100 / $totalCount);
-//         else
-//             $oStatus->percents = 0;
-
-//         $oLidsOutput->addEntity($oStatus, "status");
-//     }
-// }
-
 $oLidsOutput
     ->addSimpleEntity("total", $totalCount)
     ->xsl("musadm/statistic/lids.xsl")
@@ -244,11 +213,18 @@ else
     $attendancePercent = 0;
 }
 
+//Кол-во дней за указанный промежуток
+$countDaysInterval = ( strtotime( $dateTo ) - strtotime( $dateFrom ) ) / ( 60*60*24 );
+$countDaysInterval = intval( $countDaysInterval );
+
+$lessonIndex = $lessonReportsCount / $countDaysInterval;
+
 Core::factory("Core_Entity")
-    ->addSimpleEntity("total_count", $lessonReportsCount)
-    ->addSimpleEntity("attendance_count", $attendanceCount)
-    ->addSimpleEntity("attendance_percent", $attendancePercent)
-    ->xsl("musadm/statistic/lessons.xsl")
+    ->addSimpleEntity( "day_index", $lessonIndex )
+    ->addSimpleEntity( "total_count", $lessonReportsCount )
+    ->addSimpleEntity( "attendance_count", $attendanceCount )
+    ->addSimpleEntity( "attendance_percent", $attendancePercent )
+    ->xsl( "musadm/statistic/lessons.xsl" )
     ->show();
 
 echo "</div>";

@@ -516,6 +516,40 @@ if( $oUser->groupId() < 5 ) {
         $time = addTime($time, $period);
         echo "</tr>";
     }
+
+
+    echo "<tr>";
+    for ($i = 1; $i <= $oArea->countClassess(); $i++) {
+        echo "<th>Время</th>";
+        echo "<th";
+        if (User::checkUserAccess(array("groups" => array(1, 2)), $oUser))
+            echo " class='add_lesson' ";
+        echo "
+        data-schedule_type='Schedule_Lesson'
+        data-class_id='" . $i . "'
+        data-date='" . $date . "'
+        data-area_id='" . $areaId . "'
+        data-dayName='" . $dayName . "'
+        >Основной график</th>";
+        echo "<th";
+        if (User::checkUserAccess(array("groups" => array(1, 2)), $oUser))
+            echo " class='add_lesson' ";
+        echo "
+        data-schedule_type='Schedule_Current_Lesson'
+        data-class_id='" . $i . "'
+        data-date='" . $date . "'
+        data-area_id='" . $areaId . "'
+        data-dayName='" . $dayName . "'
+    >Актуальный график</th>";
+    }
+    echo "</tr>";
+
+    echo "<tr>";
+    for ($i = 1; $i <= $oArea->countClassess(); $i++) {
+        echo "<th colspan='3'>КЛАСС $i</th>";
+    }
+    echo "</tr>";
+
     /**
      * << Конец
      * Формирование таблицы расписания
