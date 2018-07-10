@@ -32,12 +32,12 @@
 }
 
 .balance-lessons {
-    height: 430px;
+    max-height: 430px;
     overflow: scroll;
 }
 
 .balance-payments {
-    height: 590px;
+    max-height: 590px;
     overflow: scroll;
 }
 
