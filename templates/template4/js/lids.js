@@ -47,9 +47,21 @@ $(function(){
 });
 
 function refreshLidTable(from, to) {
+
+    var url;
+
+    if( from == undefined && to == undefined )
+    {
+        url = "current";
+    }
+    else
+    {
+        url = "all";
+    }
+
     $.ajax({
         type: "GET",
-        url: "all",
+        url: url,
         async: false,
         data: {
             action: "refreshLidTable",

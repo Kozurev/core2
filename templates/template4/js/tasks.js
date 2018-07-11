@@ -104,12 +104,12 @@ $(function(){
 function addTaskNotePopup(task_id) {
     var popupData = "" +
         "<form name=\"createData\" id=\"createData\" action=\".\" novalidate=\"novalidate\">" +
-            "<div class=\"column\"><span>Текст задачи</span><span style=\"color:red\">*</span></div>" +
-            "<div class=\"column\"><input type=\"text\" required name=\"text\" class=\"form-control\"></div>" +
-            "<input type='hidden' name='id' value=''>" +
-            "<input type='hidden' name='modelName' value='Task_Note'>" +
-            "<input type='hidden' name='taskId' value='"+task_id+"'>" +
-            "<button class=\"popop_task_note_submit btn btn-default\">Сохранить</button>" +
+        "<div class=\"column\"><span>Текст задачи</span><span style=\"color:red\">*</span></div>" +
+        "<div class=\"column\"><input type=\"text\" required name=\"text\" class=\"form-control\"></div>" +
+        "<input type='hidden' name='id' value=''>" +
+        "<input type='hidden' name='modelName' value='Task_Note'>" +
+        "<input type='hidden' name='taskId' value='"+task_id+"'>" +
+        "<button class=\"popop_task_note_submit btn btn-default\">Сохранить</button>" +
         "</form>";
 
     showPopup(popupData);
@@ -160,7 +160,16 @@ function updateTaskDate(taskId, taskDate) {
 
 
 function refreshTableAll(from, to) {
-    var url = "all";//$("table_type").val();
+    var url; // = $("table_type").val();
+
+    if( from == undefined && to == undefined )
+    {
+        url = "active";
+    }
+    else
+    {
+        url = "all";
+    }
 
     $.ajax({
         type: "GET",
