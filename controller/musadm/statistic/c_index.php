@@ -217,7 +217,12 @@ else
 $countDaysInterval = ( strtotime( $dateTo ) - strtotime( $dateFrom ) ) / ( 60*60*24 );
 $countDaysInterval = intval( $countDaysInterval );
 
-$lessonIndex = round( $lessonReportsCount / $countDaysInterval, 1 );
+$attendanceLessonsCount = Core::factory("Schedule_Lesson_Report")
+    ->where( "attendance", "=", 1 )
+    ->between( "date", $dateFrom, $dateTo )
+    ->getCount();
+
+$lessonIndex = round( $attendanceLessonsCount / $countDaysInterval, 1 );
 
 Core::factory("Core_Entity")
     ->addSimpleEntity( "day_index", $lessonIndex )
