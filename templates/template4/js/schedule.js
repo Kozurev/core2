@@ -1,6 +1,6 @@
 $(function(){
 
-    var days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
+    var days = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
 
     $("body")
         //Изменение даты на календаре
@@ -9,7 +9,8 @@ $(function(){
             var date = $(this).val();
             var userid = $("#userid").val();
             var newDate = new Date( $(".schedule_calendar").val() );
-            var dayName = days[newDate.getDay() - 1];
+            console.log( newDate.getDay() );
+            var dayName = days[newDate.getDay()];
             $(".day_name").text( dayName );
             getSchedule(userid, date, loaderOff);
         })
@@ -225,7 +226,7 @@ $(function(){
     var month = today.getMonth() + 1;
     var year =  today.getFullYear();
 
-    $(".day_name").text( days[today.getDay() - 1] );
+    $(".day_name").text( days[today.getDay()] );
 
     if(day < 10)    day = "0" + day;
     if(month < 10)  month = "0" + month;

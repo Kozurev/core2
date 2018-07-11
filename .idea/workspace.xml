@@ -3,8 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="0e9b67c4-a6a1-4b7e-a8c4-08c782e4c07a" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/controller/musadm/statistic/c_index.php" afterPath="$PROJECT_DIR$/controller/musadm/statistic/c_index.php" />
-      <change beforePath="$PROJECT_DIR$/model/core/entity.php" afterPath="$PROJECT_DIR$/model/core/entity.php" />
-      <change beforePath="$PROJECT_DIR$/xml.xml" afterPath="$PROJECT_DIR$/xml.xml" />
+      <change beforePath="$PROJECT_DIR$/templates/template4/js/schedule.js" afterPath="$PROJECT_DIR$/templates/template4/js/schedule.js" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -40,18 +39,18 @@
       <file leaf-file-name="c_index.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/controller/musadm/statistic/c_index.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="618">
-              <caret line="216" column="86" lean-forward="true" selection-start-line="216" selection-start-column="86" selection-end-line="216" selection-end-column="86" />
+            <state relative-caret-position="686">
+              <caret line="232" column="24" lean-forward="false" selection-start-line="232" selection-start-column="24" selection-end-line="232" selection-end-column="24" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="entity.php" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/model/core/entity.php">
+      <file leaf-file-name="schedule.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/templates/template4/js/schedule.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="448">
-              <caret line="175" column="10" lean-forward="false" selection-start-line="175" selection-start-column="10" selection-end-line="175" selection-end-column="10" />
+            <state relative-caret-position="408">
+              <caret line="231" column="40" lean-forward="true" selection-start-line="231" selection-start-column="40" selection-end-line="231" selection-end-column="40" />
               <folding />
             </state>
           </provider>
@@ -91,6 +90,7 @@
       <find>schedule_calendar</find>
       <find>lessonType</find>
       <find>be</find>
+      <find>day_name</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -111,7 +111,6 @@
         <option value="$PROJECT_DIR$/templates/template4/css/style.css" />
         <option value="$PROJECT_DIR$/templates/template10/assets/css/custom.css" />
         <option value="$PROJECT_DIR$/controller/musadm/schedule/c_schedule(backup).php" />
-        <option value="$PROJECT_DIR$/templates/template4/js/schedule.js" />
         <option value="$USER_HOME$/AppData/Local/Temp/fz3temp-2/schedule.js" />
         <option value="$USER_HOME$/AppData/Local/Temp/fz3temp-2/config.php" />
         <option value="$PROJECT_DIR$/templates/template4/template.php" />
@@ -137,9 +136,10 @@
         <option value="$PROJECT_DIR$/templates/template4/js/tasks.js" />
         <option value="$PROJECT_DIR$/controller/musadm/balance/c_balance.php" />
         <option value="$PROJECT_DIR$/templates/template4/js/lids.js" />
+        <option value="$PROJECT_DIR$/model/core/entity.php" />
         <option value="$PROJECT_DIR$/controller/musadm/statistic/c_index.php" />
         <option value="$USER_HOME$/AppData/Local/Temp/fz3temp-2/c_index.php" />
-        <option value="$PROJECT_DIR$/model/core/entity.php" />
+        <option value="$PROJECT_DIR$/templates/template4/js/schedule.js" />
       </list>
     </option>
   </component>
@@ -182,24 +182,20 @@
             <path>
               <item name="musadm" type="b2602c69:ProjectViewProjectNode" />
               <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="controller" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="templates" type="2a2b976b:PhpTreeStructureProvider$1" />
             </path>
             <path>
               <item name="musadm" type="b2602c69:ProjectViewProjectNode" />
               <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="controller" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="templates" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="template4" type="2a2b976b:PhpTreeStructureProvider$1" />
             </path>
             <path>
               <item name="musadm" type="b2602c69:ProjectViewProjectNode" />
               <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="model" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="musadm" type="b2602c69:ProjectViewProjectNode" />
-              <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="model" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="core" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="templates" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="template4" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="js" type="2a2b976b:PhpTreeStructureProvider$1" />
             </path>
           </expand>
           <select />
@@ -251,13 +247,12 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="44391000" />
+    <option name="totallyTimeSpent" value="45886000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19349681" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19349681" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -420,13 +415,6 @@
       </provider>
     </entry>
     <entry file="file://$USER_HOME$/AppData/Local/Temp/fz3temp-2/c_schedule.php" />
-    <entry file="file://$PROJECT_DIR$/templates/template4/js/schedule.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="493">
-          <caret line="212" column="0" lean-forward="true" selection-start-line="212" selection-start-column="0" selection-end-line="212" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/template4/js/js.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -535,6 +523,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="476">
           <caret line="81" column="12" lean-forward="true" selection-start-line="81" selection-start-column="12" selection-end-line="81" selection-end-column="12" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -575,26 +564,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/model/core/entity.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="397">
+          <caret line="172" column="67" lean-forward="true" selection-start-line="172" selection-start-column="67" selection-end-line="172" selection-end-column="67" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$USER_HOME$/AppData/Local/Temp/fz3temp-2/c_index.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="771">
-          <caret line="236" column="14" lean-forward="false" selection-start-line="236" selection-start-column="14" selection-end-line="236" selection-end-column="14" />
+        <state relative-caret-position="839">
+          <caret line="240" column="14" lean-forward="false" selection-start-line="240" selection-start-column="14" selection-end-line="240" selection-end-column="14" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/controller/musadm/statistic/c_index.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="618">
-          <caret line="216" column="86" lean-forward="true" selection-start-line="216" selection-start-column="86" selection-end-line="216" selection-end-column="86" />
+        <state relative-caret-position="686">
+          <caret line="232" column="24" lean-forward="false" selection-start-line="232" selection-start-column="24" selection-end-line="232" selection-end-column="24" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/model/core/entity.php">
+    <entry file="file://$PROJECT_DIR$/templates/template4/js/schedule.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="448">
-          <caret line="175" column="10" lean-forward="false" selection-start-line="175" selection-start-column="10" selection-end-line="175" selection-end-column="10" />
+        <state relative-caret-position="408">
+          <caret line="231" column="40" lean-forward="true" selection-start-line="231" selection-start-column="40" selection-end-line="231" selection-end-column="40" />
           <folding />
         </state>
       </provider>

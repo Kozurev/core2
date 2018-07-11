@@ -199,8 +199,9 @@ $lessonReportsCount = Core::factory("Schedule_Lesson_Report")
     ->getCount();
 
 $attendanceCount = Core::factory("Schedule_Lesson_Report")
-    ->between("date", $dateFrom, $dateTo)
-    ->where("attendance", "=", 1)
+    ->where( "date", ">=", $dateFrom )
+    ->where( "date", "<=", $dateTo )
+    ->where( "attendance", "=", 1 )
     ->getCount();
 
 if( $lessonReportsCount != 0 )
@@ -222,7 +223,10 @@ $attendanceLessonsCount = Core::factory("Schedule_Lesson_Report")
     ->between( "date", $dateFrom, $dateTo )
     ->getCount();
 
-$lessonIndex = round( $attendanceLessonsCount / $countDaysInterval, 1 );
+if( $countDaysInterval == 0 )
+    $lessonIndex = $attendanceLessonsCount;
+else
+    $lessonIndex = round( $attendanceLessonsCount / $countDaysInterval, 1 );
 
 Core::factory("Core_Entity")
     ->addSimpleEntity( "day_index", $lessonIndex )
