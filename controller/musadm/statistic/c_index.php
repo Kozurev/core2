@@ -216,17 +216,20 @@ else
 
 //Кол-во дней за указанный промежуток
 $countDaysInterval = ( strtotime( $dateTo ) - strtotime( $dateFrom ) ) / ( 60*60*24 );
-$countDaysInterval = intval( $countDaysInterval );
+$countDaysInterval = intval( $countDaysInterval ) + 1;
 
 $attendanceLessonsCount = Core::factory("Schedule_Lesson_Report")
     ->where( "attendance", "=", 1 )
-    ->between( "date", $dateFrom, $dateTo )
+    ->where( "date", ">=", $dateFrom )
+    ->where( "date", "<=", $dateTo )
+    //->between( "date", $dateFrom, $dateTo )
     ->getCount();
 
 if( $countDaysInterval == 0 )
     $lessonIndex = $attendanceLessonsCount;
 else
     $lessonIndex = round( $attendanceLessonsCount / $countDaysInterval, 1 );
+
 
 Core::factory("Core_Entity")
     ->addSimpleEntity( "day_index", $lessonIndex )
