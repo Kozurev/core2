@@ -66,5 +66,3 @@
 //    $oCertificateNote->save();
 //}
 
-$oCertificate = Core::factory( "Certificate", 5 );
-debug( $oCertificate->getNotes() );

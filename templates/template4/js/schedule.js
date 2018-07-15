@@ -72,9 +72,9 @@ $(function(){
             var date = $(this).parent().parent().data("date");
             var type = $(this).parent().parent().data("type");
             
-            if(type == "Schedule_Lesson")
+            if(type == "1")
                 markAbsent(lessonid, date, refreshSchedule);
-            if(type == "Schedule_Current_Lesson")
+            if(type == "2")
                 deleteItem(type, lessonid, "../admin?menuTab=Main&menuAction=deleteAction&ajax=1", refreshSchedule);
 
             loaderOff();

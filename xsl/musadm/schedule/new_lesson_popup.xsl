@@ -24,7 +24,7 @@
 
 
         <form name="createData" id="createData" action=".">
-            <center><h2>Добавление урока в основное расписание</h2></center>
+            <center><h2>Добавление урока в <xsl:value-of select="schedule_type" /> расписание</h2></center>
 
             <div class="column">
                 <span>Учитель</span><span style="color:red" >*</span>
@@ -89,6 +89,7 @@
             <input type="hidden" name="insertDate" value="{date}" />
             <input type="hidden" name="areaId" value="{area_id}" />
             <input type="hidden" name="dayName" value="{day_name}" />
+            <input type="hidden" name="lessonType" value="{lesson_type}" />
             <input type="hidden" name="deleteDate" />
             <input type="hidden" value="Schedule_Lesson" name="modelName" />
 

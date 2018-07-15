@@ -89,7 +89,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         $report = Core::factory("Schedule_Lesson_Report")
             ->where("date", "=", $date)
             ->where("type_id", "=", $this->type_id)
-            ->where("lesson_name", "=", get_class($this));
+            ->where("lesson_type", "=", $this->lesson_type);
 
             if( isset( $this->oldid ) ) $report->where( "lesson_id", "=", $this->oldid );
             else $report->where( "lesson_id", "=", $this->id );
@@ -149,49 +149,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     public function save($obj = null)
     {
         Core::notify(array(&$this), "beforeScheduleLessonSave");
-        if ($this->delete_date == "" || $this->delete_date == "0000-00-00") $this->delete_date = "2001-01-01";
-
-        /**
-         * Проверка на пересечение добавляемого занятия с другими (из основного расписания) по времени
-         */
-        $iLessons = Core::factory("Schedule_Lesson")
-            ->where("id", "<>", $this->id)
-            ->where("day_name", "=", $this->day_name)
-            ->where("insert_date", "<=", $this->insert_date)
-            ->open()
-            ->where("delete_date", ">", $this->insert_date)
-            ->where("delete_date", "=", "2001-01-01", "OR")
-            ->close()
-            ->where("area_id", "=", $this->area_id)
-            ->open()
-            ->where("time_from", ">", $this->time_from)
-            ->where("time_from", "<", $this->time_to)
-            ->where("time_to", ">", $this->time_from, "OR")
-            ->where("time_to", "<", $this->time_to)
-            ->close()
-            ->where("class_id", "=", $this->class_id)
-            ->getCount();
-
-        /**
-         * Проверка на пересечение добавляемого занятия с другими (из текущего расписания) по времени
-         */
-        $iCurrentLessons = Core::factory("Schedule_Current_Lesson")
-            ->where("date", "=", $this->insert_date)
-            ->where("class_id", "=", $this->class_id)
-            ->where("area_id", "=", $this->area_id)
-            ->open()
-            ->where("time_from", ">", $this->time_from)
-            ->where("time_from", "<", $this->time_to)
-            ->where("time_to", ">", $this->time_from, "OR")
-            ->where("time_to", "<", $this->time_to)
-            ->close()
-            ->getCount();
-
-        if ($iLessons > 0 || $iCurrentLessons > 0 && $this->id == null )
-        {
-            die("Добавление невозможно по причине пересечения с другим занятием");
-        }
-
+       
         parent::save();
 
         Core::notify(array(&$this), "afterScheduleLessonSave");

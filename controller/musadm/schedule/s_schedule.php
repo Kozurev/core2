@@ -52,7 +52,7 @@ if($action === "getScheduleAbsentPopup")
 if($action === "getScheduleLessonPopup")
 {
     $classId =      Core_Array::getValue($_GET, "class_id", 0);
-    $modelName =    Core_Array::getValue($_GET, "model_name", "");
+    $lessonType =   Core_Array::getValue($_GET, "model_name", "");
     $date =         Core_Array::getValue($_GET, "date", 0);
     $areaId =       Core_Array::getValue($_GET, "area_id", 0);
 
@@ -67,7 +67,8 @@ if($action === "getScheduleLessonPopup")
         ->addSimpleEntity( "date", $date )
         ->addSimpleEntity( "area_id", $areaId )
         ->addSimpleEntity( "day_name", $dayName )
-        ->addSimpleEntity( "period", $period);
+        ->addSimpleEntity( "period", $period)
+        ->addSimpleEntity( "lesson_type", $lessonType );
 
     $aoUsers = Core::factory("User")
         ->where("active", "=", 1)
@@ -83,10 +84,12 @@ if($action === "getScheduleLessonPopup")
         ->addEntities($aoGroups)
         ->addEntities($aoLessonTypes);
 
-    if($modelName == "Schedule_Current_Lesson") $output->xsl("musadm/schedule/new_current_lesson_popup.xsl");
-    elseif($modelName == "Schedule_Lesson")     $output->xsl("musadm/schedule/new_lesson_popup.xsl");
+    if($lessonType == "1")       $output->addSimpleEntity( "schedule_type", "актуальное" );
+    elseif($lessonType == "2")   $output->addSimpleEntity( "schedule_type", "основное" );
 
-    $output->show();
+    $output
+        ->xsl("musadm/schedule/new_lesson_popup.xsl")
+        ->show();
 
     exit;
 }

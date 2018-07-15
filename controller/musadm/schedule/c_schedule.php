@@ -1,7 +1,7 @@
 <?php
 
 $aoMainLessons =    Core::factory("Schedule_Lesson");
-$aoCurrentLessons = Core::factory("Schedule_Current_Lesson");
+//$aoCurrentLessons = Core::factory("Schedule_Current_Lesson");
 
 $oArea = $this->oStructureItem;
 $areaId = $oArea->getId();
@@ -13,219 +13,11 @@ $userId = $oUser->getId();
 
 
 /**
- * Формирование таблицы расписания для преподавателей и клиентов
- * Начало>>
- */
-if( $oUser->groupId() == 5 )
-{
-    ?>
-        <select class="form-control client_schedule" id="month">
-            <option value="01">Январь</option>
-            <option value="02">Февраль</option>
-            <option value="03">Март</option>
-            <option value="04">Апрель</option>
-            <option value="05">Май</option>
-            <option value="06">Июнь</option>
-            <option value="07">Июль</option>
-            <option value="08">Август</option>
-            <option value="09">Сентябрь</option>
-            <option value="10">Октябрь</option>
-            <option value="11">Ноябрь</option>
-            <option value="12">Декабрь</option>
-        </select>
-
-        <select class="form-control client_schedule" id="year">
-            <option value="2017">2017</option>
-            <option value="2018">2018</option>
-            <option value="2019">2019</option>
-        </select>
-    <?
-
-    $month = Core_Array::getValue( $_GET, "month", date("m") );
-    $year = Core_Array::getValue( $_GET, "year", date("Y") );
-    $dateStart = $year . "-" . $month . "-01";
-    $countDays = date( "t", strtotime( $dateStart ) );
-    $dateEnd = $year . "-" . $month . "-" . $countDays;
-    $firstDayNumber = date( "N", strtotime( $dateStart ) );
-    $aoTeacherLessons = array();
-
-
-    /**
-     * Заголовок таблицы
-     * Начало>>
-     */
-    echo "<table class='table table-bordered'>";
-    echo "<tr class='header'>
-        <th>Понедельник</th>
-        <th>Вторник</th>
-        <th>Среда</th>
-        <th>Четверг</th>
-        <th>Пятница</th>
-        <th>Суббота</th>
-        <th>Воскресенье</th>
-    </tr>";
-    /**
-     * <<Конец
-     * Заголовок таблицы
-     */
-
-    $table = array();
-    $index = 0;
-
-    /**
-     * Дни предыдущего месяца
-     * Начало>>
-     */
-    if( $month == "01" )
-    {
-        $prevYear = $year - 1;
-        $prevMonth = 12;
-    }
-    else
-    {
-        $prevYear = $year;
-        $prevMonth = intval( $month ) - 1;
-        if( $prevMonth < 10 )   $prevMonth = "0" . $prevMonth;
-    }
-    $countPrevDays = date( "t", strtotime( $prevYear . "-" . $prevMonth . "-" . "01" ) );
-
-    echo "<tr>";
-    for( $i = 0; $i < $firstDayNumber-1; $i++ )
-    {
-        $day = $countPrevDays - ( $firstDayNumber - $i - 2 );
-        $date = $prevYear . "-" . $prevMonth . "-" . $day;
-        $Lessons = getLessons( $date, $userId );
-
-        $table[$index]["date"] = $date;
-        $table[$index]["lessons"] = $Lessons;
-        $index++;
-
-        if( $i == 0 )   $dateStart = $date;
-    }
-    /**
-     * <<Конец
-     * Дни предыдущего месяца
-     */
-
-
-    /**
-     * Дни текущего месяца
-     * Начало>>
-     */
-    $day = 0;
-    for( $i = $firstDayNumber; $i < $countDays + $firstDayNumber; $i++ )
-    {
-        $day = $day + 1;
-        if( $day < 10 ) $day = "0" . $day;
-        $date = $year . "-" . $month . "-" . $day;
-        $Lessons = getLessons( $date, $userId );
-
-        $table[$index]["date"] = $date;
-        $table[$index]["lessons"] = $Lessons;
-        $index++;
-    }
-    /**
-     * <<Конец
-     * Дни текущего месяца
-     */
-
-
-    /**
-     * Дни следующего месяца
-     * Начало>>
-     */
-    if( intval( $month ) == 12 )
-    {
-        $nextMonth = "01";
-        $nextYear = $year + 1;
-    }
-    else
-    {
-        $nextMonth = intval( $month ) + 1;
-        if( $nextMonth < 10 )   $nextMonth = "0" . $nextMonth;
-        $nextYear = $year;
-    }
-
-    $rest = 36 - $countDays - $firstDayNumber;
-    if( $rest < 0 ) $rest = 7 + $rest;
-
-    for( $i = 1; $i <= $rest; $i++ )
-    {
-        if( intval( $i ) < 10 ) $day = "0" . $i;
-        else $day = $i;
-        $date = $nextYear . "-" . $nextMonth . "-" . $day;
-        $Lessons = getLessons( $date, $userId );
-
-        $table[$index]["date"] = $date;
-        $table[$index]["lessons"] = $Lessons;
-
-        if( $i == $rest ) $dateEnd = $date;
-    }
-    /**
-     * <<Конец
-     * Дни следующего месяца
-     */
-
-    /**
-     * Вывод содержимого таблицы
-     * Начало>>
-     */
-    $today = date("Y-m-d");
-    for( $i = 0; $i < 35; $i++ )
-    {
-        if( $i + 1 % 7 == 1 )   echo "<tr>";
-
-        if( $today === $table[$i]["date"] ) echo "<td style='background-color: #75c181'>";
-        else echo "<td>";
-
-        echo "<span class='date'>" . refactorDateFormat( $table[$i]["date"], ".", "short" ) . "</span><hr/>";
-
-        if( count( $table[$i]["lessons"] ) > 0 )
-            foreach ( $table[$i]["lessons"] as $Lesson )
-            {
-                if( $today === $table[$i]["date"] ) $aoTeacherLessons[] = $Lesson;
-
-                if( $oUser->groupId() == 5 )
-                {
-                    $Teacher = $Lesson->getTeacher();
-                    $lessonData = $Teacher->surname() . " " . $Teacher->name();
-                }
-                else
-                {
-                    $Client = $Lesson->getClient();
-                    if( $Lesson->typeId() == 2 )
-                        $lessonData = $Client->title();
-                    else
-                        $lessonData = $Client->surname() . " " . $Client->name();
-                }
-
-                $Area = Core::factory( "Schedule_Area", $Lesson->areaId() );
-                echo "<span class='teacher'>" . $lessonData . "</span><br/>";
-                echo "<span class='time'>" . refactorTimeFormat( $Lesson->timeFrom() ) . " - " . refactorTimeFormat( $Lesson->timeTo() ) . "</span><br/>";
-                echo "<span class='area'>" . $Area->title() . "</span><hr/>";
-            }
-
-        echo "</td>";
-        if( ($i + 1) % 7 == 0 )   echo "</tr>";
-    }
-    /**
-     * <<Конец
-     * Вывод содержимого таблицы
-     */
-
-    echo "</table>";
-}
-/**
- * <<Конец
- * Формирование таблицы расписания для преподавателей и клиентов
- */
-
-
-/**
  * Формирование таблицы расписания для менеджеров
  * Начало >>
  */
-if( $oUser->groupId() < 5 ) {
+if( $oUser->groupId() < 5 ) 
+{
     $date = Core_Array::getValue($_GET, "date", null);
     $today = date("Y-m-d");
     if (is_null($date)) $date = $today;
@@ -237,21 +29,27 @@ if( $oUser->groupId() < 5 ) {
         ->where("insert_date", "<=", $date)
         ->open()
         ->where("delete_date", ">", $date)
-        ->where("delete_date", "=", "2001-01-01", "or")
+        ->where("delete_date", "=", "0000-00-00", "or")
         ->close()
         ->where("area_id", "=", $areaId)
         ->where("day_name", "=", $dayName)
         ->orderBy("time_from");
 
-    $aoCurrentLessons
-        ->where("date", "=", $date)
-        ->where("area_id", "=", $areaId);
+    // $aoCurrentLessons
+    //     ->where("date", "=", $date)
+    //     ->where("area_id", "=", $areaId);
 
     if( $oUser->groupId() == 4 )
     {
         $aoMainLessons->where( "teacher_id", "=", $oUser->getId() );
-        $aoCurrentLessons->where( "teacher_id", "=", $oUser->getId() );
+        // $aoCurrentLessons->where( "teacher_id", "=", $oUser->getId() );
     }
+
+    // $aoCurrentLessons = $aoCurrentLessons->findAll();
+
+    $aoCurrentLessons = clone $aoMainLessons;
+    $aoCurrentLessons->where( "lesson_type", "=", "2" );
+    $aoMainLessons->where( "lesson_type", "=", "1" );
 
     $aoCurrentLessons = $aoCurrentLessons->findAll();
     $aoMainLessons = $aoMainLessons->findAll();
@@ -309,7 +107,7 @@ if( $oUser->groupId() < 5 ) {
         if (User::checkUserAccess(array("groups" => array(1, 2)), $oUser))
             echo " class='add_lesson' ";
         echo "
-        data-schedule_type='Schedule_Lesson'
+        data-schedule_type='1'
         data-class_id='" . $i . "'
         data-date='" . $date . "'
         data-area_id='" . $areaId . "'
@@ -319,7 +117,7 @@ if( $oUser->groupId() < 5 ) {
         if (User::checkUserAccess(array("groups" => array(1, 2)), $oUser))
             echo " class='add_lesson' ";
         echo "
-        data-schedule_type='Schedule_Current_Lesson'
+        data-schedule_type='2'
         data-class_id='" . $i . "'
         data-date='" . $date . "'
         data-area_id='" . $areaId . "'
@@ -486,7 +284,7 @@ if( $oUser->groupId() < 5 ) {
                         if (isset($oCurrentLesson->oldid)) echo "data-id='" . $oCurrentLesson->oldid;
                         else                                echo "data-id='" . $oCurrentLesson->getId();
 
-                        echo "' data-type='" . get_class($oCurrentLesson) . "'>";
+                        echo "' data-type='" . $oCurrentLesson->lessonType() . "'>";
                         echo "
                                 <li><a href=\"#\" class='schedule_today_absent'>Отсутствует сегодня</a></li>
                                 <li><a href=\"#\" class='schedule_update_time'>Изменить на сегодня время</a></li>
@@ -518,6 +316,16 @@ if( $oUser->groupId() < 5 ) {
     }
 
 
+    /**
+     * Заголовок таблицы
+     * Начало >>
+     */
+    echo "<tr>";
+    for ($i = 1; $i <= $oArea->countClassess(); $i++) {
+        echo "<th colspan='3'>КЛАСС $i</th>";
+    }
+    echo "</tr>";
+
     echo "<tr>";
     for ($i = 1; $i <= $oArea->countClassess(); $i++) {
         echo "<th>Время</th>";
@@ -525,7 +333,7 @@ if( $oUser->groupId() < 5 ) {
         if (User::checkUserAccess(array("groups" => array(1, 2)), $oUser))
             echo " class='add_lesson' ";
         echo "
-        data-schedule_type='Schedule_Lesson'
+        data-schedule_type='1'
         data-class_id='" . $i . "'
         data-date='" . $date . "'
         data-area_id='" . $areaId . "'
@@ -535,7 +343,7 @@ if( $oUser->groupId() < 5 ) {
         if (User::checkUserAccess(array("groups" => array(1, 2)), $oUser))
             echo " class='add_lesson' ";
         echo "
-        data-schedule_type='Schedule_Current_Lesson'
+        data-schedule_type='2'
         data-class_id='" . $i . "'
         data-date='" . $date . "'
         data-area_id='" . $areaId . "'
@@ -543,12 +351,10 @@ if( $oUser->groupId() < 5 ) {
     >Актуальный график</th>";
     }
     echo "</tr>";
-
-    echo "<tr>";
-    for ($i = 1; $i <= $oArea->countClassess(); $i++) {
-        echo "<th colspan='3'>КЛАСС $i</th>";
-    }
-    echo "</tr>";
+    /**
+     * << Конец
+     * Заголовок таблицы
+     */
 
     /**
      * << Конец

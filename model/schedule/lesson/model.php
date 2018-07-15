@@ -19,6 +19,7 @@ class Schedule_Lesson_Model extends Core_Entity
     protected $teacher_id;
     protected $client_id;
     protected $type_id;
+    protected $lesson_type;
 
     public function __construct(){}
 
@@ -44,6 +45,13 @@ class Schedule_Lesson_Model extends Core_Entity
         return $this;
     }
 
+
+    public function lessonType($val = null)
+    {
+        if(is_null($val))   return $this->lesson_type;
+        $this->lesson_type = intval($val);
+        return $this;
+    }
 
 
     public function timeFrom($val = null)
