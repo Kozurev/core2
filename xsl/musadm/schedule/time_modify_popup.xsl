@@ -37,11 +37,11 @@
             <hr/>
 
             <xsl:choose>
-                <xsl:when test="model_name = 'Schedule_Current_Lesson'">
-                    <input type="hidden" name="id" value="{schedule_current_lesson/id}" />
-                    <input type="hidden" name="classId" value="{schedule_current_lesson/class_id}" />
-                    <input type="hidden" name="date" value="{schedule_current_lesson/date}" />
-                    <input type="hidden" name="areaId" value="{schedule_current_lesson/area_id}" />
+                <xsl:when test="model_name = 'Schedule_Lesson'">
+                    <input type="hidden" name="id" value="{schedule_lesson/id}" />
+                    <input type="hidden" name="classId" value="{schedule_lesson/class_id}" />
+                    <input type="hidden" name="date" value="{schedule_lesson/date}" />
+                    <input type="hidden" name="areaId" value="{schedule_lesson/area_id}" />
                 </xsl:when>
                 <xsl:otherwise>
                     <input type="hidden" name="id" value="{schedule_lesson_timeModified/id}" />

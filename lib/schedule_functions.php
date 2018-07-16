@@ -135,18 +135,21 @@ function getLessons( $date, $userId = 0 )
     $dayName =  $dayName->format("l");
 
     $aoMainLessons = Core::factory( "Schedule_Lesson" )
-        ->where("insert_date", "<=", $date)
         ->open()
         ->where("delete_date", ">", $date)
-        ->where("delete_date", "=", "2001-01-01", "or")
+        ->where("delete_date", "IS", Core::unchanged( "NULL" ), "or")
         ->close()
-        //->where("area_id", "=", $areaId)
-        ->where("day_name", "=", $dayName)
         ->orderBy("time_from");
 
-    $aoCurrentLessons = Core::factory( "Schedule_Current_Lesson" )
-        ->where("date", "=", $date);
-        //->where("area_id", "=", $areaId);
+    $aoCurrentLessons = clone $aoMainLessons;
+    $aoCurrentLessons
+        ->where( "lesson_type", "=", 2 )
+        ->where( "insert_date", "=", $date );
+
+    $aoMainLessons
+        ->where( "lesson_type", "=", 1 )
+        ->where("day_name", "=", $dayName)
+        ->where( "insert_date", "<=", $date );
 
     if( $userId != 0 )
     {

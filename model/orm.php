@@ -114,9 +114,22 @@ class Orm
 			
 			for($i = 0; $i < count($objData); $i++)
 			{
-				$i + 1 == count($objData)
-					? $queryStr .= "`".$aRows[$i]."` = '".$aValues[$i]."' "
-					: $queryStr .= "`".$aRows[$i]."` = '".$aValues[$i]."', ";
+			    if( $i + 1 == count( $objData ) )
+                {
+                    $queryStr .= "`".$aRows[$i]."` = ";//'".$aValues[$i]."' "
+                    if( $aValues[$i] === "null" || $aValues[$i] === "NULL" )
+                        $queryStr .= "NULL";
+                    else
+                        $queryStr .= "'". $aValues[$i] ."'";
+                }
+                else
+                {
+                    $queryStr .= "`".$aRows[$i]."` = ";//'".$aValues[$i]."' "
+                    if( $aValues[$i] == "null" || $aValues[$i] == "NULL" )
+                        $queryStr .= "NULL, ";
+                    else
+                        $queryStr .= "'". $aValues[$i] ."', ";
+                }
 			}
 
 			$queryStr .= "WHERE `id` = '".$this->getId()."'";
@@ -137,9 +150,20 @@ class Orm
 
 			for($i = 0; $i < count($objData); $i++)
 			{
-				$i + 1 == count($objData)
-					? $queryStr .= "'".$aValues[$i]."'"
-					: $queryStr .= "'".$aValues[$i]."', "; 
+                if( $i + 1 == count( $objData ) )
+                {
+                    if( $aValues[$i] === "null" || $aValues[$i] === "NULL" )
+                        $queryStr .= "NULL";
+                    else
+                        $queryStr .= "'". $aValues[$i] ."'";
+                }
+                else
+                {
+                    if( $aValues[$i] === "null" || $aValues[$i] === "NULL" )
+                        $queryStr .= "NULL, ";
+                    else
+                        $queryStr .= "'". $aValues[$i] ."', ";
+                }
 			}
 
 			$queryStr .= ") ";

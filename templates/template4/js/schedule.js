@@ -123,7 +123,7 @@ $(function(){
             var client_id = tr.find("input[name=clientId]").val();
             var type_id = tr.find("input[name=typeId]").val();
             var date = tr.find("input[name=date]").val();
-            var lesson_name = tr.find("input[name=lessonName]").val();
+            var lesson_type = tr.find("input[name=lessonType]").val();
             var attendance = tr.find("input[name=attendance]").is(':checked');
             if(attendance == true) attendance = 1;
             else attendance = 0;
@@ -138,7 +138,7 @@ $(function(){
                     type_id: type_id,
                     date: date,
                     lesson_id: lesson_id,
-                    model_name: lesson_name,
+                    lesson_type: lesson_type,
                     attendance: attendance
                 },
                 success: function(responce){
@@ -153,7 +153,7 @@ $(function(){
             var tr = $(this).parent().parent();
             var id = tr.find("input[name=reportId]").val();
             var lessonId = tr.find("input[name=lessonId]").val();
-            var lessonModelName = tr.find("input[name=lessonName]").val();
+            var lessonType = tr.find("input[name=lessonType]").val();
 
             $.ajax({
                 type: "GET",
@@ -161,7 +161,7 @@ $(function(){
                 data: {
                     action: "deleteReport",
                     lesson_id: lessonId,
-                    model_name: lessonModelName,
+                    lesson_type: lessonType,
                     report_id: id,
                 },
                 success: function(responce) {

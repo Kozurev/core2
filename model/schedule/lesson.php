@@ -149,7 +149,8 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     public function save($obj = null)
     {
         Core::notify(array(&$this), "beforeScheduleLessonSave");
-       
+        if( $this->delete_date == "" )  $this->delete_date = "NULL";
+
         parent::save();
 
         Core::notify(array(&$this), "afterScheduleLessonSave");

@@ -267,10 +267,8 @@ if( $oUser->groupId() == 5 )
 //$calendarDateTo = Core_Array::getValue($_GET, "date_to", $defaultDateTo );
 
 $UserReports = Core::factory( "Schedule_Lesson_Report" )
-    ->select( array( "attendance", "date", "lesson_id", "lesson_name", "surname", "name" ) )
+    ->select( array( "attendance", "date", "lesson_id", "lesson_type", "surname", "name" ) )
     ->join( "User AS usr", "usr.id = teacher_id" )
-    //->where( "date", ">=", $calendarDateFrom )
-    //->where( "date", "<=", $calendarDateTo )
     ->orderBy( "date", "DESC" );
 
 $aoClientGroups = Core::factory("Schedule_Group_Assignment")
@@ -301,13 +299,13 @@ foreach ( $UserReports as $rep )
 {
     $rep->date( refactorDateFormat( $rep->date() ) );
 
-    if( $rep->lessonName() == null )    $rep->lessonName( "Schedule_Current_Lesson" );
+    //if( $rep->lessonName() == null )    $rep->lessonName( "Schedule_Current_Lesson" );
 
-    $RepLesson = Core::factory( $rep->lessonName(), $rep->lessonId() );
+    $RepLesson = Core::factory( "Schedule_Lesson", $rep->lessonId() );
 
     if( $RepLesson == false )   { debug($RepLesson, 1); debug($rep);  }
 
-    if( $rep->lessonName() == "Schedule_Lesson" && $RepLesson->isTimeModified( $rep->date() ) )
+    if( $rep->lessonType() == "1" && $RepLesson->isTimeModified( $rep->date() ) )
     {
         $Modified = Core::factory("Schedule_Lesson_TimeModified")
             ->where( "lesson_id", "=", $RepLesson->getId() )
@@ -325,8 +323,6 @@ foreach ( $UserReports as $rep )
 }
 
 Core::factory( "Core_Entity" )
-    //->addSimpleEntity( "date_from", $calendarDateFrom )
-    //->addSimpleEntity( "date_to", $calendarDateTo )
     ->addEntities( $UserReports )
     ->xsl( "musadm/users/balance/attendance_report.xsl" )
     ->show();

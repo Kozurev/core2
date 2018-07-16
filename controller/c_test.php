@@ -6,63 +6,115 @@
  * Time: 1:02
  */
 
-// $dbh = new mysqli("37.140.192.32:3306", "u4834_ADMIN", "big#psKT", "u4834955_musbase");
-// $dbh->query("SET NAMES utf8");
+$dbh = new mysqli("37.140.192.32:3306", "u4834_root", "n1omY2_1", "u4834955_core");
+$dbh->query("SET NAMES utf8");
 
-// Core::factory("Orm")->executeQuery("TRUNCATE Task");
-// Core::factory("Orm")->executeQuery("TRUNCATE Task_Note");
+Core::factory("Orm")->executeQuery("TRUNCATE Schedule_Lesson");
+Core::factory("Orm")->executeQuery("TRUNCATE Schedule_Lesson_Report");
+Core::factory("Orm")->executeQuery("TRUNCATE Schedule_Lesson_TimeModified");
+Core::factory("Orm")->executeQuery("TRUNCATE Schedule_Lesson_Absent");
 
-// $aoTasks = $dbh->query("SELECT * FROM `admin_notes` WHERE date >= '2018-01-01'");
+/**
+ * Основное расписание
+ */
+$aoLessons = $dbh->query( "SELECT * FROM `Schedule_Lesson`" );
+while( $lesson = $aoLessons->fetch_object() )
+{
+    $Lesson = Core::factory( "Schedule_Lesson" )
+        ->insertDate( $lesson->insert_date )
+        ->timeFrom( $lesson->time_from )
+        ->timeTo( $lesson->time_to )
+        ->dayName( $lesson->day_name )
+        ->areaId( $lesson->area_id )
+        ->classId( $lesson->class_id )
+        ->teacherId( $lesson->teacher_id )
+        ->clientId( $lesson->client_id )
+        ->typeId( $lesson->type_id )
+        ->lessonType( 1 );
 
-// while ($task = $aoTasks->fetch_object())
-// {
-//     $oTask = Core::factory("Task")
-//         ->date($task->date)
-//         ->type($task->type + 1)
-//         ->done($task->done);
+    if( $lesson->delete_date == "2001-01-01" )  $Lesson->deleteDate( "NULL" );
+    else $Lesson->deleteDate( $lesson->delete_date );
 
-//     $oTask = $oTask->save();
+    $Lesson->save();
 
-//     $oTask->addNote($task->note);
-// }
+    /**
+     * Отчеты
+     */
+    $aoLessonReports = $dbh->query( "SELECT * FROM `Schedule_Lesson_Report` WHERE lesson_id = $lesson->id and lesson_name = 'Schedule_Lesson'" );
+    while( $report = $aoLessonReports->fetch_object() )
+    {
+        Core::factory( "Schedule_Lesson_Report" )
+            ->teacherId( $report->teacher_id )
+            ->clientId( $report->client_id )
+            ->attendance( intval( $report->attendance) )
+            ->lessonId( $Lesson->getId() )
+            ->typeId( $report->type_id )
+            ->date( $report->date )
+            ->lessonType( 1 )
+            ->save();
+    }
 
+    /**
+     * Изменение времени
+     */
+    $aoModifies = $dbh->query( "SELECT * FROM `Schedule_Lesson_TimeModified` WHERE lesson_id = $lesson->id" );
+    while( $modify = $aoModifies->fetch_object() )
+    {
+        Core::factory( "Schedule_Lesson_TimeModified" )
+            ->lessonId( $Lesson->getId() )
+            ->date( $modify->date )
+            ->timeFrom( $modify->time_from )
+            ->timeTo( $modify->time_to )
+            ->save();
+    }
 
-// Core::factory("Orm")->executeQuery("TRUNCATE Lid");
-// Core::factory("Orm")->executeQuery("TRUNCATE Lid_Comment");
-// Core::factory("Orm")->executeQuery("DELETE FROM Property_List WHERE model_name = 'Lid'");
-// Core::factory("Orm")->executeQuery("DELETE FROM Property_List_Assigment WHERE model_name = 'Lid'");
+    /**
+     * Отсутствует сегодня
+     */
+    $aoAbsents = $dbh->query( "SELECT * FROM `Schedule_Lesson_Absent` WHERE lesson_id = $lesson->id" );
+    while( $absent = $aoAbsents->fetch_object() )
+    {
+        Core::factory( "Schedule_Lesson_Absent" )
+            ->lessonId( $Lesson->getId() )
+            ->date( $absent->date )
+            ->save();
+    }
+}
 
-// $aoLids = $dbh->query("SELECT * FROM `lids`");
+/**
+ * Актуальное расписание
+ */
+$aoCurrentLessons = $dbh->query( "SELECT * FROM Schedule_Current_Lesson" );
+while( $lesson = $aoCurrentLessons->fetch_object() )
+{
+    $Lesson = Core::factory( "Schedule_Lesson" )
+        ->timeFrom( $lesson->time_from )
+        ->timeTo( $lesson->time_to )
+        ->areaId( $lesson->area_id )
+        ->classId( $lesson->class_id )
+        ->teacherId( $lesson->teacher_id )
+        ->clientId( $lesson->client_id )
+        ->typeId( $lesson->type_id )
+        ->insertDate( $lesson->date )
+        ->lessonType( 2 )
+        ->deleteDate( "NULL" );
 
-// while ($lid = $aoLids->fetch_object())
-// {
-// 	$Lid = Core::factory("Lid")
-// 		->name($lid->name)
-// 		->surname($lid->surname)
-// 		->number($lid->phone)
-// 		->vk($lid->vk)
-// 		->controlDate($lid->date);
+    $Lesson->save();
 
-// 	$Lid->save();
-
-// 	Core::factory("Property", 27)->addNewValue($Lid, $lid->status + 79);
-
-// 	Core::factory("Lid_Comment")
-// 		->lidId($Lid->getId())
-// 		->text($lid->note)
-// 		->save();
-// }
-
-
-//$aoCertificates = Core::factory( "Certificate" )->findAll();
-//
-//foreach ( $aoCertificates as $certificate )
-//{
-//    $oCertificateNote = Core::factory( "Certificate_Note" )
-//        ->authorId( 5 )
-//        ->certificateId( $certificate->getId() )
-//        ->text( $certificate->note() );
-//
-//    $oCertificateNote->save();
-//}
-
+    /**
+     * Отчеты
+     */
+    $aoLessonReports = $dbh->query( "SELECT * FROM `Schedule_Lesson_Report` WHERE lesson_id = $lesson->id and lesson_name = 'Schedule_Current_Lesson'" );
+    while( $report = $aoLessonReports->fetch_object() )
+    {
+        Core::factory( "Schedule_Lesson_Report" )
+            ->teacherId( $report->teacher_id )
+            ->clientId( $report->client_id )
+            ->attendance( 0 )
+            ->lessonId( $Lesson->getId() )
+            ->typeId( $report->type_id )
+            ->date( $report->date )
+            ->lessonType( 2 )
+            ->save();
+    }
+}

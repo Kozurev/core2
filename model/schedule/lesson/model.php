@@ -10,7 +10,7 @@ class Schedule_Lesson_Model extends Core_Entity
 {
     protected $id;
     protected $insert_date;
-    protected $delete_date = "0000-00-00";
+    protected $delete_date = "NULL";
     protected $time_from;
     protected $time_to;
     protected $day_name;

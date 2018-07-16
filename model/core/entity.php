@@ -190,6 +190,13 @@ class Core_Entity extends Core_Entity_Model
 
 		// Вывод результирующего кода
 		echo $parsed;	
-	}		
+	}
+
+
+	public function setId( $val )
+    {
+        $this->id = $val;
+        return $this;
+    }
 
 }

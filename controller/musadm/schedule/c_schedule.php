@@ -26,30 +26,29 @@ if( $oUser->groupId() < 5 )
     $dayName = $dayName->format("l");
 
     $aoMainLessons
-        ->where("insert_date", "<=", $date)
         ->open()
         ->where("delete_date", ">", $date)
-        ->where("delete_date", "=", "0000-00-00", "or")
+        ->where("delete_date", "IS", Core::unchanged("NULL"), "or")
         ->close()
         ->where("area_id", "=", $areaId)
-        ->where("day_name", "=", $dayName)
         ->orderBy("time_from");
-
-    // $aoCurrentLessons
-    //     ->where("date", "=", $date)
-    //     ->where("area_id", "=", $areaId);
 
     if( $oUser->groupId() == 4 )
     {
         $aoMainLessons->where( "teacher_id", "=", $oUser->getId() );
-        // $aoCurrentLessons->where( "teacher_id", "=", $oUser->getId() );
     }
 
     // $aoCurrentLessons = $aoCurrentLessons->findAll();
 
     $aoCurrentLessons = clone $aoMainLessons;
-    $aoCurrentLessons->where( "lesson_type", "=", "2" );
-    $aoMainLessons->where( "lesson_type", "=", "1" );
+    $aoCurrentLessons
+        ->where( "insert_date", "=", $date )
+        ->where( "lesson_type", "=", "2" );
+
+    $aoMainLessons
+        ->where("insert_date", "<=", $date)
+        ->where("day_name", "=", $dayName)
+        ->where( "lesson_type", "=", "1" );
 
     $aoCurrentLessons = $aoCurrentLessons->findAll();
     $aoMainLessons = $aoMainLessons->findAll();
@@ -76,6 +75,7 @@ if( $oUser->groupId() < 5 )
                 ->areaId($oMainLesson->areaId())
                 ->teacherId($oMainLesson->teacherId())
                 ->clientId($oMainLesson->clientId())
+                ->lessonType($oMainLesson->lessonType())
                 ->typeId($oMainLesson->typeId());
             $oNewCurrentLesson->oldid = $oMainLesson->getId();
 
@@ -378,7 +378,7 @@ if( $oUser->groupId() == 4 )
         $lesson->timeFrom(refactorTimeFormat($lesson->timeFrom()));
         $lesson->timeTo(refactorTimeFormat($lesson->timeTo()));
         $lesson->addEntity($lesson->getClient(), "client");
-        $lesson->addSimpleEntity("lesson_name", $lesson->getTableName());
+        $lesson->addSimpleEntity("lesson_type", $lesson->lessonType());
 
         $oReported = $lesson->isReported($date);
 

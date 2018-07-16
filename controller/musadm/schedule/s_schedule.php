@@ -84,8 +84,8 @@ if($action === "getScheduleLessonPopup")
         ->addEntities($aoGroups)
         ->addEntities($aoLessonTypes);
 
-    if($lessonType == "1")       $output->addSimpleEntity( "schedule_type", "актуальное" );
-    elseif($lessonType == "2")   $output->addSimpleEntity( "schedule_type", "основное" );
+    if($lessonType == "2")       $output->addSimpleEntity( "schedule_type", "актуальное" );
+    elseif($lessonType == "")   $output->addSimpleEntity( "schedule_type", "основное" );
 
     $output
         ->xsl("musadm/schedule/new_lesson_popup.xsl")
@@ -98,7 +98,7 @@ if($action === "getScheduleLessonPopup")
 if($action === "teacherReport")
 {
     $lessonId = Core_Array::getValue($_GET, "lesson_id", 0);
-    $lessonName = Core_Array::getValue($_GET, "model_name", "");
+    $lessonType = Core_Array::getValue($_GET, "lesson_type", 0);
     $attendance = Core_Array::getValue($_GET, "attendance", 0);
     $teacherId = Core_Array::getValue($_GET, "teacher_id", 0);
     $clientId = Core_Array::getValue($_GET, "client_id", 0);
@@ -108,7 +108,7 @@ if($action === "teacherReport")
     /**
      * Проверка во избежание дублирование отчетов
      */
-    $Lesson = Core::factory( $lessonName, $lessonId );
+    $Lesson = Core::factory( "Schedule_Lesson", $lessonId );
     if( $Lesson->isReported( $date ) )  exit;
 
     /**
@@ -120,11 +120,11 @@ if($action === "teacherReport")
         ->typeId($typeId)
         ->date($date)
         ->attendance($attendance)
-        ->lessonName($lessonName)
+        ->lessonType($lessonType)
         ->clientId($clientId);
     $Report->save();
 
-    $oLesson = Core::factory($lessonName, $lessonId);
+    $oLesson = Core::factory( "Schedule_Lesson", $lessonId);
     $clients = array();
 
     if($oLesson->typeId() != 2)
@@ -163,10 +163,10 @@ if($action === "deleteReport")
 {
     $reportId = Core_Array::getValue($_GET, "report_id", 0);
     $lessonId = Core_Array::getValue($_GET, "lesson_id", 0);
-    $lessonName = Core_Array::getValue($_GET, "model_name", "");
+    $lessonType = Core_Array::getValue($_GET, "lesson_type", 0);
 
     $oReport = Core::factory("Schedule_Lesson_Report", $reportId);
-    $oLesson = Core::factory($lessonName, $lessonId);
+    $oLesson = Core::factory( "Schedule_Lesson", $lessonId);
 
     $attendance = $oReport->attendance();
     $clients = array();
@@ -259,7 +259,7 @@ if($action === "getScheduleChangeTimePopup")
 
     $output = Core::factory("Core_Entity");
 
-    if($type == "Schedule_Lesson")
+    if($type == "1")
     {
         $modelName = "Schedule_Lesson_TimeModified";
         $oModify = Core::factory($modelName)
@@ -276,8 +276,8 @@ if($action === "getScheduleChangeTimePopup")
     }
     else
     {
-        $modelName = $type;
-        $oCurrentLesson = Core::factory("Schedule_Current_Lesson", $id);
+        $modelName = "Schedule_Lesson";
+        $oCurrentLesson = Core::factory("Schedule_Lesson", $id);
         $output->addEntity($oCurrentLesson);
     }
 

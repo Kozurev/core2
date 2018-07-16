@@ -65,7 +65,7 @@
             </xsl:choose>
 
             <input type="hidden" name="reportId" value="{report/id}" />
-            <input type="hidden" name="lessonName" value="{lesson_name}" />
+            <input type="hidden" name="lessonType" value="{lesson_type}" />
 
             <td>
                 <button class="btn btn-green send_report" >
