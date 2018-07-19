@@ -43,15 +43,13 @@ class Orm
 
 	public function open()
     {
-        //$this->where .= " (";
-        $this->open = 1;
+        $this->open++;
         return $this;
     }
 
 
     public function close()
     {
-        //$this->close = 1;
         $this->where .= ") ";
         return $this;
     }
@@ -382,13 +380,19 @@ class Orm
 	public function between($param, $val1, $val2, $condition = "and")
     {
         if( $this->where != "" )
-            $this->where .= " " . $condition . " ";
-
-        if( $this->open == 1 )
         {
-            $this->where .= "(";
+            for( $i = 0; $i < $this->open; $i++ )
+                $condition .= " (";
+            $this->open = 0;
+            $this->where .= " " . $condition . " ";
+        }
+        else
+        {
+            for( $i = 0; $i < $this->open; $i++ )
+                $this->where .= " (";
             $this->open = 0;
         }
+
 
         $this->where .= $param . " BETWEEN '" . $val1 . "' AND '" . $val2 . "' ";
         return $this;
@@ -429,9 +433,10 @@ class Orm
             else
                 $condition = "";
 
-            if($this->open == 1)
+            if($this->open != 0)
             {
-                $condition .= " (";
+                for( $i = 0; $i < $this->open; $i++ )
+                    $condition .= " (";
                 $this->open = 0;
             }
 
@@ -446,7 +451,11 @@ class Orm
             {
                 $val = "'".$value."' ";
             }
-            $this->where .= $val;
+
+            if( $value === "NULL" || $value === null )
+                $val = "NULL";
+
+            $this->where .= $val . " ";
         }
 
         return $this;

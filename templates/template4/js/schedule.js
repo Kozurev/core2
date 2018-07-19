@@ -38,7 +38,6 @@ $(function(){
         //Окно добавления урока в расписание
         .on("click", ".add_lesson", function(){
             var date = $(this).data("date");
-
             var today = new Date();
             var lessonDate = new Date(date);
             var currentDate = new Date(getCurrentDate());
@@ -71,26 +70,25 @@ $(function(){
             var lessonid = $(this).parent().parent().data("id");
             var date = $(this).parent().parent().data("date");
             var type = $(this).parent().parent().data("type");
-            
-            if(type == "1")
-                markAbsent(lessonid, date, refreshSchedule);
-            if(type == "2")
-                deleteItem(type, lessonid, "../admin?menuTab=Main&menuAction=deleteAction&ajax=1", refreshSchedule);
-
+            markAbsent(lessonid, date, refreshSchedule);
             loaderOff();
         })
         .on("click", ".schedule_update_time", function(e){
             e.preventDefault();
-            //loaderOn();
             var lessonid = $(this).parent().parent().data("id");
             var date = $(this).parent().parent().data("date");
-            var type = $(this).parent().parent().data("type");
-            getScheduleChangeTimePopup(lessonid, type, date);
+            //var type = $(this).parent().parent().data("type");
+            getScheduleChangeTimePopup(lessonid, date);
         })
         .on("click", ".popop_schedule_time_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", refreshSchedule);
+            var timeFrom = $("input[name=timeFrom]").val();
+            var timeTo = $("input[name=timeTo]").val();
+            var lessonId = $("input[name=lesson_id]").val();
+            var date = $("input[name=date]").val();
+            saveScheduleChangeTimePopup(lessonId, date, timeFrom, timeTo, refreshSchedule);
+            //saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", refreshSchedule);
         })
         .on("change", "select[name=typeId]", function(){
             loaderOn();
@@ -383,18 +381,37 @@ function markAbsent(lessonid, date, func) {
 }
 
 
-function getScheduleChangeTimePopup(lessonid, model_name, date) {
+function getScheduleChangeTimePopup(lessonid, date) {
     $.ajax({
         type: "GET",
         url: "",
         data: {
             action: "getScheduleChangeTimePopup",
             id: lessonid,
-            type: model_name,
             date: date
         },
         success: function(responce){
             showPopup(responce)
+        }
+    });
+}
+
+
+function saveScheduleChangeTimePopup(lessonId, date, timeFrom, timeTo, func) {
+    $.ajax({
+        type: "GET",
+        url: "",
+        data: {
+            action: "saveScheduleChangeTimePopup",
+            lesson_id: lessonId,
+            date: date,
+            time_from: timeFrom,
+            time_to: timeTo
+        },
+        success: function(responce){
+            if(responce != "")  alert(responce);
+            closePopup();
+            func();
         }
     });
 }

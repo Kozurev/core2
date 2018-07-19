@@ -97,13 +97,13 @@ if($action === "getScheduleLessonPopup")
 
 if($action === "teacherReport")
 {
-    $lessonId = Core_Array::getValue($_GET, "lesson_id", 0);
-    $lessonType = Core_Array::getValue($_GET, "lesson_type", 0);
-    $attendance = Core_Array::getValue($_GET, "attendance", 0);
-    $teacherId = Core_Array::getValue($_GET, "teacher_id", 0);
-    $clientId = Core_Array::getValue($_GET, "client_id", 0);
-    $typeId = Core_Array::getValue($_GET, "type_id", 0);
-    $date = Core_Array::getValue($_GET, "date", 0);
+    $lessonId =     Core_Array::getValue($_GET, "lesson_id", 0);
+    $lessonType =   Core_Array::getValue($_GET, "lesson_type", 0);
+    $attendance =   Core_Array::getValue($_GET, "attendance", 0);
+    $teacherId =    Core_Array::getValue($_GET, "teacher_id", 0);
+    $clientId =     Core_Array::getValue($_GET, "client_id", 0);
+    $typeId =       Core_Array::getValue($_GET, "type_id", 0);
+    $date =         Core_Array::getValue($_GET, "date", 0);
 
     /**
      * Проверка во избежание дублирование отчетов
@@ -161,9 +161,9 @@ if($action === "teacherReport")
 
 if($action === "deleteReport")
 {
-    $reportId = Core_Array::getValue($_GET, "report_id", 0);
-    $lessonId = Core_Array::getValue($_GET, "lesson_id", 0);
-    $lessonType = Core_Array::getValue($_GET, "lesson_type", 0);
+    $reportId =     Core_Array::getValue($_GET, "report_id", 0);
+    $lessonId =     Core_Array::getValue($_GET, "lesson_id", 0);
+    $lessonType =   Core_Array::getValue($_GET, "lesson_type", 0);
 
     $oReport = Core::factory("Schedule_Lesson_Report", $reportId);
     $oLesson = Core::factory( "Schedule_Lesson", $lessonId);
@@ -232,8 +232,8 @@ if($action === "getclientList")
 
 if($action === "markDeleted")
 {
-    $lessonId = Core_Array::getValue($_GET, "lessonid", 0);
-    $deleteDate = Core_Array::getValue($_GET, "deletedate", "");
+    $lessonId =     Core_Array::getValue($_GET, "lessonid", 0);
+    $deleteDate =   Core_Array::getValue($_GET, "deletedate", "");
 
     $oLesson = Core::factory("Schedule_Lesson", $lessonId);
     $oLesson->markDeleted($deleteDate);
@@ -244,48 +244,39 @@ if($action === "markDeleted")
 if($action === "markAbsent")
 {
     $lessonId = Core_Array::getValue($_GET, "lessonid", 0);
-    $date = Core_Array::getValue($_GET, "date", "");
+    $date =     Core_Array::getValue($_GET, "date", "");
 
     Core::factory("Schedule_Lesson", $lessonId)->setAbsent($date);
     exit;
 }
 
 
-if($action === "getScheduleChangeTimePopup")
+if( $action === "getScheduleChangeTimePopup" )
 {
-    $id = Core_Array::getValue($_GET, "id", 0);
-    $type = Core_Array::getValue($_GET, "type", "");
+    $id =   Core_Array::getValue($_GET, "id", 0);
     $date = Core_Array::getValue($_GET, "date", "");
 
-    $output = Core::factory("Core_Entity");
-
-    if($type == "1")
-    {
-        $modelName = "Schedule_Lesson_TimeModified";
-        $oModify = Core::factory($modelName)
-            ->where("lesson_id", "=", $id)
-            ->where("date", "=", $date)
-            ->find();
-
-        if($oModify == false)
-            $oModify = Core::factory($modelName)->lessonId($id)->date($date);
-
-        $output
-            ->addSimpleEntity( "lesson_id", $id )
-            ->addEntity($oModify);
-    }
-    else
-    {
-        $modelName = "Schedule_Lesson";
-        $oCurrentLesson = Core::factory("Schedule_Lesson", $id);
-        $output->addEntity($oCurrentLesson);
-    }
-
-    $output
-        ->addSimpleEntity( "model_name", $modelName )
-        ->xsl("musadm/schedule/time_modify_popup.xsl")
+    Core::factory("Core_Entity")
+        ->addSimpleEntity( "lesson_id", $id )
+        ->addSimpleEntity( "date", $date )
+        ->xsl( "musadm/schedule/time_modify_popup.xsl" )
         ->show();
 
+    exit;
+}
+
+
+if( $action === "saveScheduleChangeTimePopup" )
+{
+    $lessonId = Core_Array::getValue( $_GET, "lesson_id", 0 );
+    $date =     Core_Array::getValue( $_GET, "date", date( "Y-m-d" ) );
+    $timeFrom = Core_Array::getValue( $_GET, "time_from", "" );
+    $timeTo =   Core_Array::getValue( $_GET, "time_to", "" );
+
+    $timeFrom .= ":00";
+    $timeTo .= ":00";
+
+    Core::factory( "Schedule_Lesson", $lessonId )->modifyTime( $date, $timeFrom, $timeTo );
     exit;
 }
 

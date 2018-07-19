@@ -104,17 +104,21 @@ while( $lesson = $aoCurrentLessons->fetch_object() )
     /**
      * Отчеты
      */
-    $aoLessonReports = $dbh->query( "SELECT * FROM `Schedule_Lesson_Report` WHERE lesson_id = $lesson->id and lesson_name = 'Schedule_Current_Lesson'" );
-    while( $report = $aoLessonReports->fetch_object() )
+    if( $Lesson->getId() != null )
     {
-        Core::factory( "Schedule_Lesson_Report" )
-            ->teacherId( $report->teacher_id )
-            ->clientId( $report->client_id )
-            ->attendance( 0 )
-            ->lessonId( $Lesson->getId() )
-            ->typeId( $report->type_id )
-            ->date( $report->date )
-            ->lessonType( 2 )
-            ->save();
+        $aoLessonReports = $dbh->query( "SELECT * FROM `Schedule_Lesson_Report` WHERE lesson_id = $lesson->id and lesson_name = 'Schedule_Current_Lesson'" );
+        while( $report = $aoLessonReports->fetch_object() )
+        {
+            Core::factory( "Schedule_Lesson_Report" )
+                ->teacherId( $report->teacher_id )
+                ->clientId( $report->client_id )
+                ->attendance( 0 )
+                ->lessonId( $Lesson->getId() )
+                ->typeId( $report->type_id )
+                ->date( $report->date )
+                ->lessonType( 2 )
+                ->save();
+        }
     }
+
 }
