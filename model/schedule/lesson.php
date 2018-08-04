@@ -22,10 +22,14 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
     public function getClient()
     {
-        if($this->type_id != 2)
-            return Core::factory("User", $this->client_id);
-        if($this->type_id == 2)
-            return Core::factory("Schedule_Group", $this->client_id);
+        if ( $this->type_id == 1 )
+            return Core::factory( "User", $this->client_id );
+        if ( $this->type_id == 2 )
+            return Core::factory( "Schedule_Group", $this->client_id );
+        if ( $this->type_id == 3 && $this->client_id )
+            return Core::factory( "Lid", $this->client_id );
+
+        return Core::factory( "User" )->surname( "Неизвестно" );
     }
 
 
@@ -88,11 +92,6 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      */
     public function isAbsent($date)
     {
-        if( $this->lesson_type == 2 )   //Занятие из актуального графика
-        {
-            return false;
-        }
-
         $oAbsent = Core::factory("Schedule_Lesson_Absent")
             ->where("date", "=", $date)
             ->where("lesson_id", "=", $this->id)
@@ -201,6 +200,23 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     }
 
 
+    public function setRealTime( $date )
+    {
+        $Modify = Core::factory( "Schedule_Lesson_TimeModified" )
+            ->where( "lesson_id", "=", $this->id )
+            ->where( "date", "=", $date )
+            ->find();
+
+        if( $Modify != false )
+        {
+            $this->time_from = $Modify->timeFrom();
+            $this->time_to = $Modify->timeTo();
+        }
+
+        return $this;
+    }
+
+
     public function delete($obj = null)
     {
         Core::notify(array(&$this), "beforeScheduleLessonDelete");
@@ -211,7 +227,6 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
     public function save($obj = null)
     {
-        Core::notify(array(&$this), "beforeScheduleLessonSave");
         if( $this->delete_date == "" )  $this->delete_date = "NULL";
 
         $countModifies = Core::factory( "Schedule_Lesson_TimeModified" )
@@ -276,15 +291,16 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         foreach ( $Lessons as $Lesson )
         {
             if( $this->lesson_type == 1 && $Lesson->lessonType() == 1 )
-                return $this;
-                //die( "Добавление невозможно по причине пересечения с другим занятием 2" );
+                //return $this;
+                die( "Добавление невозможно по причине пересечения с другим занятием 2" );
 
             if( $Lesson->lessonType() == 2 && !$Lesson->isAbsent( $this->insert_date ) )
                 if( !$Lesson->isTimeModified( $this->insert_date ) )
-                    return $this;
-                    //die( "Добавление невозможно по причине пересечения с другим занятием 3" );
+                    //return $this;
+                    die( "Добавление невозможно по причине пересечения с другим занятием 3" );
         }
 
+        Core::notify(array(&$this), "beforeScheduleLessonSave");
         parent::save();
         Core::notify(array(&$this), "afterScheduleLessonSave");
     }
