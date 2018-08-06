@@ -229,7 +229,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     {
         if( $this->delete_date == "" )  $this->delete_date = "NULL";
 
-        $countModifies = Core::factory( "Schedule_Lesson_TimeModified" )
+        $Modifies = Core::factory( "Schedule_Lesson_TimeModified" )
             ->open()
                 ->open()
                     ->between( "Schedule_Lesson_TimeModified.time_from", $this->time_from, $this->time_to )
@@ -251,11 +251,15 @@ class Schedule_Lesson extends Schedule_Lesson_Model
                 ->where( "delete_date", ">", $this->insert_date )
                 ->where( "delete_date", "IS", "NULL", "OR" )
             ->close()
-            ->getCount();
+            ->findAll();
 
-        if( $countModifies > 0 )
-            return $this;
-            //die( "Добавление невозможно по причине пересечения с другим занятием 1" );
+        foreach ( $Modifies as $modify )
+        {
+            $Lesson = Core::factory( "Schedule_Lesson", $modify->lessonId() );
+            if( !$Lesson->isAbsent( $this->insert_date ) )
+                die( "Добавление невозможно по причине пересечения с другим занятием 1" );
+        }
+
 
         $Lessons = Core::factory( "Schedule_Lesson" )
             ->where( "id", "<>", $this->id )
@@ -291,12 +295,10 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         foreach ( $Lessons as $Lesson )
         {
             if( $this->lesson_type == 1 && $Lesson->lessonType() == 1 )
-                //return $this;
                 die( "Добавление невозможно по причине пересечения с другим занятием 2" );
 
             if( $Lesson->lessonType() == 2 && !$Lesson->isAbsent( $this->insert_date ) )
                 if( !$Lesson->isTimeModified( $this->insert_date ) )
-                    //return $this;
                     die( "Добавление невозможно по причине пересечения с другим занятием 3" );
         }
 
