@@ -11,8 +11,12 @@ $dateFrom = Core_Array::getValue( $_GET, "date_from", "" );
 $dateTo = Core_Array::getValue( $_GET, "date_to", "" );
 
 
+$Director = User::current()->getDirector();
+if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+$subordinated = $Director->getId();
+
 $aoLids = Core::factory("Lid")
-    ->where("active", "=", 1)
+    ->where( "subordinated", "=", $subordinated )
     ->orderBy("id", "DESC");
 
 if( $dateFrom != "" )   $aoLids->where( "control_date", ">=", $dateFrom );

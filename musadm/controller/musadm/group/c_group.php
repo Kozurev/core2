@@ -6,7 +6,12 @@
  * Time: 19:46
  */
 
-$aoGroups = Core::factory("Schedule_Group")->findAll();
+$User = Core::factory( "User" )->getCurrent();
+$subordinated = $User->getDirector()->getId();
+
+$aoGroups = Core::factory("Schedule_Group")
+    ->where( "subordinated", "=", $subordinated )
+    ->findAll();
 $output = Core::factory("Core_Entity");
 
 foreach ($aoGroups as $oGroup)

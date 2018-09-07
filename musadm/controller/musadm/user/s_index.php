@@ -13,12 +13,12 @@ if( $this->oStructureItem->getId() == 5 )
 }
 else 
 {
-    $title2 = "ПРЕПОДАВАТЕЛЕЙ";
-    $breadcumb = "преподавателей";
+    $title2 = "СОТРУДНИКОВ";
+    $breadcumb = "сотрудников";
 }
 
 $breadcumbs[0] = new stdClass();
-$breadcumbs[0]->title = "Список " . $breadcumb;
+$breadcumbs[0]->title = $this->oStructureItem->title();
 $breadcumbs[0]->active = 1;
 
 $this->setParam( "body-class", "body-primary" );
@@ -33,9 +33,13 @@ $this->setParam( "breadcumbs", $breadcumbs );
 $oUser = Core::factory("User")->getCurrent();
 
 $accessRules = array(
-    "groups"    => array(1, 2)
+    "groups"    => array(1, 2, 6)
 );
 
+if( !User::checkUserAccess( $accessRules ) )
+{
+    $this->error404();
+}
 
 $action = Core_Array::getValue($_GET, "action", null);
 
@@ -92,7 +96,7 @@ if($action == "updateFormClient")
  */
 if($action == "updateFormTeacher")
 {
-    $userid =           Core_Array::getValue($_GET, "userid", 0);
+    $userid = Core_Array::getValue($_GET, "userid", 0);
     $output = Core::factory("Core_Entity");
 
     if($userid)
@@ -117,6 +121,62 @@ if($action == "updateFormTeacher")
         ->addEntity($oUser)
         ->addEntities($aoPropertyLists, "property_list")
         ->xsl("musadm/users/edit_teacher_popup.xsl")
+        ->show();
+
+    exit;
+}
+
+
+/**
+ * Форма редактирования директора
+ */
+if( $action == "updateFormDirector" )
+{
+    $userid = Core_Array::getValue($_GET, "userid", 0);
+    $output = Core::factory("Core_Entity");
+
+    if($userid)
+    {
+        $oUser =  Core::factory("User", $userid);
+        $City =   Core::factory("Property", 28)->getPropertyValues($oUser)[0]; //Город
+        $Organization = Core::factory("Property", 29)->getPropertyValues($oUser)[0]; //Организация
+        $output->addEntity($City, "property_value");
+        $output->addEntity($Organization, "property_value");
+    }
+    else
+    {
+        $oUser = Core::factory("User");
+    }
+
+    $output
+        ->addEntity($oUser)
+        ->xsl("musadm/users/edit_director_popup.xsl")
+        ->show();
+
+    exit;
+}
+
+
+/**
+ * Форма редактирования менеджера
+ */
+if( $action == "updateFormManager" )
+{
+    $userid = Core_Array::getValue($_GET, "userid", 0);
+    $output = Core::factory("Core_Entity");
+
+    if( $userid )
+    {
+        $oUser = Core::factory( "User", $userid );
+    }
+    else
+    {
+        $oUser = Core::factory( "User" );
+    }
+
+    $output
+        ->addEntity( $oUser )
+        ->xsl( "musadm/users/edit_manager_popup.xsl" )
         ->show();
 
     exit;

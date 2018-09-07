@@ -4,7 +4,9 @@
 
     <xsl:template match="root">
 
-        <div style="text-align: right; margin: 20px 0px">
+        <h2>Список преподавателей</h2>
+
+        <div class="button-block">
             <a class="btn btn-primary user_create" data-usergroup="4">Создать пользователя</a>
         </div>
 
@@ -27,11 +29,14 @@
 
     <xsl:template match="user">
         <tr>
-            <td><a href="../?userid={id}"><xsl:value-of select="surname" /></a></td>
+            <td><a href="/{/root/wwwroot}authorize?auth_as={id}"><xsl:value-of select="surname" /></a></td>
             <td><xsl:value-of select="name" /></td>
             <td><xsl:value-of select="patronimyc" /></td>
             <td><xsl:value-of select="property_value[property_id = 20]/value" /></td>
-            <td><a class="action edit user_edit" href="#" data-userid="{id}" data-usergroup="{group_id}"></a></td>
+            <td>
+                <a class="action edit user_edit" href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
+                <a class="action archive user_archive"     href="#" data-userid="{id}"></a>
+            </td>
         </tr>
     </xsl:template>
 

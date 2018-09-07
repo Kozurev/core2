@@ -137,7 +137,9 @@ class Schedule_Controller
 
                 $Lessons
                     ->open()
-                    ->where("client_id", "=", $this->userId);
+                    ->where("client_id", "=", $this->userId)
+                    ->where("type_id", "=", 1)
+                    ->where("type_id", "<>", 3);
 
                 if( count( $aUserGroups) > 0 )
                 {
@@ -389,8 +391,10 @@ class Schedule_Controller
                     && $Lesson->dayName() == $dayName
                 )
                 {
-                    $Lesson->setRealTime( $date );
-                    $output[] = $Lesson;
+                    //$Lesson->setRealTime( $date );
+                    $temp = clone $Lesson;
+                    $temp->setRealTime( $date );
+                    $output[] = $temp;
                 }
             }
         }

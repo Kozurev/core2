@@ -6,14 +6,18 @@
  * Time: 17:07
  */
 
+
+/**
+ * Блок проверки авторизации и прав доступа
+ */
 $oUser = Core::factory("User")->getCurrent();
 
 $accessRules = array(
-    "groups"    => array(1, 2)
+    "groups"    => array(1, 2, 6)
 );
 
 $breadcumbs[0] = new stdClass();
-$breadcumbs[0]->title = "Задачи";
+$breadcumbs[0]->title = $this->oStructure->title();
 $breadcumbs[0]->active = 1;
 
 $this->setParam( "body-class", "body-red" );
@@ -79,14 +83,12 @@ if($action === "new_task_popup")
 if($action === "save_task")
 {
     $date = Core_Array::getValue($_GET, "date", "");
-    //$type = Core_Array::getValue($_GET, "type", 0);
     $note = Core_Array::getValue($_GET, "text", "");
 
     $authorId = $oUser->getId();
     $noteDate = date("Y-m-d");
 
     $oTask = Core::factory("Task")
-        //->type($type)
         ->date($date);
 
     $oTask = $oTask->save();

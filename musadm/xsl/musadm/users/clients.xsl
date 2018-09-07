@@ -49,7 +49,7 @@
 
         <tr>
             <td>
-                <a href="balance?userid={id}">
+                <a href="/{/root/wwwroot}authorize?auth_as={id}">
                     <xsl:value-of select="surname" />
                 </a>
                 <!--Анкета (соглашение подписано)-->

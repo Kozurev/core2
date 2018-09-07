@@ -6,7 +6,7 @@ class Page_Show extends Core
     private $oStructure;
     private $oStructureItem;
     private $oTemplate;
-    private $aTemplatesPath;
+    private $aTemplatesPath = [];
     private $aParams = array();
     private $title;
     private $meta_title;

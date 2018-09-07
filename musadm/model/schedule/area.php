@@ -12,7 +12,9 @@ class Schedule_Area extends Core_Entity
     protected $title;
     protected $count_classess;
     protected $path;
-    protected $sorting;
+    protected $active = 1;
+    protected $sorting = 0;
+    protected $subordinated = 0;
 
     public function __construct(){}
 
@@ -53,9 +55,40 @@ class Schedule_Area extends Core_Entity
     public function sorting($val = null)
     {
         if(is_null($val))	return $this->sorting;
-        //if(!is_int($val))   die(Core::getMessage("INVALID_TYPE", array("sorting", "Structure", "int")));
         $this->sorting = intval($val);
         return $this;
+    }
+
+
+    public function active( $val = null )
+    {
+        if( is_null( $val ) )   return $this->active;
+        $val == true ? $this->active = 1 : $this->active = 0;
+        return $this;
+    }
+
+
+    public function subordinated( $val = null )
+    {
+        if( is_null( $val ) )   return $this->subordinated;
+        $this->subordinated = intval( $val );
+        return $this;
+    }
+
+
+    public function save( $obj = null )
+    {
+        Core::notify(array(&$this), "beforeScheduleAreaSave");
+        parent::save();
+        Core::notify(array(&$this), "afterScheduleAreaSave");
+    }
+
+
+    public function delete( $obj = null )
+    {
+        Core::notify(array(&$this), "beforeScheduleAreaDelete");
+        parent::delete();
+        Core::notify(array(&$this), "afterScheduleAreaDelete");
     }
 
 }

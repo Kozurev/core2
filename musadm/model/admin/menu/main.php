@@ -306,12 +306,8 @@ class Admin_Menu_Main
         $modelId = $aParams["model_id"];
         $value = $aParams["value"];
 
-        //var_dump($value);
-
         if($value == "true")		$bValue = true;
         else	$bValue = false;
-
-        //var_dump($bValue);
 
         $obj = Core::factory($modelName, $modelId);
         $obj

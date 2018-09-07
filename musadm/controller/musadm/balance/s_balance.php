@@ -26,16 +26,16 @@ if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
     exit;
 }
 
-/*
-*	Блок проверки авторизации
-*/
+/**
+ * Блок проверки авторизации и прав доступа
+ */
 $oUser = Core::factory("User")->getCurrent();
 if(!$oUser)
 {
     $host  = $_SERVER['HTTP_HOST'];
     $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
     $extra = "";
-    header("Location: http://$host$uri/authorize?back=$host$uri/$extra");
+    header("Location: http://$host$uri/authorize");
     exit;
 }
 
@@ -175,7 +175,7 @@ if($action == "buyTarif")
 
     //Создание платежа
     $oPayment = Core::factory("Payment")
-        ->type(0)
+        ->type(2)
         ->user($userId)
         ->value($oTarif->price());
 

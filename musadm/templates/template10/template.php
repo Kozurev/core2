@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php global $CFG; ?>
     <title><?=$this->title;?></title>
     <!-- Meta -->
     <meta charset="utf-8">
@@ -21,31 +20,10 @@
         ->js( "/templates/template10/assets/plugins/jquery.min.js" );
 
         global $CFG;
-        $oCurentUser = Core::factory("User")->getCurrent();
-        $pageUserId = Core_Array::getValue($_GET, "userid", 0); //id просматриваемого пользователя администратором
+        $oUser = Core::factory("User")->getCurrent();
+        $oUserGroup  = $oUser->getParent();
         $rootdir = "/" . $CFG->rootdir;
-        $back = $_SERVER['HTTP_HOST'] . $rootdir;
-        $disauthorizeLink = $rootdir . "authorize?disauthorize=1&back=" . $back;
-
-
-        //Если администратор авторизован под учетной записью пользователя
-        if($oCurentUser->groupId() < 4 && $pageUserId > 0)
-        {
-            $oUser = Core::factory("User", $pageUserId);
-            $oUserGroup = Core::factory("User_Group", $oUser->groupId());
-            $disauthorizeLink = $rootdir . "user/" . $oUserGroup->path();
-            $sUserId = "?userid=" . $oUser->getId();
-            $iUserId = $oUser->getId();
-        }
-        else
-        {
-            $oUser = $oCurentUser;
-            $oUserGroup = Core::factory("User_Group", $oUser->groupId());
-            $disauthorizeLink = $rootdir . "authorize?disauthorize=1&back=" . $back;
-            $sUserId = "";
-            $iUserId = 0;
-        }
-
+        $disauthorizeLink = $rootdir . "authorize?auth_revert=1";
 
         $name = $oUser->name();
         $surname = $oUser->surname();
@@ -71,18 +49,20 @@
                         </div>
                         <ul class="nav navbar-nav">
                             <?
-                            if( $oUser->groupId() < 4 )
+                            if( $oUser->groupId() == 2 )
                             { ?>
                             <li class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$rootdir?>user">Расписание
                                     <span class="caret"></span></a>
                                 <ul class="dropdown-menu">
                                     <?
-                                    $aoAreas = Core::factory("Schedule_Area")->orderBy("sorting")->findAll();
+                                    $aoAreas = Core::factory("Schedule_Area")
+                                        ->where( "active", "=", 1 )
+                                        ->orderBy("sorting")
+                                        ->findAll();
                                     foreach ($aoAreas as $area)
                                     {
                                         $href = $rootdir . "schedule/" . $area->path();
-                                        if($iUserId != 0)   $href .= "?userid=" . $iUserId;
                                         echo "<li><a href='".$href."'>";
                                         echo $area->title();
                                         echo "</a></li>";
@@ -90,23 +70,21 @@
                                     ?>
                                 </ul>
                             </li>
-                            <? } elseif( $oUser->groupId() == 4 ) {
-                                    $href = "schedule";
-                                    if($iUserId != 0)   $href .= "?userid=" . $iUserId;
-                                ?>
-                            <li><a href="<?=$rootdir?><?=$href?>">Расписание</a></li>
+                            <? } elseif( $oUser->groupId() == 4 || $oUser->groupId() == 6 ) {?>
+                                <li><a href="<?=$rootdir?>schedule">Расписание</a></li>
                             <? }
 
                             //Пункты только для клиентов
-                            if(!$isAdmin && $oUserGroup->getId() == 5)
+                            if( $oUser->groupId() == 5 )
                             {
                                 ?>
                                 <li><a href="<?=$rootdir?>user/balance<?=$sUserId?>" >Баланс</a></li>
-                                <li><a href="<?=$rootdir?>user/changelogin<?=$sUserId?>" >Сменить логин или пароль</a></li>
+                                <li><a href="<?=$rootdir?>user/changelogin" >Сменить логин или пароль</a></li>
                                 <?
                             }
+
                             //Пункты только для администратора, директора или менеджера
-                            if($isAdmin)
+                            if( $oUser->groupId() == 2 || $oUser->groupId() == 6 )
                             {
                                 ?>
                                 <li class="dropdown">
@@ -124,8 +102,9 @@
                                 <li><a href="<?=$rootdir?>finances">Финансы</a></li>
                                 <li><a href="<?=$rootdir?>tasks">Задачи</a></li>
                                 <?
-                                if($oUser->superuser() == 1)
+                                if( User::checkUserAccess(["groups" => [6]]) )
                                 {
+                                    echo "<li><a href='".$rootdir."tarif'>Тарифы</a></li>";
                                     echo "<li><a href='".$rootdir."statistic'>Статистика</a></li>";
                                 }
                             }
@@ -133,7 +112,7 @@
                         </ul>
                         <ul class="nav navbar-nav navbar-right">
                             <?
-                            if($oCurentUser->groupId() < 4 && $oUserGroup->getId() == 5)
+                            if( User::isAuthAs() && User::checkUserAccess(["groups" => [4, 5]]) )
                             {
                                 echo "<li><a>". $oUser->phoneNumber()."</a></li>";
                             }

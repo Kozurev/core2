@@ -6,10 +6,14 @@
  * Time: 10:01
  */
 
+
+/**
+ * Блок проверки авторизации и прав доступа
+ */
 $oUser = Core::factory("User")->getCurrent();
 
 $accessRules = array(
-    "groups"    => array(1, 2)
+    "groups"    => array(1, 2, 6)
 );
 
 if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
@@ -20,7 +24,7 @@ if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
 
 
 $breadcumbs[0] = new stdClass();
-$breadcumbs[0]->title = "Список сертификатов";
+$breadcumbs[0]->title = $this->oStructure->title();
 $breadcumbs[0]->active = 1;
 
 $this->setParam( "body-class", "body-pink" );

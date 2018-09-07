@@ -6,7 +6,11 @@
  * Time: 10:01
  */
 
+$User = Core::factory( "User" )->getCurrent();
+$subordinated = $User->getDirector()->getId();
+
 $aoCertificates = Core::factory("Certificate")
+    ->where( "subordinated", "=", $subordinated )
     ->orderBy("sell_date", "DESC")
     ->findAll();
 
@@ -14,7 +18,6 @@ foreach ($aoCertificates as $cert)
 {
     $cert->sellDate(refactorDateFormat($cert->sellDate()));
     $cert->activeTo(refactorDateFormat($cert->activeTo()));
-    //$cert->addEntities( $cert->getNotes() );
 }
 
 $aoNotes = Core::factory( "Certificate_Note" )
@@ -22,6 +25,11 @@ $aoNotes = Core::factory( "Certificate_Note" )
     ->join( "User as usr", "author_id = usr.id" )
     ->orderBy( "date", "DESC" )
     ->findAll();
+
+foreach ( $aoNotes as $Note )
+{
+    $Note->date( refactorDateFormat( $Note->date() ) );
+}
 
 Core::factory("Core_Entity")
     ->addEntities( $aoCertificates )

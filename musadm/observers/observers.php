@@ -11,14 +11,26 @@
  */
 Core::attachObserver("beforeUserSave", function($args){
     $oUser = $args[0];
+
     if($oUser->groupId() == 4 && $oUser->getId() == "")
     {
         $teacherFullName = $oUser->surname() . " " . $oUser->name();
 
-        $listValue = Core::factory("Property_List_Values")
+        Core::factory("Property_List_Values")
             ->property_id(21)
             ->value($teacherFullName)
             ->save();
+    }
+
+    if( $oUser->groupId() != 6 && $oUser->groupId() != 1 )
+    {
+        $User = Core::factory( "User" )->getCurrent();
+        $subordinated = $User->getDirector()->getId();
+
+        if( $oUser->subordinated() == 0 )
+        {
+            $oUser->subordinated( $subordinated );
+        }
     }
 });
 
@@ -75,12 +87,6 @@ Core::attachObserver("beforeUserDelete", function($args){
         ->where("teacher_id", "=", $oUser->getId(), "OR")
         ->findAll();
 
-    $aoCurrentLessons = Core::factory("Schedule_Current_Lesson")
-        ->where("client_id", "=", $oUser->getId())
-        ->where("teacher_id", "=", $oUser->getId(), "OR")
-        ->findALl();
-
-    $aoLessons = array_merge($aoLessons, $aoCurrentLessons);
     foreach ($aoLessons as $oLesson)    $oLesson->delete();
 });
 
@@ -132,7 +138,7 @@ Core::attachObserver("afterUserAuthorize", function($args){
  */
 Core::attachObserver("beforeStructureDelete", function($args){
     $oStructure = $args[0];
-    $oProperty = Core::factory("Property")->clearForObject($oStructure);
+    Core::factory("Property")->clearForObject($oStructure);
 });
 
 
@@ -141,7 +147,7 @@ Core::attachObserver("beforeStructureDelete", function($args){
  */
 Core::attachObserver("beforeItemDelete", function($args){
     $oStructure = $args[0];
-    $oProperty = Core::factory("Property")->clearForObject($oStructure);
+    Core::factory("Property")->clearForObject($oStructure);
 });
 
 
@@ -167,7 +173,6 @@ Core::attachObserver("beforeStructureDelete", function($args){
  */
 Core::attachObserver("beforeStructureSave", function($args){
     $oStructure = $args[0];
-    //$oParentStructure = $oStructure->getParent();
     $oRootStructure = Core::factory("Structure")->where("path", "=", "")->find();
     $aParentId[] = $oStructure->parentId();
 
@@ -220,6 +225,19 @@ Core::attachObserver("beforeItemSave", function($args){
         ->getCount();
 
     if($countCoincidingItems > 0 || $countCoincidingStructures > 0) die("Дублирование путей");
+});
+
+
+/**
+ * При создании лида задание значения свойства subordinated
+ */
+Core::attachObserver("beforeLidSave", function($args){
+    $Lid = $args[0];
+    if( $Lid->subordinated() == 0 )
+    {
+        $User = Core::factory( "User" )->getCurrent()->getDirector();
+        $Lid->subordinated( $User->getId() );
+    }
 });
 
 
@@ -335,5 +353,57 @@ Core::attachObserver( "afterScheduleReportSave", function( $args ){
         {
             $LidStatus->value( 81 )->save();
         }
+    }
+});
+
+
+/**
+ * Проверка на совпадения по свойству path
+ * и транслитное автоматическое задание данного свойства
+ */
+Core::attachObserver("beforeScheduleAreaSave", function($args){
+    $Area = $args[0];
+
+    if( $Area->path() == "" )
+    {
+        $Area->path( translite( $Area->title() ) );
+    }
+
+    if( $Area->subordinated() == 0 )
+    {
+        $oUser = Core::factory( "User" )->getCurrent()->getDirector();
+        $Area->subordinated( $oUser->getId() );
+    }
+
+    if( !$Area->getId() && Core::factory( "Schedule_Area" )->where( "path", "=", $Area->path() )->find() )
+        die( "Сохранение невозможно, так как уже существует филлиал имеющий путь: \"" . $Area->path() . "\"" );
+
+});
+
+
+/**
+ *
+ */
+Core::attachObserver("beforePaymentSave", function($args){
+    $Payment = $args[0];
+
+    if( $Payment->subordinated() == 0 )
+    {
+        $oUser = Core::factory( "User" )->getCurrent()->getDirector();
+        $Payment->subordinated( $oUser->getId() );
+    }
+});
+
+
+/**
+ *
+ */
+Core::attachObserver("beforeScheduleGroupSave", function($args){
+    $Group = $args[0];
+
+    if( $Group->subordinated() == 0 )
+    {
+        $oUser = Core::factory( "User" )->getCurrent()->getDirector();
+        $Group->subordinated( $oUser->getId() );
     }
 });

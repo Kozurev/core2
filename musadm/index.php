@@ -14,6 +14,16 @@ require_once ROOT."/config/config.php";
 require_once ROOT."/includes.php";
 Core_Database::connect();
 
+if( !isset( $_SESSION["core"] ) )
+{
+    $_SESSION["core"] = [];
+}
+
+if( !isset( $_SESSION["core"]["user_backup"] ) )
+{
+    $_SESSION["core"]["user_backup"] = [];
+}
+
 //Подключение обязательных биьлиотек
 require_once ROOT . "/model/orm.php";
 require_once ROOT . "/model/core.php";
@@ -25,6 +35,8 @@ require_once ROOT . "/model/core/entity/controller/model.php";
 require_once ROOT . "/model/core/entity/controller.php";
 require_once ROOT . "/model/property/assigment/model.php";
 require_once ROOT . "/model/property/assigment.php";
+require_once ROOT . "/model/user/model.php";
+require_once ROOT . "/model/user.php";
 
 //Установка системных констант
 define('TEST_MODE_PAGE', false);

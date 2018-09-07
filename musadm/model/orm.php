@@ -90,6 +90,7 @@ class Orm
 
 		if(!$result)    return 0;
 		$result = $result->fetch();
+		$this->queryString = "";
 		return intval($result['count']);
 	}
 
@@ -123,7 +124,7 @@ class Orm
                 else
                 {
                     $queryStr .= "`".$aRows[$i]."` = ";//'".$aValues[$i]."' "
-                    if( $aValues[$i] == "null" || $aValues[$i] == "NULL" )
+                    if( $aValues[$i] === "null" || $aValues[$i] === "NULL" )
                         $queryStr .= "NULL, ";
                     else
                         $queryStr .= "'". $aValues[$i] ."', ";

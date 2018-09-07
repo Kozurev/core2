@@ -20,7 +20,7 @@ $(function(){
             e.preventDefault();
             loaderOn();
             var userid = $(this).data("userid");
-            saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", loaderOff);
+            saveData("Main", loaderOff);
             refreshPaymentsTable(userid, loaderOff);
         })
         //Открытие формы пополнения баланса
@@ -64,6 +64,19 @@ $(function(){
             var tarifid = $("select[name=tarif_id]").val();
             var userid = $(this).data("userid");
             buyTarif(userid, tarifid);
+        })
+        .on("click", ".tarifs_show", function(e){
+            e.preventDefault();
+
+            var TarifsBlock = $(".tarifs");
+            if(TarifsBlock.css("display") === "block")
+            {
+                TarifsBlock.hide("slow");
+            }
+            else
+            {
+                TarifsBlock.show("slow");
+            }
         });
 });
 

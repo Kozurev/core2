@@ -6,16 +6,16 @@
  * Time: 23:18
  */
 
-$oCurentUser = Core::factory("User")->getCurrent();
-$pageUserId = Core_Array::getValue($_GET, "userid", 0);
+//$oCurentUser = Core::factory("User")->getCurrent();
+//$pageUserId = Core_Array::getValue($_GET, "userid", 0);
 
-if($oCurentUser->groupId() < 4 && $pageUserId > 0)
-    $oUser = Core::factory("User", $pageUserId);
-else
-    $oUser = $oCurentUser;
+//if($oCurentUser->groupId() < 4 && $pageUserId > 0)
+//    $oUser = Core::factory("User", $pageUserId);
+//else
+//    $oUser = $oCurentUser;
 
-$oCurenUserGroup = Core::factory("User_Group", $oCurentUser->groupId());
-
+$oUser = Core::factory( "User" )->getCurrent();
+User::isAuthAs() ? $isAdmin = 1 : $isAdmin = 0;
 
 /**
  * Баланс, кол-во индивидуальных занятий, кол-во групповых занятий
@@ -30,7 +30,8 @@ $groupLessons   =   $oPropertyGroupLessons->getPropertyValues($oUser)[0];
 
 Core::factory("Core_Entity")
     ->addEntity($oUser)
-    ->addEntity($oCurenUserGroup)
+    //->addEntity($oCurenUserGroup)
+    ->addSimpleEntity( "is_admin", $isAdmin )
     ->addEntity($balance,           "property")
     ->addEntity($privateLessons,    "property")
     ->addEntity($groupLessons,      "property")
@@ -140,28 +141,32 @@ $UserReports = $UserReports->findAll();
 foreach ( $UserReports as $rep )
 {
     $rep->date( refactorDateFormat( $rep->date() ) );
-
-    //if( $rep->lessonName() == null )    $rep->lessonName( "Schedule_Current_Lesson" );
-
     $RepLesson = Core::factory( "Schedule_Lesson", $rep->lessonId() );
 
-    if( $RepLesson == false )   { debug($RepLesson, 1); debug($rep);  }
-
-    if( $rep->lessonType() == "1" && $RepLesson->isTimeModified( $rep->date() ) )
+    if( $RepLesson == false )   //Если занятие было удалено
     {
-        $Modified = Core::factory("Schedule_Lesson_TimeModified")
-            ->where( "lesson_id", "=", $RepLesson->getId() )
-            ->where( "date", "=", $rep->date() )
-            ->find();
-
-        $rep->time_from = refactorTimeFormat( $Modified->timeFrom() );
-        $rep->time_to = refactorTimeFormat( $Modified->timeTo() );
+        $rep->time_from = "Нет данных";
+        $rep->time_to = "Нет данных";
     }
     else
     {
-        $rep->time_from = refactorTimeFormat( $RepLesson->timeFrom() );
-        $rep->time_to = refactorTimeFormat( $RepLesson->timeTo() );
+        if( $rep->lessonType() == "1" && $RepLesson->isTimeModified( $rep->date() ) )
+        {
+            $Modified = Core::factory("Schedule_Lesson_TimeModified")
+                ->where( "lesson_id", "=", $RepLesson->getId() )
+                ->where( "date", "=", $rep->date() )
+                ->find();
+
+            $rep->time_from = refactorTimeFormat( $Modified->timeFrom() );
+            $rep->time_to = refactorTimeFormat( $Modified->timeTo() );
+        }
+        else
+        {
+            $rep->time_from = refactorTimeFormat( $RepLesson->timeFrom() );
+            $rep->time_to = refactorTimeFormat( $RepLesson->timeTo() );
+        }
     }
+
 }
 
 Core::factory( "Core_Entity" )
@@ -176,7 +181,6 @@ Core::factory( "Core_Entity" )
 $aoUserPayments = Core::factory("Payment")
     ->orderBy("id", "DESC")
     ->where("user", "=", $oUser->getId())
-    //->where("value", ">", "0")
     ->findAll();
 
 foreach ($aoUserPayments as $payment)
@@ -187,7 +191,7 @@ foreach ($aoUserPayments as $payment)
 }
 
 Core::factory("Core_Entity")
-    ->addEntity($oCurenUserGroup)
+    ->addSimpleEntity( "is_admin", $isAdmin )
     ->addEntities($aoUserPayments)
     ->xsl("musadm/users/balance/payments.xsl")
     ->show();

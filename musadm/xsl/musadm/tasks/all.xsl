@@ -11,19 +11,18 @@
             <a class="btn btn-red tasks_show" >Показать</a>
         </div>
 
-        <div style="text-align: right; margin-bottom:20px">
+        <div class="button-block">
             <a class="btn btn-red task_create">Добавить задачу</a>
         </div>
 
-        <table id="sortingTable" class="table table-bordered task">
+        <table id="sortingTable" class="table table-bordered task center">
             <thead>
                 <tr class="header">
                     <th>№</th>
                     <th>Дата контроля</th>
                     <th>Примечания</th>
-                    <!--<th>Тип</th>-->
                     <th>Статус</th>
-                    <th>Добавить</th>
+                    <th>Добавить <br/> коммент.</th>
                 </tr>
             </thead>
 
@@ -69,23 +68,18 @@
                 </xsl:for-each>
             </td>
 
-            <!--<td class="{$class}">-->
-                <!--<xsl:variable name="type" select="type" />-->
-                <!--<xsl:value-of select="//task_type[id = $type]/title" />-->
-            <!--</td>-->
             <td class="{$class}">
                 <xsl:choose>
                     <xsl:when test="done = 1">
                         <a href="#" class="action ok"></a>
                     </xsl:when>
                     <xsl:otherwise>
-                        <!--<button data-task_id="{id}" class="btn btn-primary task_append_done" >Сделано</button>-->
                         <a href="#" class="action append_done task_append_done" data-task_id="{id}"></a>
                     </xsl:otherwise>
                 </xsl:choose>
             </td>
             <td class="{$class}">
-                <a data-task_id="{id}" class="btn btn-red task_add_note" data-table_type="{/root/table_name}">Добавить примечание</a>
+                <a data-task_id="{id}" class="btn btn-red task_add_note" data-table_type="{/root/table_name}">+</a>
             </td>
         </tr>
     </xsl:template>

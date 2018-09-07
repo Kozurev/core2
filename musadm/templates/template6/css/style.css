@@ -1,7 +1,10 @@
-body {
-	font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-	font-size: 20px;
-	font-weight: 300;
-	overflow-x: hidden;
-}
+/*.users {*/
+	/*font-family: 'Open Sans', Helvetica, Arial, sans-serif;*/
+	/*font-size: 16px;*/
+	/*overflow-x: hidden;*/
+/*}*/
 
+
+.users h2 {
+	display: inline-block;
+}

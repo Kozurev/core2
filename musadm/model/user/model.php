@@ -14,8 +14,9 @@ class User_Model extends Core_Entity
 	protected $password; //
 	protected $group_id; //
 	protected $register_date; //
-	protected $active = 0; //
+	protected $active = 1; //
 	protected $superuser = 0;
+	protected $subordinated = 0;
 	//protected $properties_list;
 
 	function __construct()
@@ -52,13 +53,17 @@ class User_Model extends Core_Entity
 	}
 
 
-	public function password($val = null)
+	public function password( $val = null, $type = false )
 	{
 		if(is_null($val)) 		return $this->password;
 		if(strlen($val) > 255)
 		    die(Core::getMessage("TOO_LARGE_VALUE", array("password", "User", 255)));
 
-		$this->password = md5($val);
+		if( $type == false )
+		    $this->password = md5($val);
+		else
+		    $this->password = strval( $val );
+
 		return $this;
 	}
 
@@ -143,6 +148,14 @@ class User_Model extends Core_Entity
 		
 		return $this;
 	}
+
+
+	public function subordinated( $val = null )
+    {
+        if( is_null( $val ) )   return $this->subordinated;
+        $this->subordinated = intval( $val );
+        return $this;
+    }
 
 
 }

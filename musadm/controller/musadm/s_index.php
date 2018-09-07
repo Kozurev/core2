@@ -14,8 +14,7 @@ if(!$oUser)
 {
     $host  = $_SERVER['HTTP_HOST'];
     $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-    $extra = "";
-    header("Location: http://$host$uri/authorize?back=$host$uri/$extra");
+    header("Location: http://$host$uri/authorize?back=$host$uri/");
     exit;
 }
 
@@ -31,26 +30,50 @@ if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
 $host  = $_SERVER['HTTP_HOST'];
 $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
 
-$oCurentUser = Core::factory("User")->getCurrent();
-$pageUserId = Core_Array::getValue($_GET, "userid", 0); //id просматриваемого пользователя администратором
 
-//Если администратор авторизован под учетной записью пользователя
-if($oCurentUser->groupId() < 4 && $pageUserId > 0)
+$oUser = Core::factory("User")->getCurrent();
+
+
+$this->setParam( "body-class", "body-green" );
+$this->setParam( "title-first", "ГЛАВНАЯ" );
+$this->setParam( "title-second", "СТРАНИЦА" );
+
+$access = ["groups" => [1, 2, 3, 6]];
+
+
+if( !User::checkUserAccess( $access ) )
 {
-    $oUser = Core::factory("User", $pageUserId);
-}
-else
-{
-    $oUser = $oCurentUser;
+    header( "Location: http://$host$uri/authorize?back=/$uri" );
 }
 
-if($oCurentUser->groupId() < 4 && $pageUserId)
+if( $oUser->groupId() == 6 )
 {
-    header("Location: http://$host$uri/schedule?userid=$pageUserId");
-    exit;
+    header( "Location: http://$host$uri/user/client" );
 }
-elseif($oCurentUser->groupId() < 4)
+
+if( $oUser->groupId() == 5 )
 {
-	header("Location: http://$host$uri/user/client");
+    header( "Location: http://$host$uri/balance" );
+}
+
+if( $oUser->groupId() == 4 )
+{
+    header( "Location: http://$host$uri/schedule" );
+}
+
+if( $oUser->groupId() == 2)
+{
+    header( "Location: http://$host$uri/user/client" );
+}
+
+
+$action = Core_Array::getValue($_GET, "action", null);
+
+/**
+ * Обновление таблиц
+ */
+if($action == "refreshTableUsers")
+{
+    $this->execute();
     exit;
 }

@@ -10,7 +10,6 @@
                     rules: {
                         surname:    {required: true, maxlength: 255},
                         name:       {required: true, maxlength: 255},
-                        //phoneNumber:{required: true, maxlength: 255},
                         login:      {required: true, maxlength: 255},
                     },
                     messages: {
@@ -18,11 +17,11 @@
                             required: "Это поле обязательноое к заполнению",
                             maxlength: "Длина значения не должна превышать 255 символов"
                         },
-                        surname: {
+                        name: {
                             required: "Это поле обязательноое к заполнению",
                             maxlength: "Длина значения не должна превышать 255 символов"
                         },
-                        surname: {
+                        login: {
                             required: "Это поле обязательноое к заполнению",
                             maxlength: "Длина значения не должна превышать 255 символов"
                         },
@@ -64,7 +63,14 @@
                 <span>Пароль</span>
             </div>
             <div class="column">
-                <input class="form-control" type="text" value="" name="password" />
+                <input class="form-control" type="password" value="" name="pass1" />
+            </div>
+            <hr/>
+            <div class="column">
+                <span>Повторите пароль</span>
+            </div>
+            <div class="column">
+                <input class="form-control" type="password" value="" name="pass2" />
             </div>
             <hr/>
             <div class="column">

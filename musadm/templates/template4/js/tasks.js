@@ -4,31 +4,6 @@ $(function(){
             e.preventDefault();
             newTaskPopup();
         })
-        // .on("change", "select[name=type]", function(e){
-        //     var type = $(this).val();
-        //     var dateRow = $(".date");
-        //     var dateInp = $("input[name=date]");
-        //
-        //     var date = new Date();
-        //     var year = date.getFullYear();
-        //     var month = date.getMonth() + 1;
-        //     var day = date.getDate();
-        //
-        //     if(month < 10)  month = "0" + month;
-        //     if(day < 10)    day = "0" + day;
-        //
-        //     var currentDate = year + "-" + month + "-" + day;
-        //     dateInp.val(currentDate);
-        //
-        //     if(type == 3)
-        //     {
-        //         dateRow.show("slow");
-        //     }
-        //     else
-        //     {
-        //         dateRow.hide("slow");
-        //     }
-        // })
         .on("click", ".popop_task_submit", function(e){
             e.preventDefault();
             loaderOn();
@@ -90,7 +65,7 @@ $(function(){
         .on("click", ".popop_task_note_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("./admin?menuTab=Main&menuAction=updateAction&ajax=1", refreshTableAll);
+            saveData("Main", refreshTableAll);
         })
         .on("click", ".tasks_show", function(){
             loaderOn();

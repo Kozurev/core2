@@ -1,4 +1,5 @@
 var loaderTime = 200;
+var root = "/musadm";
 
 $(function(){
 
@@ -132,29 +133,29 @@ function reloadMain(hash){
 
 /**
  *	Изменение активности структуры или элемента
+ *
  *	@param model_name - название объекта (Structure, Structure_Item и т.д.)
  *	@param model_id - id объекта
  *	@param value - значение активности true/false
  */
-function updateActive(model_name, model_id, value){
+function updateActive(model_name, model_id, value, func){
     loaderOn();
 
-    var link = "?menuTab=Main&menuAction=updateActive&ajax=1";
+    var link = root + "/admin?menuTab=Main&menuAction=updateActive&ajax=1";
     link += "&model_name=" + model_name;
     link += "&model_id=" + model_id;
     link += "&value=" + value;
     link += "&ajax=1";
 
-    console.log(link);
-
     $.ajax({
         type: "GET",
         url: link,
         success: function(answer){
-            setTimeout("loaderOff()", loaderTime);
-            //loaderOff();
             if(answer != "0")
                 alert("Ошибка: " + answer);
+
+            if(typeof func === "function") func();
+            setTimeout("loaderOff()", loaderTime);
         }
     });
 }
