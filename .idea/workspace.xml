@@ -14,7 +14,7 @@
       <file leaf-file-name="client_payments.xsl" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/musadm/xsl/musadm/finances/client_payments.xsl">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
+            <state relative-caret-position="578">
               <caret line="34" column="31" lean-forward="false" selection-start-line="34" selection-start-column="31" selection-end-line="34" selection-end-column="31" />
               <folding />
             </state>
@@ -24,8 +24,8 @@
       <file leaf-file-name="s_index.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/musadm/controller/musadm/finances/s_index.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-4">
-              <caret line="41" column="9" lean-forward="true" selection-start-line="41" selection-start-column="9" selection-end-line="41" selection-end-column="9" />
+            <state relative-caret-position="612">
+              <caret line="41" column="9" lean-forward="false" selection-start-line="41" selection-start-column="9" selection-end-line="41" selection-end-column="9" />
               <folding />
             </state>
           </provider>
@@ -34,19 +34,31 @@
       <file leaf-file-name="new_tarif_popup.xsl" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/musadm/xsl/musadm/finances/new_tarif_popup.xsl">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="455">
+            <state relative-caret-position="918">
               <caret line="54" column="49" lean-forward="false" selection-start-line="54" selection-start-column="49" selection-end-line="54" selection-end-column="49" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="s_balance.php" pinned="false" current-in-tab="true">
+      <file leaf-file-name="s_balance.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/musadm/controller/musadm/balance/s_balance.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="217">
-              <caret line="160" column="58" lean-forward="true" selection-start-line="160" selection-start-column="58" selection-end-line="160" selection-end-column="58" />
+            <state relative-caret-position="17">
+              <caret line="160" column="58" lean-forward="false" selection-start-line="160" selection-start-column="58" selection-end-line="160" selection-end-column="58" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="array.php" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/musadm/model/core/array.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="234">
+              <caret line="31" column="26" lean-forward="true" selection-start-line="31" selection-start-column="26" selection-end-line="31" selection-end-column="26" />
+              <folding>
+                <element signature="e#6#94#0#PHP" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -54,7 +66,7 @@
       <file leaf-file-name="payments.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/musadm/templates/template4/js/payments.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
+            <state relative-caret-position="1547">
               <caret line="91" column="31" lean-forward="false" selection-start-line="91" selection-start-column="31" selection-end-line="91" selection-end-column="31" />
               <folding />
             </state>
@@ -159,13 +171,13 @@
         <option value="$PROJECT_DIR$/musadm/xsl/musadm/users/balance/edit_payment_popup.xsl" />
         <option value="$PROJECT_DIR$/musadm/index.php" />
         <option value="$PROJECT_DIR$/musadm/controller/c_test.php" />
-        <option value="$PROJECT_DIR$/musadm/model/core/array.php" />
         <option value="$PROJECT_DIR$/musadm/xsl/musadm/finances/client_payments.xsl" />
         <option value="$PROJECT_DIR$/musadm/model/payment/tarif/model.php" />
         <option value="$PROJECT_DIR$/musadm/controller/musadm/finances/s_index.php" />
         <option value="$PROJECT_DIR$/musadm/templates/template4/js/payments.js" />
         <option value="$PROJECT_DIR$/musadm/xsl/musadm/finances/new_tarif_popup.xsl" />
         <option value="$PROJECT_DIR$/musadm/controller/musadm/balance/s_balance.php" />
+        <option value="$PROJECT_DIR$/musadm/model/core/array.php" />
       </list>
     </option>
   </component>
@@ -198,7 +210,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
@@ -252,15 +263,7 @@
               <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
               <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
               <item name="model" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="payment" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="musadm" type="b2602c69:ProjectViewProjectNode" />
-              <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="model" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="payment" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="tarif" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="core" type="2a2b976b:PhpTreeStructureProvider$1" />
             </path>
             <path>
               <item name="musadm" type="b2602c69:ProjectViewProjectNode" />
@@ -308,6 +311,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -368,21 +372,21 @@
       <workItem from="1536500779428" duration="314000" />
       <workItem from="1536501122892" duration="117000" />
       <workItem from="1536501267406" duration="4029000" />
+      <workItem from="1536512504512" duration="77000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="164455000" />
+    <option name="totallyTimeSpent" value="164532000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24426934" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.247851" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293011" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293011" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -394,6 +398,7 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -411,7 +416,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/lib/functions.php" />
     <entry file="file://$PROJECT_DIR$/controller/musadm/schedule/c_schedule.php" />
     <entry file="file://$PROJECT_DIR$/index.php" />
     <entry file="file://$PROJECT_DIR$/templates/template7/template.php" />
@@ -459,19 +463,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-460">
           <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-          <folding>
-            <marker date="1536281256000" expanded="true" signature="1724:1778" ph="SELECT * FRO... users" />
-            <marker date="1536281256000" expanded="true" signature="2684:2734" ph="SELECT rolei... role_assignment" />
-            <marker date="1536281256000" expanded="true" signature="3609:3644" ph="SELECT * fro... payment" />
-            <marker date="1536281256000" expanded="true" signature="4006:4102" ph="SELECT * fro... payment" />
-            <marker date="1536281256000" expanded="true" signature="4339:4417" ph="SELECT * fro... payment" />
-            <marker date="1536281256000" expanded="true" signature="4904:5014" ph="SELECT * fro... payment" />
-            <marker date="1536281256000" expanded="true" signature="5322:5433" ph="SELECT * fro... payment" />
-            <marker date="1536281256000" expanded="true" signature="6299:6342" ph="SELECT note client_notes" />
-            <marker date="1536281256000" expanded="true" signature="6666:6725" ph="SELECT instr... teacher_assignment" />
-            <marker date="1536281256000" expanded="true" signature="7089:7126" ph="SELECT * FRO... payment" />
-            <marker date="1536281256000" expanded="true" signature="7987:8032" ph="SELECT * FRO... group_members" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -493,7 +484,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="357">
           <caret line="26" column="0" lean-forward="false" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -613,7 +603,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="404">
           <caret line="72" column="0" lean-forward="false" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -621,34 +610,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="336">
           <caret line="57" column="0" lean-forward="false" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
-          <folding>
-            <element signature="e#6#93#0#PHP" expanded="false" />
-            <marker date="1536498968819" expanded="true" signature="968:1018" ph="ALTER TABLE `User`... " />
-            <marker date="1536498968819" expanded="true" signature="1062:1111" ph="ALTER TABLE `Lid`... " />
-            <marker date="1536498968819" expanded="true" signature="1155:1212" ph="ALTER TABLE `Certificate`... " />
-            <marker date="1536498968819" expanded="true" signature="1256:1306" ph="ALTER TABLE `Task`... " />
-            <marker date="1536498968819" expanded="true" signature="1350:1409" ph="ALTER TABLE `Schedule_Area`... " />
-            <marker date="1536498968819" expanded="true" signature="1453:1506" ph="ALTER TABLE `Schedule_Area`... " />
-            <marker date="1536498968819" expanded="true" signature="1551:1604" ph="ALTER TABLE `Payment`... " />
-            <marker date="1536498968819" expanded="true" signature="1648:1692" ph="UPDATE `Payment`... " />
-            <marker date="1536498968819" expanded="true" signature="1737:1796" ph="ALTER TABLE `Payment_Tarif`... " />
-            <marker date="1536498968819" expanded="true" signature="1840:1898" ph="ALTER TABLE `Payment_Tarif`... " />
-            <marker date="1536498968819" expanded="true" signature="1941:1999" ph="ALTER TABLE `Payment_tarif`... " />
-            <marker date="1536498968819" expanded="true" signature="2043:2120" ph="UPDATE `Payment_Tarif`... " />
-            <marker date="1536498968819" expanded="true" signature="2164:2241" ph="UPDATE `Payment_Tarif`... " />
-            <marker date="1536498968819" expanded="true" signature="2285:2366" ph="ALTER TABLE Payment_Tarif... " />
-            <marker date="1536498968819" expanded="true" signature="2412:2444" ph="UPDATE User... " />
-            <marker date="1536498968819" expanded="true" signature="2412:2445" ph="UPDATE User... " />
-            <marker date="1536498968819" expanded="true" signature="2412:2479" ph="UPDATE `User`... " />
-            <marker date="1536498968819" expanded="true" signature="2412:2480" ph="UPDATE User... " />
-            <marker date="1536498968819" expanded="true" signature="2523:2589" ph="UPDATE `Lid`... " />
-            <marker date="1536498968819" expanded="true" signature="2633:2707" ph="UPDATE `Certificate`... " />
-            <marker date="1536498968819" expanded="true" signature="2751:2821" ph="UPDATE `Payment`... " />
-            <marker date="1536498968819" expanded="true" signature="2865:2941" ph="UPDATE `Payment_Tarif`... " />
-            <marker date="1536498968819" expanded="true" signature="2985:3052" ph="UPDATE `Task`... " />
-            <marker date="1536498968819" expanded="true" signature="3096:3172" ph="UPDATE `Schedule_Area`... " />
-            <marker date="1536498968819" expanded="true" signature="3216:3261" ph="UPDATE `Schedule_Area`... " />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -659,19 +620,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/musadm/model/core/array.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="455">
-          <caret line="32" column="46" lean-forward="false" selection-start-line="32" selection-start-column="46" selection-end-line="32" selection-end-column="46" />
-          <folding>
-            <element signature="e#6#94#0#PHP" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/musadm/xsl/musadm/finances/client_payments.xsl">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
+        <state relative-caret-position="578">
           <caret line="34" column="31" lean-forward="false" selection-start-line="34" selection-start-column="31" selection-end-line="34" selection-end-column="31" />
           <folding />
         </state>
@@ -681,7 +632,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
           <caret line="4" column="8" lean-forward="false" selection-start-line="4" selection-start-column="8" selection-end-line="37" selection-end-column="15" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -689,21 +639,20 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="325">
           <caret line="27" column="0" lean-forward="true" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/musadm/controller/musadm/finances/s_index.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4">
-          <caret line="41" column="9" lean-forward="true" selection-start-line="41" selection-start-column="9" selection-end-line="41" selection-end-column="9" />
+        <state relative-caret-position="612">
+          <caret line="41" column="9" lean-forward="false" selection-start-line="41" selection-start-column="9" selection-end-line="41" selection-end-column="9" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/musadm/templates/template4/js/payments.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
+        <state relative-caret-position="1547">
           <caret line="91" column="31" lean-forward="false" selection-start-line="91" selection-start-column="31" selection-end-line="91" selection-end-column="31" />
           <folding />
         </state>
@@ -711,7 +660,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/musadm/xsl/musadm/finances/new_tarif_popup.xsl">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="455">
+        <state relative-caret-position="918">
           <caret line="54" column="49" lean-forward="false" selection-start-line="54" selection-start-column="49" selection-end-line="54" selection-end-column="49" />
           <folding />
         </state>
@@ -719,9 +668,27 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/musadm/controller/musadm/balance/s_balance.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="217">
-          <caret line="160" column="58" lean-forward="true" selection-start-line="160" selection-start-column="58" selection-end-line="160" selection-end-column="58" />
+        <state relative-caret-position="17">
+          <caret line="160" column="58" lean-forward="false" selection-start-line="160" selection-start-column="58" selection-end-line="160" selection-end-column="58" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/musadm/model/core/entity.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/musadm/model/core/array.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="31" column="26" lean-forward="true" selection-start-line="31" selection-start-column="26" selection-end-line="31" selection-end-column="26" />
+          <folding>
+            <element signature="e#6#94#0#PHP" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
