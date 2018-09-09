@@ -109,6 +109,7 @@ class Core //extends Orm
      * Получение значения часто используемой строки
      * @param $sMessageName - назавние строки
      * @param $aMessageParams - параметры, передаваемые в строку
+     * @return string
      */
     public static function getMessage($sMessageName, $aMessageParams = [])
     {

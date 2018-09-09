@@ -15,7 +15,7 @@
         <entry file="file://$PROJECT_DIR$/musadm/model/schedule/controller.php">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-425">
-              <caret line="130" column="0" lean-forward="true" selection-start-line="130" selection-start-column="0" selection-end-line="130" selection-end-column="0" />
+              <caret line="130" column="0" lean-forward="false" selection-start-line="130" selection-start-column="0" selection-end-line="130" selection-end-column="0" />
               <folding>
                 <marker date="1536281256000" expanded="true" signature="6469:6485" ph="..." />
                 <marker date="1536281256000" expanded="true" signature="6522:6777" ph="..." />
@@ -28,11 +28,21 @@
       <file leaf-file-name="c_index.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/musadm/controller/musadm/finances/c_index.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-85">
-              <caret line="10" column="36" lean-forward="true" selection-start-line="10" selection-start-column="36" selection-end-line="10" selection-end-column="36" />
+            <state relative-caret-position="221">
+              <caret line="13" column="0" lean-forward="true" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
               <folding>
                 <element signature="e#6#94#0#PHP" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="core.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/musadm/model/core.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="105" column="0" lean-forward="true" selection-start-line="105" selection-start-column="0" selection-end-line="105" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -89,8 +99,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$USER_HOME$/AppData/Local/Temp/fz3temp-2/users.js" />
-        <option value="$PROJECT_DIR$/xsl/musadm/users/balance/attendance_report.xsl" />
         <option value="$USER_HOME$/AppData/Local/Temp/fz3temp-2/s_schedule.php" />
         <option value="$USER_HOME$/AppData/Local/Temp/fz3temp-2/c_balance.php" />
         <option value="$PROJECT_DIR$/model/schedule/current/lesson.php" />
@@ -140,6 +148,8 @@
         <option value="$PROJECT_DIR$/controller/musadm/balance/s_balance.php" />
         <option value="$PROJECT_DIR$/musadm/index.php" />
         <option value="$PROJECT_DIR$/musadm/model/schedule/controller.php" />
+        <option value="$PROJECT_DIR$/musadm/model/core.php" />
+        <option value="$PROJECT_DIR$/musadm/.gitignore" />
       </list>
     </option>
   </component>
@@ -276,12 +286,12 @@
       <workItem from="1533025315328" duration="8640000" />
       <workItem from="1533198943119" duration="444000" />
       <workItem from="1536077309914" duration="732000" />
-      <workItem from="1536475337220" duration="767000" />
+      <workItem from="1536475337220" duration="1076000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="142791000" />
+    <option name="totallyTimeSpent" value="143100000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
@@ -318,8 +328,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/model/admin/menu/scheduleCurrent.php" />
-    <entry file="file://$PROJECT_DIR$/model/admin/menu/schedule.php" />
     <entry file="file://$PROJECT_DIR$/controller/musadm/tasks/s_active.php" />
     <entry file="file://$PROJECT_DIR$/controller/musadm/tasks/c_active.php" />
     <entry file="file://$PROJECT_DIR$/controller/musadm/tasks/c_today.php" />
@@ -377,7 +385,7 @@
     <entry file="file://$PROJECT_DIR$/musadm/model/schedule/controller.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-425">
-          <caret line="130" column="0" lean-forward="true" selection-start-line="130" selection-start-column="0" selection-end-line="130" selection-end-column="0" />
+          <caret line="130" column="0" lean-forward="false" selection-start-line="130" selection-start-column="0" selection-end-line="130" selection-end-column="0" />
           <folding>
             <marker date="1536281256000" expanded="true" signature="6469:6485" ph="..." />
             <marker date="1536281256000" expanded="true" signature="6522:6777" ph="..." />
@@ -386,10 +394,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/musadm/model/core.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="105" column="0" lean-forward="true" selection-start-line="105" selection-start-column="0" selection-end-line="105" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/musadm/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/musadm/controller/musadm/finances/c_index.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-85">
-          <caret line="10" column="36" lean-forward="true" selection-start-line="10" selection-start-column="36" selection-end-line="10" selection-end-column="36" />
+        <state relative-caret-position="221">
+          <caret line="13" column="0" lean-forward="true" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
           <folding>
             <element signature="e#6#94#0#PHP" expanded="true" />
           </folding>
