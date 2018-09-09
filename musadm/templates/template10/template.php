@@ -27,8 +27,11 @@
 
         $name = $oUser->name();
         $surname = $oUser->surname();
-        $isAdmin = $oUser->groupId() <= 3;  
+        $isAdmin = $oUser->groupId() <= 3;
 
+        $Director = User::current()->getDirector();
+        if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+        $subordinated = $Director->getId();
     ?>
 </head>
 
@@ -58,6 +61,7 @@
                                     <?
                                     $aoAreas = Core::factory("Schedule_Area")
                                         ->where( "active", "=", 1 )
+                                        ->where( "subordinated", "=", $subordinated )
                                         ->orderBy("sorting")
                                         ->findAll();
                                     foreach ($aoAreas as $area)
