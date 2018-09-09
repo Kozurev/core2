@@ -137,7 +137,9 @@ class Schedule_Controller
 
                 $Lessons
                     ->open()
-                    ->where("client_id", "=", $this->userId);
+                    ->where("client_id", "=", $this->userId)
+                    ->where("type_id", "=", 1)
+                    ->where("type_id", "<>", 3);
 
                 if( count( $aUserGroups) > 0 )
                 {

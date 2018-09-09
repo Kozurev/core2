@@ -433,6 +433,7 @@ if( $oUser->groupId() == 4 )
 
     $aoTeacherReports = Core::factory("Schedule_Lesson_Report")
         ->where("teacher_id", "=", $oUser->getId())
+        ->where("type_id", "<>", "3")
         ->where("date", ">=", $dateFrom)
         ->where("date", "<=", $dateTo);
 

@@ -80,6 +80,7 @@ $queryString = Core::factory("Orm")
 $Result = Core::factory("Orm")->executeQuery($queryString);
 $Result = $Result->fetch();
 $group_lessons_pos = $Result["sum"];
+if( $group_lessons_pos == "" )  $group_lessons_pos = 0;
 
 //Кол-во неоплаченных груповых уроков
 $queryString = Core::factory("Orm")
@@ -94,6 +95,7 @@ $queryString = Core::factory("Orm")
 $Result = Core::factory("Orm")->executeQuery($queryString);
 $Result = $Result->fetch();
 $group_lessons_neg = $Result["sum"];
+if( $group_lessons_neg == "" )  $group_lessons_neg = 0;
 
 Core::factory("Core_Entity")
     ->addSimpleEntity("balance", $sum)
