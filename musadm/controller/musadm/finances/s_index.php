@@ -60,3 +60,18 @@ if($action === "saveCustomPayment")
     echo "0";
     exit;
 }
+
+
+if( $action === "edit_payment_popup" )
+{
+    $tarifId = Core_Array::Get( "tarifid", null );
+    if( $tarifId !== null ) $Tarif = Core::factory( "Payment_Tarif", $tarifId );
+    else    $Tarif = Core::factory( "Payment_Tarif" );
+
+    Core::factory( "Core_Entity" )
+        ->addEntity( $Tarif )
+        ->xsl( "musadm/finances/new_tarif_popup.xsl" )
+        ->show();
+
+    exit;
+}

@@ -7,8 +7,10 @@
     				<xsl:value-of select="title" />
     				<xsl:text> </xsl:text>
     				<xsl:value-of select="price" />
-    				<xsl:text>р. Уроков: </xsl:text>
-    				<xsl:value-of select="lessons_count" />
+    				<xsl:text>р. Уроков: </xsl:text><br/>
+					<xsl:text>Индив. </xsl:text><xsl:value-of select="count_indiv" />
+					<xsl:text> / Групп.: </xsl:text><xsl:value-of select="count_group" />
+    				<!--<xsl:value-of select="lessons_count" />-->
     			</option>
     		</xsl:for-each>
     	</select>

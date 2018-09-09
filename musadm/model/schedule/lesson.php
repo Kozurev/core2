@@ -22,12 +22,9 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
     public function getClient()
     {
-        if ( $this->type_id == 1 )
-            return Core::factory( "User", $this->client_id );
-        if ( $this->type_id == 2 )
-            return Core::factory( "Schedule_Group", $this->client_id );
-        if ( $this->type_id == 3 && $this->client_id )
-            return Core::factory( "Lid", $this->client_id );
+        if ( $this->type_id == 1 ) return Core::factory( "User", $this->client_id );
+        if ( $this->type_id == 2 ) return Core::factory( "Schedule_Group", $this->client_id );
+        if ( $this->type_id == 3 && $this->client_id ) return Core::factory( "Lid", $this->client_id );
 
         return Core::factory( "User" )->surname( "Неизвестно" );
     }
@@ -37,6 +34,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      * Пометка удаления занятия
      *
      * @param $date - дата удаления
+     * @return $this
      */
     public function markDeleted( $date )
     {
@@ -64,6 +62,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      * Установка разового отсутствия занятия
      *
      * @param $date - дата отсутствия
+     * @return $this
      */
     public function setAbsent( $date )
     {
@@ -114,9 +113,9 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     public function isReported($date)
     {
         $report = Core::factory("Schedule_Lesson_Report")
-            ->where("date", "=", $date)
-            ->where("type_id", "=", $this->type_id)
-            ->where("lesson_type", "=", $this->lesson_type);
+            ->where("date", "=", $date);
+            //->where("type_id", "=", $this->type_id);
+            //->where("lesson_type", "=", $this->lesson_type);
 
             if( isset( $this->oldid ) ) $report->where( "lesson_id", "=", $this->oldid );
             else $report->where( "lesson_id", "=", $this->id );
@@ -133,6 +132,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      * @param $date     - дата изменения времени занятия
      * @param $timeFrom - начало занятия (новое)
      * @param $timeTo   - конец занятия (новое)
+     * @return $this
      */
     public function modifyTime($date, $timeFrom, $timeTo)
     {

@@ -37,7 +37,7 @@
             </div>
             <div class="column">
                 <p><input type="radio" name="type" value="1" style="height: auto" checked="checked" /><span>Зачисление</span></p>
-                <p><input type="radio" name="type" value="5" style="height: auto"/><span>Списание</span></p>
+                <p><input type="radio" name="type" value="2" style="height: auto"/><span>Списание</span></p>
             </div>
 
             <!--<input type="hidden" name="user" value="{user/id}" />-->

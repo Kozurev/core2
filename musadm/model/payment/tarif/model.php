@@ -11,9 +11,9 @@ class Payment_Tarif_Model extends Core_Entity
     protected $id;
     protected $title;
     protected $price = 0;
-    protected $lessons_count;
-    protected $lessons_type;
-    protected $access = 1;
+    protected $count_indiv = 0;
+    protected $count_group = 0;
+    protected $access = 0;
     protected $subordinated = 0;
 
 
@@ -44,18 +44,18 @@ class Payment_Tarif_Model extends Core_Entity
     }
 
 
-    public function lessonsCount($val = null)
+    public function countIndiv( $val = null )
     {
-        if(is_null($val))       return $this->lessons_count;
-        $this->lessons_count =  floatval($val);
+        if( is_null( $val ) )   return $this->count_indiv;
+        $this->count_indiv = intval( $val );
         return $this;
     }
 
 
-    public function lessonsType($val = null)
+    public function countGroup( $val = null )
     {
-        if(is_null($val))       return $this->lessons_type;
-        $this->lessons_type =   intval($val);
+        if( is_null( $val ) )   return $this->count_group;
+        $this->count_group = intval( $val );
         return $this;
     }
 

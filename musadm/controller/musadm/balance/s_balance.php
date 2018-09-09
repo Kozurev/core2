@@ -116,22 +116,19 @@ if($action == "getPaymentPopup")
 }
 
 
-if($action == "getTarifPopup")
+if( $action == "getTarifPopup" )
 {
-    $userId =       Core_Array::getValue($_GET, "userid", 0);
-    $typeLessons =  Core_Array::getValue($_GET, "type", 0);
-    $userAccess =   Core::factory("User")->getCurrent()->groupId() == 5;
-
-    $aoTarifs =     Core::factory("Payment_Tarif")->where("lessons_type", "=", $typeLessons);
-    if($userAccess != 0) $aoTarifs->where("access", "=", "1");
+    $userId =       Core_Array::getValue( $_GET, "userid", 0 );
+    $aoTarifs =     Core::factory( "Payment_Tarif" );
+    if( !User::isAuthAs() ) $aoTarifs->where( "access", "=", "1" );
 
     $aoTarifs =     $aoTarifs->findAll();
-    $oUser =        Core::factory("User", $userId);
+    $oUser =        Core::factory( "User", $userId );
 
-    Core::factory("Core_Entity")
-        ->addEntity($oUser)
-        ->addEntities($aoTarifs)
-        ->xsl("musadm/users/balance/buy_tarif_popup.xsl")
+    Core::factory( "Core_Entity" )
+        ->addEntity( $oUser )
+        ->addEntities( $aoTarifs )
+        ->xsl( "musadm/users/balance/buy_tarif_popup.xsl" )
         ->show();
 
     exit;
@@ -150,43 +147,41 @@ if($action == "updateNote")
 }
 
 
-if($action == "buyTarif")
+if( $action == "buyTarif" )
 {
-    $userId =   Core_Array::getValue($_GET, "userid", 0);
-    $tarifId =  Core_Array::getValue($_GET, "tarifid", 0);
-    $oUser =    Core::factory("User", $userId);
-    $oTarif =   Core::factory("Payment_Tarif", $tarifId);
-    $oUserBalance =     Core::factory("Property", 12);
-    $oUserBalance =     $oUserBalance->getPropertyValues($oUser)[0];
-    $oCountLessons =    Core::factory("Property", 12 + intval($oTarif->lessonsType()));
-    $oCountLessons =    $oCountLessons->getPropertyValues($oUser)[0];
+    $userId =   Core_Array::getValue( $_GET, "userid", 0 );
+    $tarifId =  Core_Array::getValue( $_GET, "tarifid", 0 );
 
-    if($oUserBalance->value() < $oTarif->price())   die("Недостаточно средств для покупки данного тарифа");
+    $oUser =    Core::factory( "User", $userId );
+    $oTarif =   Core::factory( "Payment_Tarif", $tarifId );
+
+    $oUserBalance =     Core::factory( "Property", 12 );
+    $oUserBalance =     $oUserBalance->getPropertyValues( $oUser )[0];
+
+    $oCountIndivLessons = Core::factory( "Property", 13 );
+    $oCountGroupLessons = Core::factory( "Property", 14 );
+
+    $oCountIndivLessons = $oCountIndivLessons->getPropertyValues( $oUser )[0];
+    $oCountGroupLessons = $oCountGroupLessons->getPropertyValues( $oUser )[0];
+
+    if( $oUserBalance->value() < $oTarif->price() )   die( "Недостаточно средств для покупки данного тарифа" );
 
     //Корректировка баланса
-    $oldBalance = intval($oUserBalance->value());
-    $newBalance = $oldBalance - intval($oTarif->price());
-    $oUserBalance->value($newBalance)->save();
+    $oldBalance = intval( $oUserBalance->value() );
+    $newBalance = $oldBalance - intval( $oTarif->price() );
+    $oUserBalance->value( $newBalance )->save();
 
     //Корректировка кол-ва занятий
-    $oldCountLessons = floatval($oCountLessons->value());
-    $newCountLessons = $oldCountLessons + floatval($oTarif->lessonsCount());
-    $oCountLessons->value($newCountLessons)->save();
+    if( $oTarif->countIndiv() != 0 ) $oCountIndivLessons->value( $oCountIndivLessons->value() + $oTarif->countIndiv() )->save();
+    if( $oTarif->countGroup() != 0 ) $oCountGroupLessons->value( $oCountGroupLessons->value() + $oTarif->countGroup() )->save();
 
     //Создание платежа
-    $oPayment = Core::factory("Payment")
-        ->type(2)
-        ->user($userId)
-        ->value($oTarif->price());
-
-    if($oTarif->lessonsType() == 1)
-        $oPayment->description("Оплата индивидуального пакета");
-    elseif($oTarif->lessonsType() == 2)
-        $oPayment->description("Оплата группового пакета");
-    else
-        $oPayment->description("Покупка тарифа");
-
-    $oPayment->save();
+    $oPayment = Core::factory( "Payment" )
+        ->type( 2 )
+        ->user( $userId )
+        ->value( $oTarif->price() )
+        ->description( "Покупка тарифа" )
+        ->save();
 
     exit;
 }

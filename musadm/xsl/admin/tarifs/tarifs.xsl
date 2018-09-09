@@ -10,7 +10,8 @@
                 <th>id</th>
                 <th>Название</th>
                 <th>Цена</th>
-                <th>Кол-во уроков</th>
+                <th>Индив.</th>
+                <th>Групп.</th>
                 <th>Тип уроков</th>
                 <th>Доступ</th>
                 <th>Действия</th>
@@ -41,7 +42,8 @@
             <td><xsl:value-of select="id" /></td>
             <td><xsl:value-of select="title" /></td>
             <td><xsl:value-of select="price" /></td>
-            <td><xsl:value-of select="lessons_count" /></td>
+            <td><xsl:value-of select="count_indiv" /></td>
+            <td><xsl:value-of select="count_group" /></td>
 
             <xsl:choose>
                 <xsl:when test="lessons_type = 1">

@@ -106,7 +106,7 @@ if(
     for ($i = 1; $i <= $oArea->countClassess(); $i++) {
         echo "<th>Время</th>";
         echo "<th";
-        if (User::checkUserAccess(array("groups" => array(1, 2)), $oUser))
+        if (User::checkUserAccess(array("groups" => array(1, 2, 6)), $oUser))
             echo " class='add_lesson' ";
         echo "
         title='Добавить занятие в основной график'
@@ -117,7 +117,7 @@ if(
         data-dayName='" . $dayName . "'
         >Основной график</th>";
         echo "<th";
-        if (User::checkUserAccess(array("groups" => array(1, 2)), $oUser))
+        if (User::checkUserAccess(array("groups" => array(1, 2, 6)), $oUser))
             echo " class='add_lesson' ";
         echo "
         title='Добавить занятие в актуальный график'
@@ -227,7 +227,7 @@ if(
 
                     echo "<span class='client'>" . $aMainLessonData["client"] . "</span><hr><span class='teacher'>преп. " . $aMainLessonData["teacher"] . "</span>";
 
-                    if (User::checkUserAccess(array("groups" => array(1, 2)), $oUser) && $lessonTime >= $currentTime) {
+                    if (User::checkUserAccess(array("groups" => array(1, 2, 6)), $oUser) && $lessonTime >= $currentTime) {
                         echo "<ul class=\"submenu\">
                         <li>
                             <a href=\"#\"></a>
@@ -279,7 +279,7 @@ if(
                     if (isset($oCurrentLesson->oldid)) echo "<span><b>Временно</b></span><hr>";
                     echo "<span class='client'>" . $aCurrentLessonData["client"] . "</span><hr><span class='teacher'>преп. " . $aCurrentLessonData["teacher"] . "</span>";
 
-                    if (User::checkUserAccess(array("groups" => array(1, 2)), $oUser) && !$oCurrentLesson->isReported($date)) {
+                    if (User::checkUserAccess(array("groups" => array(1, 2, 6)), $oUser) && !$oCurrentLesson->isReported($date)) {
                         echo "<ul class=\"submenu\">
                         <li>
                             <a href=\"#\"></a>
@@ -328,7 +328,7 @@ if(
     for ($i = 1; $i <= $oArea->countClassess(); $i++) {
         echo "<th>Время</th>";
         echo "<th";
-        if (User::checkUserAccess(array("groups" => array(1, 2)), $oUser))
+        if (User::checkUserAccess(array("groups" => array(1, 2, 6)), $oUser))
             echo " class='add_lesson' ";
         echo "
         title='Добавить занятие в основной график'
@@ -339,7 +339,7 @@ if(
         data-dayName='" . $dayName . "'
         >Основной график</th>";
         echo "<th";
-        if (User::checkUserAccess(array("groups" => array(1, 2)), $oUser))
+        if (User::checkUserAccess(array("groups" => array(1, 2, 6)), $oUser))
             echo " class='add_lesson' ";
         echo "
         title='Добавить занятие в актуальный график'

@@ -24,8 +24,8 @@
                     <tr class="header">
                         <th>Название</th>
                         <th>Цена</th>
-                        <th>Количество уроков</th>
-                        <th>Тип урока</th>
+                        <th>Индив.</th>
+                        <th>Групп.</th>
                         <th>Публичность</th>
                         <th>Действия</th>
                     </tr>
@@ -35,6 +35,10 @@
                     <xsl:apply-templates select="payment_tarif" />
                 </tbody>
             </table>
+
+            <div class="right">
+                <a class="btn btn-green tarif_edit" href="#" data-tarifid="">Создать тариф</a>
+            </div>
         </div>
 
 
@@ -93,8 +97,9 @@
 
             <td><xsl:value-of select="title" /></td>
             <td><xsl:value-of select="price" /></td>
-            <td><xsl:value-of select="lessons_count" /></td>
-            <td><xsl:value-of select="/root/schedule_lesson_type[id = $type_id]/title" /></td>
+            <td><xsl:value-of select="count_indiv" /></td>
+            <td><xsl:value-of select="count_group" /></td>
+            <!--<td><xsl:value-of select="/root/schedule_lesson_type[id = $type_id]/title" /></td>-->
             <td>
                 <input type="checkbox" disabled="true">
                     <xsl:if test="access = 1">
@@ -103,8 +108,8 @@
                 </input>
             </td>
             <td>
-                <a class="action edit user_edit"        href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
-                <a class="action delete user_delete"      href="#" data-model_id="{id}" data-model_name="User"></a>
+                <a class="action edit tarif_edit"       href="#" data-tarifid="{id}"></a>
+                <a class="action delete tarif_delete"   href="#" data-model_id="{id}" data-model_name="Payment_Tarif"></a>
             </td>
         </tr>
     </xsl:template>

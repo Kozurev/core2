@@ -77,8 +77,53 @@ $(function(){
             {
                 TarifsBlock.show("slow");
             }
+        })
+        .on("click", ".tarif_delete", function(e){
+            e.preventDefault();
+            var tarifid = $(this).data("model_id");
+            deleteItem("Payment_Tarif", tarifid, refreshPayments);
+        })
+        .on("click", ".tarif_edit", function(e){
+            e.preventDefault();
+            var tarifid = $(this).data("tarifid");
+            editTarifPopup(tarifid);
+        })
+        .on("click", ".popop_tarif_submit", function(e){
+            e.preventDefault();
+            loaderOn();
+            saveData("Main", refreshPayments);
         });
 });
+
+
+function editTarifPopup(tarifid) {
+    $.ajax({
+        type: "GET",
+        url: "finances",
+        data: {
+            action: "edit_payment_popup",
+            tarifid: tarifid
+        },
+        success: function(responce) {
+            showPopup(responce);
+        }
+    });
+}
+
+
+function refreshPayments() {
+    $.ajax({
+        type: "GET",
+        url: "finances",
+        data: {
+            action: "show",
+        },
+        success: function( responce ) {
+            $(".finances").html(responce);
+            loaderOff();
+        }
+    });
+}
 
 
 function refreshPaymentsTable(userid, func) {

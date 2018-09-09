@@ -178,16 +178,17 @@ Core::factory( "Core_Entity" )
 /**
  * Платежи
  */
-$aoUserPayments = Core::factory("Payment")
-    ->orderBy("id", "DESC")
-    ->where("user", "=", $oUser->getId())
+$aoUserPayments = Core::factory( "Payment" )
+    ->orderBy( "id", "DESC" )
+    ->where( "user", "=", $oUser->getId() )
     ->findAll();
 
-foreach ($aoUserPayments as $payment)
+foreach ( $aoUserPayments as $payment )
 {
-    $aoUserPaymentsNotes = Core::factory("Property", 26)->getPropertyValues($payment);
-    $aoUserPaymentsNotes = array_reverse($aoUserPaymentsNotes);
-    $payment->addEntities($aoUserPaymentsNotes, "notes");
+    $aoUserPaymentsNotes = Core::factory( "Property", 26 )->getPropertyValues( $payment );
+    $aoUserPaymentsNotes = array_reverse( $aoUserPaymentsNotes );
+    $payment->addEntities( $aoUserPaymentsNotes, "notes" );
+    $payment->datetime( refactorDateFormat( $payment->datetime() ) );
 }
 
 Core::factory("Core_Entity")
