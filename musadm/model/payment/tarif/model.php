@@ -14,6 +14,7 @@ class Payment_Tarif_Model extends Core_Entity
     protected $lessons_count;
     protected $lessons_type;
     protected $access = 1;
+    protected $subordinated = 0;
 
 
     public function __construct() {}
@@ -64,6 +65,14 @@ class Payment_Tarif_Model extends Core_Entity
         if(is_null($val))       return $this->access;
         if($val == true)        $this->access = 1;
         elseif($val == false)   $this->access = 0;
+        return $this;
+    }
+
+
+    public function subordinated( $val = null )
+    {
+        if( is_null( $val ) )   return $this->subordinated;
+        $this->subordinated = intval( $val );
         return $this;
     }
 

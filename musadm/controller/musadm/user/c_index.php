@@ -6,7 +6,12 @@
  * Time: 22:17
  */
 
+
+global $CFG;
 $oProperty = Core::factory("Property");
+
+$oUser = Core::factory( "User" )->getCurrent()->getDirector();
+$subordinated = $oUser->getId();
 
 $groupId = $this->oStructureItem->getId();
 $groupId == 5
@@ -14,6 +19,7 @@ $groupId == 5
     :   $xsl = "musadm/users/teachers.xsl";
 
 $aoUsers = Core::factory("User")
+    ->where( "subordinated", "=", $subordinated )
     ->where("group_id", "=", $groupId)
     ->where("active", "=", 1)
     ->orderBy("id", "DESC")
@@ -30,12 +36,28 @@ foreach ($aoUsers as $user)
     }
 }
 
-$output = Core::factory("Core_Entity")
+Core::factory("Core_Entity")
     ->xsl($xsl)
-    ->addEntity(
-        Core::factory("Core_Entity")
-            ->name("table_type")
-            ->value("active")
-    )
+    ->addSimpleEntity( "wwwroot", $CFG->rootdir )
+    ->addSimpleEntity( "table_type", "active" )
     ->addEntities($aoUsers)
     ->show();
+
+
+/**
+ * Список менеджеров для директора
+ */
+if( $groupId == 4 && User::checkUserAccess(["groups" => [6]]) )
+{
+    $aoManagers = Core::factory( "User" )
+        ->where( "subordinated", "=", $oUser->getId() )
+        ->where( "active", "=", 1 )
+        ->where( "group_id", "=", 2 )
+        ->findAll();
+
+    Core::factory( "Core_Entity" )
+        ->addSimpleEntity( "wwwroot", $CFG->rootdir )
+        ->addEntities( $aoManagers )
+        ->xsl( "musadm/users/managers.xsl" )
+        ->show();
+}

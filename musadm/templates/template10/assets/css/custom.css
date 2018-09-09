@@ -165,12 +165,19 @@ header {
 }
 
 .finances_total {
-    text-align: right;
-    margin-top: 20px;
+    text-align: left;
+    //margin-top: 20px;
+    font-size: 18px;
 }
 
 .finances_add_payment {
     float: right;
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+
+.tarifs {
+    display: none;
 }
  /**
   * <<Конец
@@ -279,12 +286,12 @@ section .container .cards-wrapper .item .icon-holder {
   */
 .balance-lessons {
     max-height: 430px;
-    overflow: scroll;
+    overflow-y: scroll;
 }
 
 .balance-payments {
     max-height: 590px;
-    overflow: scroll;
+    overflow-y: scroll;
 }
  /**
   * <<Конец
@@ -299,13 +306,42 @@ section .container .cards-wrapper .item .icon-holder {
 .schedule .date {
     font-size: 11px;
     color: #D1D1D1;
-}   
+}
 
 .schedule .teacher_payments_block {
     overflow-y: scroll;
-    height: 470px;
+    max-height: 470px;
 }
+
+.calendar_small {
+    text-align: center;
+}
+
+.schedule_calendar {
+    width: 14%;
+    /*position: relative;*/
+    /*left: 43%;*/
+    display: inline-block;
+}
+
+.day_name {
+    /*position: relative;*/
+    /*left: 500px;*/
+    font-size: 18px;
+}
+
  /**
   * <<Конец
   * Расписание
   */
+
+.table {
+    font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+    font-size: 16px;
+}
+
+.button-block {
+    display: inline-block;
+    float: right;
+    margin: 20px 0px;
+}

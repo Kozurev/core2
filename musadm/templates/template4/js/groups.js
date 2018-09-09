@@ -4,7 +4,7 @@ $(function(){
             e.preventDefault();
             loaderOn();
             var groupid = $(this).data("groupid");
-            deleteItem("Schedule_Group", groupid, "./admin?menuTab=Main&menuAction=deleteAction&ajax=1", refreshGroupTable);
+            deleteItem("Schedule_Group", groupid, refreshGroupTable);
         })
         .on("click", ".group_edit", function(e){
             e.preventDefault();
@@ -14,7 +14,7 @@ $(function(){
         .on("click", ".popop_group_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("groups", refreshGroupTable);
+            saveGroup();
         })
         .on("click", ".group_create", function(e){
             e.preventDefault();
@@ -22,6 +22,20 @@ $(function(){
         });
 });
 
+
+function saveGroup() {
+    var Data = $("#createData").serialize();
+
+    $.ajax({
+        type: "GET",
+        url: "",
+        data: Data,
+        success: function(responce){
+            closePopup();
+            refreshGroupTable();
+        }
+    });
+}
 
 
 function refreshGroupTable(){

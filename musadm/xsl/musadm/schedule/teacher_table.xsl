@@ -87,7 +87,7 @@
                     Отправить данные
                 </button>
 
-                <xsl:if test="count(report/id) != 0 and /root/admin/group_id = 1">
+                <xsl:if test="count(report/id) != 0 and /root/is_admin = 1">
                     <button class="btn btn-danger delete_report">
                         Отменить
                     </button>

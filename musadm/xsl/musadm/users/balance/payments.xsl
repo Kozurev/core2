@@ -22,7 +22,7 @@
                     <tr class="header">
                         <th>Дата</th>
                         <th>Сумма</th>
-                        <xsl:if test="user_group/id != 5">
+                        <xsl:if test="is_admin = 1">
                             <th>Примечание</th>
                             <th></th>
                         </xsl:if>
@@ -50,13 +50,11 @@
         <tr>
             <td class="{$class}"><xsl:value-of select="datetime" /></td>
             <td class="{$class}"><xsl:value-of select="value" /></td>
-            <!--<td class="{$class}"><xsl:value-of select="description" /></td>-->
 
-            <xsl:if test="//user_group/id != 5">
+            <xsl:if test="//is_admin = 1">
                 <td class="{$class}">
                     <xsl:if test="description != ''"><xsl:value-of select="description" /><br/></xsl:if>
                     <xsl:for-each select="notes">
-                        <!--<xsl:if test="position() != 1"><br/></xsl:if>-->
                         <xsl:value-of select="value" /><br/>
                     </xsl:for-each>
                 </td>

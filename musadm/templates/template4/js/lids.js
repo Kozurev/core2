@@ -21,7 +21,7 @@ $(function(){
         .on("click", ".popop_lid_comment_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("./admin?menuTab=Main&menuAction=updateAction&ajax=1", refreshLidTable);
+            saveData("Main", refreshLidTable);
         })
         .on("change", ".lid_status", function(){
             loaderOn();

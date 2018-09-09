@@ -2,7 +2,7 @@
 
     <xsl:template match="root">
         <div class="certificate">
-            <div style="text-align: right; margin-bottom:20px">
+            <div class="button-block">
                 <a class="btn btn-pink certificate_create">Добавить сертификат</a>
             </div>
 
@@ -12,7 +12,7 @@
                 }
             </style>
 
-            <table id="sortingTable" class="table table-striped certificate">
+            <table id="sortingTable" class="table table-striped certificate center">
                 <thead>
                     <tr class="header">
                         <th>№</th>
@@ -20,7 +20,7 @@
                         <th>Действителен до</th>
                         <th>Номер</th>
                         <th>Комментарии</th>
-                        <th>Добавление комментария</th>
+                        <th>Добавление <br/>комментария</th>
                     </tr>
                 </thead>
 
@@ -44,7 +44,7 @@
                     <xsl:apply-templates select="/root/certificate_note[certificate_id = $id]" />
                 </div>
             </td>
-            <td><a class="btn btn-pink add_comment" data-cert-id="{id}">Добавить комментарий</a></td>
+            <td><a class="btn btn-pink add_comment" data-cert-id="{id}">+</a></td>
             <!--<td><a class="btn btn-pink certificate_delete" data-id="{id}">Удалить</a></td>-->
         </tr>
     </xsl:template>

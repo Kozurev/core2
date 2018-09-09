@@ -14,11 +14,10 @@ class Payment_Model extends Core_Entity
     protected $datetime;
     protected $value;
     protected $description;
+    protected $subordinated = 0;
 
-    public function __construct()
-    {
 
-    }
+    public function __construct(){}
 
 
     public function getId()
@@ -40,8 +39,6 @@ class Payment_Model extends Core_Entity
     {
         if(is_null($val))   return $this->type;
         $this->type = intval($val);
-//        if($val == true)    $this->type = 1;
-//        elseif($val == false)$this->type = 0;
         return $this;
     }
 
@@ -66,6 +63,14 @@ class Payment_Model extends Core_Entity
     {
         if(is_null($val))   return $this->description;
         $this->description= $val;
+        return $this;
+    }
+
+
+    public function subordinated( $val = null )
+    {
+        if( is_null( $val ) )   return $this->subordinated;
+        $this->subordinated = intval( $val );
         return $this;
     }
 

@@ -17,14 +17,25 @@ $dateFrom = Core_Array::getValue($_GET, "date_from", $defaultDateFrom);
 $dateTo = Core_Array::getValue($_GET, "date_to", $defaultDateTo);
 
 
+$Director = User::current()->getDirector();
+if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+$subordinated = $Director->getId();
+
+
+$Tarifs = Core::factory( "Payment_Tarif" )->findAll();
+$LessonTypes = Core::factory( "Schedule_Lesson_Type" )->where( "id", "<>", 3 )->findAll();
+
+
 $aoPayments = Core::factory("Payment")
+    ->where( "subordinated", "=", $subordinated )
     ->open()
     ->where("type", "=", 1)
     ->where("type", "=", 3, "OR")
     ->where("type", "=", 4, "OR")
     ->where("type", "=", 5, "OR")
     ->close()
-    ->orderBy("datetime", "DESC");
+    ->orderBy("datetime", "DESC")
+    ->orderBy( "id", "DESC" );
 
 if($dateFrom != "")
 {
@@ -46,6 +57,7 @@ $summ = Core::factory("Orm")
     ->where("datetime", ">=", $dateFrom)
     ->where("datetime", "<=", $dateTo)
     ->close()
+    ->where( "subordinated", "=", $subordinated )
     ->find();
 
 $minus = Core::factory("Orm")
@@ -56,6 +68,7 @@ $minus = Core::factory("Orm")
     ->where("datetime", ">=", $dateFrom)
     ->where("datetime", "<=", $dateTo)
     ->close()
+    ->where( "subordinated", "=", $subordinated )
     ->find();
 
 foreach ($aoPayments as $payment)
@@ -63,6 +76,8 @@ foreach ($aoPayments as $payment)
     $oPaymentUser = $payment->getUser();
 
     $payment->addEntity( $oPaymentUser );
+    $payment->datetime( refactorDateFormat($payment->datetime()) );
+
     if( $oPaymentUser->groupId() == 5 )
     {
         $oProperty = Core::factory( "Property", 15 );
@@ -75,6 +90,8 @@ foreach ($aoPayments as $payment)
 
 Core::factory("Core_Entity")
     ->addEntities($aoPayments)
+    ->addEntities( $Tarifs )
+    ->addEntities( $LessonTypes )
     ->addSimpleEntity("date_from", $dateFrom)
     ->addSimpleEntity("date_to", $dateTo)
     ->addSimpleEntity("total_summ", intval($summ->value) - intval($minus->value))

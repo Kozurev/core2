@@ -110,7 +110,7 @@ class Core //extends Orm
      * @param $sMessageName - назавние строки
      * @param $aMessageParams - параметры, передаваемые в строку
      */
-    public static function getMessage($sMessageName, $aMessageParams)
+    public static function getMessage($sMessageName, $aMessageParams = [])
     {
         ini_set('display_errors','Off');
         $aStrings = include ROOT . "/config/messages/ru/messages.php";

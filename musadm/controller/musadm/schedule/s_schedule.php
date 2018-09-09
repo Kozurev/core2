@@ -3,14 +3,14 @@
 
 $oUser = Core::factory("User")->getCurrent();
 
-if($oUser != true)
+if( !User::checkUserAccess( ["groups" => [2, 4, 5, 6]] ) )
 {
     $this->error404();
 }
 
 
 $breadcumbs[0] = new stdClass();
-$breadcumbs[0]->title = "Расписание";
+$breadcumbs[0]->title = $this->oStructure->title();
 $breadcumbs[0]->active = 1;
 
 if( $this->oStructureItem != false )
@@ -37,6 +37,22 @@ else
 
 
 $action = Core_Array::getValue($_GET, "action", null);
+
+
+if( $action == "getScheduleAreaPopup" )
+{
+    $areaId = Core_Array::getValue( $_GET, "areaId", 0 );
+    $areaId == 0
+        ?   $Area = Core::factory( "Schedule_Area" )
+        :   $Area = Core::factory( "Schedule_Area", $areaId );
+
+    Core::factory( "Core_Entity" )
+        ->addEntity( $Area )
+        ->xsl( "musadm/schedule/new_area_popup.xsl" )
+        ->show();
+
+    exit;
+}
 
 
 if($action === "getScheduleAbsentPopup")

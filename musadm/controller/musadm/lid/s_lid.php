@@ -17,20 +17,22 @@ $this->setParam( "title-second", "ЛИДОВ" );
 $this->setParam( "breadcumbs", $breadcumbs );
 
 
-/*
-*	Блок проверки авторизации
-*/
+/**
+ * Блок проверки авторизации и прав доступа
+ */
 $oUser = Core::factory("User")->getCurrent();
 
 $accessRules = array(
-    "groups"    => array(1, 2)
+    "groups"    => array(1, 2, 6)
 );
 
-if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
+if($oUser == false || !User::checkUserAccess($accessRules))
 {
     $this->error404();
     exit;
 }
+
+
 
 $action = Core_Array::getValue($_GET, "action", 0);
 

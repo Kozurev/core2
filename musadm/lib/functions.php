@@ -21,7 +21,6 @@ function debug( $val, $type = 0 )
  *
  * @param $time - исходное время
  * @param $val - прибавляемое значение
- * @param $type - к чему будет прибавляться значние (минуты или часы)
  * @return string
  */
 function addTime( $time, $val )
@@ -141,7 +140,7 @@ function toTime( $seconds )
  * Преобразование времени в количество секунд
  *
  * @param $time
- * @return float|int
+ * @return int
  */
 function toSeconds( $time )
 {
@@ -179,6 +178,12 @@ function refactorDateFormat ( $date, $glue = ".", $type = "full")
 }
 
 
+/**
+ * Получение номера месяца
+ *
+ * @param $date - дата формата "Y-m-d"
+ * @return int
+ */
 function getMonth($date)
 {
     $month = substr( $date, 5 );
@@ -187,14 +192,76 @@ function getMonth($date)
 }
 
 
+/**
+ * Получение номера года
+ *
+ * @param $date - дата формата "Y-m-d"
+ * @return int
+ */
 function getYear($date)
 {
-    return substr($date, 0, 4);
+    return intval( substr($date, 0, 4) );
 }
 
 
+/**
+ * Получение названия месяца из даты
+ *
+ * @param $date - дата формата "Y-m-d"
+ * @return string - название месяца
+ */
 function getMonthName($date)
 {
     $mouthes = array("Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь");
     return $mouthes[getMonth($date) - 1];
+}
+
+
+/**
+ * Преобразование строки русских символов в английские
+ *
+ * @param string $str - исходная строка
+ * @return string
+ */
+function translite( $str )
+{
+    $result = "";
+    $str = trim( $str );
+
+    $translite = [
+        "а" => "a", "б" => "b", "в" => "v",
+        "г" => "g", "д" => "d", "е" => "e",
+        "ё" => "y", "ж" => "j", "з" => "z",
+        "и" => "i", "к" => "k", "л" => "l",
+        "м" => "m", "н" => "n", "о" => "o",
+        "п" => "p", "р" => "r", "с" => "s",
+        "т" => "t", "у" => "u", "ф" => "f",
+        "х" => "h", "ц" => "c", "ч" => "ch",
+        "ш" => "sh", "щ" => "sh", "ъ" => "",
+        "ы" => "u", "ь" => "", "э" => "e",
+        "ю" => "ju", "я" => "ja"
+    ];
+
+
+    while( $str !== false && iconv_strlen ( $str ) > 0 )
+    {
+        $temp = mb_substr( $str, 0, 1 );
+        $temp = mb_strtolower( $temp );
+
+        if( $temp == " " )
+        {
+            $result .= "-";
+        }
+        else
+        {
+            if( Core_Array::getValue( $translite, $temp, false ) )
+            {
+                $result .= $translite[$temp];
+            }
+        }
+
+        $str = mb_substr( $str, 1 );
+    }
+
+    return $result;
 }

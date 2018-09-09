@@ -46,10 +46,24 @@
             </div>
             <hr/>
             <div class="column">
+                <span>Отчество</span>
+            </div>
+            <div class="column">
+                <input class="form-control" type="text" value="{user/patronimyc}" name="patronimyc"  />
+            </div>
+            <hr/>
+            <div class="column">
                 <span>Телефон</span>
             </div>
             <div class="column">
                 <input class="form-control" type="text" value="{user/phone_number}" name="phoneNumber" />
+            </div>
+            <hr/>
+            <div class="column">
+                <span>Email</span>
+            </div>
+            <div class="column">
+                <input class="form-control" type="text" value="{user/email}" name="email" />
             </div>
             <hr/>
             <div class="column">
@@ -74,41 +88,28 @@
             </div>
             <hr/>
             <div class="column">
-                <span>Инструмент</span>
+                <span>Город</span>
             </div>
             <div class="column">
-                <select name="property_20[]" class="form-control">
-                    <option value="0">...</option>
-                    <xsl:call-template name="property_list">
-                        <xsl:with-param name="property_id" select="20" />
-                    </xsl:call-template>
-                </select>
+                <input class="form-control" type="text" value="{property_value[property_id=28]/value}" name="property_28[]" />
             </div>
+            <hr/>
+            <div class="column">
+                <span>Организация</span>
+            </div>
+            <div class="column">
+                <input class="form-control" type="text" value="{property_value[property_id=29]/value}" name="property_29[]" />
+            </div>
+            <hr/>
 
             <input type="hidden" name="id" value="{user/id}" />
-            <input type="hidden" name="groupId" value="4" />
+            <input type="hidden" name="groupId" value="6" />
             <input type="hidden" name="active" value="1" />
             <input type="hidden" name="modelName" value="User" />
 
 
             <button class="popop_user_submit btn btn-default">Сохранить</button>
         </form>
-    </xsl:template>
-
-
-    <xsl:template name="property_list">
-        <xsl:param name="property_id" />
-
-        <xsl:for-each select="property_list[property_id=$property_id]">
-            <xsl:variable name="id" select="id" />
-            <option value="{$id}">
-                <xsl:if test="count(//property_value[id=$id]/value) != 0">
-                    <xsl:attribute name="selected">selected</xsl:attribute>
-                </xsl:if>
-                <xsl:value-of select="value" />
-            </option>
-        </xsl:for-each>
-
     </xsl:template>
 
 

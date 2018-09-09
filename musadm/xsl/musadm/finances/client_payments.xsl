@@ -12,7 +12,31 @@
         <div class="finances_add_payment">
             <a class="btn btn-green finances_payment">Хозрасходы</a>
         </div>
+        <div class="finances_add_payment">
+            <a class="btn btn-green tarifs_show">Тарифы</a>
+        </div>
         <br/>
+
+
+        <div class="tarifs">
+            <table id="sortingTable" class="table table-striped">
+                <thead>
+                    <tr class="header">
+                        <th>Название</th>
+                        <th>Цена</th>
+                        <th>Количество уроков</th>
+                        <th>Тип урока</th>
+                        <th>Публичность</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <xsl:apply-templates select="payment_tarif" />
+                </tbody>
+            </table>
+        </div>
+
 
         <div class="finances_total">
             За данный период суммарные поступления составили <xsl:value-of select="total_summ" /> руб.
@@ -47,8 +71,11 @@
                         <xsl:text>  </xsl:text>
                         <xsl:value-of select="user/name" />
                     </xsl:when>
-                    <xsl:otherwise>
+                    <xsl:when test="type = 4">
                         Хозрасходы
+                    </xsl:when>
+                    <xsl:otherwise>
+                        Пользователь удален
                     </xsl:otherwise>
                 </xsl:choose>
             </td>
@@ -56,6 +83,29 @@
             <td><xsl:value-of select="description" /></td>
             <td><xsl:value-of select="datetime" /></td>
             <td><xsl:value-of select="area" /></td>
+        </tr>
+    </xsl:template>
+
+
+    <xsl:template match="payment_tarif">
+        <tr>
+            <xsl:variable name="type_id" select="lessons_type" />
+
+            <td><xsl:value-of select="title" /></td>
+            <td><xsl:value-of select="price" /></td>
+            <td><xsl:value-of select="lessons_count" /></td>
+            <td><xsl:value-of select="/root/schedule_lesson_type[id = $type_id]/title" /></td>
+            <td>
+                <input type="checkbox" disabled="true">
+                    <xsl:if test="access = 1">
+                        <xsl:attribute name="checked">true</xsl:attribute>
+                    </xsl:if>
+                </input>
+            </td>
+            <td>
+                <a class="action edit user_edit"        href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
+                <a class="action delete user_delete"      href="#" data-model_id="{id}" data-model_name="User"></a>
+            </td>
         </tr>
     </xsl:template>
 

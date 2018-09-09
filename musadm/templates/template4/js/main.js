@@ -1,5 +1,5 @@
 var loaderTime = 0;
-
+var root = "/musadm";
 
 
 function getCurrentDate() {
@@ -30,6 +30,11 @@ function loaderOff(){
 }
 
 
+/**
+ * Вызов всплывающего окна
+ *
+ * @param data - html данные окна
+ */
 function showPopup(data) {
     $(".overlay").show();
     $(".popup").empty();
@@ -45,7 +50,13 @@ function closePopup() {
 }
 
 
-function saveData(link, func) {
+/**
+ * Сохранение данных объекта
+ *
+ * @param tab - вкладка админ меню, на которую будет отправлен запрос
+ * @param func - выполняемая функция по получению ответа ajax-запроса
+ */
+function saveData(tab, func) {
     var form = $("#createData");
     if(form.valid() == false)
     {
@@ -58,7 +69,8 @@ function saveData(link, func) {
         data += "&" + $(aUnchecked[i]).attr("name") + "=0";
     }
 
-    //alert(link + "?menuTab=Main&menuAction=updateAction&ajax=1");
+    var link = root + "/admin?menuTab=" + tab + "&menuAction=updateAction&ajax=1";
+
     $.ajax({
         type: "GET",
         url: link,
@@ -74,10 +86,14 @@ function saveData(link, func) {
 
 /**
  *	Удаление объекта
+ *
+ * @param model_name - название класса объекта
+ * @param model_id - id объекта
+ * @param func - выполняемая функция после ответа ajax-запроса
  */
-function deleteItem(model_name, model_id, link, func){
+function deleteItem(model_name, model_id, func){
 
-    var url = link;
+    var url = root + "/admin?menuTab=Main&menuAction=deleteAction&ajax=1";
     url += "&model_name=" + model_name;
     url += "&model_id=" + model_id;
 
@@ -88,7 +104,7 @@ function deleteItem(model_name, model_id, link, func){
         type: "GET",
         url: url,
         success: function(answer){
-            func();
+            if(typeof func === "function") func();
             loaderOff();
             if(answer != "0")
                 alert("Ошибка: " + answer);
@@ -97,11 +113,51 @@ function deleteItem(model_name, model_id, link, func){
 }
 
 
-function savePayment(userid, value, description, type, url, func) {
-    //alert(userid + " " + value + " " + description);
+/**
+ *	Изменение активности структуры или элемента
+ *
+ *	@param model_name - название объекта (Structure, Structure_Item и т.д.)
+ *	@param model_id - id объекта
+ *	@param value - значение активности true/false
+ *  @param func - выполняемая функция по получению результата ajax-запроса
+ */
+function updateActive(model_name, model_id, value, func){
+    loaderOn();
+
+    var link = root + "/admin?menuTab=Main&menuAction=updateActive&ajax=1";
+    link += "&model_name=" + model_name;
+    link += "&model_id=" + model_id;
+    link += "&value=" + value;
+    link += "&ajax=1";
+
     $.ajax({
         type: "GET",
-        url: url,
+        url: link,
+        success: function(answer){
+            if(answer != "0")
+                alert("Ошибка: " + answer);
+
+            if(typeof func === "function") func();
+            setTimeout("loaderOff()", loaderTime);
+        }
+    });
+}
+
+
+/**
+ * Сохранение платежа
+ *
+ * @param userid - id пользователя, к которому привязан платеж
+ * @param value - сумма платежа
+ * @param description - описание платежа (примечание)
+ * @param type - тип платежа (зачисление, списание и т.д.)
+ * @param url - адрес запроса после root + "/user/" (client || balance)
+ * @param func - выполняемая функция по получению ответа от ajax-запроса
+ */
+function savePayment(userid, value, description, type, url, func) {
+    $.ajax({
+        type: "GET",
+        url: root + "/user/" + url,
         async: false,
         data: {
             action: "savePayment",
@@ -113,7 +169,7 @@ function savePayment(userid, value, description, type, url, func) {
         success: function(responce){
             if(responce != "0") alert("Ошибка: " + responce);
             closePopup();
-            func();
+            if(typeof func === "function") func();
         }
     });
 }

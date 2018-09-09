@@ -106,6 +106,7 @@ Core::factory("Core_Entity")
     ->xsl("musadm/statistic/balance.xsl")
     ->show();
 
+
 /**
  * Статистика по лидам
  */
@@ -115,9 +116,10 @@ $totalCount = Core::factory("Lid")
     ->between("control_date", $dateFrom, $dateTo)
     ->getCount();
 
+$countLidsStatus80 = $totalCount;
+
 $Orm = Core::factory("Orm");
 $queryString = $Orm->getQueryString();
-//echo $queryString;
 $aoResults = $Orm->executeQuery($queryString);
 
 if($aoResults != false)
@@ -127,6 +129,7 @@ if($aoResults != false)
 
 $aoStatuses = Core::factory("Property_List_Values")
 	->where("property_id", "=", 27)
+    ->orderBy( "id", "DESC" )
 	->findAll();
 
 	if(count($aoStatuses) > 0)
@@ -147,6 +150,16 @@ $aoStatuses = Core::factory("Property_List_Values")
 			{
 				$Result = $Result->fetch();
 				$count = $Result["count"];
+
+				if( $status->getId() != 80 )
+                {
+                    $countLidsStatus80 -= $count;
+                }
+                else
+                {
+                    $count = $countLidsStatus80;
+                }
+
 				if( $totalCount == 0 ) $percents = 0;
 				else $percents = round($count * 100 / $totalCount, 1);
 			}
@@ -168,11 +181,11 @@ $oLidsOutput
     ->show();
 
 
-echo "<div class=\"col-lg-4 col-md-6 col-sm-6 col-xs-12\">";
-
 /**
  * Статистика по выплатам преподавателям
  */
+echo "<div class=\"col-lg-4 col-md-6 col-sm-6 col-xs-12\">";
+
 $queryString = Core::factory("Orm")
     ->select("sum(value)", "sum")
     ->from("Payment")
@@ -224,7 +237,6 @@ $attendanceLessonsCount = Core::factory("Schedule_Lesson_Report")
     ->where( "attendance", "=", 1 )
     ->where( "date", ">=", $dateFrom )
     ->where( "date", "<=", $dateTo )
-    //->between( "date", $dateFrom, $dateTo )
     ->getCount();
 
 if( $countDaysInterval == 0 )

@@ -8,4 +8,5 @@ return array(
     "UNSIGNED_VALUE" => "Свойство $aMessageParams[0] объекта $aMessageParams[1] должно быть больше либо равным нулю. <br>",
     "ACCESS_DENIED" => "Доступ к данной странице запрещен",
     "NOT_NULL" => "Свойство $aMessageParams[0] модели $aMessageParams[1] не должно быть пустым.",
+    "NOT_DIRECTOR" => "ПОльзователь текущий пользователь не принадлежит ни одному директору и сам не является директором",
 );

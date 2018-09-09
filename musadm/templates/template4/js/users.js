@@ -1,3 +1,6 @@
+
+var root = "/musadm";
+
 $(function(){
     $("body")
     //Открытие всплывающего окна редактирования пользователя
@@ -6,27 +9,33 @@ $(function(){
             var userid = $(this).data("userid");
             var usergroupid = $(this).data("usergroup");
 
-            if(usergroupid == 5)
-                getClientPopup(userid);
-            else
-                getTeacherPopup(userid);
+            switch(usergroupid)
+            {
+                case 2: getManagerPopup(userid);    break;
+                case 4: getTeacherPopup(userid);    break;
+                case 5: getClientPopup(userid);     break;
+                case 6: getDirectorPopup(userid);   break;
+            }
         })
         .on("click", ".user_create", function(e){
             e.preventDefault();
             var userid = 0;
             var usergroupid = $(this).data("usergroup");
 
-            if(usergroupid == 5)
-                getClientPopup(userid);
-            else
-                getTeacherPopup(userid);
+            switch(usergroupid)
+            {
+                case 2: getManagerPopup(userid);    break;
+                case 4: getTeacherPopup(userid);    break;
+                case 5: getClientPopup(userid);     break;
+                case 6: getDirectorPopup(userid);   break;
+            }
+
         })
         //Сохранение данных
         .on("click", ".popop_user_submit", function(e){
             e.preventDefault();
             loaderOn();
             userSave(refreshUserTable);
-            //refreshUserTable();
         })
         //Добавление пользователя в архив
         .on("click", ".user_archive", function(){
@@ -34,7 +43,7 @@ $(function(){
             if(agree != true) return;
             var userid = $(this).data("userid");
             loaderOn();
-            changeUserActive(userid, "false");
+            updateActive("User", userid, "false", refreshUserTable);
         })
         //"Разархивирование пользователя"
         .on("click", ".user_unarchive", function(){
@@ -42,13 +51,13 @@ $(function(){
             if(agree != true) return;
             loaderOn();
             var userid = $(this).data("userid");
-            changeUserActive(userid, "true");
+            updateActive("User", userid, "true", refreshUserTable);
         })
         //Удаление пользователя
         .on("click", ".user_delete", function(e){
             e.preventDefault();
             var userid = $(this).data("model_id");
-            deleteItem("User", userid, "../admin?menuTab=Main&menuAction=deleteAction&ajax=1", refreshArchiveTable);
+            deleteItem("User", userid, refreshArchiveTable);
         })
         //Нажатие на кнопку закрытия высплывающего окна редактирования пользователя
         .on("click", ".popup_close", function(e){
@@ -89,7 +98,7 @@ $(function(){
             e.preventDefault();
             loaderOn();
             userSave(loaderOff);
-            //saveData("../admin?menuTab=User&menuAction=updateAction&ajax=1", loaderOff);
+
             $("input[name=pass1]").val('');
             $("input[name=pass2]").val('');
         })
@@ -121,7 +130,7 @@ function userSave(func) {
 
     $.ajax({
         type: "GET",
-        url: "client",
+        url: root + "/user/client",
         data: {
             action: "checkLoginExists",
             login: login,
@@ -136,7 +145,7 @@ function userSave(func) {
             else
             {
                 if( $("#createData").valid() )
-                    saveData("../admin?menuTab=User&menuAction=updateAction&ajax=1", func);
+                    saveData("User", func);
                 else
                     loaderOff();
             }
@@ -148,7 +157,7 @@ function userSave(func) {
 function updateUserNote(userid, note, func) {
     $.ajax({
         type: "GET",
-        url: "balance",
+        url: root + "/user/balance",
         data: {
             action: "updateNote",
             userid: userid,
@@ -184,7 +193,6 @@ function refreshUserTable() {
         async: false,
         data: {
             action: "refreshTableUsers",
-            //group: groupid
         },
         success: function(responce) {
             $(".users").empty();
@@ -199,7 +207,7 @@ function refreshUserTable() {
 function refreshArchiveTable(func) {
     $.ajax({
         type: "GET",
-        url: "archive",
+        url: root + "/user/archive",
         data: {
             action: "refreshTableArchive"
         },
@@ -213,29 +221,25 @@ function refreshArchiveTable(func) {
 }
 
 
-function changeUserActive(userid, status) {
-    $.ajax({
-        type: "GET",
-        url: "../admin?menuTab=Main&menuAction=updateActive&ajax=1",
-        data: {
-            model_name: "User",
-            model_id: userid,
-            value: status
-        },
-        success: function(responce){
-            var url;
-            if(status == "false") url = "client";
-            else url = "archive";
-
-            refreshUserTable("clients", url, loaderOff);
-        }
-    });
-}
+// function changeUserActive(userid, status) {
+//     $.ajax({
+//         type: "GET",
+//         url: root + "/admin?menuTab=Main&menuAction=updateActive&ajax=1",
+//         data: {
+//             model_name: "User",
+//             model_id: userid,
+//             value: status
+//         },
+//         success: function(responce){
+//             refreshUserTable();
+//         }
+//     });
+// }
 
 function getClientPopup(userid) {
     $.ajax({
         type: "GET",
-        url: "client",
+        url: root + "/user/client",
         data: {
             action: "updateFormClient",
             userid: userid,
@@ -249,12 +253,42 @@ function getClientPopup(userid) {
 function getTeacherPopup(userid) {
     $.ajax({
         type: "GET",
-        url: "teacher",
+        url: root + "/user/teacher",
         data: {
             action: "updateFormTeacher",
             userid: userid,
         },
         success: function(responce){
+            showPopup(responce);
+        }
+    });
+}
+
+
+function getDirectorPopup(userid) {
+    $.ajax({
+        type: "GET",
+        url: root + "/user/client",
+        data: {
+            action: "updateFormDirector",
+            userid: userid
+        },
+        success: function(responce) {
+            showPopup(responce);
+        }
+    });
+}
+
+
+function getManagerPopup(userid) {
+    $.ajax({
+        type: "GET",
+        url: root + "/user/client",
+        data: {
+            action: "updateFormManager",
+            userid: userid
+        },
+        success: function(responce) {
             showPopup(responce);
         }
     });

@@ -5,7 +5,7 @@
 
         <div class="teacher_payments_block">
             <table class="table table-striped teacher_payments">
-                <xsl:if test="user_group = 1 or user_group = 2">
+                <xsl:if test="is_admin = 1">
                     <tr class="header">
                         <td><input name="date" class="form-control" type="date" value="{date}"/></td>
                         <td><input name="summ" class="form-control" type="number" placeholder="Сумма" /></td>
@@ -19,7 +19,16 @@
                         <th colspan="2">Сумма</th>
                     </tr>
                 </xsl:if>
-                <xsl:apply-templates select="month" />
+                <xsl:choose>
+                    <xsl:when test="count(month) != 0">
+                        <xsl:apply-templates select="month" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <tr>
+                            <td colspan="3">Выплат не найдено</td>
+                        </tr>
+                    </xsl:otherwise>
+                </xsl:choose>
             </table>
         </div>
 

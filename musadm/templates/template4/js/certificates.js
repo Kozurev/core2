@@ -30,7 +30,7 @@ $(function(){
             e.preventDefault();
             loaderOn();
             var id = $(this).data("id");
-            deleteItem("Certificate", id, "admin?menuTab=Main&menuAction=deleteAction&ajax=1", refreshCertificatesTable);
+            deleteItem("Certificate", id, refreshCertificatesTable);
         });
 });
 
@@ -46,8 +46,6 @@ function addNewCertificatePopup() {
             "<div class=\"column\"><input type=\"text\" required name=\"number\" class=\"form-control\"></div>" +
             "<div class=\"column\"><span>Примечание</span><span style=\"color:red\">*</span></div>" +
             "<div class=\"column\"><textarea required name=\"note\" class=\"form-control\"></textarea></div>" +
-            //"<input type='hidden' name='id' value=''>" +
-            //"<input type='hidden' name='modelName' value='Certificate'>" +
             "<button class=\"popop_certificate_submit btn btn-default\">Сохранить</button>" +
         "</form>";
 

@@ -1,7 +1,7 @@
 <?php
 
 $breadcumbs[0] = new stdClass();
-$breadcumbs[0]->title = "Личный кабинет";
+$breadcumbs[0]->title = $this->oStructure->title();
 $breadcumbs[0]->href = "balance";
 
 $userId = Core_Array::getValue( $_GET, "userid", null );

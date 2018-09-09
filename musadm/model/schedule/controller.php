@@ -391,8 +391,10 @@ class Schedule_Controller
                     && $Lesson->dayName() == $dayName
                 )
                 {
-                    $Lesson->setRealTime( $date );
-                    $output[] = $Lesson;
+                    //$Lesson->setRealTime( $date );
+                    $temp = clone $Lesson;
+                    $temp->setRealTime( $date );
+                    $output[] = $temp;
                 }
             }
         }

@@ -1,3 +1,6 @@
+
+var root = "/musadm";
+
 $(function(){
 
     var days = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
@@ -33,12 +36,11 @@ $(function(){
                 addAbsentTask(dateTo, clientId);
             }
 
-            saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", refreshSchedule);
+            saveData("Main", refreshSchedule);
         })
         //Окно добавления урока в расписание
         .on("click", ".add_lesson", function(){
             var date = $(this).data("date");
-            var today = new Date();
             var lessonDate = new Date(date);
             var currentDate = new Date(getCurrentDate());
 
@@ -53,7 +55,7 @@ $(function(){
         .on("click", ".popop_schedule_lesson_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", refreshSchedule);
+            saveData("Main", refreshSchedule);
         })
         //Удаление урока из основного графика
         .on("click", ".schedule_delete_main", function(e){
@@ -69,7 +71,6 @@ $(function(){
             loaderOn();
             var lessonid = $(this).parent().parent().data("id");
             var date = $(this).parent().parent().data("date");
-            var type = $(this).parent().parent().data("type");
             markAbsent(lessonid, date, refreshSchedule);
             loaderOff();
         })
@@ -77,7 +78,6 @@ $(function(){
             e.preventDefault();
             var lessonid = $(this).parent().parent().data("id");
             var date = $(this).parent().parent().data("date");
-            //var type = $(this).parent().parent().data("type");
             getScheduleChangeTimePopup(lessonid, date);
         })
         .on("click", ".popop_schedule_time_submit", function(e){
@@ -88,7 +88,6 @@ $(function(){
             var lessonId = $("input[name=lesson_id]").val();
             var date = $("input[name=date]").val();
             saveScheduleChangeTimePopup(lessonId, date, timeFrom, timeTo, refreshSchedule);
-            //saveData("../admin?menuTab=Main&menuAction=updateAction&ajax=1", refreshSchedule);
         })
         .on("change", "select[name=typeId]", function(){
             loaderOn();
@@ -130,8 +129,6 @@ $(function(){
             e.preventDefault();
             loaderOn();
             var tr = $(this).parent().parent();
-            var modelName = "Schedule_Lesson_Report";
-            var id = "";
             var lesson_id = tr.find("input[name=lessonId]").val();
             var teacher_id = tr.find("input[name=teacherId]").val();
             var client_id = tr.find("input[name=clientId]").val();
@@ -232,6 +229,27 @@ $(function(){
                     loaderOff();
                 }
             });
+        })
+        .on("click", ".schedule_area_edit", function(e){
+            e.preventDefault();
+            var areaId = $(this).data("area_id");
+            getScheduleAreaPopup(areaId);
+        })
+        .on("click", ".popop_schedule_area_submit", function(e){
+            e.preventDefault();
+            loaderOn();
+            saveData("Main", refreshAreasTable);
+        })
+        .on("click", "input[name=schedule_area_active]", function(){
+            var areaId = $(this).data("area_id");
+            var value = $(this).prop("checked");
+            updateActive("Schedule_Area", areaId, value, loaderOff);
+        })
+        .on("click", ".schedule_area_delete", function(e){
+            e.preventDefault();
+            loaderOn();
+            var areaId = $(this).data("area_id");
+            deleteItem("Schedule_Area", areaId, refreshAreasTable);
         });
 
 
@@ -251,10 +269,26 @@ $(function(){
 });
 
 
+
+function refreshAreasTable() {
+    $.ajax({
+        type: "GET",
+        url: "",
+        data: {
+            action: "getSchedule",
+        },
+        success: function(responce) {
+            $(".page").html(responce);
+            loaderOff();
+        }
+    });
+}
+
+
 function saveTeacherPayment(user, summ, date, description, func) {
     $.ajax({
         type: "GET",
-        url: "./admin?menuTab=Main&menuAction=updateAction&ajax=1",
+        url: root + "/admin?menuTab=Main&menuAction=updateAction&ajax=1",
         async: false,
         data: {
             id: "",
@@ -269,6 +303,21 @@ function saveTeacherPayment(user, summ, date, description, func) {
             if(responce != "0") alert("Ошибка: " + responce);
             closePopup();
             func();
+        }
+    });
+}
+
+
+function getScheduleAreaPopup(areaId) {
+    $.ajax({
+        type: "GET",
+        url: "",
+        data: {
+            action: "getScheduleAreaPopup",
+            areaId: areaId
+        },
+        success: function(responce){
+            showPopup(responce);
         }
     });
 }
@@ -444,7 +493,6 @@ function addAbsentTask(dateTo, clientId) {
         },
         success: function(responce){
             if(responce != "")  alert(responce);
-
         }
     });
 }

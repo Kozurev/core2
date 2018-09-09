@@ -8,24 +8,23 @@
 
 $oUser = Core::factory("User")->getCurrent();
 
+/**
+ * Блок проверки авторизации и прав доступа
+ */
 $accessRules = array(
-    "groups"    => array(1),
-    "superuser" => 1
+    "groups"    => array(1, 6),
+    //"superuser" => 1
 );
 
 if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
 {
     $this->error404();
-//    $host  = $_SERVER['HTTP_HOST'];
-//    $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-//    $extra = $_SERVER["REQUEST_URI"];
-//    header("Location: http://$host$uri/authorize?back=$host$uri"."$extra");
     exit;
 }
 
 
 $breadcumbs[0] = new stdClass();
-$breadcumbs[0]->title = "Статистика";
+$breadcumbs[0]->title = $this->oStructure->title();
 $breadcumbs[0]->active = 1;
 
 $this->setParam( "body-class", "body-orange" );

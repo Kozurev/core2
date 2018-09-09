@@ -11,7 +11,10 @@ class Payment extends Payment_Model
 
     public function getUser()
     {
-        return Core::factory("User", $this->user);
+        $User = Core::factory("User", $this->user);
+
+        if( $User != false )    return $User;
+        else    return Core::factory( "User" );
     }
 
     public function save($obj = null)

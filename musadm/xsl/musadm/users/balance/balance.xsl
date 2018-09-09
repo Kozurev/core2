@@ -10,7 +10,7 @@
                     </xsl:call-template>
                 </td>
                 <td>
-                    <xsl:if test="user_group/id != 5">
+                    <xsl:if test="is_admin">
                         <a class="btn btn-orange btn_balance" data-userid="{user/id}">
                             Пополнить баланс
                         </a>
@@ -27,9 +27,6 @@
                 </td>
                 <td>
                     <a class="btn btn-orange btn_private_lessons" data-userid="{user/id}">
-                        <!-- <xsl:if test="property[property_id='12']/value = 0 and user_group/id != 5">
-                            <xsl:attribute name="disabled">disabled</xsl:attribute>
-                        </xsl:if> -->
                         Купить индивидуальные занятия
                     </a></td>
             </tr>

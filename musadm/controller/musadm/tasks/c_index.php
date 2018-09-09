@@ -10,6 +10,12 @@ $from = Core_Array::getValue( $_GET, "date_from", "" );
 $to =   Core_Array::getValue( $_GET, "date_to", "" );
 $today = date( "Y-m-d" );
 
+
+$Director = User::current()->getDirector();
+if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+$subordinated = $Director->getId();
+
+
 $output = Core::factory( "Core_Entity" );
 
 if( $from == "" && $to == "" )
@@ -38,6 +44,7 @@ else
 }
 
 $Tasks = $Tasks
+    ->where( "subordinated", "=", $subordinated )
     ->orderBy( "date", "DESC" )
     ->findAll();
 
@@ -60,6 +67,12 @@ $Notes = Core::factory( "Task_Note" )
     ->join( "User AS usr", "author_id = usr.id" )
     ->orderBy( "date", "DESC" )
     ->findAll();
+
+foreach ( $Notes as $Note )
+{
+    $time = strtotime( $Note->date() );
+    $Note->date( date( "d.m.Y H:i", $time ) );
+}
 
 $output
     ->addEntities( $Tasks )

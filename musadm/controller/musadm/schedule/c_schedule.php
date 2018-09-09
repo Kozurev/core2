@@ -13,7 +13,11 @@ $userId = $oUser->getId();
  * Формирование таблицы расписания для менеджеров
  * Начало >>
  */
-if( $oUser->groupId() < 4 ) 
+
+if(
+    User::checkUserAccess( ["groups" => [2]], $oUser )
+    || ( User::checkUserAccess( ["groups" => [6]], $oUser ) && is_object( $this->oStructureItem ) )
+    )
 {
     $oArea = $this->oStructureItem;
     $areaId = $oArea->getId();
@@ -363,15 +367,15 @@ if( $oUser->groupId() < 4 )
      * Формирование таблицы расписания
      */
     echo "</table>";
-} 
+}
 
 
+/**
+ * Формирование таблицы расписания для клиентов/преподавателей
+ * Начало>>
+ */
 if( $oUser->groupId() == 4 )
 {
-    /**
-     * Формирование таблицы расписания для клиентов
-     * Начало>>
-     */
     $userId = $oUser->getId();
     $getDate = Core_Array::getValue( $_GET, "date", date("Y-m-d") );
     $month = getMonth( $getDate );
@@ -415,10 +419,11 @@ if( $oUser->groupId() == 4 )
         ->addEntity( $oUser )
         ->addEntities( $aoTeacherLessons, "lesson" );
 
-    $oCurrentUser = Core::factory( "User" )->getCurrent();
+    //$oCurrentUser = Core::factory( "User" )->getCurrent();
+    User::isAuthAs() ? $isAdmin = 1 : $isAdmin = 0;
 
     $output
-        ->addEntity( $oCurrentUser, "admin" )
+        ->addSimpleEntity( "is_admin", $isAdmin )
         ->xsl( "musadm/schedule/teacher_table.xsl" )
         ->show();
 
@@ -433,7 +438,6 @@ if( $oUser->groupId() == 4 )
 
     $aoTeacherReports = Core::factory("Schedule_Lesson_Report")
         ->where("teacher_id", "=", $oUser->getId())
-        ->where("type_id", "<>", "3")
         ->where("date", ">=", $dateFrom)
         ->where("date", "<=", $dateTo);
 
@@ -479,6 +483,7 @@ if( $oUser->groupId() == 4 )
         ->where( "type", "=", 3 )
         ->where( "user", "=", $oUser->getId() )
         ->orderBy( "datetime", "DESC" )
+        ->orderBy( "id", "DESC" )
         ->findAll();
 
     $aoMonthesPayments = array();
@@ -499,10 +504,12 @@ if( $oUser->groupId() == 4 )
         $aoMonthesPayments[$index]->addEntity($payment);
     }
 
+    User::isAuthAs() ? $isAdmin = 1 : $isAdmin = 0;
+
     Core::factory("Core_Entity")
         ->addEntities($aoMonthesPayments)
         ->addSimpleEntity("userid", $oUser->getId())
-        ->addSimpleEntity("user_group", Core::factory("User")->getCurrent()->groupId())
+        ->addSimpleEntity("is_admin", $isAdmin)
         ->addSimpleEntity("date", date("Y-m-d"))
         ->xsl("musadm/finances/teacher_payments.xsl")
         ->show();
@@ -514,4 +521,23 @@ if( $oUser->groupId() == 4 )
  * <<Формирование таблицы с отметками и выплатами для учителей
  */
 
-?>
+
+
+/**
+ * Формирование списка филлиалов
+ */
+if( $oUser->groupId() == 6 && !$this->oStructureItem )
+{
+    global $CFG;
+
+    $aoAreas = Core::factory( "Schedule_Area" )
+        ->where( "subordinated", "=", $oUser->getId() )
+        ->orderBy( "sorting" )
+        ->findAll();
+
+    Core::factory( "Core_Entity" )
+        ->addEntities( $aoAreas )
+        ->addSimpleEntity( "wwwroot", $CFG->rootdir )
+        ->xsl( "musadm/schedule/areas.xsl" )
+        ->show();
+}
