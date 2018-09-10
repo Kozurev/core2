@@ -6,30 +6,35 @@
  * Time: 23:36
  */
 
-$oProperty = Core::factory("Property");
+$oProperty = Core::factory( "Property" );
 $xsl = "musadm/users/clients.xsl";
 
+$Director = User::current()->getDirector();
+if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+$subordinated = $Director->getId();
+
 $aoUsers = Core::factory("User")
-    ->where("group_id", "=", 5)
-    ->where("active", "=", 0)
-    ->orderBy("id", "DESC")
+    ->where( "group_id", "=", 5 )
+    ->where( "active", "=", 0 )
+    ->where( "subordinated", "=", $subordinated )
+    ->orderBy( "id", "DESC" )
     ->findAll();
 
-foreach ($aoUsers as $user)
+foreach ( $aoUsers as $user )
 {
-    $aoPropertiesList = $oProperty->getPropertiesList($user);
-    foreach ($aoPropertiesList as $prop)
+    $aoPropertiesList = $oProperty->getPropertiesList( $user );
+    foreach ( $aoPropertiesList as $prop )
     {
-        $user->addEntities($prop->getPropertyValues($user), "property_value");
+        $user->addEntities( $prop->getPropertyValues( $user ), "property_value" );
     }
 }
 
-$output = Core::factory("Core_Entity")
-    ->xsl($xsl)
+$output = Core::factory( "Core_Entity" )
+    ->xsl( $xsl )
     ->addEntity(
-        Core::factory("Core_Entity")
-            ->name("table_type")
-            ->value("archive")
+        Core::factory( "Core_Entity" )
+            ->name( "table_type" )
+            ->value( "archive" )
     )
     ->addEntities($aoUsers)
     ->show();

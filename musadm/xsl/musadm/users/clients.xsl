@@ -4,11 +4,11 @@
 
     <xsl:template match="root">
 
-        <xsl:if test="user/active = 1">
+        <!--<xsl:if test="user/active = 1">-->
             <div style="text-align: right; margin: 20px 0px">
                 <a href="#" class="btn btn-primary user_create" data-usergroup="5">Создать пользователя</a>
             </div>
-        </xsl:if>
+        <!--</xsl:if>-->
 
         <table id="sortingTable" class="table table-striped">
             <thead>

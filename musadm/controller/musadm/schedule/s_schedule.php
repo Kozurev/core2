@@ -77,6 +77,10 @@ if($action === "getScheduleLessonPopup")
     $date =         Core_Array::getValue($_GET, "date", 0);
     $areaId =       Core_Array::getValue($_GET, "area_id", 0);
 
+    $Director = User::current()->getDirector();
+    if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+    $subordinated = $Director->getId();
+
     $dayName =  new DateTime($date);
     $dayName =  $dayName->format("l");
 
@@ -94,6 +98,7 @@ if($action === "getScheduleLessonPopup")
     $aoUsers = Core::factory("User")
         ->where("active", "=", 1)
         ->where("group_id", ">", 3)
+        ->where( "subordinated", "=", $subordinated )
         ->orderBy("surname", "ASC")
         ->findAll();
 
@@ -226,24 +231,29 @@ if($action === "deleteReport")
 }
 
 
-if($action === "getclientList")
+if( $action === "getclientList" )
 {
-    $type = Core_Array::getValue($_GET, "type", 0);
-    if($type == 2)
+    $type = Core_Array::getValue( $_GET, "type", 0 );
+    if( $type == 2 )
     {
-        $aoGroups = Core::factory("Schedule_Group")->orderBy("title")->findAll();
-        foreach ($aoGroups as $group)
+        $aoGroups = Core::factory( "Schedule_Group" )->orderBy( "title" )->findAll();
+        foreach ( $aoGroups as $group )
             echo "<option value='".$group->getId()."'>" . $group->title() . "</option>";
     }
     else
     {
-        $aoUsers = Core::factory("User")
-            ->where("active", "=", 1)
-            ->where("group_id", "=", 5)
-            ->orderBy("surname", "ASC")
+        $Director = User::current()->getDirector();
+        if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+        $subordinated = $Director->getId();
+
+        $aoUsers = Core::factory( "User" )
+            ->where( "active", "=", 1 )
+            ->where( "group_id", "=", 5 )
+            ->where( "subordinated", "=", $subordinated )
+            ->orderBy( "surname", "ASC" )
             ->findAll();
 
-        foreach ($aoUsers as $user)
+        foreach ( $aoUsers as $user )
             echo "<option value='".$user->getId()."'>". $user->surname() . " " . $user->name() ."</option>";
     }
 

@@ -42,34 +42,7 @@ $action = Core_Array::getValue($_GET, "action", 0);
  */
 if($action === "refreshTableUsers")
 {
-    $oProperty = Core::factory("Property");
-    $xsl = "musadm/users/clients.xsl";
-
-    $aoUsers = Core::factory("User")
-        ->where("group_id", "=", 5)
-        ->where("active", "=", 0)
-        ->orderBy("id", "DESC")
-        ->findAll();
-
-    foreach ($aoUsers as $user)
-    {
-        $aoPropertiesList = $oProperty->getPropertiesList($user);
-        foreach ($aoPropertiesList as $prop)
-        {
-            $user->addEntities($prop->getPropertyValues($user), "property_value");
-        }
-    }
-
-    $output = Core::factory("Core_Entity")
-        ->xsl($xsl)
-        ->addEntity(
-            Core::factory("Core_Entity")
-                ->name("table_type")
-                ->value("archive")
-        )
-        ->addEntities($aoUsers)
-        ->show();
-
+    $this->execute();
     exit;
 }
 

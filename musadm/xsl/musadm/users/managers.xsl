@@ -6,11 +6,11 @@
 
         <h2>Список менеджеров</h2>
 
-        <xsl:if test="user/active = 1">
+        <!--<xsl:if test="user/active = 1">-->
             <div class="button-block">
                 <a href="#" class="btn btn-primary user_create" data-usergroup="2">Добавить менеджера</a>
             </div>
-        </xsl:if>
+        <!--</xsl:if>-->
 
         <table id="sortingTable" class="table table-striped">
             <thead>
