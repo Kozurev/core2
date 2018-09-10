@@ -97,7 +97,7 @@ class Orm
 
 	/**
 	*	Метод для добавления/сохранения объектов
-	*	@return void
+	*	@return $this
 	*/
 	public function save()
 	{
@@ -187,10 +187,11 @@ class Orm
 		*/
 		if(!$this->id)
 		{
-			$lastInsertId = Core_Database::getConnect()->query("SELECT LAST_INSERT_ID() as id");
-            $lastInsertId->setFetchMode(PDO::FETCH_CLASS, "stdClass");
-            $lastInsertId = $lastInsertId->fetch();
-            $this->id = $lastInsertId->id;
+//			$lastInsertId = Core_Database::getConnect()->query("SELECT LAST_INSERT_ID() as id");
+//            $lastInsertId->setFetchMode(PDO::FETCH_CLASS, "stdClass");
+//            $lastInsertId = $lastInsertId->fetch();
+//            $this->id = $lastInsertId->id;
+            $this->id = Core_Database::getConnect()->lastInsertId();
 		}
 
 		return $this;
