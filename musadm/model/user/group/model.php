@@ -10,7 +10,7 @@ class User_Group_Model extends Core_Entity
 {
     protected $id;
     protected $title;
-    protected $sorting;
+    protected $sorting = 0;
     protected $path;
     protected $children_name;
 

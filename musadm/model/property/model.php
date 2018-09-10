@@ -7,13 +7,13 @@ class Property_Model extends Core_Entity
 	protected $id;
 	protected $tag_name; //
 	protected $title; //
-	protected $description; //
-	protected $type; //
-    protected $multiple;
-	protected $active; //
-    protected $sorting;
-    protected $dir;
-    protected $default_value;
+	protected $description = " "; //
+	protected $type = 0; //
+    protected $multiple = 0;
+	protected $active = 1; //
+    protected $sorting = 0;
+    protected $dir = 0;
+    protected $default_value = 0;
 
 	public function __construct()
 	{

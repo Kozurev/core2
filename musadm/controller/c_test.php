@@ -9,9 +9,31 @@
 $dbh = new mysqli("37.140.192.32:3306", "u4834_root", "n1omY2_1", "u4834955_core");
 $dbh->query("SET NAMES utf8");
 
-Core::factory( "User_Group" )
+$UserGroup = Core::factory( "User_Group" )
     ->title( "Директор" )
     ->save();
+
+$Property1 = Core::factory( "Property" )
+    ->title( "Город" )
+    ->tag_name( "city" )
+    ->type( "string" )
+    ->multiple( 0 )
+    ->active( 1 )
+    ->dir( 0 )
+    ->sorting( 0 )
+    ->save();
+
+$Property2 = Core::factory( "Property" )
+    ->title( "Организация" )
+    ->tag_name( "organization" )
+    ->type( "string" )
+    ->multiple( 0 )
+    ->active( 1 )
+    ->dir( 0 )
+    ->sorting( 0 )
+    ->save();
+
+Core::factory( "Orm" )->executeQuery( "ALTER TABLE `User` ADD `subordinated` INT NOT NULL" );
 
 $Director = Core::factory( "User" )
     ->name( "Герус" )
@@ -24,29 +46,13 @@ $Director = Core::factory( "User" )
     ->superuser( 0 )
     ->save();
 
-Core::factory( "Property" )
-    ->title( "Город" )
-    ->tag_name( "city" )
-    ->type( "string" )
-    ->multiple( 0 )
-    ->active( 1 )
-    ->dir( 0 )
-    ->sorting( 0 )
-    ->save();
 
-Core::factory( "Property" )
-    ->title( "Организация" )
-    ->tag_name( "organization" )
-    ->type( "string" )
-    ->multiple( 0 )
-    ->active( 1 )
-    ->dir( 0 )
-    ->sorting( 0 )
-    ->save();
-
+debug( $UserGroup );
+debug( $Property1 );
+debug( $Property2 );
 debug( $Director );
 
-Core::factory( "Orm" )->executeQuery( "ALTER TABLE `User` ADD `subordinated` INT NOT NULL" );
+
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Lid` ADD `subordinated` INT NOT NULL" );
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Certificate` ADD `subordinated` INT NOT NULL" );
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Task` ADD `subordinated` INT NOT NULL" );
