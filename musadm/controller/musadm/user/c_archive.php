@@ -14,7 +14,7 @@ if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
 $subordinated = $Director->getId();
 
 $aoUsers = Core::factory("User")
-    ->where( "group_id", "=", 5 )
+    //->where( "group_id", "=", 5 )
     ->where( "active", "=", 0 )
     ->where( "subordinated", "=", $subordinated )
     ->orderBy( "id", "DESC" )
