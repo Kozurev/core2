@@ -46,6 +46,7 @@ else
 $Tasks = $Tasks
     ->where( "subordinated", "=", $subordinated )
     ->orderBy( "date", "DESC" )
+    ->orderBy( "id", "DESC" )
     ->findAll();
 
 foreach ( $Tasks as $Task )
