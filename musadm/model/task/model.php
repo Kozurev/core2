@@ -12,6 +12,7 @@ class Task_Model extends Core_Entity
     protected $date;
     protected $done = 0;
     protected $done_date;
+    protected $subordinated = 0;
 
     public function getId()
     {
@@ -40,6 +41,14 @@ class Task_Model extends Core_Entity
         {
             $this->done = 0;
         }
+        return $this;
+    }
+
+
+    public function subordinated( $val = null )
+    {
+        if( is_null( $val ) )   return $this->subordinated;
+        $this->subordinated = intval( $val );
         return $this;
     }
 
