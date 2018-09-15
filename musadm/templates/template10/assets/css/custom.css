@@ -345,3 +345,7 @@ section .container .cards-wrapper .item .icon-holder {
     float: right;
     margin: 20px 0px;
 }
+
+.balance-payments a {
+    margin-right: 20px;
+}
