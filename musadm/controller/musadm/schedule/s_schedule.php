@@ -350,8 +350,7 @@ if( $action === "addAbsentTask" )
     $clientId = Core_Array::getValue( $_GET, "client_id", 0 );
 
     $oTask = Core::factory( "Task" )
-        ->date( $dateTo )
-        ->type( 3 );
+        ->date( $dateTo );
 
     $oTask = $oTask->save();
 
