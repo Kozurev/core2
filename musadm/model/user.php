@@ -71,6 +71,7 @@ class User extends User_Model
 	 * Авторизация пользователя
      *
      * @param bool $remember - указатель "Запомнить меня" при истинном значении создается файл кукки
+     * @return object
 	 */
 	public function authorize($remember = false)
 	{
@@ -261,6 +262,21 @@ class User extends User_Model
             return true;
         else
             return false;
+    }
+
+
+    /**
+     * Получение пользователя, под которым происходила самая первая рекурсивная авторизация
+     *
+     * @return $this|object
+     */
+    public function getParentAuth()
+    {
+        $backup = Core_Array::getValue( $_SESSION["core"], "user_backup", false );
+        if( $backup == false )      return $this;
+        if( count( $backup ) == 0 ) return $this;
+
+        return Core::factory( "User", $backup[0] );
     }
 
 

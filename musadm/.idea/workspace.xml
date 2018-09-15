@@ -21,11 +21,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="s_balance.php" pinned="false" current-in-tab="true">
+      <file leaf-file-name="s_balance.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/controller/musadm/balance/s_balance.php">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="730">
               <caret line="290" column="9" lean-forward="false" selection-start-line="290" selection-start-column="9" selection-end-line="290" selection-end-column="9" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="user.php" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/model/user.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="589">
+              <caret line="272" column="33" lean-forward="true" selection-start-line="272" selection-start-column="33" selection-end-line="272" selection-end-column="33" />
               <folding />
             </state>
           </provider>
@@ -110,8 +120,8 @@
       <find>finances_payment</find>
       <find>change</find>
       <find>client_schedule</find>
-      <find>ajax</find>
       <find>popop_payment_submit</find>
+      <find>ajax</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -164,13 +174,13 @@
         <option value="$PROJECT_DIR$/controller/musadm/schedule/s_schedule.php" />
         <option value="$PROJECT_DIR$/index.php" />
         <option value="$USER_HOME$/AppData/Local/Temp/fz3temp-2/c_balance.php" />
-        <option value="$PROJECT_DIR$/model/user.php" />
         <option value="$PROJECT_DIR$/controller/musadm/balance/c_balance.php" />
         <option value="$PROJECT_DIR$/templates/template10/assets/css/custom.css" />
         <option value="$PROJECT_DIR$/xsl/musadm/users/balance/payments.xsl" />
         <option value="$PROJECT_DIR$/xsl/musadm/finances/edit_payment_popup.xsl" />
         <option value="$PROJECT_DIR$/templates/template4/js/payments.js" />
         <option value="$PROJECT_DIR$/controller/musadm/balance/s_balance.php" />
+        <option value="$PROJECT_DIR$/model/user.php" />
       </list>
     </option>
   </component>
@@ -373,12 +383,12 @@
       <workItem from="1534400218971" duration="22723000" />
       <workItem from="1534487186452" duration="3623000" />
       <workItem from="1536561838498" duration="5493000" />
-      <workItem from="1537004465172" duration="11139000" />
+      <workItem from="1537004465172" duration="11389000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="235277000" />
+    <option name="totallyTimeSpent" value="235527000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -755,14 +765,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/model/user.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="606">
-          <caret line="273" column="47" lean-forward="false" selection-start-line="273" selection-start-column="47" selection-end-line="273" selection-end-column="47" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/template10/assets/css/custom.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="280">
@@ -858,6 +860,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="730">
           <caret line="290" column="9" lean-forward="false" selection-start-line="290" selection-start-column="9" selection-end-line="290" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/model/user.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="589">
+          <caret line="272" column="33" lean-forward="true" selection-start-line="272" selection-start-column="33" selection-end-line="272" selection-end-column="33" />
           <folding />
         </state>
       </provider>
