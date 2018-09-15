@@ -59,9 +59,11 @@
                     </xsl:for-each>
                 </td>
                 <td class="{$class}" style="text-align:center">
-                    <a class="btn btn-orange payment_add_note" data-modelid="{./id}">
-                        Добавить примечание
-                    </a>
+                    <a class="btn btn-orange payment_add_note" data-modelid="{./id}">+</a>
+                    <xsl:if test="//parent_user/group_id = 1 or //parent_user/group_id = 6">
+                        <a class="action edit payment_edit" href="#" data-id="{id}"></a>
+                        <a class="action delete payment_delete" href="#" data-id="{id}"></a>
+                    </xsl:if>
                 </td>
             </xsl:if>
         </tr>
