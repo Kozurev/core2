@@ -54,8 +54,10 @@ debug( $Director );
 
 
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Lid` ADD `subordinated` INT NOT NULL" );
+Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Lid` DROP COLUMN `active` " );
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Certificate` ADD `subordinated` INT NOT NULL" );
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Task` ADD `subordinated` INT NOT NULL" );
+Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Task` DROP COLUMN `type` " );
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Schedule_Area` ADD `subordinated` INT NOT NULL" );
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Schedule_Area` ADD `active` INT NOT NULL" );
 
