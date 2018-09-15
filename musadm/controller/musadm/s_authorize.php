@@ -23,6 +23,7 @@ if(isset($_POST["login"]) && isset($_POST["password"]))
         global $CFG;
         if($oUser->groupId() == 3 || $oUser->groupId() == 4)   $back = "/".$CFG->rootdir."schedule/";
         elseif($oUser->groupId() < 3 || $oUser->groupId() == 6)$back = "/".$CFG->rootdir;
+        elseif( $oUser->groupId() == 5 ) $back = "/" . $CFG->rootdir . "balance";
         header("Location: " . $back);
     }
 }
