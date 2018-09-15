@@ -140,33 +140,14 @@ $UserReports = $UserReports->findAll();
 
 foreach ( $UserReports as $rep )
 {
-    $rep->date( refactorDateFormat( $rep->date() ) );
     $RepLesson = Core::factory( "Schedule_Lesson", $rep->lessonId() );
 
-    if( $RepLesson == false )   //Если занятие было удалено
-    {
-        $rep->time_from = "Нет данных";
-        $rep->time_to = "Нет данных";
-    }
-    else
-    {
-        if( $rep->lessonType() == "1" && $RepLesson->isTimeModified( $rep->date() ) )
-        {
-            $Modified = Core::factory("Schedule_Lesson_TimeModified")
-                ->where( "lesson_id", "=", $RepLesson->getId() )
-                ->where( "date", "=", $rep->date() )
-                ->find();
+    if( $RepLesson == false )   continue;
+    $RepLesson->setRealTime( $rep->date() );
 
-            $rep->time_from = refactorTimeFormat( $Modified->timeFrom() );
-            $rep->time_to = refactorTimeFormat( $Modified->timeTo() );
-        }
-        else
-        {
-            $rep->time_from = refactorTimeFormat( $RepLesson->timeFrom() );
-            $rep->time_to = refactorTimeFormat( $RepLesson->timeTo() );
-        }
-    }
-
+    $rep->time_from = refactorTimeFormat( $RepLesson->timeFrom() );
+    $rep->time_to = refactorTimeFormat( $RepLesson->timeTo() );
+    $rep->date( refactorDateFormat( $rep->date() ) );
 }
 
 Core::factory( "Core_Entity" )
@@ -183,6 +164,8 @@ $aoUserPayments = Core::factory( "Payment" )
     ->where( "user", "=", $oUser->getId() )
     ->findAll();
 
+$ParentUser = $oUser->getParentAuth();
+
 foreach ( $aoUserPayments as $payment )
 {
     $aoUserPaymentsNotes = Core::factory( "Property", 26 )->getPropertyValues( $payment );
@@ -194,5 +177,6 @@ foreach ( $aoUserPayments as $payment )
 Core::factory("Core_Entity")
     ->addSimpleEntity( "is_admin", $isAdmin )
     ->addEntities($aoUserPayments)
+    ->addEntity( $ParentUser, "parent_user" )
     ->xsl("musadm/users/balance/payments.xsl")
     ->show();

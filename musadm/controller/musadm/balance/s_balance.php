@@ -180,7 +180,7 @@ if( $action == "buyTarif" )
         ->type( 2 )
         ->user( $userId )
         ->value( $oTarif->price() )
-        ->description( "Покупка тарифа" )
+        ->description( "Покупка тарифа \"" . $oTarif->title() . "\"" )
         ->save();
 
     exit;
@@ -216,5 +216,77 @@ if($action == "savePayment")
     $oUserBalance->save();
 
     echo 0;
+    exit;
+}
+
+
+if( $action === "edit_payment" )
+{
+    $id = Core_Array::getValue( $_GET, "id", null );
+    $Payment = Core::factory( "Payment", $id );
+
+    Core::factory( "Core_Entity" )
+        ->addEntity( $Payment )
+        ->xsl( "musadm/finances/edit_payment_popup.xsl" )
+        ->show();
+
+    exit;
+}
+
+
+if( $action === "payment_save" )
+{
+    $id = Core_Array::getValue( $_GET, "id", 0 );
+    $value = Core_Array::getValue( $_GET, "value", 0 );
+    $description = Core_Array::getValue( $_GET, "description", "" );
+
+    $Payment = Core::factory( "Payment", $id );
+
+    $difference = intval( $Payment->value() ) - intval( $value );
+
+    $oUser =        Core::factory( "User", $Payment->user() );
+    $oUserBalance = Core::factory( "Property", 12 );
+    $oUserBalance = $oUserBalance->getPropertyValues( $oUser )[0];
+    $balanceOld = $oUserBalance->value();
+
+    $Payment->type() == 1
+        ?   $balanceNew = $balanceOld - $difference
+        :   $balanceNew = $balanceOld + $difference;
+
+    $Payment
+        ->value( $value )
+        ->description( $description )
+        ->save();
+
+    $oUserBalance
+        ->value( $balanceNew )
+        ->save();
+
+    $this->execute();
+    exit;
+}
+
+
+if( $action === "payment_delete" )
+{
+    $id = Core_Array::getValue( $_GET, "id", 0 );
+    $Payment = Core::factory( "Payment", $id );
+
+    $oUser =        Core::factory( "User", $Payment->user() );
+    $oUserBalance = Core::factory( "Property", 12 );
+    $oUserBalance = $oUserBalance->getPropertyValues( $oUser )[0];
+    $balanceOld = $oUserBalance->value();
+
+    $Payment->type() == 1
+        ?   $newBalance = $balanceOld - $Payment->value()
+        :   $newBalance = $balanceOld + $Payment->value();
+
+    $oUserBalance
+        ->value( $newBalance )
+        ->save();
+
+    $Payment->delete();
+
+    $this->execute();
     exit;
 }
