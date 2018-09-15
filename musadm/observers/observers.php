@@ -118,7 +118,7 @@ Core::attachObserver("afterUserAuthorize", function($args){
     {
         $oProperty = Core::factory("Property", 22);
         $oProperty->addToPropertiesList($oUser, 22);
-        $now = date("d-m-Y H:i:s");
+        $now = date("d.m.Y H:i:s");
 
         $value = $oProperty->getPropertyValues($oUser)[0];
         if($value->getId())
@@ -405,5 +405,16 @@ Core::attachObserver("beforeScheduleGroupSave", function($args){
     {
         $oUser = Core::factory( "User" )->getCurrent()->getDirector();
         $Group->subordinated( $oUser->getId() );
+    }
+});
+
+
+Core::attachObserver( "beforeTaskSave", function( $args ){
+    $Task = $args[0];
+
+    if( $Task->subordinated() == 0 )
+    {
+        $User = Core::factory( "User" )->getCurrent()->getDirector();
+        $Task->subordinated( $User->getId() );
     }
 });
