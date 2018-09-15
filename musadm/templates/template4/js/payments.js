@@ -1,3 +1,5 @@
+var root = "/musadm";
+
 $(function(){
     $("body")
         //Открытие формы добавления комментария к платежу
@@ -92,8 +94,71 @@ $(function(){
             e.preventDefault();
             loaderOn();
             saveData("Main", refreshPayments);
+        })
+        .on("click", ".payment_edit", function(e){
+            e.preventDefault();
+            var id = $(this).data("id");
+            editPaymentPopup(id);
+        })
+        .on("click", ".popop_payment_submit", function(e){
+            e.preventDefault();
+            loaderOn();
+            var Form = $("#createData");
+            var id = Form.find("input[name=id]").val();
+            var value = Form.find("input[name=summ]").val();
+            var description = Form.find("textarea[name=description]").val();
+            $.ajax({
+                type: "GET",
+                url: root + "/balance",
+                data: {
+                    action: "payment_save",
+                    id: id,
+                    value: value,
+                    description: description
+                },
+                success: function(responce){
+                    $(".users").empty();
+                    $(".users").html(responce);
+                    closePopup();
+                    loaderOff();
+                }
+            });
+        })
+        .on("click", ".payment_delete", function(e){
+            e.preventDefault();
+            loaderOn();
+            var id = $(this).data("id");
+
+            $.ajax({
+                type: "GET",
+                url: root + "/balance",
+                data: {
+                    action: "payment_delete",
+                    id: id
+                },
+                success: function(responce){
+                    $(".users").html(responce);
+                    closePopup();
+                    loaderOff();
+                }
+            });
         });
 });
+
+
+function editPaymentPopup(id) {
+    $.ajax({
+        type: "GET",
+        url: root + "/balance",
+        data: {
+            action: "edit_payment",
+            id: id
+        },
+        success: function(responce){
+            showPopup(responce);
+        }
+    });
+}
 
 
 function editTarifPopup(tarifid) {
