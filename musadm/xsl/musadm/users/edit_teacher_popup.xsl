@@ -84,6 +84,14 @@
                     </xsl:call-template>
                 </select>
             </div>
+            <div class="column">
+                <span>График для занятий</span>
+            </div>
+            <div class="column">
+                <textarea name="property_33[]" class="form-control">
+                    <xsl:value-of select="property_value[property_id = 33]/value" />
+                </textarea>
+            </div>
 
             <input type="hidden" name="id" value="{user/id}" />
             <input type="hidden" name="groupId" value="4" />
