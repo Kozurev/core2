@@ -11,32 +11,32 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="s_index.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/musadm/controller/musadm/user/s_index.php">
+      <file leaf-file-name="c_index.php" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/musadm/controller/musadm/statistic/c_index.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="390">
-              <caret line="266" column="0" lean-forward="true" selection-start-line="266" selection-start-column="0" selection-end-line="266" selection-end-column="0" />
+            <state relative-caret-position="387">
+              <caret line="236" column="0" lean-forward="true" selection-start-line="236" selection-start-column="0" selection-end-line="236" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="clients.xsl" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/musadm/xsl/musadm/users/clients.xsl">
+      <file leaf-file-name="c_schedule.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/musadm/controller/musadm/schedule/c_schedule.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="8" column="16" lean-forward="true" selection-start-line="8" selection-start-column="16" selection-end-line="8" selection-end-column="117" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="export.xsl" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/musadm/xsl/musadm/users/export.xsl">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="20" column="38" lean-forward="true" selection-start-line="20" selection-start-column="38" selection-end-line="20" selection-end-column="38" />
-              <folding />
+            <state relative-caret-position="561">
+              <caret line="453" column="12" lean-forward="true" selection-start-line="453" selection-start-column="12" selection-end-line="453" selection-end-column="12" />
+              <folding>
+                <marker date="1537124565848" expanded="true" signature="7623:7822" ph="..." />
+                <marker date="1537124565848" expanded="true" signature="7626:7815" ph="..." />
+                <marker date="1537124565848" expanded="true" signature="8332:8459" ph="..." />
+                <marker date="1537124565848" expanded="true" signature="8361:8459" ph="..." />
+                <marker date="1537124565848" expanded="true" signature="8839:9133" ph="..." />
+                <marker date="1537124565848" expanded="true" signature="8985:9095" ph="..." />
+                <marker date="1537124565848" expanded="true" signature="10856:11034" ph="..." />
+                <marker date="1537124565848" expanded="true" signature="10885:11034" ph="..." />
+                <marker date="1537124565848" expanded="true" signature="16875:17114" ph="..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -95,7 +95,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/model/lid.php" />
         <option value="$PROJECT_DIR$/model/schedule/lesson.php" />
         <option value="$PROJECT_DIR$/model/schedule/lesson/report.php" />
         <option value="$PROJECT_DIR$/lib/schedule_functions.php" />
@@ -124,7 +123,6 @@
         <option value="$PROJECT_DIR$/musadm/model/schedule/lesson.php" />
         <option value="$PROJECT_DIR$/musadm/templates/template10/assets/css/custom.css" />
         <option value="$PROJECT_DIR$/musadm/templates/template10/template.php" />
-        <option value="$PROJECT_DIR$/musadm/controller/musadm/schedule/c_schedule.php" />
         <option value="$PROJECT_DIR$/musadm/xsl/musadm/users/balance/buy_tarif_popup.xsl" />
         <option value="$PROJECT_DIR$/musadm/xsl/admin/tarifs/tarifs.xsl" />
         <option value="$PROJECT_DIR$/musadm/controller/musadm/balance/c_balance.php" />
@@ -146,6 +144,8 @@
         <option value="$PROJECT_DIR$/musadm/xsl/musadm/users/export.xsl" />
         <option value="$PROJECT_DIR$/musadm/controller/musadm/user/s_index.php" />
         <option value="$PROJECT_DIR$/musadm/xsl/musadm/users/clients.xsl" />
+        <option value="$PROJECT_DIR$/musadm/controller/musadm/statistic/c_index.php" />
+        <option value="$PROJECT_DIR$/musadm/controller/musadm/schedule/c_schedule.php" />
       </list>
     </option>
   </component>
@@ -178,7 +178,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -210,34 +209,22 @@
               <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
               <item name="controller" type="2a2b976b:PhpTreeStructureProvider$1" />
               <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="user" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="schedule" type="2a2b976b:PhpTreeStructureProvider$1" />
             </path>
             <path>
               <item name="musadm" type="b2602c69:ProjectViewProjectNode" />
               <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
               <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="xsl" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="musadm" type="b2602c69:ProjectViewProjectNode" />
+              <item name="controller" type="2a2b976b:PhpTreeStructureProvider$1" />
               <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="xsl" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="musadm" type="b2602c69:ProjectViewProjectNode" />
-              <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="xsl" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="musadm" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="users" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="statistic" type="2a2b976b:PhpTreeStructureProvider$1" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
       <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -300,16 +287,18 @@
       <workItem from="1536501267406" duration="4029000" />
       <workItem from="1536512504512" duration="77000" />
       <workItem from="1537113701552" duration="4677000" />
+      <workItem from="1537124272474" duration="535000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="169209000" />
+    <option name="totallyTimeSpent" value="169744000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25143266" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25501433" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293011" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -413,13 +402,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="408">
           <caret line="63" column="83" lean-forward="false" selection-start-line="63" selection-start-column="83" selection-end-line="63" selection-end-column="83" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/musadm/controller/musadm/schedule/c_schedule.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="14" column="3" lean-forward="false" selection-start-line="14" selection-start-column="3" selection-end-line="14" selection-end-column="3" />
         </state>
       </provider>
     </entry>
@@ -560,7 +542,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1581">
           <caret line="93" column="31" lean-forward="false" selection-start-line="93" selection-start-column="31" selection-end-line="93" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -585,10 +566,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
           <caret line="160" column="58" lean-forward="false" selection-start-line="160" selection-start-column="58" selection-end-line="160" selection-end-column="58" />
-          <folding>
-            <marker date="1537113617674" expanded="true" signature="5068:5084" ph="..." />
-            <marker date="1537113617674" expanded="true" signature="7894:7907" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -596,7 +573,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="659">
           <caret line="54" column="49" lean-forward="false" selection-start-line="54" selection-start-column="49" selection-end-line="54" selection-end-column="49" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -604,7 +580,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
           <caret line="41" column="9" lean-forward="false" selection-start-line="41" selection-start-column="9" selection-end-line="41" selection-end-column="9" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -612,15 +587,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="34" column="31" lean-forward="false" selection-start-line="34" selection-start-column="31" selection-end-line="34" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/musadm/controller/musadm/statistic/c_index.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="833">
-          <caret line="60" column="31" lean-forward="true" selection-start-line="60" selection-start-column="31" selection-end-line="60" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -637,23 +603,49 @@
     <entry file="file://$PROJECT_DIR$/musadm/xsl/musadm/users/export.xsl">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="340">
-          <caret line="20" column="38" lean-forward="true" selection-start-line="20" selection-start-column="38" selection-end-line="20" selection-end-column="38" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/musadm/controller/musadm/user/s_index.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="266" column="0" lean-forward="true" selection-start-line="266" selection-start-column="0" selection-end-line="266" selection-end-column="0" />
+          <caret line="20" column="38" lean-forward="false" selection-start-line="20" selection-start-column="38" selection-end-line="20" selection-end-column="38" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/musadm/xsl/musadm/users/clients.xsl">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="16" lean-forward="true" selection-start-line="8" selection-start-column="16" selection-end-line="8" selection-end-column="117" />
+        <state relative-caret-position="17">
+          <caret line="8" column="16" lean-forward="false" selection-start-line="8" selection-start-column="16" selection-end-line="8" selection-end-column="117" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/musadm/controller/musadm/user/s_index.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="266" column="0" lean-forward="false" selection-start-line="266" selection-start-column="0" selection-end-line="266" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/musadm/controller/musadm/schedule/c_schedule.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="561">
+          <caret line="453" column="12" lean-forward="true" selection-start-line="453" selection-start-column="12" selection-end-line="453" selection-end-column="12" />
+          <folding>
+            <marker date="1537124565848" expanded="true" signature="7623:7822" ph="..." />
+            <marker date="1537124565848" expanded="true" signature="7626:7815" ph="..." />
+            <marker date="1537124565848" expanded="true" signature="8332:8459" ph="..." />
+            <marker date="1537124565848" expanded="true" signature="8361:8459" ph="..." />
+            <marker date="1537124565848" expanded="true" signature="8839:9133" ph="..." />
+            <marker date="1537124565848" expanded="true" signature="8985:9095" ph="..." />
+            <marker date="1537124565848" expanded="true" signature="10856:11034" ph="..." />
+            <marker date="1537124565848" expanded="true" signature="10885:11034" ph="..." />
+            <marker date="1537124565848" expanded="true" signature="16875:17114" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/musadm/controller/musadm/statistic/c_index.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="387">
+          <caret line="236" column="0" lean-forward="true" selection-start-line="236" selection-start-column="0" selection-end-line="236" selection-end-column="0" />
           <folding />
         </state>
       </provider>

@@ -210,10 +210,12 @@ Core::factory("Core_Entity")
  * Статистика по проведенным занятиям
  */
 $lessonReportsCount = Core::factory("Schedule_Lesson_Report")
+    ->where( "type_id", "<>", "3" )
     ->between("date", $dateFrom, $dateTo)
     ->getCount();
 
 $attendanceCount = Core::factory("Schedule_Lesson_Report")
+    ->where( "type_id", "<>", "3" )
     ->where( "date", ">=", $dateFrom )
     ->where( "date", "<=", $dateTo )
     ->where( "attendance", "=", 1 )
@@ -234,6 +236,7 @@ $countDaysInterval = ( strtotime( $dateTo ) - strtotime( $dateFrom ) ) / ( 60*60
 $countDaysInterval = intval( $countDaysInterval ) + 1;
 
 $attendanceLessonsCount = Core::factory("Schedule_Lesson_Report")
+    ->where( "type_id", "<>", "3" )
     ->where( "attendance", "=", 1 )
     ->where( "date", ">=", $dateFrom )
     ->where( "date", "<=", $dateTo )

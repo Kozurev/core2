@@ -442,7 +442,7 @@ if( $oUser->groupId() == 4 )
         ->where("date", "<=", $dateTo);
 
     $totalCount = clone $aoTeacherReports;
-    $totalCount = $totalCount->getCount();
+    $totalCount = $totalCount->where( "type_id", "<>", "3" )->getCount();
 
     $attendenceIndivCount = clone $aoTeacherReports;
     $attendenceIndivCount = $attendenceIndivCount
