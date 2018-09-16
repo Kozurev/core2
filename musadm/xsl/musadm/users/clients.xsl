@@ -6,6 +6,7 @@
 
         <!--<xsl:if test="user/active = 1">-->
             <div style="text-align: right; margin: 20px 0px">
+                <a href="client?action=export" class="btn btn-primary" style="margin-right: 20px">Экспорт в Excel</a>
                 <a href="#" class="btn btn-primary user_create" data-usergroup="5">Создать пользователя</a>
             </div>
         <!--</xsl:if>-->

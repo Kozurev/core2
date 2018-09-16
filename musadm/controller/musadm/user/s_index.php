@@ -258,6 +258,36 @@ if( $action == "checkLoginExists" )
 }
 
 
+if( $action === "export" )
+{
+    User::checkUserAccess( ["groups" => [1, 2, 6]] );
+
+    header("Content-type: application/vnd.ms-excel");
+    header("Content-Disposition: attachment; filename=demo.xls");
+
+    $Users = Core::factory( "User" )
+        ->select( ["name", "surname", "phone_number"] )
+        ->where( "group_id", "=", 5 )
+        ->where( "phone_number", "<>", "" )
+        ->where( "active", "=", 1 )
+        ->findAll();
+
+    foreach ( $Users as $User )
+    {
+        $Property = Core::factory( "Property", 16 );
+        $Numbers = $Property->getPropertyValues( $User );
+        $User->addEntities( $Numbers, "numbers" );
+    }
+
+    Core::factory( "Core_Entity" )
+        ->addEntities( $Users )
+        ->xsl( "musadm/users/export.xsl" )
+        ->show();
+
+    exit;
+}
+
+
 
 $aTitle[] = $this->oStructure->title();
 
