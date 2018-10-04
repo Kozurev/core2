@@ -106,7 +106,9 @@ $(function(){
             var Form = $("#createData");
             var id = Form.find("input[name=id]").val();
             var value = Form.find("input[name=summ]").val();
+            var date = Form.find("input[name=date]").val();
             var description = Form.find("textarea[name=description]").val();
+
             $.ajax({
                 type: "GET",
                 url: root + "/balance",
@@ -114,6 +116,7 @@ $(function(){
                     action: "payment_save",
                     id: id,
                     value: value,
+                    date: date,
                     description: description
                 },
                 success: function(responce){

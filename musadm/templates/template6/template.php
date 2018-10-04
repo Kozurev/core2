@@ -20,11 +20,14 @@ User::isAuthAs() ? $isAdmin = 1 : $isAdmin = 0;
 //if($oCurentUser->groupId() < 4 && $oUser->groupId() == 5)
 if( $isAdmin && $oCurentUser->groupId() == 5 )
 {
-    $oPropertyNotes = Core::factory("Property", 19);
-    $clienNotes = $oPropertyNotes->getPropertyValues($oUser);
+    $oPropertyNotes = Core::factory( "Property", 19 );
+    $clienNotes = $oPropertyNotes->getPropertyValues( $oUser );
 
-    $oPropertyLastEntry = Core::factory("Property", 22);
-    $lastEntry = $oPropertyLastEntry->getPropertyValues($oUser);
+    $oPropertyLastEntry = Core::factory( "Property", 22 );
+    $lastEntry = $oPropertyLastEntry->getPropertyValues( $oUser );
+
+    $oPropertyPerLesson = Core::factory( "Property", 34 );
+    $perLesson = $oPropertyPerLesson->getPropertyValues( $oUser );
 
     Core::factory("Core_Entity")
         ->addEntities($clienNotes, "note")

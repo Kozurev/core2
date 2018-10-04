@@ -19,8 +19,9 @@ $Property1 = Core::factory( "Property" )
     ->type( "string" )
     ->multiple( 0 )
     ->active( 1 )
-    ->dir( 0 )
+    ->dir( 7 )
     ->sorting( 0 )
+    ->defaultValue( "" )
     ->save();
 
 $Property2 = Core::factory( "Property" )
@@ -29,9 +30,56 @@ $Property2 = Core::factory( "Property" )
     ->type( "string" )
     ->multiple( 0 )
     ->active( 1 )
+    ->dir( 7 )
+    ->sorting( 0 )
+    ->defaultValue( "" )
+    ->save();
+
+$Property3 = Core::factory( "Property" )
+    ->title( "Расписание занятий" )
+    ->tag_name( "teacher_schedule" )
+    ->type( "text" )
+    ->multiple( 0 )
+    ->active( 1 )
     ->dir( 0 )
     ->sorting( 0 )
+    ->defaultValue( "" )
     ->save();
+
+$Property4 = Core::factory( "Property" )
+    ->title( "Поурочная оплата" )
+    ->tag_name( "per_lesson" )
+    ->type( "bool" )
+    ->multiple( 0 )
+    ->active( 1 )
+    ->dir( 2 )
+    ->sorting( 0 )
+    ->defaultValue( 0 )
+    ->save();
+
+$Property5 = Core::factory( "Property" )
+    ->title( "Ссылка" )
+    ->tag_name( "link" )
+    ->type( "string" )
+    ->multiple( 0 )
+    ->active( 1 )
+    ->dir( 7 )
+    ->sorting( 0 )
+    ->defaultValue( "" )
+    ->save();
+
+Core::factory( "Property_Dir" )
+    ->title( "Директор" )
+    ->dir( 0 )
+    ->sorting( 0 )
+    ->description( "" )
+    ->save();
+
+$Property1->addToPropertiesList( $UserGroup, $Property1->getId() );
+$Property2->addToPropertiesList( $UserGroup, $Property2->getId() );
+$Property5->addToPropertiesList( $UserGroup, $Property5->getId() );
+$Property3->addToPropertiesList( Core::factory( "User_Group", 4 ), $Property3->getId() );
+$Property4->addToPropertiesList( Core::factory( "User_Group", 5 ), $Property4->getId() );
 
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `User` ADD `subordinated` INT NOT NULL" );
 
@@ -45,12 +93,6 @@ $Director = Core::factory( "User" )
     ->active( 1 )
     ->superuser( 0 )
     ->save();
-
-
-debug( $UserGroup );
-debug( $Property1 );
-debug( $Property2 );
-debug( $Director );
 
 
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Lid` ADD `subordinated` INT NOT NULL" );

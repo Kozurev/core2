@@ -91,14 +91,21 @@
                 <span>Город</span>
             </div>
             <div class="column">
-                <input class="form-control" type="text" value="{property_value[property_id=28]/value}" name="property_28[]" />
+                <input class="form-control" type="text" value="{property_value[property_id=29]/value}" name="property_29[]" />
+            </div>
+            <hr/>
+            <div class="column">
+                <span>Ссылка</span>
+            </div>
+            <div class="column">
+                <input class="form-control" type="text" value="{property_value[property_id=33]/value}" name="property_33[]" />
             </div>
             <hr/>
             <div class="column">
                 <span>Организация</span>
             </div>
             <div class="column">
-                <input class="form-control" type="text" value="{property_value[property_id=29]/value}" name="property_29[]" />
+                <input class="form-control" type="text" value="{property_value[property_id=30]/value}" name="property_30[]" />
             </div>
             <hr/>
 

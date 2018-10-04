@@ -9,6 +9,12 @@
                 <input type="number" name="summ" class="form-control" value="{payment/value}" />
             </div>
             <div class="column">
+                <span>Дата</span><span style="color:red">*</span>
+            </div>
+            <div class="column">
+                <input type="date" name="date" class="form-control" value="{payment/datetime}" />
+            </div>
+            <div class="column">
                 <span>Примечание</span><span style="color:red">*</span>
             </div>
             <div class="column">

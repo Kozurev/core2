@@ -238,28 +238,33 @@ if( $action === "payment_save" )
 {
     $id = Core_Array::getValue( $_GET, "id", 0 );
     $value = Core_Array::getValue( $_GET, "value", 0 );
+    $date = Core_Array::getValue( $_GET, "date", date( "Y-m-d" ) );
     $description = Core_Array::getValue( $_GET, "description", "" );
 
     $Payment = Core::factory( "Payment", $id );
 
     $difference = intval( $Payment->value() ) - intval( $value );
 
-    $oUser =        Core::factory( "User", $Payment->user() );
-    $oUserBalance = Core::factory( "Property", 12 );
-    $oUserBalance = $oUserBalance->getPropertyValues( $oUser )[0];
-    $balanceOld = $oUserBalance->value();
+    if( $difference !== 0 )
+    {
+        $oUser =        Core::factory( "User", $Payment->user() );
+        $oUserBalance = Core::factory( "Property", 12 );
+        $oUserBalance = $oUserBalance->getPropertyValues( $oUser )[0];
+        $balanceOld = $oUserBalance->value();
 
-    $Payment->type() == 1
-        ?   $balanceNew = $balanceOld - $difference
-        :   $balanceNew = $balanceOld + $difference;
+        $Payment->type() == 1
+            ?   $balanceNew = $balanceOld - $difference
+            :   $balanceNew = $balanceOld + $difference;
+
+        $oUserBalance
+            ->value( $balanceNew )
+            ->save();
+    }
 
     $Payment
         ->value( $value )
+        ->datetime( $date )
         ->description( $description )
-        ->save();
-
-    $oUserBalance
-        ->value( $balanceNew )
         ->save();
 
     $this->execute();

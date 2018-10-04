@@ -34,7 +34,7 @@
             <td><xsl:value-of select="name" /></td>
             <td><xsl:value-of select="patronimyc" /></td>
             <td><xsl:value-of select="property_value[property_id = 20]/value" /></td>
-            <td><xsl:value-of select="property_value[property_id = 33]/value" /></td>
+            <td><xsl:value-of select="property_value[property_id = 31]/value" /></td>
             <td>
                 <a class="action edit user_edit" href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
                 <a class="action archive user_archive"     href="#" data-userid="{id}"></a>
