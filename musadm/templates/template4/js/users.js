@@ -71,27 +71,35 @@ $(function(){
             getPaymentPopup(userid, "client");
         })
         //Сохранение платежа
-        .on("click", ".popop_user_payment_submit", function(e){
-            e.preventDefault();
-            loaderOn();
-            var form = $("#createData");
-            if($(form).valid() == false)
-            {
-                loaderOff();
-                return;
-            }
-            var userid = $(this).data("userid");
-            var value = $(form).find("input[name=value]").val();
-            var description = $(form).find("textarea[name=description]").val();
-            var type = $(form).find("input[name=type]:checked").val();
-            savePayment(userid, value, description, type, "client", refreshUserTable);
-        })
+        // .on("click", ".popop_user_payment_submit", function(e){
+        //     e.preventDefault();
+        //     loaderOn();
+        //     var form = $("#createData");
+        //     if($(form).valid() == false)
+        //     {
+        //         loaderOff();
+        //         return;
+        //     }
+        //     var userid = $(this).data("userid");
+        //     var value = $(form).find("input[name=value]").val();
+        //     var description = $(form).find("textarea[name=description]").val();
+        //     var description2 = $(form).find("textarea[name=property_26]").val();
+        //     var type = $(form).find("input[name=type]:checked").val();
+        //     savePayment(userid, value, description, description2, type, "client", refreshUserTable);
+        // })
         //Сохранение заметок клиента
         .on("blur", "#client_notes", function(){
             loaderOn();
             var note = $(this).val();
             var userid = $(this).data("userid");
             updateUserNote(userid, note, loaderOff);
+        })
+        .on("click", "#per_lesson", function(){
+            loaderOn();
+            var value = 0;
+            if($(this).is(":checked"))  value = 1;
+            var userid = $(this).data("userid");
+            updateUserPerLesson(userid, value, loaderOff);
         })
         //Сохранение логина клиента в личном кабинете
         .on("click", ".change_login_submit", function(e){
@@ -164,6 +172,23 @@ function updateUserNote(userid, note, func) {
             note: note
         },
         success: function(responce){
+            func();
+            if(responce != "")  alert(responce);
+        }
+    });
+}
+
+
+function updateUserPerLesson(userid, value, func) {
+    $.ajax({
+        type: "GET",
+        url: root + "/user/balance",
+        data: {
+            action: "updatePerLesson",
+            userid: userid,
+            value: value
+        },
+        success: function(responce) {
             func();
             if(responce != "")  alert(responce);
         }

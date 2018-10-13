@@ -4,27 +4,30 @@
 
     <xsl:template match="root">
 
-        <h2 style="display: inline-block">Список менеджеров</h2>
+        <h2>Филиалы</h2>
 
-
-        <div class="button-block">
-            <a href="#" class="btn btn-green schedule_area_edit" data-area_id="0">Создать филлиал</a>
+        <div class="row buttons-panel">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                <a href="#" class="btn btn-green schedule_area_edit" data-area_id="0">Создать филлиал</a>
+            </div>
         </div>
 
-        <table id="sortingTable" class="table table-striped">
-            <thead>
-                <tr class="header">
-                    <th>Название</th>
-                    <th>Кол-во классов</th>
-                    <th>Активность</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
+        <div class="table-responsive">
+            <table id="sortingTable" class="table table-striped">
+                <thead>
+                    <tr class="header">
+                        <th>Название</th>
+                        <th>Кол-во классов</th>
+                        <th>Активность</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
 
-            <tbody>
-                <xsl:apply-templates select="schedule_area" />
-            </tbody>
-        </table>
+                <tbody>
+                    <xsl:apply-templates select="schedule_area" />
+                </tbody>
+            </table>
+        </div>
     </xsl:template>
 
 

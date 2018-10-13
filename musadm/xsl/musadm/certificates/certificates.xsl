@@ -2,8 +2,11 @@
 
     <xsl:template match="root">
         <div class="certificate">
-            <div class="button-block">
-                <a class="btn btn-pink certificate_create">Добавить сертификат</a>
+
+            <div class="row buttons-panel">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <a class="btn btn-pink certificate_create">Добавить сертификат</a>
+                </div>
             </div>
 
             <style>
@@ -12,22 +15,25 @@
                 }
             </style>
 
-            <table id="sortingTable" class="table table-striped certificate center">
-                <thead>
-                    <tr class="header">
-                        <th>№</th>
-                        <th>Дата продажи</th>
-                        <th>Действителен до</th>
-                        <th>Номер</th>
-                        <th>Комментарии</th>
-                        <th>Добавление <br/>комментария</th>
-                    </tr>
-                </thead>
+            <div class="table-responsive">
+                <table id="sortingTable" class="table table-striped certificate center">
+                    <thead>
+                        <tr class="header">
+                            <th>№</th>
+                            <th>Дата продажи</th>
+                            <th>Действителен до</th>
+                            <th>Номер</th>
+                            <th>Комментарии</th>
+                            <th>Добавление <br/>комментария</th>
+                        </tr>
+                    </thead>
 
-                <tbody>
-                    <xsl:apply-templates select="certificate" />
-                </tbody>
-            </table>
+                    <tbody>
+                        <xsl:apply-templates select="certificate" />
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     </xsl:template>
 

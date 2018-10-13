@@ -109,6 +109,7 @@ if($action == "getPaymentPopup")
 
     Core::factory("Core_Entity")
         ->addEntity($oUser)
+        ->addSimpleEntity( "function", "balance" )
         ->xsl("musadm/users/balance/edit_payment_popup.xsl")
         ->show();
 
@@ -143,6 +144,18 @@ if($action == "updateNote")
     $oUserNote = Core::factory("Property", 19);
     $oUserNote = $oUserNote->getPropertyValues($oUser)[0];
     $oUserNote->value($note)->save();
+    exit;
+}
+
+
+if( $action === "updatePerLesson" )
+{
+    $userId =   Core_Array::getValue( $_GET, "userid", 0 );
+    $value =    Core_Array::getValue( $_GET, "value", 0 );
+    $oUser =    Core::factory( "User", $userId );
+    $oPerLesson = Core::factory( "Property", 32 );
+    $oPerLesson = $oPerLesson->getPropertyValues( $oUser )[0];
+    $oPerLesson->value( $value )->save();
     exit;
 }
 
@@ -187,19 +200,22 @@ if( $action == "buyTarif" )
 }
 
 
-if($action == "savePayment")
+if( $action == "savePayment" )
 {
-    $userid =       Core_Array::getValue($_GET, "userid", 0);
-    $value  =       Core_Array::getValue($_GET, "value", 0);
-    $description =  Core_Array::getValue($_GET, "description", "");
-    $type =         Core_Array::getValue($_GET, "type", 0);
+    $userid =       Core_Array::getValue( $_GET, "userid", 0 );
+    $value  =       Core_Array::getValue( $_GET, "value", 0 );
+    $description =  Core_Array::getValue( $_GET, "description", "" );
+    $type =         Core_Array::getValue( $_GET, "type", 0 );
+    $description2 = Core_Array::getValue( $_GET, "property_26", "" );
 
     $payment = Core::factory("Payment")
         ->user($userid)
         ->type($type)
         ->value($value)
-        ->description($description)
-        ->save();
+        ->description($description);
+    $payment->save();
+
+    Core::factory( "Property", 26 )->addNewValue( $payment, $description2 );
 
     /**
      * Корректировка баланса ученика

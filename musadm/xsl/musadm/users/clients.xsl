@@ -4,31 +4,37 @@
 
     <xsl:template match="root">
 
-        <!--<xsl:if test="user/active = 1">-->
-            <div style="text-align: right; margin: 20px 0px">
-                <a href="client?action=export" class="btn btn-primary" style="margin-right: 20px">Экспорт в Excel</a>
+        <div class="row buttons-panel">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                 <a href="#" class="btn btn-primary user_create" data-usergroup="5">Создать пользователя</a>
             </div>
-        <!--</xsl:if>-->
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                <a href="client?action=export" class="btn btn-primary">Экспорт в Excel</a>
+            </div>
+        </div>
 
-        <table id="sortingTable" class="table table-striped">
-            <thead>
-                <tr class="header">
-                    <th>Фамилия</th>
-                    <th>Имя</th>
-                    <th>Телефон</th>
-                    <th>Баланс</th>
-                    <th>Кол-во индив. занятий</th>
-                    <th>Кол-во групп. занятий</th>
-                    <th>Студия</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
+        <div class="table-responsive">
+            <table id="sortingTable" class="table table-striped">
+                <thead>
+                    <tr class="header">
+                        <th>Фамилия</th>
+                        <th>Имя</th>
+                        <th>Телефон</th>
+                        <th>Год рождения</th>
+                        <th>Баланс</th>
+                        <th>Кол-во индив. занятий</th>
+                        <th>Кол-во групп. занятий</th>
+                        <th>Продрлжительность урока</th>
+                        <th>Студия</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
 
-            <tbody>
-                <xsl:apply-templates select="user" />
-            </tbody>
-        </table>
+                <tbody>
+                    <xsl:apply-templates select="user" />
+                </tbody>
+            </table>
+        </div>
     </xsl:template>
 
 
@@ -49,6 +55,7 @@
         </xsl:variable>
 
         <tr>
+            <!--Фамилия-->
             <td>
                 <a href="/{/root/wwwroot}authorize?auth_as={id}">
                     <xsl:value-of select="surname" />
@@ -60,21 +67,46 @@
                     </xsl:if>
                 </span>
 
+                <xsl:if test="property_value[property_id = 32]/value = '1'">
+                    <div class="notes">«Поурочно»</div>
+                </xsl:if>
+
                 <!--Примечания-->
                 <div class="notes">
                     <xsl:value-of select="property_value[property_id = 19]/value" />
                 </div>
             </td>
+
+            <!--Имя-->
             <td><xsl:value-of select="name" /></td>
+
+            <!--номер (номера) телефона-->
             <td>
                 <xsl:value-of select="phone_number" /><br/>
                 <xsl:value-of select="property_value[property_id = 16]/value" />
             </td>
+
+            <!--Год рождения-->
+            <td>
+                <xsl:value-of select="property_value[property_id = 28]/value" />
+            </td>
+
+            <!--Баланс-->
             <td class="{$class}"><xsl:value-of select="property_value[property_id = 12]/value" /></td>
+
+            <!--Кол-во индивидуальных заданий-->
             <td class="{$class}"><xsl:value-of select="property_value[property_id = 13]/value" /></td>
+
+            <!--Кол-во групповых заданий-->
             <td class="{$class}"><xsl:value-of select="property_value[property_id = 14]/value" /></td>
+
+            <!--Продрлжительность урока-->
+            <td><xsl:value-of select="property_value[property_id = 17]/value" /></td>
+
+            <!--Студия-->
             <td><xsl:value-of select="property_value[property_id = 15]/value" /></td>
 
+            <!--Действия-->
             <xsl:if test="//table_type = 'active'">
                 <td>
                     <a class="action add_payment user_add_payment" href="#" data-userid="{id}"></a>

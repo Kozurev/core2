@@ -26,10 +26,17 @@
             </div>
 
             <div class="column">
-                <span>Примечание</span><span style="color:red" >*</span>
+                <span>Примечание (общее)</span><span style="color:red" >*</span>
             </div>
             <div class="column">
                 <textarea class="form-control" name="description"></textarea>
+            </div>
+
+            <div class="column">
+                <span>Примечание (для админа)</span><span style="color:red" >*</span>
+            </div>
+            <div class="column">
+                <textarea class="form-control" name="property_26"></textarea>
             </div>
 
             <div class="column">
@@ -40,6 +47,7 @@
                 <p><input type="radio" name="type" value="2" style="height: auto"/><span>Списание</span></p>
             </div>
 
+            <input type="hidden" id="payment_from" value="{function}" />
             <!--<input type="hidden" name="user" value="{user/id}" />-->
 
             <button class="popop_balance_payment_submit btn btn-default" data-userid="{user/id}">Сохранить</button>

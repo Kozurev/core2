@@ -89,6 +89,13 @@
             <div class="column">
                 <input class="form-control" type="text" value="{property_value[property_id=16]/value}" name="property_16[]" />
             </div>
+            <hr/>
+            <div class="column">
+                <span>Год рождения</span>
+            </div>
+            <div class="column">
+                <input class="form-control" type="text" value="{property_value[property_id=28]/value}" name="property_28[]" />
+            </div>
                 <hr/>
             <div class="column">
                 <span>Ссылка вконтакте</span>

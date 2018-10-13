@@ -1,0 +1,18 @@
+
+.client-notes {
+    margin-bottom: 20px;
+}
+
+.client-notes div {
+    margin: 10px 0px;
+}
+
+.balance-lessons {
+    max-height: 430px;
+    overflow-y: scroll;
+}
+
+.balance-payments {
+    max-height: 590px;
+    overflow-y: scroll;
+}

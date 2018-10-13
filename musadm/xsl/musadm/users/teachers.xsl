@@ -6,25 +6,30 @@
 
         <h2>Список преподавателей</h2>
 
-        <div class="button-block">
-            <a class="btn btn-primary user_create" data-usergroup="4">Создать пользователя</a>
+        <div class="row buttons-panel">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                <a class="btn btn-primary user_create" data-usergroup="4">Создать пользователя</a>
+            </div>
         </div>
 
-        <table id="sortingTable" class="table table-striped">
-            <thead>
-                <tr class="header">
-                    <th>Фамилия</th>
-                    <th>Имя</th>
-                    <th>Отчество</th>
-                    <th>Инструмент</th>
-                    <th>График для занятий</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                <xsl:apply-templates select="user" />
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table id="sortingTable" class="table table-striped">
+                <thead>
+                    <tr class="header">
+                        <th>Фамилия</th>
+                        <th>Имя</th>
+                        <th>Отчество</th>
+                        <th>Инструмент</th>
+                        <th>График для занятий</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <xsl:apply-templates select="user" />
+                </tbody>
+            </table>
+        </div>
+
     </xsl:template>
 
 

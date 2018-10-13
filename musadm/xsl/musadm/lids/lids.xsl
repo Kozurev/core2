@@ -3,33 +3,50 @@
     <xsl:template match="root">
 
         <div class="lids">
-            <div class="finances_calendar">
-                Период
-                с: <input type="date" class="form-control" name="date_from" value="{date_from}"/>
-                по: <input type="date" class="form-control" name="date_to" value="{date_to}"/>
-                <a class="btn btn-purple lids_show" >Показать</a>
+            <div class="row finances_calendar">
+                <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                    <span>Период с:</span>
+                </div>
+
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                    <input type="date" class="form-control" name="date_from" value="{date_from}"/>
+                </div>
+
+                <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                    <span>по:</span>
+                </div>
+
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                    <input type="date" class="form-control" name="date_to" value="{date_to}"/>
+                </div>
+
+                <div class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-1 col-md-offset-1 col-xs-12">
+                    <a class="btn btn-purple lids_show">Показать</a>
+                </div>
             </div>
 
-            <table class="table lids">
-                <form name="lid_form">
-                    <tr class="header">
-                        <td class="date" colspan="2"><input type="date" class="form-control date_inp"    name="control_date"/></td>
-                        <td class="string"><input type="text" class="form-control" name="surname"  placeholder="Фамилия"/></td>
-                        <td class="string"><input type="text" class="form-control" name="name"     placeholder="Имя"/></td>
-                        <td class="string"><input type="text" class="form-control" name="number"   placeholder="Телефон"/></td>
-                        <td class="string"><input type="text" class="form-control" name="vk"       placeholder="Ссылка вк"/></td>
-                        <td class="string"><input type="text" class="form-control" name="source"   placeholder="Источник"/></td>
-                        <td class="last">
-                            <a class="btn btn-purple lid_submit">Добавить</a>
-                        </td>
-                    </tr>
-                    <tr class="header">
-                        <td colspan="8">
-                            <input type="text" class="form-control" name="comment"  placeholder="Комментарий"/>
-                        </td>
-                    </tr>
-                </form>
-            </table>
+            <div class="table-responsive">
+                <table class="table lids">
+                    <form name="lid_form">
+                        <tr class="header">
+                            <td class="date" colspan="2"><input type="date" class="form-control date_inp"    name="control_date"/></td>
+                            <td class="string"><input type="text" class="form-control" name="surname"  placeholder="Фамилия"/></td>
+                            <td class="string"><input type="text" class="form-control" name="name"     placeholder="Имя"/></td>
+                            <td class="string"><input type="text" class="form-control" name="number"   placeholder="Телефон"/></td>
+                            <td class="string"><input type="text" class="form-control" name="vk"       placeholder="Ссылка вк"/></td>
+                            <td class="string"><input type="text" class="form-control" name="source"   placeholder="Источник"/></td>
+                            <td class="last">
+                                <a class="btn btn-purple lid_submit">Добавить</a>
+                            </td>
+                        </tr>
+                        <tr class="header">
+                            <td colspan="8">
+                                <input type="text" class="form-control" name="comment"  placeholder="Комментарий"/>
+                            </td>
+                        </tr>
+                    </form>
+                </table>
+            </div>
 
             <section class="cards-section text-center">
                 <div id="cards-wrapper" class="cards-wrapper row">
@@ -59,7 +76,7 @@
             </xsl:choose>
         </xsl:variable>
 
-        <div class="item item-{$status} col-md-6 col-sm-12 col-xs-12">
+        <div class="item item-{$status} col-md-6 col-sm-6 col-xs-12">
             <div class="item-inner">
                 <h3 class="title">
                     <xsl:value-of select="id" /> <xsl:text> </xsl:text>

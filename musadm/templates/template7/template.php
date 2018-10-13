@@ -17,14 +17,22 @@
             User::checkUserAccess( ["groups" => [2, 4]], $oUser )
             || ( User::checkUserAccess( ["groups" => [6]], $oUser ) && is_object( $this->oStructureItem ) )
         ) { ?>
-        <div class="calendar_small">
-            <input type="date" class="form-control schedule_calendar" />
-            <span class="day_name"></span>
+
+        <div class="row calendar_small">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-7 col-lg-offset-3 col-md-offset-0 col-sm-offset-0">
+                <input type="date" class="form-control schedule_calendar" />
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-5">
+                <span class="day_name"></span>
+            </div>
         </div>
 
-        <div style="float: right; margin: 20px 0px">
-            <a class="btn btn-green schedule_task_create">Написать администратору</a>
+        <div class="row buttons-panel">
+            <div class="col-lg-3 col-md-6 col-sm-12">
+                <a class="btn btn-green schedule_task_create">Написать администратору</a>
+            </div>
         </div>
+
     <? }else { ?>
         <script>
             $(function(){

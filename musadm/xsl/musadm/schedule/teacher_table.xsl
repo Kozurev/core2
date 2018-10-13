@@ -1,17 +1,19 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <table class="table table-bordered teacher_table">
-            <tr class="header">
-                <th>Дата</th>
-                <th>Время</th>
-                <th>Преподаватель</th>
-                <th>Ученик / Группа</th>
-                <th>Отметка о явке</th>
-                <th>Отправить данные</th>
-            </tr>
-            <xsl:apply-templates select="lesson" />
-        </table>
+        <div class="table-responsive">
+            <table class="table table-bordered teacher_table">
+                <tr class="header">
+                    <th>Дата</th>
+                    <th>Время</th>
+                    <th>Преподаватель</th>
+                    <th>Ученик / Группа</th>
+                    <th>Отметка <br/>о явке</th>
+                    <th>Отправить данные</th>
+                </tr>
+                <xsl:apply-templates select="lesson" />
+            </table>
+        </div>
     </xsl:template>
 
 

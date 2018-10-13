@@ -15,8 +15,8 @@
     font-size: 14px;
     background-color: #FCFBFB;
     width: 40%;
-    z-index: 1000;
     left: 30%;
+    z-index: 1000;
     top: 10%;
     display: none;
     border-radius: 12px;
@@ -45,6 +45,7 @@
     width: 50%;
     vertical-align: middle;
     padding-right: 15px;
+    padding-left: 15px;
     display: inline-block;
     text-align: center;
 }
@@ -68,4 +69,51 @@
     left: 30%;
     width: 40%;
     margin: 15px;
+}
+
+
+
+@media(max-width: 1024px) {
+
+    .popup {
+        width: 40%;
+        left: 30%;
+    }
+}
+
+
+@media(max-width: 768px) {
+
+    .popup {
+        width: 70%;
+        left: 15%;
+    }
+
+}
+
+
+@media(max-width: 420px) {
+
+    .popup {
+        width: 90%;
+        left: 5%;
+        max-height: 80%;
+        overflow-y: scroll;
+    }
+
+    .popup h2 {
+        font-size: 15px;
+    }
+
+    .popup .column {
+        width: 100%;
+        padding-left: 30px;
+        padding-right: 30px;
+        margin-bottom: 10px;
+    }
+
+    .popup .column span {
+        font-size: 13px;
+    }
+
 }

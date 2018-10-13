@@ -5,8 +5,10 @@
     <xsl:template match="root">
 
         <xsl:if test="user/active = 1">
-            <div style="text-align: right; margin: 20px 0px">
-                <a href="#" class="btn btn-primary user_create" data-usergroup="5">Создать пользователя</a>
+            <div class="row buttons-panel">
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <a href="#" class="btn btn-primary user_create" data-usergroup="5">Создать пользователя</a>
+                </div>
             </div>
         </xsl:if>
 

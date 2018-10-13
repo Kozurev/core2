@@ -154,7 +154,7 @@ function updateActive(model_name, model_id, value, func){
  * @param url - адрес запроса после root + "/user/" (client || balance)
  * @param func - выполняемая функция по получению ответа от ajax-запроса
  */
-function savePayment(userid, value, description, type, url, func) {
+function savePayment(userid, value, description, description2, type, url, func) {
     $.ajax({
         type: "GET",
         url: root + "/user/" + url,
@@ -164,7 +164,8 @@ function savePayment(userid, value, description, type, url, func) {
             userid: userid,
             value: value,
             type: type,
-            description: description
+            description: description,
+            property_26: description2
         },
         success: function(responce){
             if(responce != "0") alert("Ошибка: " + responce);

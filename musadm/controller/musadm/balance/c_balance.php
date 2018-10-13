@@ -6,14 +6,6 @@
  * Time: 23:18
  */
 
-//$oCurentUser = Core::factory("User")->getCurrent();
-//$pageUserId = Core_Array::getValue($_GET, "userid", 0);
-
-//if($oCurentUser->groupId() < 4 && $pageUserId > 0)
-//    $oUser = Core::factory("User", $pageUserId);
-//else
-//    $oUser = $oCurentUser;
-
 $oUser = Core::factory( "User" )->getCurrent();
 User::isAuthAs() ? $isAdmin = 1 : $isAdmin = 0;
 
@@ -30,14 +22,12 @@ $groupLessons   =   $oPropertyGroupLessons->getPropertyValues($oUser)[0];
 
 Core::factory("Core_Entity")
     ->addEntity($oUser)
-    //->addEntity($oCurenUserGroup)
     ->addSimpleEntity( "is_admin", $isAdmin )
     ->addEntity($balance,           "property")
     ->addEntity($privateLessons,    "property")
     ->addEntity($groupLessons,      "property")
     ->xsl("musadm/users/balance/balance.xsl")
     ->show();
-
 
 
 /**
@@ -50,26 +40,33 @@ if( $oUser->groupId() == 5 )
     ?>
     <input type="hidden" id="userid" value="<?=$oUser->getId()?>" />
 
-    <select class="form-control client_schedule" id="month">
-        <option value="01">Январь</option>
-        <option value="02">Февраль</option>
-        <option value="03">Март</option>
-        <option value="04">Апрель</option>
-        <option value="05">Май</option>
-        <option value="06">Июнь</option>
-        <option value="07">Июль</option>
-        <option value="08">Август</option>
-        <option value="09">Сентябрь</option>
-        <option value="10">Октябрь</option>
-        <option value="11">Ноябрь</option>
-        <option value="12">Декабрь</option>
-    </select>
+    <h3>Расписание занятий</h3>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <select class="form-control client_schedule" id="month">
+                <option value="01">Январь</option>
+                <option value="02">Февраль</option>
+                <option value="03">Март</option>
+                <option value="04">Апрель</option>
+                <option value="05">Май</option>
+                <option value="06">Июнь</option>
+                <option value="07">Июль</option>
+                <option value="08">Август</option>
+                <option value="09">Сентябрь</option>
+                <option value="10">Октябрь</option>
+                <option value="11">Ноябрь</option>
+                <option value="12">Декабрь</option>
+            </select>
+        </div>
 
-    <select class="form-control client_schedule" id="year">
-        <option value="2017">2017</option>
-        <option value="2018">2018</option>
-        <option value="2019">2019</option>
-    </select>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <select class="form-control client_schedule" id="year">
+                <option value="2017">2017</option>
+                <option value="2018">2018</option>
+                <option value="2019">2019</option>
+            </select>
+        </div>
+    </div>
     <?
 
     $month = Core_Array::getValue( $_GET, "month", date("m") );
@@ -112,7 +109,9 @@ $UserReports = Core::factory( "Schedule_Lesson_Report" )
 $aoClientGroups = Core::factory("Schedule_Group_Assignment")
     ->where("user_id", "=", $oUser->getId())
     ->findAll();
+
 $aUserGroups = array();
+
 foreach ($aoClientGroups as $group)
 {
     $aUserGroups[] = $group->groupId();

@@ -20,8 +20,8 @@ if( $this->oStructureItem != false )
     $breadcumbs[1]->active = 1;
 }
 
-$this->setParam( "body-class", "body-green" );
 $this->setParam( "title-first", "РАСПИСАНИЕ" );
+$this->setParam( "body-class", "body-green" );
 
 if( $this->oStructureItem != false )
 {
@@ -30,7 +30,11 @@ if( $this->oStructureItem != false )
 }
 else 
 {
-    $this->setParam( "title-second", "Расписание" );
+    $breadcumbs[1] = new stdClass();
+    $breadcumbs[1]->title = "Список филиалов";
+    $breadcumbs[1]->active = 1;
+
+    //$this->setParam( "title-second", "Филиалов" );
     $this->setParam( "breadcumbs", $breadcumbs );
 }
 

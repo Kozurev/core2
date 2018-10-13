@@ -4,32 +4,52 @@
 
         <input id="table_type" type="hidden" value="{table_name}" />
 
-        <div class="finances_calendar">
-            Период
-            с: <input type="date" class="form-control" name="date_from" value="{date_from}"/>
-            по: <input type="date" class="form-control" name="date_to" value="{date_to}"/>
-            <a class="btn btn-red tasks_show" >Показать</a>
+        <div class="row finances_calendar">
+            <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                <span>Период с:</span>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                <input type="date" class="form-control" name="date_from" value="{date_from}"/>
+            </div>
+
+            <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                <span>по:</span>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                <input type="date" class="form-control" name="date_to" value="{date_to}"/>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-1 col-md-offset-1 col-xs-12">
+                <a class="btn btn-red tasks_show" >Показать</a>
+            </div>
         </div>
 
-        <div class="button-block">
-            <a class="btn btn-red task_create">Добавить задачу</a>
+        <div class="row buttons-panel">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                <a class="btn btn-red task_create">Добавить задачу</a>
+            </div>
         </div>
 
-        <table id="sortingTable" class="table table-bordered task center">
-            <thead>
-                <tr class="header">
-                    <th>№</th>
-                    <th>Дата контроля</th>
-                    <th>Примечания</th>
-                    <th>Статус</th>
-                    <th>Добавить <br/> коммент.</th>
-                </tr>
-            </thead>
+        <div class="table-responsive">
+            <table id="sortingTable" class="table table-bordered task center">
+                <thead>
+                    <tr class="header">
+                        <th>№</th>
+                        <th>Дата контроля</th>
+                        <th>Примечания</th>
+                        <th>Статус</th>
+                        <th>Добавить <br/> коммент.</th>
+                    </tr>
+                </thead>
 
-            <tbody>
-                <xsl:apply-templates select="task" />
-            </tbody>
-        </table>
+                <tbody>
+                    <xsl:apply-templates select="task[done = 0]" />
+                    <xsl:apply-templates select="task[done = 1]" />
+                </tbody>
+            </table>
+        </div>
     </xsl:template>
 
 

@@ -2,28 +2,28 @@
 
     <xsl:template match="root">
 
-        <style>
-            .positive {
-            background-color:palegreen !important;
-            }
-            .negative {
-            background-color:indianred !important;
-            }
-            .neutral {
-            background-color:lightyellow !important;
-            }
-        </style>
+        <!--<style>-->
+            <!--.positive {-->
+            <!--background-color:palegreen !important;-->
+            <!--}-->
+            <!--.negative {-->
+            <!--background-color:indianred !important;-->
+            <!--}-->
+            <!--.neutral {-->
+            <!--background-color:lightyellow !important;-->
+            <!--}-->
+        <!--</style>-->
 
         <h3>Список платежей</h3>
 
-        <div class="balance-payments">
+        <div class="balance-payments tab">
             <table id="sortingTable" class="table">
                 <thead>
                     <tr class="header">
                         <th>Дата</th>
                         <th>Сумма</th>
+                        <th>Примечание</th>
                         <xsl:if test="is_admin = 1">
-                            <th>Примечание</th>
                             <th></th>
                         </xsl:if>
                     </tr>
@@ -51,13 +51,17 @@
             <td class="{$class}"><xsl:value-of select="datetime" /></td>
             <td class="{$class}"><xsl:value-of select="value" /></td>
 
-            <xsl:if test="//is_admin = 1">
-                <td class="{$class}">
-                    <xsl:if test="description != ''"><xsl:value-of select="description" /><br/></xsl:if>
+            <td class="{$class}">
+                <xsl:if test="description != ''"><xsl:value-of select="description" /></xsl:if>
+
+                <xsl:if test="//is_admin = 1">
                     <xsl:for-each select="notes">
-                        <xsl:value-of select="value" /><br/>
+                        <br/><xsl:value-of select="value" />
                     </xsl:for-each>
-                </td>
+                </xsl:if>
+            </td>
+
+            <xsl:if test="//is_admin = 1">
                 <td class="{$class}" style="text-align:center">
                     <a class="btn btn-orange payment_add_note" data-modelid="{./id}">+</a>
                     <xsl:if test="//parent_user/group_id = 1 or //parent_user/group_id = 6">

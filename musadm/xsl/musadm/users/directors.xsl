@@ -5,30 +5,34 @@
     <xsl:template match="root">
 
         <h2>Список директоров</h2>
-        <div class="button-block">
-            <a href="#" class="btn btn-green user_create" data-usergroup="6">Добавить директора</a>
+
+        <div class="row buttons-panel">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                <a href="#" class="btn btn-green user_create" data-usergroup="6">Добавить директора</a>
+            </div>
         </div>
 
+        <div class="table-responsive">
+            <table id="sortingTable" class="table table-striped">
+                <thead>
+                    <tr class="header">
+                        <th>Фамилия</th>
+                        <th>Имя</th>
+                        <th>Отчество</th>
+                        <th>Телефон</th>
+                        <th>Email</th>
+                        <th>Ссылка</th>
+                        <th>Город</th>
+                        <th>Организация</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
 
-        <table id="sortingTable" class="table table-striped">
-            <thead>
-                <tr class="header">
-                    <th>Фамилия</th>
-                    <th>Имя</th>
-                    <th>Отчество</th>
-                    <th>Телефон</th>
-                    <th>Email</th>
-                    <th>Ссылка</th>
-                    <th>Город</th>
-                    <th>Организация</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <xsl:apply-templates select="user" />
-            </tbody>
-        </table>
+                <tbody>
+                    <xsl:apply-templates select="user" />
+                </tbody>
+            </table>
+        </div>
     </xsl:template>
 
 

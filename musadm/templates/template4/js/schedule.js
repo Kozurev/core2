@@ -5,6 +5,8 @@ $(function(){
 
     var days = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
 
+    $(".submenu").on("click", "a", function(e){ e.preventDefault(); });
+
     $("body")
         //Изменение даты на календаре
         .on("change", ".schedule_calendar", function(){

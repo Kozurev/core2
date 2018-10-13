@@ -1,10 +1,8 @@
-/*.users {*/
-	/*font-family: 'Open Sans', Helvetica, Arial, sans-serif;*/
-	/*font-size: 16px;*/
-	/*overflow-x: hidden;*/
-/*}*/
-
 
 .users h2 {
 	display: inline-block;
+}
+
+.users .notes {
+	max-width: 160px;
 }

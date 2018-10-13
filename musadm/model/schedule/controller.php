@@ -215,7 +215,7 @@ class Schedule_Controller
     {
         $Lessons = $this->getLessons();
 
-        echo "<table class='table table-bordered' style='margin-top: 20px'>";
+        echo "<div class='table-responsive'><table class='table table-bordered' style='margin-top: 20px'>";
         echo "<tr class='header'>
                 <th>Понедельник</th>
                 <th>Вторник</th>
@@ -360,7 +360,7 @@ class Schedule_Controller
             echo "</td>";
             if( ($i + 1) % 7 == 0 )   echo "</tr>";
         }
-        echo "</table>";
+        echo "</table></div>";
         /**
          * <<Конец
          * Вывод содержимого таблицы

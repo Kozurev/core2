@@ -31,7 +31,7 @@ $(function(){
             var userid = $(this).data("userid");
             getPaymentPopup(userid, "balance");
         })
-        //Отправка формы пополнения баланся
+        //Отправка формы пополнения баланса
         .on("click", ".popop_balance_payment_submit", function(e){
             e.preventDefault();
             loaderOn();
@@ -44,9 +44,20 @@ $(function(){
             var userid = $(this).data("userid");
             var value = $(form).find("input[name=value]").val();
             var description = $(form).find("textarea[name=description]").val();
+            var description2 = $(form).find("textarea[name=property_26]").val();
             var type = $(form).find("input[name=type]:checked").val();
-            savePayment(userid, value, description, type, "balance", function(){});
-            refreshPaymentsTable(userid, loaderOff);
+            // savePayment(userid, value, description, description2, type, "balance", function(){});
+            // refreshPaymentsTable(userid, loaderOff);
+
+            if( $("#payment_from").val() == "clients" )
+            {
+                savePayment(userid, value, description, description2, type, "balance", refreshUserTable);
+            }
+            else
+            {
+                savePayment(userid, value, description, description2, type, "balance", function(){});
+                refreshPaymentsTable(userid, loaderOff);
+            }
         })
         //Открытие формы покупки индивидуальных уроков
         .on("click", ".btn_private_lessons", function(e){

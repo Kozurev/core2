@@ -1,0 +1,61 @@
+
+.lids .form-control {
+    min-width: 95px;
+}
+
+.lids .finances_calendar .form-control {
+
+}
+
+.lids .cards-section .item-inner {
+    padding: 15px 15px;
+    height: 300px !important;
+    overflow-y: scroll;
+}
+
+.lids .cards-section .cards-wrapper {
+    max-width: 100%;
+}
+
+.lids .lid_date {
+    width: 40%;
+    display: inline-block;
+}
+
+.lids .lid_status {
+    width: 40%;
+    margin-left: 5%;
+    display: inline-block;
+}
+
+.lids .add_lid_comment {
+    width: 10%;
+    margin-left: 5%;
+    display:inline-block;
+}
+
+
+@media(max-width: 1024px) {
+
+}
+
+@media(max-width: 768px) {
+
+}
+
+@media(max-width: 420px) {
+
+    .lids .lid_date,
+    .lids .lid_status {
+        display: block;
+        width: 90%;
+        margin-left: 5%;
+        margin-top: 6px;
+    }
+
+    .lids .add_lid_comment {
+        width: 18%;
+        margin-top: 6px;
+    }
+
+}

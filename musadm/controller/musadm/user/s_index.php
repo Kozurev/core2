@@ -53,19 +53,23 @@ if($action == "updateFormClient")
 
     if($userid)
     {
-        $oUser =            Core::factory("User", $userid);
-        $aoProperties[] =   Core::factory("Property", 16)->getPropertyValues($oUser)[0];    //Доп. телефон
-        $aoProperties[] =   Core::factory("Property", 9)->getPropertyValues($oUser)[0];     //Ссылка вк
-        $aoProperties[] =   Core::factory("Property", 17)->getPropertyValues($oUser)[0];    //Длительность урока
-        $aoProperties[] =   Core::factory("Property", 15)->getPropertyValues($oUser)[0];    //Студия
-        $aoProperties[] =   Core::factory("Property", 18)->getPropertyValues($oUser)[0];    //Соглашение подписано
-        $aoProperties =   array_merge($aoProperties, Core::factory("Property", 21)->getPropertyValues($oUser));   //Учителя
+        $oUser =            Core::factory( "User", $userid );
+        $aoProperties[] =   Core::factory( "Property", 16 )->getPropertyValues( $oUser )[0];    //Доп. телефон
+        $aoProperties[] =   Core::factory( "Property", 9  )->getPropertyValues( $oUser )[0];    //Ссылка вк
+        $aoProperties[] =   Core::factory( "Property", 17 )->getPropertyValues( $oUser )[0];    //Длительность урока
+        $aoProperties[] =   Core::factory( "Property", 15 )->getPropertyValues( $oUser )[0];    //Студия
+        $aoProperties[] =   Core::factory( "Property", 18 )->getPropertyValues( $oUser )[0];    //Соглашение подписано
+        $aoProperties[] =   Core::factory( "Property", 28 )->getPropertyValues( $oUser )[0];
+        $aoProperties =   array_merge( $aoProperties, Core::factory( "Property", 21 )->getPropertyValues( $oUser) );   //Учителя
     }
     else
     {
-        $oUser = Core::factory("User");
-        $aoProperties[] =   Core::factory("Property_Int")
-            ->value(Core::factory("Property", 17)->defaultValue());
+        $oUser = Core::factory( "User" );
+
+        $aoProperties[] =   Core::factory( "Property_Int" )
+            ->value(
+                Core::factory( "Property", 17 )->defaultValue()
+            );
     }
 
     $aoPropertyLists = Core::factory("Property_List_Values")
@@ -200,7 +204,8 @@ if($action == "getPaymentPopup")
 
     Core::factory("Core_Entity")
         ->addEntity($oUser)
-        ->xsl("musadm/users/edit_payment_popup.xsl")
+        ->addSimpleEntity( "function", "clients" )
+        ->xsl("musadm/users/balance/edit_payment_popup.xsl")
         ->show();
 
     exit;

@@ -1,0 +1,41 @@
+.finances_calendar {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.finances_calendar div {
+    margin-top: 10px;
+    padding-left: 7px;
+    padding-right: 7px;
+}
+
+.finances_calendar div span {
+    display: block;
+    padding-top: 10px;
+}
+
+/*.finances_calendar .form-control {*/
+    /*width: 150px;*/
+    /*display: inline-block;*/
+    /*margin-right: 15px;*/
+/*}*/
+
+.finances_total {
+    text-align: left;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.finances_add_payment {
+    float: right;
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+
+.tarifs {
+    display: none;
+}
+
+.finances_calendar a {
+    width: 100%;
+}

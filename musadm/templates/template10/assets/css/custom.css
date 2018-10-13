@@ -1,14 +1,18 @@
 
+body {
+    max-width: 100vw;
+}
+
+.row {
+    margin: 0;
+}
+
 .error {
     color: red;
 }
 
 .default {
     color: black;
-}
-
-.container {
-    min-width: 420px;
 }
 
 .left {
@@ -23,9 +27,15 @@
     text-align: center;
 }
 
-#client_notes {
-    margin-bottom: 20px;
+
+.table-responsive {
+    border: none;
 }
+
+.table-responsive .form-control {
+    min-width: 75px;
+}
+
 
 .comment_button_box {
     margin-top: 10px;
@@ -38,6 +48,11 @@
 
 header {
     margin-bottom: 20px;
+}
+
+.table {
+    font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+    font-size: 14px;
 }
 
 
@@ -149,54 +164,20 @@ header {
 
 
 /**
- *  Блок с временным периодом
- *  Начало>>
- */
-.finances_calendar {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.finances_calendar .form-control {
-    width: 150px;
-    display: inline-block;
-    margin-top: 20px;
-    margin-right: 15px;
-}
-
-.finances_total {
-    text-align: left;
-    //margin-top: 20px;
-    font-size: 18px;
-}
-
-.finances_add_payment {
-    float: right;
-    margin-left: 20px;
-    margin-bottom: 20px;
-}
-
-.tarifs {
-    display: none;
-}
- /**
-  * <<Конец
-  * Блок с временным периодом
-  */
-
-
-/**
  *  Подсветка пользователей 
  *  Начало>>
  */
 .positive {
-    background-color:#78FC5A !important;
+    /*background-color:#78FC5A !important;*/
+    background-color: rgba(120, 252, 90, 0.7) !important;
 }
 .negative {
-    background-color:#f77b6b !important;
+    /*background-color:#f77b6b !important;*/
+    background-color: rgba(247, 123, 107, 0.7) !important;
 }
 .neutral {
-    background-color:#F0EDEA !important;
+    /*background-color:#F0EDEA !important;*/
+    background-color: rgba(240, 237, 234, 0.7) !important;
 }
 
 .group {
@@ -227,125 +208,69 @@ header {
     top: 15%;
 }
 
+
+
+
+.buttons-panel {
+    /*text-align: right;*/
+}
+
+.buttons-panel div {
+    margin-bottom: 10px;
+    padding-left: 7px;
+    padding-right: 7px;
+}
+
+.buttons-panel div a {
+    width: 100%;
+}
+
+
+
 /**
- * Карточки навигации
+ * Расписание
  * Начало>>
  */
-section .container .cards-wrapper .item .item-inner {
-    height: auto;
-    min-height: 225px;
-}
-
-section .container .cards-wrapper .item .icon-holder {
-    text-align: center;
-}
-/**
- * <<Конец
- * Карточки навигации
- */
-
-
- /**
-  * Лиды
-  * Начало>>
-  */
-.lids .cards-section .item-inner {
-    padding: 15px 15px;
-    height: 300px !important;
-    overflow-y: scroll;
-}
-
-.lids .cards-section .cards-wrapper {
-    max-width: 100%;
-}
-
-.lids .lid_date {
-    width: 40%;
-    display: inline-block;
-}
-
-.lids .lid_status {
-    width: 40%;
-    margin-left: 5%;
-    display: inline-block;
-}
-
-.lids .add_lid_comment {
-    width: 10%;
-    margin-left: 5%;
-    display:inline-block;
-} 
- /**
-  * <<Конец
-  * Начало
- */
-
- /**
-  * Страница "Баланс"
-  * Начало>>
-  */
-.balance-lessons {
-    max-height: 430px;
-    overflow-y: scroll;
-}
-
-.balance-payments {
-    max-height: 590px;
-    overflow-y: scroll;
-}
- /**
-  * <<Конец
-  * Страница "Баланс"
-  */
-
-
- /**
-  * Расписание
-  * Начало>>
-  */
-.schedule .date {
-    font-size: 11px;
-    color: #D1D1D1;
-}
-
-.schedule .teacher_payments_block {
-    overflow-y: scroll;
-    max-height: 470px;
+.schedule .table .btn {
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .calendar_small {
     text-align: center;
 }
 
-.schedule_calendar {
-    width: 14%;
-    /*position: relative;*/
-    /*left: 43%;*/
-    display: inline-block;
+.calendar_small div {
+    margin-bottom: 20px;
 }
+
+/*.schedule_calendar {*/
+    /*width: 14%;*/
+    /*display: inline-block;*/
+/*}*/
 
 .day_name {
-    /*position: relative;*/
-    /*left: 500px;*/
     font-size: 18px;
+    margin: 10px;
 }
 
- /**
-  * <<Конец
-  * Расписание
-  */
+/**
+ * <<Конец
+ * Расписание
+ */
 
-.table {
-    font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-    font-size: 14px;
+
+@media(max-width: 1024px) {
+
 }
 
-.button-block {
-    display: inline-block;
-    float: right;
-    margin: 20px 0px;
+
+@media(max-width: 768px) {
+
 }
 
-.balance-payments a {
-    margin-right: 20px;
+
+@media(max-width: 420px) {
+
 }

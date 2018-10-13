@@ -90,7 +90,7 @@ if(
 
     $aoTeacherLessons = $aoCurrentLessons;
 
-    echo "<table class='table table-bordered manager_table'>";
+    echo "<div class='table-responsive'><table class='table table-bordered manager_table'>";
 
     /**
      * Заголовок таблицы
@@ -139,7 +139,7 @@ if(
      * Установка первоначальных значений
      */
     $timeStart = "09:00:00";    //Начальная отметка временного промежутка
-    $timeEnd = "21:00:00";      //Конечная отметка временного промежутка
+    $timeEnd = "22:00:00";      //Конечная отметка временного промежутка
     $period = "00:15:00";       //Временной промежуток (временное значение одной ячейки)
     if (defined("SCHEDULE_DELIMITER") != "") $period = SCHEDULE_DELIMITER;
     $time = $timeStart;
@@ -366,7 +366,7 @@ if(
      * << Конец
      * Формирование таблицы расписания
      */
-    echo "</table>";
+    echo "</table></div>";
 }
 
 
@@ -501,6 +501,7 @@ if( $oUser->groupId() == 4 )
             $aoMonthesPayments[$index]->addSimpleEntity("month_name", $monthName);
         }
 
+        $payment->datetime( date( "d.m.Y", strtotime( $payment->datetime() ) ) );
         $aoMonthesPayments[$index]->addEntity($payment);
     }
 

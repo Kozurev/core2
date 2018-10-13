@@ -17,6 +17,9 @@
         ->css( "/templates/template10/assets/css/popup.css" )
         ->css( "/templates/template10/assets/css/styles.css" )
         ->css( "/templates/template10/assets/css/custom.css" )
+        ->css( "/templates/template10/assets/css/balance.css" )
+        ->css( "/templates/template10/assets/css/lids.css" )
+        ->css( "/templates/template10/assets/css/finances.css" )
         ->js( "/templates/template10/assets/plugins/jquery.min.js" );
 
         global $CFG;
@@ -108,7 +111,6 @@
                                 <?
                                 if( User::checkUserAccess(["groups" => [6]]) )
                                 {
-                                    echo "<li><a href='".$rootdir."tarif'>Тарифы</a></li>";
                                     echo "<li><a href='".$rootdir."statistic'>Статистика</a></li>";
                                 }
                             }
@@ -130,6 +132,7 @@
                 <div class="container">
                     <?php
                         Core::factory( "Core_Entity" )
+                            ->addSimpleEntity( "rootdir", $rootdir )
                             ->addSimpleEntity( "title-first", $this->getParam( "title-first" ) )
                             ->addSimpleEntity( "title-second", $this->getParam( "title-second" ) )
                             ->addEntities( $this->getParam( "breadcumbs" ), "breadcumb" )

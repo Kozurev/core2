@@ -3,7 +3,7 @@
     <xsl:template match="root">
         <h2>Выплаты</h2>
 
-        <div class="teacher_payments_block">
+        <div class="teacher_payments_block table-responsive">
             <table class="table table-striped teacher_payments">
                 <xsl:if test="is_admin = 1">
                     <tr class="header">

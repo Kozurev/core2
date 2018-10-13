@@ -6,26 +6,29 @@
 
         <h2>Список менеджеров</h2>
 
-        <!--<xsl:if test="user/active = 1">-->
-            <div class="button-block">
+        <div class="row buttons-panel">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                 <a href="#" class="btn btn-primary user_create" data-usergroup="2">Добавить менеджера</a>
             </div>
-        <!--</xsl:if>-->
+        </div>
 
-        <table id="sortingTable" class="table table-striped">
-            <thead>
-                <tr class="header">
-                    <th>Фамилия</th>
-                    <th>Имя</th>
-                    <th>Телефон</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
+        <div class="table-responsive">
+            <table id="sortingTable" class="table table-striped">
+                <thead>
+                    <tr class="header">
+                        <th>Фамилия</th>
+                        <th>Имя</th>
+                        <th>Телефон</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+    
+                <tbody>
+                    <xsl:apply-templates select="user" />
+                </tbody>
+            </table>
+        </div>
 
-            <tbody>
-                <xsl:apply-templates select="user" />
-            </tbody>
-        </table>
     </xsl:template>
 
 
