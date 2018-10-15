@@ -72,8 +72,7 @@
 }
 
 
-
-@media(max-width: 1024px) {
+@media(min-width: 1024px) {
 
     .popup {
         width: 40%;
@@ -82,7 +81,7 @@
 }
 
 
-@media(max-width: 768px) {
+@media(max-width: 900px) {
 
     .popup {
         width: 70%;
