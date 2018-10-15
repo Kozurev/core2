@@ -1,5 +1,5 @@
-
-var root = "/musadm";
+//var root = "/musadm";
+var root = $("#rootdir").val();
 
 $(function(){
     $("body")
@@ -138,7 +138,7 @@ function userSave(func) {
 
     $.ajax({
         type: "GET",
-        url: root + "/user/client",
+        url: root + "user/client",
         data: {
             action: "checkLoginExists",
             login: login,
@@ -165,7 +165,7 @@ function userSave(func) {
 function updateUserNote(userid, note, func) {
     $.ajax({
         type: "GET",
-        url: root + "/user/balance",
+        url: root + "user/balance",
         data: {
             action: "updateNote",
             userid: userid,
@@ -182,7 +182,7 @@ function updateUserNote(userid, note, func) {
 function updateUserPerLesson(userid, value, func) {
     $.ajax({
         type: "GET",
-        url: root + "/user/balance",
+        url: root + "user/balance",
         data: {
             action: "updatePerLesson",
             userid: userid,
@@ -232,7 +232,7 @@ function refreshUserTable() {
 function refreshArchiveTable(func) {
     $.ajax({
         type: "GET",
-        url: root + "/user/archive",
+        url: root + "user/archive",
         data: {
             action: "refreshTableArchive"
         },
@@ -264,7 +264,7 @@ function refreshArchiveTable(func) {
 function getClientPopup(userid) {
     $.ajax({
         type: "GET",
-        url: root + "/user/client",
+        url: root + "user/client",
         data: {
             action: "updateFormClient",
             userid: userid,
@@ -278,7 +278,7 @@ function getClientPopup(userid) {
 function getTeacherPopup(userid) {
     $.ajax({
         type: "GET",
-        url: root + "/user/teacher",
+        url: root + "user/teacher",
         data: {
             action: "updateFormTeacher",
             userid: userid,
@@ -293,7 +293,7 @@ function getTeacherPopup(userid) {
 function getDirectorPopup(userid) {
     $.ajax({
         type: "GET",
-        url: root + "/user/client",
+        url: root + "user/client",
         data: {
             action: "updateFormDirector",
             userid: userid
@@ -308,7 +308,7 @@ function getDirectorPopup(userid) {
 function getManagerPopup(userid) {
     $.ajax({
         type: "GET",
-        url: root + "/user/client",
+        url: root + "user/client",
         data: {
             action: "updateFormManager",
             userid: userid

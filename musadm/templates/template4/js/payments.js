@@ -1,4 +1,5 @@
-var root = "/musadm";
+//var root = "/musadm";
+var root = $("#rootdir").val();
 
 $(function(){
     $("body")
@@ -122,7 +123,7 @@ $(function(){
 
             $.ajax({
                 type: "GET",
-                url: root + "/balance",
+                url: root + "balance",
                 data: {
                     action: "payment_save",
                     id: id,
@@ -145,7 +146,7 @@ $(function(){
 
             $.ajax({
                 type: "GET",
-                url: root + "/balance",
+                url: root + "balance",
                 data: {
                     action: "payment_delete",
                     id: id
@@ -163,7 +164,7 @@ $(function(){
 function editPaymentPopup(id) {
     $.ajax({
         type: "GET",
-        url: root + "/balance",
+        url: root + "balance",
         data: {
             action: "edit_payment",
             id: id

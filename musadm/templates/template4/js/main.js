@@ -1,5 +1,6 @@
 var loaderTime = 0;
-var root = "/musadm";
+//var root = "/musadm";
+var root = $("#rootdir").val();
 
 
 function getCurrentDate() {
@@ -69,7 +70,7 @@ function saveData(tab, func) {
         data += "&" + $(aUnchecked[i]).attr("name") + "=0";
     }
 
-    var link = root + "/admin?menuTab=" + tab + "&menuAction=updateAction&ajax=1";
+    var link = root + "admin?menuTab=" + tab + "&menuAction=updateAction&ajax=1";
 
     $.ajax({
         type: "GET",
@@ -93,7 +94,7 @@ function saveData(tab, func) {
  */
 function deleteItem(model_name, model_id, func){
 
-    var url = root + "/admin?menuTab=Main&menuAction=deleteAction&ajax=1";
+    var url = root + "admin?menuTab=Main&menuAction=deleteAction&ajax=1";
     url += "&model_name=" + model_name;
     url += "&model_id=" + model_id;
 
@@ -124,7 +125,7 @@ function deleteItem(model_name, model_id, func){
 function updateActive(model_name, model_id, value, func){
     loaderOn();
 
-    var link = root + "/admin?menuTab=Main&menuAction=updateActive&ajax=1";
+    var link = root + "admin?menuTab=Main&menuAction=updateActive&ajax=1";
     link += "&model_name=" + model_name;
     link += "&model_id=" + model_id;
     link += "&value=" + value;
@@ -157,7 +158,7 @@ function updateActive(model_name, model_id, value, func){
 function savePayment(userid, value, description, description2, type, url, func) {
     $.ajax({
         type: "GET",
-        url: root + "/user/" + url,
+        url: root + "user/" + url,
         async: false,
         data: {
             action: "savePayment",

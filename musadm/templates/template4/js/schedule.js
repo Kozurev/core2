@@ -1,5 +1,5 @@
-
-var root = "/musadm";
+//var root = "/musadm";
+var root = $("#rootdir").val();
 
 $(function(){
 
@@ -290,7 +290,7 @@ function refreshAreasTable() {
 function saveTeacherPayment(user, summ, date, description, func) {
     $.ajax({
         type: "GET",
-        url: root + "/admin?menuTab=Main&menuAction=updateAction&ajax=1",
+        url: root + "admin?menuTab=Main&menuAction=updateAction&ajax=1",
         async: false,
         data: {
             id: "",

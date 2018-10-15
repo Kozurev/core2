@@ -1,5 +1,6 @@
 var loaderTime = 200;
-var root = "/musadm";
+//var root = "/musadm";
+var root = $("#rootdir").val();
 
 $(function(){
 
@@ -141,7 +142,7 @@ function reloadMain(hash){
 function updateActive(model_name, model_id, value, func){
     loaderOn();
 
-    var link = root + "/admin?menuTab=Main&menuAction=updateActive&ajax=1";
+    var link = root + "admin?menuTab=Main&menuAction=updateActive&ajax=1";
     link += "&model_name=" + model_name;
     link += "&model_id=" + model_id;
     link += "&value=" + value;

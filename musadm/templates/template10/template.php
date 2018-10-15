@@ -44,6 +44,7 @@
     <div class="popup"></div>
     <div class="overlay"></div>
 
+    <input type="hidden" id="rootdir" value="<?=$rootdir?>"/>
 
     <div id="fb-root"></div>
         <div class="page-wrapper">
