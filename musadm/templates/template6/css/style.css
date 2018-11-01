@@ -1,8 +1,29 @@
-
 .users h2 {
 	display: inline-block;
 }
 
-.users .notes {
-	max-width: 160px;
+
+/*.users .table {*/
+	/*font-family: serif;*/
+	/*font-size: 17px;*/
+/*}*/
+
+
+.users .table .notes {
+	max-width: 225px;
+}
+
+
+.users .table tr td {
+	vertical-align: middle;
+}
+
+.users .contract {
+	background: url("../../template10/assets/images/contract.png");
+	background-size: cover;
+	display: inline-block;
+	width:20px;
+	height: 20px;
+	margin-left: 5px;
+	cursor: help;
 }

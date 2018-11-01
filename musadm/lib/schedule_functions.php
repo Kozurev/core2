@@ -77,7 +77,7 @@ function getLessonData( $oLesson )
         }
         else
         {
-            $output["teacher"] = $oTeacher->surname() . "<br>" . $oTeacher->name();
+            $output["teacher"] = $oTeacher->surname() . " " . $oTeacher->name();
         }
 
         if( $oGroup == false )
@@ -94,7 +94,9 @@ function getLessonData( $oLesson )
     {
         $oTeacher = $oLesson->getTeacher();
         $oClient = $oLesson->getClient();
-        $output["teacher"] = $oTeacher->surname() . "<br>" . $oTeacher->name();
+
+        if( $oTeacher === false )   $output["teacher"] = "Пользователь был удален";
+        else $output["teacher"] = $oTeacher->surname() . " " . $oTeacher->name();
 
         if( $oClient == false )
         {
@@ -103,7 +105,7 @@ function getLessonData( $oLesson )
         }
         else
         {
-            $output["client"] = $oClient->surname() . "<br>" . $oClient->name();
+            $output["client"] = $oClient->surname() . " " . $oClient->name();
 
             /**
              * Определение цвета "подцветки" занятия
@@ -122,7 +124,8 @@ function getLessonData( $oLesson )
     elseif ( $oLesson->typeId() == 3 )
     {
         $oTeacher = $oLesson->getTeacher();
-        $output["teacher"] = $oTeacher->surname() . "<br/>" . $oTeacher->name();
+        if( $oTeacher === false )   $output["teacher"] = "Пользователь был удален";
+        else $output["teacher"] = $oTeacher->surname() . " " . $oTeacher->name();
         $output["client"] = "Консультация";
         $output["client_status"] = "neutral";
 

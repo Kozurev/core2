@@ -43,25 +43,6 @@ $action = Core_Array::getValue($_GET, "action", "");
 
 
 /**
- * Добавление комментария к платежу
- */
-if($action == "add_note")
-{
-    $modelId = Core_Array::getValue($_GET,"model_id", 0);
-    $oPayment = Core::factory("Payment", $modelId);
-    $aoNotes = Core::factory("Property", 26)->getPropertyValues($oPayment);
-
-    Core::factory("Core_Entity")
-        ->addEntity($oPayment)
-        ->addEntities($aoNotes, "notes")
-        ->xsl("musadm/users/balance/add_payment_note.xsl")
-        ->show();
-
-    exit;
-}
-
-
-/**
  * Обновление сожержимого страницы
  */
 if($action == "refreshTablePayments")
@@ -69,15 +50,10 @@ if($action == "refreshTablePayments")
     $oCurentUser = Core::factory("User")->getCurrent();
     $pageUserId = Core_Array::getValue($_GET, "userid", 0);
 
-    if($oCurentUser->groupId() < 4 && $pageUserId > 0)
-        $oUser = Core::factory("User", $pageUserId);
-    else
-        $oUser = $oCurentUser;
-
     /**
      * Пользовательские примечания и дата последней авторизации
      */
-    if($oCurentUser->groupId() < 4 && $oUser->groupId() == 5)
+    if( User::isAuthAs() )
     {
         $oPropertyNotes = Core::factory("Property", 19);
         $clienNotes = $oPropertyNotes->getPropertyValues($oUser);
@@ -93,14 +69,15 @@ if($action == "refreshTablePayments")
     }
 
     echo "<div class='users'>";
-    $this->execute();
+        $this->execute();
     echo "</div>";
+
     exit;
 }
 
 
 /**
- * Открытие
+ * Открытие всплывающего окна для начисления оплаты (создания платежа клиента с 2 полями для примечания)
  */
 if($action == "getPaymentPopup")
 {
@@ -117,10 +94,14 @@ if($action == "getPaymentPopup")
 }
 
 
+/**
+ * Открытие всплывающего окна для покупки тарифа
+ */
 if( $action == "getTarifPopup" )
 {
     $userId =       Core_Array::getValue( $_GET, "userid", 0 );
     $aoTarifs =     Core::factory( "Payment_Tarif" );
+
     if( !User::isAuthAs() ) $aoTarifs->where( "access", "=", "1" );
 
     $aoTarifs =     $aoTarifs->findAll();
@@ -136,6 +117,9 @@ if( $action == "getTarifPopup" )
 }
 
 
+/**
+ * Редактирование
+ */
 if($action == "updateNote")
 {
     $userId =   Core_Array::getValue($_GET, "userid", 0);
@@ -236,13 +220,26 @@ if( $action == "savePayment" )
 }
 
 
+/**
+ * Создание / редактирование платежа
+ */
 if( $action === "edit_payment" )
 {
     $id = Core_Array::getValue( $_GET, "id", null );
     $Payment = Core::factory( "Payment", $id );
 
+    /**
+     * Указатель на тип обновляемого контента страницы после сохранения данных платежа
+     *
+     * На данный момент 16.10.2018 платеж редактируется из двух разделов
+     *  значение 'client' - редактирование платежа из личного кабинета клиента
+     *  значение 'teacher' - редактирование платежа из личного кабинета преподавателя
+     */
+    $afterSaveAction = Core_Array::getValue( $_GET, "afterSaveAction", null );
+
     Core::factory( "Core_Entity" )
         ->addEntity( $Payment )
+        ->addSimpleEntity( "afterSaveAction", $afterSaveAction )
         ->xsl( "musadm/finances/edit_payment_popup.xsl" )
         ->show();
 
@@ -250,6 +247,28 @@ if( $action === "edit_payment" )
 }
 
 
+/**
+ * Добавление комментария к платежу
+ */
+if($action == "add_note")
+{
+    $modelId = Core_Array::getValue($_GET,"model_id", 0);
+    $oPayment = Core::factory("Payment", $modelId);
+    $aoNotes = Core::factory("Property", 26)->getPropertyValues($oPayment);
+
+    Core::factory("Core_Entity")
+        ->addEntity($oPayment)
+        ->addEntities($aoNotes, "notes")
+        ->xsl("musadm/users/balance/add_payment_note.xsl")
+        ->show();
+
+    exit;
+}
+
+
+/**
+ * Сохранение данных платежа
+ */
 if( $action === "payment_save" )
 {
     $id = Core_Array::getValue( $_GET, "id", 0 );

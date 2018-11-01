@@ -6,48 +6,54 @@
 */
 class Core_Entity extends Core_Entity_Model
 {
-	/**
-	*	Конвертирует, к примеру, "Structure_Item" в "structure_item"
-	*	@param $name - название модели, которое необходимо отконвертировать
-	*	@return string - название модели без больших букв
-	*/
-	protected function renameModelName($intputName)
+    /**
+     * Конвертирует, к примеру, "Structure_Item" в "structure_item"
+     * @param $intputName - название модели, которое необходимо отконвертировать
+     * @return string - название модели без больших букв
+     */
+	protected function renameModelName( $intputName )
 	{
-		$aSegments = explode("_", $intputName);
+		$aSegments = explode( "_", $intputName );
 		$outputName = "";
 
 		//if($aSegments[0] == "Property" && count($aSegments) > 1) return "property_value";
 		//if($intputName === "Admin_Form") return "item";
 
-		foreach ($aSegments as $segment) 
+		foreach ( $aSegments as $segment )
 		{
-			if($outputName == "") $outputName .= lcfirst($segment);
-			else $outputName .= "_" . lcfirst($segment);
+			if( $outputName == "" ) $outputName .= lcfirst( $segment );
+			else $outputName .= "_" . lcfirst( $segment );
 		}
 
 		return $outputName;
 	}
 
 
-	/**
-	*	Добавление дочерней сущьности в XML
-	*	@param $obj - добавляемая дочерняя сущьность
-	*/
-	public function addEntity($obj, $tag = null)
+    /**
+     * Добавление дочерней сущьности в XML
+     *
+     * @param $obj
+     * @param null $tag
+     * @return $this
+     */
+	public function addEntity( $obj, $tag = null )
 	{
-		if(!is_null($tag)) 	
-		{
-		    if(method_exists($obj, "custom_tag"))
-			    $obj->custom_tag($tag);
-            elseif(get_class($obj) == "stdClass")
-                $obj->custom_tag = $tag;
-			// echo "<pre>";
-			// print_r($obj);
-			// echo "</pre>";
-		}
-		
+	    if( !is_object( $obj ) )
+        {
+            echo "<br>Переданный параметр в метод addEntity не является объектом:<br>";
+            debug( $obj );
+            return $this;
+        }
 
-		if($this->aEntityVars["value"] == "")	 
+		if( !is_null( $tag ) )
+		{
+		    if( method_exists( $obj,  "custom_tag" ) )
+			    $obj->custom_tag( $tag );
+            elseif( get_class( $obj ) == "stdClass" )
+                $obj->custom_tag = $tag;
+		}
+
+		if( $this->aEntityVars["value"] == "" )
 			$this->childrenObjects[] = $obj;
 		else
 			echo "Невозможно добавыить элемент к простой XML-сущьности";
@@ -56,28 +62,43 @@ class Core_Entity extends Core_Entity_Model
 	}
 
 
-	/**
-	*	Добавление массива дочерних сущьностей в XML
-	*	@param $aoChilren - массив объектов
-	*/
-	public function addEntities($aoChilren, $tags = null)
+    /**
+     * Добавление массива дочерних сущьностей в XML
+     *
+     * @param $aoChilren
+     * @param null $tags
+     * @return $this
+     */
+	public function addEntities( $aoChilren, $tags = null )
 	{
-		if(is_array($aoChilren) && count($aoChilren) > 0)
-		foreach ($aoChilren as $oChild) 
+		if( is_array( $aoChilren ) && count( $aoChilren ) > 0 )
+
+		foreach ( $aoChilren as $oChild )
 		{
-			if(is_object($oChild)) 	$this->addEntity($oChild, $tags);
+			if( is_object( $oChild ) ) 	$this->addEntity( $oChild, $tags );
 		}
+
 		return $this;
 	}
 
 
-	public function addSimpleEntity($name, $value)
+    /**
+     * Добавление простой дочерней сущьности в XML
+     *
+     * @param $name - название тэга
+     * @param $value - значение
+     * @return $this
+     */
+	public function addSimpleEntity( $name, $value )
     {
+        if( $value === null )   $value = "";
+
         $this->addEntity(
             Core::factory("Core_Entity")
-                ->name($name)
-                ->value($value)
+                ->name( $name )
+                ->value( $value )
         );
+
         return $this;
     }
 
@@ -143,6 +164,10 @@ class Core_Entity extends Core_Entity_Model
 			{
 				$objTag->appendChild($xml->createElement($key, strval($val)));
 			}
+			elseif( $val === "" || is_null( $val ) )
+            {
+                $objTag->appendChild($xml->createElement($key, ""));
+            }
 		}
 
 		/*

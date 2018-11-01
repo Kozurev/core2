@@ -5,7 +5,7 @@
 
             <div class="row buttons-panel">
                 <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                    <a class="btn btn-pink certificate_create">Добавить сертификат</a>
+                    <a class="btn btn-pink certificate_edit" data-id="">Добавить сертификат</a>
                 </div>
             </div>
 
@@ -24,7 +24,7 @@
                             <th>Действителен до</th>
                             <th>Номер</th>
                             <th>Комментарии</th>
-                            <th>Добавление <br/>комментария</th>
+                            <th>Действия</th>
                         </tr>
                     </thead>
 
@@ -50,7 +50,21 @@
                     <xsl:apply-templates select="/root/certificate_note[certificate_id = $id]" />
                 </div>
             </td>
-            <td><a class="btn btn-pink add_comment" data-cert-id="{id}">+</a></td>
+            <td>
+                <div class="row">
+                    <div class="col-lg-2">
+                        <a class="btn btn-pink add_comment" data-cert-id="{id}">+</a>
+                    </div>
+                    <xsl:if test="/root/is_director = 1">
+                        <div class="col-lg-5">
+                            <a class="btn btn-orange certificate_edit" data-id="{id}">Изменить</a>
+                        </div>
+                        <div class="col-lg-5">
+                            <a class="btn btn-red certificate_delete" data-id="{id}">Удалить</a>
+                        </div>
+                    </xsl:if>
+                </div>
+            </td>
             <!--<td><a class="btn btn-pink certificate_delete" data-id="{id}">Удалить</a></td>-->
         </tr>
     </xsl:template>

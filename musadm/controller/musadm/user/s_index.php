@@ -27,9 +27,13 @@ $this->setParam( "title-second", $title2 );
 $this->setParam( "breadcumbs", $breadcumbs );
 
 
-/*
-*	Блок проверки авторизации
-*/
+$Director = User::current()->getDirector();
+if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+$subordinated = $Director->getId();
+
+/**
+ *	Блок проверки авторизации
+ */
 $oUser = Core::factory("User")->getCurrent();
 
 $accessRules = array(
@@ -46,12 +50,12 @@ $action = Core_Array::getValue($_GET, "action", null);
 /**
  * Форма редактирования клиента
  */
-if($action == "updateFormClient")
+if( $action == "updateFormClient" )
 {
-    $userid =           Core_Array::getValue($_GET, "userid", 0);
-    $output = Core::factory("Core_Entity");
+    $userid = Core_Array::getValue( $_GET, "userid", 0 );
+    $output = Core::factory( "Core_Entity" );
 
-    if($userid)
+    if( $userid )
     {
         $oUser =            Core::factory( "User", $userid );
         $aoProperties[] =   Core::factory( "Property", 16 )->getPropertyValues( $oUser )[0];    //Доп. телефон
@@ -72,23 +76,25 @@ if($action == "updateFormClient")
             );
     }
 
-    $aoPropertyLists = Core::factory("Property_List_Values")
-        ->where("property_id", "=", 21)
-        ->orderBy("sorting")
+    $aoPropertyLists = Core::factory( "Property_List_Values" )
+        ->where( "subordinated", "=", $subordinated )
+        ->where( "property_id", "=", 21 )
+        ->orderBy( "value" )
         ->findAll();
 
-    $aoPropertyLists = array_merge($aoPropertyLists,
+    $aoPropertyLists = array_merge( $aoPropertyLists,
         Core::factory("Property_List_Values")
-            ->where("property_id", "=", 15)
-            ->orderBy("sorting")
+            ->where( "subordinated", "=", $subordinated )
+            ->where( "property_id", "=", 15 )
+            ->orderBy( "sorting" )
             ->findAll()
     );
 
     $output
-        ->addEntity($oUser)
-        ->addEntities($aoProperties,    "property_value")
-        ->addEntities($aoPropertyLists, "property_list")
-        ->xsl("musadm/users/edit_client_popup.xsl")
+        ->addEntity( $oUser )
+        ->addEntities( $aoProperties,    "property_value" )
+        ->addEntities( $aoPropertyLists, "property_list" )
+        ->xsl( "musadm/users/edit_client_popup.xsl" )
         ->show();
 
     exit;
@@ -197,6 +203,9 @@ if($action == "refreshTableUsers")
 }
 
 
+/**
+ * Форма для создания платежа
+ */
 if($action == "getPaymentPopup")
 {
     $userId =   Core_Array::getValue($_GET, "userid", 0);
@@ -212,6 +221,9 @@ if($action == "getPaymentPopup")
 }
 
 
+/**
+ * Сохранение платежа
+ */
 if($action == "savePayment")
 {
     $userid =       Core_Array::getValue($_GET, "userid", 0);
@@ -226,9 +238,7 @@ if($action == "savePayment")
         ->description($description)
         ->save();
 
-    /**
-     * Корректировка баланса ученика
-     */
+    //Корректировка баланса ученика
     $oUser =        Core::factory("User", $userid);
     $oUserBalance = Core::factory("Property", 12);
     $oUserBalance = $oUserBalance->getPropertyValues($oUser)[0];
@@ -237,6 +247,7 @@ if($action == "savePayment")
     $type == 1
         ?   $balanceNew =   $balanceOld + intval($value)
         :   $balanceNew =   $balanceOld - intval($value);
+
     $oUserBalance->value($balanceNew);
     $oUserBalance->save();
 
@@ -245,6 +256,9 @@ if($action == "savePayment")
 }
 
 
+/**
+ * При сохранении пользователя идет проверка на дублирования логина
+ */
 if( $action == "checkLoginExists" )
 {
     $userid = Core_Array::getValue( $_GET, "userid", 0 );
@@ -263,6 +277,9 @@ if( $action == "checkLoginExists" )
 }
 
 
+/**
+ * Экспорт пользователей в Excell
+ */
 if( $action === "export" )
 {
     User::checkUserAccess( ["groups" => [1, 2, 6]] );
@@ -292,6 +309,25 @@ if( $action === "export" )
     exit;
 }
 
+
+/**
+ * Получение данных лида
+ */
+if( $action === "getLidData" )
+{
+    $lidId = Core_Array::Get( "lidid", 0 );
+    $Lid = Core::factory( "Lid", $lidId );
+    if( $Lid === false )    die( "0" );
+
+    $LidEncode = new stdClass();
+    $LidEncode->name = $Lid->name();
+    $LidEncode->surname = $Lid->surname();
+    $LidEncode->phone = $Lid->number();
+    $LidEncode->vk = $Lid->vk();
+
+    echo json_encode( $LidEncode );
+    exit;
+}
 
 
 $aTitle[] = $this->oStructure->title();

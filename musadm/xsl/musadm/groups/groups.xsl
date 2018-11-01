@@ -34,7 +34,7 @@
             <td><xsl:value-of select="id" /></td>
             <td><xsl:value-of select="title" /></td>
             <td>
-                <a href="./?userid={id}">
+                <a href="/{/root/wwwroot}authorize?auth_as={$teacher}">
                     <xsl:value-of select="user[id = $teacher]/surname" />
                     <xsl:text> </xsl:text>
                     <xsl:value-of select="user[id = $teacher]/name" />
@@ -43,7 +43,7 @@
             <td><xsl:value-of select="duration" /></td>
             <td>
                 <xsl:for-each select="user[id != $teacher]" >
-                    <a href="./?userid={id}">
+                    <a href="/{/root/wwwroot}authorize?auth_as={id}">
                         <xsl:value-of select="surname" />
                         <xsl:text> </xsl:text>
                         <xsl:value-of select="name" />

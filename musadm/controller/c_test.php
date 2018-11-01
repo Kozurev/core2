@@ -104,18 +104,19 @@ Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Task` DROP COLUMN `type` " )
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Schedule_Area` ADD `subordinated` INT NOT NULL" );
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Schedule_Area` ADD `active` INT NOT NULL" );
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Schedule_Group` ADD `subordinated` INT NOT NULL" );
+Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Property_List_Values` ADD `subordinated` INT NOT NULL" );
 
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Payment` ADD `subordinated` INT NOT NULL" );
 Core::factory( "Orm" )->executeQuery( "UPDATE `Payment` SET type = 2 WHERE type = 0" );
 
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Payment_Tarif` ADD `subordinated` INT NOT NULL" );
-Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Payment_Tarif` ADD `count_indiv` INT NOT NULL");
-Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Payment_tarif` ADD `count_group` INT NOT NULL" );
+Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Payment_Tarif` ADD `count_indiv` FLOAT NOT NULL");
+Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Payment_tarif` ADD `count_group` FLOAT NOT NULL" );
 Core::factory( "Orm" )->executeQuery( "UPDATE `Payment_Tarif` SET count_indiv = lessons_count WHERE lessons_type = 1" );
 Core::factory( "Orm" )->executeQuery( "UPDATE `Payment_Tarif` SET count_group = lessons_count WHERE lessons_type = 2" );
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE Payment_Tarif DROP COLUMN `lessons_type`, DROP COLUMN `lessons_count`;" );
 
-Core::factory( "Orm" )->executeQuery( "UPDATE `User` SET subordinated = " . $Director->getId() . " WHERE 1" );
+Core::factory( "Orm" )->executeQuery( "UPDATE `User` SET subordinated = " . $Director->getId() . " WHERE superuser = 0" );
 Core::factory( "Orm" )->executeQuery( "UPDATE `Lid` SET subordinated = " . $Director->getId() . " WHERE 1" );
 Core::factory( "Orm" )->executeQuery( "UPDATE `Certificate` SET subordinated = " . $Director->getId() . " WHERE 1" );
 Core::factory( "Orm" )->executeQuery( "UPDATE `Payment` SET subordinated = " . $Director->getId() . " WHERE 1" );
@@ -124,6 +125,7 @@ Core::factory( "Orm" )->executeQuery( "UPDATE `Task` SET subordinated = " . $Dir
 Core::factory( "Orm" )->executeQuery( "UPDATE `Schedule_Area` SET subordinated = " . $Director->getId() . " WHERE 1" );
 Core::factory( "Orm" )->executeQuery( "UPDATE `Schedule_Group` SET subordinated = " . $Director->getId() . " WHERE 1" );
 Core::factory( "Orm" )->executeQuery( "UPDATE `Schedule_Area` SET active = 1 WHERE 1" );
+Core::factory( "Orm" )->executeQuery( "UPDATE `Property_List_Values` SET subordinated = " . $Director->getId() . " WHERE 1" );
 
 //Core::factory( "Orm" )->executeQuery(
 //    "CREATE PROCEDURE `dropall` ()

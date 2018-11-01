@@ -76,6 +76,7 @@ function saveData(tab, func) {
         type: "GET",
         url: link,
         data: data,
+        async: false,
         success: function(responce) {
             closePopup();
             if(responce != "0" && responce != "") alert(responce);
@@ -99,7 +100,11 @@ function deleteItem(model_name, model_id, func){
     url += "&model_id=" + model_id;
 
     var agree = confirm("Подтвердите действие");
-    if(agree != true) return;
+    if(agree != true)
+    {
+        loaderOff();
+        return;
+    }
 
     $.ajax({
         type: "GET",

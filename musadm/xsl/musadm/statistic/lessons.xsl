@@ -21,7 +21,17 @@
 
                 <tr>
                     <td>Дневной индекс</td>
-                    <td><xsl:value-of select="day_index" /></td>
+                    <td>
+                        <xsl:choose>
+                            <xsl:when test="day_index != '-0'">
+                                <xsl:value-of select="day_index" />
+                            </xsl:when>
+                            <xsl:otherwise>
+                                Для корректного отображения дневного индекса необходимо укаать точный временной промежуток
+                                либо указав даты "с" и "по" либо удалив временной промежуток полностью
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </td>
                 </tr>
             </table>
         </div>

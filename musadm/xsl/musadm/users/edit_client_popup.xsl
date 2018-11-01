@@ -135,16 +135,36 @@
                 </select>
             </div>
 
+            <hr/>
             <div class="column">
                 <span>Соглашение подписано</span>
             </div>
             <div class="column">
-                <input type="checkbox" name="property_18[]" >
+                <!--<input type="checkbox" name="property_18[]" >-->
+                    <!--<xsl:if test="property_value[property_id=18]/value = 1">-->
+                        <!--<xsl:attribute name="checked">checked</xsl:attribute>-->
+                    <!--</xsl:if>-->
+                <!--</input>-->
+                <input type="checkbox" id="property_18" name="property_18[]" class="checkbox-new" >
                     <xsl:if test="property_value[property_id=18]/value = 1">
                         <xsl:attribute name="checked">checked</xsl:attribute>
                     </xsl:if>
                 </input>
+                <label for="property_18" class="label-new">
+                    <div class="tick"><input type="hidden" name="kostul"/></div>
+                </label>
             </div>
+
+            <xsl:if test="user/id = ''">
+                <hr style="margin: 10px 0px" />
+                <div class="column get_lid_data_row">
+                    <span>Данные из лида:</span>
+                </div>
+                <div class="column row get_lid_data_row">
+                    <div class="col-lg-6"><input type="number" class="form-control" id="lid_id" placeholder="Номер лида" /></div>
+                    <div class="col-lg-6"><a href="#" class="btn btn-primary" id="get_lid_data">Загрузить</a></div>
+                </div>
+            </xsl:if>
 
             <input type="hidden" name="id" value="{user/id}" />
             <input type="hidden" name="groupId" value="5" />

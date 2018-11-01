@@ -13,6 +13,10 @@ $oProperty = Core::factory("Property");
 $oUser = Core::factory( "User" )->getCurrent()->getDirector();
 $subordinated = $oUser->getId();
 
+User::parentAuth()->groupId() == 6 || User::parentAuth()->superuser() == 1
+    ?   $isDirector = 1
+    :   $isDirector = 0;
+
 $groupId = $this->oStructureItem->getId();
 $groupId == 5
     ?   $xsl = "musadm/users/clients.xsl"
@@ -38,6 +42,8 @@ foreach ($aoUsers as $user)
 
 Core::factory("Core_Entity")
     ->xsl($xsl)
+    ->addSimpleEntity( "page-theme-color", "primary" )
+    ->addSimpleEntity( "is_director", $isDirector )
     ->addSimpleEntity( "wwwroot", $CFG->rootdir )
     ->addSimpleEntity( "table_type", "active" )
     ->addEntities($aoUsers)

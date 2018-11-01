@@ -366,6 +366,27 @@ if( $action === "addAbsentTask" )
 }
 
 
+/**
+ * Создание задачи с напоминанием об уточнении времени следующего занятия
+ */
+if( $action === "create_schedule_task" )
+{
+    $date =     Core_Array::Get( "date", date("Y-m-d") );
+    $clientId = Core_Array::Get( "client_id", 0 );
+
+    $Client = Core::factory( "User", $clientId );
+    $taskNoteText = $Client->surname() . " " . $Client->name() . " обсудить следующее занятие.";
+
+    $Task = Core::factory( "Task" )
+        ->date( $date );
+
+    $Task->save();
+    $Task->addNote( $taskNoteText );
+
+    exit;
+}
+
+
 if($action === "getSchedule")
 {
     $this->execute();

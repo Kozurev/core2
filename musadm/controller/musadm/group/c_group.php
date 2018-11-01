@@ -20,7 +20,11 @@ foreach ($aoGroups as $oGroup)
     $oGroup->addEntities($oGroup->getClientList());
 }
 
+
+global $CFG;
+
 $output
-    ->addEntities($aoGroups)
-    ->xsl("musadm/groups/groups.xsl")
+    ->addEntities( $aoGroups )
+    ->addSimpleEntity( "wwwroot", $CFG->rootdir )
+    ->xsl( "musadm/groups/groups.xsl" )
     ->show();

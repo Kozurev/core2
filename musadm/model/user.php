@@ -106,7 +106,7 @@ class User extends User_Model
 	/**
 	 * Метод возвращает авторизованного пользователя, если такой есть
      *
-	 * @return object|boolean or false
+	 * @return object|boolean
 	*/	
 	public function getCurrent()
 	{
@@ -140,6 +140,11 @@ class User extends User_Model
 	}
 
 
+    /**
+     * Статический аналог метода getCurrent
+     *
+     * @return bool|object
+     */
     public static function current()
     {
         if(isset($_COOKIE["userdata"]))
@@ -187,8 +192,12 @@ class User extends User_Model
 	}
 
 
-	/**
+    /**
      * Проверка авторизации пользователя (объявляется в самом начале страницы)
+     *
+     * @param $aParams - ассоциативный массив параметров -> список идентификаторов допустимых групп пользователей и проверка на свойство superuser
+     * @param null $oUser - объект пользователя (по умолчанию используется авторизованный пользователь)
+     * @return bool
      */
 	static public function checkUserAccess($aParams, $oUser = null)
     {
@@ -229,11 +238,19 @@ class User extends User_Model
      */
     public static function authAs( $userid )
     {
-        $cookieTime = 3600 * 24;
-        setcookie("userdata", "", 0 - time() - $cookieTime, "/");
-        $_SESSION["core"]["user_backup"][] = $_SESSION['core']['user'];
-        $_SESSION['core']['user'] = $userid;
-        $_SESSION["core"]["user_object"] = serialize( Core::factory( "User", $userid ) );
+        $CurrentUser = self::current();
+        if( $CurrentUser !== false && self::checkUserAccess( ["groups" => [1, 2, 6]], $CurrentUser ) )
+        {
+            $cookieTime = 3600 * 24;
+            setcookie("userdata", "", 0 - time() - $cookieTime, "/");
+            $_SESSION["core"]["user_backup"][] = $_SESSION['core']['user'];
+            $_SESSION['core']['user'] = $userid;
+            $_SESSION["core"]["user_object"] = serialize( Core::factory( "User", $userid ) );
+        }
+        else
+        {
+
+        }
     }
 
 
@@ -268,13 +285,13 @@ class User extends User_Model
     /**
      * Получение пользователя, под которым происходила самая первая рекурсивная авторизация
      *
-     * @return $this|object
+     * @return object|bool
      */
-    public function getParentAuth()
+    public static function parentAuth()
     {
         $backup = Core_Array::getValue( $_SESSION["core"], "user_backup", false );
-        if( $backup == false )      return $this;
-        if( count( $backup ) == 0 ) return $this;
+        if( $backup == false )      return self::current();
+        if( count( $backup ) == 0 ) return self::current();
 
         return Core::factory( "User", $backup[0] );
     }

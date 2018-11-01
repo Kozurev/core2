@@ -22,6 +22,7 @@
             </div>
 
             <input type="hidden" name="id" value="{payment/id}" />
+            <input type="hidden" name="after_save_action" value="{afterSaveAction}" />
             <button class="popop_payment_submit btn btn-default">Сохранить</button>
         </form>
     </xsl:template>

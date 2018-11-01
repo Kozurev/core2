@@ -9,7 +9,7 @@
                     <th>Преподаватель</th>
                     <th>Ученик / Группа</th>
                     <th>Отметка <br/>о явке</th>
-                    <th>Отправить данные</th>
+                    <th>Действия</th>
                 </tr>
                 <xsl:apply-templates select="lesson" />
             </table>
@@ -22,7 +22,8 @@
             <td><xsl:value-of select="/root/date" /></td>
 
             <td>
-                <xsl:value-of select="time_from" /><br/>
+                <xsl:value-of select="time_from" />
+                <xsl:text> - </xsl:text>
                 <xsl:value-of select="time_to" />
             </td>
 
@@ -47,7 +48,20 @@
             </td>
 
             <td>
-                <input type="checkbox" name="attendance" >
+                <!--<input type="checkbox" name="attendance" >-->
+                    <!--<xsl:if test="count(report/id) != 0">-->
+                        <!--<xsl:attribute name="disabled">-->
+                            <!--disabled-->
+                        <!--</xsl:attribute>-->
+                    <!--</xsl:if>-->
+
+                    <!--<xsl:if test="report/attendance = 1">-->
+                        <!--<xsl:attribute name="checked" >-->
+                            <!--checked-->
+                        <!--</xsl:attribute>-->
+                    <!--</xsl:if>-->
+                <!--</input>-->
+                <input type="checkbox" id="attendance{position()}" name="attendance" class="checkbox-new" >
                     <xsl:if test="count(report/id) != 0">
                         <xsl:attribute name="disabled">
                             disabled
@@ -60,6 +74,9 @@
                         </xsl:attribute>
                     </xsl:if>
                 </input>
+                <label for="attendance{position()}" class="label-new">
+                    <div class="tick"><input type="hidden" name="kostul"/></div>
+                </label>
             </td>
 
             <input type="hidden" name="teacherId" value="{../user/id}" />
@@ -80,19 +97,24 @@
             <input type="hidden" name="lessonType" value="{lesson_type}" />
 
             <td>
-                <button class="btn btn-green send_report" >
-                    <xsl:if test="count(report/id) != 0">
-                        <xsl:attribute name="disabled">
-                            disabled
-                        </xsl:attribute>
-                    </xsl:if>
-                    Отправить данные
-                </button>
+                <!--<button class="btn btn-green send_report" >-->
+                    <!--<xsl:if test="count(report/id) != 0">-->
+                        <!--<xsl:attribute name="disabled">-->
+                            <!--disabled-->
+                        <!--</xsl:attribute>-->
+                    <!--</xsl:if>-->
+                    <!--Сохранить-->
+                <!--</button>-->
+
+                <xsl:if test="count(report/id) = 0">
+                    <a class="action save send_report" title="Сохранить отчет о проведении занятия"></a>
+                </xsl:if>
 
                 <xsl:if test="count(report/id) != 0 and /root/is_admin = 1">
-                    <button class="btn btn-danger delete_report">
-                        Отменить
-                    </button>
+                    <!--<button class="btn btn-danger delete_report">-->
+                        <!--Отменить-->
+                    <!--</button>-->
+                    <a class="action unarchive delete_report" title="Отменить отправку отчета"></a>
                 </xsl:if>
 
             </td>

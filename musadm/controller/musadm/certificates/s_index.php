@@ -42,24 +42,53 @@ if( $action === "refreshCertificatesTable" )
 }
 
 
+/**
+ * Содержание всплывающего окна создания / редактирования сертификата
+ */
+if( $action === "edit_popup" )
+{
+    $id = Core_Array::Get( "id", 0 );
+
+    $id == 0 ? $isNew = 1 : $isNew = 0;
+
+    Core::factory( "Core_Entity" )
+        ->addSimpleEntity( "is_new", $isNew )
+        ->addEntity(
+            Core::factory( "Certificate", $id )
+        )
+        ->xsl( "musadm/certificates/new_certificate_popup.xsl" )
+        ->show();
+
+    exit;
+}
+
+
 if( $action === "saveCertificate" )
 {
+    $id =       Core_Array::getValue( $_GET, "id", 0 );
     $sellDate = Core_Array::getValue( $_GET, "sellDate", date( "Y-m-d" ) );
     $activeTo = Core_Array::getValue( $_GET, "activeTo", "" );
     $number =   Core_Array::getValue( $_GET, "number", "000" );
     $note =     Core_Array::getValue( $_GET, "note", "" );
 
-    $oCertificate = Core::factory( "Certificate" )
+    $User = Core::factory( "User" )->getCurrent();
+    $subordinated = $User->getDirector()->getId();
+
+    $oCertificate = Core::factory( "Certificate", $id )
         ->sellDate( $sellDate )
         ->activeTo( $activeTo )
-        ->number( $number );
+        ->number( $number )
+        ->subordinated( $subordinated );
 
     $oCertificate->save();
 
-    $oCertificateNote = Core::factory( "Certificate_Note" )
-        ->text( $note )
-        ->certificateId( $oCertificate->getId() )
-        ->save();
+    if( $note != "" )
+    {
+        $oCertificateNote = Core::factory( "Certificate_Note" )
+            ->text( $note )
+            ->certificateId( $oCertificate->getId() )
+            ->save();
+    }
 
     exit;
 }

@@ -1,10 +1,9 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-
         <div class="lids">
             <div class="row finances_calendar">
-                <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                <div class="right col-lg-1 col-md-1 col-sm-1 col-xs-4">
                     <span>Период с:</span>
                 </div>
 
@@ -12,7 +11,7 @@
                     <input type="date" class="form-control" name="date_from" value="{date_from}"/>
                 </div>
 
-                <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                <div class="right col-lg-1 col-md-1 col-sm-1 col-xs-4">
                     <span>по:</span>
                 </div>
 
@@ -20,8 +19,16 @@
                     <input type="date" class="form-control" name="date_to" value="{date_to}"/>
                 </div>
 
-                <div class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-1 col-md-offset-1 col-xs-12">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                     <a class="btn btn-purple lids_show">Показать</a>
+                </div>
+
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                    <input class="form-control" type="number" id="search_id" placeholder="Номер лида" value="{lid_id}" />
+                </div>
+
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                    <a class="btn btn-purple search">Поиск</a>
                 </div>
             </div>
 
@@ -61,7 +68,6 @@
                 </div>
             </section>
         </div>
-
     </xsl:template>
 
 
@@ -84,7 +90,7 @@
                     <xsl:value-of select="name" /><xsl:text> </xsl:text>
                     <xsl:value-of select="patronimyc" /><xsl:text> </xsl:text>
                 </h3>
-                
+
                 <xsl:if test="number != ''">
                     <p class="intro">
                         <span>Телефон: </span><xsl:value-of select="number" />
@@ -120,9 +126,8 @@
                     </xsl:for-each>
                 </select>
 
-                <!-- <div class="comment_button_box"> -->
-                    <a class="btn btn-purple add_lid_comment" data-lidid="{id}">+</a>
-                <!-- </div> -->
+                <!--<a class="btn btn-purple add_lid_comment" data-lidid="{id}">+</a>-->
+                <a class="action comment add_lid_comment" data-lidid="{id}" title="Добавить комментарий"><input type="hidden" value="kostul" /></a>
 
                 <div class="comments">
                     <input type="hidden" value="KOCTb|J|b" />
@@ -152,5 +157,6 @@
         </div><!--//item-->
 
     </xsl:template>
+
 
 </xsl:stylesheet>

@@ -28,7 +28,7 @@ $this->setParam( "breadcumbs", $breadcumbs );
 $action = Core_Array::getValue($_GET, "action", null);
 
 
-if($action === "refresh_table")
+if($action === "refreshTasksTable")
 {
     $this->execute();
     exit;

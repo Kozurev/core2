@@ -13,39 +13,44 @@
                     </td>
                     <td>
                         <xsl:if test="is_admin = 1">
-                            <a class="btn btn-orange btn_balance" data-userid="{user/id}">
-                                Пополнить баланс
+                            <a class="action add_payment btn_balance" data-userid="{user/id}" title="Зачислить платеж">
+                                <!--Пополнить баланс-->
                             </a>
                         </xsl:if>
                     </td>
                 </tr>
 
                 <tr>
-                    <td>Кол-во индивидуальных занятий</td>
+                    <td>Кол-во индивидуальных / групповых занятий</td>
                     <td>
                         <xsl:call-template name="property">
                             <xsl:with-param name="id" select="'13'"/>
                         </xsl:call-template>
-                    </td>
-                    <td>
-                        <a class="btn btn-orange btn_private_lessons" data-userid="{user/id}">
-                            Купить индивидуальные занятия
-                        </a></td>
-                </tr>
-
-                <tr>
-                    <td>Кол-во групповых занятий</td>
-                    <td>
+                        <xsl:text> / </xsl:text>
                         <xsl:call-template name="property">
                             <xsl:with-param name="id" select="'14'"/>
                         </xsl:call-template>
                     </td>
-                    <td>
-                        <a class="btn btn-orange btn_group_lessons" data-userid="{user/id}">
-                            Купить групповые занятия
+                    <td rowspan="2">
+                        <a class="action buy btn_private_lessons" data-userid="{user/id}">
+                            <!--Купить индивидуальные занятия-->
                         </a>
                     </td>
                 </tr>
+
+                <!--<tr>-->
+                    <!--<td>Кол-во групповых занятий</td>-->
+                    <!--<td>-->
+                        <!--<xsl:call-template name="property">-->
+                            <!--<xsl:with-param name="id" select="'14'"/>-->
+                        <!--</xsl:call-template>-->
+                    <!--</td>-->
+                    <!--<td>-->
+                        <!--<a class="btn btn-orange btn_group_lessons" data-userid="{user/id}">-->
+                            <!--Купить групповые занятия-->
+                        <!--</a>-->
+                    <!--</td>-->
+                <!--</tr>-->
             </table>
         </div>
     </xsl:template>

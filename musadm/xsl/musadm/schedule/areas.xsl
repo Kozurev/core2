@@ -37,11 +37,20 @@
             <td><a href="/{/root/wwwroot}schedule/{path}"><xsl:value-of select="title" /></a></td>
             <td><xsl:value-of select="count_classess" /></td>
             <td>
-                <input type="checkbox" name="schedule_area_active" data-area_id="{id}">
+                <!--<input type="checkbox" name="schedule_area_active" data-area_id="{id}">-->
+                    <!--<xsl:if test="active = 1">-->
+                        <!--<xsl:attribute name="checked">true</xsl:attribute>-->
+                    <!--</xsl:if>-->
+                <!--</input>-->
+
+                <input type="checkbox" name="schedule_area_active" id="schedule_area_active{position()}" data-area_id="{id}" class="checkbox-new" >
                     <xsl:if test="active = 1">
-                        <xsl:attribute name="checked">true</xsl:attribute>
+                        <xsl:attribute name="checked">checked</xsl:attribute>
                     </xsl:if>
                 </input>
+                <label for="schedule_area_active{position()}" class="label-new">
+                    <div class="tick"><input type="hidden" name="kostul"/></div>
+                </label>
             </td>
 
             <td>

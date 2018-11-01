@@ -332,12 +332,12 @@ class Schedule_Controller
             if( $today === $table[$i]["date"] ) echo "<td style='background-color: #75c181'>";
             else echo "<td>";
 
-            echo "<span class='date'>" . refactorDateFormat( $table[$i]["date"], ".", "short" ) . "</span><hr/>";
+            echo "<span class='date'>" . refactorDateFormat( $table[$i]["date"], ".", "short" ) . "</span>";
 
             if( count( $table[$i]["lessons"] ) > 0 )
             {
                 $Area = Core::factory( "Schedule_Area", $table[$i]["lessons"][0]->areaId() );
-                echo "<span class='area'>". $Area->title() ."</span><hr/>";
+                echo "<hr/><span class='area'>". $Area->title() ."</span><hr/>";
             }
 
             if( count( $table[$i]["lessons"] ) > 0 )
@@ -350,7 +350,8 @@ class Schedule_Controller
                     if( Core::factory( "User", $this->userId )->groupId() == 5 )
                     {
                         $Teacher = $Lesson->getTeacher();
-                        $teacherFIO = $Teacher->surname() . " " . $Teacher->name();
+                        if( $Teacher === false )    $teacherFIO = "Пользователь был удален";
+                        else $teacherFIO = $Teacher->surname() . " " . $Teacher->name();
                         echo "<span class=\"teacher\"> $teacherFIO</span>";
                     }
 

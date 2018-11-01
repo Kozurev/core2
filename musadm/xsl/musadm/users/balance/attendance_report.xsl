@@ -57,9 +57,16 @@
             </td>
 
             <td>
-                <xsl:value-of select="surname" />
-                <xsl:text> </xsl:text>
-                <xsl:value-of select="name" />
+                <xsl:choose>
+                    <xsl:when test="surname != '' and name != ''">
+                        <xsl:value-of select="surname" />
+                        <xsl:text> </xsl:text>
+                        <xsl:value-of select="name" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        Пользователь был удален
+                    </xsl:otherwise>
+                </xsl:choose>
             </td>
         </tr>
     </xsl:template>

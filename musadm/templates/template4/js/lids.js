@@ -1,3 +1,5 @@
+var root = $("#rootdir").val();
+
 $(function(){
     $(document)
         .on("click", ".lid_submit", function(e){
@@ -38,9 +40,26 @@ $(function(){
         .on("click", ".lids_show", function(){
             loaderOn();
             refreshLidTable();
+        })
+        .on("click", ".search", function(e){
+            e.preventDefault();
+            loaderOn();
+            var lidId = $("#search_id").val();
+            if( lidId == "" )
+            {
+                $("#search_id").addClass("error");
+                alert("Введите номер лида в соответствующее поле");
+                loaderOff();
+                return false;
+            }
+            findLid( lidId );
         });
 });
 
+
+/**
+ * Перезагрузка блока с классом lids
+ */
 function refreshLidTable() {
 
     var dateFrom = $("input[name=date_from]").val();
@@ -63,10 +82,39 @@ function refreshLidTable() {
     });
 }
 
+
+/**
+ * Поиск лида по id
+ *
+ * @param id - id лида
+ */
+function findLid(id) {
+    $.ajax({
+        type: "GET",
+        url: "",
+        async: false,
+        data: {
+            action: "refreshLidTable",
+            lidid: id
+        },
+        success: function(responce){
+            $(".lids").empty();
+            $(".lids").append(responce);
+            loaderOff();
+        }
+    });
+}
+
+
+/**
+ * Открытие всплывающего окна для добавления комментария
+ *
+ * @param lidid - id лида
+ */
 function getCommentPopup(lidid){
     $.ajax({
         type: "GET",
-        url: "lids",
+        url: root + "lids",
         data: {
             action: "add_note_popup",
             model_id: lidid
@@ -78,10 +126,16 @@ function getCommentPopup(lidid){
 }
 
 
+/**
+ * Сохранение лида
+ *
+ * @param data - данные формы создания лида
+ * @param func - функция, выполняющаяся после сохранения
+ */
 function saveLid(data, func){
     $.ajax({
         type: "GET",
-        url: "lids?action=save_lid",
+        url: root + "lids?action=save_lid",
         async: false,
         data: data,
         success: function(responce){
@@ -90,10 +144,18 @@ function saveLid(data, func){
     });
 }
 
+
+/**
+ * Обработчик изменения статуса лида
+ *
+ * @param lidid - id лида
+ * @param statusid - id статуса
+ * @param func - функция выполняющаяся после выполнения
+ */
 function changeStatus(lidid, statusid, func){
     $.ajax({
         type: "GET",
-        url: "",
+        url: root + "lids",
         data: {
             action: "changeStatus",
             model_id: lidid,
@@ -105,10 +167,18 @@ function changeStatus(lidid, statusid, func){
     });
 }
 
+
+/**
+ * Изменение даты контроля лида
+ *
+ * @param lidid
+ * @param date
+ * @param func
+ */
 function changeDate(lidid, date, func){
     $.ajax({
         type: "GET",
-        url: "lids",
+        url: root + "lids",
         async: false,
         data: {
             action: "changeDate",

@@ -72,6 +72,10 @@ $(function(){
             var userid = $(this).data("userid");
             getTarifPopup(userid, 2);
         })
+
+        /**
+         * Покупка тарифа
+         */
         .on("click", ".popop_buy_tarif_submit", function(e){
             e.preventDefault();
             loaderOn();
@@ -79,10 +83,15 @@ $(function(){
             var userid = $(this).data("userid");
             buyTarif(userid, tarifid);
         })
+
+        /**
+         * Форма открытия/скрытия блока (таблицы) с существующими тарифами
+         */
         .on("click", ".tarifs_show", function(e){
             e.preventDefault();
 
             var TarifsBlock = $(".tarifs");
+
             if(TarifsBlock.css("display") === "block")
             {
                 TarifsBlock.hide("slow");
@@ -92,26 +101,47 @@ $(function(){
                 TarifsBlock.show("slow");
             }
         })
+
+        /**
+         * Удаление тарифа
+         */
         .on("click", ".tarif_delete", function(e){
             e.preventDefault();
             var tarifid = $(this).data("model_id");
             deleteItem("Payment_Tarif", tarifid, refreshPayments);
         })
+
+        /**
+         * Открытие всплывающего окна создания/редактирования nfhbaf
+         */
         .on("click", ".tarif_edit", function(e){
             e.preventDefault();
             var tarifid = $(this).data("tarifid");
             editTarifPopup(tarifid);
         })
+
+        /**
+         * Сохранения формы редактирования тарифа
+         */
         .on("click", ".popop_tarif_submit", function(e){
             e.preventDefault();
             loaderOn();
             saveData("Main", refreshPayments);
         })
+
+        /**
+         * Открытие всплывающего окна создания/редактирования платежа
+         */
         .on("click", ".payment_edit", function(e){
             e.preventDefault();
             var id = $(this).data("id");
-            editPaymentPopup(id);
+            var afterSaveAction = $(this).data("after_save_action");
+            editPaymentPopup(id, afterSaveAction);
         })
+
+        /**
+         * Сохранение формы редактирования платежа
+         */
         .on("click", ".popop_payment_submit", function(e){
             e.preventDefault();
             loaderOn();
@@ -120,6 +150,7 @@ $(function(){
             var value = Form.find("input[name=summ]").val();
             var date = Form.find("input[name=date]").val();
             var description = Form.find("textarea[name=description]").val();
+            var afterSaveAction = Form.find("input[name=after_save_action]").val();
 
             $.ajax({
                 type: "GET",
@@ -132,10 +163,25 @@ $(function(){
                     description: description
                 },
                 success: function(responce){
-                    $(".users").empty();
-                    $(".users").html(responce);
                     closePopup();
-                    loaderOff();
+
+                    /**
+                     * Сохранение изменений свойств платежа может происходить из разных разделов и требуют
+                     * различных действия для обновления контента страницы.
+                     * На данный момент информация о платеже редактируется из разделов клиента и страницы расписания преподавателя
+                     */
+                    switch (afterSaveAction)
+                    {
+                        case 'client':  //обновление контента страницы клиента
+                            $(".users").empty();
+                            $(".users").html(responce);
+                            loaderOff();
+                            break;
+                        case 'teacher': //обновление контента страницы преподавателя
+                            refreshSchedule();
+                            break;
+                        default: loaderOff();
+                    }
                 }
             });
         })
@@ -161,13 +207,14 @@ $(function(){
 });
 
 
-function editPaymentPopup(id) {
+function editPaymentPopup(id, afterSaveAction) {
     $.ajax({
         type: "GET",
         url: root + "balance",
         data: {
             action: "edit_payment",
-            id: id
+            id: id,
+            afterSaveAction: afterSaveAction
         },
         success: function(responce){
             showPopup(responce);
@@ -181,7 +228,7 @@ function editTarifPopup(tarifid) {
         type: "GET",
         url: "finances",
         data: {
-            action: "edit_payment_popup",
+            action: "edit_tarif_popup",
             tarifid: tarifid
         },
         success: function(responce) {

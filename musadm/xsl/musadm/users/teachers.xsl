@@ -4,13 +4,15 @@
 
     <xsl:template match="root">
 
-        <h2>Список преподавателей</h2>
+        <xsl:if test="is_director = 1">
+            <h2>Список преподавателей</h2>
 
-        <div class="row buttons-panel">
-            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                <a class="btn btn-primary user_create" data-usergroup="4">Создать пользователя</a>
+            <div class="row buttons-panel">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <a class="btn btn-primary user_create" data-usergroup="4">Создать пользователя</a>
+                </div>
             </div>
-        </div>
+        </xsl:if>
 
         <div class="table-responsive">
             <table id="sortingTable" class="table table-striped">
@@ -41,8 +43,10 @@
             <td><xsl:value-of select="property_value[property_id = 20]/value" /></td>
             <td><xsl:value-of select="property_value[property_id = 31]/value" /></td>
             <td>
-                <a class="action edit user_edit" href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
-                <a class="action archive user_archive"     href="#" data-userid="{id}"></a>
+                <xsl:if test="/root/is_director = 1">
+                    <a class="action edit user_edit" href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
+                    <a class="action archive user_archive"     href="#" data-userid="{id}"></a>
+                </xsl:if>
             </td>
         </tr>
     </xsl:template>

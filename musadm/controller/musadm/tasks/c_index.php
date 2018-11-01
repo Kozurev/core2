@@ -75,9 +75,11 @@ foreach ( $Notes as $Note )
     $Note->date( date( "d.m.Y H:i", $time ) );
 }
 
+echo "<div class='tasks'>";
 $output
     ->addEntities( $Tasks )
     ->addEntities( $Notes )
+    ->addSimpleEntity( "periods", "1" )
     ->xsl( "musadm/tasks/all.xsl" )
     ->show();
-
+echo "</div>";

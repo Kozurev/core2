@@ -6,8 +6,8 @@ class Page_Template_Model extends Core_Entity
 {
 	protected $id;
 	protected $title;
-	protected $parent_id;
-	protected $dir;
+	protected $parent_id = 0;
+	protected $dir = 0;
 
 	public function getId(){
 		return $this->id;}

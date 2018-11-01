@@ -9,6 +9,7 @@ body {
 
 .error {
     color: red;
+    border-color: red;
 }
 
 .default {
@@ -27,6 +28,10 @@ body {
     text-align: center;
 }
 
+.table-statused tr {
+    border-left: 5px solid;
+    border-right: 5px solid;
+}
 
 .table-responsive {
     border: none;
@@ -51,8 +56,8 @@ header {
 }
 
 .table {
-    font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-    font-size: 14px;
+    font-family: serif;
+    font-size: 17px;
 }
 
 
@@ -114,23 +119,29 @@ header {
  */
 .action {
     display: inline-block;
-    height: 25px;
-    width: 25px;
+    height: 35px;
+    width: 35px;
     margin: 0px 2px 0px 2px;
+    cursor: pointer !important;
 }
 
 .save {
-    background-image: url(../images/save.png);
+    background-image: url("../images/save1.png");
     background-size: cover;
 }
 
 .add_payment {
-    background: url(../images/money.png);
+    background: url("../images/money2.png");
+    background-size: cover;
+}
+
+.pay {
+    background: url("../images/add_payment.png");
     background-size: cover;
 }
 
 .append_done {
-    background-image: url("../images/append_ok.png");
+    background-image: url("../images/append_ok2.png");
     background-size: cover;
 }
 
@@ -139,23 +150,34 @@ header {
     background-size: cover;
 }
 
+.comment {
+    background: url("../images/comment2.png");
+    background-size: cover;
+}
+
 .edit {
-    background: url(../images/edit.png);
+    background: url("../images/edit2.svg");
     background-size: cover;
 }
 
 .archive {
-    background: url(../images/archive.png);
+    background: url("../images/archive2.png");
     background-size: cover;
 }
 
 .unarchive {
-    background: url(../images/archiveminus.png);
+    background: url("../images/archiveminus2.png");
     background-size: cover;
 }
 
 .delete {
-    background: url(../images/delete.png);
+    background: url("../images/delete2.svg");
+    background-size: cover;
+    background-position-x: -4px;
+}
+
+.buy {
+    background: url("../images/buy2.png");
     background-size: cover;
 }
 /**
@@ -168,21 +190,41 @@ header {
  *  Подсветка пользователей 
  *  Начало>>
  */
+
 .positive {
     /*background-color:#78FC5A !important;*/
     background-color: rgba(120, 252, 90, 0.7) !important;
+    /*border-color: rgba(120, 252, 90, 0.7) !important;*/
 }
 .negative {
     /*background-color:#f77b6b !important;*/
     background-color: rgba(247, 123, 107, 0.7) !important;
+    /*border-color: rgba(247, 123, 107, 0.7) !important;*/
 }
 .neutral {
     /*background-color:#F0EDEA !important;*/
     background-color: rgba(240, 237, 234, 0.7) !important;
+    /*border-color: rgba(240, 237, 234, 0.7) !important;*/
 }
 
 .group {
     background: lightblue !important;
+}
+
+.users .positive {
+    /*background-color:#78FC5A !important;*/
+    background-color: inherit !important;
+    border-color: rgba(120, 252, 90, 0.7) !important;
+}
+.users .negative {
+    /*background-color:#f77b6b !important;*/
+    background-color: inherit !important;
+    border-color: rgba(247, 123, 107, 0.7) !important;
+}
+.users .neutral {
+    /*background-color:#F0EDEA !important;*/
+    background-color: inherit !important;
+    border-color: rgba(240, 237, 234, 0.7) !important;
 }
 /**
  *  <<Конец 
@@ -246,6 +288,12 @@ header {
     margin-bottom: 20px;
 }
 
+.teacher_table td,
+.teacher_table th {
+    vertical-align: middle;
+    text-align: center;
+}
+
 /*.schedule_calendar {*/
     /*width: 14%;*/
     /*display: inline-block;*/
@@ -259,6 +307,36 @@ header {
 /**
  * <<Конец
  * Расписание
+ */
+
+
+
+/**
+ * Динамически-фиксированный блок на индексной странице у менеджера
+ * Начало>>
+ */
+
+.dynamic-fixed-row {
+    position: sticky;
+    width: 1140px;
+    z-index: 998;
+    background-color: #f9f9fb;
+    top: -115px;
+    padding-top: 10px;
+    margin-bottom: 20px;
+}
+
+.dynamic-fixed-row .searching-row {
+    margin-bottom: 20px;
+}
+
+/*.dynamic-fixed-row .table {*/
+    /*position: sticky;*/
+/*}*/
+
+/**
+ * <<Конец
+ * Динамически-фиксированный блок на индексной странице у менеджера
  */
 
 

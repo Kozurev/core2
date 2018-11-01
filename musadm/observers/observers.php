@@ -1,10 +1,13 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 13.04.2018
- * Time: 13:52
+ * Наблюдатели
+ *
+ * @author: Kozurev Egor
+ * @date: 13.04.2018 13:52
  */
+
+require_once "subordinated.php";
+
 
 /**
  * Добавление ФИО преподавателя в список дополнительного свойства "Преподаватель"
@@ -12,21 +15,23 @@
 Core::attachObserver("beforeUserSave", function($args){
     $oUser = $args[0];
 
-    if($oUser->groupId() == 4 && $oUser->getId() == "")
+    $Director = User::current()->getDirector();
+    if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+    $subordinated = $Director->getId();
+
+    if( $oUser->groupId() == 4 && $oUser->getId() == "" )
     {
         $teacherFullName = $oUser->surname() . " " . $oUser->name();
 
-        Core::factory("Property_List_Values")
-            ->property_id(21)
-            ->value($teacherFullName)
+        Core::factory( "Property_List_Values" )
+            ->property_id( 21 )
+            ->value( $teacherFullName )
+            ->subordinated( $subordinated )
             ->save();
     }
 
     if( $oUser->groupId() != 6 && $oUser->groupId() != 1 )
     {
-        $User = Core::factory( "User" )->getCurrent();
-        $subordinated = $User->getDirector()->getId();
-
         if( $oUser->subordinated() == 0 )
         {
             $oUser->subordinated( $subordinated );
@@ -40,10 +45,16 @@ Core::attachObserver("beforeUserSave", function($args){
  */
 Core::attachObserver("beforeUserDelete", function($args){
     $oUser = $args[0];
+
     if($oUser->groupId() == 4)
     {
+        $Director = User::current()->getDirector();
+        if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+        $subordinated = $Director->getId();
+
         $listValue = Core::factory("Property_List_Values")
             ->where("property_id", "=", 21)
+            ->where( "subordinated", "=", $subordinated )
             ->where("value", "like", "%".$oUser->name()."%")
             ->where("value", "like", "%".$oUser->surname()."%")
             ->find();
@@ -56,38 +67,101 @@ Core::attachObserver("beforeUserDelete", function($args){
 
 
 /**
+ * Создание элемента списка "Студия"
+ */
+Core::attachObserver("beforeScheduleAreaSave", function( $args ){
+    $Area = $args[0];
+
+    //Формирование пути
+    if( $Area->path() == "" )
+    {
+        $Area->path( translite( $Area->title() ) );
+    }
+
+    //Создание элемента списка дополнительного свойства
+    if( $Area->getId() == "" )
+    {
+        $Director = User::current()->getDirector();
+        if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+        $subordinated = $Director->getId();
+
+        Core::factory( "Property_List_Values" )
+            ->property_id( 15 )
+            ->value( $Area->title() )
+            ->subordinated( $subordinated )
+            ->save();
+    }
+
+    //Проверка на существование филиала с таким же путем
+    if( !$Area->getId() && Core::factory( "Schedule_Area" )->where( "path", "=", $Area->path() )->find() )
+        die( "Сохранение невозможно, так как уже существует филлиал имеющий путь: \"" . $Area->path() . "\"" );
+});
+
+
+/**
+ * Удаление элемента списка "Студия"
+ */
+Core::attachObserver("beforeScheduleAreaDelete", function( $args ){
+    $Area = $args[0];
+
+    $listValue = Core::factory( "Property_List_Values" )
+        ->where( "property_id", "=", 15 )
+        ->where( "value", "like", "%".$Area->title()."%" )
+        ->find();
+
+    if( $listValue ) $listValue->delete();
+});
+
+
+/**
+ * Удаление всех связей с удаляемым элементом списка доп. свойства
+ */
+Core::attachObserver("beforePropertyListValuesDelete", function( $args ){
+    $PropertyListValue = $args[0];
+
+    $aoPropertyLists = Core::factory( "Property_List" )
+        ->where( "property_id", "=", $PropertyListValue->property_id() )
+        ->where( "value_id", "=", $PropertyListValue->getId() )
+        ->findAll();
+
+    foreach ($aoPropertyLists as $val)  $val->delete();
+});
+
+
+/**
  * Удаление всех занятий и связей с группами, принадлежащие этому пользователю
  */
 Core::attachObserver("beforeUserDelete", function($args){
     $oUser = $args[0];
 
-    /**
-     * Удаление принадлежности к группам
-     */
+    //Удаление принадлежности к группам
     $aoGroupsAssignments = Core::factory("Schedule_Group_Assignment")
         ->where("user_id", "=", $oUser->getId())
         ->findAll();
 
     foreach ($aoGroupsAssignments as $oAssignment)  $oAssignment->delete();
 
-    /**
-     * Если пользователь был учителем одной из групп необъодимо откорректировать свойство teracher_id
-     */
+    //Если пользователь был учителем одной из групп необходимо откорректировать свойство teracher_id
     $aoGroups = Core::factory("Schedule_Group")
         ->where("teacher_id", "=", $oUser->getId())
         ->findAll();
 
     foreach ($aoGroups as $oGroup)  $oGroup->teacherId("0")->save();
 
-    /**
-     * Поиск занятий, с которымисвязан пользователь и удаление
-     */
+    //Поиск занятий, с которымисвязан пользователь и удаление
     $aoLessons = Core::factory("Schedule_Lesson")
         ->where("client_id", "=", $oUser->getId())
         ->where("teacher_id", "=", $oUser->getId(), "OR")
         ->findAll();
 
-    foreach ($aoLessons as $oLesson)    $oLesson->delete();
+    foreach ( $aoLessons as $Lesson )
+    {
+        if( $Lesson->lessonType() == 1 )
+        {
+            $Lesson->markDeleted( date("Y-m-d") );
+        }
+    }
+
 });
 
 
@@ -358,63 +432,14 @@ Core::attachObserver( "afterScheduleReportSave", function( $args ){
 
 
 /**
- * Проверка на совпадения по свойству path
- * и транслитное автоматическое задание данного свойства
- */
-Core::attachObserver("beforeScheduleAreaSave", function($args){
-    $Area = $args[0];
-
-    if( $Area->path() == "" )
-    {
-        $Area->path( translite( $Area->title() ) );
-    }
-
-    if( $Area->subordinated() == 0 )
-    {
-        $oUser = Core::factory( "User" )->getCurrent()->getDirector();
-        $Area->subordinated( $oUser->getId() );
-    }
-
-    if( !$Area->getId() && Core::factory( "Schedule_Area" )->where( "path", "=", $Area->path() )->find() )
-        die( "Сохранение невозможно, так как уже существует филлиал имеющий путь: \"" . $Area->path() . "\"" );
-
-});
-
-
-/**
  *
  */
-Core::attachObserver("beforePaymentSave", function($args){
-    $Payment = $args[0];
-
-    if( $Payment->subordinated() == 0 )
-    {
-        $oUser = Core::factory( "User" )->getCurrent()->getDirector();
-        $Payment->subordinated( $oUser->getId() );
-    }
-});
-
-
-/**
- *
- */
-Core::attachObserver("beforeScheduleGroupSave", function($args){
-    $Group = $args[0];
-
-    if( $Group->subordinated() == 0 )
-    {
-        $oUser = Core::factory( "User" )->getCurrent()->getDirector();
-        $Group->subordinated( $oUser->getId() );
-    }
-});
-
-
-Core::attachObserver( "beforeTaskSave", function( $args ){
-    $Task = $args[0];
-
-    if( $Task->subordinated() == 0 )
-    {
-        $User = Core::factory( "User" )->getCurrent()->getDirector();
-        $Task->subordinated( $User->getId() );
-    }
-});
+//Core::attachObserver("beforePaymentSave", function( $args ){
+//    $Payment = $args[0];
+//
+//    if( $Payment->getId() == "" && $Payment->type() == 3 )
+//    {
+//        $description = $Payment->description();
+//        $Payment->description( "Выплата преподавателю. " . $description  );
+//    }
+//});

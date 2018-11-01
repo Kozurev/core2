@@ -20,6 +20,9 @@
         ->css( "/templates/template10/assets/css/balance.css" )
         ->css( "/templates/template10/assets/css/lids.css" )
         ->css( "/templates/template10/assets/css/finances.css" )
+        ->css( "/templates/template10/assets/css/tasks.css" )
+        ->css( "/templates/template10/assets/css/checkbox.css" )
+        ->css( "/templates/template10/assets/css/tooltip.css" )
         ->js( "/templates/template10/assets/plugins/jquery.min.js" );
 
         global $CFG;
@@ -35,10 +38,28 @@
         $Director = User::current()->getDirector();
         if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
         $subordinated = $Director->getId();
+
+        switch ( $this->getParam( "body-class", "" ) )
+        {
+            case "body-orange":     $hover = '#F88C30';     break;
+            case "body-primary":    $hover = '#40babd';     break;
+            case "body-blue":       $hover = '#58bbee';     break;
+            case "body-red":        $hover = '#f77b6b';     break;
+            case "body-pink":       $hover = '#EA5395';     break;
+            case "body-green":      $hover = '#75c181';     break;
+            default:                $hover = 'black';
+        }
+
     ?>
 </head>
 
 <body class="<?=$this->getParam( "body-class", "" )?>">
+
+    <style>
+        :root {
+            --hover-color: <?=$hover?>;
+        }
+    </style>
 
     <div class="loader" style="display: none"></div>
     <div class="popup"></div>

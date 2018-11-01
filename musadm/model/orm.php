@@ -28,6 +28,29 @@ class Orm
 * 	Начлао>>
 */
 
+
+    /**
+     * Переключатель режима отладки SQL-запросов
+     *
+     * @param bool $switch - указатель
+     */
+    public static function Debug( $switch )
+    {
+        $_SESSION["core"]["SQL_DEBUG"] = $switch;
+    }
+
+
+    /**
+     * Проверка на включенность отладки
+     *
+     * @return bool
+     */
+    private static function isDebugSql()
+    {
+        return Core_Array::getValue( $_SESSION["core"], "SQL_DEBUG", false ) === true;
+    }
+
+
 	/**
 	*	Возвращает название таблицы для данного объекта
 	*	@return string
@@ -83,7 +106,7 @@ class Orm
 		$this->setQueryString();
 		$result = Core_Database::getConnect()->query($this->queryString);
 
-        if(TEST_MODE_ORM)
+        if( self::isDebugSql() )
         {
             echo "<br>Строка запроса метода <b>getCount()</b>: ".$this->queryString;
         }
@@ -168,7 +191,7 @@ class Orm
 			$queryStr .= ") ";
 		}
 
-		if(TEST_MODE_ORM)
+		if( self::isDebugSql() )
 		{
 			echo "<br>Строка запроса метода <b>save()</b>: ".$queryStr;
 		}
@@ -264,7 +287,7 @@ class Orm
 	public function executeQuery($sql)
 	{
 		//$this->setConnect();
-		if(TEST_MODE_ORM) echo "<br>Строка из метода <b>executeQuery()</b>: ".$sql;
+		if( self::isDebugSql() ) echo "<br>Строка из метода <b>executeQuery()</b>: ".$sql;
 		$result = Core_Database::getConnect()->query($sql);
 		return $result;
 	}
@@ -303,7 +326,7 @@ class Orm
 		$sTableName = $obj->getTableName();
 		$query = "DELETE FROM " . $sTableName . " WHERE id = " . $obj->getId();
         $this->executeQuery($query);
-		if(TEST_MODE_ORM) echo "<br>Строка из метода <b>delete()</b>: " . $query;
+		if( self::isDebugSql() ) echo "<br>Строка из метода <b>delete()</b>: " . $query;
 	}
 
 
@@ -568,7 +591,7 @@ class Orm
 	{
 		$this->setQueryString();
 
-		if(TEST_MODE_ORM)
+		if( self::isDebugSql() )
 		{
 			echo "<br>Строка запроса из метода <b>findAll()</b>: ".$this->queryString;
 		}
@@ -600,7 +623,7 @@ class Orm
 	{
 		$this->setQueryString();
 
-		if(TEST_MODE_ORM)
+		if( self::isDebugSql() )
 		{
 			echo "<br>Строка запроса из метода <b>find()</b>: ".$this->queryString;
 		}

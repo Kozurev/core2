@@ -1257,6 +1257,11 @@ select {
 .cards-section .item-purple .icon {
   color: #8A40A7;
 }
+
+
+
+
+
 /* Extra small devices (phones, less than 768px) */
 @media (max-width: 767px) {
   .cards-section .item-inner {

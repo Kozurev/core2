@@ -1,3 +1,5 @@
+var root = $("#rootdir").val();
+
 $(function(){
     $("body")
         .on("click", ".task_create", function(e){
@@ -12,7 +14,7 @@ $(function(){
             if(form.valid())
             {
                 var formData = form.serialize();
-                saveTask(formData, refreshTableAll);
+                saveTask(formData, refreshTasksTable);
             }
             else
             {
@@ -31,8 +33,8 @@ $(function(){
             taskDateVal = taskYear + "-" + taskMonth + "-" + taskDay;
 
             taskDate.remove();
-            $(this).parent().append("<input type='date' value='" + taskDateVal + "'> ");
-            $(this).parent().append("<a href='#' class='action save save_task_date' data-task_id='" + taskId + "'></a>");
+            $(this).parent().append("<input type='date' value='" + taskDateVal + "' class='form-control'> ");
+            $(this).parent().append("<a href='#' class='action save save_task_date' data-task_id='" + taskId + "' title='Сохранить изменения'></a>");
             $(this).remove();
         })
         .on("click", ".save_task_date", function(e){
@@ -65,13 +67,13 @@ $(function(){
         .on("click", ".popop_task_note_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("Main", refreshTableAll);
+            saveData("Main", refreshTasksTable);
         })
         .on("click", ".tasks_show", function(){
             loaderOn();
             var dateFrom = $("input[name=date_from]").val();
             var dateTo = $("input[name=date_to]").val();
-            refreshTableAll(dateFrom, dateTo);
+            refreshTasksTable(dateFrom, dateTo);
         });
 });
 
@@ -94,7 +96,7 @@ function addTaskNotePopup(task_id) {
 function markAsDone(task_id, func) {
     $.ajax({
         type: "GET",
-        url: "",
+        url: root + "tasks",
         data: {
             action: "markAsDone",
             task_id: task_id
@@ -106,7 +108,7 @@ function markAsDone(task_id, func) {
                 loaderOff();
                 return;
             }
-            refreshTableAll();
+            refreshTasksTable();
             func();
         }
     });
@@ -116,7 +118,7 @@ function markAsDone(task_id, func) {
 function updateTaskDate(taskId, taskDate) {
     $.ajax({
         type: "GET",
-        url: "",
+        url: root + "tasks",
         data: {
             action: "update_date",
             task_id: taskId,
@@ -127,18 +129,18 @@ function updateTaskDate(taskId, taskDate) {
 }
 
 
-function refreshTableAll(from, to) {
+function refreshTasksTable(from, to) {
     $.ajax({
         type: "GET",
         url: "",
         data: {
-            action: "refresh_table",
+            action: "refreshTasksTable",
             date_from: from,
             date_to: to
         },
         success: function(responce){
-            $(".page").empty();
-            $(".page").append(responce);
+            $(".tasks").empty();
+            $(".tasks").append(responce);
             loaderOff();
         }
     });
@@ -148,7 +150,7 @@ function refreshTableAll(from, to) {
 function newTaskPopup() {
     $.ajax({
         type: "GET",
-        url: "",
+        url: root + "tasks",
         data: {
             action: "new_task_popup",
         },
@@ -164,7 +166,7 @@ function saveTask(formData, func) {
 
     $.ajax({
         type: "GET",
-        url: "",
+        url: root + "tasks",
         data: formData,
         success: function(responce){
             if(responce != "0") alert(responce);

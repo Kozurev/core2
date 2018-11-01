@@ -13,7 +13,7 @@
 $oUser = Core::factory("User")->getCurrent();
 
 $accessRules = array(
-    "groups"    => array(1, 2, 6)
+    "groups"    => array(1, 6)
 );
 
 if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
@@ -43,6 +43,9 @@ if($action === "show")
 }
 
 
+/**
+ * Сохранение платежа типа "Хозрасходы"
+ */
 if($action === "saveCustomPayment")
 {
     $summ = Core_Array::getValue($_GET, "summ", 0);
@@ -62,9 +65,13 @@ if($action === "saveCustomPayment")
 }
 
 
-if( $action === "edit_payment_popup" )
+/**
+ * Создание / редактирование тарифа
+ */
+if( $action === "edit_tarif_popup" )
 {
     $tarifId = Core_Array::Get( "tarifid", null );
+
     if( $tarifId !== null ) $Tarif = Core::factory( "Payment_Tarif", $tarifId );
     else    $Tarif = Core::factory( "Payment_Tarif" );
 

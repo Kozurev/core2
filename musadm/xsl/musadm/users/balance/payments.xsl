@@ -2,22 +2,10 @@
 
     <xsl:template match="root">
 
-        <!--<style>-->
-            <!--.positive {-->
-            <!--background-color:palegreen !important;-->
-            <!--}-->
-            <!--.negative {-->
-            <!--background-color:indianred !important;-->
-            <!--}-->
-            <!--.neutral {-->
-            <!--background-color:lightyellow !important;-->
-            <!--}-->
-        <!--</style>-->
-
         <h3>Список платежей</h3>
 
         <div class="balance-payments tab">
-            <table id="sortingTable" class="table">
+            <table id="sortingTable" class="table table-statused">
                 <thead>
                     <tr class="header">
                         <th>Дата</th>
@@ -38,7 +26,6 @@
 
 
     <xsl:template match="payment">
-
         <xsl:variable name="class">
             <xsl:choose>
                 <xsl:when test="type = 1">positive</xsl:when>
@@ -47,11 +34,11 @@
             </xsl:choose>
         </xsl:variable>
 
-        <tr>
-            <td class="{$class}"><xsl:value-of select="datetime" /></td>
-            <td class="{$class}"><xsl:value-of select="value" /></td>
+        <tr class="{$class}">
+            <td><xsl:value-of select="datetime" /></td>
+            <td><xsl:value-of select="value" /></td>
 
-            <td class="{$class}">
+            <td>
                 <xsl:if test="description != ''"><xsl:value-of select="description" /></xsl:if>
 
                 <xsl:if test="//is_admin = 1">
@@ -62,11 +49,11 @@
             </td>
 
             <xsl:if test="//is_admin = 1">
-                <td class="{$class}" style="text-align:center">
-                    <a class="btn btn-orange payment_add_note" data-modelid="{./id}">+</a>
+                <td style="text-align:center">
+                    <a class="action comment payment_add_note" data-modelid="{./id}" title="Добавить комментарий"></a>
                     <xsl:if test="//parent_user/group_id = 1 or //parent_user/group_id = 6">
-                        <a class="action edit payment_edit" href="#" data-id="{id}"></a>
-                        <a class="action delete payment_delete" href="#" data-id="{id}"></a>
+                        <a class="action edit payment_edit" href="#" data-id="{id}" data-after_save_action="client" title="Редактирование платежа"></a>
+                        <a class="action delete payment_delete" href="#" data-id="{id}" data-after_save_action="client" title="Удаление платежа"></a>
                     </xsl:if>
                 </td>
             </xsl:if>

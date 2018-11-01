@@ -40,8 +40,11 @@ require_once ROOT . "/model/user.php";
 
 //Установка системных констант
 define('TEST_MODE_PAGE', false);
-define('TEST_MODE_ORM', false);
+//define('TEST_MODE_ORM', false);
 define('TEST_MODE_FACTORY', false);
+
+//Выключение отладки SQL-запросов
+Orm::Debug( false );
 
 //Объявление констант
 Core::factory("Constant")->setAllConstants();

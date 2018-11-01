@@ -103,7 +103,7 @@ if( $oUser->groupId() == 5 )
 
 $UserReports = Core::factory( "Schedule_Lesson_Report" )
     ->select( array( "attendance", "date", "lesson_id", "lesson_type", "surname", "name" ) )
-    ->join( "User AS usr", "usr.id = teacher_id" )
+    ->leftJoin( "User AS usr", "usr.id = teacher_id" )
     ->orderBy( "date", "DESC" );
 
 $aoClientGroups = Core::factory("Schedule_Group_Assignment")
@@ -163,7 +163,7 @@ $aoUserPayments = Core::factory( "Payment" )
     ->where( "user", "=", $oUser->getId() )
     ->findAll();
 
-$ParentUser = $oUser->getParentAuth();
+$ParentUser = User::parentAuth();
 
 foreach ( $aoUserPayments as $payment )
 {

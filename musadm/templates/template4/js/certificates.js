@@ -1,9 +1,10 @@
 $(function(){
     $("body")
         //Форма добавления нового сертификата
-        .on("click", ".certificate_create", function(e){
+        .on("click", ".certificate_edit", function(e){
             e.preventDefault();
-            addNewCertificatePopup();
+            var id = $(this).data("id");
+            editCertificatePopup(id);
         })
         //Сохранение нового сертификата
         .on("click", ".popop_certificate_submit", function(e){
@@ -35,21 +36,31 @@ $(function(){
 });
 
 
-function addNewCertificatePopup() {
-    var popupData = "" +
-        "<form name=\"createData\" id=\"createData\" action=\".\" novalidate=\"novalidate\">" +
-            "<div class=\"column\"><span>Дата продажи</span><span style=\"color:red\">*</span></div>" +
-            "<div class=\"column\"><input type=\"date\" required name=\"sellDate\" class=\"form-control\"></div>" +
-            "<div class=\"column\"><span>Действителен до</span><span style=\"color:red\">*</span></div>" +
-            "<div class=\"column\"><input type=\"date\" required name=\"activeTo\" class=\"form-control\"></div>" +
-            "<div class=\"column\"><span>Номер</span><span style=\"color:red\">*</span></div>" +
-            "<div class=\"column\"><input type=\"text\" required name=\"number\" class=\"form-control\"></div>" +
-            "<div class=\"column\"><span>Примечание</span><span style=\"color:red\">*</span></div>" +
-            "<div class=\"column\"><textarea required name=\"note\" class=\"form-control\"></textarea></div>" +
-            "<button class=\"popop_certificate_submit btn btn-default\">Сохранить</button>" +
-        "</form>";
+function editCertificatePopup(id) {
+    // var popupData = "" +
+    //     "<form name=\"createData\" id=\"createData\" action=\".\" novalidate=\"novalidate\">" +
+    //         "<div class=\"column\"><span>Дата продажи</span><span style=\"color:red\">*</span></div>" +
+    //         "<div class=\"column\"><input type=\"date\" required name=\"sellDate\" class=\"form-control\"></div>" +
+    //         "<div class=\"column\"><span>Действителен до</span><span style=\"color:red\">*</span></div>" +
+    //         "<div class=\"column\"><input type=\"date\" required name=\"activeTo\" class=\"form-control\"></div>" +
+    //         "<div class=\"column\"><span>Номер</span><span style=\"color:red\">*</span></div>" +
+    //         "<div class=\"column\"><input type=\"text\" required name=\"number\" class=\"form-control\"></div>" +
+    //         "<div class=\"column\"><span>Примечание</span><span style=\"color:red\">*</span></div>" +
+    //         "<div class=\"column\"><textarea required name=\"note\" class=\"form-control\"></textarea></div>" +
+    //         "<button class=\"popop_certificate_submit btn btn-default\">Сохранить</button>" +
+    //     "</form>";
 
-    showPopup(popupData);
+    $.ajax({
+        type: "GET",
+        url: "",
+        data: {
+            action: "edit_popup",
+            id: id
+        },
+        success: function(response) {
+            showPopup(response);
+        }
+    });
 }
 
 

@@ -3,7 +3,7 @@ var root = $("#rootdir").val();
 
 $(function(){
     $("body")
-    //Открытие всплывающего окна редактирования пользователя
+        //Открытие всплывающего окна редактирования пользователя
         .on("click", ".user_edit", function(e){
             e.preventDefault();
             var userid = $(this).data("userid");
@@ -29,7 +29,6 @@ $(function(){
                 case 5: getClientPopup(userid);     break;
                 case 6: getDirectorPopup(userid);   break;
             }
-
         })
         //Сохранение данных
         .on("click", ".popop_user_submit", function(e){
@@ -65,28 +64,11 @@ $(function(){
             closePopup();
         })
         //Начисление платежа пользователю (форма)
-        .on("click", ".add_payment", function(e){
+        .on("click", ".user_add_payment", function(e){
             e.preventDefault();
             var userid = $(this).data("userid");
-            getPaymentPopup(userid, "client");
+            getPaymentPopup(userid, root + "user/client");
         })
-        //Сохранение платежа
-        // .on("click", ".popop_user_payment_submit", function(e){
-        //     e.preventDefault();
-        //     loaderOn();
-        //     var form = $("#createData");
-        //     if($(form).valid() == false)
-        //     {
-        //         loaderOff();
-        //         return;
-        //     }
-        //     var userid = $(this).data("userid");
-        //     var value = $(form).find("input[name=value]").val();
-        //     var description = $(form).find("textarea[name=description]").val();
-        //     var description2 = $(form).find("textarea[name=property_26]").val();
-        //     var type = $(form).find("input[name=type]:checked").val();
-        //     savePayment(userid, value, description, description2, type, "client", refreshUserTable);
-        // })
         //Сохранение заметок клиента
         .on("blur", "#client_notes", function(){
             loaderOn();
@@ -128,8 +110,85 @@ $(function(){
                     loaderOff();
                 }
             });
+        })
+        .on("click", "#get_lid_data", function(e){
+            e.preventDefault();
+            var lid_id = $("#lid_id").val();
+            if( lid_id == "" || lid_id == "0" )
+            {
+                $("#lid_id").addClass("error");
+                return false;
+            }
+            loaderOn();
+
+            $.ajax({
+                type: "GET",
+                url: "",
+                dataType: 'json',
+                data: {
+                    action: "getLidData",
+                    lidid: lid_id
+                },
+                success: function(responce) {
+                    if( responce != "0" )
+                    {
+                        $("input[name=name]").val( responce.name );
+                        $("input[name=surname]").val( responce.surname );
+                        $("input[name=phoneNumber]").val( responce.phone );
+                        $("input[name='property_9[]']").val( responce.vk );
+                        $(".get_lid_data_row").remove();
+                    }
+                    else
+                    {
+                        alert( "Лида с номером " + lid_id + " не существует" );
+                    }
+                    loaderOff();
+                }
+            });
+
+            loaderOff();
+        })
+        //Поиск клиента на странице менеджера
+        .on("submit", "#search_client", function(e){
+            e.preventDefault();
+            loaderOn();
+            var surname = $("#surname").val();
+            var name    = $("#name").val();
+            var phone   = $("#phone").val();
+            searchClients( surname, name, phone );
+        })
+        .on("click", "#user_search_clear", function(e){
+            e.preventDefault();
+            $(".dynamic-fixed-row").find(".buttons-panel").remove();
+            $(".dynamic-fixed-row").find(".table-responsive").remove();
+            $("#surname").val("");
+            $("#name").val("");
+            $("#phone").val("");
         });
 });
+
+
+/**
+ * Поиск списка клиентов по фамилии, имени и номеру телефона
+ */
+function searchClients( surname, name, phone ) {
+    $.ajax({
+        url: root,
+        type: "GET",
+        data: {
+            action: "search_client",
+            surname: surname,
+            name: name,
+            phone: phone
+        },
+        success: function(response) {
+            if( response == "" )    alert( "Пользователи с указаными параметрами не найдены" );
+            $(".users").remove();
+            $(".dynamic-fixed-row").append( response );
+            loaderOff();
+        }
+    });
+}
 
 
 function userSave(func) {
@@ -212,9 +271,15 @@ function getPaymentPopup(userid, url) {
 
 
 function refreshUserTable() {
+    if( $(".users").length == 0 )
+    {
+        loaderOff();
+        return false;
+    }
+
     $.ajax({
         type: "GET",
-        url: "",
+        url: root + "user/client",
         async: false,
         data: {
             action: "refreshTableUsers",
@@ -246,21 +311,6 @@ function refreshArchiveTable(func) {
 }
 
 
-// function changeUserActive(userid, status) {
-//     $.ajax({
-//         type: "GET",
-//         url: root + "/admin?menuTab=Main&menuAction=updateActive&ajax=1",
-//         data: {
-//             model_name: "User",
-//             model_id: userid,
-//             value: status
-//         },
-//         success: function(responce){
-//             refreshUserTable();
-//         }
-//     });
-// }
-
 function getClientPopup(userid) {
     $.ajax({
         type: "GET",
@@ -274,6 +324,7 @@ function getClientPopup(userid) {
         }
     });
 }
+
 
 function getTeacherPopup(userid) {
     $.ajax({

@@ -5,10 +5,17 @@ $(function(){
 
     var days = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
 
+    /**
+     * Отмена перехода по ссылке при клике на элемент выпадающего списка
+     */
     $(".submenu").on("click", "a", function(e){ e.preventDefault(); });
 
+
     $("body")
-        //Изменение даты на календаре
+
+        /**
+         * Подгрузка данных расписания при изменении даты в календаре
+         */
         .on("change", ".schedule_calendar", function(){
             loaderOn();
             var date = $(".schedule_calendar").val();
@@ -19,14 +26,20 @@ $(function(){
             $(".day_name").text( dayName );
             getSchedule(userid, date, loaderOff);
         })
-        //Открытие окна с выставлением периода отсутствия
+
+        /**
+         * Открытие всплывающего окна создания периода отсутствия
+         */
         .on("click", ".schedule_absent", function(e){
             e.preventDefault();
             var clientid = $(this).parent().parent().data("clientid");
             var typeid = $(this).parent().parent().data("typeid");
             getScheduleAbsentPopup(clientid, typeid);
         })
-        //Сохранение периода отсутствия
+
+        /**
+         * Сохранение данных периода отсутствия
+         */
         .on("click", ".popop_schedule_absent_submit", function(e){
             e.preventDefault();
             loaderOn();
@@ -40,7 +53,10 @@ $(function(){
 
             saveData("Main", refreshSchedule);
         })
-        //Окно добавления урока в расписание
+
+        /**
+         * Открытие всплывающего окна создания занятия
+         */
         .on("click", ".add_lesson", function(){
             var date = $(this).data("date");
             var lessonDate = new Date(date);
@@ -53,13 +69,37 @@ $(function(){
             var area_id = $(this).data("area_id");
             getScheduleLessonPopup(class_id, date, area_id, type);
         })
-        //Сохранение урока в расписание
+
+        /**
+         * Сохранение данных данятия
+         */
         .on("click", ".popop_schedule_lesson_submit", function(e){
             e.preventDefault();
             loaderOn();
+
+            var clientId = $("#createData").find("select[name=clientId]").val();
+            var date = $("#createData").find("input[name=insertDate]").val();
+
+            //Создание задачи с напоминанием
+            if( $("input[name=is_create_task]").is(":checked") )
+            {
+                $.ajax({
+                    type: "GET",
+                    url: "",
+                    data: {
+                        action: "create_schedule_task",
+                        date: date,
+                        client_id: clientId
+                    }
+                });
+            }
+
             saveData("Main", refreshSchedule);
         })
-        //Удаление урока из основного графика
+
+        /**
+         * УДаление занятия из основного графика
+         */
         .on("click", ".schedule_delete_main", function(e){
             e.preventDefault();
             loaderOn();
@@ -67,7 +107,10 @@ $(function(){
             var deletedate = $(this).data("date");
             markDeleted(lessonid, deletedate, refreshSchedule);
         })
-        //Выставление отсутствия занятия
+
+        /**
+         * Выставка отметки об разовом отсутствии занятия
+         */
         .on("click", ".schedule_today_absent", function(e){
             e.preventDefault();
             loaderOn();
@@ -76,12 +119,20 @@ $(function(){
             markAbsent(lessonid, date, refreshSchedule);
             loaderOff();
         })
+
+        /**
+         * Открытие всплывающего окна для редактирования времени проведения занятия
+         */
         .on("click", ".schedule_update_time", function(e){
             e.preventDefault();
             var lessonid = $(this).parent().parent().data("id");
             var date = $(this).parent().parent().data("date");
             getScheduleChangeTimePopup(lessonid, date);
         })
+
+        /**
+         * Сохранение изменения времени проведения занятия
+         */
         .on("click", ".popop_schedule_time_submit", function(e){
             e.preventDefault();
             loaderOn();
@@ -91,6 +142,11 @@ $(function(){
             var date = $("input[name=date]").val();
             saveScheduleChangeTimePopup(lessonId, date, timeFrom, timeTo, refreshSchedule);
         })
+
+        /**
+         * Подгрузка элементов выпадающего списка в зависимости от типа занятия:
+         * индивидуальное, групповое или консультация
+         */
         .on("change", "select[name=typeId]", function(){
             loaderOn();
             var type = $(this).val();
@@ -99,12 +155,19 @@ $(function(){
             if(type != 0) select.show();
             else select.hide();
 
+            var rememberRow = $("#createData").find(".remember");
+
             if( type == 3 )
             {
                 var select = $("select[name=clientId]");
                 var selectBlock = select.parent();
                 select.remove();
                 selectBlock.append("<input type='number' name='clientId' class='form-control' placeholder='Номер лида' />");
+
+                $.each(rememberRow, function(index, value){
+                    $(value).hide();
+                });
+
                 loaderOff();
             }
             else
@@ -113,6 +176,10 @@ $(function(){
                 var inputBlock = input.parent();
                 input.remove();
                 inputBlock.append("<select name='clientId' class='form-control valid' ></select>");
+
+                $.each(rememberRow, function(index, value){
+                    $(value).show();
+                });
 
                 $.ajax({
                     type: "GET",
@@ -127,6 +194,10 @@ $(function(){
                 });
             }
         })
+
+        /**
+         * Отправка отчета преподавателем о проведении занятия
+         */
         .on("click", ".send_report", function(e){
             e.preventDefault();
             loaderOn();
@@ -160,6 +231,10 @@ $(function(){
                 }
             });
         })
+
+        /**
+         * Удаление отчета о проведении занятия
+         */
         .on("click", ".delete_report", function(e){
             e.preventDefault();
             loaderOn();
@@ -183,9 +258,17 @@ $(function(){
                 }
             });
         })
+
+        /**
+         * Открытие всплывающего окна о создании задачи из раздела расписания
+         */
         .on("click", ".schedule_task_create", function(){
             newScheduleTaskPopup();
         })
+
+        /**
+         * Сохранение данных задачи из раздела расписания
+         */
         .on("click", ".popop_schedule_task_submit", function(e){
             e.preventDefault();
             loaderOn();
@@ -201,14 +284,23 @@ $(function(){
                 loaderOff();
             }
         })
+
+        /**
+         * Сохранение выплаты преподавателю
+         */
         .on("click", ".add_teacher_payment", function(e){
             e.preventDefault();
             loaderOn();
             var date = $(".teacher_payments").find("input[name=date]").val();
             var summ = $(".teacher_payments").find("input[name=summ]").val();
             var user = $(".teacher_payments").find("input[name=userid]").val();
-            saveTeacherPayment(user, summ, date, "Выплата преподавателю", refreshSchedule);
+            var description = $(".teacher_payments").find("input[name=description]").val();
+            saveTeacherPayment(user, summ, date, description, refreshSchedule);
         })
+
+        /**
+         * Указание месяца / года клиентом и подгрузка расписания за выбранный период
+         */
         .on("change", ".client_schedule", function(){
             loaderOn();
 
@@ -232,21 +324,37 @@ $(function(){
                 }
             });
         })
+
+        /**
+         * Открытие всплывающего окна редактирования филиала
+         */
         .on("click", ".schedule_area_edit", function(e){
             e.preventDefault();
             var areaId = $(this).data("area_id");
             getScheduleAreaPopup(areaId);
         })
+
+        /**
+         * Сохранение данных филиала
+         */
         .on("click", ".popop_schedule_area_submit", function(e){
             e.preventDefault();
             loaderOn();
             saveData("Main", refreshAreasTable);
         })
+
+        /**
+         * Изменение активности филлиала
+         */
         .on("click", "input[name=schedule_area_active]", function(){
             var areaId = $(this).data("area_id");
             var value = $(this).prop("checked");
             updateActive("Schedule_Area", areaId, value, loaderOff);
         })
+
+        /**
+         * Удаление филиала
+         */
         .on("click", ".schedule_area_delete", function(e){
             e.preventDefault();
             loaderOn();
@@ -255,6 +363,9 @@ $(function(){
         });
 
 
+    /**
+     * Формирование текущей даты для календаря
+     */
     var today = new Date();
     var day =   today.getDate();
     var month = today.getMonth() + 1;

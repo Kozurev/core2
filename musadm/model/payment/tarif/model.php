@@ -47,7 +47,7 @@ class Payment_Tarif_Model extends Core_Entity
     public function countIndiv( $val = null )
     {
         if( is_null( $val ) )   return $this->count_indiv;
-        $this->count_indiv = intval( $val );
+        $this->count_indiv = floatval( $val );
         return $this;
     }
 
@@ -55,7 +55,7 @@ class Payment_Tarif_Model extends Core_Entity
     public function countGroup( $val = null )
     {
         if( is_null( $val ) )   return $this->count_group;
-        $this->count_group = intval( $val );
+        $this->count_group = floatval( $val );
         return $this;
     }
 

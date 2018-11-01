@@ -13,6 +13,7 @@ class Certificate extends Core_Entity
     protected $number;
     protected $active_to;
     protected $note;
+    protected $subordinated;
 
     public function __construct(){}
 
@@ -55,6 +56,15 @@ class Certificate extends Core_Entity
     }
 
 
+    public function subordinated( $val = null )
+    {
+        if( is_null( $val ) )   return $this->subordinated;
+        $this->subordinated = intval( $val );
+        return $this;
+    }
+
+
+
     public function save($obj = null)
     {
         Core::notify(array(&$this), "beforeCertificateSave");
@@ -71,6 +81,11 @@ class Certificate extends Core_Entity
     }
 
 
+    /**
+     * Поиск всех комментариев сертификата
+     *
+     * @return array
+     */
     public function getNotes()
     {
         return Core::factory( "Certificate_Note" )
@@ -78,7 +93,6 @@ class Certificate extends Core_Entity
             ->join( "User as usr", "author_id = usr.id" )
             ->where( "certificate_id", "=", $this->id )
             ->findAll();
-
     }
 
 }

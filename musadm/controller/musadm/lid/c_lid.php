@@ -10,6 +10,7 @@
 $dateFrom = Core_Array::getValue( $_GET, "date_from", "" );
 $dateTo = Core_Array::getValue( $_GET, "date_to", "" );
 
+$lidId = Core_Array::getValue( $_GET, "lidid", null );
 
 $Director = User::current()->getDirector();
 if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
@@ -19,9 +20,18 @@ $aoLids = Core::factory("Lid")
     ->where( "subordinated", "=", $subordinated )
     ->orderBy("id", "DESC");
 
-if( $dateFrom != "" )   $aoLids->where( "control_date", ">=", $dateFrom );
-if( $dateTo != "" )     $aoLids->where( "control_date", "<=", $dateTo );
-if( $dateFrom == "" && $dateTo == "" )  $aoLids->where( "control_date", "=", date( "Y-m-d" ) );
+//Поиск лида по id
+if( $lidId !== null )
+{
+    $aoLids->where( "id", "=", $lidId );
+}
+//Общий список лидов
+else
+{
+    if( $dateFrom != "" )   $aoLids->where( "control_date", ">=", $dateFrom );
+    if( $dateTo != "" )     $aoLids->where( "control_date", "<=", $dateTo );
+    if( $dateFrom == "" && $dateTo == "" )  $aoLids->where( "control_date", "=", date( "Y-m-d" ) );
+}
 
 $aoLids = $aoLids->findAll();
 
@@ -47,14 +57,15 @@ $aoAuthors = Core::factory("User")
     ->findAll();
 
 
-$output = Core::factory("Core_Entity")
-    ->addSimpleEntity("date_from", $dateFrom)
-    ->addSimpleEntity("date_to", $dateTo)
-    ->addSimpleEntity("structure_type", "all")
+$output = Core::factory( "Core_Entity" )
+    ->addSimpleEntity( "lid_id", $lidId )
+    ->addSimpleEntity( "date_from", $dateFrom )
+    ->addSimpleEntity( "date_to", $dateTo )
+    ->addSimpleEntity( "structure_type", "all" )
     ->addEntities(
-        Core::factory("Lid")->getStatusList(), "status"
+        Core::factory( "Lid" )->getStatusList(), "status"
     )
-    ->addEntities($aoAuthors)
-    ->addEntities($aoLids)
-    ->xsl("musadm/lids/lids.xsl")
+    ->addEntities( $aoAuthors )
+    ->addEntities( $aoLids )
+    ->xsl( "musadm/lids/lids.xsl" )
     ->show();

@@ -9,15 +9,21 @@
 $User = Core::factory( "User" )->getCurrent();
 $subordinated = $User->getDirector()->getId();
 
-$aoCertificates = Core::factory("Certificate")
+$aoCertificates = Core::factory( "Certificate" )
     ->where( "subordinated", "=", $subordinated )
-    ->orderBy("sell_date", "DESC")
+    ->orderBy( "sell_date", "DESC" )
     ->findAll();
 
-foreach ($aoCertificates as $cert)
+//Проверка на авторизованность под
+User::checkUserAccess( ["groups" => [1, 6]] ) || User::checkUserAccess( ["groups" => [1, 6]], User::parentAuth() )
+    ? $isDirector = 1
+    : $isDirector = 0;
+
+
+foreach ( $aoCertificates as $cert )
 {
-    $cert->sellDate(refactorDateFormat($cert->sellDate()));
-    $cert->activeTo(refactorDateFormat($cert->activeTo()));
+    $cert->sellDate( refactorDateFormat( $cert->sellDate() ) );
+    $cert->activeTo( refactorDateFormat( $cert->activeTo() ) );
 }
 
 $aoNotes = Core::factory( "Certificate_Note" )
@@ -32,7 +38,8 @@ foreach ( $aoNotes as $Note )
 }
 
 Core::factory("Core_Entity")
+    ->addSimpleEntity( "is_director", $isDirector )
     ->addEntities( $aoCertificates )
     ->addEntities( $aoNotes )
-    ->xsl("musadm/certificates/certificates.xsl")
+    ->xsl( "musadm/certificates/certificates.xsl" )
     ->show();

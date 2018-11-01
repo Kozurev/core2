@@ -16,15 +16,13 @@
                         typeId:     { min: "Это поле обязательноое к заполнению"},
                     }
                 });
-
-
             });
         </script>
 
 
 
         <form name="createData" id="createData" action=".">
-            <center><h2>Добавление урока в <xsl:value-of select="schedule_type" /> расписание</h2></center>
+            <div class="center"><h2>Добавление урока в <xsl:value-of select="schedule_type" /> расписание</h2></div>
 
             <div class="column">
                 <span>Учитель</span><span style="color:red" >*</span>
@@ -82,6 +80,16 @@
                 <input class="form-control" name="timeTo" type="time" />
             </div>
             <hr/>
+
+            <xsl:if test="lesson_type = 2">
+                <div class="column remember">
+                    <span>Обсудить после урока следующий день занятий</span>
+                </div>
+                <div class="column remember">
+                    <input class="form-control" name="is_create_task" type="checkbox" />
+                </div>
+                <hr/>
+            </xsl:if>
 
 
             <input type="hidden" name="id" value="" />

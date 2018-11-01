@@ -71,6 +71,9 @@
     margin: 15px;
 }
 
+.popup .column .label-new {
+    margin-top: 10px !important;
+}
 
 @media(min-width: 1024px) {
 

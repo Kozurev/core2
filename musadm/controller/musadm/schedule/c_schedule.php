@@ -8,7 +8,6 @@ else                    $oUser = Core::factory("User", $userId);
 $userId = $oUser->getId();
 
 
-
 /**
  * Формирование таблицы расписания для менеджеров
  * Начало >>
@@ -420,7 +419,10 @@ if( $oUser->groupId() == 4 )
         ->addEntities( $aoTeacherLessons, "lesson" );
 
     //$oCurrentUser = Core::factory( "User" )->getCurrent();
-    User::isAuthAs() ? $isAdmin = 1 : $isAdmin = 0;
+    //User::isAuthAs() ? $isAdmin = 1 : $isAdmin = 0;
+    User::checkUserAccess( ["groups" => [6]], User::parentAuth() )
+        ?   $isAdmin = 1
+        :   $isAdmin = 0;
 
     $output
         ->addSimpleEntity( "is_admin", $isAdmin )
@@ -505,14 +507,20 @@ if( $oUser->groupId() == 4 )
         $aoMonthesPayments[$index]->addEntity($payment);
     }
 
+    //Проверка на авторизованность под видом текущего пользователя
     User::isAuthAs() ? $isAdmin = 1 : $isAdmin = 0;
 
-    Core::factory("Core_Entity")
-        ->addEntities($aoMonthesPayments)
-        ->addSimpleEntity("userid", $oUser->getId())
-        ->addSimpleEntity("is_admin", $isAdmin)
-        ->addSimpleEntity("date", date("Y-m-d"))
-        ->xsl("musadm/finances/teacher_payments.xsl")
+    //Проверка на авторизованность директора ? администратора под видом преподавателя
+    User::parentAuth()->groupId() === 6 || User::parentAuth()->superuser() == 1 ? $isDirector = 1 : $isDirector = 0;
+
+
+    Core::factory( "Core_Entity" )
+        ->addEntities( $aoMonthesPayments )
+        ->addSimpleEntity( "userid", $oUser->getId() )
+        ->addSimpleEntity( "is_admin", $isAdmin )
+        ->addSimpleEntity( "is_director", $isDirector )
+        ->addSimpleEntity( "date", date("Y-m-d") )
+        ->xsl( "musadm/finances/teacher_payments.xsl" )
         ->show();
     /**
      * <<Формирование таблицы с выплатами

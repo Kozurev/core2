@@ -125,7 +125,12 @@
                 </xsl:choose>
             </td>
             <td><xsl:value-of select="value" /></td>
-            <td><xsl:value-of select="description" /></td>
+            <td>
+                <xsl:if test="type = 3">
+                    <xsl:text>Выплата преподавателю. </xsl:text>
+                </xsl:if>
+                <xsl:value-of select="description" />
+            </td>
             <td><xsl:value-of select="datetime" /></td>
             <td><xsl:value-of select="area" /></td>
         </tr>
