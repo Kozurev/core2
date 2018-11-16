@@ -51,15 +51,28 @@ $Tasks = $Tasks
 
 foreach ( $Tasks as $Task )
 {
-    $Task->date(refactorDateFormat($Task->date()));
+    $Task->date( refactorDateFormat( $Task->date() ) );
 }
 
 $tasksIds = array();
+$clientsAssignments = array();
+
 foreach ( $Tasks as $Task )
 {
     $tasksIds[] = $Task->getId();
+
+    //Поиск пользователей, с которыми связаны задачи
+    if( $Task->associate() !== 0 )
+    {
+        $Client = Core::factory( "User", $Task->associate() );
+        if( $Client !== false )
+        {
+            $clientsAssignments[] = $Client;
+        }
+    }
 }
 
+//Поиск всех комментариев, связанных с выбранными задачами
 $Notes = Core::factory( "Task_Note" )
     ->select([
         "Task_Note.id AS id", "date", "task_id", "text", "usr.name AS name", "usr.surname AS surname"
@@ -69,6 +82,7 @@ $Notes = Core::factory( "Task_Note" )
     ->orderBy( "date", "DESC" )
     ->findAll();
 
+//Изменение формата даты и времени комментариев
 foreach ( $Notes as $Note )
 {
     $time = strtotime( $Note->date() );
@@ -76,9 +90,12 @@ foreach ( $Notes as $Note )
 }
 
 echo "<div class='tasks'>";
+global $CFG;
 $output
+    ->addSimpleEntity( "wwwroot", $CFG->rootdir )
     ->addEntities( $Tasks )
     ->addEntities( $Notes )
+    ->addEntities( $clientsAssignments, "assignment" )
     ->addSimpleEntity( "periods", "1" )
     ->xsl( "musadm/tasks/all.xsl" )
     ->show();

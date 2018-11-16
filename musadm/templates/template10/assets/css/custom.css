@@ -176,8 +176,18 @@ header {
     background-position-x: -4px;
 }
 
+.associate {
+    background: url("../images/associate.png");
+    background-size: cover;
+}
+
 .buy {
     background: url("../images/buy2.png");
+    background-size: cover;
+}
+
+.plus {
+    background: url("../images/plus.png");
     background-size: cover;
 }
 /**
@@ -294,11 +304,6 @@ header {
     text-align: center;
 }
 
-/*.schedule_calendar {*/
-    /*width: 14%;*/
-    /*display: inline-block;*/
-/*}*/
-
 .day_name {
     font-size: 18px;
     margin: 10px;
@@ -329,10 +334,6 @@ header {
 .dynamic-fixed-row .searching-row {
     margin-bottom: 20px;
 }
-
-/*.dynamic-fixed-row .table {*/
-    /*position: sticky;*/
-/*}*/
 
 /**
  * <<Конец

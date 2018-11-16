@@ -77,6 +77,17 @@
                 <xsl:if test="done = 0">
                     <a href="#" class="action edit task_date_edit" data-task_id="{id}" title="Изменить дату контроля"></a>
                 </xsl:if>
+
+                <xsl:if test="associate != 0">
+                    <xsl:variable name="userid" select="associate" />
+                    <xsl:variable name="fio">
+                        <xsl:value-of select="//assignment[id = $userid]/surname" />
+                        <xsl:text> </xsl:text>
+                        <xsl:value-of select="//assignment[id = $userid]/name" />
+                    </xsl:variable>
+
+                    <a class="user-icon" title="{$fio}" href="/{//wwwroot}authorize?auth_as={//assignment[id = $userid]/id}"><input type="hidden" /></a>
+                </xsl:if>
             </td>
 
             <td class="tasks-comments-td">
@@ -103,20 +114,10 @@
             </td>
 
             <td>
-                <!--<xsl:choose>-->
-                    <!--<xsl:when test="done = 1">-->
-                        <!--<a href="#" class="action ok"></a>-->
-                    <!--</xsl:when>-->
-                    <!--<xsl:otherwise>-->
-                        <!--<a href="#" class="action append_done task_append_done" data-task_id="{id}"></a>-->
-                    <!--</xsl:otherwise>-->
-                <!--</xsl:choose>-->
-
-                <!--<a data-task_id="{id}" class="btn btn-red task_add_note" data-table_type="{/root/table_name}">+</a>-->
-
                 <xsl:if test="done = 0">
                     <a href="#" class="action append_done task_append_done" data-task_id="{id}" title="Закрыть задачу"></a>
                     <a data-task_id="{id}" class="action comment task_add_note" data-table_type="{/root/table_name}" title="Добавить комментарий"></a>
+                    <a href="#" class="action associate associate" title="Привязать к клиенту" data-task_id="{id}"></a>
                 </xsl:if>
             </td>
         </tr>

@@ -103,3 +103,24 @@ if($action === "save_task")
     echo "0";
     exit;
 }
+
+
+if( $action === "task_assignment_popup" )
+{
+    $taskId = Core_Array::Get( "taskid", 0 );
+    $Task = Core::factory( "Task", $taskId );
+
+    $Clients = Core::factory( "User" )
+        ->where( "active", "=", 1 )
+        ->where( "group_id", "=", 5 )
+        ->orderBy( "surname" )
+        ->findAll();
+
+    Core::factory( "Core_Entity" )
+        ->addEntity( $Task )
+        ->addEntities( $Clients )
+        ->xsl( "musadm/tasks/assignment_task_popup.xsl" )
+        ->show();
+
+    exit;
+}

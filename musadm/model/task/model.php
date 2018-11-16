@@ -12,42 +12,53 @@ class Task_Model extends Core_Entity
     protected $date;
     protected $done = 0;
     protected $done_date;
+    protected $associate = 0;
     protected $subordinated = 0;
+
 
     public function getId()
     {
-        return $this->id;
+        return intval( $this->id );
     }
 
 
-    public function date($val = null)
+    public function date( $val = null )
     {
-        if(is_null($val))   return $this->date;
-        $this->date = strval($val);
+        if( is_null( $val ) )   return $this->date;
+        $this->date = strval( $val );
         return $this;
     }
 
 
-    public function done($val = null)
+    public function done( $val = null )
     {
-        if(is_null($val))   return $this->done;
+        if( is_null( $val ) )   return intval( $this->done );
 
-        if($val == true)
+        if( $val == true )
         {
             $this->done = 1;
-            $this->done_date = date("Y-m-d");
+            $this->done_date = date( "Y-m-d" );
         }
-        elseif($val == false)
+        elseif( $val == false )
         {
             $this->done = 0;
         }
+
+        return $this;
+    }
+
+
+    public function associate( $val = null )
+    {
+        if( is_null( $val ) )   return intval( $this->associate );
+        $this->associate = intval( $val );
         return $this;
     }
 
 
     public function subordinated( $val = null )
     {
-        if( is_null( $val ) )   return $this->subordinated;
+        if( is_null( $val ) )   return intval( $this->subordinated );
         $this->subordinated = intval( $val );
         return $this;
     }

@@ -14,6 +14,14 @@
     max-height: 250px;
 }
 
+.tasks .user-icon {
+    display: inline-block;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    background-image: url("../images/user.png");
+    background-size: cover;
+}
 
 @media(min-width: 1024px) {
 

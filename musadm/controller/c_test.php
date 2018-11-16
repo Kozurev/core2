@@ -106,6 +106,9 @@ Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Schedule_Area` ADD `active` 
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Schedule_Group` ADD `subordinated` INT NOT NULL" );
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Property_List_Values` ADD `subordinated` INT NOT NULL" );
 
+Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Task` ADD `associate` INT NOT NULL" );
+Core::factory( "Orm" )->executeQuery( "UPDATE `Task` SET associate = 0 WHERE 1" );
+
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Payment` ADD `subordinated` INT NOT NULL" );
 Core::factory( "Orm" )->executeQuery( "UPDATE `Payment` SET type = 2 WHERE type = 0" );
 

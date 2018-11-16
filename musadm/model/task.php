@@ -13,23 +13,25 @@ class Task extends Task_Model
 
     public function getNotes()
     {
-        $aoNotes = Core::factory("Task_Note")->where("task_id", "=", $this->id)->orderBy("date", "DESC")->findAll();
-        return $aoNotes;
+        return Core::factory( "Task_Note" )
+            ->where( "task_id", "=", $this->id )
+            ->orderBy( "date", "DESC" )
+            ->findAll();
     }
 
 
-    public function addNote($text)
+    public function addNote( $text )
     {
-        $oNote = Core::factory("Task_Note");
+        $oNote = Core::factory( "Task_Note" );
 
-        $authorId = Core::factory("User")->getCurrent()->getId();
-        $oNote->authorId($authorId);
+        $authorId = Core::factory( "User" )->getCurrent()->getId();
+        $oNote->authorId( $authorId );
 
-        $currentDate = date("Y-m-d H:i:s");
-        $oNote->date($currentDate);
+        $currentDate = date( "Y-m-d H:i:s" );
+        $oNote->date( $currentDate );
 
-        $oNote->taskId($this->id);
-        $oNote->text($text);
+        $oNote->taskId( $this->id );
+        $oNote->text( $text );
 
         $oNote->save();
 
@@ -37,21 +39,21 @@ class Task extends Task_Model
     }
 
 
-    public function save($obj = null)
+    public function save( $obj = null )
     {
-        Core::notify(array(&$this), "beforeTaskSave");
-        if($this->date == "")   $this->date = date("Y-m-d");
+        Core::notify( array( &$this ), "beforeTaskSave" );
+        if( $this->date == "" )   $this->date = date( "Y-m-d" );
         parent::save();
-        Core::notify(array(&$this), "afterTaskSave");
+        Core::notify( array( &$this ), "afterTaskSave" );
         return $this;
     }
 
 
-    public function delete($obj = null)
+    public function delete( $obj = null )
     {
-        Core::notify(array(&$this), "beforeTaskDelete");
+        Core::notify( array( &$this ), "beforeTaskDelete" );
         parent::delete();
-        Core::notify(array(&$this), "afterTaskDelete");
+        Core::notify( array( &$this ), "afterTaskDelete" );
     }
 
 }

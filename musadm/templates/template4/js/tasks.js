@@ -74,7 +74,17 @@ $(function(){
             var dateFrom = $("input[name=date_from]").val();
             var dateTo = $("input[name=date_to]").val();
             refreshTasksTable(dateFrom, dateTo);
+        })
+        .on("click", ".associate", function(e){
+            e.preventDefault();
+            assignmentTaskPopup( $(this).data("task_id") );
+        })
+        .on("click", ".popop_task_assignment_submit", function(e){
+            e.preventDefault();
+            loaderOn();
+            saveData("Main", refreshTasksTable);
         });
+
 });
 
 
@@ -90,6 +100,24 @@ function addTaskNotePopup(task_id) {
         "</form>";
 
     showPopup(popupData);
+}
+
+
+function assignmentTaskPopup(task_id) {
+    //loaderOn();
+
+    $.ajax({
+        url: root + "tasks",
+        type: "GET",
+        data: {
+            action: "task_assignment_popup",
+            taskid: task_id
+        },
+        success: function(response){
+            showPopup(response);
+            //loaderOff();
+        }
+    });
 }
 
 
