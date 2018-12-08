@@ -67,7 +67,7 @@ $(function(){
         .on("click", ".user_add_payment", function(e){
             e.preventDefault();
             var userid = $(this).data("userid");
-            getPaymentPopup(userid, root + "user/client");
+            getPaymentPopup(userid, root + "/user/client");
         })
         //Сохранение заметок клиента
         .on("blur", "#client_notes", function(){
@@ -110,6 +110,16 @@ $(function(){
                     loaderOff();
                 }
             });
+        })
+        .on("click", "#user_comment_save", function(e){
+            e.preventDefault();
+            var text = $("#user_comment").val();
+            if( text != '' )
+            {
+                loaderOn();
+                var userid = $(this).data("userid");
+                saveUserComment(userid, text, refreshUserTable);
+            }
         })
         .on("click", "#get_lid_data", function(e){
             e.preventDefault();
@@ -155,6 +165,11 @@ $(function(){
             var surname = $("#surname").val();
             var name    = $("#name").val();
             var phone   = $("#phone").val();
+            if(surname == "" && name == "" && phone == "")
+            {
+                loaderOff();
+                return false;
+            }
             searchClients( surname, name, phone );
         })
         .on("click", "#user_search_clear", function(e){
@@ -164,8 +179,50 @@ $(function(){
             $("#surname").val("");
             $("#name").val("");
             $("#phone").val("");
+        })
+        .on("click", ".info-by-id", function(e){
+            e.preventDefault();
+            var model = $(this).data("model");
+            var id = $(this).data("id");
+            getObjectPopupInfo( id, model );
+        })
+        .on("click", ".events_show", function(e){
+            e.preventDefault();
+            var from = $("input[name='event_date_from']").val();
+            var to = $("input[name='event_date_to']").val();
+            loaderOn();
+            $.ajax({type:"GET", url:"", data:{action:"refreshTableUsers",event_date_from:from,event_date_to:to}, success:function(response){
+                $(".page").html(response);
+                loaderOff();
+                }});
+        })
+        .on("click", ".events_load_more", function(){
+            loaderOn();
+            var limit = $(this).data("limit");
+            $.ajax({url:"", type:"GET", data:{action:"refreshTableUsers", limit: limit}, success:function(responce){
+                $(".page").html(responce);
+                loaderOff();
+                }});
         });
 });
+
+
+function getObjectPopupInfo( id, model ) {
+    loaderOn();
+    $.ajax({
+        url: root,
+        type: "GET",
+        data: {
+            action: "getObjectInfoPopup",
+            id: id,
+            model: model
+        },
+        success: function( responce ) {
+            showPopup( responce );
+            loaderOff();
+        }
+    });
+}
 
 
 /**
@@ -184,6 +241,8 @@ function searchClients( surname, name, phone ) {
         success: function(response) {
             if( response == "" )    alert( "Пользователи с указаными параметрами не найдены" );
             $(".users").remove();
+            $(".dynamic-fixed-row").find(".buttons-panel").remove();
+            $(".dynamic-fixed-row").find(".table-responsive").remove();
             $(".dynamic-fixed-row").append( response );
             loaderOff();
         }
@@ -197,7 +256,7 @@ function userSave(func) {
 
     $.ajax({
         type: "GET",
-        url: root + "user/client",
+        url: root + "/user/client",
         data: {
             action: "checkLoginExists",
             login: login,
@@ -224,7 +283,7 @@ function userSave(func) {
 function updateUserNote(userid, note, func) {
     $.ajax({
         type: "GET",
-        url: root + "user/balance",
+        url: root + "/user/balance",
         data: {
             action: "updateNote",
             userid: userid,
@@ -241,7 +300,7 @@ function updateUserNote(userid, note, func) {
 function updateUserPerLesson(userid, value, func) {
     $.ajax({
         type: "GET",
-        url: root + "user/balance",
+        url: root + "/user/balance",
         data: {
             action: "updatePerLesson",
             userid: userid,
@@ -271,6 +330,13 @@ function getPaymentPopup(userid, url) {
 
 
 function refreshUserTable() {
+
+    if( $("#search_client").length != 0 )
+    {
+        $("#search_client").submit();
+        return;
+    }
+
     if( $(".users").length == 0 )
     {
         loaderOff();
@@ -279,7 +345,7 @@ function refreshUserTable() {
 
     $.ajax({
         type: "GET",
-        url: root + "user/client",
+        url: "",
         async: false,
         data: {
             action: "refreshTableUsers",
@@ -297,7 +363,7 @@ function refreshUserTable() {
 function refreshArchiveTable(func) {
     $.ajax({
         type: "GET",
-        url: root + "user/archive",
+        url: root + "/user/archive",
         data: {
             action: "refreshTableArchive"
         },
@@ -314,7 +380,7 @@ function refreshArchiveTable(func) {
 function getClientPopup(userid) {
     $.ajax({
         type: "GET",
-        url: root + "user/client",
+        url: root + "/user/client",
         data: {
             action: "updateFormClient",
             userid: userid,
@@ -329,7 +395,7 @@ function getClientPopup(userid) {
 function getTeacherPopup(userid) {
     $.ajax({
         type: "GET",
-        url: root + "user/teacher",
+        url: root + "/user/teacher",
         data: {
             action: "updateFormTeacher",
             userid: userid,
@@ -344,7 +410,7 @@ function getTeacherPopup(userid) {
 function getDirectorPopup(userid) {
     $.ajax({
         type: "GET",
-        url: root + "user/client",
+        url: root + "/user/client",
         data: {
             action: "updateFormDirector",
             userid: userid
@@ -359,13 +425,31 @@ function getDirectorPopup(userid) {
 function getManagerPopup(userid) {
     $.ajax({
         type: "GET",
-        url: root + "user/client",
+        url: root + "/user/client",
         data: {
             action: "updateFormManager",
             userid: userid
         },
         success: function(responce) {
             showPopup(responce);
+        }
+    });
+}
+
+
+function saveUserComment( userid, text, func) {
+    $.ajax({
+        type: "GET",
+        url: root + "/balance",
+        data: {
+            action: "saveUserComment",
+            userid: userid,
+            text: text
+        },
+        success: function(responce){
+            //$(".page").empty();
+            $(".page").html(responce);
+            loaderOff();
         }
     });
 }

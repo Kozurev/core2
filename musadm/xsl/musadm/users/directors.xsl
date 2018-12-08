@@ -39,7 +39,7 @@
     <xsl:template match="user">
 
         <tr>
-            <td><a href="/{/root/wwwroot}authorize?auth_as={id}"><xsl:value-of select="surname" /></a></td>
+            <td><a href="{/root/wwwroot}/authorize?auth_as={id}"><xsl:value-of select="surname" /></a></td>
             <td><xsl:value-of select="name" /></td>
             <td><xsl:value-of select="patronimyc" /></td>
             <td><xsl:value-of select="phone_number" /><br/></td>

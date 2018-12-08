@@ -11,10 +11,6 @@ class Admin_Menu_Main
      */
     public function updateAction($aParams)
     {
-//        echo "<pre>";
-//        print_r($aParams);
-//        echo "</pre>";
-
         //Список параметров, не имеющих отношения к свойствам редактируемого/создаваемого объекта
         $aForbiddenTags = array("menuTab", "menuAction", "ajax", "id", "modelName", "getId");
 
@@ -32,12 +28,20 @@ class Admin_Menu_Main
             if(method_exists($oUpdatingItem, $key)) $oUpdatingItem->$key($value);
         }
 
-        /*echo "<pre>";
-        print_r($oUpdatingItem);
-        print_r($_GET);
-        echo "</pre>";*/
+
         $oUpdatingItem->save();
 
+        //Создание доп. свойств объекта со значением по умолчанию либо пустых
+        if( !isset( $aParams["id"] ) || $aParams["id"] == "" )
+        {
+            $Property = Core::factory( "Property" );
+            $Properties = $Property->getAllPropertiesList( $oUpdatingItem );
+
+            foreach ( $Properties as $Prop )
+            {
+                $Prop->addNewValue( $oUpdatingItem, $Prop->defaultValue() );
+            }
+        }
 
         /**
          *	Обновление дополнительных свойств объекта
@@ -306,13 +310,27 @@ class Admin_Menu_Main
         $modelId = $aParams["model_id"];
         $value = $aParams["value"];
 
-        if($value == "true")		$bValue = true;
-        else	$bValue = false;
+        if($value == "true")
+            $bValue = true;
+        else
+            $bValue = false;
+
+        $eventObjectName = explode( "_", $modelName );
+        $eventObjectName = implode( "", $eventObjectName );
+
+        $bValue === true
+            ?   $eventType = "Activate"
+            :   $eventType = "Deactivate";
 
         $obj = Core::factory($modelName, $modelId);
+
+        Core::notify( array( $obj ), "before" . $eventObjectName . $eventType );
+
         $obj
             ->active($bValue)
             ->save();
+
+        Core::notify( array( $obj ), "after" . $eventObjectName . $eventType );
 
         echo 0;
     }

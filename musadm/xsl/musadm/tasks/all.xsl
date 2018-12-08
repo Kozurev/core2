@@ -74,9 +74,9 @@
             <td><xsl:value-of select="id" /></td>
             <td>
                 <span><xsl:value-of select="date" /></span>
-                <xsl:if test="done = 0">
-                    <a href="#" class="action edit task_date_edit" data-task_id="{id}" title="Изменить дату контроля"></a>
-                </xsl:if>
+                <!--<xsl:if test="done = 0">-->
+                    <br/><a href="#" class="action edit task_date_edit" data-task_id="{id}" title="Изменить дату контроля"></a>
+                <!--</xsl:if>-->
 
                 <xsl:if test="associate != 0">
                     <xsl:variable name="userid" select="associate" />
@@ -96,9 +96,16 @@
                         <div class="block">
                             <div class="comment_header">
                                 <div class="author">
-                                    <xsl:value-of select="surname" />
-                                    <xsl:text> </xsl:text>
-                                    <xsl:value-of select="name" />
+                                    <xsl:choose>
+                                        <xsl:when test="author_id = 0">
+                                            Система
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="surname" />
+                                            <xsl:text> </xsl:text>
+                                            <xsl:value-of select="name" />
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </div>
                                 <div class="date">
                                     <xsl:value-of select="date" />
@@ -116,9 +123,9 @@
             <td>
                 <xsl:if test="done = 0">
                     <a href="#" class="action append_done task_append_done" data-task_id="{id}" title="Закрыть задачу"></a>
+                </xsl:if>
                     <a data-task_id="{id}" class="action comment task_add_note" data-table_type="{/root/table_name}" title="Добавить комментарий"></a>
                     <a href="#" class="action associate associate" title="Привязать к клиенту" data-task_id="{id}"></a>
-                </xsl:if>
             </td>
         </tr>
     </xsl:template>

@@ -128,12 +128,18 @@ class Orm
 		$aRows = array_keys($objData);
 		$aValues = array_values($objData);
 
+		$eventObjectName = get_class( $this );
+		$eventObjectName = explode( "_", $eventObjectName );
+		$eventObjectName = implode( "", $eventObjectName );
+
 		//Если это существующий элемент
 		if($this->id)
 		{
 			$queryStr = "UPDATE ".$this->getTableName()." ";
 			$queryStr .= "SET ";
-			
+
+            $eventType = "Update";
+
 			for($i = 0; $i < count($objData); $i++)
 			{
 			    if( $i + 1 == count( $objData ) )
@@ -159,6 +165,8 @@ class Orm
 		//Если это новый элемент
 		else 
 		{
+            $eventType = "Insert";
+
 			$queryStr = "INSERT INTO ".$this->getTableName()."(";
 
 			for($i = 0; $i < count($objData); $i++)
@@ -196,6 +204,8 @@ class Orm
 			echo "<br>Строка запроса метода <b>save()</b>: ".$queryStr;
 		}
 
+		Core::notify( array( &$this ), "before" . $eventObjectName . $eventType );
+
 		try
 		{
 			$result = Core_Database::getConnect()->query($queryStr);
@@ -210,12 +220,10 @@ class Orm
 		*/
 		if(!$this->id)
 		{
-//			$lastInsertId = Core_Database::getConnect()->query("SELECT LAST_INSERT_ID() as id");
-//            $lastInsertId->setFetchMode(PDO::FETCH_CLASS, "stdClass");
-//            $lastInsertId = $lastInsertId->fetch();
-//            $this->id = $lastInsertId->id;
             $this->id = Core_Database::getConnect()->lastInsertId();
 		}
+
+        Core::notify( array( &$this ), "after" . $eventObjectName . $eventType );
 
 		return $this;
 	}

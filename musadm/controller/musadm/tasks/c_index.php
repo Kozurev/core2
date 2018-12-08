@@ -43,7 +43,15 @@ else
     }
 }
 
+//Поиск конкретной задачи по id
+$id = Core_Array::Get( "task_id", 0 );
+if( $id != 0 )
+{
+    $Tasks->where( "id", "=", $id );
+}
+
 $Tasks = $Tasks
+    ->where( "type", "<>", 3 )
     ->where( "subordinated", "=", $subordinated )
     ->orderBy( "date", "DESC" )
     ->orderBy( "id", "DESC" )
@@ -75,10 +83,10 @@ foreach ( $Tasks as $Task )
 //Поиск всех комментариев, связанных с выбранными задачами
 $Notes = Core::factory( "Task_Note" )
     ->select([
-        "Task_Note.id AS id", "date", "task_id", "text", "usr.name AS name", "usr.surname AS surname"
+        "Task_Note.id AS id", "date", "task_id", "author_id", "text", "usr.name AS name", "usr.surname AS surname"
     ])
     ->where( "task_id", "IN", $tasksIds )
-    ->join( "User AS usr", "author_id = usr.id" )
+    ->leftJoin( "User AS usr", "author_id = usr.id" )
     ->orderBy( "date", "DESC" )
     ->findAll();
 
@@ -86,7 +94,17 @@ $Notes = Core::factory( "Task_Note" )
 foreach ( $Notes as $Note )
 {
     $time = strtotime( $Note->date() );
-    $Note->date( date( "d.m.Y H:i", $time ) );
+
+    if( date( "H:i", $time ) == "00:00" )
+    {
+        $dateFormat = "d.m.y";
+    }
+    else
+    {
+        $dateFormat = "d.m.y H:i";
+    }
+
+    $Note->date( date( $dateFormat, $time ) );
 }
 
 echo "<div class='tasks'>";

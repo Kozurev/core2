@@ -154,34 +154,105 @@ if($action === "teacherReport")
         ->clientId($clientId);
     $Report->save();
 
-    $oLesson = Core::factory( "Schedule_Lesson", $lessonId);
-    $clients = array();
+    $Lesson = Core::factory( "Schedule_Lesson", $lessonId );
+    $Clients = array();
 
-    if($oLesson->typeId() != 2)
+    if( $Lesson->typeId() != 2 )
     {
-        $clients[] = $oLesson->getClient();
+        $Clients[] = $Lesson->getClient();
     }
     else
     {
-        $oGroup = $oLesson->getCLient();
-        $clients = $oGroup->getClientList();
+        $Group = $Lesson->getCLient();
+        $Clients = $Group->getClientList();
     }
 
 
-    if($oLesson->typeId() == 2)
+    if( $Lesson->typeId() == 2 )
         $propertyId = 14;
     else
         $propertyId = 13;
 
-    $oProperty = Core::factory("Property", $propertyId);
+    //Создание свойства кол-ва групп/индив занятий у клиента
+    $Property = Core::factory("Property", $propertyId);
 
-    foreach ($clients as $client)
+    $PropertyPerLesson = COre::factory( "Property" )->getByTagName( "per_lesson" );
+
+    foreach ( $Clients as $Client )
     {
-        $clientCountLessons = $oProperty->getPropertyValues($client)[0];
+        $clientCountLessons = $Property->getPropertyValues( $Client )[0];
         $count = floatval( $clientCountLessons->value() );
-        if($attendance == 1)    $count--;
+        if( $attendance == 1 )    $count--;
         else $count -= 0.5;
-        $clientCountLessons->value($count)->save();
+        $clientCountLessons->value( $count )->save();
+
+        /**
+         * Проверка на кол-во оставшихся занятий
+         * и создание задачи с напоминанием об оплате на завтра
+         */
+        $today = strtotime("+1 day");
+        $today = date( "Y-m-d", $today );
+
+        if( $count <= 1 && $PropertyPerLesson->getPropertyValues( $Client )[0]->value() == 0 )
+        {
+            $isIssetTask = Core::factory( "Task" )
+                ->where( "associate", "=", $Client->getId() )
+                ->where( "done", "=", "0" )
+                ->where( "type", "=", 1 )
+                ->find();
+
+            //Если не существет подобной незакрытой задачи
+            if( $isIssetTask === false )
+            {
+                $Task = Core::factory( "Task" )
+                    ->date( $today )
+                    ->type( 1 )
+                    ->associate( $Client->getId() );
+
+                $Task = $Task->save();
+
+                $taskNoteText = $Client->surname() . " " . $Client->name() . " уточнить насчет оплаты.";
+                $Task->addNote( $taskNoteText, 0, date( "Y-m-d" ) );
+            }
+        }
+
+
+        /**
+         * Проверка на отсутствие на занятии 2 раза подряд
+         * и создание задачи с напоминание о звонке
+         */
+        if( $Report->attendance() == 0 )
+        {
+            $LastClientReport = Core::factory( "Schedule_Lesson_Report" )
+                ->where( "type_id", "=", 1 )
+                ->where( "client_id", "=", $Client->getId() )
+                ->orderBy( "id", "DESC" )
+                ->find();
+
+            if( $LastClientReport !== false && $LastClientReport->attendance() === 0 )
+            {
+                $isIssetTask = Core::factory( "Task" )
+                    ->where( "associate", "=", $Client->getId() )
+                    ->where( "done", "=", "0" )
+                    ->where( "type", "=", 2 )
+                    ->find();
+
+                if( $isIssetTask === false )
+                {
+                    $Task = Core::factory( "Task" )
+                        ->date( $today )
+                        ->type( 2 )
+                        ->associate( $Client->getId() );
+
+                    $Task = $Task->save();
+
+                    $taskNoteText = $Client->surname() . " " . $Client->name() . " пропустил(а) два урока подряд. Необходимо связаться.";
+                    $Task->addNote( $taskNoteText, 0, date( "Y-m-d" ) );
+                }
+            }
+        }
+
+
     }
 
     echo "0";

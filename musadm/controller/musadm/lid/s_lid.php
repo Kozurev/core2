@@ -78,10 +78,11 @@ if($action === "save_lid")
 
     if(!is_null($comment))
     {
-        Core::factory("Lid_Comment")
-            ->lidId($oLid->getId())
-            ->text($comment)
-            ->save();
+//        Core::factory("Lid_Comment")
+//            ->lidId($oLid->getId())
+//            ->text($comment)
+//            ->save();
+        $oLid->addComment( $comment, false );
     }
 
     exit;
@@ -112,10 +113,11 @@ if($action === "changeStatus")
     exit;
 }
 
-if($action === "changeDate")
+if( $action === "changeDate" )
 {
-    $modelId =  Core_Array::getValue($_GET, "model_id", 0);
-    $date =     Core_Array::getValue($_GET, "date", 0);
-    $oLid =     Core::factory("Lid", $modelId);
-    $oLid->controlDate($date)->save();
+    $modelId =  Core_Array::getValue( $_GET, "model_id", 0 );
+    $date =     Core_Array::getValue( $_GET, "date", 0 );
+    $oLid =     Core::factory( "Lid", $modelId );
+
+    $oLid->changeDate( $date );
 }

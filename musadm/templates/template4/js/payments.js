@@ -30,7 +30,7 @@ $(function(){
         .on("click", ".btn_balance", function(e){
             e.preventDefault();
             var userid = $(this).data("userid");
-            getPaymentPopup(userid, "balance");
+            getPaymentPopup(userid, root + "/balance");
         })
         //Отправка формы пополнения баланса
         .on("click", ".popop_balance_payment_submit", function(e){
@@ -50,6 +50,7 @@ $(function(){
             // savePayment(userid, value, description, description2, type, "balance", function(){});
             // refreshPaymentsTable(userid, loaderOff);
 
+            //Если это страница со списком клиентов
             if( $("#payment_from").val() == "clients" )
             {
                 savePayment(userid, value, description, description2, type, "balance", refreshUserTable);
@@ -154,7 +155,7 @@ $(function(){
 
             $.ajax({
                 type: "GET",
-                url: root + "balance",
+                url: root + "/balance",
                 data: {
                     action: "payment_save",
                     id: id,
@@ -192,7 +193,7 @@ $(function(){
 
             $.ajax({
                 type: "GET",
-                url: root + "balance",
+                url: root + "/balance",
                 data: {
                     action: "payment_delete",
                     id: id
@@ -210,7 +211,7 @@ $(function(){
 function editPaymentPopup(id, afterSaveAction) {
     $.ajax({
         type: "GET",
-        url: root + "balance",
+        url: root + "/balance",
         data: {
             action: "edit_payment",
             id: id,
@@ -256,7 +257,7 @@ function refreshPayments() {
 function refreshPaymentsTable(userid, func) {
     $.ajax({
         type: "GET",
-        url: "balance",
+        url: root + "/balance",
         async: false,
         data: {
             action: "refreshTablePayments",
@@ -276,7 +277,7 @@ function refreshPaymentsTable(userid, func) {
 function getTarifPopup(id, type) {
     $.ajax({
         type: "GET",
-        url: "balance",
+        url: root + "/balance",
         data: {
             action: "getTarifPopup",
             type: type,
@@ -293,7 +294,7 @@ function buyTarif(userid, tarifid)
 {
     $.ajax({
         type: "GET",
-        url: "balance",
+        url: root + "/balance",
         async: false,
         data: {
             action: "buyTarif",

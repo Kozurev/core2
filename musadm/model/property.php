@@ -3,6 +3,14 @@
 class Property extends Property_Model
 {
 
+    public function getByTagName( $tag_name )
+    {
+        return $this->queryBuilder()
+            ->where( "tag_name", "=", $tag_name )
+            ->find();
+    }
+
+
 	public function getPropertyValuesArr( $arr )
 	{
 		$ids = array();
@@ -150,7 +158,7 @@ class Property extends Property_Model
 	*	Добавление свойства в список свойств объекта
 	*	@param $obj - объект, которому добавляется свойство 
 	*	@param $propertyId - id свойства, которое необходимо добавить в список свойств
-	*	@return void
+	*	@return bool
 	*/
 	public function addToPropertiesList($obj, $propertyId)
 	{
@@ -181,7 +189,7 @@ class Property extends Property_Model
 	*	Удаление свойства из списка 
 	*	@param $obj - объект, у которого удаляется свойство
 	*	@param $propertyId - id свойства, которое необходимо удалить из списка свойств
-	*	@return void
+	*	@return bool
 	*/
 	public function deleteFromPropertiesList($obj, $propertyId)
 	{
@@ -234,7 +242,7 @@ class Property extends Property_Model
 	*/
 	private function getPropertyListValues($obj)
 	{
-		if($this->type != "list") return false;
+		if($this->type != "list") return array();
 		$aoPropertyList = Core::factory("Property_List");
 		$aoPropertyList = $aoPropertyList->queryBuilder()
 			->where("property_id", "=", $this->id)
@@ -242,10 +250,20 @@ class Property extends Property_Model
             ->where("model_name", "=", get_class($obj))
 			->findAll();
 
+		if( count( $aoPropertyList ) == 0 && $this->default_value != "" )
+        {
+            $aoPropertyList[] = Core::factory( "Property_List" )
+                ->property_id( $this->id )
+                ->object_id( $obj->getId() )
+                ->model_name( get_class( $obj ) )
+                ->value( $this->default_value );
+        }
+
 		$aoOutputData = array();
 
 		foreach ($aoPropertyList as $oPropertyList)
 		{
+		    if( $oPropertyList->value() == 0 ) continue;
 			$aoOutputData[] = Core::factory("Property_List_Values")
 				->where("property_id", "=", $this->id)
 				->where("id", "=", $oPropertyList->value())
@@ -320,7 +338,54 @@ class Property extends Property_Model
     }
 
 
+    public function getAllPropertiesList( $obj )
+    {
+        $types = $this->getPropertyTypes();
+        $Properties = array();
 
+        foreach ( $types as $type )
+        {
+            $Assignments = Core::factory( "Property_" . $type . "_Assigment" )
+                ->where( "model_name", "=", get_class( $obj ) )
+                ->where( "object_id", "=", $obj->getId() )
+                ->findAll();
+
+            foreach ( $Assignments as $assignment )
+                $Properties[] = Core::factory( "Property", $assignment->property_id() );
+        }
+
+        if( method_exists( $obj, "getParent" ) )
+        {
+            $Parent = $obj->getParent();
+
+            if( $Parent->getId() !== null )
+            {
+                $ParentProperties = Core::factory( "Property" )->getAllPropertiesList( $Parent );
+                $Properties = array_merge( $ParentProperties, $Properties );
+            }
+        }
+
+
+        //Отсеивание повторяющихся свойств
+        $propertiesIds = array();
+        $returnsProperties = array();
+
+        foreach ( $Properties as $Property )
+        {
+            $propertiesIds[$Property->getId()] = 1;
+        }
+
+        foreach ( $Properties as $Property )
+        {
+            if( Core_Array::getValue( $propertiesIds, $Property->getId(), null ) == 1 )
+            {
+                $returnsProperties[] = clone $Property;
+                $propertiesIds[$Property->getId()] = 0;
+            }
+        }
+
+        return $returnsProperties;
+    }
 
 
 

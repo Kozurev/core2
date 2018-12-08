@@ -37,19 +37,26 @@ class Page_Show extends Core
         global $CFG;
         if(!empty($_SERVER['REQUEST_URI']))
         {
-            $rootdir = $CFG->rootdir;
-            $output = trim($_SERVER['REQUEST_URI'],  "/");
-            $output = explode("?", $output);
-            $output = substr($output[0], strlen($rootdir));
-            $output = trim($output, "/");
+            //$rootdir = $CFG->rootdir;
+            $output = trim( $_SERVER['REQUEST_URI'],  "/" );
+            $output = explode( "?", $output );
+            $output = substr( $output[0], strlen( $CFG->rootdir ) );
+            $output = trim( $output, "/" );
             return $output;
+        }
+        else
+        {
+            return "";
         }
     }
 
 
+    /**
+     * Метод иммитации ошибки 404
+     */
     public function error404()
     {
-        Core::getMessage("ERROR_404", array());
+        Core::getMessage( "ERROR_404", [] );
         exit;
     }
 
@@ -75,7 +82,7 @@ class Page_Show extends Core
         }
         if( $id == 0 ) die( "Макет не найден" );
 
-        $aTemplates = array();
+        //$aTemplates = array();
         $this->oTemplate = Core::factory('Page_Template', $id);
         $this->aTemplatesPath[] = $this->oTemplate;
 
@@ -129,11 +136,11 @@ class Page_Show extends Core
     public function css($path)
     {
         global $CFG;
-        $rootdir = $CFG->rootdir;
+        //$rootdir = $CFG->rootdir;
         //$templateName = "template".$this->oTemplate->getId();
         echo '<link rel="stylesheet" type="text/css" href="';
-        if($rootdir != "")  echo "/$rootdir";
-        echo $path.'">';
+        if( $CFG->rootdir != "" )  echo $CFG->rootdir;
+        echo "/" . $path . '">';
         echo "\n";
         return $this;   
     }
@@ -145,12 +152,12 @@ class Page_Show extends Core
     public function showCss()
     {
         global $CFG;
-        $rootdir = $CFG->rootdir;
+        //$rootdir = $CFG->rootdir;
         $templateName = "template".$this->oTemplate->getId();
         $path = "";
-        if($rootdir != "")  $path .= "/".$rootdir;
-        $path .= "/templates/".$templateName."/css/style.css";
-        echo '<link rel="stylesheet" type="text/css" href="'.$path.'">';
+        if( $CFG->rootdir != "" )  $path .= $CFG->rootdir;
+        $path .= "/templates/" . $templateName . "/css/style.css";
+        echo '<link rel="stylesheet" type="text/css" href="' . $path . '">';
         echo "\n";
         return $this;
     }
@@ -162,11 +169,11 @@ class Page_Show extends Core
     public function js($path)
     {
         global $CFG;
-        $rootdir = $CFG->rootdir;
+        //$rootdir = $CFG->rootdir;
         //$templateName = "template".$this->oTemplate->getId();
         echo '<script src="';
-        if($rootdir != "")  echo "/".$rootdir;
-        echo $path.'"></script>';
+        if( $CFG->rootdir != "" )  echo $CFG->rootdir;
+        echo $path . '"></script>';
         echo "\n";
         return $this;   
     }
@@ -178,12 +185,12 @@ class Page_Show extends Core
     public function showJs()
     {
         global $CFG;
-        $rootdir = $CFG->rootdir;
-        $templateName = "template".$this->oTemplate->getId();
+        //$rootdir = $CFG->rootdir;
+        $templateName = "template" . $this->oTemplate->getId();
         $path = "";
-        if($rootdir != "")  $path = "/".$rootdir;
-        $path .= "/templates/".$templateName."/js/js.js";
-        echo '<script src="'.$path.'"></script>';
+        if( $CFG->rootdir != "" )  $path .= $CFG->rootdir;
+        $path .= "/templates/" . $templateName . "/js/js.js";
+        echo '<script src="' . $path . '"></script>';
         echo "\n";
         return $this;       
     }
@@ -292,7 +299,7 @@ class Page_Show extends Core
         $uri = $this->getURI();
         $segments = explode("/", $uri);
 
-        if($segments[0] == "templates")
+        if($segments[0] == "templates" || $segments[0] == "cron")
         {
             include ROOT."/".$this->getURI();
             return;

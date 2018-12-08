@@ -34,70 +34,80 @@ if($action === "refreshTasksTable")
     exit;
 }
 
-if($action === "markAsDone")
+if( $action === "markAsDone" )
 {
-    $taskId = Core_Array::getValue($_GET, "task_id", 0);
-    $Task = Core::factory("Task", $taskId)
-        ->done(1)
-        ->save();
-
-    $Task->addNote( "Задача закрыта" );
+    $taskId = Core_Array::getValue( $_GET, "task_id", 0 );
+    $Task = Core::factory( "Task", $taskId )->markAsDone();
+//        ->done(1)
+//        ->save();
+//
+//    $Task->addNote( "Задача закрыта" );
 
     echo "0";
     exit;
 }
 
 
-if($action === "update_date")
+if( $action === "update_date" )
 {
-    $taskId = Core_Array::getValue($_GET, "task_id", 0);
-    $date = Core_Array::getValue($_GET, "date", "");
+    $taskId = Core_Array::getValue( $_GET, "task_id", 0 );
+    $date = Core_Array::getValue( $_GET, "date", "" );
 
-    Core::factory("Task", $taskId)
-        ->date($date)
+    $Task = Core::factory( "Task", $taskId );
+
+    $ObserverArgs = array(
+        "task_id" => $taskId,
+        "old_date" => $Task->date(),
+        "new_date" => $date
+    );
+
+    Core::notify( $ObserverArgs, "ChangeTaskControlDate" );
+
+    $Task
+        ->date( $date )
         ->save();
 
     exit;
 }
 
 
-if($action === "new_task_popup")
+if( $action === "new_task_popup" )
 {
-    $aoTaskTypes = Core::factory("Task_Type")->findAll();
-    $date = date("Y-m-d");
+    $TaskTypes = Core::factory("Task_Type")->findAll();
 
     Core::factory("Core_Entity")
-        ->addEntities($aoTaskTypes)
-        ->addEntity(
-            Core::factory("Core_Entity")
-                ->name("date")
-                ->value($date)
-        )
-        ->xsl("musadm/tasks/new_task_popup.xsl")
+        ->addEntities( $TaskTypes )
+        ->addSimpleEntity( "date", date( "Y-m-d" ) )
+//        ->addEntity(
+//            Core::factory("Core_Entity")
+//                ->name("date")
+//                ->value($date)
+//        )
+        ->xsl( "musadm/tasks/new_task_popup.xsl" )
         ->show();
 
     exit;
 }
 
 
-if($action === "save_task")
+if( $action === "save_task" )
 {
-    $date = Core_Array::getValue($_GET, "date", "");
-    $note = Core_Array::getValue($_GET, "text", "");
+    $date = Core_Array::Get( "date", "" );
+    $note = Core_Array::Get( "text", "" );
 
     $authorId = $oUser->getId();
-    $noteDate = date("Y-m-d");
+    $noteDate = date( "Y-m-d H:i:s" );
 
-    $oTask = Core::factory("Task")
-        ->date($date);
+    $oTask = Core::factory( "Task" )
+        ->date( $date );
 
     $oTask = $oTask->save();
 
-    Core::factory("Task_Note")
-        ->authorId($authorId)
-        ->date($noteDate)
-        ->text($note)
-        ->taskId($oTask->getId())
+    Core::factory( "Task_Note" )
+        ->authorId( $authorId )
+        ->date( $noteDate )
+        ->text( $note )
+        ->taskId( $oTask->getId() )
         ->save();
 
     echo "0";
@@ -110,9 +120,14 @@ if( $action === "task_assignment_popup" )
     $taskId = Core_Array::Get( "taskid", 0 );
     $Task = Core::factory( "Task", $taskId );
 
+    $Director = User::current()->getDirector();
+    if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+    $subordinated = $Director->getId();
+
     $Clients = Core::factory( "User" )
         ->where( "active", "=", 1 )
         ->where( "group_id", "=", 5 )
+        ->where( "subordinated", "=", $subordinated )
         ->orderBy( "surname" )
         ->findAll();
 

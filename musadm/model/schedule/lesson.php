@@ -38,6 +38,12 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      */
     public function markDeleted( $date )
     {
+        $observerArgs = array(
+            "Lesson" => &$this,
+            "date" => $date,
+        );
+        Core::notify( $observerArgs, "ScheduleLessonMarkDeleted" );
+
         if( $this->lesson_type == 1 )   //Основной график
         {
             if( $this->insert_date == $this->delete_date )
@@ -68,8 +74,14 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     {
         if( $this->lesson_type == 2 )
         {
+            $observerArgs = array(
+                "Lesson" => &$this,
+                "date" => $date,
+            );
+            Core::notify( $observerArgs, "ScheduleLessonMarkDeleted" );
+
             $this->delete();
-            return;
+            return $this;
         }
         elseif( $this->lesson_type == 1 )
         {
@@ -136,6 +148,14 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      */
     public function modifyTime($date, $timeFrom, $timeTo)
     {
+        $observerArgs = array(
+            "Lesson" => &$this,
+            "date" => $date,
+            "new_time_from" => $timeFrom,
+            "new_time_to" => $timeTo
+        );
+        Core::notify( $observerArgs, "ScheduleLessonTimemodify" );
+
         if( $this->lesson_type == 2 )   //Актуальный график
         {
             $this->time_from = $timeFrom;

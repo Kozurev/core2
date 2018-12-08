@@ -8,11 +8,11 @@
 
 
 global $CFG;
-$rootdir = "/" . $CFG->rootdir;
-$back = Core_Array::getValue($_GET, "back", $rootdir);
+//$rootdir = $CFG->rootdir;
+$back = Core_Array::Get( "back", $CFG->rootdir );
 ?>
 
-<form action="<?=$rootdir?>authorize?back=<?=$back?>" method="post">
+<form action="<?=$CFG->rootdir?>/authorize?back=<?=$back?>" method="post">
     <label for="name">Логин:</label>
     <input type="name" name="login"/>
 

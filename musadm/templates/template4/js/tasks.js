@@ -104,10 +104,8 @@ function addTaskNotePopup(task_id) {
 
 
 function assignmentTaskPopup(task_id) {
-    //loaderOn();
-
     $.ajax({
-        url: root + "tasks",
+        url: root + "/tasks",
         type: "GET",
         data: {
             action: "task_assignment_popup",
@@ -115,7 +113,6 @@ function assignmentTaskPopup(task_id) {
         },
         success: function(response){
             showPopup(response);
-            //loaderOff();
         }
     });
 }
@@ -124,7 +121,7 @@ function assignmentTaskPopup(task_id) {
 function markAsDone(task_id, func) {
     $.ajax({
         type: "GET",
-        url: root + "tasks",
+        url: root + "/tasks",
         data: {
             action: "markAsDone",
             task_id: task_id
@@ -146,7 +143,7 @@ function markAsDone(task_id, func) {
 function updateTaskDate(taskId, taskDate) {
     $.ajax({
         type: "GET",
-        url: root + "tasks",
+        url: root + "/tasks",
         data: {
             action: "update_date",
             task_id: taskId,
@@ -178,7 +175,7 @@ function refreshTasksTable(from, to) {
 function newTaskPopup() {
     $.ajax({
         type: "GET",
-        url: root + "tasks",
+        url: root + "/tasks",
         data: {
             action: "new_task_popup",
         },
@@ -194,7 +191,7 @@ function saveTask(formData, func) {
 
     $.ajax({
         type: "GET",
-        url: root + "tasks",
+        url: root + "/tasks",
         data: formData,
         success: function(responce){
             if(responce != "0") alert(responce);

@@ -30,6 +30,7 @@ if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
  * Блок проверки авторизации и прав доступа
  */
 $oUser = Core::factory("User")->getCurrent();
+
 if(!$oUser)
 {
     $host  = $_SERVER['HTTP_HOST'];
@@ -100,7 +101,10 @@ if($action == "getPaymentPopup")
 if( $action == "getTarifPopup" )
 {
     $userId =       Core_Array::getValue( $_GET, "userid", 0 );
-    $aoTarifs =     Core::factory( "Payment_Tarif" );
+    $Director = Core::factory( "User" )->getCurrent()->getDirector();
+
+    $aoTarifs = Core::factory( "Payment_Tarif" )
+        ->where( "subordinated", "=", $Director->getId() );
 
     if( !User::isAuthAs() ) $aoTarifs->where( "access", "=", "1" );
 
@@ -328,5 +332,89 @@ if( $action === "payment_delete" )
     $Payment->delete();
 
     $this->execute();
+    exit;
+}
+
+
+if( $action == "refreshTasksTable" )
+{
+    $Tasks = Core::factory( "Task" )
+        ->where( "associate", "=", $oUser->getId() )
+        ->orderBy( "date", "DESC" )
+        ->orderBy( "id", "DESC" )
+        ->findAll();
+
+    foreach ( $Tasks as $Task )
+    {
+        $Task->date( refactorDateFormat( $Task->date() ) );
+    }
+
+    $tasksIds = array();
+
+    foreach ( $Tasks as $Task )
+    {
+        $tasksIds[] = $Task->getId();
+    }
+
+    //Поиск всех комментариев, связанных с выбранными задачами
+    $Notes = Core::factory( "Task_Note" )
+        ->select([
+            "Task_Note.id AS id", "date", "task_id", "author_id", "text", "usr.name AS name", "usr.surname AS surname"
+        ])
+        ->where( "task_id", "IN", $tasksIds )
+        ->leftJoin( "User AS usr", "author_id = usr.id" )
+        ->orderBy( "date", "DESC" )
+        ->findAll();
+
+    //Изменение формата даты и времени комментариев
+    foreach ( $Notes as $Note )
+    {
+        $time = strtotime( $Note->date() );
+
+        if( date( "H:i", $time ) == "00:00" )
+        {
+            $dateFormat = "d.m.Y";
+        }
+        else
+        {
+            $dateFormat = "d.m.Y H:i";
+        }
+
+        $Note->date( date( $dateFormat, $time ) );
+    }
+
+    global $CFG;
+    Core::factory( "Core_Entity" )
+        ->addSimpleEntity( "wwwroot", $CFG->rootdir )
+        ->addEntities( $Tasks )
+        ->addEntities( $Notes )
+        ->xsl( "musadm/tasks/client_tasks.xsl" )
+        ->show();
+
+    exit;
+}
+
+
+if( $action === "saveUserComment" )
+{
+    $userId = Core_Array::Get( "userid", 0 );
+    $text = Core_Array::Get( "text", "" );
+
+    Core::factory( "User" )->addComment( $text, $userId );
+
+    echo "<div class='users'>";
+    $this->execute();
+    echo "</div>";
+
+    exit;
+}
+
+
+if( $action === "refreshTableUsers" )
+{
+    echo "<div class='users'>";
+    $this->execute();
+    echo "</div>";
+
     exit;
 }

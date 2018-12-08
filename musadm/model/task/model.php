@@ -12,6 +12,7 @@ class Task_Model extends Core_Entity
     protected $date;
     protected $done = 0;
     protected $done_date;
+    protected $type = 0;
     protected $associate = 0;
     protected $subordinated = 0;
 
@@ -44,6 +45,14 @@ class Task_Model extends Core_Entity
             $this->done = 0;
         }
 
+        return $this;
+    }
+
+
+    public function type( $val = null )
+    {
+        if( is_null( $val ) )   return intval( $this->type );
+        $this->type = intval( $val );
         return $this;
     }
 

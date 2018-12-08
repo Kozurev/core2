@@ -7,6 +7,7 @@
  */
 
 require_once "subordinated.php";
+require_once "events.php";
 
 
 /**
@@ -72,29 +73,45 @@ Core::attachObserver("beforeUserDelete", function($args){
 Core::attachObserver("beforeScheduleAreaSave", function( $args ){
     $Area = $args[0];
 
-    //Формирование пути
-    if( $Area->path() == "" )
-    {
-        $Area->path( translite( $Area->title() ) );
-    }
+    $Director = User::current()->getDirector();
+    if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+    $subordinated = $Director->getId();
+
+    $Area->path( translite( $Area->title() ) . "-" . $subordinated );
 
     //Создание элемента списка дополнительного свойства
     if( $Area->getId() == "" )
     {
-        $Director = User::current()->getDirector();
-        if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
-        $subordinated = $Director->getId();
-
         Core::factory( "Property_List_Values" )
             ->property_id( 15 )
             ->value( $Area->title() )
             ->subordinated( $subordinated )
             ->save();
     }
+    else
+    {
+        //debug( $Area );
+        $OldPropListVal = Core::factory( "Property_List_Values" )
+            ->where( "property_id", "=", 15 )
+            ->where( "subordinated", "=", $subordinated )
+            ->where( "value", "=", $Area->oldTitle )
+            ->find();
+
+        if( $OldPropListVal !== false )
+        {
+            $OldPropListVal
+                ->value( $Area->title() )
+                ->save();
+        }
+    }
 
     //Проверка на существование филиала с таким же путем
-    if( !$Area->getId() && Core::factory( "Schedule_Area" )->where( "path", "=", $Area->path() )->find() )
-        die( "Сохранение невозможно, так как уже существует филлиал имеющий путь: \"" . $Area->path() . "\"" );
+    if( Core::factory( "Schedule_Area" )
+        ->where( "id", "<>", $Area->getId() )
+        ->where( "path", "=", $Area->path() )
+        ->where( "subordinated", "=", $subordinated )
+        ->find() )
+        die( "Сохранение невозможно, так как уже существует филлиал с названием: \"" . $Area->title() . "\"" );
 });
 
 
@@ -406,7 +423,7 @@ Core::attachObserver( "afterScheduleReportSave", function( $args ){
         :   $commentText .= " не состоялась";
 
     $Lid = Core::factory( "Lid", $Report->clientId() );
-    $Lid->addComment( $commentText );
+    $Lid->addComment( $commentText, false );
 
     //Изменение статуса лида
     if( $Report->attendance() == 1 )
@@ -432,14 +449,9 @@ Core::attachObserver( "afterScheduleReportSave", function( $args ){
 
 
 /**
- *
+ * Автоматическое создание задачи типа "Оплата" для клиентов при остатке занятий 1 или меньше
  */
-//Core::attachObserver("beforePaymentSave", function( $args ){
-//    $Payment = $args[0];
-//
-//    if( $Payment->getId() == "" && $Payment->type() == 3 )
-//    {
-//        $description = $Payment->description();
-//        $Payment->description( "Выплата преподавателю. " . $description  );
-//    }
+//Core::attachObserver( "beforeScheduleReportSave", function( $args ){
+//    $Report = $args[0];
+//    if( $Report->attendance() == 1 )    return;
 //});

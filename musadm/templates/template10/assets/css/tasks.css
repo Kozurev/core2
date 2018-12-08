@@ -9,10 +9,13 @@
 }
 
 .tasks .tasks-comments {
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: visible;
     max-height: 250px;
 }
+
+/*.tasks .tasks-comments::-webkit-scrollbar { width: 0; }*/
+/*.tasks .tasks-comments { -ms-overflow-style: none; }*/
 
 .tasks .user-icon {
     display: inline-block;

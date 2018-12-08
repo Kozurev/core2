@@ -30,6 +30,7 @@ $aoNotes = Core::factory( "Certificate_Note" )
     ->select( array( "Certificate_Note.id", "date", "certificate_id", "author_id", "text", "usr.surname", "usr.name" ) )
     ->join( "User as usr", "author_id = usr.id" )
     ->orderBy( "date", "DESC" )
+    ->orderBy( "id", "DESC" )
     ->findAll();
 
 foreach ( $aoNotes as $Note )

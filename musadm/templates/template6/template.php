@@ -1,6 +1,6 @@
 <?php
 
-$this->css( "templates/template6/css/style.css" );
+$this->css( "/templates/template6/css/style.css" );
 
 /**
  * Вывод панели с заметками пользователя и датой последней авторизации 

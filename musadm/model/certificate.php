@@ -95,4 +95,20 @@ class Certificate extends Core_Entity
             ->findAll();
     }
 
+
+    public function addNote( $text, $triggerObserver = true )
+    {
+        $oCertificateNote = Core::factory( "Certificate_Note" )
+            ->text( $text )
+            ->certificateId( $this->id );
+
+        if( $triggerObserver == true )
+            Core::notify( array( &$oCertificateNote ), "beforeCertificateAddComment" );
+
+        $oCertificateNote->save();
+
+        if( $triggerObserver == true )
+            Core::notify( array( &$oCertificateNote ), "afterCertificateAddComment" );
+    }
+
 }

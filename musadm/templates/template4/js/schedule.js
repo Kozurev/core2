@@ -19,7 +19,7 @@ $(function(){
         .on("change", ".schedule_calendar", function(){
             loaderOn();
             var date = $(".schedule_calendar").val();
-            console.log( date );
+            //console.log( date );
             var userid = $("#userid").val();
             var newDate = new Date( $(".schedule_calendar").val() );
             var dayName = days[newDate.getDay()];
@@ -401,7 +401,7 @@ function refreshAreasTable() {
 function saveTeacherPayment(user, summ, date, description, func) {
     $.ajax({
         type: "GET",
-        url: root + "admin?menuTab=Main&menuAction=updateAction&ajax=1",
+        url: root + "/admin?menuTab=Main&menuAction=updateAction&ajax=1",
         async: false,
         data: {
             id: "",

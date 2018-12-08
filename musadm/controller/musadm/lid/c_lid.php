@@ -45,6 +45,7 @@ foreach ($aoLids as $lid)
     foreach ($lidComments as $comment)
     {
         if(!in_array($comment->authorId(), $authorsId)) $authorsId[] = $comment->authorId();
+        $comment->datetime( date( "d.m.y H:i", strtotime( $comment->datetime() ) ) );
     }
     $lid->addEntities($lidComments);
     $lid->addEntity(

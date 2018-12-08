@@ -95,12 +95,15 @@ $Director = Core::factory( "User" )
     ->superuser( 0 );
 $Director->save();
 
+Core::factory( "Orm" )->executeQuery( "DELETE FROM Property_Int WHERE property_id = 13 AND model_name <> 'User'" );
 
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Lid` ADD `subordinated` INT NOT NULL" );
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Lid` DROP COLUMN `active` " );
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Certificate` ADD `subordinated` INT NOT NULL" );
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Task` ADD `subordinated` INT NOT NULL" );
-Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Task` DROP COLUMN `type` " );
+Core::factory( "Orm" )->executeQuery( "UPDATE Task SET type = 0 WHERE 1" );
+Core::factory( "Orm" )->executeQuery( "ALTER TABLE Task MODIFY COLUMN type int DEFAULT 0 AFTER done_date;" );
+//Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Task` DROP COLUMN `type` " );
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Schedule_Area` ADD `subordinated` INT NOT NULL" );
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Schedule_Area` ADD `active` INT NOT NULL" );
 Core::factory( "Orm" )->executeQuery( "ALTER TABLE `Schedule_Group` ADD `subordinated` INT NOT NULL" );
@@ -130,13 +133,137 @@ Core::factory( "Orm" )->executeQuery( "UPDATE `Schedule_Group` SET subordinated 
 Core::factory( "Orm" )->executeQuery( "UPDATE `Schedule_Area` SET active = 1 WHERE 1" );
 Core::factory( "Orm" )->executeQuery( "UPDATE `Property_List_Values` SET subordinated = " . $Director->getId() . " WHERE 1" );
 
-//Core::factory( "Orm" )->executeQuery(
-//    "CREATE PROCEDURE `dropall` ()
-//    BEGIN
-//        DROP TABLE `Admin_Form`, `Admin_Form_Modelname`, `Admin_Form_Type`, `Admin_Menu`, `Certificate`, `Certificate_Note`, `Constant`, `Constant_Dir`, `Constant_Type`, `Lid`, `Lid_Comment`, `Page_Menu`,
-//        `Page_Template`, `Page_Template_Dir`, `Payment`, `Payment_Tarif`, `Payment_Type`, `Property`, `Property_Bool`, `Property_Bool_Assigment`, `Property_Dir`, `Property_Int`, `Property_Int_Assigment`,
-//        `Property_List`, `Property_List_Assigment`, `Property_List_Values`, `Property_String`, `Property_String_Assigment`, `Property_Text`, `Property_Text_Assigment`, `Schedule_Absent`, `Schedule_Area`,
-//        `Schedule_Group`, `Schedule_Group_Assignment`, `Schedule_Lesson`, `Schedule_Lesson_Absent`, `Schedule_Lesson_Report`, `Schedule_Lesson_TimeModified`, `Schedule_Lesson_Type`, `Structure`,
-//        `Structure_Item`, `Task`, `Task_Note`, `Task_Type`, `User`, `User_Group`;
-//    END;"
-//);
+//$Property = Core::factory( "Property" );
+//$User = Core::factory( "User", 503 );
+//
+//debug( $Property->getAllPropertiesList( $User ) );
+
+
+/**
+ * Разделение задач на типы и создание трех овых типов
+ */
+Core::factory( "Orm" )->executeQuery( "TRUNCATE Task_Type" );
+
+Core::factory( "Task_Type" )
+    ->title( "Оплата" )
+    ->save();
+
+Core::factory( "Task_Type" )
+    ->title( "Расписание" )
+    ->save();
+
+Core::factory( "Task_Type" )
+    ->title( "Комментарий к клиенту" )
+    ->save();
+
+
+/**
+ * Создание таблиц событий и типов событий
+ */
+Core::factory( "Orm" )->executeQuery( "
+CREATE TABLE Event_Type
+(
+    id int PRIMARY KEY AUTO_INCREMENT,
+    parent_id int,
+    name varchar(255),
+    title varchar(255)
+);" );
+
+Core::factory( "Orm" )->executeQuery( "
+CREATE TABLE Event
+(
+    id int PRIMARY KEY AUTO_INCREMENT,
+    time int,
+    author_id int,
+    author_fio varchar(255),
+    user_assignment_id int,
+    user_assignment_fio varchar(255),
+    type_id int,
+    data TEXT
+);
+" );
+
+
+Core::factory( "Orm" )->executeQuery( "
+CREATE TABLE User_Comment
+(
+    id int PRIMARY KEY AUTO_INCREMENT,
+    time int,
+    author_id int,
+    user_id int,
+    text text
+);
+" );
+
+/**
+ * Создание типов событий
+ */
+$EventSchedule = Core::factory( "Event_Type" )
+    ->name( "schedule" )
+    ->title( "Расписание" );
+$EventSchedule->save();
+
+$EventSchedule->appendChild( "Добавление пользователя в расписание", "schedule_append_user" );
+$EventSchedule->appendChild( "Удаление пользователя из расписания", "schedule_remove_user" );
+$EventSchedule->appendChild( "Создание периода отсутствия", "schedule_create_absent_period" );
+$EventSchedule->appendChild( "Изменение времени в актуальном графике", "schedule_change_time" );
+
+
+$EventClient = Core::factory( "Event_Type" )
+    ->name( "client" )
+    ->title( "Клиент" );
+$EventClient->save();
+
+$EventClient->appendChild( "Добавление в архив", "client_archive" );
+$EventClient->appendChild( "Восстановдение из архива", "client_unarchive" );
+$EventClient->appendChild( "Добавление комментария", "client_append_comment" );
+
+
+$EventPayment = Core::factory( "Event_Type" )
+    ->name( "payment" )
+    ->title( "Платеж" );
+$EventPayment->save();
+
+$EventPayment->appendChild( "Внесение средств на баланс клиента", "payment_change_balance" );
+$EventPayment->appendChild( "Внесение хозрасходов", "payment_host_costs" );
+$EventPayment->appendChild( "Выплата преподавателю", "payment_teacher_payment" );
+$EventPayment->appendChild( "Добавление комментария к платежу", "payment_append_comment" );
+
+
+$EventTask = Core::factory( "Event_Type" )
+    ->name( "task" )
+    ->title( "Задача" );
+$EventTask->save();
+
+$EventTask->appendChild( "Создание задачи", "task_create" );
+$EventTask->appendChild( "Закрытие задачи", "task_done" );
+$EventTask->appendChild( "Добавление комментария к задаче", "task_append_comment" );
+$EventTask->appendChild( "Изменение даты контроля задачи", "task_change_date" );
+
+
+$EventLid = Core::factory( "Event_Type" )
+    ->name( "lid" )
+    ->title( "Лид" );
+$EventLid->save();
+
+$EventLid->appendChild( "Создание лида", "lid_create" );
+$EventLid->appendChild( "Добавление комментария к лиду", "lid_append_comment" );
+$EventLid->appendChild( "Изменение даты контроля лида", "lid_change_date" );
+
+
+$EventCertificate = Core::factory( "Event_Type" )
+    ->name( "certificate" )
+    ->title( "Сертификат" );
+$EventCertificate->save();
+
+$EventCertificate->appendChild( "Создание сертификата", "certificate_create" );
+$EventCertificate->appendChild( "Добавление комментария к сертификату", "certificate_append_comment" );
+
+//Core::factory( "Task" );
+//Core::factory( "Certificate" );
+//Core::factory( "Certificate_Note" );
+//$Event = Core::factory( "Event", 38 );
+//
+//debug( $Event );
+//debug( $Event->data() );
+

@@ -8,10 +8,10 @@
 
 
 global $CFG;
-$oProperty = Core::factory("Property");
+$Property = Core::factory( "Property" );
 
-$oUser = Core::factory( "User" )->getCurrent()->getDirector();
-$subordinated = $oUser->getId();
+$User = Core::factory( "User" )->getCurrent()->getDirector();
+$subordinated = $User->getId();
 
 User::parentAuth()->groupId() == 6 || User::parentAuth()->superuser() == 1
     ?   $isDirector = 1
@@ -22,31 +22,31 @@ $groupId == 5
     ?   $xsl = "musadm/users/clients.xsl"
     :   $xsl = "musadm/users/teachers.xsl";
 
-$aoUsers = Core::factory("User")
+$Users = Core::factory("User")
     ->where( "subordinated", "=", $subordinated )
-    ->where("group_id", "=", $groupId)
-    ->where("active", "=", 1)
-    ->orderBy("id", "DESC")
+    ->where( "group_id", "=", $groupId )
+    ->where( "active", "=", 1 )
+    ->orderBy( "id", "DESC" )
     ->findAll();
 
-$oUserGroup = Core::factory("User_Group", $groupId);
+$UserGroup = Core::factory( "User_Group", $groupId );
 
-foreach ($aoUsers as $user)
+foreach ( $Users as $User )
 {
-    $aoPropertiesList = $oProperty->getPropertiesList($oUserGroup);
-    foreach ($aoPropertiesList as $prop)
+    $PropertiesList = $Property->getPropertiesList( $UserGroup );
+    foreach ( $PropertiesList as $prop )
     {
-        $user->addEntities($prop->getPropertyValues($user), "property_value");
+        $User->addEntities( $prop->getPropertyValues( $User ), "property_value" );
     }
 }
 
-Core::factory("Core_Entity")
-    ->xsl($xsl)
+Core::factory( "Core_Entity" )
+    ->xsl( $xsl )
     ->addSimpleEntity( "page-theme-color", "primary" )
     ->addSimpleEntity( "is_director", $isDirector )
     ->addSimpleEntity( "wwwroot", $CFG->rootdir )
     ->addSimpleEntity( "table_type", "active" )
-    ->addEntities($aoUsers)
+    ->addEntities( $Users )
     ->show();
 
 
@@ -56,7 +56,7 @@ Core::factory("Core_Entity")
 if( $groupId == 4 && User::checkUserAccess(["groups" => [6]]) )
 {
     $aoManagers = Core::factory( "User" )
-        ->where( "subordinated", "=", $oUser->getId() )
+        ->where( "subordinated", "=", $subordinated )
         ->where( "active", "=", 1 )
         ->where( "group_id", "=", 2 )
         ->findAll();

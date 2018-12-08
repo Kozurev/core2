@@ -8,13 +8,6 @@
             </div>
 
             <div class="col-lg-2 col-md-2 col-sm-2">
-                <!--<label for="per_lesson">Поурочно </label>-->
-                <!--<input id="per_lesson" type="checkbox" data-userid="{note/object_id}">-->
-                    <!--<xsl:if test="per_lesson/value = 1">-->
-                        <!--<xsl:attribute name="checked">checked</xsl:attribute>-->
-                    <!--</xsl:if>-->
-                <!--</input>-->
-
                 <span>Поурочно: </span>
 
                 <input type="checkbox" id="per_lesson" class="checkbox-new" data-userid="{note/object_id}" >

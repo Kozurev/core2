@@ -50,6 +50,10 @@ if( $action == "updateForm" )
     $popupData =    Core::factory( "Core_Entity" );
     $modelId =      Core_Array::getValue( $_GET, "groupid", 0 );
 
+    $Director = User::current()->getDirector();
+    if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+    $subordinated = $Director->getId();
+
     if( $modelId != 0 )
     {
         $oGroup = Core::factory( "Schedule_Group", $modelId );
@@ -62,8 +66,10 @@ if( $action == "updateForm" )
     }
 
     $aoUsers = Core::factory( "User" )
+        ->open()
         ->where( "group_id", "=", 4 )
         ->where( "group_id", "=", 5, "or" )
+        ->close()
         ->where( "subordinated", "=", $subordinated )
         ->where( "active", "=", 1 )
         ->orderBy( "surname" )

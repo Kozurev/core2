@@ -127,7 +127,7 @@
                 <span>Учителя</span>
             </div>
             <div class="column">
-                <select class="form-control" name="property_21[]" multiple="multiple" size="5" >
+                <select class="form-control" name="property_21[]" multiple="multiple" size="3" >
                     <option value="0">...</option>
                     <xsl:call-template name="property_list" >
                         <xsl:with-param name="property_id" select="21" />

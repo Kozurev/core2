@@ -64,8 +64,13 @@ class Task_Note extends Core_Entity
     public function save($obj = null)
     {
         Core::notify(array(&$this), "beforeTaskNoteSave");
-        $this->date = date("Y-m-d H:i:s");
-        if($this->author_id == "")  $this->author_id = Core::factory("User")->getCurrent()->getId();
+
+        if( $this->date == null )       $this->date = date("Y-m-d H:i:s");
+
+        if( $this->author_id === null )
+        {
+            $this->author_id = User::parentAuth()->getId();
+        }
         parent::save();
         Core::notify(array(&$this), "afterTaskNoteSave");
     }

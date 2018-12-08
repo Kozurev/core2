@@ -14,7 +14,7 @@
             </h1>
         </div><!--//branding-->
         <ol class="breadcrumb">
-            <li><a href="{rootdir}">Главная</a></li>
+            <li><a href="{rootdir}/">Главная</a></li>
             <xsl:apply-templates select="breadcumb" />
         </ol>
 	</xsl:template>

@@ -420,7 +420,7 @@ if( $oUser->groupId() == 4 )
 
     //$oCurrentUser = Core::factory( "User" )->getCurrent();
     //User::isAuthAs() ? $isAdmin = 1 : $isAdmin = 0;
-    User::checkUserAccess( ["groups" => [6]], User::parentAuth() )
+    User::checkUserAccess( ["groups" => [1, 6]], User::parentAuth() )
         ?   $isAdmin = 1
         :   $isAdmin = 0;
 

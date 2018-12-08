@@ -26,10 +26,12 @@
 }
 
 .schedule .teacher_payments_block {
-	overflow-y: scroll;
+	overflow-y: auto;
 	max-height: 470px;
 }
 
+.schedule .teacher_payments_block::-webkit-scrollbar { width: 0; }
+.schedule .teacher_payments_block { -ms-overflow-style: none; }
 
 /**
  * Таблица >>

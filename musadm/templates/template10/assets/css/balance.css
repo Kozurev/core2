@@ -5,10 +5,17 @@
 
 .balance-lessons {
     max-height: 430px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
+
+/*.balance-lessons::-webkit-scrollbar { width: 0; }*/
+/*.balance-lessons { -ms-overflow-style: none; }*/
 
 .balance-payments {
     max-height: 590px;
-    overflow-y: scroll;
+    overflow-y: auto;
+    margin-bottom: 30px;
 }
+
+/*.balance-payments::-webkit-scrollbar { width: 0; }*/
+/*.balance-lessons { -ms-overflow-style: none; }*/

@@ -199,7 +199,10 @@ class Schedule_Controller
                 ->close();
         }
 
-        $Lessons = $Lessons->orderBy( "time_from" )->findAll();
+        $Lessons = $Lessons
+            ->orderBy( "time_from" )
+            //->orderBy(  )
+            ->findAll();
 
         if( $this->date )
         {
@@ -233,9 +236,9 @@ class Schedule_Controller
         $index = 0;
         $table = array();
 
+
         /**
         * Дни предыдущего месяца
-        * Начало>>
         */
        if( $this->calendarMonth == "01" )
        {
@@ -262,14 +265,10 @@ class Schedule_Controller
 
            if( $i == 0 )   $dateStart = $date;
        }
-       /**
-        * <<Конец
-        * Дни предыдущего месяца
-        */
+
 
         /**
          * Дни текущего месяца
-         * Начало>>
          */
         $day = 0;
         for( $i = $firstDayNumber; $i < $countDays + $firstDayNumber; $i++ )
@@ -283,14 +282,10 @@ class Schedule_Controller
             $table[$index]["lessons"] = $lessons;
             $index++;
         }
-        /**
-         * <<Конец
-         * Дни текущего месяца
-         */
+
 
         /**
          * Дни следующего месяца
-         * Начало>>
          */
         if( intval( $this->calendarMonth ) == 12 )
         {
@@ -318,10 +313,6 @@ class Schedule_Controller
             $table[$i+$index-1]["date"] = $date;
             $table[$i+$index-1]["lessons"] = $lessons;
         }
-        /**
-         * <<Конец
-         * Дни следующего месяца
-         */
 
 
         $today = date("Y-m-d");
@@ -334,15 +325,32 @@ class Schedule_Controller
 
             echo "<span class='date'>" . refactorDateFormat( $table[$i]["date"], ".", "short" ) . "</span>";
 
+
+            /**
+             * Поиск филиалов в которых проводяться занятия
+             */
             if( count( $table[$i]["lessons"] ) > 0 )
             {
-                $Area = Core::factory( "Schedule_Area", $table[$i]["lessons"][0]->areaId() );
-                echo "<hr/><span class='area'>". $Area->title() ."</span><hr/>";
+                //$Area = Core::factory( "Schedule_Area", $table[$i]["lessons"][0]->areaId() );
+                //echo "<hr/><span class='area'>". $Area->title() ."</span><hr/>";
+                $areasIds = [];
+                foreach ( $table[$i]["lessons"] as $Lesson )   $areasIds[] = $Lesson->areaId();
+                $Areas = Core::factory( "Schedule_Area" )->where( "id", "IN", $areasIds )->findAll();
+                foreach ( $Areas as $Area ) $Areas[$Area->getId()] = clone $Area;
             }
 
             if( count( $table[$i]["lessons"] ) > 0 )
+            {
+                $lastAreaId = $table[$i]["lessons"][0]->areaId();
+                echo "<hr/><b><span class='area'>". Core_Array::getValue( $Areas, $lastAreaId, null )->title() ."</span></b><hr/>";
+
                 foreach ( $table[$i]["lessons"] as $Lesson )
                 {
+                    if( $Lesson->areaId() != $lastAreaId )
+                    {
+                        echo "<hr/><b><span class='area'>". Core_Array::getValue( $Areas, $Lesson->areaId(), null )->title() ."</span></b><hr/>";
+                    }
+
                     if( $today === $table[$i]["date"] ) $aoTeacherLessons[] = $Lesson;
 
                     echo "<span class='time'>" . refactorTimeFormat( $Lesson->timeFrom() ) . " - " . refactorTimeFormat( $Lesson->timeTo() ) . "</span>";
@@ -356,7 +364,9 @@ class Schedule_Controller
                     }
 
                     echo "<br/>";
+                    $lastAreaId = $Lesson->areaId();
                 }
+            }
 
             echo "</td>";
             if( ($i + 1) % 7 == 0 )   echo "</tr>";

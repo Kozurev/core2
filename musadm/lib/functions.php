@@ -252,6 +252,10 @@ function translite( $str )
         {
             $result .= "-";
         }
+        elseif ( is_numeric( $temp ) )
+        {
+            $result .= $temp;
+        }
         else
         {
             if( Core_Array::getValue( $translite, $temp, false ) )

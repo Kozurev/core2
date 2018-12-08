@@ -40,7 +40,9 @@ $queryString = Core::factory( "Orm" )
     ->join( "User AS u", "u.id = p.object_id" )
     ->where( "u.active", "=", 1 )
     ->where( "u.subordinated", "=", $subordinated )
-    ->where( "property_id", "=", 12 )
+    ->where( "u.group_id", "=", 5 )
+    ->where( "p.model_name", "=", "User" )
+    ->where( "p.property_id", "=", 12 )
     ->getQueryString();
 
 $Result = Core::factory("Orm")->executeQuery( $queryString );
@@ -54,7 +56,9 @@ $queryString = Core::factory( "Orm" )
     ->join( "User AS u", "u.id = p.object_id" )
     ->where( "u.active", "=", 1 )
     ->where( "u.subordinated", "=", $subordinated )
-    ->where( "property_id", "=", 13 )
+    ->where( "u.group_id", "=", 5 )
+    ->where( "p.model_name", "=", "User" )
+    ->where( "p.property_id", "=", 13 )
     ->where( "value", ">", 0 )
     ->getQueryString();
 
@@ -68,8 +72,10 @@ $queryString = Core::factory("Orm")
     ->from( "Property_Int AS p" )
     ->join( "User AS u", "u.id = p.object_id" )
     ->where( "u.active", "=", 1 )
+    ->where( "u.group_id", "=", 5 )
+    ->where( "p.model_name", "=", "User" )
     ->where( "u.subordinated", "=", $subordinated )
-    ->where( "property_id", "=", 13 )
+    ->where( "p.property_id", "=", 13 )
     ->where( "value", "<", 0 )
     ->getQueryString();
 
@@ -84,7 +90,9 @@ $queryString = Core::factory( "Orm" )
     ->join( "User AS u", "u.id = p.object_id" )
     ->where( "u.active", "=", 1 )
     ->where( "u.subordinated", "=", $subordinated )
-    ->where( "property_id", "=", 14 )
+    ->where( "u.group_id", "=", 5 )
+    ->where( "p.model_name", "=", "User" )
+    ->where( "p.property_id", "=", 14 )
     ->where( "value", ">", 0 )
     ->getQueryString();
 

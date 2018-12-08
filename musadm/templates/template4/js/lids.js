@@ -114,7 +114,7 @@ function findLid(id) {
 function getCommentPopup(lidid){
     $.ajax({
         type: "GET",
-        url: root + "lids",
+        url: root + "/lids",
         data: {
             action: "add_note_popup",
             model_id: lidid
@@ -135,7 +135,7 @@ function getCommentPopup(lidid){
 function saveLid(data, func){
     $.ajax({
         type: "GET",
-        url: root + "lids?action=save_lid",
+        url: root + "/lids?action=save_lid",
         async: false,
         data: data,
         success: function(responce){
@@ -155,7 +155,7 @@ function saveLid(data, func){
 function changeStatus(lidid, statusid, func){
     $.ajax({
         type: "GET",
-        url: root + "lids",
+        url: root + "/lids",
         data: {
             action: "changeStatus",
             model_id: lidid,
@@ -178,7 +178,7 @@ function changeStatus(lidid, statusid, func){
 function changeDate(lidid, date, func){
     $.ajax({
         type: "GET",
-        url: root + "lids",
+        url: root + "/lids",
         async: false,
         data: {
             action: "changeDate",

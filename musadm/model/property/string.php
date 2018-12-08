@@ -22,7 +22,7 @@ class Property_String extends Core_Entity
 
     public function property_id($val = null)
     {
-        if(is_null($val))	return $this->property_id;
+        if(is_null($val))	return intval( $this->property_id );
         $this->property_id = intval($val);
         return $this;
     }

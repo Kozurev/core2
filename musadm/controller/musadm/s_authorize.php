@@ -18,13 +18,13 @@ if(isset($_POST["login"]) && isset($_POST["password"]))
 
     $oUser = $oUser->authorize($rememberMe);
 
-    if($oUser)
+    if( $oUser )
     {
         global $CFG;
-        if($oUser->groupId() == 3 || $oUser->groupId() == 4)   $back = "/".$CFG->rootdir."schedule/";
-        elseif($oUser->groupId() < 3 || $oUser->groupId() == 6)$back = "/".$CFG->rootdir;
-        elseif( $oUser->groupId() == 5 ) $back = "/" . $CFG->rootdir . "balance";
-        header("Location: " . $back);
+        if( $oUser->groupId() == 3 || $oUser->groupId() == 4 )      $back = $CFG->rootdir . "/schedule/";
+        elseif( $oUser->groupId() < 3 || $oUser->groupId() == 6 )   $back = $CFG->rootdir . "/";
+        elseif( $oUser->groupId() == 5 )                            $back = $CFG->rootdir . "/balance";
+        header( "Location: " . $back );
     }
 }
 
@@ -43,7 +43,7 @@ if( Core_Array::getValue( $_GET, "auth_as", null ) !== null )
     User::authAs( Core_Array::getValue( $_GET, "auth_as", null ) );
     $User = Core::factory( "User" )->getCurrent();
 
-    $url = "/" . $CFG->rootdir ;
+    $url = $CFG->rootdir ;
     header( "Location: " . $url );
 }
 
@@ -56,14 +56,14 @@ if( Core_Array::getValue( $_GET, "auth_revert", null ) !== null )
     $User = Core::factory( "User" )->getCurrent();
     if( $User == false )
     {
-        $url = $CFG->rootdir . "authorize/";
+        $url = $CFG->rootdir . "/authorize/";
     }
     else
     {
         $url = $CFG->rootdir;
     }
 
-    header( "Location: " . "/" . $url );
+    header( "Location: " . $url );
 }
 
 

@@ -84,10 +84,12 @@ if( $action === "saveCertificate" )
 
     if( $note != "" )
     {
-        $oCertificateNote = Core::factory( "Certificate_Note" )
-            ->text( $note )
-            ->certificateId( $oCertificate->getId() )
-            ->save();
+//        $oCertificateNote = Core::factory( "Certificate_Note" )
+//            ->text( $note )
+//            ->certificateId( $oCertificate->getId() )
+//            ->save();
+
+        $oCertificate->addNote( $note, false );
     }
 
     exit;
@@ -99,10 +101,12 @@ if( $action === "saveCertificateNote" )
     $note = Core_Array::getValue( $_GET, "note", "" );
     $certId = Core_Array::getValue( $_GET, "certificate_id", 0 );
 
-    $oCertificateNote = Core::factory( "Certificate_Note" )
-        ->text( $note )
-        ->certificateId( $certId )
-        ->save();
+//    $oCertificateNote = Core::factory( "Certificate_Note" )
+//        ->text( $note )
+//        ->certificateId( $certId )
+//        ->save();
+
+    Core::factory( "Certificate", $certId )->addNote( $note );
 
     exit;
 }

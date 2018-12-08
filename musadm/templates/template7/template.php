@@ -1,7 +1,26 @@
 <?php
 
-    $oUser = Core::factory("User")->getCurrent();
-    //$pageUserId = Core_Array::getValue($_GET, "userid", 0);
+    $pageUserId = Core_Array::Get( "userid", null );
+    $subordinated = User::current()->getDirector()->getId();
+
+    if( is_null( $pageUserId ) )
+    {
+        $User = Core::factory("User")->getCurrent();
+    }
+    else
+    {
+        $User = Core::factory( "User", $pageUserId );
+    }
+
+    /**
+     * Проверка на принадлежность клиента, под которым происходит авторизация,
+     * тому же директору, которому принадлежит и менеджер
+     */
+    if( $User->subordinated() !== $subordinated && !is_null( $pageUserId ) )
+    {
+        die( "Доступ к личному кабинету данного пользователя заблокирован, так как он принадлежит другой организации" );
+    }
+
 
     is_object( $this->oStructureItem )
         ?   $areaId = $this->oStructureItem->getId()
@@ -9,13 +28,13 @@
 
 
         if(
-            User::checkUserAccess( ["groups" => [2]], $oUser )
-            || ( User::checkUserAccess( ["groups" => [6]], $oUser ) && is_object( $this->oStructureItem ) )
+            User::checkUserAccess( ["groups" => [2]], $User )
+            || ( User::checkUserAccess( ["groups" => [6]], $User ) && is_object( $this->oStructureItem ) )
         )   $this->css("/templates/template7/css/style.css");
 
         if(
-            User::checkUserAccess( ["groups" => [2, 4]], $oUser )
-            || ( User::checkUserAccess( ["groups" => [6]], $oUser ) && is_object( $this->oStructureItem ) )
+            User::checkUserAccess( ["groups" => [2, 4]], $User )
+            || ( User::checkUserAccess( ["groups" => [6]], $User ) && is_object( $this->oStructureItem ) )
         ) { ?>
 
         <div class="row calendar_small">
@@ -52,6 +71,6 @@
         <?php $this->execute();?>
     </div>
 
-    <input type="hidden" id="userid" value="<?=$oUser->getId()?>" />
+    <input type="hidden" id="userid" value="<?=$User->getId()?>" />
     <input type="hidden" id="areaid" value="<?=$areaId?>" />
 

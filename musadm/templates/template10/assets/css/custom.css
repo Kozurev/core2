@@ -326,10 +326,16 @@ header {
     width: 1140px;
     z-index: 998;
     background-color: #f9f9fb;
-    top: -115px;
+    top: -133px;
     padding-top: 10px;
     margin-bottom: 20px;
+    max-height: 315px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
+
+/*.dynamic-fixed-row::-webkit-scrollbar { width: 0; }*/
+/*.dynamic-fixed-row { -ms-overflow-style: none; }*/
 
 .dynamic-fixed-row .searching-row {
     margin-bottom: 20px;

@@ -18,9 +18,10 @@
             <table id="sortingTable" class="table table-striped">
                 <thead>
                     <tr class="header">
-                        <th>Фамилия</th>
-                        <th>Имя</th>
-                        <th>Отчество</th>
+                        <!--<th>Фамилия</th>-->
+                        <!--<th>Имя</th>-->
+                        <!--<th>Отчество</th>-->
+                        <th>ФИО</th>
                         <th>Инструмент</th>
                         <th>График для занятий</th>
                         <th>Действия</th>
@@ -37,9 +38,17 @@
 
     <xsl:template match="user">
         <tr>
-            <td><a href="/{/root/wwwroot}authorize?auth_as={id}"><xsl:value-of select="surname" /></a></td>
-            <td><xsl:value-of select="name" /></td>
-            <td><xsl:value-of select="patronimyc" /></td>
+            <td>
+                <a href="{/root/wwwroot}/schedule/?userid={id}">
+                    <xsl:value-of select="surname" />
+                    <xsl:text> </xsl:text>
+                    <xsl:value-of select="name" />
+                    <xsl:text> </xsl:text>
+                    <xsl:value-of select="patronimyc" />
+                </a>
+            </td>
+            <!--<td><xsl:value-of select="name" /></td>-->
+            <!--<td><xsl:value-of select="patronimyc" /></td>-->
             <td><xsl:value-of select="property_value[property_id = 20]/value" /></td>
             <td><xsl:value-of select="property_value[property_id = 31]/value" /></td>
             <td>

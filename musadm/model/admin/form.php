@@ -550,5 +550,4 @@ class Admin_Form extends Admin_Form_Model
         $this->addEntities($aoTypes, "item");
     }
 
-
 }

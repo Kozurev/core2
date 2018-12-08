@@ -109,9 +109,21 @@ if( User::checkUserAccess( ["groups" => [2]] ) )
     }
 
     $tasksIds = array();
+    $clientsAssignments = array();
+
     foreach ( $Tasks as $Task )
     {
         $tasksIds[] = $Task->getId();
+
+        //Поиск пользователей, с которыми связаны задачи
+        if( $Task->associate() !== 0 )
+        {
+            $Client = Core::factory( "User", $Task->associate() );
+            if( $Client !== false )
+            {
+                $clientsAssignments[] = $Client;
+            }
+        }
     }
 
     $Notes = Core::factory( "Task_Note" )
@@ -119,7 +131,7 @@ if( User::checkUserAccess( ["groups" => [2]] ) )
             "Task_Note.id AS id", "date", "task_id", "text", "usr.name AS name", "usr.surname AS surname"
         ])
         ->where( "task_id", "IN", $tasksIds )
-        ->join( "User AS usr", "author_id = usr.id" )
+        ->leftJoin( "User AS usr", "author_id = usr.id" )
         ->orderBy( "date", "DESC" )
         ->findAll();
 
@@ -129,9 +141,13 @@ if( User::checkUserAccess( ["groups" => [2]] ) )
         $Note->date( date( "d.m.Y H:i", $time ) );
     }
 
+    global $CFG;
+
     $TasksOutput = Core::factory( "Core_Entity" )
+        ->addSimpleEntity( "wwwroot", $CFG->rootdir )
         ->addEntities( $Tasks )
         ->addEntities( $Notes )
+        ->addEntities( $clientsAssignments, "assignment" )
         ->addSimpleEntity( "periods", "0" )
         ->xsl( "musadm/tasks/all.xsl" );
 
@@ -139,7 +155,7 @@ if( User::checkUserAccess( ["groups" => [2]] ) )
     <div class="dynamic-fixed-row">
         <div class="row searching-row">
             <form action="." method="GET" id="search_client">
-                <div class="right col-md-2">
+                <div class="right col-md-1">
                     <h4>Поиск клиента</h4>
                 </div>
                 <div class="col-md-2">
@@ -158,6 +174,9 @@ if( User::checkUserAccess( ["groups" => [2]] ) )
                 <div class="col-md-2">
                     <a href="#" class="btn btn-red" id="user_search_clear">Очистить</a>
                 </div>
+                <div class="col-md-2">
+                    <a href="#" class="btn btn-primary user_create" data-usergroup="5">Создать</a>
+                </div>
             </form>
         </div>
 
@@ -173,5 +192,72 @@ if( User::checkUserAccess( ["groups" => [2]] ) )
         </div>
     </div>
     <?
+
+
+    /**
+     * Список действий менеджера
+     * доступен только директорам
+     */
+
+    $LIMIT_STEP = 5;    //Лимит кол-ва отображаемых/подгружаемых событий
+    $limit = Core_Array::Get( "limit", $LIMIT_STEP );
+    $bEnableLoadButton = 1;  //Флаг активности кнопки подгрузки
+    $dateFrom = Core_Array::Get( "event_date_from", null ); //Начала временного периода
+    $dateTo = Core_Array::Get( "event_date_to", null );     //Конец временного периода
+
+    $Events = Core::factory( "Event" )
+        ->where( "author_id", "=", $oUser->getId() )
+        ->orderBy( "time", "DESC" );
+
+    if ( $dateFrom === null && $dateTo === null )
+    {
+        $totalCount = clone $Events;
+        $totalCount = $totalCount->getCount();
+
+        $Events->limit( $limit );
+
+        if( $totalCount <= $limit )
+        {
+            $bEnableLoadButton = 0;
+        }
+    }
+    else
+    {
+        $bEnableLoadButton = 0;
+
+        if ( $dateFrom !== null )
+        {
+            $Events->where( "time", ">=", strtotime( $dateFrom ) );
+        }
+
+        if( $dateTo !== null )
+        {
+            $Events->where( "time", "<=", strtotime( $dateTo . " + 1 day" ) );
+        }
+    }
+
+
+    $Events = $Events->findAll();
+
+    foreach ( $Events as $Event )
+    {
+        $Event->date = date( "d.m.Y H:i", $Event->time() );
+        $Event->text = $Event->getTemplateString();
+    }
+
+    global $CFG;
+
+    echo "<div class='events'>";
+    Core::factory( "Core_Entity" )
+        ->addEntity( $oUser )
+        ->addEntities( $Events )
+        ->addSimpleEntity( "limit", $limit += $LIMIT_STEP )
+        ->addSimpleEntity( "date_from", $dateFrom )
+        ->addSimpleEntity( "date_to", $dateTo )
+        ->addSimpleEntity( "enable_load_button", $bEnableLoadButton )
+        ->xsl( "musadm/users/events.xsl" )
+        ->show();
+    echo "</div>";
+
 
 }

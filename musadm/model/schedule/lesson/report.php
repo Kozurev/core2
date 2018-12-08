@@ -85,7 +85,7 @@ class Schedule_Lesson_Report extends Core_Entity
 
     public function attendance($val = null)
     {
-        if(is_null($val))   return $this->attendance;
+        if(is_null($val))   return intval( $this->attendance );
         if($val == true)    $this->attendance = 1;
         elseif($val == false)$this->attendance = 0;
         return $this;

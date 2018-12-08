@@ -34,7 +34,7 @@
     <xsl:template match="schedule_area">
 
         <tr>
-            <td><a href="/{/root/wwwroot}schedule/{path}"><xsl:value-of select="title" /></a></td>
+            <td><a href="{/root/wwwroot}/schedule/{path}"><xsl:value-of select="title" /></a></td>
             <td><xsl:value-of select="count_classess" /></td>
             <td>
                 <!--<input type="checkbox" name="schedule_area_active" data-area_id="{id}">-->

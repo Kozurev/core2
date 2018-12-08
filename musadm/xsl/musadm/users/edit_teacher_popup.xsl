@@ -46,6 +46,13 @@
             </div>
             <hr/>
             <div class="column">
+                <span>Отчество</span>
+            </div>
+            <div class="column">
+                <input class="form-control" type="text" value="{user/patronimyc}" name="patronimyc"  />
+            </div>
+            <hr/>
+            <div class="column">
                 <span>Телефон</span>
             </div>
             <div class="column">

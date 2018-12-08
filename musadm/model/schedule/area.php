@@ -24,12 +24,14 @@ class Schedule_Area extends Core_Entity
     }
 
 
-    public function title($val = null)
+    public function title( $val = null )
     {
-        if(is_null($val))   return $this->title;
-        if(strlen($val) > 255)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("title", "Schedule_Area", 255)));
-        $this->title = strval($val);
+        if( is_null( $val ) )   return $this->title;
+        if( strlen( $val ) > 255 )
+            die( Core::getMessage( "TOO_LARGE_VALUE", ["title", "Schedule_Area", 255] ) );
+
+        $this->oldTitle = $this->title;
+        $this->title = strval( $val );
         return $this;
     }
 
@@ -79,6 +81,7 @@ class Schedule_Area extends Core_Entity
     public function save( $obj = null )
     {
         Core::notify(array(&$this), "beforeScheduleAreaSave");
+        if( isset( $this->oldTitle ) )  unset( $this->oldTitle );
         parent::save();
         Core::notify(array(&$this), "afterScheduleAreaSave");
     }

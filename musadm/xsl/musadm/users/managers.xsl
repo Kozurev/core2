@@ -16,8 +16,9 @@
             <table id="sortingTable" class="table table-striped">
                 <thead>
                     <tr class="header">
-                        <th>Фамилия</th>
-                        <th>Имя</th>
+                        <!--<th>Фамилия</th>-->
+                        <!--<th>Имя</th>-->
+                        <th>ФИО</th>
                         <th>Телефон</th>
                         <th>Действия</th>
                     </tr>
@@ -35,8 +36,16 @@
     <xsl:template match="user">
 
         <tr>
-            <td><a href="/{/root/wwwroot}authorize?auth_as={id}"><xsl:value-of select="surname" /></a></td>
-            <td><xsl:value-of select="name" /></td>
+            <td>
+                <a href="{/root/wwwroot}/authorize?auth_as={id}">
+                    <xsl:value-of select="surname" />
+                    <xsl:text> </xsl:text>
+                    <xsl:value-of select="name" />
+                    <xsl:text> </xsl:text>
+                    <xsl:value-of select="patronimyc" />
+                </a>
+            </td>
+            <!--<td><xsl:value-of select="name" /></td>-->
             <td><xsl:value-of select="phone_number" /><br/></td>
 
             <td>

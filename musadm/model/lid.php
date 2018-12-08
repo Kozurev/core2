@@ -16,6 +16,26 @@ class Lid extends Lid_Model
     }
 
 
+    public function changeDate( $date )
+    {
+        $oldDate = $this->controlDate();
+
+        $ObserverArgs = array(
+            "Lid" => &$this,
+            "new_date" => $date,
+            "old_date" => $oldDate
+        );
+
+        Core::notify( $ObserverArgs, "beforeLidChangeDate" );
+
+        $this
+            ->controlDate( $date )
+            ->save();
+
+        Core::notify( $ObserverArgs, "afterLidChangeDate" );
+    }
+
+
     public function save($obj = null)
     {
         Core::notify(array(&$this), "beforeLidSave");
@@ -57,7 +77,14 @@ class Lid extends Lid_Model
     }
 
 
-    public function addComment( $text )
+    /**
+     * Добавление комментария к лиду
+     *
+     * @param $text
+     * @param bool $triggerObserver
+     * @return $this
+     */
+    public function addComment( $text, $triggerObserver = true )
     {
         if( !$this->id )    die( "Не указан id лида при сохранении комментария" );
 
@@ -66,12 +93,20 @@ class Lid extends Lid_Model
             ?   $authorId = 0
             :   $authorId = $User->getId();
 
-        Core::factory( "Lid_Comment" )
+        $Comment = Core::factory( "Lid_Comment" )
             ->datetime( date( "Y-m-d H:i:s" ) )
             ->authorId( $authorId )
             ->lidId( $this->id )
-            ->text( $text )
-            ->save();
+            ->text( $text );
+            //->save();
+
+        if( $triggerObserver == true )
+            Core::notify( array( &$Comment ), "beforeLidAddComment" );
+
+        $Comment->save();
+
+        if( $triggerObserver == true )
+            Core::notify( array( &$Comment ), "afterLidAddComment" );
 
         return $this;
     }

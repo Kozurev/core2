@@ -23,21 +23,36 @@
         ->css( "/templates/template10/assets/css/tasks.css" )
         ->css( "/templates/template10/assets/css/checkbox.css" )
         ->css( "/templates/template10/assets/css/tooltip.css" )
+        ->css( "/templates/template10/assets/css/scroll.css" )
         ->js( "/templates/template10/assets/plugins/jquery.min.js" );
 
         global $CFG;
-        $oUser = Core::factory("User")->getCurrent();
-        $oUserGroup  = $oUser->getParent();
-        $rootdir = "/" . $CFG->rootdir;
-        $disauthorizeLink = $rootdir . "authorize?auth_revert=1";
-
-        $name = $oUser->name();
-        $surname = $oUser->surname();
-        $isAdmin = $oUser->groupId() <= 3;
 
         $Director = User::current()->getDirector();
         if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
         $subordinated = $Director->getId();
+
+        $pageUserId = Core_Array::Get( "userid", null );
+
+        is_null( $pageUserId )
+            ?   $User = Core::factory("User")->getCurrent()
+            :   $User = Core::factory( "User", $pageUserId );
+
+
+        if( is_null( $pageUserId ) )
+        {
+            $disauthorizeLink = "href='" . $CFG->rootdir . "/authorize?auth_revert=1" ."'";
+        }
+        else
+        {
+            //$disauthorizeLink = $CFG->rootdir . "/user/client";
+            $disauthorizeLink = "href='#' onclick='history.back()'";
+        }
+
+        $name = $User->name();
+        $surname = $User->surname();
+        $isAdmin = $User->groupId() <= 3;
+
 
         switch ( $this->getParam( "body-class", "" ) )
         {
@@ -65,7 +80,7 @@
     <div class="popup"></div>
     <div class="overlay"></div>
 
-    <input type="hidden" id="rootdir" value="<?=$rootdir?>"/>
+    <input type="hidden" id="rootdir" value="<?=$CFG->rootdir?>"/>
 
     <div id="fb-root"></div>
         <div class="page-wrapper">
@@ -73,14 +88,14 @@
                 <nav class="navbar navbar-inverse">
                     <div class="container-fluid">
                         <div class="navbar-header">
-                            <a class="navbar-brand" href="<?=$rootdir?>" >Musicmetod</a>
+                            <a class="navbar-brand" href="<?=$CFG->rootdir?>" >Musicmetod</a>
                         </div>
                         <ul class="nav navbar-nav">
                             <?
-                            if( $oUser->groupId() == 2 )
+                            if( $User->groupId() == 2 )
                             { ?>
                             <li class="dropdown">
-                                <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$rootdir?>user">Расписание
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$CFG->rootdir?>/user">Расписание
                                     <span class="caret"></span></a>
                                 <ul class="dropdown-menu">
                                     <?
@@ -91,7 +106,7 @@
                                         ->findAll();
                                     foreach ($aoAreas as $area)
                                     {
-                                        $href = $rootdir . "schedule/" . $area->path();
+                                        $href = $CFG->rootdir . "/schedule/" . $area->path();
                                         echo "<li><a href='".$href."'>";
                                         echo $area->title();
                                         echo "</a></li>";
@@ -99,41 +114,46 @@
                                     ?>
                                 </ul>
                             </li>
-                            <? } elseif( $oUser->groupId() == 4 || $oUser->groupId() == 6 ) {?>
-                                <li><a href="<?=$rootdir?>schedule">Расписание</a></li>
+                            <? } elseif( $User->groupId() == 4 || $User->groupId() == 6 ) {?>
+                                <li><a href="<?=$CFG->rootdir?>/schedule">Расписание</a></li>
                             <? }
 
                             //Пункты только для клиентов
-                            if( $oUser->groupId() == 5 )
+                            if( $User->groupId() == 5 )
                             {
                                 ?>
-                                <li><a href="<?=$rootdir?>user/balance<?=$sUserId?>" >Баланс</a></li>
-                                <li><a href="<?=$rootdir?>user/changelogin" >Сменить логин или пароль</a></li>
+                                <li><a href="<?=$CFG->rootdir?>/user/balance" >Баланс</a></li>
+                                <li><a href="<?=$CFG->rootdir?>/user/changelogin" >Сменить логин или пароль</a></li>
                                 <?
                             }
 
                             //Пункты только для администратора, директора или менеджера
-                            if( $oUser->groupId() == 2 || $oUser->groupId() == 6 )
+                            if( $User->groupId() == 2 || $User->groupId() == 6 )
                             {
                                 ?>
                                 <li class="dropdown">
-                                    <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$rootdir?>user">Пользователи
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$CFG->rootdir?>/user">Пользователи
                                         <span class="caret"></span></a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="<?=$rootdir?>user/teacher" >Штат</a></li>
-                                        <li><a href="<?=$rootdir?>user/client" >Клиенты</a></li>
-                                        <li><a href="<?=$rootdir?>user/archive">Архив</a></li>
+                                        <li><a href="<?=$CFG->rootdir?>/user/teacher" >Штат</a></li>
+                                        <li><a href="<?=$CFG->rootdir?>/user/client" >Клиенты</a></li>
+                                        <li><a href="<?=$CFG->rootdir?>/user/archive">Архив</a></li>
                                     </ul>
                                 </li>
-                                <li><a href="<?=$rootdir?>groups">Группы</a></li>
-                                <li><a href="<?=$rootdir?>lids">Лиды</a></li>
-                                <li><a href="<?=$rootdir?>certificates">Сертификаты</a></li>
-                                <li><a href="<?=$rootdir?>finances">Финансы</a></li>
-                                <li><a href="<?=$rootdir?>tasks">Задачи</a></li>
+                                <li><a href="<?=$CFG->rootdir?>/groups">Группы</a></li>
+                                <li><a href="<?=$CFG->rootdir?>/lids">Лиды</a></li>
+                                <li><a href="<?=$CFG->rootdir?>/certificates">Сертификаты</a></li>
                                 <?
                                 if( User::checkUserAccess(["groups" => [6]]) )
                                 {
-                                    echo "<li><a href='".$rootdir."statistic'>Статистика</a></li>";
+                                    echo "<li><a href='" . $CFG->rootdir . "/finances'>Финансы</a></li>";
+                                }
+                                ?>
+                                <li><a href="<?=$CFG->rootdir?>/tasks">Задачи</a></li>
+                                <?
+                                if( User::checkUserAccess(["groups" => [6]]) )
+                                {
+                                    echo "<li><a href='".$CFG->rootdir."/statistic'>Статистика</a></li>";
                                 }
                             }
                             ?>
@@ -142,11 +162,12 @@
                             <?
                             if( User::isAuthAs() && User::checkUserAccess(["groups" => [4, 5]]) )
                             {
-                                echo "<li><a>". $oUser->phoneNumber()."</a></li>";
+                                echo "<li><a>". $User->phoneNumber()."</a></li>";
                             }
                             ?>
                             <li><a><?echo $surname . " " . $name; ?></a></li>
-                            <li><a href="<?=$disauthorizeLink?>">Выйти</a></li>
+                            <li><a><?=$User->getOrganizationName()?></a></li>
+                            <li><a <?=$disauthorizeLink?>>Выйти</a></li>
                         </ul>
                     </div>
                 </nav>
@@ -154,7 +175,7 @@
                 <div class="container">
                     <?php
                         Core::factory( "Core_Entity" )
-                            ->addSimpleEntity( "rootdir", $rootdir )
+                            ->addSimpleEntity( "rootdir", $CFG->rootdir )
                             ->addSimpleEntity( "title-first", $this->getParam( "title-first" ) )
                             ->addSimpleEntity( "title-second", $this->getParam( "title-second" ) )
                             ->addEntities( $this->getParam( "breadcumbs" ), "breadcumb" )

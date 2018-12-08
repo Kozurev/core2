@@ -275,7 +275,10 @@ class User extends User_Model
      */
     public static function isAuthAs()
     {
-        if( Core_Array::getValue( $_SESSION["core"], "user_backup", false ) )
+        $sessionAuthAs = Core_Array::getValue( $_SESSION["core"], "user_backup", false );
+        $getParamAuthAs = Core_Array::Get( "userid", false );
+
+        if( $sessionAuthAs || $getParamAuthAs )
             return true;
         else
             return false;
@@ -312,5 +315,64 @@ class User extends User_Model
         return Core::factory( "User", $this->subordinated() )->getDirector();
     }
 
+
+    /**
+     * Добавление комментария к кользователю
+     *
+     * @param $text - текст комментария
+     * @param $userId - id пользователя к которому создается комментарий
+     * @param $authorId - id автора комментария
+     * @return User
+     * @date 30.11.2018 14:02
+     */
+    public function addComment( $text, $userId = 0, $authorId = 0 )
+    {
+        if( $userId === 0 && $this->id == null )
+        {
+            die( "Невозможно добавить комментарий не указав id пользователя" );
+        }
+
+        if( !is_string( $text ) )
+        {
+            die( "Параметр <b>text</b> метода <b>addComment</b> должен быть типа 'string'" );
+        }
+
+        if( $userId === 0 )    $userId = $this->getId();
+        //$authorId = self::parentAuth()->getId();
+
+        $Comment = Core::factory( "User_Comment" )
+            ->authorId( $authorId )
+            ->userId( $userId )
+            ->text( $text );
+
+        Core::notify( array( &$Comment ), "beforeUserAddComment" );
+
+        $Comment->save();
+
+        Core::notify( array( &$Comment ), "afterUserAddComment" );
+
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getOrganizationName()
+    {
+//        if( Core_Array::getValue( $_SESSION, "user_organization", null ) == null )
+//        {
+            $Director = $this->getDirector();
+            if( $Director->groupId() !== 6 )    return "";
+            $Property = Core::factory( "Property", 30 );
+            $organization = $Property->getPropertyValues( $Director )[0]->value();
+            //$_SESSION["user_organization"] = $organization;
+            return $organization;
+//        }
+//        else
+//        {
+//            return Core_Array::getValue( $_SESSION, "user_organization", null );
+//        }
+    }
 
 }
