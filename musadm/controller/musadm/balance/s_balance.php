@@ -148,6 +148,9 @@ if( $action === "updatePerLesson" )
 }
 
 
+/**
+ * Покупка тарифа
+ */
 if( $action == "buyTarif" )
 {
     $userId =   Core_Array::getValue( $_GET, "userid", 0 );

@@ -110,7 +110,7 @@
 
                 <!--Поурочная оплата-->
                 <xsl:if test="property_value[property_id = 32]/value = '1'">
-                    <div class="notes">«Поурочно»</div>
+                    <div class="notes">«Сменный график»</div>
                 </xsl:if>
 
                 <!--Примечания-->
