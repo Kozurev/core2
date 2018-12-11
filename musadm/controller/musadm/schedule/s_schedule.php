@@ -221,7 +221,7 @@ if($action === "teacherReport")
          * Проверка на отсутствие на занятии 2 раза подряд
          * и создание задачи с напоминание о звонке
          */
-        if( $Report->attendance() == 0 )
+        if( $Report->attendance() == 0 && $Report->typeId() != 3 )
         {
             $LastClientReport = Core::factory( "Schedule_Lesson_Report" )
                 //->where( "type_id", "=", 1 )
