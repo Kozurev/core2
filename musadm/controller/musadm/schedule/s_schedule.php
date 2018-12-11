@@ -224,7 +224,8 @@ if($action === "teacherReport")
         if( $Report->attendance() == 0 )
         {
             $LastClientReport = Core::factory( "Schedule_Lesson_Report" )
-                ->where( "type_id", "=", 1 )
+                //->where( "type_id", "=", 1 )
+                ->where( "id", "<>", $Report->getId() )
                 ->where( "client_id", "=", $Client->getId() )
                 ->orderBy( "id", "DESC" )
                 ->find();
