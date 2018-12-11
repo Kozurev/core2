@@ -30,8 +30,13 @@
 	max-height: 470px;
 }
 
-.schedule .teacher_payments_block::-webkit-scrollbar { width: 0; }
-.schedule .teacher_payments_block { -ms-overflow-style: none; }
+
+.schedule .table-responsive {
+	overflow-x: inherit;
+}
+
+/*.schedule .teacher_payments_block::-webkit-scrollbar { width: 0; }*/
+/*.schedule .teacher_payments_block { -ms-overflow-style: none; }*/
 
 /**
  * Таблица >>

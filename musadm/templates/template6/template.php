@@ -5,15 +5,18 @@ $this->css( "/templates/template6/css/style.css" );
 /**
  * Вывод панели с заметками пользователя и датой последней авторизации 
  */
-$oCurentUser = Core::factory("User")->getCurrent();
-User::isAuthAs() ? $isAdmin = 1 : $isAdmin = 0;
+$pageUserId = Core_Array::Get( "userid", null );
 
-$oUser = $oCurentUser;
+//User::isAuthAs() ? $isAdmin = 1 : $isAdmin = 0;
+if( is_null( $pageUserId ) )
+    $oUser = User::current();
+else
+    $oUser = Core::factory( "User", $pageUserId );
 
 /**
  * Пользовательские примечания и дата последней авторизации
  */
-if( $isAdmin && $oCurentUser->groupId() == 5 )
+if( !is_null( $pageUserId ) )
 {
     $oPropertyNotes = Core::factory( "Property", 19 );
     $clienNotes = $oPropertyNotes->getPropertyValues( $oUser );

@@ -7,8 +7,8 @@
                 <input class="form-control" placeholder="Заметки" value="{note/value}" id="client_notes" data-userid="{note/object_id}" />
             </div>
 
-            <div class="col-lg-2 col-md-2 col-sm-2">
-                <span>Поурочно: </span>
+            <div class="col-lg-3 col-md-2 col-sm-2">
+                <span>Сменный график: </span>
 
                 <input type="checkbox" id="per_lesson" class="checkbox-new" data-userid="{note/object_id}" >
                     <xsl:if test="per_lesson/value = 1">
@@ -21,7 +21,7 @@
             </div>
 
             <xsl:if test="entry/value != ''">
-                <div class="col-lg-4 col-md-4 col-sm-4">
+                <div class="col-lg-3 col-md-4 col-sm-4">
                     <span>Последний раз онлайн: <xsl:value-of select="entry/value" /></span>
                 </div>
             </xsl:if>
