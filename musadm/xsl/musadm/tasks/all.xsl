@@ -86,7 +86,7 @@
                         <xsl:value-of select="//assignment[id = $userid]/name" />
                     </xsl:variable>
 
-                    <a class="user-icon" title="{$fio}" href="/{//wwwroot}authorize?auth_as={//assignment[id = $userid]/id}"><input type="hidden" /></a>
+                    <a class="user-icon" title="{$fio}" href="{//wwwroot}/user/client?userid={//assignment[id = $userid]/id}"><input type="hidden" /></a>
                 </xsl:if>
             </td>
 

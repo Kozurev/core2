@@ -193,7 +193,7 @@ if($action === "teacherReport")
         $today = strtotime("+1 day");
         $today = date( "Y-m-d", $today );
 
-        if( $count <= 1 && $PropertyPerLesson->getPropertyValues( $Client )[0]->value() == 0 )
+        if( $count <= 1 && $PropertyPerLesson->getPropertyValues( $Client )[0]->value() == 0 && $Report->typeId() != 3 )
         {
             $isIssetTask = Core::factory( "Task" )
                 ->where( "associate", "=", $Client->getId() )
