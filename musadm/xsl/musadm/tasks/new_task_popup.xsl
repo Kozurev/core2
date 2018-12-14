@@ -32,6 +32,23 @@
                 </div>
             </div>
 
+            <div class="column">
+                <span>Клиент</span>
+            </div>
+            <div class="column">
+                <select name="associate" class="form-control">
+                    <option value="0"> ... </option>
+                    <xsl:for-each select="user">
+                        <option value="{id}">
+                            <xsl:value-of select="surname" />
+                            <xsl:text> </xsl:text>
+                            <xsl:value-of select="name" />
+                        </option>
+                    </xsl:for-each>
+                </select>
+            </div>
+
+
             <!--<input type="hidden" name="user" value="{user/id}" />-->
 
             <button class="popop_task_submit btn btn-default">Сохранить</button>

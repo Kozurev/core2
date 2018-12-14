@@ -145,22 +145,26 @@ if( $action == "updateFormDirector" )
     $userid = Core_Array::getValue($_GET, "userid", 0);
     $output = Core::factory("Core_Entity");
 
-    if($userid)
+    if( $userid )
     {
-        $oUser =  Core::factory("User", $userid);
-        $City =   Core::factory("Property", 28)->getPropertyValues($oUser)[0]; //Город
-        $Organization = Core::factory("Property", 29)->getPropertyValues($oUser)[0]; //Организация
-        $output->addEntity($City, "property_value");
-        $output->addEntity($Organization, "property_value");
+        $oUser =  Core::factory( "User", $userid );
+
+        $City =   Core::factory( "Property", 29 )->getPropertyValues($oUser)[0]; //Город
+        $Link =   Core::factory( "Property", 33 )->getPropertyValues($oUser)[0]; //Город
+        $Organization = Core::factory( "Property", 30 )->getPropertyValues($oUser)[0]; //Организация
+
+        $output->addEntity( $City, "property_value" );
+        $output->addEntity( $Link, "property_value" );
+        $output->addEntity( $Organization, "property_value" );
     }
     else
     {
-        $oUser = Core::factory("User");
+        $oUser = Core::factory( "User" );
     }
 
     $output
-        ->addEntity($oUser)
-        ->xsl("musadm/users/edit_director_popup.xsl")
+        ->addEntity( $oUser )
+        ->xsl( "musadm/users/edit_director_popup.xsl" )
         ->show();
 
     exit;

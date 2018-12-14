@@ -426,6 +426,7 @@ if( $action === "addAbsentTask" )
     $clientId = Core_Array::getValue( $_GET, "client_id", 0 );
 
     $oTask = Core::factory( "Task" )
+        ->associate( $clientId )
         ->date( $dateTo );
 
     $oTask = $oTask->save();

@@ -448,7 +448,7 @@ function saveUserComment( userid, text, func) {
         },
         success: function(responce){
             //$(".page").empty();
-            $(".page").html(responce);
+            $(".users").html(responce);
             loaderOff();
         }
     });

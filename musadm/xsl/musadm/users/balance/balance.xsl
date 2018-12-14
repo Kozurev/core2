@@ -1,7 +1,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <h3>Общие сведенья</h3>
+        <h3>Общие сведения</h3>
         <div class="table-responsive">
             <table class="table" cellspacing='0'>
                 <tr>

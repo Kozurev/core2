@@ -48,30 +48,30 @@ $action = Core_Array::getValue($_GET, "action", "");
  */
 if($action == "refreshTablePayments")
 {
-    $oCurentUser = Core::factory("User")->getCurrent();
-    $pageUserId = Core_Array::getValue($_GET, "userid", 0);
+//    $oCurentUser = Core::factory("User")->getCurrent();
+//    $pageUserId = Core_Array::getValue($_GET, "userid", 0);
+//
+//    /**
+//     * Пользовательские примечания и дата последней авторизации
+//     */
+//    if( User::isAuthAs() )
+//    {
+//        $oPropertyNotes = Core::factory("Property", 19);
+//        $clienNotes = $oPropertyNotes->getPropertyValues($oUser);
+//
+//        $oPropertyLastEntry = Core::factory("Property", 22);
+//        $lastEntry = $oPropertyLastEntry->getPropertyValues($oUser);
+//
+//        Core::factory("Core_Entity")
+//            ->addEntities($clienNotes, "note")
+//            ->addEntities($lastEntry, "entry")
+//            ->xsl("musadm/client_notes.xsl")
+//            ->show();
+//    }
 
-    /**
-     * Пользовательские примечания и дата последней авторизации
-     */
-    if( User::isAuthAs() )
-    {
-        $oPropertyNotes = Core::factory("Property", 19);
-        $clienNotes = $oPropertyNotes->getPropertyValues($oUser);
-
-        $oPropertyLastEntry = Core::factory("Property", 22);
-        $lastEntry = $oPropertyLastEntry->getPropertyValues($oUser);
-
-        Core::factory("Core_Entity")
-            ->addEntities($clienNotes, "note")
-            ->addEntities($lastEntry, "entry")
-            ->xsl("musadm/client_notes.xsl")
-            ->show();
-    }
-
-    echo "<div class='users'>";
+    //echo "<div class='users'>";
         $this->execute();
-    echo "</div>";
+    //echo "</div>";
 
     exit;
 }

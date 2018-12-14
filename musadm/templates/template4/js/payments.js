@@ -8,7 +8,7 @@ $(function(){
             var modelid = $(this).data("modelid");
             $.ajax({
                 type: "GET",
-                url: "balance",
+                url: root + "/balance",
                 data: {
                     action: "add_note",
                     model_id: modelid
@@ -242,12 +242,14 @@ function editTarifPopup(tarifid) {
 function refreshPayments() {
     $.ajax({
         type: "GET",
-        url: "finances",
+        url: root + "/finances",
         data: {
             action: "show",
         },
         success: function( responce ) {
+            var isTarifsTableDisplay = $('.tarifs').css('display');
             $(".finances").html(responce);
+            $('.tarifs').css('display', isTarifsTableDisplay);
             loaderOff();
         }
     });
@@ -265,8 +267,8 @@ function refreshPaymentsTable(userid, func) {
             userid: userid
         },
         success: function(responce) {
-            $(".page").empty();
-            $(".page").append(responce);
+            $(".users").empty();
+            $(".users").append(responce);
             $("#sortingTable").tablesorter();
             func();
         }

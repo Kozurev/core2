@@ -73,16 +73,23 @@ if( $action === "update_date" )
 
 if( $action === "new_task_popup" )
 {
-    $TaskTypes = Core::factory("Task_Type")->findAll();
+    //$TaskTypes = Core::factory("Task_Type")->findAll();
+
+    $Director = User::current()->getDirector();
+    if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+    $subordinated = $Director->getId();
+
+    $Clients = Core::factory( "User" )
+        ->where( "active", "=", 1 )
+        ->where( "group_id", "=", 5 )
+        ->where( "subordinated", "=", $subordinated )
+        ->orderBy( "surname" )
+        ->findAll();
 
     Core::factory("Core_Entity")
-        ->addEntities( $TaskTypes )
+        //->addEntities( $TaskTypes )
+        ->addEntities( $Clients )
         ->addSimpleEntity( "date", date( "Y-m-d" ) )
-//        ->addEntity(
-//            Core::factory("Core_Entity")
-//                ->name("date")
-//                ->value($date)
-//        )
         ->xsl( "musadm/tasks/new_task_popup.xsl" )
         ->show();
 
@@ -94,11 +101,13 @@ if( $action === "save_task" )
 {
     $date = Core_Array::Get( "date", "" );
     $note = Core_Array::Get( "text", "" );
+    $associate = Core_Array::Get( "associate", 0 );
 
     $authorId = $oUser->getId();
     $noteDate = date( "Y-m-d H:i:s" );
 
     $oTask = Core::factory( "Task" )
+        ->associate( $associate )
         ->date( $date );
 
     $oTask = $oTask->save();

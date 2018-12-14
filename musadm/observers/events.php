@@ -13,20 +13,44 @@
 Core::attachObserver( "afterScheduleLessonInsert", function( $args ){
     $Lesson = $args[0];
 
-    if( $Lesson->typeId() != 1 )    return;
+    if( $Lesson->typeId() == 1 )
+    {
+        $Client = $Lesson->getClient();
+        $ClientFio = $Client->surname() . " " . $Client->name();
 
-    $Client = $Lesson->getClient();
-    $ClientFio = $Client->surname() . " " . $Client->name();
+        $EventData = new stdClass();
+        $EventData->Lesson = $Lesson;
 
-    $EventData = new stdClass();
-    $EventData->Lesson = $Lesson;
+        Core::factory( "Event" )
+            ->userAssignmentId( $Client->getId() )
+            ->userAssignmentFio( $ClientFio )
+            ->typeId( 2 )
+            ->data( $EventData )
+            ->save();
+    }
+    elseif( $Lesson->typeId() == 3 )
+    {
+        $Event = Core::factory( "Event" )
+            ->typeId( 27 );
 
-    Core::factory( "Event" )
-        ->userAssignmentId( $Client->getId() )
-        ->userAssignmentFio( $ClientFio )
-        ->typeId( 2 )
-        ->data( $EventData )
-        ->save();
+        if( $Lesson->clientId() )
+        {
+            $Lid = $Lesson->getClient();
+            $LidFio = $Lid->surname() . " " . $Lid->name();
+
+            $EventData = new stdClass();
+            $EventData->Lid = $Lid;
+            $EventData->Lesson = $Lesson;
+
+            $Event
+                ->userAssignmentFio( $LidFio )
+                ->data( $EventData );
+        }
+
+        $Event->save();
+    }
+
+
 });
 
 

@@ -160,7 +160,7 @@
                         </ul>
                         <ul class="nav navbar-nav navbar-right">
                             <?
-                            if( User::isAuthAs() && User::checkUserAccess(["groups" => [4, 5]]) )
+                            if( !is_null( $pageUserId ) )
                             {
                                 echo "<li><a>". $User->phoneNumber()."</a></li>";
                             }

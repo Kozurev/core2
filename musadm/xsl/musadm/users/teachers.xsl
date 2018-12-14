@@ -18,10 +18,8 @@
             <table id="sortingTable" class="table table-striped">
                 <thead>
                     <tr class="header">
-                        <!--<th>Фамилия</th>-->
-                        <!--<th>Имя</th>-->
-                        <!--<th>Отчество</th>-->
                         <th>ФИО</th>
+                        <th>Телефон</th>
                         <th>Инструмент</th>
                         <th>График для занятий</th>
                         <th>Действия</th>
@@ -47,15 +45,14 @@
                     <xsl:value-of select="patronimyc" />
                 </a>
             </td>
-            <!--<td><xsl:value-of select="name" /></td>-->
-            <!--<td><xsl:value-of select="patronimyc" /></td>-->
+            <td><xsl:value-of select="phone_number" /></td>
             <td><xsl:value-of select="property_value[property_id = 20]/value" /></td>
             <td><xsl:value-of select="property_value[property_id = 31]/value" /></td>
             <td>
-                <xsl:if test="/root/is_director = 1">
+                <!--<xsl:if test="/root/is_director = 1">-->
                     <a class="action edit user_edit" href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
                     <a class="action archive user_archive"     href="#" data-userid="{id}"></a>
-                </xsl:if>
+                <!--</xsl:if>-->
             </td>
         </tr>
     </xsl:template>

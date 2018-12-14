@@ -88,7 +88,7 @@ Core::attachObserver("beforeScheduleAreaSave", function( $args ){
             ->subordinated( $subordinated )
             ->save();
     }
-    else
+    elseif( isset( $Area->oldTitle ) )
     {
         //debug( $Area );
         $OldPropListVal = Core::factory( "Property_List_Values" )

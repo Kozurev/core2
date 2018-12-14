@@ -52,7 +52,7 @@ class Core //extends Orm
 
 	/**
 	*	Подключает необходимый файл и создаёт объект класса
-	* 	@return object or false
+	* 	@return mixed
 	*/
 	static public function factory($className, $id = 0)
 	{

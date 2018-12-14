@@ -51,6 +51,20 @@ class Event extends Event_Model
                     . ", новое время " . refactorTimeFormat($this->data()->new_time_from) . ".";
                 break;
 
+            case 27:
+                Core::factory( "Schedule_Lesson" );
+                Core::factory( "Lid" );
+                $Lesson = $this->data()->Lesson;
+                $str =  "Добавил(а) консультацию c " . refactorTimeFormat( $Lesson->timeFrom() ) . " по " . refactorTimeFormat( $Lesson->timeTo() ) . ". ";
+
+                if( $Lesson->clientId() )
+                {
+                    $lidId = $this->data()->Lid->getId();
+                    $str .= "Лид <a href='#' class='info-by-id' data-model='Lid' data-id='".$lidId."'>№" . $lidId . "</a>";
+                }
+                return $str;
+                break;
+
             case 7:
                 return $this->user_assignment_fio . ". Добавлен(а) в архив";
                 break;

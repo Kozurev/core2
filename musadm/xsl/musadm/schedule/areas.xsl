@@ -8,7 +8,7 @@
 
         <div class="row buttons-panel">
             <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                <a href="#" class="btn btn-green schedule_area_edit" data-area_id="0">Создать филлиал</a>
+                <a href="#" class="btn btn-green schedule_area_edit" data-area_id="0">Создать филиал</a>
             </div>
         </div>
 
