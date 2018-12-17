@@ -167,8 +167,12 @@ class Property extends Property_Model
         if($oProperty == false) return false;
         $sTableName = "Property_" . $oProperty->type() . "_Assigment";
 
+        $obj->getId() == null
+            ?   $objectId = 0
+            :   $objectId = $obj->getId();
+
         $assigment = Core::factory($sTableName)
-            ->where("object_id", "=", $obj->getId())
+            ->where("object_id", "=", $objectId)
 	        ->where("property_id", "=", $propertyId)
             ->where("model_name", "=", get_class($obj))
             ->find();
@@ -198,8 +202,12 @@ class Property extends Property_Model
         if($oProperty == false) return false;
         $sTableName = "Property_" . $oProperty->type() . "_Assigment";
 
+        $obj->getId() == null
+            ?   $objectId = 0
+            :   $objectId = $obj->getId();
+
         $assigment = Core::factory($sTableName)
-            ->where("object_id", "=", $obj->getId())
+            ->where("object_id", "=", $objectId)
             ->where("property_id", "=", $propertyId)
             ->where("model_name", "=", get_class($obj))
             ->find();
@@ -343,11 +351,16 @@ class Property extends Property_Model
         $types = $this->getPropertyTypes();
         $Properties = array();
 
+        $obj->getId() == null
+            ?   $objectId = 0
+            :   $objectId = $obj->getId();
+
         foreach ( $types as $type )
         {
             $Assignments = Core::factory( "Property_" . $type . "_Assigment" )
                 ->where( "model_name", "=", get_class( $obj ) )
-                ->where( "object_id", "=", $obj->getId() )
+                ->where( "object_id", "=", $objectId )
+                ->where( "object_id", "=", 0 )
                 ->findAll();
 
             foreach ( $Assignments as $assignment )
