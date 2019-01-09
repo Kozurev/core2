@@ -326,7 +326,7 @@ header {
     width: 1140px;
     z-index: 998;
     background-color: #f9f9fb;
-    top: -133px;
+    top: 0px;
     padding-top: 10px;
     margin-bottom: 20px;
     max-height: 315px;
@@ -345,6 +345,16 @@ header {
  * <<Конец
  * Динамически-фиксированный блок на индексной странице у менеджера
  */
+
+
+.teacher_rate_config .teacher_rate_save {
+    display: none;
+}
+
+.teacher_rate_config span {
+    vertical-align: top;
+    margin-right: 50px;
+}
 
 
 @media(min-width: 1024px) {

@@ -16,6 +16,9 @@ class Schedule_Lesson_Report extends Core_Entity
     protected $type_id;
     protected $date;
     protected $lesson_type;
+    protected $client_rate = 0;
+    protected $teacher_rate = 0;
+    protected $total_rate = 0;
 
 
     public function __construct(){}
@@ -59,12 +62,12 @@ class Schedule_Lesson_Report extends Core_Entity
     }
 
 
-    public function groupId($val = null)
-    {
-        if(is_null($val))   return $this->group_id;
-        $this->group_id = intval($val);
-        return $this;
-    }
+//    public function groupId($val = null)
+//    {
+//        if(is_null($val))   return $this->group_id;
+//        $this->group_id = intval($val);
+//        return $this;
+//    }
 
 
     public function lessonId($val = null)
@@ -92,8 +95,37 @@ class Schedule_Lesson_Report extends Core_Entity
     }
 
 
+    public function clientRate( $val = null )
+    {
+        if( is_null( $val ) )   return floatval( $this->client_rate );
+
+        $this->client_rate = floatval( $val );
+        return $this;
+    }
+
+
+    public function teacherRate( $val = null )
+    {
+        if( is_null( $val ) )   return floatval( $this->teacher_rate );
+
+        $this->teacher_rate = floatval( $val );
+        return $this;
+    }
+
+
+    public function totalRate( $val = null )
+    {
+        if( is_null( $val ) )   return floatval( $this->total_rate );
+
+        $this->total_rate = floatval( $val );
+        return $this;
+    }
+
+
     public function save( $obj = null )
     {
+        $this->total_rate = $this->clientRate() - $this->teacherRate();
+
         Core::notify( array( &$this ), "beforeScheduleReportSave" );
         parent::save();
         Core::notify( array( &$this ), "afterScheduleReportSave" );

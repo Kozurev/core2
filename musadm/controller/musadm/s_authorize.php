@@ -8,6 +8,14 @@
 
 $oUser = Core::factory("User");
 
+$CurrentUser = User::current();
+if( $CurrentUser != false )
+{
+    global $CFG;
+    $uri = Core_Array::Get( "back", $CFG->rootdir );
+    header( "Location: " . $uri );
+}
+
 if(isset($_POST["login"]) && isset($_POST["password"]))
 {
     $rememberMe = Core_Array::getValue($_POST, "remember", false);

@@ -33,12 +33,15 @@
             <div class="column">
                 <span>Публичность</span>
             </div>
-            <div class="column">
-                <input type="checkbox" name="access" class="checkbox" >
+            <div class="column right">
+                <input type="checkbox" name="access" id="access" class="checkbox-new" >
                     <xsl:if test="payment_tarif/access = 1">
-                        <xsl:attribute name="checked">TRUE</xsl:attribute>
+                        <xsl:attribute name="checked">checked</xsl:attribute>
                     </xsl:if>
                 </input>
+                <label for="access" class="label-new">
+                    <div class="tick"><input type="hidden" name="kostul"/></div>
+                </label>
             </div>
 
             <div class="column">

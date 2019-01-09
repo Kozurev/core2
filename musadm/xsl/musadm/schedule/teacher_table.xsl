@@ -48,20 +48,20 @@
             </td>
 
             <td>
-                <!--<input type="checkbox" name="attendance" >-->
-                    <!--<xsl:if test="count(report/id) != 0">-->
-                        <!--<xsl:attribute name="disabled">-->
-                            <!--disabled-->
-                        <!--</xsl:attribute>-->
-                    <!--</xsl:if>-->
+                <input type="checkbox" name="attendance" >
+                    <xsl:if test="count(report/id) != 0">
+                        <xsl:attribute name="disabled">
+                            disabled
+                        </xsl:attribute>
+                    </xsl:if>
 
-                    <!--<xsl:if test="report/attendance = 1">-->
-                        <!--<xsl:attribute name="checked" >-->
-                            <!--checked-->
-                        <!--</xsl:attribute>-->
-                    <!--</xsl:if>-->
-                <!--</input>-->
-                <input type="checkbox" id="attendance{position()}" name="attendance" class="checkbox-new" >
+                    <xsl:if test="report/attendance = 1">
+                        <xsl:attribute name="checked" >
+                            checked
+                        </xsl:attribute>
+                    </xsl:if>
+                </input>
+                <!-- <input type="checkbox" id="attendance{position()}" name="attendance" class="checkbox-new" >
                     <xsl:if test="count(report/id) != 0">
                         <xsl:attribute name="disabled">
                             disabled
@@ -76,7 +76,7 @@
                 </input>
                 <label for="attendance{position()}" class="label-new">
                     <div class="tick"><input type="hidden" name="kostul"/></div>
-                </label>
+                </label> -->
             </td>
 
             <input type="hidden" name="teacherId" value="{../user/id}" />

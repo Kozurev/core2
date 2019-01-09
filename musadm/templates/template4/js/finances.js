@@ -15,6 +15,100 @@ $(function(){
             var summ = $("#createData").find("input[name=summ]").val();
             var note = $("#createData").find("textarea[name=note]").val();
             saveCustomPayment(summ, note);
+        })
+        .on("click", ".edit_rate", function(e){
+            e.preventDefault();
+
+            $(this).css("display", "none");
+            $(this).parent().find(".save_rate").css("display", "inline-block");
+
+            var valueSpan = $(this).parent().parent().find(".current_value");
+            var valueInput = $(this).parent().parent().find(".edit_rate_value");
+
+            var oldValue = valueSpan.text();
+            valueSpan.css("display", "none");
+
+            valueInput.val(oldValue);
+            valueInput.css("display", "inline-block");
+        })
+        .on("click", ".save_rate", function(e){
+            e.preventDefault();
+
+            $(this).css("display", "none");
+            $(this).parent().find(".edit_rate").css("display", "inline-block");
+
+            var valueSpan = $(this).parent().parent().find(".current_value");
+            var valueInput = $(this).parent().parent().find(".edit_rate_value");
+
+            var newValue = valueInput.val();
+            valueInput.css("display", "none");
+
+            valueSpan.text(newValue);
+            valueSpan.css("display", "inline-block");
+
+            var propertyTagName = valueInput.data("prop-name");
+            var propertyValue = valueInput.val();
+            var directorId = $("#director_id").val();
+
+            savePropertyValue( propertyTagName, propertyValue, "User", directorId );
+        })
+        .on("change", ".is_default_rate", function(){
+            var propertyValue;
+            $(this).is(":checked")
+                ?   propertyValue = 0
+                :   propertyValue = 1;
+
+            var propertyTagName = $(this).data( "prop-name" );
+            var teacherId = $("#teacher_id").val();
+
+            savePropertyValue( propertyTagName, propertyValue, "User", teacherId );
+        })
+        .on("click", ".is_default_rate_director", function(e){
+            var propertyValue;
+            $(this).is(":checked")
+                ?   propertyValue = 1
+                :   propertyValue = 0;
+
+            var propertyTagName = $(this).data( "prop-name" );
+            var teacherId = $("#director_id").val();
+
+            savePropertyValue( propertyTagName, propertyValue, "User", teacherId );
+        })
+        .on("click", ".teacher_rate_edit", function(e){
+            e.preventDefault();
+
+            $(this).css("display", "none");
+            $(this).parent().find(".teacher_rate_save").css("display", "inline-block");
+
+            var valueSpan = $(this).parent().parent().find(".indiv-rate");
+            var valueInput = $(this).parent().parent().find(".edit_rate_value");
+
+            var oldValue = valueSpan.text();
+            valueSpan.css("display", "none");
+
+            valueInput.val(oldValue);
+            valueInput.css("display", "inline-block");
+        })
+        .on("click", ".teacher_rate_save", function(e){
+            e.preventDefault();
+
+            $(this).css("display", "none");
+            $(this).parent().find(".teacher_rate_edit").css("display", "inline-block");
+
+            var valueSpan = $(this).parent().parent().find(".indiv-rate");
+            var valueInput = $(this).parent().parent().find(".edit_rate_value");
+
+            var newValue = valueInput.val();
+            valueInput.css("display", "none");
+
+            valueSpan.text(newValue);
+            valueSpan.css("display", "inline-block");
+
+            var propertyTagName = valueInput.data("prop-name");
+            var propertyValue = valueInput.val();
+            var teacherId = $("#teacher_id").val();
+
+            savePropertyValue( propertyTagName, propertyValue, "User", teacherId );
         });
 });
 

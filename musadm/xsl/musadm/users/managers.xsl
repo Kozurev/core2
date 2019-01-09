@@ -20,7 +20,7 @@
                         <!--<th>Имя</th>-->
                         <th>ФИО</th>
                         <th>Телефон</th>
-                        <th>Действия</th>
+                        <th class="center">Действия</th>
                     </tr>
                 </thead>
     
@@ -48,7 +48,7 @@
             <!--<td><xsl:value-of select="name" /></td>-->
             <td><xsl:value-of select="phone_number" /><br/></td>
 
-            <td>
+            <td class="center">
                 <a class="action edit user_edit"        href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
                 <a class="action archive user_archive"     href="#" data-userid="{id}"></a>
             </td>

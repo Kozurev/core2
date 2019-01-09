@@ -35,9 +35,16 @@
         <tr>
             <td><xsl:value-of select="id" /></td>
             <td>
-                <xsl:value-of select="client/surname" />
-                <xsl:text> </xsl:text>
-                <xsl:value-of select="client/name" />
+                <xsl:choose>
+                    <xsl:when test="type_id = 1">
+                        <xsl:value-of select="client/surname" />
+                        <xsl:text> </xsl:text>
+                        <xsl:value-of select="client/name" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="client/title" />
+                    </xsl:otherwise>
+                </xsl:choose>
             </td>
             <td><xsl:value-of select="date_from" /></td>
             <td><xsl:value-of select="date_to" /></td>

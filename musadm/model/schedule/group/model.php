@@ -13,6 +13,7 @@ class Schedule_Group_Model extends Core_Entity
     protected $title;
     protected $duration;
     protected $subordinated = 0;
+    protected $active = 1;
 
 
     public function __construct(){}
@@ -53,6 +54,15 @@ class Schedule_Group_Model extends Core_Entity
     {
         if( is_null( $val ) )   return $this->subordinated;
         $this->subordinated = intval( $val );
+        return $this;
+    }
+
+
+    public function active( $val = null )
+    {
+        if( is_null( $val ) )   return intval( $this->active );
+        if( $val == 1 ) $this->active = 1;
+        elseif( $val == 0 ) $this->active = 0;
         return $this;
     }
 

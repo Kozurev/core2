@@ -19,6 +19,9 @@ if(
     )
 {
     $oArea = $this->oStructureItem;
+
+    if( is_null( $oArea ) )     die( "Филлиала по данному пути не существует" );
+    if( $oArea->active() == 0 ) die( "Филлиал " . $oArea->title() . " не активен" );
     $areaId = $oArea->getId();
 
     $date = Core_Array::getValue($_GET, "date", null);
@@ -418,8 +421,7 @@ if( $oUser->groupId() == 4 )
         ->addEntity( $oUser )
         ->addEntities( $aoTeacherLessons, "lesson" );
 
-    //$oCurrentUser = Core::factory( "User" )->getCurrent();
-    //User::isAuthAs() ? $isAdmin = 1 : $isAdmin = 0;
+
     User::checkUserAccess( ["groups" => [1, 6]], User::parentAuth() )
         ?   $isAdmin = 1
         :   $isAdmin = 0;
@@ -429,19 +431,19 @@ if( $oUser->groupId() == 4 )
         ->xsl( "musadm/schedule/teacher_table.xsl" )
         ->show();
 
-    $dateFrom = substr($getDate, 0, 8) . "01";
-    $currentMonth = intval( substr($getDate, 5, 2) );
-    $currentYear = intval( substr($getDate, 0, 4) );
-    $countDays = cal_days_in_month(CAL_GREGORIAN, $currentMonth, $currentYear);
+    $dateFrom = substr( $getDate, 0, 8 ) . "01";
+    $currentMonth = intval( substr( $getDate, 5, 2 ) );
+    $currentYear = intval( substr( $getDate, 0, 4 ) );
+    $countDays = cal_days_in_month( CAL_GREGORIAN, $currentMonth, $currentYear );
 
     if( $currentMonth < 10 )    $currentMonth = "0" . $currentMonth;
 
     $dateTo = $currentYear . "-" . $currentMonth . "-" . $countDays;
 
     $aoTeacherReports = Core::factory("Schedule_Lesson_Report")
-        ->where("teacher_id", "=", $oUser->getId())
-        ->where("date", ">=", $dateFrom)
-        ->where("date", "<=", $dateTo);
+        ->where( "teacher_id", "=", $oUser->getId() )
+        ->where( "date", ">=", $dateFrom )
+        ->where( "date", "<=", $dateTo );
 
     $totalCount = clone $aoTeacherReports;
     $totalCount = $totalCount->where( "type_id", "<>", "3" )->getCount();
@@ -470,13 +472,56 @@ if( $oUser->groupId() == 4 )
         ->where("attendance", "=", "0")
         ->getCount();
 
-
-    echo "<div class='teacher_footer'>Общее число проведенных занятий в этом месяце: $totalCount <br>
-            из них явки/неявки: $attendenceIndivCount / $disAttendenceIndivCount (индивидуальные), $attendenceGroupCount / $disAttendenceGroupCount (групповые).
+    echo "<div class='teacher_footer'>
+            Общее число проведенных занятий в этом месяце: $totalCount <br>
+            из них явки/неявки: $attendenceIndivCount / $disAttendenceIndivCount (индивидуальные), 
+            $attendenceGroupCount / $disAttendenceGroupCount (групповые).<br>          
         </div>";
+
+
+    /**
+     * Подсчет сумм необходимых выплат преподавателю и того что уже выплачено
+     * за текущий период (месяц)
+     */
+//    if( User::checkUserAccess( ["groups" => [1, 6]], User::parentAuth() ) )
+//    {
+        $totalPayedSql = Core::factory( "Orm" )
+            ->select( "sum(value) AS payed" )
+            ->from( "Payment" )
+            ->where( "user", "=", $oUser->getId() )
+            ->where( "type", "=", 3 )
+            ->where( "datetime", ">=", $dateFrom )
+            ->where( "datetime", "<=", $dateTo )
+            ->getQueryString();
+
+        $totalHaveToPaySql = Core::factory( "Orm" )
+            ->select( "sum(teacher_rate) AS total" )
+            ->from( "Schedule_Lesson_Report" )
+            ->where( "teacher_id", "=", $oUser->getId() )
+            ->where( "date", ">=", $dateFrom )
+            ->where( "date", "<=", $dateTo )
+            ->getQueryString();
+
+        $totalPayed = Core::factory( "Orm" )
+            ->executeQuery( $totalPayedSql )
+            ->fetch();
+
+        $totalHaveToPay = Core::factory( "Orm" )
+            ->executeQuery( $totalHaveToPaySql )
+            ->fetch();
+
+        $totalPayed = (int)Core_Array::getValue( $totalPayed, "payed", 0 );
+        $totalHaveToPay = (int)Core_Array::getValue( $totalHaveToPay, "total", 0 );
+
+        echo "<div class='teacher_footer'>
+                За текущий месяц к выплате / уже выплачено: $totalHaveToPay / $totalPayed <br>
+            </div>";
+//    }
     /**
      * <<Формирование таблицы с отметками о явке/неявке
      */
+
+
 
     /**
      * Формирование таблицы с выплатами>>
@@ -524,6 +569,72 @@ if( $oUser->groupId() == 4 )
         ->show();
     /**
      * <<Формирование таблицы с выплатами
+     */
+
+
+    /**
+     * Таблица с настройками тарифов преподавателя>>
+     */;
+    if( User::checkUserAccess( ["groups" => [1, 6]], User::parentAuth() ) )
+    {
+        //Общие значения
+        $Director = User::current()->getDirector();
+        $TeacherRateDefaultIndiv = Core::factory( "Property" )->getByTagName( "teacher_rate_indiv_default" );
+        $TeacherRateDefaultGroup = Core::factory( "Property" )->getByTagName( "teacher_rate_group_default" );
+        $TeacherRateDefaultConsult = Core::factory( "Property" )->getByTagName( "teacher_rate_consult_default" );
+        $TeacherRateDefaultAbsent = Core::factory( "Property" )->getByTagName( "teacher_rate_absent_default" );
+
+        $teacherRateDefIndivValue = $TeacherRateDefaultIndiv->getPropertyValues( $Director )[0]->value();
+        $teacherRateDefGroupValue = $TeacherRateDefaultGroup->getPropertyValues( $Director )[0]->value();
+        $teacherRateDefConsultValue = $TeacherRateDefaultConsult->getPropertyValues( $Director )[0]->value();
+        $teacherRateDefAbsentValue = $TeacherRateDefaultAbsent->getPropertyValues( $Director )[0]->value();
+
+        //Индивидуальный или общий тариф у преподавателя
+        $IsTeacherRateDefaultIndiv = Core::factory( "Property" )->getByTagName( "is_teacher_rate_default_indiv" );
+        $IsTeacherRateDefaultGroup = Core::factory( "Property" )->getByTagName( "is_teacher_rate_default_group" );
+        $IsTeacherRateDefaultConsult = Core::factory( "Property" )->getByTagName( "is_teacher_rate_default_consult" );
+        $IsTeacherRateDefaultAbsent = Core::factory( "Property" )->getByTagName( "is_teacher_rate_default_absent" );
+
+        $isTeacherRateDefIndivValue = $IsTeacherRateDefaultIndiv->getPropertyValues( $oUser )[0]->value();
+        $isTeacherRateDefGroupValue = $IsTeacherRateDefaultGroup->getPropertyValues( $oUser )[0]->value();
+        $isTeacherRateDefConsultValue = $IsTeacherRateDefaultConsult->getPropertyValues( $oUser )[0]->value();
+        $isTeacherRateDefAbsentValue = $IsTeacherRateDefaultAbsent->getPropertyValues( $oUser )[0]->value();
+
+        //Значения индивидуальных тарифов преподавателя
+        $TeacherRateIndiv = Core::factory( "Property" )->getByTagName( "teacher_rate_indiv" );
+        $TeacherRateGroup = Core::factory( "Property" )->getByTagName( "teacher_rate_group" );
+        $TeacherRateConsult = Core::factory( "Property" )->getByTagName( "teacher_rate_consult" );
+        $TeacherRateAbsent = Core::factory( "Property" )->getByTagName( "teacher_rate_absent" );
+
+        $teacherRateIndivValue = $TeacherRateIndiv->getPropertyValues( $oUser )[0]->value();
+        $teacherRateGroupValue = $TeacherRateGroup->getPropertyValues( $oUser )[0]->value();
+        $teacherRateConsultValue = $TeacherRateConsult->getPropertyValues( $oUser )[0]->value();
+        $teacherRateAbsentValue = $TeacherRateAbsent->getPropertyValues( $oUser )[0]->value();
+
+
+        $AbsentRateType = Core::factory( "Property" )->getByTagName( "teacher_rate_type_absent_default" );
+        $absentRateType = $AbsentRateType->getPropertyValues( $Director )[0]->value();
+
+        Core::factory( "Core_Entity" )
+            ->addSimpleEntity( "teacher_id", $oUser->getId() )
+            ->addSimpleEntity( "is_teacher_rate_default_indiv", $isTeacherRateDefIndivValue )
+            ->addSimpleEntity( "is_teacher_rate_default_gorup", $isTeacherRateDefGroupValue )
+            ->addSimpleEntity( "is_teacher_rate_default_consult", $isTeacherRateDefConsultValue )
+            ->addSimpleEntity( "is_teacher_rate_default_absent", $isTeacherRateDefAbsentValue )
+            ->addSimpleEntity( "teacher_rate_indiv", $teacherRateIndivValue )
+            ->addSimpleEntity( "teacher_rate_group", $teacherRateGroupValue )
+            ->addSimpleEntity( "teacher_rate_consult", $teacherRateConsultValue )
+            ->addSimpleEntity( "teacher_rate_absent", $teacherRateAbsentValue )
+            ->addSimpleEntity( "teacher_rate_indiv_default", $teacherRateDefIndivValue )
+            ->addSimpleEntity( "teacher_rate_gorup_default", $teacherRateDefGroupValue )
+            ->addSimpleEntity( "teacher_rate_consult_default", $teacherRateDefConsultValue )
+            ->addSimpleEntity( "teacher_rate_absent_default", $teacherRateDefAbsentValue )
+            ->addSimpleEntity( "teacher_rate_type_absent", $absentRateType )
+            ->xsl( "musadm/finances/teacher_rate_config.xsl" )
+            ->show();
+    }
+    /**
+     * <<Таблица с настройками тарифов преподавателя
      */
 }
 /**

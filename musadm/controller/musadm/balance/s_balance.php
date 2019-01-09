@@ -170,14 +170,44 @@ if( $action == "buyTarif" )
 
     if( $oUserBalance->value() < $oTarif->price() )   die( "Недостаточно средств для покупки данного тарифа" );
 
+
     //Корректировка баланса
     $oldBalance = intval( $oUserBalance->value() );
     $newBalance = $oldBalance - intval( $oTarif->price() );
     $oUserBalance->value( $newBalance )->save();
 
+
     //Корректировка кол-ва занятий
     if( $oTarif->countIndiv() != 0 ) $oCountIndivLessons->value( $oCountIndivLessons->value() + $oTarif->countIndiv() )->save();
     if( $oTarif->countGroup() != 0 ) $oCountGroupLessons->value( $oCountGroupLessons->value() + $oTarif->countGroup() )->save();
+
+
+    //Корректировка пользовательской медианы (средняя стоимость занятия)
+    $countLessons = 0;
+    if( $oTarif->countIndiv() != 0 )
+    {
+        $clientRate = "client_rate_indiv";
+        $countLessons = $oTarif->countIndiv();
+    }
+    if( $oTarif->countGroup() != 0 )
+    {
+        $clientRate = "client_rate_group";
+        $countLessons = $oTarif->countGroup();
+    }
+    if( $oTarif->countIndiv() != 0 && $oTarif->countGroup() != 0 )
+    {
+        $clientRate = "";
+    }
+
+    if( $clientRate != "" && $countLessons !== 0 )
+    {
+        $ClientRateProperty = Core::factory( "Property" )->getByTagName( $clientRate );
+        $newClientRateValue = $oTarif->price() / $countLessons;
+        $newClientRateValue = round( $newClientRateValue, 2 );
+        $OldClientRateValue = $ClientRateProperty->getPropertyValues( $oUser )[0];
+        $OldClientRateValue->value( $newClientRateValue )->save();
+    }
+
 
     //Создание платежа
     $oPayment = Core::factory( "Payment" )
@@ -408,6 +438,28 @@ if( $action === "saveUserComment" )
     echo "<div class='users'>";
     $this->execute();
     echo "</div>";
+
+    exit;
+}
+
+
+/**
+ * Открытие всплывающего окна для редактирования данных отчета о проведенном занятии
+ */
+if( $action === "edit_report_popup" )
+{
+    $id = Core_Array::Get( "id", 0 );
+    $Report = Core::factory( "Schedule_Lesson_Report", $id );
+
+    if( $Report == false || $Report->getId() == null )
+    {
+        die("Отчета с id $id не существует");
+    }
+
+    Core::factory( "Core_Entity" )
+        ->addEntity( $Report, "rep" )
+        ->xsl( "musadm/users/balance/edit_report_popup.xsl" )
+        ->show();
 
     exit;
 }

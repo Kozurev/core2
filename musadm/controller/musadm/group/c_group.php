@@ -10,6 +10,7 @@ $User = Core::factory( "User" )->getCurrent();
 $subordinated = $User->getDirector()->getId();
 
 $aoGroups = Core::factory("Schedule_Group")
+    ->where( "active", "=", 1 )
     ->where( "subordinated", "=", $subordinated )
     ->findAll();
 $output = Core::factory("Core_Entity");

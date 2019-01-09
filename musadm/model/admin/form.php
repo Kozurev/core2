@@ -485,6 +485,28 @@ class Admin_Form extends Admin_Form_Model
     }
 
 
+    public function getListClientsTask( $aParams )
+    {
+        $Users = Core::factory( "User" )
+            ->orderBy( "id", "DESC" )
+            ->where( "group_id", "=", 5 )
+            ->where( "active", "=", 1 )
+            ->findAll();
+
+        foreach ( $Users as $User )   $User->title = $User->surname() . " " . $User->name();
+
+        $this->addEntities( $Users, "item" );
+
+        $modelId = Core_Array::getValue( $aParams, "model_id", 0 );
+        $modelName = Core_Array::getValue( $aParams, "model", "" );
+
+        if( $modelId > 0 )
+        {
+            $this->value = Core::factory( $modelName, $modelId )->associate();
+        }
+    }
+
+
     public function getListClients($aParams)
     {
         $aoUsers = Core::factory("User")

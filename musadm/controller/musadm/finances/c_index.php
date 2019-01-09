@@ -14,8 +14,8 @@ $interval = new DateInterval("P1M");
 //$defaultDateTo = date($dateFormat);
 
 
-$dateFrom = Core_Array::getValue( $_GET, "date_from", null );
-$dateTo = Core_Array::getValue( $_GET, "date_to", null );
+$dateFrom = Core_Array::Get( "date_from", null );
+$dateTo = Core_Array::Get( "date_to", null );
 
 
 $Director = User::current()->getDirector();
@@ -26,15 +26,17 @@ $subordinated = $Director->getId();
 $Tarifs = Core::factory( "Payment_Tarif" )
     ->where( "subordinated", "=", $subordinated )
     ->findAll();
-$LessonTypes = Core::factory( "Schedule_Lesson_Type" )->where( "id", "<>", 3 )->findAll();
+$LessonTypes = Core::factory( "Schedule_Lesson_Type" )
+    ->where( "id", "<>", 3 )
+    ->findAll();
 
 
 $aoPayments = Core::factory("Payment")
     ->where( "subordinated", "=", $subordinated )
     ->open()
-    ->where("type", "=", 1)
-    ->where("type", "=", 3, "OR")
-    ->where("type", "=", 4, "OR")
+        ->where("type", "=", 1)
+        ->where("type", "=", 3, "OR")
+        ->where("type", "=", 4, "OR")
     ->close()
     ->orderBy("datetime", "DESC")
     ->orderBy( "id", "DESC" );
@@ -98,6 +100,36 @@ foreach ($aoPayments as $payment)
             $payment->addSimpleEntity( "area", $userAreaName );
     }
 }
+
+
+/**
+ * Данные настроек ставок
+ */
+$DefTeacherIndivRate =  Core::factory( "Property" )->getByTagName( "teacher_rate_indiv_default" );
+$DefTeacherGroupRate =  Core::factory( "Property" )->getByTagName( "teacher_rate_group_default" );
+$DefTeacherConsultRate= Core::factory( "Property" )->getByTagName( "teacher_rate_consult_default" );
+$DefAbsentRate =        Core::factory( "Property" )->getByTagName( "client_absent_rate" );
+$DefAbsentRateType =    Core::factory( "Property" )->getByTagName( "teacher_rate_type_absent_default" );
+$DefAbsentRateVal =     Core::factory( "Property" )->getByTagName( "teacher_rate_absent_default" );
+
+$defTeacherIndivRate =  $DefTeacherIndivRate->getPropertyValues( $Director )[0]->value();
+$defTeacherGroupRate =  $DefTeacherGroupRate->getPropertyValues( $Director )[0]->value();
+$defTeacherConsultRate= $DefTeacherConsultRate->getPropertyValues( $Director )[0]->value();
+$defAbsentRate =        $DefAbsentRate->getPropertyValues( $Director )[0]->value();
+$defAbsentRateType =    $DefAbsentRateType->getPropertyValues( $Director )[0]->value();
+$defAbsentRateVal =     $DefAbsentRateVal->getPropertyValues( $Director )[0]->value();
+
+Core::factory( "Core_Entity" )
+    ->addSImpleEntity( "director_id", $Director->getId() )
+    ->addSimpleEntity( "teacher_indiv_rate", $defTeacherIndivRate )
+    ->addSimpleEntity( "teacher_group_rate", $defTeacherGroupRate )
+    ->addSimpleEntity( "teacher_consult_rate", $defTeacherConsultRate )
+    ->addSimpleEntity( "absent_rate", $defAbsentRate )
+    ->addSimpleEntity( "absent_rate_type", $defAbsentRateType )
+    ->addSimpleEntity( "absent_rate_val", $defAbsentRateVal )
+    ->xsl( "musadm/finances/rate_config.xsl" )
+    ->show();
+
 
 Core::factory("Core_Entity")
     ->addEntities( $aoPayments )

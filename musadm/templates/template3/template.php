@@ -19,9 +19,6 @@
 /*
 *	Верхняя панель
 */
-
-//echo "<h1>".$_COOKIE["user_data"]."</h1>";
-
 if($this->oStructure->path() == "admin")
 {
     $oUser = Core::factory("User")->getCurrent();
@@ -31,7 +28,11 @@ if($this->oStructure->path() == "admin")
         ->show();
 }
 
+global $CFG;
+$rootdir = $CFG->rootdir;
 ?>
+
+<input type="hidden" id="rootdir" value="<?=$rootdir?>" />
 
 <div class="container">
     <div class="row middle">

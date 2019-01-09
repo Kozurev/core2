@@ -377,20 +377,21 @@ class Orm
 	*	Метод указывающий список таблиц из которых делается выборка
 	*	@return self
 	*/
-	public function from($aTables)
+	public function from( $aTables )
 	{
-		if(is_array($aTables))
+		if( is_array( $aTables ) )
 		{
-			$count = count($aTables);
-
-			for($i = 0; $i < $count; $i++)
-			{
-				!stristr($this->from, $aTables[$i])
-					? $this->from .= ", "
-					: $this->from .= " ";
-
-					$this->from .= $aTables[$i];
-			}
+		    $this->from .= implode( ", ", $aTables );
+//			$count = count($aTables);
+//
+//			for($i = 0; $i < $count; $i++)
+//			{
+//				!stristr($this->from, $aTables[$i])
+//					? $this->from .= ", "
+//					: $this->from .= " ";
+//
+//					$this->from .= $aTables[$i];
+//			}
 
 			return $this;
 		}

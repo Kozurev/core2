@@ -11,8 +11,31 @@ class Schedule_Absent extends Schedule_Absent_Model
 
     public function getClient()
     {
-        if($this->client_id != "")
-            return Core::factory("User", $this->client_id);
+        if( $this->client_id == "" )    return Core::factory( "User" );
+
+        if( $this->type_id == 1 )
+        {
+            $User = Core::factory( "User", $this->client_id );
+
+            if( $User == false )
+            {
+                $User = Core::factory( "User" );
+            }
+
+            return $User;
+        }
+        elseif( $this->type_id == 2 )
+        {
+            $Group = Core::factory( "Schedule_Group", $this->client_id );
+
+            if( $Group == false )
+            {
+                $Group = Core::factory( "Schedule_Group" );
+            }
+
+            return $Group;
+        }
+
     }
 
     public function save($obj = null)

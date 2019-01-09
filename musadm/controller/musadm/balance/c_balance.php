@@ -127,12 +127,12 @@ if( $User->groupId() == 5 )
 
 
 
-
 /**
  * Блок статистики посещаемости
  */
 $UserReports = Core::factory( "Schedule_Lesson_Report" )
-    ->select( array( "attendance", "date", "lesson_id", "lesson_type", "surname", "name" ) )
+    ->select( ["Schedule_Lesson_Report.id", "attendance", "date", "lesson_id", "lesson_type", "surname", "name",
+                "client_rate", "teacher_rate", "total_rate"] )
     ->leftJoin( "User AS usr", "usr.id = teacher_id" )
     ->orderBy( "date", "DESC" );
 
@@ -180,8 +180,13 @@ foreach ( $UserReports as $rep )
     $rep->date( refactorDateFormat( $rep->date() ) );
 }
 
+User::checkUserAccess( ["groups" => [1, 6]], User::parentAuth() )
+    ?   $isDirector = 1
+    :   $isDirector = 0;
+
 Core::factory( "Core_Entity" )
     ->addEntities( $UserReports )
+    ->addSimpleEntity( "is_director", $isDirector )
     ->xsl( "musadm/users/balance/attendance_report.xsl" )
     ->show();
 

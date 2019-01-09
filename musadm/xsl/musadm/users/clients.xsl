@@ -35,16 +35,18 @@
 
 
         <xsl:if test="table_type = 'active'">
-            <div class="row buttons-panel">
-                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                    <a href="#" class="btn btn-{page-theme-color} user_create" data-usergroup="5">Создать пользователя</a>
-                </div>
-                <xsl:if test="export_button_disable != 1">
+            <xsl:if test="count(buttons_row) = 0 or buttons_row != 0">
+                <div class="row buttons-panel">
                     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                        <a href="client?action=export" class="btn btn-{page-theme-color}">Экспорт в Excel</a>
+                        <a href="#" class="btn btn-{page-theme-color} user_create" data-usergroup="5">Создать пользователя</a>
                     </div>
-                </xsl:if>
-            </div>
+                    <xsl:if test="export_button_disable != 1">
+                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                            <a href="client?action=export" class="btn btn-{page-theme-color}">Экспорт в Excel</a>
+                        </div>
+                    </xsl:if>
+                </div>
+            </xsl:if>
         </xsl:if>
 
 

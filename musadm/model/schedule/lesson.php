@@ -249,6 +249,22 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     {
         if( $this->delete_date == "" )  $this->delete_date = "NULL";
 
+        if( $this->type_id == 3 && $this->client_id != 0 )
+        {
+            $Director = Core::factory( "User" )->getCurrent()->getDirector();
+            //$subordinated = $Director->getId();
+
+            $isLidIsset = Core::factory( "Lid" )
+                ->where( "id", "=", $this->client_id )
+                ->where( "subordinated", "=", $Director->getId() )
+                ->getCount();
+
+            if( $isLidIsset == 0 )
+            {
+                die( "Лид под номером " . $this->client_id . " не найден" );
+            }
+        }
+
         $Modifies = Core::factory( "Schedule_Lesson_TimeModified" )
             ->open()
                 ->open()

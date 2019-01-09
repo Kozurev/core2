@@ -258,13 +258,13 @@ Core::factory( "Core_Entity" )
  */
 $lessonReportsCount = Core::factory( "Schedule_Lesson_Report" )
     ->where( "type_id", "<>", "3" )
-    ->join( "User as u", "u.id = client_id" )
+    ->leftJoin( "User as u", "u.id = teacher_id" )
     ->where( "u.subordinated", "=", $subordinated );
 
 $attendanceCount = Core::factory( "Schedule_Lesson_Report" )
     ->where( "type_id", "<>", "3" )
     ->where( "attendance", "=", 1 )
-    ->join( "User as u", "u.id = client_id" )
+    ->join( "User as u", "u.id = teacher_id" )
     ->where( "u.subordinated", "=", $subordinated );
 
 if( $dateFrom === null && $dateTo === null )
@@ -327,6 +327,64 @@ Core::factory("Core_Entity")
     ->xsl( "musadm/statistic/lessons.xsl" )
     ->show();
 
-echo "</div>";
+/**
+ * Статистика по доходам, расходам и прибыли
+ */
+$finances = Core::factory( "Schedule_Lesson_Report" )
+    ->join( "User AS u", "teacher_id = u.id" )
+    ->where( "u.subordinated", "=", $subordinated );
+
+//Хозрасходы
+$hostExpenses = Core::factory( "Payment" )
+    ->select( "sum(Payment.value)", "value" )
+    ->where( "type", "=", 4 )
+    ->where( "subordinated", "=", $subordinated );
+
+if( $dateFrom === null && $dateTo === null )
+{
+    $finances->where( "date", "=", $date );
+    $hostExpenses->where( "datetime", "=", $date );
+}
+else
+{
+    if( $dateFrom !== null )
+    {
+        $finances->where( "date", ">=", $dateFrom );
+        $hostExpenses->where( "datetime", ">=", $dateFrom );
+    }
+
+    if($dateTo !== "")
+    {
+        $finances->where( "date", "<=", $dateTo );
+        $hostExpenses->where( "datetime", "<=", $dateTo );
+    }
+}
+
+$income =   clone $finances->select( "sum(client_rate)", "value" );
+$expenses = clone $finances->select( "sum(teacher_rate)", "value" );
+$profit =   clone $finances->select( "sum(total_rate)", "value" );
+
+$income =   $income->find()->value;
+$expenses = $expenses->find()->value;
+$profit =   $profit->find()->value;
+$hostExpenses = $hostExpenses->find()->value();
+
+if( $income === null )      $income = 0;
+if( $expenses === null )    $expenses = 0;
+if( $profit === null )      $profit = 0;
+if( $hostExpenses === null )$hostExpenses = 0;
+
+
+Core::factory( "Core_Entity" )
+    ->addSimpleEntity( "income", $income )
+    ->addSimpleEntity( "expenses", $expenses )
+    ->addSimpleEntity( "profit", $profit )
+    ->addSimpleEntity( "host_expenses", $hostExpenses )
+    ->xsl( "musadm/statistic/lessons_income.xsl" )
+    ->show();
 
 echo "</div>";
+echo "</div>";
+
+
+

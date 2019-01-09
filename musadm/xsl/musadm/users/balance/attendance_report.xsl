@@ -19,6 +19,9 @@
                         <th>Время</th>
                         <th>Статус</th>
                         <th>Преподаватель</th>
+                        <xsl:if test="is_director = 1">
+                            <th colspan="2">Финансы</th>
+                        </xsl:if>
                     </tr>
                     <xsl:apply-templates select="schedule_lesson_report" />
                 </table>
@@ -68,6 +71,17 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </td>
+
+            <xsl:if test="//is_director = 1">
+                <td>
+                    <xsl:value-of select="client_rate" />
+                    / <xsl:value-of select="teacher_rate" />
+                    / <xsl:value-of select="total_rate" />
+                </td>
+                <td class="center">
+                    <a class="action edit edit_teacher_report" data-reportid="{id}"></a>
+                </td>
+            </xsl:if>
         </tr>
     </xsl:template>
 

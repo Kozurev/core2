@@ -203,6 +203,27 @@ $(function(){
                 $(".page").html(responce);
                 loaderOff();
                 }});
+        })
+        .on("click", ".edit_teacher_report", function(e){
+            e.preventDefault();
+            var report_id = $(this).data("reportid");
+
+            $.ajax({
+                url: root + "/balance",
+                type: "GET",
+                data: {
+                    action: "edit_report_popup",
+                    id: report_id
+                },
+                success: function(response){
+                    showPopup(response);
+                }
+            });
+        })
+        .on("click", ".report_data_submit", function(e){
+            e.preventDefault();
+            loaderOn();
+            saveData("Main", refreshUserTable);
         });
 });
 

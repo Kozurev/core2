@@ -2,11 +2,14 @@
 
     <xsl:template match="root">
         <div class="col-lg-12">
-            <h3>Выплаты преподавателям</h3>
-            <table class="simple-little-table statistic_teacher_payments_table">
+            <!--<h3>Выплаты преподавателям</h3>-->
+            <table class="table table-bordered statistic_teacher_payments_table" style="margin-bottom: 20px">
+                <tr class="header">
+                    <th colspan="2">Выплаты преподавателям</th>
+                </tr>
                 <tr>
                     <td>Всего выплат на сумму:</td>
-                    <td><xsl:value-of select="total_sum" /></td>
+                    <td><xsl:value-of select="total_sum" /> руб.</td>
                 </tr>
             </table>
         </div>

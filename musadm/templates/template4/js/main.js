@@ -133,8 +133,6 @@ function deleteItem(model_name, model_id, func){
  *  @param func - выполняемая функция по получению результата ajax-запроса
  */
 function updateActive(model_name, model_id, value, func){
-    loaderOn();
-
     var link = root + "/admin?menuTab=Main&menuAction=updateActive&ajax=1";
     link += "&model_name=" + model_name;
     link += "&model_id=" + model_id;
@@ -182,6 +180,37 @@ function savePayment(userid, value, description, description2, type, url, func) 
             if(responce != "0") alert("Ошибка: " + responce);
             closePopup();
             if(typeof func === "function") func();
+        }
+    });
+}
+
+
+/**
+ * Сохранение значения дополнительного свойства объекта
+ *
+ * @param prop_name  - tag_name дополнительного свойства
+ * @param value      - значение
+ * @param model_name - название объекта к которому задается значение
+ * @param model_id   - id объекта к которому задается значение
+ * @param func       - исполняемая функция после выполнения запроса
+ */
+function savePropertyValue( prop_name, value, model_name, model_id, func )
+{
+    $.ajax({
+        type: "GET",
+        url: root + "/",
+        data: {
+            ajax: 1,
+            action: "savePropertyValue",
+            prop_name: prop_name,
+            value: value,
+            model_name: model_name,
+            model_id: model_id
+        },
+        success: function(responce){
+            if( responce != "" )    alert("Ошибка: " + responce);
+            if(typeof func === "function") func();
+            loaderOff();
         }
     });
 }

@@ -2,10 +2,13 @@
 
     <xsl:template match="root">
         <div class="col-lg-4">
-            <h3>Баланс и кол-во занятий</h3>
+            <!--<h3>Баланс и кол-во занятий</h3>-->
             <table class="table table-bordered statistic_lessons_table">
                 <tr class="header">
-                    <td>Общий баланс средств всех учащихся:</td>
+                    <td colspan="2">Общий баланс и кол-во занятий</td>
+                </tr>
+                <tr>
+                    <th>Общий баланс средств всех учащихся:</th>
                     <td><xsl:value-of select="balance" /> руб.</td>
                 </tr>
                 <tr>

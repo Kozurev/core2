@@ -10,6 +10,7 @@
 *	Блок проверки авторизации
 */
 $oUser = Core::factory("User")->getCurrent();
+
 if(!$oUser)
 {
     $host  = $_SERVER['HTTP_HOST'];
@@ -18,11 +19,11 @@ if(!$oUser)
     exit;
 }
 
-if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
-{
-    $this->execute();
-    exit;
-}
+//if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
+//{
+//    $this->execute();
+//    exit;
+//}
 
 /**
  * Настроки редиректа
@@ -40,25 +41,27 @@ $this->setParam( "title-second", "СТРАНИЦА" );
 
 $access = ["groups" => [1, 2, 3, 6]];
 
-
-if( !User::checkUserAccess( $access ) )
+if( Core_Array::Get( "ajax", null ) === null )
 {
-    header( "Location: http://$host$uri/authorize?back=/$uri" );
-}
+    if( !User::checkUserAccess( $access ) )
+    {
+        header( "Location: http://$host$uri/authorize?back=/$uri" );
+    }
 
-if( $oUser->groupId() == 6 )
-{
-    header( "Location: http://$host$uri/user/client" );
-}
+    if( $oUser->groupId() == 6 )
+    {
+        header( "Location: http://$host$uri/user/client" );
+    }
 
-if( $oUser->groupId() == 5 )
-{
-    header( "Location: http://$host$uri/balance" );
-}
+    if( $oUser->groupId() == 5 )
+    {
+        header( "Location: http://$host$uri/balance" );
+    }
 
-if( $oUser->groupId() == 4 )
-{
-    header( "Location: http://$host$uri/schedule" );
+    if( $oUser->groupId() == 4 )
+    {
+        header( "Location: http://$host$uri/schedule" );
+    }
 }
 
 
@@ -68,6 +71,31 @@ $action = Core_Array::getValue($_GET, "action", null);
 $Director = User::current()->getDirector();
 if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
 $subordinated = $Director->getId();
+
+
+/**
+ * Обработчик для сохранения значения доп. свойства
+ */
+if( $action === "savePropertyValue" )
+{
+    $propertyName = Core_Array::Get( "prop_name", null );
+    $propertyValue= Core_Array::Get( "value", null );
+    $modelId =      Core_Array::Get( "model_id", null );
+    $modelName =    Core_Array::Get( "model_name", null );
+
+    $Property = Core::factory( "Property" )->getByTagName( $propertyName );
+    if( $Property === false )   die( "Свойство с названием $propertyName не существует" );
+
+    $Object = Core::factory( $modelName, $modelId );
+    if( !is_object( $Object ) || $Object->getId() == 0 )
+        die( "Объекта класса $modelName с id $modelId не существует" );
+
+    $Value = $Property->getPropertyValues( $Object )[0];
+    $Value->value( $propertyValue )->save();
+
+    exit;
+}
+
 
 
 /**
@@ -198,16 +226,17 @@ if( $action === "search_client" )
             }
         }
 
-        //echo "<div class='users'>";
+        echo "<div class='users'>";
         Core::factory( "Core_Entity" )
             ->addSimpleEntity( "page-theme-color", "green" )
-            ->addSimpleEntity( "export_button_disable", 1 )
+            ->addSimpleEntity( "buttons_row", 0 )
+            //->addSimpleEntity( "export_button_disable", 1 )
             ->addSimpleEntity( "wwwroot", $CFG->rootdir )
             ->addSimpleEntity( "table_type", "active" )
             ->addEntities( $Users )
             ->xsl( "musadm/users/clients.xsl" )
             ->show();
-        //echo "</div>";
+        echo "</div>";
     }
 
     exit;

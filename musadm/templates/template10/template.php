@@ -24,6 +24,7 @@
         ->css( "/templates/template10/assets/css/checkbox.css" )
         ->css( "/templates/template10/assets/css/tooltip.css" )
         ->css( "/templates/template10/assets/css/scroll.css" )
+        ->css( "/templates/template10/assets/css/radiobutton.css" )
         ->js( "/templates/template10/assets/plugins/jquery.min.js" );
 
         global $CFG;

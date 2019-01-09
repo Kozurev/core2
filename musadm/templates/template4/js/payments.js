@@ -155,7 +155,7 @@ $(function(){
 
             $.ajax({
                 type: "GET",
-                url: root + "/balance",
+                url: "",
                 data: {
                     action: "payment_save",
                     id: id,

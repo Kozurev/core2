@@ -345,22 +345,16 @@ Core::attachObserver("afterLidSave", function($args){
  * Удаление всех занятий в расписании, с которыми была связана данная группа
  */
 Core::attachObserver("beforeScheduleGroupDelete", function($args){
-    $oGroup = $args[0];
-    $oGroup->clearClientList();
+    $Group = $args[0];
+    $Group->clearClientList();
 
-    $aoLessons = Core::factory("Schedule_Lesson")
-        ->where("group_id", "=", $oGroup->getId())
+    $Lessons = Core::factory("Schedule_Lesson")
+        ->where( "type_id", "=", 2 )
+        ->where( "client_id", "=", $Group->getId())
         ->findAll();
 
-    $aoCurrentLessons = Core::factory("Schedule_Lesson")
-        ->where("group_id", "=", $oGroup->getId())
-        ->findAll();
 
-    $lessons = array();
-    if(is_array($aoLessons))    $lessons = array_merge($lessons, $aoLessons);
-    if(is_array($aoCurrentLessons)) $lessons = array_merge($lessons, $aoCurrentLessons);
-
-    foreach ($lessons as $oLesson)    $oLesson->delete();
+    foreach ( $Lessons as $Lesson ) $Lesson->delete();
 });
 
 

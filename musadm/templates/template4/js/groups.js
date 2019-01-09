@@ -6,6 +6,12 @@ $(function(){
             var groupid = $(this).data("groupid");
             deleteItem("Schedule_Group", groupid, refreshGroupTable);
         })
+        .on("click", ".group_archive", function(e){
+            e.preventDefault();
+            loaderOn();
+            var group_id = $(this).data("groupid");
+            updateActive("Schedule_Group", group_id, 0, refreshGroupTable);
+        })
         .on("click", ".group_edit", function(e){
             e.preventDefault();
             var groupid = $(this).data("groupid");

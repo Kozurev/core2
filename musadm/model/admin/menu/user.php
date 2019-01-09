@@ -22,8 +22,8 @@ class Admin_Menu_User
 
             foreach ($data as $word)
                 $oUser
-                    ->where("name", "like", $word, "or")
-                    ->where("surname", "like", $word, "or");
+                    ->where("name", "like", "%".$word."%", "or")
+                    ->where("surname", "like", "%".$word."%", "or");
 
             $search->value($searchData);
         }
@@ -58,7 +58,6 @@ class Admin_Menu_User
                     ->name("total_count")
                     ->value($totalCount)
             );
-
 
         $aoUsers = $oUser
             ->limit(SHOW_LIMIT)

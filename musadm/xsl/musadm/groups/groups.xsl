@@ -54,7 +54,8 @@
 
             <td>
                 <a href="#" class="action edit group_edit" data-groupid="{id}"></a>
-                <a href="#" class="action delete group_delete" data-groupid="{id}"></a>
+                <!--<a href="#" class="action delete group_delete" data-groupid="{id}"></a>-->
+                <a href="#" class="action archive group_archive" data-groupid="{id}"></a>
             </td>
         </tr>
     </xsl:template>

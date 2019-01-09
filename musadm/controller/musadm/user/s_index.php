@@ -113,6 +113,7 @@ if($action == "updateFormTeacher")
     {
         $oUser =            Core::factory("User", $userid);
         $aoProperties[] =   Core::factory("Property", 20)->getPropertyValues($oUser)[0];    //Инструмент
+        $aoProperties[] =   Core::factory("Property", 31)->getPropertyValues($oUser)[0];    //Инструмент
 
         $output
             ->addEntities($aoProperties,    "property_value");

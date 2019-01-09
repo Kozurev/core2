@@ -86,7 +86,7 @@ class User_Model extends Core_Entity
 		if( strlen( $val ) > 255 )
             die( Core::getMessage( "TOO_LARGE_VALUE", ["name", "User", 255] ) );
 
-		$this->name = $val;
+		$this->name = trim( $val );
 		return $this;
 	}
 
@@ -97,7 +97,7 @@ class User_Model extends Core_Entity
 		if( strlen( $val ) > 255 )
             die(Core::getMessage("TOO_LARGE_VALUE", array("surname", "User", 255)));
 
-		$this->surname = $val;
+		$this->surname = trim( $val );
 		return $this;
 	}
 
@@ -108,7 +108,7 @@ class User_Model extends Core_Entity
 		if( strlen( $val ) > 255 )
             die( Core::getMessage( "TOO_LARGE_VALUE", ["patronimyc", "User", 255] ) );
 
-		$this->patronimyc = $val;
+		$this->patronimyc = trim($val);
 		return $this;
 	}
 

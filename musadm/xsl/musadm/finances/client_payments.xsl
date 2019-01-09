@@ -2,20 +2,6 @@
 
     <xsl:template match="root">
 
-        <!--<div class="row finances_calendar">-->
-            <!--<div class="col-lg-3 col-md-5 col-sm-5 col-xs-12 col-lg-offset-2 col-md-offset-0">-->
-                <!--Период с: <input type="date" class="form-control" name="date_from" value="{date_from}"/>-->
-            <!--</div>-->
-
-            <!--<div class="col-lg-3 col-md-5 col-sm-5 col-xs-12">-->
-                <!--по: <input type="date" class="form-control" name="date_to" value="{date_to}"/>-->
-            <!--</div>-->
-
-            <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">-->
-                <!--<a class="btn btn-green finances_show" >Показать</a>-->
-            <!--</div>-->
-        <!--</div>-->
-
         <div class="row finances_calendar">
             <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
                 <span>Период с:</span>
@@ -49,7 +35,7 @@
         </div>
 
         <div class="tarifs table-responsive">
-            <table id="sortingTable" class="table table-striped">
+            <table  class="table table-striped table-statused">
                 <thead>
                     <tr class="header">
                         <th>Название</th>
@@ -65,10 +51,6 @@
                     <xsl:apply-templates select="payment_tarif" />
                 </tbody>
             </table>
-
-            <!--<div class="right">-->
-                <!--<a class="btn btn-green tarif_edit" href="#" data-tarifid="">Создать тариф</a>-->
-            <!--</div>-->
 
             <div class="row buttons-panel">
                 <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
@@ -147,11 +129,23 @@
             <td><xsl:value-of select="count_group" /></td>
             <!--<td><xsl:value-of select="/root/schedule_lesson_type[id = $type_id]/title" /></td>-->
             <td>
-                <input type="checkbox" disabled="true">
+                <input type="checkbox" name="access" id="access{id}" class="checkbox-new" disabled="true" >
                     <xsl:if test="access = 1">
-                        <xsl:attribute name="checked">true</xsl:attribute>
+                        <xsl:attribute name="checked">checked</xsl:attribute>
                     </xsl:if>
                 </input>
+                <label for="access{id}" class="label-new">
+                    <div class="tick"><input type="hidden" name="kostul"/></div>
+                </label>
+                <!--<input class="checkbox" id="checkbox{id}" type="checkbox" disabled="true">-->
+                    <!--<xsl:if test="access = 1">-->
+                        <!--<xsl:attribute name="checked">true</xsl:attribute>-->
+                    <!--</xsl:if>-->
+                <!--</input>-->
+                <!--<label for="checkbox{id}" class="checkbox-label">-->
+                    <!--<span class="off">скрытый</span>-->
+                    <!--<span class="on">общий</span>-->
+                <!--</label>-->
             </td>
             <td>
                 <a class="action edit tarif_edit"       href="#" data-tarifid="{id}"></a>
