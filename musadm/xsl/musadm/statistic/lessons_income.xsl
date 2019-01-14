@@ -5,18 +5,18 @@
             <div class='col-lg-12 col-md-12 col-sm-12'>
                 <table class="table table-bordered">
                     <tr class="header">
-                        <td colspan="2">Выручка от занятий</td>
+                        <td colspan="2">Доходы-расходы</td>
                     </tr>
                     <tr>
-                        <td>Суммарные поступления</td>
+                        <td>Выручка от занятий</td>
                         <td><xsl:value-of select="income" /></td>
                     </tr>
                     <tr>
-                        <td>Выплаты преподавателям</td>
+                        <td>Начислено преподавателям</td>
                         <td><xsl:value-of select="expenses" /></td>
                     </tr>
                     <tr>
-                        <td>Общая прибыль</td>
+                        <td>Выручка с учетом отчислений преподавателям</td>
                         <td><xsl:value-of select="profit" /></td>
                     </tr>
                     <tr>
@@ -24,7 +24,7 @@
                         <td><xsl:value-of select="host_expenses" /></td>
                     </tr>
                     <tr>
-                        <td>Прибыль с учетом хозрасходов</td>
+                        <td>Прибыль с учетом зарплат и хозрасходов</td>
                         <td><xsl:value-of select="profit - host_expenses" /></td>
                     </tr>
                 </table>

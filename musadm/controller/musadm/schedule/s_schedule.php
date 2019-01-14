@@ -602,6 +602,30 @@ if( $action === "create_schedule_task" )
 }
 
 
+if( $action === "payment_save" )
+{
+    $id = Core_Array::Get( "id", null );
+    $date = Core_Array::Get( "date", date( "Y-m-d" ) );
+    $value = Core_Array::Get( "value", 0 );
+    $description = Core_Array::Get( "description", "" );
+
+    if( $id == null || Core::factory( "Payment", $id ) == false )
+    {
+        die( "Редактируемый платеж не найден либо был удален" );
+    }
+
+    Core::factory( "Payment", $id )
+        ->datetime( $date )
+        ->value( $value )
+        ->description( $description )
+        ->save();
+
+
+    $this->execute();
+    exit;
+}
+
+
 if($action === "getSchedule")
 {
     $this->execute();

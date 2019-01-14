@@ -179,7 +179,10 @@ $(function(){
                             loaderOff();
                             break;
                         case 'teacher': //обновление контента страницы преподавателя
-                            refreshSchedule();
+                            $(".schedule").empty();
+                            $(".schedule").html(responce);
+                            loaderOff();
+                            //refreshSchedule();
                             break;
                         default: loaderOff();
                     }
