@@ -1,12 +1,17 @@
 <?php
 class Core_Database
 {
+
+    /**
+     * @var PDO
+     */
 	private static $db;
 
 	/**
-	*	Метод для установления соединения с базой данных
-	*	@return void
-	*/
+	 * Метод для установления соединения с базой данных
+     *
+	 * @return void
+	 */
 	public static function connect()
 	{
 		$connectionParams = include(ROOT."/config/dbcon.php");
@@ -18,14 +23,17 @@ class Core_Database
 	}
 
 	/**
-	*	Метод для разрыва соединения
-	*/
+	 * Метод для разрыва соединения
+	 */
 	public static function disconnect()
 	{
 		Core_Database::$db = null;
-	} 
+	}
 
 
+    /**
+     * @return PDO
+     */
 	public static function getConnect()
 	{
 		return Core_Database::$db;

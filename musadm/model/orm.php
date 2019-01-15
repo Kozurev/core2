@@ -52,9 +52,10 @@ class Orm
 
 
 	/**
-	*	Возвращает название таблицы для данного объекта
-	*	@return string
-	*/
+	 * Возвращает название таблицы для данного объекта
+     *
+	 * @return string
+	 */
 	public function getTableName()
 	{
 		if(method_exists($this, "databaseTableName"))
@@ -79,9 +80,10 @@ class Orm
 
 
 	/**
-	*	Формирует из не пустых свойств объекта ассоциативный массив 
-	*	@return array
-	*/
+	 * Формирует из не пустых свойств объекта ассоциативный массив
+     *
+	 * @return array
+	 */
 	public function getObjectProperties()
 	{
 		$result = array();
@@ -97,9 +99,10 @@ class Orm
 
 
 	/**
-	*	Возвращает количество элементов в базе
-	*	@return int
-	*/
+	 * Возвращает количество элементов в базе
+     *
+	 * @return int
+	 */
 	public function getCount()
 	{
 		$this->select = "count(".$this->getTableName().".id) as count";
@@ -119,9 +122,10 @@ class Orm
 
 
 	/**
-	*	Метод для добавления/сохранения объектов
-	*	@return $this
-	*/
+	 * Метод для добавления/сохранения объектов
+     *
+	 * @return $this
+	 */
 	public function save()
 	{
 		$objData = $this->getObjectProperties();
@@ -230,8 +234,9 @@ class Orm
 
 
     /**
-     *	Метод для формирования строки запроса
-     *	@return void
+     * Метод для формирования строки запроса
+     *
+     * @return void
      */
     private function setQueryString()
     {
@@ -268,7 +273,11 @@ class Orm
 
         if($this->having != "")
             $this->queryString .= " HAVING ".$this->having;
+
+        $this->queryString = strip_tags( $this->queryString );
+        //$this->queryString = mysqli_real_escape_string( $this->queryString );
     }
+
 
     public function getQueryString()
     {
@@ -290,11 +299,10 @@ class Orm
 */
 	
 	/**
-	*	Метод для выполнения sql запроса
-	*/
+	 * Метод для выполнения sql запроса
+	 */
 	public function executeQuery($sql)
 	{
-		//$this->setConnect();
 		if( self::isDebugSql() ) echo "<br>Строка из метода <b>executeQuery()</b>: ".$sql;
 		$result = Core_Database::getConnect()->query($sql);
 		return $result;
@@ -302,8 +310,9 @@ class Orm
 
 
     /**
-     *	Метод, проыеряющий соединение с базой данный
-     *	@return self
+     * Метод, проыеряющий соединение с базой данный
+     *
+     * @return self
      */
     public function queryBuilder()
     {
@@ -325,8 +334,8 @@ class Orm
 
 
 	/**
-	*	Удаление
-	*/
+	 * Удаление
+	 */
 	public function delete($obj = null)
 	{
 	    if(is_null($obj))   $obj = $this;
@@ -339,10 +348,11 @@ class Orm
 
 
 	/**
-	*	Метод указывающий название таблицы и параметры, которые из неё будут выбираться.
-	*	Если параметры не заданы тогда выбираются все столбцы таблицы.
-	*	@return self
-	*/
+	 * Метод указывающий название таблицы и параметры, которые из неё будут выбираться.
+	 * Если параметры не заданы тогда выбираются все столбцы таблицы.
+     *
+	 * @return self
+	 */
 	public function select($aParams, $as = null)
 	{
 		//Если был передан массив параметров
@@ -374,24 +384,15 @@ class Orm
 
 
 	/**
-	*	Метод указывающий список таблиц из которых делается выборка
-	*	@return self
-	*/
+	 * Метод указывающий список таблиц из которых делается выборка
+     *
+	 * @return self
+	 */
 	public function from( $aTables )
 	{
 		if( is_array( $aTables ) )
 		{
 		    $this->from .= implode( ", ", $aTables );
-//			$count = count($aTables);
-//
-//			for($i = 0; $i < $count; $i++)
-//			{
-//				!stristr($this->from, $aTables[$i])
-//					? $this->from .= ", "
-//					: $this->from .= " ";
-//
-//					$this->from .= $aTables[$i];
-//			}
 
 			return $this;
 		}
@@ -434,9 +435,10 @@ class Orm
 
 
 	/**
-	*	Метод задающий условия выборки данных
-	* 	@return self
-	*/
+	 * Метод задающий условия выборки данных
+     *
+	 * @return self
+	 */
 	public function where($row, $operation = null, $value = null, $or = null)
 	{
         if(($operation == "in" || $operation == "IN") && is_array($value))
@@ -497,9 +499,10 @@ class Orm
 
 
 	/**
-	*	Метод задающий групировку результата
-	*	@return self
-	*/
+	 * Метод задающий групировку результата
+     *
+	 * @return self
+	 */
 	public function orderBy($row, $order = "ASC")
 	{
 		if(is_array($row))
@@ -538,9 +541,10 @@ class Orm
 
 
 	/**
-	*	Метод задающий выбираемое количество из базы данных
-	*	@return self
-	*/
+	 * Метод задающий выбираемое количество из базы данных
+     *
+	 * @return self
+	 */
 	public function limit($count)
 	{
 		if(!is_numeric($count))
@@ -559,9 +563,10 @@ class Orm
 
 
 	/**
-	*	Метод для объединения таблиц INNER JOIN
-	*	@return self
-	*/
+	 * Метод для объединения таблиц INNER JOIN
+     *
+	 * @return self
+	 */
 	public function join($table, $condition)
 	{
 		$this->join .= " JOIN " . $table . " ON " . $condition;
@@ -593,9 +598,10 @@ class Orm
 
 
 	/**
-	*	Метод выполняющий запрос к бд
-	*	@return array of objects
-	*/
+	 * Метод выполняющий запрос к бд
+     *
+	 * @return array | false
+	 */
 	public function findAll( $modelName = null )
 	{
 		$this->setQueryString();
@@ -625,9 +631,10 @@ class Orm
 
 
 	/**
-	*	Выполняет запрос к бд
-	*	@return object
-	*/
+	 * Выполняет запрос к бд
+     *
+	 * @return object | false
+	 */
 	public function find()
 	{
 		$this->setQueryString();

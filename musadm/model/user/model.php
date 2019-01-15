@@ -60,6 +60,8 @@ class User_Model extends Core_Entity
 		if( strlen( $val ) > 255 )
 		    die( Core::getMessage( "TOO_LARGE_VALUE", ["password", "User", 255] ) );
 
+		$val = trim( $val );
+
 		if( $type == false )
 		    $this->password = md5( $val );
 		else
@@ -130,7 +132,7 @@ class User_Model extends Core_Entity
 		if( strlen( $val ) > 255 )
             die( Core::getMessage("TOO_LARGE_VALUE", ["login", "User", 255] ) );
 
-		$this->login = $val;
+		$this->login = trim( $val );
 		return $this;
 	}
 
