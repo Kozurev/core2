@@ -273,9 +273,6 @@ class Orm
 
         if($this->having != "")
             $this->queryString .= " HAVING ".$this->having;
-
-        $this->queryString = strip_tags( $this->queryString );
-        //$this->queryString = mysqli_real_escape_string( $this->queryString );
     }
 
 
