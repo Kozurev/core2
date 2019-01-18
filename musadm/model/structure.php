@@ -8,14 +8,18 @@ class Structure extends Structure_Model
 
     /**
      * Возвращает объект родительской структуры
-     * @return object
+     * @return Structure | bool
      */
 	public function getParent()
     {
-        if($this->parentId() != 0)
-            return Core::factory("Structure", $this->parent_id);
+        if ( $this->parentId() != 0 )
+        {
+            return Core::factory( "Structure", $this->parent_id );
+        }
         else
-            return false;
+        {
+            return null;
+        }
     }
 
 
@@ -24,11 +28,11 @@ class Structure extends Structure_Model
      * @param Structure $oStructure - проверяемый элемент
      * @return bool
      */
-    public function isChild($oStructure)
+    public function isChild( $Structure )
     {
-        if($oStructure->parentId() == $this->id) return true;
-        if($oStructure->parentId() == 0) return false;
-        return $this->isChild($oStructure->getParent());
+        if( $Structure->parentId() == $this->id )  return true;
+        if( $Structure->parentId() == 0 )          return false;
+        return $this->isChild( $Structure->getParent() );
     }
 
 
@@ -41,39 +45,39 @@ class Structure extends Structure_Model
      */
     public function getChildren()
     {
-        $aoChildren = Core::factory("Structure")
-            ->where("parent_id", "=", $this->id)
+        $Children = Core::factory( "Structure" )->queryBuilder()
+            ->where( "parent_id", "=", $this->id )
             ->findAll();
 
-        if(count($aoChildren) == 0) return array();
+        if ( count( $Children ) == 0 ) return [];
 
-        $aoResult = $aoChildren;
+        $Result = $Children;
 
-        foreach($aoChildren as $oStructure)
+        foreach ( $Children as $ChildStructure )
         {
-            $aoResult = array_merge($aoResult, $oStructure->getChildren(true));
+            $Result = array_merge( $Result, $ChildStructure->getChildren( true ) );
         }
 
-        return $aoResult;
+        return $Result;
     }
 
 
     /**
      * Реализация рекурсивного удаления структур
      */
-    public function delete($obj = null)
+    public function delete( $obj = null )
     {
-        Core::notify(array(&$this), "beforeStructureDelete");
+        Core::notify( [&$this], "beforeStructureDelete" );
         parent::delete();
-        Core::notify(array(&$this), "afterStructureDelete");
+        Core::notify( [&$this], "afterStructureDelete" );
     }
 
 
-    public function save($obj = null)
+    public function save( $obj = null )
     {
-        Core::notify(array(&$this), "beforeStructureSave");
+        Core::notify( [&$this], "beforeStructureSave" );
         parent::save();
-        Core::notify(array(&$this), "afterStructureSave");
+        Core::notify( [&$this], "afterStructureSave" );
     }
 
 

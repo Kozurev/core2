@@ -1,7 +1,7 @@
 <?php
 /**
-*	Модель константы 
-*/
+ * Модель константы
+ */
 class Constant extends Constant_Model
 {
 
@@ -18,7 +18,7 @@ class Constant extends Constant_Model
 	* 	Установка пользовательских констант
 	*	@return void	
 	*/
-	public function setAllConstants()
+	public static function setAllConstants()
 	{
 		$aConstants = Core::factory('Constant');
 		$aConstants = $aConstants->queryBuilder()
@@ -31,9 +31,16 @@ class Constant extends Constant_Model
         {
             $sConstName = $const->name();
             $val = $const->value();
-            $sValueType = Core::factory("Constant_Type", $const->valueType())->title();
+            //$sValueType = Core::factory("Constant_Type", $const->valueType())->title();
 
-            switch($sValueType)
+            $ValueType = Core::factory( "Constant_Type", $const->valueType() );
+
+            if ( $ValueType === null )
+            {
+                exit ( "Тип константы с id " . $const->valueType() . " не найдена" );
+            }
+
+            switch ( $ValueType->title() )
             {
                 case "bool":
                     {

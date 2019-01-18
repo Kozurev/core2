@@ -10,6 +10,7 @@ $User = Core::factory( "User" )->getCurrent();
 $subordinated = $User->getDirector()->getId();
 
 $aoCertificates = Core::factory( "Certificate" )
+    ->queryBuilder()
     ->where( "subordinated", "=", $subordinated )
     ->orderBy( "sell_date", "DESC" )
     ->findAll();
@@ -27,6 +28,7 @@ foreach ( $aoCertificates as $cert )
 }
 
 $aoNotes = Core::factory( "Certificate_Note" )
+    ->queryBuilder()
     ->select( array( "Certificate_Note.id", "date", "certificate_id", "author_id", "text", "usr.surname", "usr.name" ) )
     ->join( "User as usr", "author_id = usr.id" )
     ->orderBy( "date", "DESC" )

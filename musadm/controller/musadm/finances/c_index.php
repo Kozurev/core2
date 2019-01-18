@@ -7,11 +7,9 @@
  */
 
 $dateFormat = "Y-m-d";
-$date = date( "Y-m-d" );
-$oDate = new DateTime(date($dateFormat));
-$interval = new DateInterval("P1M");
-//$defaultDateFrom = $oDate->sub($interval)->format($dateFormat);
-//$defaultDateTo = date($dateFormat);
+$date = date( $dateFormat );
+$oDate = new DateTime( date( $dateFormat ) );
+$interval = new DateInterval( "P1M" );
 
 
 $dateFrom = Core_Array::Get( "date_from", null );
@@ -24,14 +22,18 @@ $subordinated = $Director->getId();
 
 
 $Tarifs = Core::factory( "Payment_Tarif" )
+    ->queryBuilder()
     ->where( "subordinated", "=", $subordinated )
     ->findAll();
+
 $LessonTypes = Core::factory( "Schedule_Lesson_Type" )
+    ->queryBuilder()
     ->where( "id", "<>", 3 )
     ->findAll();
 
 
-$aoPayments = Core::factory("Payment")
+$Payments = Core::factory( "Payment" );
+$Payments->queryBuilder()
     ->where( "subordinated", "=", $subordinated )
     ->open()
         ->where("type", "=", 1)
@@ -42,7 +44,7 @@ $aoPayments = Core::factory("Payment")
     ->orderBy( "id", "DESC" );
 
 //Сумма поступлений
-$summ = Core::factory("Orm")
+$summ = Core::factory( "Orm" )
     ->select("sum(value)", "value")
     ->from("Payment")
     ->where("type", "=", 1)
@@ -54,25 +56,31 @@ $summ = Core::factory("Orm")
  */
 if( $dateFrom === null && $dateTo === null )
 {
-    $aoPayments->where( "datetime", "=", $date );
+    $Payments->queryBuilder()
+        ->where( "datetime", "=", $date );
+
     $summ->where( "datetime", "=", $date );
 }
 else
 {
-    if($dateFrom !== null )
+    if( $dateFrom !== null )
     {
-        $aoPayments->where("datetime", ">=", $dateFrom);
+        $Payments->queryBuilder()
+            ->where( "datetime", ">=", $dateFrom );
+
         $summ->where( "datetime", ">=", $dateFrom );
     }
 
-    if($dateTo !== "")
+    if( $dateTo !== "" )
     {
-        $aoPayments->where("datetime", "<=", $dateTo);
+        $Payments->queryBuilder()
+            ->where( "datetime", "<=", $dateTo );
+
         $summ->where( "datetime", "<=", $dateTo );
     }
 }
 
-$aoPayments = $aoPayments->findAll();
+$Payments = $Payments->findAll();
 
 
 /**
@@ -85,19 +93,22 @@ if( $summ === null )    $summ = 0;
 /**
  * Поиск информации о платеже: ФИО клиента/преподавателя и название филлиала
  */
-foreach ($aoPayments as $payment)
+foreach ( $Payments as $payment )
 {
-    $oPaymentUser = $payment->getUser();
+    $PaymentUser = $payment->getUser();
 
-    $payment->addEntity( $oPaymentUser );
-    $payment->datetime( refactorDateFormat($payment->datetime()) );
+    $payment->addEntity( $PaymentUser );
+    $payment->datetime( refactorDateFormat( $payment->datetime() ) );
 
-    if( $oPaymentUser->groupId() == 5 )
+    if( $PaymentUser->groupId() == 5 )
     {
-        $oProperty = Core::factory( "Property", 15 );
-        $userAreaName = $oProperty->getPropertyValues( $oPaymentUser )[0]->value();
-        if( $userAreaName != $oProperty->defaultValue() )
+        $Property = Core::factory( "Property", 15 );
+        $userAreaName = $Property->getPropertyValues( $PaymentUser )[0]->value();
+
+        if( $userAreaName != $Property->defaultValue() )
+        {
             $payment->addSimpleEntity( "area", $userAreaName );
+        }
     }
 }
 
@@ -132,7 +143,7 @@ Core::factory( "Core_Entity" )
 
 
 Core::factory("Core_Entity")
-    ->addEntities( $aoPayments )
+    ->addEntities( $Payments )
     ->addEntities( $Tarifs )
     ->addEntities( $LessonTypes )
     ->addSimpleEntity( "date_from", $dateFrom )

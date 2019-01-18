@@ -64,18 +64,19 @@ class Property extends Property_Model
 
 
 	/**
-	*	Возвращает список значений свойства объекта
-	*	@param $obj - объект, значения свойства которого будет возвращено
-	*	@return array
-	*/
+	 * Возвращает список значений свойства объекта
+     *
+	 * @param $obj - объект, значения свойства которого будет возвращено
+	 * @return array
+	 */
 	public function getPropertyValues($obj)
 	{
-		/*
-		*	Чтобы полдучить значения свойства необходимо чтобы
-		*	это объект представлял из себя существующее свойство
-		*	и это свойство принадлежало объекту, для которого ищется значение
-		*	Данного свойства
-		*/
+		/**
+		 * Чтобы полдучить значения свойства необходимо чтобы
+		 * это объект представлял из себя существующее свойство
+		 * и это свойство принадлежало объекту, для которого ищется значение
+		 * данного свойства
+		 */
 		if(!$this->id) die("Неопределенное свойство"); 
 
 		if(!$this->active())
@@ -138,6 +139,7 @@ class Property extends Property_Model
         {
             $sTableName = "Property_" . $type . "_Assigment";
             $aoTypeProperties = Core::factory($sTableName)
+                ->queryBuilder()
                 ->where("object_id", "=", $obj->getId())
                 ->where("model_name", "=", get_class($obj))
                 ->findAll();
@@ -172,6 +174,7 @@ class Property extends Property_Model
             :   $objectId = $obj->getId();
 
         $assigment = Core::factory($sTableName)
+            ->queryBuilder()
             ->where("object_id", "=", $objectId)
 	        ->where("property_id", "=", $propertyId)
             ->where("model_name", "=", get_class($obj))
@@ -273,6 +276,7 @@ class Property extends Property_Model
 		{
 		    if( $oPropertyList->value() == 0 ) continue;
 			$aoOutputData[] = Core::factory("Property_List_Values")
+                ->queryBuilder()
 				->where("property_id", "=", $this->id)
 				->where("id", "=", $oPropertyList->value())
 				->find();
@@ -287,12 +291,14 @@ class Property extends Property_Model
     {
         $sTableName = "Property_".ucfirst($this->type());
         $aoAssigments = Core::factory($sTableName . "_Assigment")
+            ->queryBuilder()
             ->where("property_id", "=", $this->id)
             ->findAll();
 
         foreach ($aoAssigments as $assigment) $assigment->delete();
 
         $aoValues = Core::factory($sTableName)
+            ->queryBuilder()
             ->where("property_id", "=", $this->id)
             ->findAll();
 
@@ -319,6 +325,7 @@ class Property extends Property_Model
             if($prop->type() == "list")
             {
                 $aoValues = Core::factory("Property_List")
+                    ->queryBuilder()
                     ->where("model_name", "=", $modelName)
                     ->where("object_id", "=", $modelId)
                     ->findAll();
@@ -335,6 +342,7 @@ class Property extends Property_Model
         {
             $tableName = "Property_" . $type . "_Assigment";
             $assignments = Core::factory($tableName)
+                ->queryBuilder()
                 ->where("model_name", "=", $modelName)
                 ->where("object_id", "=", $modelId)
                 ->findAll();
@@ -358,6 +366,7 @@ class Property extends Property_Model
         foreach ( $types as $type )
         {
             $Assignments = Core::factory( "Property_" . $type . "_Assigment" )
+                ->queryBuilder()
                 ->where( "model_name", "=", get_class( $obj ) )
                 ->where( "object_id", "=", $objectId )
                 ->where( "object_id", "=", 0 )

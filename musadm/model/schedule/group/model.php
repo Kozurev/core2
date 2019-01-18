@@ -24,27 +24,30 @@ class Schedule_Group_Model extends Core_Entity
     }
 
 
-    public function teacherId($val = null)
+    public function teacherId( $val = null )
     {
-        if(is_null($val))   return $this->teacher_id;
-        $this->teacher_id = intval($val);
+        if( is_null( $val ) )   return $this->teacher_id;
+        $this->teacher_id = intval( $val );
         return $this;
     }
 
 
-    public function title($val = null)
+    public function title( $val = null )
     {
-        if(is_null($val))   return $this->title;
-        if(strlen($val) > 255)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("title", "Schedule_Group", 255)));
-        $this->title = strval($val);
+        if( is_null( $val ) )   return $this->title;
+
+        if( strlen( $val ) > 255 )
+            die( Core::getMessage( "TOO_LARGE_VALUE", ["title", "Schedule_Group", 255]));
+
+        $this->title = strval( $val );
         return $this;
     }
 
 
-    public function duration($val = null)
+    public function duration( $val = null )
     {
-        if(is_null($val))   return $this->duration;
+        if( is_null( $val ) )   return $this->duration;
+
         $this->duration = $val;
         return $this;
     }
@@ -53,6 +56,7 @@ class Schedule_Group_Model extends Core_Entity
     public function subordinated( $val = null )
     {
         if( is_null( $val ) )   return $this->subordinated;
+
         $this->subordinated = intval( $val );
         return $this;
     }
@@ -61,6 +65,7 @@ class Schedule_Group_Model extends Core_Entity
     public function active( $val = null )
     {
         if( is_null( $val ) )   return intval( $this->active );
+
         if( $val == 1 ) $this->active = 1;
         elseif( $val == 0 ) $this->active = 0;
         return $this;

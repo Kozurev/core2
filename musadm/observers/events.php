@@ -10,10 +10,10 @@
 /**
  * Добавление клиента в расписание
  */
-Core::attachObserver( "afterScheduleLessonInsert", function( $args ){
+Core::attachObserver( "afterScheduleLessonInsert", function( $args ) {
     $Lesson = $args[0];
 
-    if( $Lesson->typeId() == 1 )
+    if ( $Lesson->typeId() == 1 )
     {
         $Client = $Lesson->getClient();
         $ClientFio = $Client->surname() . " " . $Client->name();
@@ -28,12 +28,12 @@ Core::attachObserver( "afterScheduleLessonInsert", function( $args ){
             ->data( $EventData )
             ->save();
     }
-    elseif( $Lesson->typeId() == 3 )
+    elseif ( $Lesson->typeId() == 3 )
     {
         $Event = Core::factory( "Event" )
             ->typeId( 27 );
 
-        if( $Lesson->clientId() )
+        if ( $Lesson->clientId() )
         {
             $Lid = $Lesson->getClient();
             $LidFio = $Lid->surname() . " " . $Lid->name();
@@ -49,18 +49,16 @@ Core::attachObserver( "afterScheduleLessonInsert", function( $args ){
 
         $Event->save();
     }
-
-
 });
 
 
 /**
  * Удаление клиента из расписания
  */
-Core::attachObserver( "ScheduleLessonMarkDeleted", function( $args ){
+Core::attachObserver( "ScheduleLessonMarkDeleted", function( $args ) {
     $Lesson = $args["Lesson"];
 
-    if( $Lesson->typeId() != 1 )    return;
+    if ( $Lesson->typeId() != 1 )    return;
 
     $Client = $Lesson->getClient();
     $ClientFio = $Client->surname() . " " . $Client->name();
@@ -81,7 +79,7 @@ Core::attachObserver( "ScheduleLessonMarkDeleted", function( $args ){
 /**
  * Создание периода отсутствия
  */
-Core::attachObserver( "beforeScheduleAbsentInsert", function( $args ){
+Core::attachObserver( "beforeScheduleAbsentInsert", function( $args ) {
     $Period = $args[0];
 
     $Client = $Period->getClient();
@@ -102,10 +100,10 @@ Core::attachObserver( "beforeScheduleAbsentInsert", function( $args ){
 /**
  * Изменение времени занятия в расписании
  */
-Core::attachObserver( "ScheduleLessonTimemodify", function( $args ){
+Core::attachObserver( "ScheduleLessonTimemodify", function( $args ) {
     $Lesson = $args["Lesson"];
 
-    if( $Lesson->typeId() != 1 )    return;
+    if ( $Lesson->typeId() != 1 )    return;
 
     $Client = $Lesson->getClient();
     $ClientFio = $Client->surname() . " " . $Client->name();
@@ -128,7 +126,7 @@ Core::attachObserver( "ScheduleLessonTimemodify", function( $args ){
 /**
  * Добавление пользователя в архив
  */
-Core::attachObserver( "beforeUserDeactivate", function( $args ){
+Core::attachObserver( "beforeUserDeactivate", function( $args ) {
     $User = $args[0];
     $UserFio = $User->surname() . " " . $User->name();
 
@@ -147,7 +145,7 @@ Core::attachObserver( "beforeUserDeactivate", function( $args ){
 /**
  * Восстановдение пользователя из архива
  */
-Core::attachObserver( "beforeUserActivate", function( $args ){
+Core::attachObserver( "beforeUserActivate", function( $args ) {
     $User = $args[0];
     $UserFio = $User->surname() . " " . $User->name();
 
@@ -166,7 +164,7 @@ Core::attachObserver( "beforeUserActivate", function( $args ){
 /**
  * Внесение средств на баланс, выплата преподавателю и хозрасходы
  */
-Core::attachObserver( "afterPaymentInsert", function( $args ){
+Core::attachObserver( "afterPaymentInsert", function( $args ) {
     $Payment = $args[0];
 
 
@@ -177,14 +175,14 @@ Core::attachObserver( "afterPaymentInsert", function( $args ){
         ->userAssignmentId( $Payment->user() )
         ->data( $EventData );
 
-    if( $Payment->user() != 0 )
+    if ( $Payment->user() != 0 )
     {
         $User = Core::factory( "User", $Payment->user() );
         $UserFio = $User->surname() . " " . $User->name();
         $Event->userAssignmentFio( $UserFio );
     }
 
-    switch( $Payment->type() )
+    switch ( $Payment->type() )
     {
         case 1: $Event->typeId( 11 );   break;
         case 3: $Event->typeId( 13 );   break;
@@ -199,12 +197,12 @@ Core::attachObserver( "afterPaymentInsert", function( $args ){
 /**
  * Добавление комментария к платежу а странице клиента
  */
-Core::attachObserver( "beforePropertyStringInsert", function( $args ){
+Core::attachObserver( "beforePropertyStringInsert", function( $args ) {
     if( $args[0]->property_id() !== 26 ) return;
 
     $Comment = $args[0];
 
-    $countPaymentComments = Core::factory( "Property_String" )
+    $countPaymentComments = Core::factory( "Property_String" )->queryBuilder()
         ->where( "property_id", "=", 26 )
         ->where( "model_name", "=", "Payment" )
         ->where( "object_id", "=", $Comment->object_id() )
@@ -215,7 +213,7 @@ Core::attachObserver( "beforePropertyStringInsert", function( $args ){
      * и если таких ещё нет, значит это создание платежа,
      * если же комментарии у платежа уже есть, тогда действие квалифицируется как "Добавления комментария к платежу"
      */
-    if( $countPaymentComments !== 0 )
+    if ( $countPaymentComments !== 0 )
     {
         $Payment = Core::factory( "Payment", $Comment->object_id() );
         $User = Core::factory( "User", $Payment->user() );
@@ -238,11 +236,11 @@ Core::attachObserver( "beforePropertyStringInsert", function( $args ){
 /**
  * Создание задачи / добавление комментария к задаче
  */
-Core::attachObserver( "beforeTaskNoteInsert", function( $args ){
+Core::attachObserver( "beforeTaskNoteInsert", function( $args ) {
     $Note = $args[0];
     $Task = Core::factory( "Task" );
 
-    $countTaskComments = Core::factory( "Task_Note" )
+    $countTaskComments = Core::factory( "Task_Note" )->queryBuilder()
         ->where( "task_id", "=", $Note->taskId() )
         ->getCount();
 
@@ -255,7 +253,7 @@ Core::attachObserver( "beforeTaskNoteInsert", function( $args ){
     /**
      * Если это первый комментарий у задачи значит действие квалифицируется как "Создание задачи"
      */
-    if( $countTaskComments === 0 )
+    if ( $countTaskComments === 0 )
     {
         $Event->typeId( 16 );
     }
@@ -263,7 +261,7 @@ Core::attachObserver( "beforeTaskNoteInsert", function( $args ){
      * Если это не первый комментарий и его текст отличен от текста комментария при закрытии задачи
      * тогда это - "Добавление комментария к задаче"
      */
-    elseif( $Note->text() != $Task->doneComment() )
+    elseif ( $Note->text() != $Task->doneComment() )
     {
         $Event->typeId( 18 );
     }
@@ -279,13 +277,13 @@ Core::attachObserver( "beforeTaskNoteInsert", function( $args ){
 /**
  * Изменение даты контроля задачи
  */
-Core::attachObserver( "ChangeTaskControlDate", function( $args ){
+Core::attachObserver( "ChangeTaskControlDate", function( $args ) {
     $EventData = new stdClass();
     $EventData->task_id = $args["task_id"];
     $EventData->old_date = $args["old_date"];
     $EventData->new_date = $args["new_date"];
 
-    if( $args["old_date"] != $args["new_date"] )
+    if ( $args["old_date"] != $args["new_date"] )
     {
         Core::factory("Event" )
             ->typeId( 19 )
@@ -295,7 +293,7 @@ Core::attachObserver( "ChangeTaskControlDate", function( $args ){
 });
 
 
-Core::attachObserver( "TaskMarkAsDone", function( $args ){
+Core::attachObserver( "TaskMarkAsDone", function( $args ) {
     $EventData = new stdClass();
     $EventData->task_id = $args[0];
 
@@ -309,7 +307,7 @@ Core::attachObserver( "TaskMarkAsDone", function( $args ){
 /**
  * Добавление лида
  */
-Core::attachObserver( "afterLidInsert", function( $args ){
+Core::attachObserver( "afterLidInsert", function( $args ) {
     $EventData = new stdClass();
     $EventData->Lid = $args[0];
 
@@ -323,7 +321,7 @@ Core::attachObserver( "afterLidInsert", function( $args ){
 /**
  * Изменение даты контроля лида
  */
-Core::attachObserver( "afterLidChangeDate", function( $args ){
+Core::attachObserver( "afterLidChangeDate", function( $args ) {
     $EventData = new stdClass();
     $EventData->Lid = $args["Lid"];
     $EventData->old_date = $args["old_date"];
@@ -339,13 +337,13 @@ Core::attachObserver( "afterLidChangeDate", function( $args ){
 /**
  * Добавление комментария лиду
  */
-Core::attachObserver( "beforeLidCommentInsert", function( $args ){
-    $countLidComments = Core::factory( "Lid_Comment" )
+Core::attachObserver( "beforeLidCommentInsert", function( $args ) {
+    $countLidComments = Core::factory( "Lid_Comment" )->queryBuilder()
         ->where( "lid_id", "=", $args[0]->lidId() )
         ->getCount();
 
     //Если это первый комментарий - тогда это создание лида
-    if( $countLidComments === 0 )   return;
+    if ( $countLidComments === 0 )   return;
 
     $EventData = new stdClass();
     $EventData->Comment = $args[0];
@@ -360,7 +358,7 @@ Core::attachObserver( "beforeLidCommentInsert", function( $args ){
 /**
  * Создание сертификата
  */
-Core::attachObserver( "afterCertificateInsert", function( $args ){
+Core::attachObserver( "afterCertificateInsert", function( $args ) {
     $EventData = new stdClass();
     $EventData->Certificate = $args[0];
 
@@ -374,7 +372,7 @@ Core::attachObserver( "afterCertificateInsert", function( $args ){
 /**
  * Добавление комментария к сертификату
  */
-Core::attachObserver( "afterCertificateAddComment", function( $args ){
+Core::attachObserver( "afterCertificateAddComment", function( $args ) {
     $EventData = new stdClass();
     $EventData->Note = $args[0];
     $EventData->Certificate = Core::factory( "Certificate", $args[0]->certificateId() );
@@ -389,7 +387,7 @@ Core::attachObserver( "afterCertificateAddComment", function( $args ){
 /**
  * Добавление комментария к пользователю в новом разделе
  */
-Core::attachObserver( "afterUserAddComment", function( $args ){
+Core::attachObserver( "afterUserAddComment", function( $args ) {
     $EventData = new stdClass();
     $EventData->Comment = $args[0];
 

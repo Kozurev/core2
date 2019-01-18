@@ -9,9 +9,10 @@
 /*
 *	Блок проверки авторизации
 */
-$oUser = Core::factory("User")->getCurrent();
+$User = Core::factory("User")->getCurrent();
+$access = ["groups" => [1, 2, 3, 6]];
 
-if(!$oUser)
+if( !$User )
 {
     $host  = $_SERVER['HTTP_HOST'];
     $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
@@ -19,11 +20,6 @@ if(!$oUser)
     exit;
 }
 
-//if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
-//{
-//    $this->execute();
-//    exit;
-//}
 
 /**
  * Настроки редиректа
@@ -32,40 +28,36 @@ $host  = $_SERVER['HTTP_HOST'];
 $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
 
 
-$oUser = Core::factory("User")->getCurrent();
+Core_Page_Show::instance()->setParam( "body-class", "body-green" );
+Core_Page_Show::instance()->setParam( "title-first", "ГЛАВНАЯ" );
+Core_Page_Show::instance()->setParam( "title-second", "СТРАНИЦА" );
 
-
-$this->setParam( "body-class", "body-green" );
-$this->setParam( "title-first", "ГЛАВНАЯ" );
-$this->setParam( "title-second", "СТРАНИЦА" );
-
-$access = ["groups" => [1, 2, 3, 6]];
 
 if( Core_Array::Get( "ajax", null ) === null )
 {
-    if( !User::checkUserAccess( $access ) )
+    if( !User::checkUserAccess( $access, $User ) )
     {
         header( "Location: http://$host$uri/authorize?back=/$uri" );
     }
 
-    if( $oUser->groupId() == 6 )
+    if( $User->groupId() == 6 )
     {
         header( "Location: http://$host$uri/user/client" );
     }
 
-    if( $oUser->groupId() == 5 )
+    if( $User->groupId() == 5 )
     {
         header( "Location: http://$host$uri/balance" );
     }
 
-    if( $oUser->groupId() == 4 )
+    if( $User->groupId() == 4 )
     {
         header( "Location: http://$host$uri/schedule" );
     }
 }
 
 
-$action = Core_Array::getValue($_GET, "action", null);
+$action = Core_Array::Get( "action", null);
 
 
 $Director = User::current()->getDirector();
@@ -103,31 +95,34 @@ if( $action === "savePropertyValue" )
  */
 if( $action == "refreshLidTable" )
 {
-    $aoLids = Core::factory("Lid")
+    $Lids = Core::factory( "Lid" )->queryBuilder()
         ->where( "subordinated", "=", $subordinated )
         ->where( "control_date", "=", date("Y-m-d") )
         ->orderBy("id", "DESC")
         ->findAll();
 
-    $aoComments = array();
-    $authorsId  = array();
-    $status = Core::factory("Property", 27);
+    $aoComments = [];
+    $authorsId  = [];
+    $status = Core::factory( "Property", 27 );
 
-    foreach ($aoLids as $lid)
+    foreach ( $Lids as $lid )
     {
         $lidComments = $lid->getComments();
-        foreach ($lidComments as $comment)
+
+        foreach ( $lidComments as $comment )
         {
-            if(!in_array($comment->authorId(), $authorsId)) $authorsId[] = $comment->authorId();
+            if( !in_array( $comment->authorId(), $authorsId ) ) $authorsId[] = $comment->authorId();
         }
-        $lid->addEntities($lidComments);
-        $lid->addEntity(
-            $status->getPropertyValues($lid)[0], "property_value"
-        );
+
+        $lid
+            ->addEntities( $lidComments )
+            ->addEntity(
+                $status->getPropertyValues( $lid )[0], "property_value"
+            );
     }
 
-    $aoAuthors = Core::factory("User")
-        ->where("id", "in", $authorsId)
+    $aoAuthors = Core::factory( "User" )->queryBuilder()
+        ->where( "id", "in", $authorsId )
         ->findAll();
 
     $LidsOutput = Core::factory( "Core_Entity" )
@@ -135,7 +130,7 @@ if( $action == "refreshLidTable" )
             Core::factory( "Lid" )->getStatusList(), "status"
         )
         ->addEntities( $aoAuthors )
-        ->addEntities( $aoLids )
+        ->addEntities( $Lids )
         ->xsl( "musadm/lids/lids_for_manager.xsl" )
         ->show();
 
@@ -148,12 +143,12 @@ if( $action == "refreshLidTable" )
  */
 if( $action === "refreshTasksTable" )
 {
-    $Tasks = Core::factory( "Task" )
+    $Tasks = Core::factory( "Task" )->queryBuilder()
         ->where( "date", "<=", date("Y-m-d") )
         ->where( "subordinated", "=", $subordinated )
         ->open()
-        ->where( "done", "=", 0 )
-        ->where( "done_date", "=", date( "Y-m-d" ), "OR" )
+            ->where( "done", "=", 0 )
+            ->where( "done_date", "=", date( "Y-m-d" ), "OR" )
         ->close()
         ->orderBy( "date", "DESC" )
         ->orderBy( "id", "DESC" )
@@ -164,13 +159,14 @@ if( $action === "refreshTasksTable" )
         $Task->date(refactorDateFormat($Task->date()));
     }
 
-    $tasksIds = array();
+    $tasksIds = [];
+
     foreach ( $Tasks as $Task )
     {
         $tasksIds[] = $Task->getId();
     }
 
-    $Notes = Core::factory( "Task_Note" )
+    $Notes = Core::factory( "Task_Note" )->queryBuilder()
         ->select([
             "Task_Note.id AS id", "date", "task_id", "text", "usr.name AS name", "usr.surname AS surname"
         ])
@@ -202,7 +198,7 @@ if( $action === "search_client" )
     $name       = Core_Array::Get( "name", null );
     $phone      = Core_Array::Get( "phone", null );
 
-    $User = Core::factory( "User" )
+    $User = Core::factory( "User" )->queryBuilder()
         ->where( "group_id", "=", 5 )
         ->where( "subordinated", "=", $subordinated )
         ->where( "active", "=", 1 );
@@ -230,7 +226,6 @@ if( $action === "search_client" )
         Core::factory( "Core_Entity" )
             ->addSimpleEntity( "page-theme-color", "green" )
             ->addSimpleEntity( "buttons_row", 0 )
-            //->addSimpleEntity( "export_button_disable", 1 )
             ->addSimpleEntity( "wwwroot", $CFG->rootdir )
             ->addSimpleEntity( "table_type", "active" )
             ->addEntities( $Users )
@@ -263,7 +258,7 @@ if( $action === "getObjectInfoPopup" )
         case 'Task' :
             $Object->date( refactorDateFormat( $Object->date() ) );
 
-            $Notes = Core::factory( "Task_Note" )
+            $Notes = Core::factory( "Task_Note" )->queryBuilder()
                 ->select( [ "task_id", "author_id", "date", "text", "u.name", "u.surname"] )
                 ->where( "task_id", "=", $id )
                 ->leftJoin( "User AS u", "u.id = author_id" )
@@ -296,7 +291,7 @@ if( $action === "getObjectInfoPopup" )
             $Status = $Property->getPropertyValues( $Object )[0];
             $Object->status = $Status->value();
 
-            $Notes = Core::factory( "Lid_Comment" )
+            $Notes = Core::factory( "Lid_Comment" )->queryBuilder()
                 ->select( [ "lid_id", "author_id", "datetime", "text", "surname", "name"] )
                 ->where( "lid_id", "=", $id )
                 ->leftJoin( "User AS u", "u.id = author_id" )
@@ -326,7 +321,7 @@ if( $action === "getObjectInfoPopup" )
             $Object->sellDate( refactorDateFormat( $Object->sellDate() ) );
             $Object->activeTo( refactorDateFormat( $Object->activeTo() ) );
 
-            $Notes = Core::factory( "Certificate_Note" )
+            $Notes = Core::factory( "Certificate_Note" )->queryBuilder()
                 ->select( [ "certificate_id", "author_id", "date", "text", "surname", "name"] )
                 ->where( "certificate_id", "=", $id )
                 ->leftJoin( "User AS u", "u.id = author_id" )
@@ -353,61 +348,8 @@ if( $action === "getObjectInfoPopup" )
 }
 
 
-/**
- * Обновление списка событий за указанный период
- */
-//if( $action === "getEventsFromPeriod" )
-//{
-//    $dateFrom = Core_Array::Get( "event_date_from", null );
-//    $dateTo = Core_Array::Get( "event_date_from", null );
-//
-//    $Events = Core::factory( "Event" )
-//        ->where( "author_id", "=", $oUser->getId() )
-//        ->orderBy( "time", "DESC" );
-//
-//    if ( $dateFrom === null && $dateTo === null )
-//    {
-//        $dateFromTime = strtotime( date( "Y-m-d" ) );
-//        $dateToTime = strtotime("+1 day");
-//
-//        $Events->between( "time", $dateFromTime, $dateToTime );
-//    }
-//
-//    if ( $dateFrom !== null )
-//    {
-//        $dateFromTime = strtotime( $dateFrom );
-//
-//        $Events->where( "time", ">=", $dateFrom );
-//    }
-//
-//    if( $dateTo !== null )
-//    {
-//        $dateToTime = strtotime( $dateTo . " + 1 day" );
-//
-//        $Events->where( "time", "<=", $dateToTime );
-//    }
-//
-//    $Events = $Events->findAll();
-//
-//    foreach ( $Events as $Event )
-//    {
-//        $Event->date = date( "d.m.Y H:i", $Event->time() );
-//        $Event->text = $Event->getTemplateString();
-//    }
-//
-//    global $CFG;
-//    Core::factory( "Core_Entity" )
-//        ->addEntity( $oUser )
-//        ->addEntities( $Events )
-//        ->addSimpleEntity( "date_from", $dateFrom )
-//        ->addSimpleEntity( "date_to", $dateTo )
-//        ->xsl( "musadm/users/events.xsl" )
-//        ->show();
-//}
-
-
 if( $action === "refreshTableUsers" )
 {
-    $this->execute();
+    Core_Page_Show::instance()->execute();
     exit;
 }

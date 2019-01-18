@@ -17,9 +17,16 @@ class Task extends Task_Model
     public function __construct(){}
 
 
+    /**
+     * Поиск комментариев задачи
+     *
+     * @return array
+     */
     public function getNotes()
     {
-        return Core::factory( "Task_Note" )
+        if ( $this->id === null || $this->id < 0 )   return [];
+
+        return Core::factory( "Task_Note" )->queryBuilder()
             ->where( "task_id", "=", $this->id )
             ->orderBy( "date", "DESC" )
             ->findAll();
@@ -47,32 +54,35 @@ class Task extends Task_Model
      */
     public function addNote( $text, $author_id = null, $date = null )
     {
-        $oNote = Core::factory( "Task_Note" );
+        $Note = Core::factory( "Task_Note" );
 
-        if( $author_id === null )
+        if ( $author_id === null )
         {
-            $authorId = Core::factory( "User" )->getCurrent()->getId();
-            $oNote->authorId( $authorId );
+            $Author = User::current();
+
+            $Author === false
+                ?   $Note->authorId( 0 )
+                :   $Note->authorId( $Author->getId() );
         }
         else
         {
-            $oNote->authorId( $author_id );
+            $Note->authorId( $author_id );
         }
 
-        if( $date === null )
+        if ( $date === null )
         {
-            $oNote->date( date( "Y-m-d H:i:s" ) );
+            $Note->date( date( "Y-m-d H:i:s" ) );
         }
         else
         {
-            $oNote->date( $date );
+            $Note->date( $date );
         }
 
 
-        $oNote->taskId( $this->id );
-        $oNote->text( $text );
-
-        $oNote->save();
+        $Note
+            ->taskId( $this->id )
+            ->text( $text )
+            ->save();
 
         return $this;
     }
@@ -83,7 +93,7 @@ class Task extends Task_Model
      */
     public function markAsDone()
     {
-        Core::notify( array( &$this ), "TaskMarkAsDone" );
+        Core::notify( [&$this], "TaskMarkAsDone" );
 
         $this
             ->done( 1 )
@@ -101,19 +111,25 @@ class Task extends Task_Model
 
     public function save( $obj = null )
     {
-        Core::notify( array( &$this ), "beforeTaskSave" );
-        if( $this->date == "" )   $this->date = date( "Y-m-d" );
+        Core::notify( [&$this], "beforeTaskSave" );
+
+        if ( $this->date == "" )   $this->date = date( "Y-m-d" );
+
         parent::save();
-        Core::notify( array( &$this ), "afterTaskSave" );
+
+        Core::notify( [&$this], "afterTaskSave" );
+
         return $this;
     }
 
 
     public function delete( $obj = null )
     {
-        Core::notify( array( &$this ), "beforeTaskDelete" );
+        Core::notify( [&$this], "beforeTaskDelete" );
+
         parent::delete();
-        Core::notify( array( &$this ), "afterTaskDelete" );
+
+        Core::notify( [&$this], "afterTaskDelete" );
     }
 
 }

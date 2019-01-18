@@ -1,32 +1,38 @@
 <?php
 
 
-$oUser = Core::factory("User")->getCurrent();
+$User = User::current();
 
-if( !User::checkUserAccess( ["groups" => [2, 4, 5, 6]] ) )
+
+$Director = $User->getDirector();
+if ( !$Director )    exit( Core::getMessage("NOT_DIRECTOR") );
+$subordinated = $Director->getId();
+
+
+if ( !User::checkUserAccess( ["groups" => [2, 4, 5, 6]] ) )
 {
-    $this->error404();
+    Core_Page_Show::instance()->error404();
 }
 
 
 $breadcumbs[0] = new stdClass();
-$breadcumbs[0]->title = $this->oStructure->title();
+$breadcumbs[0]->title = Core_Page_Show::instance()->Structure->title();
 $breadcumbs[0]->active = 1;
 
-if( $this->oStructureItem != false )
+if ( Core_Page_Show::instance()->StructureItem != false )
 {
     $breadcumbs[1] = new stdClass();
-    $breadcumbs[1]->title = $this->oStructureItem->title();
+    $breadcumbs[1]->title = Core_Page_Show::instance()->StructureItem->title();
     $breadcumbs[1]->active = 1;
 }
 
-$this->setParam( "title-first", "РАСПИСАНИЕ" );
-$this->setParam( "body-class", "body-green" );
+Core_Page_Show::instance()->setParam( "title-first", "РАСПИСАНИЕ" );
+Core_Page_Show::instance()->setParam( "body-class", "body-green" );
 
-if( $this->oStructureItem != false )
+if ( Core_Page_Show::instance()->StructureItem != false )
 {
-    $this->setParam( "title-second", $this->oStructureItem->title() );
-    $this->setParam( "breadcumbs", $breadcumbs );
+    Core_Page_Show::instance()->setParam( "title-second", Core_Page_Show::instance()->StructureItem->title() );
+    Core_Page_Show::instance()->setParam( "breadcumbs", $breadcumbs );
 }
 else 
 {
@@ -35,20 +41,24 @@ else
     $breadcumbs[1]->active = 1;
 
     //$this->setParam( "title-second", "Филиалов" );
-    $this->setParam( "breadcumbs", $breadcumbs );
+    Core_Page_Show::instance()->setParam( "breadcumbs", $breadcumbs );
 }
 
 
+$action = Core_Array::Get(  "action", null );
 
-$action = Core_Array::getValue($_GET, "action", null);
 
-
-if( $action == "getScheduleAreaPopup" )
+/**
+ * Вывод формы для всплывающего окна редактирования филиала
+ */
+if ( $action == "getScheduleAreaPopup" )
 {
-    $areaId = Core_Array::getValue( $_GET, "areaId", 0 );
-    $areaId == 0
-        ?   $Area = Core::factory( "Schedule_Area" )
-        :   $Area = Core::factory( "Schedule_Area", $areaId );
+    $areaId = Core_Array::Get( "areaId", 0 );
+
+    $Area = Core::factory( "Schedule_Area", $areaId );
+    if ( $Area === null ) exit( "Филиал с id $areaId не найден" );
+    if ( $areaId != 0 && !User::isSubordinate( $Area, $User ) ) exit ( Core::getMessage( "NOT_SUBORDINATE", ["Филиал", $areaId] ) );
+
 
     Core::factory( "Core_Entity" )
         ->addEntity( $Area )
@@ -59,39 +69,60 @@ if( $action == "getScheduleAreaPopup" )
 }
 
 
-if($action === "getScheduleAbsentPopup")
+/**
+ * Вывод формы для всплывающего окна создания периода отсутствия
+ */
+if ( $action === "getScheduleAbsentPopup" )
 {
-    $clientId = Core_Array::getValue($_GET, "client_id", 0);
-    $typeId = Core_Array::getValue($_GET, "type_id", 0);
+    $clientId = Core_Array::Get( "client_id", 0 );
+    $typeId = Core_Array::Get( "type_id", 0 );
 
-    Core::factory("Core_Entity")
+    if( $clientId === 0 )   exit ( Core::getMessage( "EMPTY_GET_PARAM", ["уникальный идентификатор клиента"] ) );
+    if( $typeId === 0 )     exit ( Core::getMessage( "EMPTY_GET_PARAM", ["тиа ззанятия"] ) );
+
+    $Client = Core::factory( "User", $clientId );
+    if ( $Client === null )    exit ( Core::getMessage( "NOT_FOUND", ["Клиент", $clientId] ) );
+    if ( !User::isSubordinate( $Client, $User ) ) exit ( Core::getMessage( "NOT_SUBORDINATE", ["Клиент", $clientId] ) );
+
+    Core::factory( "Core_Entity" )
         ->addSimpleEntity( "clientid", $clientId )
         ->addSimpleEntity( "typeid", $typeId )
-        ->xsl("musadm/schedule/absent_popup.xsl")
+        ->xsl( "musadm/schedule/absent_popup.xsl" )
         ->show();
 
     exit;
 }
 
 
-if($action === "getScheduleLessonPopup")
+/**
+ * Вывод формы для всплывающего окна создания занятия
+ */
+if ( $action === "getScheduleLessonPopup" )
 {
-    $classId =      Core_Array::getValue($_GET, "class_id", 0);
-    $lessonType =   Core_Array::getValue($_GET, "model_name", "");
-    $date =         Core_Array::getValue($_GET, "date", 0);
-    $areaId =       Core_Array::getValue($_GET, "area_id", 0);
+    $classId =      Core_Array::Get( "class_id", 0 );
+    $lessonType =   Core_Array::Get( "model_name", "" );
+    $date =         Core_Array::Get( "date", 0 );
+    $areaId =       Core_Array::Get( "area_id", 0 );
 
-    $Director = User::current()->getDirector();
-    if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
-    $subordinated = $Director->getId();
+    if ( $classId === "" )       exit ( Core::getMessage( "EMPTY_GET_PARAM", ["идентификатор класса"] ) );
+    if ( $lessonType === "" )    exit ( Core::getMessage( "EMPTY_GET_PARAM", ["тип графика"] ) );
+    if ( $date === "" )          exit ( Core::getMessage( "EMPTY_GET_PARAM", ["дата"] ) );
+    if ( $areaId === "" )        exit ( Core::getMessage( "EMPTY_GET_PARAM", ["идентификатор"] ) );
 
-    $dayName =  new DateTime($date);
-    $dayName =  $dayName->format("l");
+
+    //Проверка на принадлежность филиала и авторизованного пользователя одному и тому же директору
+    $Area = Core::factory( "Schedule_Area", $areaId );
+    if( $Area === null )   exit ( Core::getMessage( "NOT_FOUND", ["Филиал", $areaId] ) );
+    if( !User::isSubordinate( $Area, $User ) )  exit ( Core::getMessage( "NOT_SUBORDINATE", ["Филиал", $areaId] ) );
+
+
+    $Date =     new DateTime( $date );
+    $dayName =  $Date->format( "l" );
 
     $period = "00:15:00";       //Временной промежуток (временное значение одной ячейки)
-    if(defined("SCHEDULE_DELIMITER") != "")   $period = SCHEDULE_DELIMITER;
+    if ( defined("SCHEDULE_DELIMITER") )   $period = SCHEDULE_DELIMITER;
 
-    $output = Core::factory("Core_Entity")
+    $output = Core::factory( "Core_Entity" )
         ->addSimpleEntity( "class_id", $classId )
         ->addSimpleEntity( "date", $date )
         ->addSimpleEntity( "area_id", $areaId )
@@ -99,51 +130,81 @@ if($action === "getScheduleLessonPopup")
         ->addSimpleEntity( "period", $period)
         ->addSimpleEntity( "lesson_type", $lessonType );
 
-    $aoUsers = Core::factory("User")
-        ->where("active", "=", 1)
-        ->where("group_id", ">", 3)
+    $Users = Core::factory( "User" )->queryBuilder()
+        ->where( "active", "=", 1 )
+        ->where( "group_id", ">", 3 )
         ->where( "subordinated", "=", $subordinated )
-        ->orderBy("surname", "ASC")
+        ->orderBy( "surname", "ASC" )
         ->findAll();
 
-    $aoGroups = Core::factory("Schedule_Group")->findAll();
-    $aoLessonTypes = Core::factory("Schedule_Lesson_Type")->findAll();
+    $Groups = Core::factory( "Schedule_Group" )->queryBuilder()
+        ->where( "subordinated", "=", $subordinated )
+        ->findAll();
+
+    $LessonTypes = Core::factory( "Schedule_Lesson_Type" )->findAll();
 
     $output
-        ->addEntities($aoUsers)
-        ->addEntities($aoGroups)
-        ->addEntities($aoLessonTypes);
+        ->addEntities( $Users )
+        ->addEntities( $Groups )
+        ->addEntities( $LessonTypes );
 
-    if($lessonType == "2")       $output->addSimpleEntity( "schedule_type", "актуальное" );
-    elseif($lessonType == "")   $output->addSimpleEntity( "schedule_type", "основное" );
+    if ( $lessonType == "2" )    $output->addSimpleEntity( "schedule_type", "актуальное" );
+    elseif ( $lessonType == "" ) $output->addSimpleEntity( "schedule_type", "основное" );
 
     $output
-        ->xsl("musadm/schedule/new_lesson_popup.xsl")
+        ->addSimpleEntity( "timestep", $period )
+        ->xsl( "musadm/schedule/new_lesson_popup.xsl" )
         ->show();
 
     exit;
 }
 
 
-if($action === "teacherReport")
+if ( $action === "teacherReport" )
 {
     $lessonId =     Core_Array::Get( "lesson_id", 0 );
     $lessonType =   Core_Array::Get( "lesson_type", 0 );
     $attendance =   Core_Array::Get( "attendance", 0 );
     $teacherId =    Core_Array::Get( "teacher_id", 0 );
-    $clientId =     Core_Array::getValue($_GET, "client_id", 0 );
-    $typeId =       Core_Array::getValue($_GET, "type_id", 0 );
-    $date =         Core_Array::getValue($_GET, "date", 0 );
+    $clientId =     Core_Array::Get( "client_id", 0 );
+    $typeId =       Core_Array::Get( "type_id", 0 );
+    $date =         Core_Array::Get( "date", 0 );
 
 
-    $Director = User::current()->getDirector();
+    if ( $lessonId === 0 )  exit ( Core::getMessage( "EMPTY_GET_PARAM", ["идентификатор занятия"] ) );
+    if ( $lessonType === 0 )exit ( Core::getMessage( "EMPTY_GET_PARAM", ["тип графика"] ) );
+    if ( $teacherId === 0 ) exit ( Core::getMessage( "EMPTY_GET_PARAM", ["идентификатор преподавателя"] ) );
+    if ( $clientId === 0 )  exit ( Core::getMessage( "EMPTY_GET_PARAM", ["идентификатор клиента (группы)"] ) );
+    if ( $typeId === 0 )    exit ( Core::getMessage( "EMPTY_GET_PARAM", ["тип занятия"] ) );
+    if ( $date === 0 )      exit ( Core::getMessage( "EMPTY_GET_PARAM", ["дата"] ) );
 
 
     /**
      * Проверка во избежание дублирование отчетов
      */
     $Lesson = Core::factory( "Schedule_Lesson", $lessonId );
-    if( $Lesson->isReported( $date ) )  exit;
+    if ( $Lesson === null )    exit( Core::getMessage( "NOT_FOUND", ["Занятие", $lessonId] ) );
+    if ( $Lesson->isReported( $date ) )  exit ( "Отчет по данному занятию уже отправлен" );
+
+
+    if ( $Lesson->clientId() != $clientId )     exit ( "Ошибка: переданный идентификатор клиента не совпадает с клиентов занятия" );
+    if ( $Lesson->lessonType() != $lessonType ) exit ( "Ошибка: переданный тип графика не совпадает с типом графика занятия" );
+    if ( $Lesson->typeId() != $typeId )         exit ( "Ошибка: переданный тип занятия не совпадает с типом занятия" );
+
+
+    /**
+     * Проверка филлиала, клиента и преподавателя на принадлежность тому же директору что и авторизованный пользователь
+     */
+    $Area = Core::factory( "Schedule_Area", $Lesson->areaId() );
+    if ( $Area === null )      exit ( Core::getMessage( "NOT_FOUND", ["Филиал", $Lesson->areaId()] ) );
+    if ( !User::isSubordinate( $Area, $User ) )     exit ( Core::getMessage( "NOT_SUBORDINATE", ["Филиал", $Lesson->areaId()] ) );
+
+    $Teacher = Core::factory( "User", $teacherId );
+    if ( $Teacher === null )   exit ( Core::getMessage( "NOT_FOUND", ["Преподватаель", $teacherId] ) );
+    if ( !User::isSubordinate( $Teacher, $User ) )  exit ( Core::getMessage( "NOT_SUBORDINATE", ["Преподватаель", $teacherId] ) );
+
+    $LessonClient = $Lesson->getClient();
+    if ( !User::isSubordinate( $LessonClient ) )    exit ( Core::getMessage( "NOT_SUBORDINATE", ["Клиент занятия", $Lesson->clientId()] ) );
 
 
     /**
@@ -159,35 +220,34 @@ if($action === "teacherReport")
         ->clientId( $clientId );
 
 
-    $Lesson = Core::factory( "Schedule_Lesson", $lessonId );
-    $Clients = array();
+    $Clients = [];
 
-    if( $Lesson->typeId() != 2 )
+    if ( $Lesson->typeId() != 2 )
     {
         $Clients[] = $Lesson->getClient();
     }
     else
     {
-        $Group = $Lesson->getClient();
+        $Group = $Lesson->getGroup();
         $Clients = $Group->getClientList();
     }
 
 
-    if( $Lesson->typeId() == 1 )    //Индивидуальное занятие
+    if ( $Lesson->typeId() == 1 )    //Индивидуальное занятие
     {
         $clientLessons = "indiv_lessons";
         $clientRate = "client_rate_indiv";
         $teacherRate = "teacher_rate_indiv";
         $isTeacherDefaultRate = "is_teacher_rate_default_indiv";
     }
-    elseif( $Lesson->typeId() == 2 )//Групповое занятие
+    elseif ( $Lesson->typeId() == 2 )//Групповое занятие
     {
         $clientLessons = "group_lessons";
         $clientRate = "client_rate_group";
         $teacherRate = "teacher_rate_group";
         $isTeacherDefaultRate = "is_teacher_rate_default_group";
     }
-    elseif( $Lesson->typeId() == 3 )//Консультация
+    elseif ( $Lesson->typeId() == 3 )//Консультация
     {
         $clientLessons = null;
         $teacherRate = "teacher_rate_consult";
@@ -196,12 +256,12 @@ if($action === "teacherReport")
 
     //Создание свойства кол-ва групп/индив занятий у клиента для списания
     //и тариф по количеству списываемых занятий за пропуск
-    if( !is_null( $clientLessons ) )
+    if ( !is_null( $clientLessons ) )
     {
         $ClientLessons = Core::factory( "Property" )->getByTagName( $clientLessons );
         $PropertyPerLesson = Core::factory( "Property" )->getByTagName( "per_lesson" );
 
-        if( $attendance == 0 )
+        if ( $attendance == 0 )
         {
             $AbsentRate = Core::factory( "Property" )->getByTagName( "client_absent_rate" );
             $absentRateValue = $AbsentRate->getPropertyValues( $Director )[0];
@@ -226,7 +286,7 @@ if($action === "teacherReport")
     $IsTeacherDefaultRate = Core::factory( "Property" )->getByTagName( $isTeacherDefaultRate );
     $IsTeacherDefaultRate = $IsTeacherDefaultRate->getPropertyValues( $Teacher )[0];
 
-    if( $IsTeacherDefaultRate->value() )
+    if ( $IsTeacherDefaultRate->value() )
     {
         $TeacherRate = Core::factory( "Property" )->getByTagName( $teacherRate . "_default" );
         $teacherRateValue = $TeacherRate->getPropertyValues( $Director )[0]->value();
@@ -243,13 +303,13 @@ if($action === "teacherReport")
     /**
      * Обработчик для индивидуальных настроек тарифов с пропуском занятия для преподавателя
      */
-    if( $attendance == 0 )
+    if ( $attendance == 0 )
     {
         $IsTeacherDefaultAbsentRate = Core::factory( "Property" )->getByTagName( "is_teacher_rate_default_absent" );
         $isTeacherDefaultAbsentRate = $IsTeacherDefaultAbsentRate->getPropertyValues( $Teacher )[0]->value();
 
         //Индивидуальная ставка
-        if( $isTeacherDefaultAbsentRate == 0 )
+        if ( $isTeacherDefaultAbsentRate == 0 )
         {
             $TeacherRateAbsent = Core::factory( "Property" )->getByTagName( "teacher_rate_absent" );
             $teacherAbsentValue = $TeacherRateAbsent->getPropertyValues( $Teacher )[0]->value();
@@ -261,7 +321,7 @@ if($action === "teacherReport")
             $absentRateType = $AbsentRateType->getPropertyValues( $Director )[0]->value();
 
             //По формуле "пропорционально"
-            if( $absentRateType == 0 )
+            if ( $absentRateType == 0 )
             {
                 $teacherAbsentValue = $teacherRateValue * $absentRateValue;
             }
@@ -280,7 +340,7 @@ if($action === "teacherReport")
     /**
      *
      */
-    if( $Report->typeId() == 1 || $Report->typeId() == 2 )
+    if ( $Report->typeId() == 1 || $Report->typeId() == 2 )
     {
         foreach ( $Clients as $Client )
         {
@@ -289,18 +349,21 @@ if($action === "teacherReport")
              */
             $clientCountLessons = $ClientLessons->getPropertyValues( $Client )[0];
             $count = floatval( $clientCountLessons->value() );
-            if( $attendance == 1 )    $count--;
-            else $count -= $absentRateValue;
+
+            $attendance == 1
+                ?   $count--
+                :   $count -= $absentRateValue;
+
             $clientCountLessons->value( $count )->save();
 
 
             /**
-             * Задание значения клиентской "медианы"
+             * Задание значения клиентской "медианы" для отчета
              */
             $ClientRate = Core::factory( "Property" )->getByTagName( $clientRate );
             $ClientRateValue = $ClientRate->getPropertyValues( $Client )[0];
             $ClientRateValue = floatval( $ClientRateValue->value() );
-            if( $attendance == 0 ) $ClientRateValue *= $absentRateValue;
+            if ( $attendance == 0 ) $ClientRateValue *= $absentRateValue;
             $Report->clientRate( $Report->clientRate() + $ClientRateValue );
 
 
@@ -308,26 +371,25 @@ if($action === "teacherReport")
              * Проверка на кол-во оставшихся занятий
              * и создание задачи с напоминанием об оплате на завтра
              */
-            $tomorrow = strtotime("+1 day");
+            $tomorrow = strtotime( "+1 day" );
             $tomorrow = date( "Y-m-d", $tomorrow );
 
-            if( $count <= 0.5 && $PropertyPerLesson->getPropertyValues( $Client )[0]->value() == 0 )
+            if ( $count <= 0.5 && $PropertyPerLesson->getPropertyValues( $Client )[0]->value() == 0 )
             {
-                $isIssetTask = Core::factory( "Task" )
+                $isIssetTask = Core::factory( "Task" )->queryBuilder()
                     ->where( "associate", "=", $Client->getId() )
                     ->where( "done", "=", "0" )
                     ->where( "type", "=", 1 )
                     ->find();
 
                 //Если не существет подобной незакрытой задачи
-                if( $isIssetTask === false )
+                if ( $isIssetTask === null )
                 {
                     $Task = Core::factory( "Task" )
                         ->date( $tomorrow )
                         ->type( 1 )
-                        ->associate( $Client->getId() );
-
-                    $Task = $Task->save();
+                        ->associate( $Client->getId() )
+                        ->save();
 
                     $taskNoteText = $Client->surname() . " " . $Client->name() . ". Проверить баланс. Напомнить клиенту про оплату.";
                     $Task->addNote( $taskNoteText, 0, date( "Y-m-d" ) );
@@ -339,30 +401,29 @@ if($action === "teacherReport")
              * Проверка на отсутствие на занятии 2 раза подряд
              * и создание задачи с напоминание о звонке
              */
-            if( $Report->attendance() == 0 )
+            if ( $Report->attendance() == 0 )
             {
-                $LastClientReport = Core::factory( "Schedule_Lesson_Report" )
+                $LastClientReport = Core::factory( "Schedule_Lesson_Report" )->queryBuilder()
                     ->where( "id", "<>", $Report->getId() )
                     ->where( "client_id", "=", $Client->getId() )
                     ->orderBy( "id", "DESC" )
                     ->find();
 
-                if( $LastClientReport !== false && $LastClientReport->attendance() === 0 )
+                if ( $LastClientReport !== null && $LastClientReport->attendance() === 0 )
                 {
-                    $isIssetTask = Core::factory( "Task" )
+                    $isIssetTask = Core::factory( "Task" )->queryBuilder()
                         ->where( "associate", "=", $Client->getId() )
                         ->where( "done", "=", "0" )
                         ->where( "type", "=", 2 )
                         ->find();
 
-                    if( $isIssetTask === false )
+                    if ( $isIssetTask === null )
                     {
                         $Task = Core::factory( "Task" )
                             ->date( $tomorrow )
                             ->type( 2 )
-                            ->associate( $Client->getId() );
-
-                        $Task = $Task->save();
+                            ->associate( $Client->getId() )
+                            ->save();
 
                         $taskNoteText = $Client->surname() . " " . $Client->name() . " пропустил(а) два урока подряд. Необходимо связаться.";
                         $Task->addNote( $taskNoteText, 0, date( "Y-m-d" ) );
@@ -373,97 +434,104 @@ if($action === "teacherReport")
         }
     }
 
-    //if( $Report->clientRate() != 0 && $Report->teacherRate() != 0 || $Report->typeId() == 3 )
-    //{
-        $Report->totalRate( $Report->clientRate() - $Report->teacherRate() );
-    //}
 
-    //debug( $Report );
-    $Report->save();
+    $Report->totalRate( $Report->clientRate() - $Report->teacherRate() )->save();
 
-    echo "0";
-    exit;
+    exit ( "0" );
 }
 
 
-if($action === "deleteReport")
+if ( $action === "deleteReport" )
 {
-    $reportId =     Core_Array::getValue($_GET, "report_id", 0);
-    $lessonId =     Core_Array::getValue($_GET, "lesson_id", 0);
-    $lessonType =   Core_Array::getValue($_GET, "lesson_type", 0);
+    $reportId =     Core_Array::Get( "report_id", 0 );
+    $lessonId =     Core_Array::Get( "lesson_id", 0 );
+    $lessonType =   Core_Array::Get( "lesson_type", 0 );
 
-    $oReport = Core::factory("Schedule_Lesson_Report", $reportId);
-    $oLesson = Core::factory( "Schedule_Lesson", $lessonId);
+    $Report = Core::factory( "Schedule_Lesson_Report", $reportId );
 
-    $attendance = $oReport->attendance();
-    $clients = array();
-
-    if($oLesson->typeId() != 2)
+    if ( $Report === null )
     {
-        $clients[] = $oLesson->getClient();
-    }
-    else
-    {
-        $oGroup = $oLesson->getCLient();
-        $clients = $oGroup->getClientList();
+        exit ( Core::getMessage( "NOT_FOUND", ["Отчет", $reportId] ) );
     }
 
 
-    if($oLesson->typeId() == 2)
-        $propertyId = 14;
-    else
-        $propertyId = 13;
+    $Lesson = Core::factory( "Schedule_Lesson", $lessonId );
 
-    $oProperty = Core::factory("Property", $propertyId);
-
-    foreach ($clients as $client)
+    if ( $Lesson === null )
     {
-        $clientCountLessons = $oProperty->getPropertyValues($client)[0];
+        exit ( Core::getMessage( "NOT_FOUND", ["Занятие", $lessonId] ) );
+    }
+
+
+    $Clients = [];
+
+    if ( $Lesson->typeId() != 2 )
+    {
+        $Clients[] = $Lesson->getClient();
+    }
+    else
+    {
+        $Group = $Lesson->getGroup();
+        $Clients = $Group->getClientList();
+    }
+
+
+    $Lesson->typeId() == 2
+        ?   $propertyId = 14
+        :   $propertyId = 13;
+
+    $Property = Core::factory( "Property", $propertyId );
+
+    foreach ( $Clients as $Client )
+    {
+        $clientCountLessons = $Property->getPropertyValues( $Client )[0];
         $count = floatval( $clientCountLessons->value() );
-        if($attendance == 1)    $count++;
-        else $count += 0.5;
-        $clientCountLessons->value($count)->save();
+
+        $Report->attendance() == 1
+            ?   $count++
+            :   $count += 0.5;
+
+        $clientCountLessons->value( $count )->save();
     }
 
-    $oReport->delete();
+    $Report->delete();
 
-    echo "0";
-    exit;
+    exit ( "0" );
 }
 
 
 /**
  * Обновление списка клиентов/групп при выборе элемента из списка типов занятия
  */
-if( $action === "getclientList" )
+if ( $action === "getclientList" )
 {
-    $type = Core_Array::getValue( $_GET, "type", 0 );
+    $type = Core_Array::Get( "type", 0 );
 
-    $Director = User::current()->getDirector();
-    if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
-    $subordinated = $Director->getId();
-
-    if( $type == 2 )
+    if ( $type == 2 )
     {
-        $aoGroups = Core::factory( "Schedule_Group" )
+        $Groups = Core::factory( "Schedule_Group" )->queryBuilder()
             ->where( "subordinated", "=", $subordinated )
             ->orderBy( "title" )
             ->findAll();
 
-        foreach ( $aoGroups as $group )
-            echo "<option value='".$group->getId()."'>" . $group->title() . "</option>";
+        foreach ( $Groups as $Group )
+        {
+            echo "<option value='" . $Group->getId() . "'>" . $Group->title() . "</option>";
+        }
     }
-    else
+    elseif ( $type == 1 || $type == 3 )
     {
-        $aoUsers = Core::factory( "User" )
+        $Users = Core::factory( "User" )->queryBuilder()
             ->where( "active", "=", 1 )
             ->where( "group_id", "=", 5 )
             ->where( "subordinated", "=", $subordinated )
             ->orderBy( "surname", "ASC" )
             ->findAll();
 
-        foreach ( $aoUsers as $user )
-            echo "<option value='".$user->getId()."'>". $user->surname() . " " . $user->name() ."</option>";
+        foreach ( $Users as $User )
+        {
+            echo "<option value='" . $User->getId() . "'>". $User->surname() . " " . $User->name() ."</option>";
+        }
     }
 
     exit;
@@ -473,13 +541,23 @@ if( $action === "getclientList" )
 /**
  * Удаление занятия из расписания
  */
-if($action === "markDeleted")
+if ( $action === "markDeleted" )
 {
-    $lessonId =     Core_Array::getValue($_GET, "lessonid", 0);
-    $deleteDate =   Core_Array::getValue($_GET, "deletedate", "");
+    $lessonId =     Core_Array::Get( "lessonid", 0 );
+    $deleteDate =   Core_Array::Get( "deletedate", "" );
 
-    $oLesson = Core::factory("Schedule_Lesson", $lessonId);
-    $oLesson->markDeleted($deleteDate);
+    if ( $lessonId === 0 )      exit ( Core::getMessage( "EMPTY_GET_PARAM", ["уникальный идентификатор занятия"] ) );
+    if ( $deleteDate === "" )   exit ( Core::getMessage( "EMPTY_GET_PARAM", ["дата удаления занятия"] ) );
+
+    $Lesson = Core::factory( "Schedule_Lesson", $lessonId );
+    if ( $Lesson === null )     exit ( Core::getMessage( "NOT_FOUND", ["Занятие", $lessonId] ) );
+
+    $Area = Core::factory( "Schedule_Area", $Lesson->areaId() );
+    if ( $Area === null )       exit ( Core::getMessage( "NOT_FOUND", ["Филиал", $Lesson->areaId()] ) );
+    if ( !User::isSubordinate( $Area, $User ) ) exit ( Core::getMessage( "NOT_SUBORDINATE", ["Филиал", $Lesson->areaId()] ) );
+
+    $Lesson->markDeleted( $deleteDate );
+
     exit;
 }
 
@@ -487,25 +565,49 @@ if($action === "markDeleted")
 /**
  * Отсутствие занятия
  */
-if( $action === "markAbsent" )
+if ( $action === "markAbsent" )
 {
     $lessonId = Core_Array::Get( "lessonid", 0 );
     $date =     Core_Array::Get( "date", "" );
 
-    Core::factory( "Schedule_Lesson", $lessonId )->setAbsent( $date );
+    if ( $lessonId === 0 )   exit ( Core::getMessage( "EMPTY_GET_PARAM", ["уникальный идентификатор занятия"] ) );
+    if ( $date === "" )      exit ( Core::getMessage( "EMPTY_GET_PARAM", ["дата отсутствия занятия"] ) );
+
+    $Lesson = Core::factory( "Schedule_Lesson", $lessonId );
+    if ( $Lesson === null )  exit ( Core::getMessage( "NOT_FOUND", ["Занятие", $lessonId] ) );
+
+    $Area = Core::factory( "Schedule_Area", $Lesson->areaId() );
+    if ( $Area === null )    exit ( Core::getMessage( "NOT_FOUND", ["Филиал", $Lesson->areaId()] ) );
+    if ( !User::isSubordinate( $Area, $User ) ) exit ( Core::getMessage( "NOT_SUBORDINATE", ["Филиал", $Lesson->areaId()] ) );
+
+    $Lesson->setAbsent( $date );
+
     exit;
 }
 
 
 /**
- *
+ * Вывод формы изменения времени начала/конца проведения занятия
  */
-if( $action === "getScheduleChangeTimePopup" )
+if ( $action === "getScheduleChangeTimePopup" )
 {
-    $id =   Core_Array::getValue($_GET, "id", 0);
-    $date = Core_Array::getValue($_GET, "date", "");
+    $id =   Core_Array::Get( "id", 0 );
+    $date = Core_Array::Get( "date", "" );
 
-    Core::factory("Core_Entity")
+
+    if ( $id === 0 )     exit ( Core::getMessage( "EMPTY_GET_PARAM", ["уникальный идентификатор занятия"] ) );
+    if ( $date === "" )  exit ( Core::getMessage( "EMPTY_GET_PARAM", ["дата изменения времени занятия"] ) );
+
+
+    $Lesson = Core::factory( "Schedule_Lesson", $id );
+    if ( $Lesson === null ) exit ( Core::getMessage( "NOT_FOUND", ["Занятие", $id] ) );
+
+    $Area = Core::factory( "Schedule_Area", $Lesson->areaId() );
+    if ( $Area === null )   exit ( Core::getMessage( "NOT_FOUND", ["Филиал", $Lesson->areaId()] ) );
+    if ( !User::isSubordinate( $Area, $User ) ) exit ( Core::getMessage( "NOT_SUBORDINATE", ["Филиал", $Lesson->areaId()] ) );
+
+
+    Core::factory( "Core_Entity" )
         ->addSimpleEntity( "lesson_id", $id )
         ->addSimpleEntity( "date", $date )
         ->xsl( "musadm/schedule/time_modify_popup.xsl" )
@@ -515,68 +617,90 @@ if( $action === "getScheduleChangeTimePopup" )
 }
 
 
-if( $action === "saveScheduleChangeTimePopup" )
+/**
+ * Обработчик сохранения изменения времени проведения занятия
+ */
+if ( $action === "saveScheduleChangeTimePopup" )
 {
-    $lessonId = Core_Array::getValue( $_GET, "lesson_id", 0 );
-    $date =     Core_Array::getValue( $_GET, "date", date( "Y-m-d" ) );
-    $timeFrom = Core_Array::getValue( $_GET, "time_from", "" );
-    $timeTo =   Core_Array::getValue( $_GET, "time_to", "" );
+    $lessonId = Core_Array::Get( "lesson_id", 0 );
+    $date =     Core_Array::Get( "date", date( "Y-m-d" ) );
+    $timeFrom = Core_Array::Get( "time_from", "" );
+    $timeTo =   Core_Array::Get( "time_to", "" );
+
+
+    if ( $lessonId === 0 )  exit ( Core::getMessage( "EMPTY_GET_PARAM", ["уникальный идентификатор занятия"] ) );
+
+
+    $Lesson = Core::factory( "Schedule_Lesson", $lessonId );
+    if ( $Lesson === null ) exit ( Core::getMessage( "NOT_FOUND", ["Занятие", $lessonId] ) );
+
+    $Area = Core::factory( "Schedule_Area", $Lesson->areaId() );
+    if ( $Area === null )   exit ( Core::getMessage( "NOT_FOUND", ["Филиал", $Lesson->areaId()] ) );
+    if ( !User::isSubordinate( $Area, $User ) ) exit ( Core::getMessage( "NOT_SUBORDINATE", ["Филиал", $Lesson->areaId()] ) );
+
 
     $timeFrom .= ":00";
     $timeTo .= ":00";
 
-    Core::factory( "Schedule_Lesson", $lessonId )->modifyTime( $date, $timeFrom, $timeTo );
+    $Lesson = Core::factory( "Schedule_Lesson", $lessonId );
+    $Lesson->modifyTime( $date, $timeFrom, $timeTo );
+
     exit;
 }
 
 
-if($action === "new_task_popup")
+/**
+ *
+ */
+if ( $action === "new_task_popup" )
 {
-    $aoTaskTypes = Core::factory("Task_Type")->findAll();
-    $date = date("Y-m-d");
+    $TaskTypes = Core::factory( "Task_Type" )->findAll();
+    $date = date( "Y-m-d" );
 
-    Core::factory("Core_Entity")
-        ->addEntities($aoTaskTypes)
+    Core::factory( "Core_Entity" )
+        ->addEntities( $TaskTypes )
         ->addSimpleEntity( "date", $date )
-        ->xsl("musadm/schedule/new_task_popup.xsl")
+        ->xsl( "musadm/schedule/new_task_popup.xsl" )
         ->show();
 
     exit;
 }
 
 
-if($action === "save_task")
+if ( $action === "save_task" )
 {
-    $authorId = $oUser->getId();
-    $noteDate = date("Y-m-d");
-    $note = Core_Array::getValue($_GET, "text", "");
+    $authorId = $User->getId();
+    $noteDate = date( "Y-m-d" );
+    $note = Core_Array::Get( "text", "" );
 
-    $oTask = Core::factory("Task")
-        ->date($noteDate);
+    $Task = Core::factory( "Task" )->date( $noteDate );
+    $Task->save();
+    $Task->addNote( $note );
 
-    $oTask = $oTask->save();
-    $oTask->addNote( $note );
-
-    echo "0";
-    exit;
+    exit( "0" );
 }
 
 
-if( $action === "addAbsentTask" )
+if ( $action === "addAbsentTask" )
 {
-    $dateTo =   Core_Array::getValue( $_GET, "date_to", "" );
-    $clientId = Core_Array::getValue( $_GET, "client_id", 0 );
+    $dateTo =   Core_Array::Get( "date_to", null );
+    $clientId = Core_Array::Get( "client_id", 0 );
 
-    $oTask = Core::factory( "Task" )
+    if ( $dateTo === null )     exit ( Core::getMessage( "EMPTY_GET_PARAM", ["дата завершения периода отсутствия"] ) );
+    if ( $clientId === null )   exit ( Core::getMessage( "EMPTY_GET_PARAM", ["уникальный идентификатор клиента"] ) );
+
+    $Client = Core::factory( "User", $clientId );
+    if ( $Client === null )     exit ( Core::getMessage( "NOT_FOUND", ["Пользователь", $clientId] ) );
+
+    $Task = Core::factory( "Task" )
         ->associate( $clientId )
-        ->date( $dateTo );
+        ->date( $dateTo )
+        ->save();
 
-    $oTask = $oTask->save();
+    $clientFio = $Client->surname() . " " . $Client->name();
+    $text = $clientFio . ", отсутствовал. Уточнить насчет дальнейшего графика.";
+    $Task->addNote( $text );
 
-    $oAuthor = Core::factory( "User", $clientId );
-    $fio = $oAuthor->surname() . " " . $oAuthor->name();
-    $text = $fio . ", отсутствовал. Уточнить насчет дальнейшего графика.";
-    $oTask->addNote( $text );
     exit;
 }
 
@@ -584,34 +708,35 @@ if( $action === "addAbsentTask" )
 /**
  * Создание задачи с напоминанием об уточнении времени следующего занятия
  */
-if( $action === "create_schedule_task" )
+if ( $action === "create_schedule_task" )
 {
     $date =     Core_Array::Get( "date", date("Y-m-d") );
     $clientId = Core_Array::Get( "client_id", 0 );
 
     $Client = Core::factory( "User", $clientId );
+    if ( $Client === null ) exit ( Core::getMessage( "NOT_FOUND", ["Пользователь", $clientId] ) );
+
     $taskNoteText = $Client->surname() . " " . $Client->name() . " обсудить следующее занятие.";
 
-    $Task = Core::factory( "Task" )
-        ->date( $date );
-
+    $Task = Core::factory( "Task" )->date( $date );
     $Task->save();
+
     $Task->addNote( $taskNoteText );
 
     exit;
 }
 
 
-if( $action === "payment_save" )
+if ( $action === "payment_save" )
 {
-    $id = Core_Array::Get( "id", null );
-    $date = Core_Array::Get( "date", date( "Y-m-d" ) );
-    $value = Core_Array::Get( "value", 0 );
+    $id =       Core_Array::Get( "id", null );
+    $date =     Core_Array::Get( "date", date( "Y-m-d" ) );
+    $value =    Core_Array::Get( "value", 0 );
     $description = Core_Array::Get( "description", "" );
 
-    if( $id == null || Core::factory( "Payment", $id ) == false )
+    if( $id == null || Core::factory( "Payment", $id ) === null )
     {
-        die( "Редактируемый платеж не найден либо был удален" );
+        exit ( Core::getMessage( "NOT_FOUND", ["Платеж", $id] ) );
     }
 
     Core::factory( "Payment", $id )
@@ -620,15 +745,16 @@ if( $action === "payment_save" )
         ->description( $description )
         ->save();
 
-
     $this->execute();
+
     exit;
 }
 
 
-if($action === "getSchedule")
+if ( $action === "getSchedule" )
 {
     $this->execute();
+
     exit;
 }
 

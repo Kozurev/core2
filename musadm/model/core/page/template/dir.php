@@ -6,7 +6,7 @@
  * Time: 16:30
  */
 
-class Page_Template_Dir extends Page_Template_Dir_Model
+class Core_Page_Template_Dir extends Core_Page_Template_Dir_Model
 {
 
     public function getParent()

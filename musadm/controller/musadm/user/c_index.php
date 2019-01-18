@@ -10,19 +10,20 @@
 global $CFG;
 $Property = Core::factory( "Property" );
 
-$User = Core::factory( "User" )->getCurrent()->getDirector();
+$User = User::current()->getDirector();
 $subordinated = $User->getId();
 
 User::parentAuth()->groupId() == 6 || User::parentAuth()->superuser() == 1
     ?   $isDirector = 1
     :   $isDirector = 0;
 
-$groupId = $this->oStructureItem->getId();
+$groupId = Core_Page_Show::instance()->StructureItem->getId();
 $groupId == 5
     ?   $xsl = "musadm/users/clients.xsl"
     :   $xsl = "musadm/users/teachers.xsl";
 
-$Users = Core::factory("User")
+$Users = Core::factory( "User" )
+    ->queryBuilder()
     ->where( "subordinated", "=", $subordinated )
     ->where( "group_id", "=", $groupId )
     ->where( "active", "=", 1 )
@@ -34,11 +35,14 @@ $UserGroup = Core::factory( "User_Group", $groupId );
 foreach ( $Users as $User )
 {
     $PropertiesList = $Property->getPropertiesList( $UserGroup );
+
     foreach ( $PropertiesList as $prop )
     {
         $User->addEntities( $prop->getPropertyValues( $User ), "property_value" );
     }
 }
+
+$AreaAssignment = Core::factory( "Schedule_Area_Assignment" );
 
 Core::factory( "Core_Entity" )
     ->xsl( $xsl )
@@ -57,6 +61,7 @@ Core::factory( "Core_Entity" )
 if( $groupId == 4 && User::checkUserAccess(["groups" => [6]]) )
 {
     $aoManagers = Core::factory( "User" )
+        ->queryBuilder()
         ->where( "subordinated", "=", $subordinated )
         ->where( "active", "=", 1 )
         ->where( "group_id", "=", 2 )

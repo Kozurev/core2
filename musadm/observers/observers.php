@@ -13,16 +13,16 @@ require_once "events.php";
 /**
  * Добавление ФИО преподавателя в список дополнительного свойства "Преподаватель"
  */
-Core::attachObserver("beforeUserSave", function($args){
-    $oUser = $args[0];
+Core::attachObserver( "beforeUserSave", function( $args ) {
+    $User = $args[0];
 
     $Director = User::current()->getDirector();
-    if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+    if ( !$Director )    exit ( Core::getMessage("NOT_DIRECTOR") );
     $subordinated = $Director->getId();
 
-    if( $oUser->groupId() == 4 && $oUser->getId() == "" )
+    if ( $User->groupId() == 4 && $User->getId() == "" )
     {
-        $teacherFullName = $oUser->surname() . " " . $oUser->name();
+        $teacherFullName = $User->surname() . " " . $User->name();
 
         Core::factory( "Property_List_Values" )
             ->property_id( 21 )
@@ -31,11 +31,11 @@ Core::attachObserver("beforeUserSave", function($args){
             ->save();
     }
 
-    if( $oUser->groupId() != 6 && $oUser->groupId() != 1 )
+    if ( $User->groupId() != 6 && $User->groupId() != 1 )
     {
-        if( $oUser->subordinated() == 0 )
+        if ( $User->subordinated() == 0 )
         {
-            $oUser->subordinated( $subordinated );
+            $User->subordinated( $subordinated );
         }
     }
 });
@@ -44,84 +44,59 @@ Core::attachObserver("beforeUserSave", function($args){
 /**
  * Удаление пункта списка дополнительного свойства "Преподаватель"
  */
-Core::attachObserver("beforeUserDelete", function($args){
-    $oUser = $args[0];
+Core::attachObserver( "beforeUserDelete", function( $args ) {
+    $User = $args[0];
 
-    if($oUser->groupId() == 4)
+    if ( $User->groupId() == 4 )
     {
         $Director = User::current()->getDirector();
-        if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+        if ( !$Director )    exit ( Core::getMessage(  "NOT_DIRECTOR" ) );
         $subordinated = $Director->getId();
 
-        $listValue = Core::factory("Property_List_Values")
-            ->where("property_id", "=", 21)
+        $listValue = Core::factory("Property_List_Values")->queryBuilder()
+            ->where( "property_id", "=", 21 )
             ->where( "subordinated", "=", $subordinated )
-            ->where("value", "like", "%".$oUser->name()."%")
-            ->where("value", "like", "%".$oUser->surname()."%")
+            ->where( "value", "like", "%" . $User->name() . "%" )
+            ->where( "value", "like", "%" . $User->surname() . "%" )
             ->find();
 
-        if($listValue) $listValue->delete();
+        if ( $listValue ) $listValue->delete();
     }
 
-    Core::factory("Property")->clearForObject($oUser);
+    Core::factory( "Property" )->clearForObject( $User );
 });
 
 
 /**
  * Создание элемента списка "Студия"
  */
-Core::attachObserver("beforeScheduleAreaSave", function( $args ){
+Core::attachObserver( "beforeScheduleAreaSave", function( $args ) {
     $Area = $args[0];
 
     $Director = User::current()->getDirector();
-    if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+    if ( !$Director )    exit ( Core::getMessage( "NOT_DIRECTOR" ) );
     $subordinated = $Director->getId();
 
     $Area->path( translite( $Area->title() ) . "-" . $subordinated );
 
-    //Создание элемента списка дополнительного свойства
-    if( $Area->getId() == "" )
-    {
-        Core::factory( "Property_List_Values" )
-            ->property_id( 15 )
-            ->value( $Area->title() )
-            ->subordinated( $subordinated )
-            ->save();
-    }
-    elseif( isset( $Area->oldTitle ) )
-    {
-        //debug( $Area );
-        $OldPropListVal = Core::factory( "Property_List_Values" )
-            ->where( "property_id", "=", 15 )
-            ->where( "subordinated", "=", $subordinated )
-            ->where( "value", "=", $Area->oldTitle )
-            ->find();
-
-        if( $OldPropListVal !== false )
-        {
-            $OldPropListVal
-                ->value( $Area->title() )
-                ->save();
-        }
-    }
-
     //Проверка на существование филиала с таким же путем
-    if( Core::factory( "Schedule_Area" )
+    $ExistsArea = Core::factory( "Schedule_Area" )->queryBuilder()
         ->where( "id", "<>", $Area->getId() )
         ->where( "path", "=", $Area->path() )
-        ->where( "subordinated", "=", $subordinated )
-        ->find() )
-        die( "Сохранение невозможно, так как уже существует филлиал с названием: \"" . $Area->title() . "\"" );
+        ->where( "subordinated", "=", $subordinated );
+
+    if ( $ExistsArea->getCount() > 0 )
+        exit ( "Сохранение невозможно, так как уже существует филлиал с названием: \"" . $Area->title() . "\"" );
 });
 
 
 /**
  * Удаление элемента списка "Студия"
  */
-Core::attachObserver("beforeScheduleAreaDelete", function( $args ){
+Core::attachObserver("beforeScheduleAreaDelete", function( $args ) {
     $Area = $args[0];
 
-    $listValue = Core::factory( "Property_List_Values" )
+    $listValue = Core::factory( "Property_List_Values" )->queryBuilder()
         ->where( "property_id", "=", 15 )
         ->where( "value", "like", "%".$Area->title()."%" )
         ->find();
@@ -133,92 +108,110 @@ Core::attachObserver("beforeScheduleAreaDelete", function( $args ){
 /**
  * Удаление всех связей с удаляемым элементом списка доп. свойства
  */
-Core::attachObserver("beforePropertyListValuesDelete", function( $args ){
+Core::attachObserver("beforePropertyListValuesDelete", function( $args ) {
     $PropertyListValue = $args[0];
 
-    $aoPropertyLists = Core::factory( "Property_List" )
+    $PropertyLists = Core::factory( "Property_List" )->queryBuilder()
         ->where( "property_id", "=", $PropertyListValue->property_id() )
         ->where( "value_id", "=", $PropertyListValue->getId() )
         ->findAll();
 
-    foreach ($aoPropertyLists as $val)  $val->delete();
+    foreach ( $PropertyLists as $val )
+    {
+        $val->delete();
+    }
 });
 
 
 /**
  * Удаление всех занятий и связей с группами, принадлежащие этому пользователю
  */
-Core::attachObserver("beforeUserDelete", function($args){
-    $oUser = $args[0];
+Core::attachObserver("beforeUserDelete", function( $args ) {
+    $User = $args[0];
 
     //Удаление принадлежности к группам
-    $aoGroupsAssignments = Core::factory("Schedule_Group_Assignment")
-        ->where("user_id", "=", $oUser->getId())
+    $GroupsAssignments = Core::factory( "Schedule_Group_Assignment" )->queryBuilder()
+        ->where( "user_id", "=", $User->getId() )
         ->findAll();
 
-    foreach ($aoGroupsAssignments as $oAssignment)  $oAssignment->delete();
-
-    //Если пользователь был учителем одной из групп необходимо откорректировать свойство teracher_id
-    $aoGroups = Core::factory("Schedule_Group")
-        ->where("teacher_id", "=", $oUser->getId())
-        ->findAll();
-
-    foreach ($aoGroups as $oGroup)  $oGroup->teacherId("0")->save();
-
-    //Поиск занятий, с которымисвязан пользователь и удаление
-    $aoLessons = Core::factory("Schedule_Lesson")
-        ->where("client_id", "=", $oUser->getId())
-        ->where("teacher_id", "=", $oUser->getId(), "OR")
-        ->findAll();
-
-    foreach ( $aoLessons as $Lesson )
+    foreach ( $GroupsAssignments as $Assignment )
     {
-        if( $Lesson->lessonType() == 1 )
-        {
-            $Lesson->markDeleted( date("Y-m-d") );
-        }
+        $Assignment->delete();
     }
 
+    //Если пользователь был учителем одной из групп необходимо откорректировать свойство teracher_id
+    $Groups = Core::factory("Schedule_Group")->queryBuilder()
+        ->where( "teacher_id", "=", $User->getId() )
+        ->findAll();
+
+    foreach ( $Groups as $Group )
+    {
+        $Group->teacherId( "0" )->save();
+    }
+
+    //Поиск занятий, с которымисвязан пользователь и удаление
+    $Lessons = Core::factory("Schedule_Lesson")->queryBuilder()
+        ->where( "client_id", "=", $User->getId() )
+        ->where( "teacher_id", "=", $User->getId(), "OR" )
+        ->findAll();
+
+    foreach ( $Lessons as $Lesson )
+    {
+        if ( $Lesson->lessonType() == 1 )
+        {
+            $Lesson->markDeleted( date( "Y-m-d" ) );
+        }
+    }
 });
 
 
 /**
  * Рекурсивное удаление вложенных макетов и диекторий при удалении директории
  */
-Core::attachObserver("beforeTemplateDirDelete", function($args){
-    $aoChildren = $args[0]->getChildren();
-    foreach ($aoChildren as $child) $child->delete();
+Core::attachObserver("beforeTemplateDirDelete", function( $args ) {
+    $ChildrenTemplates = $args[0]->getChildren();
+
+    foreach ( $ChildrenTemplates as $ChildTemplate )
+    {
+        $ChildTemplate->delete();
+    }
 });
 
 
 /**
  * Рекурсивное удаление вложенных макетов при удалении макета
  */
-Core::attachObserver("beforeTemplateDelete", function($args){
-    $aoChildren = $args[0]->getChildren();
-    foreach ($aoChildren as $child) $child->delete();
+Core::attachObserver("beforeTemplateDelete", function( $args ) {
+    $ChildrenTemplates = $args[0]->getChildren();
+
+    foreach ( $ChildrenTemplates as $ChildTemplate )
+    {
+        $ChildTemplate->delete();
+    }
 });
 
 
 /**
  * Запись даты/времени последней авторизации пользователя
  */
-Core::attachObserver("afterUserAuthorize", function($args){
-    $oUser = $args[0];
-    if($oUser != false && $oUser->groupId() == 5)
-    {
-        $oProperty = Core::factory("Property", 22);
-        $oProperty->addToPropertiesList($oUser, 22);
-        $now = date("d.m.Y H:i:s");
+Core::attachObserver("afterUserAuthorize", function( $args ) {
+    $User = $args[0];
 
-        $value = $oProperty->getPropertyValues($oUser)[0];
-        if($value->getId())
+    if ( $User != false && $User->groupId() == 5 )
+    {
+        $Property = Core::factory( "Property", 22 );
+        $Property->addToPropertiesList( $User, 22 );
+        $now = date( "d.m.Y H:i:s" );
+
+        $value = $Property->getPropertyValues( $User )[0];
+
+        if ( $value->getId() )
         {
-            $value->value($now)->save();
+            $value->value( $now )->save();
         }
         else
         {
-            $oProperty->addNewValue($oUser, $now);
+            $Property->addNewValue( $User, $now );
         }
     }
 });
@@ -227,34 +220,40 @@ Core::attachObserver("afterUserAuthorize", function($args){
 /**
  * Удаление всех связей и значений доп. свойств при удалении объекта структуры
  */
-Core::attachObserver("beforeStructureDelete", function($args){
-    $oStructure = $args[0];
-    Core::factory("Property")->clearForObject($oStructure);
+Core::attachObserver("beforeStructureDelete", function( $args ) {
+    $Structure = $args[0];
+    Core::factory( "Property" )->clearForObject( $Structure );
 });
 
 
 /**
  * Удаление всех связей и значений доп. свойств при удалении объекта Элемента структуры
  */
-Core::attachObserver("beforeItemDelete", function($args){
-    $oStructure = $args[0];
-    Core::factory("Property")->clearForObject($oStructure);
+Core::attachObserver("beforeItemDelete", function( $args ) {
+    $Structure = $args[0];
+    Core::factory( "Property" )->clearForObject( $Structure );
 });
 
 
 /**
  * Рекурсивное удаление всех дочерних структур и элементов всех уровней вложенности
  */
-Core::attachObserver("beforeStructureDelete", function($args){
+Core::attachObserver("beforeStructureDelete", function( $args ) {
     $id = $args[0]->getId();
 
-    $aoChildrenItems = Core::factory("Structure_Item")->where("parent_id", "=", $id)->findAll();
-    $aoChildrenStructures = Core::factory("Structure")->where("parent_id", "=", $id)->findAll();
-    $aoCHildren = array_merge($aoChildrenItems, $aoChildrenStructures);
+    $ChildrenItems = Core::factory( "Structure_Item" )->queryBuilder()
+        ->where( "parent_id", "=", $id )
+        ->findAll();
 
-    foreach ($aoCHildren as $oChild)
+    $ChildrenStructures = Core::factory( "Structure" )->queryBuilder()
+        ->where( "parent_id", "=", $id )
+        ->findAll();
+
+    $Children = array_merge( $ChildrenItems, $ChildrenStructures );
+
+    foreach ( $Children as $Child )
     {
-        $oChild->delete();
+        $Child->delete();
     }
 });
 
@@ -262,71 +261,84 @@ Core::attachObserver("beforeStructureDelete", function($args){
 /**
  * Проверка на совпадение пути структуры для избежания дублирования пути
  */
-Core::attachObserver("beforeStructureSave", function($args){
-    $oStructure = $args[0];
-    $oRootStructure = Core::factory("Structure")->where("path", "=", "")->find();
-    $aParentId[] = $oStructure->parentId();
+Core::attachObserver("beforeStructureSave", function( $args ) {
+    $Structure = $args[0];
 
-    $aoCoincidingStructures = Core::factory("Structure")
-        ->where("path", "=", $oStructure->path())
-        ->where("id", "<>", $oStructure->getId());
-    $aoCoincidingItems = Core::factory("Structure_Item")->where("path", "=", $oStructure->getId());
+    $RootStructure = Core::factory( "Structure" )->queryBuilder()
+        ->where( "path", "=", "" )
+        ->find();
 
-    if($oStructure->parentId() == 0)
+    $ParentId[] = $Structure->parentId();
+
+    $CoincidingStructures = Core::factory( "Structure" )->queryBuilder()
+        ->where( "path", "=", $Structure->path() )
+        ->where( "id", "<>", $Structure->getId() );
+
+    $CoincidingItems = Core::factory( "Structure_Item" )->queryBuilder()
+        ->where( "path", "=", $Structure->getId() );
+
+    if ( $Structure->parentId() == 0 )
     {
-        $aParentId[] = $oRootStructure->getId();
+        $ParentId[] = $RootStructure->getId();
     }
 
-    $countCoincidingStructures = $aoCoincidingStructures
-        ->where("parent_id", "IN", $aParentId)
+    $countCoincidingStructures = $CoincidingStructures
+        ->where( "parent_id", "IN", $ParentId )
         ->getCount();
 
-    $countCoincidingItems = $aoCoincidingItems
-        ->where("parent_id", "IN", $aParentId)
+    $countCoincidingItems = $CoincidingItems
+        ->where( "parent_id", "IN", $ParentId )
         ->getCount();
 
-    if($countCoincidingItems > 0 || $countCoincidingStructures > 0) die("Дублирование путей");
+    if ( $countCoincidingItems > 0 || $countCoincidingStructures > 0 ) exit ( "Дублирование путей" );
 });
 
 
 /**
  * Проверка на совпадение пути элемента структуры для избежания дублирования пути
  */
-Core::attachObserver("beforeItemSave", function($args){
-    $oStructure = $args[0];
-    $oRootStructure = Core::factory("Structure")->where("path", "=", "")->find();
-    $aParentId[] = $oStructure->parentId();
+Core::attachObserver("beforeItemSave", function( $args ) {
+    $Structure = $args[0];
 
-    $aoCoincidingStructures = Core::factory("Structure")->where("path", "=", $oStructure->path());
-    $aoCoincidingItems = Core::factory("Structure_Item")
-        ->where("path", "=", $oStructure->getId())
-        ->where("id", "<>", $oStructure->getId());
+    $RootStructure = Core::factory( "Structure" )->queryBuilder()
+        ->where( "path", "=", "" )
+        ->find();
 
-    if($oStructure->parentId() == 0)
+    $ParentId[] = $Structure->parentId();
+
+    $CoincidingStructures = Core::factory( "Structure" )->queryBuilder()
+        ->where( "path", "=", $Structure->path() );
+
+    $CoincidingItems = Core::factory( "Structure_Item" )->queryBuilder()
+        ->where( "path", "=", $Structure->getId() )
+        ->where( "id", "<>", $Structure->getId() );
+
+    if ( $Structure->parentId() == 0 )
     {
-        $aParentId[] = $oRootStructure->getId();
+        $ParentId[] = $RootStructure->getId();
     }
 
-    $countCoincidingStructures = $aoCoincidingStructures
-        ->where("parent_id", "IN", $aParentId)
+    $countCoincidingStructures = $CoincidingStructures
+        ->where( "parent_id", "IN", $ParentId )
         ->getCount();
 
-    $countCoincidingItems = $aoCoincidingItems
-        ->where("parent_id", "IN", $aParentId)
+    $countCoincidingItems = $CoincidingItems
+        ->where( "parent_id", "IN", $ParentId )
         ->getCount();
 
-    if($countCoincidingItems > 0 || $countCoincidingStructures > 0) die("Дублирование путей");
+    if ( $countCoincidingItems > 0 || $countCoincidingStructures > 0 ) exit ( "Дублирование путей" );
 });
 
 
 /**
  * При создании лида задание значения свойства subordinated
  */
-Core::attachObserver("beforeLidSave", function($args){
+Core::attachObserver( "beforeLidSave", function( $args ) {
     $Lid = $args[0];
-    if( $Lid->subordinated() == 0 )
+
+    if ( $Lid->subordinated() == 0 )
     {
-        $User = Core::factory( "User" )->getCurrent()->getDirector();
+        $User = User::current()->getDirector();
         $Lid->subordinated( $User->getId() );
     }
 });
@@ -335,33 +347,35 @@ Core::attachObserver("beforeLidSave", function($args){
 /**
  * При создании лида присваивает ему дополнительное своство "Статус лида"
  */
-Core::attachObserver("afterLidSave", function($args){
-    $oLid = $args[0];
-    Core::factory("Property")->addToPropertiesList($oLid, 27);
+Core::attachObserver( "afterLidSave", function( $args ) {
+    $Lid = $args[0];
+    Core::factory( "Property" )->addToPropertiesList( $Lid, 27 );
 });
 
 
 /**
  * Удаление всех занятий в расписании, с которыми была связана данная группа
  */
-Core::attachObserver("beforeScheduleGroupDelete", function($args){
+Core::attachObserver( "beforeScheduleGroupDelete", function( $args ) {
     $Group = $args[0];
     $Group->clearClientList();
 
-    $Lessons = Core::factory("Schedule_Lesson")
+    $Lessons = Core::factory( "Schedule_Lesson" )->queryBuilder()
         ->where( "type_id", "=", 2 )
-        ->where( "client_id", "=", $Group->getId())
+        ->where( "client_id", "=", $Group->getId() )
         ->findAll();
 
-
-    foreach ( $Lessons as $Lesson ) $Lesson->delete();
+    foreach ( $Lessons as $Lesson )
+    {
+        $Lesson->delete();
+    }
 });
 
 
 /**
  * При выставлении консультации с указанием лида создается комментарий
  */
-Core::attachObserver( "beforeScheduleLessonSave", function( $args ){
+Core::attachObserver( "beforeScheduleLessonSave", function( $args ) {
     $Lesson = $args[0];
     $typeId = $Lesson->typeId();
     $clientId = $Lesson->clientId();
@@ -378,7 +392,7 @@ Core::attachObserver( "beforeScheduleLessonSave", function( $args ){
     $Lid->addComment( $commentText );
 
     $Property = Core::factory( "Property", 27 );
-    $LidStatus = Core::factory( "Property_List" )
+    $LidStatus = Core::factory( "Property_List" )->queryBuilder()
         ->where( "model_name", "=", "Lid" )
         ->where( "object_id", "=", $Lid->getId() )
         ->where( "property_id", "=", 27 )
@@ -401,7 +415,7 @@ Core::attachObserver( "beforeScheduleLessonSave", function( $args ){
  * Создание комментария у лида о проведенной консультации
  * и изменение статуса, если лид присутствовал
  */
-Core::attachObserver( "afterScheduleReportSave", function( $args ){
+Core::attachObserver( "afterScheduleReportSave", function( $args ) {
     $Report = $args[0];
     if( $Report->typeId() != 3 || $Report->clientId() == 0 )  return;
 
@@ -423,7 +437,7 @@ Core::attachObserver( "afterScheduleReportSave", function( $args ){
     if( $Report->attendance() == 1 )
     {
         $Property = Core::factory( "Property", 27 );
-        $LidStatus = Core::factory( "Property_List" )
+        $LidStatus = Core::factory( "Property_List" )->queryBuilder()
             ->where( "model_name", "=", "Lid" )
             ->where( "object_id", "=", $Lid->getId() )
             ->where( "property_id", "=", 27 )
@@ -440,12 +454,3 @@ Core::attachObserver( "afterScheduleReportSave", function( $args ){
         }
     }
 });
-
-
-/**
- * Автоматическое создание задачи типа "Оплата" для клиентов при остатке занятий 1 или меньше
- */
-//Core::attachObserver( "beforeScheduleReportSave", function( $args ){
-//    $Report = $args[0];
-//    if( $Report->attendance() == 1 )    return;
-//});

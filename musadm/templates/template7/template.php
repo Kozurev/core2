@@ -22,19 +22,19 @@
     }
 
 
-    is_object( $this->oStructureItem )
-        ?   $areaId = $this->oStructureItem->getId()
+    is_object( Core_Page_Show::instance()->StructureItem )
+        ?   $areaId = Core_Page_Show::instance()->StructureItem->getId()
         :   $areaId = 0;
 
 
         if(
             User::checkUserAccess( ["groups" => [2]], $User )
-            || ( User::checkUserAccess( ["groups" => [6]], $User ) && is_object( $this->oStructureItem ) )
-        )   $this->css("/templates/template7/css/style.css");
+            || ( User::checkUserAccess( ["groups" => [6]], $User ) && is_object( Core_Page_Show::instance()->StructureItem ) )
+        )   Core_Page_Show::instance()->css("/templates/template7/css/style.css");
 
         if(
             User::checkUserAccess( ["groups" => [2, 4]], $User )
-            || ( User::checkUserAccess( ["groups" => [6]], $User ) && is_object( $this->oStructureItem ) )
+            || ( User::checkUserAccess( ["groups" => [6]], $User ) && is_object( Core_Page_Show::instance()->StructureItem ) )
         ) { ?>
 
         <div class="row calendar_small">
@@ -68,7 +68,7 @@
     <? } ?>
 
     <div class="schedule">
-        <?php $this->execute();?>
+        <?php Core_Page_Show::instance()->execute();?>
     </div>
 
     <input type="hidden" id="userid" value="<?=$User->getId()?>" />

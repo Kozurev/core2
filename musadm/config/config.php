@@ -25,6 +25,6 @@ $CFG->items_mapping = array(
     ),
     "Schedule_Area" =>  array(
         "index"     =>  "path",
-        "active"    =>  false
+        "active"    =>  true
     )
 );

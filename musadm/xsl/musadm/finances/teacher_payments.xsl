@@ -49,7 +49,7 @@
         <xsl:for-each select="payment">
             <tr>
                 <td><xsl:value-of select="datetime" /></td>
-                <td><xsl:value-of select="value" /></td>
+                <td class="value"><xsl:value-of select="value" /></td>
                 <td>
                     <xsl:if test="/root/is_director = 0"><xsl:attribute name="colspan">2</xsl:attribute></xsl:if>
                     <xsl:value-of select="description" />

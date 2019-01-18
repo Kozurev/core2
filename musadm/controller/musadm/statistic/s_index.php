@@ -6,20 +6,16 @@
  * Time: 12:46
  */
 
-$oUser = Core::factory("User")->getCurrent();
 
 /**
  * Блок проверки авторизации и прав доступа
  */
-$accessRules = array(
-    "groups"    => array(1, 6),
-    //"superuser" => 1
-);
+$User = User::current();
+$accessRules = ["groups"    => [1, 6]];
 
-if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
+if( !User::checkUserAccess( $accessRules, $User ) )
 {
-    $this->error404();
-    exit;
+    Core_Page_Show::instance()->error404();
 }
 
 
@@ -27,15 +23,15 @@ $breadcumbs[0] = new stdClass();
 $breadcumbs[0]->title = $this->oStructure->title();
 $breadcumbs[0]->active = 1;
 
-$this->setParam( "body-class", "body-orange" );
-$this->setParam( "title-first", "СТАТИСТИКА" );
-$this->setParam( "title-second", "" );
-$this->setParam( "breadcumbs", $breadcumbs );
+Core_Page_Show::instance()->setParam( "body-class", "body-orange" );
+Core_Page_Show::instance()->setParam( "title-first", "СТАТИСТИКА" );
+Core_Page_Show::instance()->setParam( "title-second", "" );
+Core_Page_Show::instance()->setParam( "breadcumbs", $breadcumbs );
 
-$action = Core_Array::getValue($_GET, "action", "");
+$action = Core_Array::Get( "action", "" );
 
-if($action === "refresh")
+if( $action === "refresh" )
 {
-    $this->execute();
+    Core_Page_Show::instance()->execute();
     exit;
 }

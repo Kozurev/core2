@@ -15,6 +15,7 @@ class Task_Model extends Core_Entity
     protected $type = 0;
     protected $associate = 0;
     protected $subordinated = 0;
+    protected $area_id = 0;
 
 
     public function getId()
@@ -69,6 +70,15 @@ class Task_Model extends Core_Entity
     {
         if( is_null( $val ) )   return intval( $this->subordinated );
         $this->subordinated = intval( $val );
+        return $this;
+    }
+
+
+    public function areaId( $val = null )
+    {
+        if ( is_null( $val ) )  return intval( $this->area_id );
+
+        $this->area_id = intval( $val );
         return $this;
     }
 

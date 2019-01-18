@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title><?=$this->title;?></title>
+    <title><?=Core_Page_Show::instance()->title;?></title>
     <!-- Meta -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,7 +10,7 @@
     <meta name="author" content="">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
     <?
-    $this
+    Core_Page_Show::instance()
         ->css( "/templates/template10/assets/plugins/bootstrap/css/bootstrap.min.css" )
         ->css( "/templates/template10/assets/plugins/font-awesome/css/font-awesome.css" )
         ->css( "/templates/template10/assets/plugins/elegant_font/css/style.css" )
@@ -36,7 +36,7 @@
         $pageUserId = Core_Array::Get( "userid", null );
 
         is_null( $pageUserId )
-            ?   $User = Core::factory("User")->getCurrent()
+            ?   $User = User::current()
             :   $User = Core::factory( "User", $pageUserId );
 
 
@@ -46,8 +46,8 @@
         }
         else
         {
-            //$disauthorizeLink = $CFG->rootdir . "/user/client";
-            $disauthorizeLink = "href='#' onclick='history.back()'";
+            //$disauthorizeLink = "href='#' onclick='history.back()'";
+            $disauthorizeLink = "href='" . $CFG->rootdir . "/user/client'";
         }
 
         $name = $User->name();
@@ -55,7 +55,7 @@
         $isAdmin = $User->groupId() <= 3;
 
 
-        switch ( $this->getParam( "body-class", "" ) )
+        switch ( Core_Page_Show::instance()->getParam( "body-class", "" ) )
         {
             case "body-orange":     $hover = '#F88C30';     break;
             case "body-primary":    $hover = '#40babd';     break;
@@ -100,15 +100,17 @@
                                     <span class="caret"></span></a>
                                 <ul class="dropdown-menu">
                                     <?
-                                    $aoAreas = Core::factory("Schedule_Area")
+                                    $Areas = Core::factory("Schedule_Area")
+                                        ->queryBuilder()
                                         ->where( "active", "=", 1 )
                                         ->where( "subordinated", "=", $subordinated )
                                         ->orderBy("sorting")
                                         ->findAll();
-                                    foreach ($aoAreas as $area)
+
+                                    foreach ( $Areas as $area )
                                     {
                                         $href = $CFG->rootdir . "/schedule/" . $area->path();
-                                        echo "<li><a href='".$href."'>";
+                                        echo "<li><a href='" . $href . "'>";
                                         echo $area->title();
                                         echo "</a></li>";
                                     }
@@ -122,9 +124,19 @@
                             //Пункты только для клиентов
                             if( $User->groupId() == 5 )
                             {
+
+                                $linkBalance = $CFG->rootdir . "/balance";
+                                $linkChangelogin = $CFG->rootdir . "/changelogin";
+
+                                if( $pageUserId !== null )
+                                {
+                                    $linkBalance .= "?userid=" . $pageUserId;
+                                    $linkChangelogin .= "?userid=" . $pageUserId;
+                                }
+
                                 ?>
-                                <li><a href="<?=$CFG->rootdir?>/user/balance" >Баланс</a></li>
-                                <li><a href="<?=$CFG->rootdir?>/user/changelogin" >Сменить логин или пароль</a></li>
+                                <li><a href="<?=$linkBalance?>" >Баланс</a></li>
+                                <li><a href="<?=$linkChangelogin?>" >Сменить логин или пароль</a></li>
                                 <?
                             }
 
@@ -217,7 +229,7 @@
 
 
 <?php
-$this
+Core_Page_Show::instance()
     ->js( "/templates/template10/assets/plugins/bootstrap/js/bootstrap.min.js" )
     ->js( "/templates/template10/assets/js/jquery.validate.min.js" )
     ->js( "/templates/template4/lib/tablesorter/js/jquery.tablesorter.js" )

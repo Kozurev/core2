@@ -4,7 +4,7 @@
 */
 class User_Model extends Core_Entity
 {
-	protected $id;
+	protected $id = 0;
 	protected $name; //
 	protected $surname; //
 	protected $patronimyc; //

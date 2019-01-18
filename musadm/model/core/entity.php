@@ -6,18 +6,96 @@
 */
 class Core_Entity extends Core_Entity_Model
 {
+
+    /**
+     * @return Orm
+     */
+    public function queryBuilder()
+    {
+        if( is_null( $this->aEntityVars["orm"] ) )
+        {
+            $this->aEntityVars["orm"] = new Orm( $this->getTableName() );
+        }
+
+        return $this->aEntityVars["orm"];
+    }
+
+
+    public function findAll()
+    {
+        return $this->queryBuilder()->findAll();
+    }
+
+    public function find()
+    {
+        return $this->queryBuilder()->find();
+    }
+
+    public function save()
+    {
+        $this->queryBuilder()->save( $this );
+        return $this;
+    }
+
+    public function delete()
+    {
+        $this->queryBuilder()->delete( $this );
+    }
+
+    public function getCount()
+    {
+        return $this->queryBuilder()->getCount();
+    }
+
+
+
+    /**
+     * Возвращает название таблицы для данного объекта
+     *
+     * @return string
+     */
+    public function getTableName()
+    {
+        if( method_exists( $this, "databaseTableName" ) )
+            return $this->databaseTableName();
+        else
+            return get_class( $this );
+    }
+
+
+    /**
+     * Формирует из не пустых свойств объекта ассоциативный массив
+     *
+     * @return array
+     */
+    public function getObjectProperties()
+    {
+        $result = array();
+        $aVars = get_object_vars( $this );
+        $aForbidden = array( "open", "close" );
+
+        foreach ( $aVars as $key => $value )
+        {
+            if( ( is_string( $value ) || is_numeric( $value ) ) && !in_array( $key, $aForbidden ) )
+                $result[$key] = $value;
+        }
+
+        return $result;
+    }
+
+
+
     /**
      * Конвертирует, к примеру, "Structure_Item" в "structure_item"
+     *
      * @param $intputName - название модели, которое необходимо отконвертировать
      * @return string - название модели без больших букв
      */
-	protected function renameModelName( $intputName )
+	protected function renameModelName( $inputName )
 	{
-		$aSegments = explode( "_", $intputName );
+		$aSegments = explode( "_", $inputName );
 		$outputName = "";
 
-		//if($aSegments[0] == "Property" && count($aSegments) > 1) return "property_value";
-		//if($intputName === "Admin_Form") return "item";
 
 		foreach ( $aSegments as $segment )
 		{
@@ -40,8 +118,8 @@ class Core_Entity extends Core_Entity_Model
 	{
 	    if( !is_object( $obj ) )
         {
-            echo "<br>Переданный параметр в метод addEntity не является объектом:<br>";
-            debug( $obj );
+//            echo "<br>Переданный параметр в метод addEntity не является объектом:<br>";
+//            debug( $obj );
             return $this;
         }
 
@@ -53,7 +131,7 @@ class Core_Entity extends Core_Entity_Model
                 $obj->custom_tag = $tag;
 		}
 
-		if( $this->aEntityVars["value"] == "" )
+		if( $this->_entityValue() == "" )
 			$this->childrenObjects[] = $obj;
 		else
 			echo "Невозможно добавыить элемент к простой XML-сущьности";
@@ -65,15 +143,15 @@ class Core_Entity extends Core_Entity_Model
     /**
      * Добавление массива дочерних сущьностей в XML
      *
-     * @param $aoChilren
+     * @param $aoChildren
      * @param null $tags
      * @return $this
      */
-	public function addEntities( $aoChilren, $tags = null )
+	public function addEntities( $aoChildren, $tags = null )
 	{
-		if( is_array( $aoChilren ) && count( $aoChilren ) > 0 )
+		if( is_array( $aoChildren ) && count( $aoChildren ) > 0 )
 
-		foreach ( $aoChilren as $oChild )
+		foreach ( $aoChildren as $oChild )
 		{
 			if( is_object( $oChild ) ) 	$this->addEntity( $oChild, $tags );
 		}
@@ -95,8 +173,8 @@ class Core_Entity extends Core_Entity_Model
 
         $this->addEntity(
             Core::factory("Core_Entity")
-                ->name( $name )
-                ->value( $value )
+                ->_entityName( $name )
+                ->_entityValue( $value )
         );
 
         return $this;
@@ -220,7 +298,7 @@ class Core_Entity extends Core_Entity_Model
 
 	public function setId( $val )
     {
-        $this->id = $val;
+        $this->id = intval( $val );
         return $this;
     }
 

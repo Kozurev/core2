@@ -16,21 +16,23 @@ class Schedule_Group extends Schedule_Group_Model
      */
     public function getClientList()
     {
-        if($this->id == null)   return array();
+        if( $this->id == null )   return [];
 
-        $assignments = Core::factory("Schedule_Group_Assignment")
-            ->where("group_id", "=", $this->id)
+        $Assignments = Core::factory( "Schedule_Group_Assignment" )
+            ->queryBuilder()
+            ->where( "group_id", "=", $this->id )
             ->findAll();
 
-        $output = array();
+        $output = [];
 
-        foreach ($assignments as $assignment)
+        foreach ( $Assignments as $Assignment )
         {
-            $aoGroupUsers = Core::factory("User")
-                ->where("id", "=", $assignment->userId())
+            $GroupUsers = Core::factory( "User" )
+                ->queryBuilder()
+                ->where( "id", "=", $Assignment->userId() )
                 ->findAll();
 
-            $output = array_merge($output, $aoGroupUsers);
+            $output = array_merge( $output, $GroupUsers );
         }
 
         return $output;
@@ -42,13 +44,14 @@ class Schedule_Group extends Schedule_Group_Model
      */
     public function clearClientList()
     {
-        if($this->id == null)   return;
+        if( $this->id == null )   return;
 
-        $assignments = Core::factory("Schedule_Group_Assignment")
-            ->where("group_id", "=", $this->id)
+        $Assignments = Core::factory( "Schedule_Group_Assignment" )
+            ->queryBuilder()
+            ->where( "group_id", "=", $this->id )
             ->findAll();
 
-        foreach ($assignments as $assignment)   $assignment->delete();
+        foreach ( $Assignments as $Assignment )   $Assignment->delete();
     }
 
 
@@ -59,7 +62,7 @@ class Schedule_Group extends Schedule_Group_Model
      */
     public function getTeacher()
     {
-        return Core::factory("User", $this->teacher_id);
+        return Core::factory( "User", $this->teacher_id );
     }
 
 
@@ -68,11 +71,11 @@ class Schedule_Group extends Schedule_Group_Model
      *
      * @param $userid
      */
-    public function appendClient($userid)
+    public function appendClient( $userid )
     {
-        if($this->id == null)   return;
+        if( $this->id == null )   return;
 
-        Core::factory("Schedule_Group_Assignment")
+        Core::factory( "Schedule_Group_Assignment" )
             ->groupId($this->id)
             ->userId($userid)
             ->save();

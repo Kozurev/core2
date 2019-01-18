@@ -6,63 +6,59 @@
  * Time: 22:12
  */
 
-$oUser = Core::factory("User");
+global $CFG;
 
+$User = Core::factory("User");
 $CurrentUser = User::current();
+
 if( $CurrentUser != false )
 {
-    global $CFG;
     $uri = Core_Array::Get( "back", $CFG->rootdir );
     header( "Location: " . $uri );
 }
 
-if(isset($_POST["login"]) && isset($_POST["password"]))
+if( isset($_POST["login"]) && isset($_POST["password"]) )
 {
-    $rememberMe = Core_Array::getValue($_POST, "remember", false);
+    $rememberMe = Core_Array::Post( "remember", false );
+    if( $rememberMe !== false ) $rememberMe = true;
 
-    $oUser
-        ->login($_POST["login"])
-        ->password($_POST["password"]);
+    $User
+        ->login( $_POST["login"] )
+        ->password( $_POST["password"] );
 
-    $oUser = $oUser->authorize($rememberMe);
+    $User = $User->authorize( $rememberMe );
 
-    if( $oUser )
+    if( $User !== false )
     {
-        global $CFG;
-        if( $oUser->groupId() == 3 || $oUser->groupId() == 4 )      $back = $CFG->rootdir . "/schedule/";
-        elseif( $oUser->groupId() < 3 || $oUser->groupId() == 6 )   $back = $CFG->rootdir . "/";
-        elseif( $oUser->groupId() == 5 )                            $back = $CFG->rootdir . "/balance";
+        if( $User->groupId() == 3 || $User->groupId() == 4 )      $back = $CFG->rootdir . "/schedule/";
+        elseif( $User->groupId() < 3 || $User->groupId() == 6 )   $back = $CFG->rootdir . "/";
+        elseif( $User->groupId() == 5 )                            $back = $CFG->rootdir . "/balance";
         header( "Location: " . $back );
     }
 }
 
 
-if(isset($_GET["disauthorize"]))
+if( isset($_GET["disauthorize"]) )
 {
-    $oUser = Core::factory("User");
-    $oUser::disauthorize();
+    User::disauthorize();
 }
 
 
-if( Core_Array::getValue( $_GET, "auth_as", null ) !== null )
+if( Core_Array::Get( "auth_as", null ) !== null )
 {
-    global $CFG;
-
-    User::authAs( Core_Array::getValue( $_GET, "auth_as", null ) );
-    $User = Core::factory( "User" )->getCurrent();
+    User::authAs( Core_Array::Get( "auth_as", null ) );
 
     $url = $CFG->rootdir ;
     header( "Location: " . $url );
 }
 
 
-if( Core_Array::getValue( $_GET, "auth_revert", null ) !== null )
+if( Core_Array::Get( "auth_revert", null ) !== null )
 {
-    global $CFG;
     User::authRevert();
 
-    $User = Core::factory( "User" )->getCurrent();
-    if( $User == false )
+    //$User = Core::factory( "User" )->getCurrent();
+    if( $CurrentUser == false )
     {
         $url = $CFG->rootdir . "/authorize/";
     }
@@ -77,6 +73,6 @@ if( Core_Array::getValue( $_GET, "auth_revert", null ) !== null )
 
 if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
 {
-    $this->execute();
+    Core_Page_Show::instance()->execute();
     exit;
 }

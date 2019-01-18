@@ -6,6 +6,7 @@
  * Time: 11:58
  */
 
+
 class Schedule_Lesson_Absent extends Core_Entity
 {
 
@@ -23,18 +24,20 @@ class Schedule_Lesson_Absent extends Core_Entity
     }
 
 
-    public function date($val = null)
+    public function date( $val = null )
     {
-        if(is_null($val))   return $this->date;
-        $this->date = $val;
+        if( is_null( $val ) )   return $this->date;
+
+        $this->date = strval( $val );
         return $this;
     }
 
 
-    public function lessonId($val = null)
+    public function lessonId( $val = null )
     {
-        if(is_null($val))   return $this;
-        $this->lesson_id = intval($val);
+        if( is_null( $val ) )   return $this;
+
+        $this->lesson_id = intval( $val );
         return $this;
     }
 

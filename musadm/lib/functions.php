@@ -243,12 +243,12 @@ function translite( $str )
     ];
 
 
-    while( $str !== false && iconv_strlen ( $str ) > 0 )
+    while( $str !== false && iconv_strlen( $str ) > 0 )
     {
         $temp = mb_substr( $str, 0, 1 );
         $temp = mb_strtolower( $temp );
 
-        if( $temp == " " )
+        if ( $temp == " " )
         {
             $result .= "-";
         }
@@ -256,12 +256,16 @@ function translite( $str )
         {
             $result .= $temp;
         }
-        else
+        elseif ( in_array( $temp, array_keys( $translite ) ) )
         {
             if( Core_Array::getValue( $translite, $temp, false ) )
             {
                 $result .= $translite[$temp];
             }
+        }
+        else
+        {
+            $result .= $temp;
         }
 
         $str = mb_substr( $str, 1 );

@@ -77,12 +77,56 @@ $(function(){
             e.preventDefault();
             loaderOn();
 
-            var clientId = $("#createData").find("select[name=clientId]").val();
-            var date = $("#createData").find("input[name=insertDate]").val();
+            var Form = $("#createData");
+
+            //Проверка кратности количества минут времени начала и окончания занятия
+            var timestep = Form.find("#timestep").val();
+            timestep = Number(timestep.substring(3, 5));
+
+            var timeFrom = Form.find("input[name=timeFrom]").val();
+            var timeTo = Form.find("input[name=timeTo]").val();
+
+            var timeFromMinutes = Number(timeFrom.substring(3));
+            var timeToMinutes = Number(timeTo.substring(3));
+
+            var isTimeError = false;
+            var inputSelector;
+
+            if(timeFromMinutes % timestep > 0)
+            {
+                isTimeError = true;
+                inputSelector = "From";
+            }
+
+            if(timeToMinutes % timestep > 0)
+            {
+                isTimeError = true;
+                inputSelector = "To";
+            }
+
+            if(isTimeError == true)
+            {
+                var input = Form.find("input[name=time" + inputSelector + "]");
+
+                console.log(input);
+
+                input.addClass("error");
+                input.parent().append('<label ' +
+                    'id="time'+ inputSelector +'-error" ' +
+                    'class="error" ' +
+                    'for="time'+ inputSelector +'" ' +
+                    '>Количество минут указываемого времени занятия должно быть кратным ' + timestep + '</label>');
+
+                loaderOff();
+                return false;
+            }
 
             //Создание задачи с напоминанием
             if( $("input[name=is_create_task]").is(":checked") )
             {
+                var clientId = Form.find("select[name=clientId]").val();
+                var date = Form.find("input[name=insertDate]").val();
+
                 $.ajax({
                     type: "GET",
                     url: "",

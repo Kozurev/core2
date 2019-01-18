@@ -21,17 +21,19 @@ class Schedule_Group_Assignment extends Core_Entity
     }
 
 
-    public function groupId($val = null)
+    public function groupId( $val = null )
     {
-        if(is_null($val))   return $this->group_id;
-        $this->group_id = intval($val);
+        if( is_null( $val ) )   return $this->group_id;
+
+        $this->group_id = intval( $val );
         return $this;
     }
 
-    public function userId($val = null)
+    public function userId( $val = null )
     {
-        if(is_null($val))   return $this->user_id;
-        $this->user_id = intval($val);
+        if( is_null( $val ) )   return $this->user_id;
+
+        $this->user_id = intval( $val );
         return $this;
     }
 

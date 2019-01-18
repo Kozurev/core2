@@ -1,96 +1,100 @@
 <?php
 
-$aoMainLessons =    Core::factory("Schedule_Lesson");
 
-$userId =   Core_Array::getValue($_GET, "userid", null);
-if(is_null($userId))    $oUser = Core::factory("User")->getCurrent();
-else                    $oUser = Core::factory("User", $userId);
-$userId = $oUser->getId();
+$userId = Core_Array::Get( "userid", null );
+
+is_null( $userId )
+    ?   $User = User::current()
+    :   $User = Core::factory( "User", $userId );
+
+if ( $User === false )   $this->error404();
+
+$userId = $User->getId();
+
+$today = date( "Y-m-d" );
+$date = Core_Array::Get( "date", $today );
+if ( is_null( $date ) ) $date = $today;
 
 
 /**
  * Формирование таблицы расписания для менеджеров
  * Начало >>
  */
-
-if(
-    User::checkUserAccess( ["groups" => [2]], $oUser )
-    || ( User::checkUserAccess( ["groups" => [6]], $oUser ) && is_object( $this->oStructureItem ) )
+if (
+    User::checkUserAccess( ["groups" => [2]], $User )
+    || ( User::checkUserAccess( ["groups" => [6]], $User ) && is_object( Core_Page_Show::instance()->StructureItem ) )
     )
 {
-    $oArea = $this->oStructureItem;
+    $Area = Core_Page_Show::instance()->StructureItem;
+    $areaId = $Area->getId();
 
-    if( is_null( $oArea ) )     die( "Филлиала по данному пути не существует" );
-    if( $oArea->active() == 0 ) die( "Филлиал " . $oArea->title() . " не активен" );
-    $areaId = $oArea->getId();
+    $Date = new DateTime( $date );
+    $dayName = $Date->format( "l" );
 
-    $date = Core_Array::getValue($_GET, "date", null);
-    $today = date("Y-m-d");
-    if (is_null($date)) $date = $today;
-
-    $dayName = new DateTime($date);
-    $dayName = $dayName->format("l");
-
-    $aoMainLessons
+    $Lessons = Core::factory( "Schedule_Lesson" )
+        ->queryBuilder()
         ->open()
-        ->where("delete_date", ">", $date)
-        ->where("delete_date", "IS", Core::unchanged("NULL"), "or")
+            ->where( "delete_date", ">", $date )
+            ->where( "delete_date", "IS", Core::unchanged("NULL"), "or" )
         ->close()
-        ->where("area_id", "=", $areaId)
-        ->orderBy("time_from");
+        ->where( "area_id", "=", $areaId )
+        ->orderBy( "time_from" );
 
-    if( $oUser->groupId() == 4 )
+    if ( $User->groupId() == 4 )
     {
-        $aoMainLessons->where( "teacher_id", "=", $oUser->getId() );
+        $Lessons->where( "teacher_id", "=", $User->getId() );
     }
 
-    $aoCurrentLessons = clone $aoMainLessons;
-    $aoCurrentLessons
+
+    $CurrentLessons = clone $Lessons;
+    $CurrentLessons
         ->where( "insert_date", "=", $date )
         ->where( "lesson_type", "=", "2" );
 
-    $aoMainLessons
-        ->where("insert_date", "<=", $date)
-        ->where("day_name", "=", $dayName)
+    $Lessons
+        ->where( "insert_date", "<=", $date )
+        ->where( "day_name", "=", $dayName )
         ->where( "lesson_type", "=", "1" );
 
-    $aoCurrentLessons = $aoCurrentLessons->findAll();
-    $aoMainLessons = $aoMainLessons->findAll();
+    $Lessons = $Lessons->findAll();
+    $CurrentLessons = $CurrentLessons->findAll();
 
 
-    foreach ($aoMainLessons as $oMainLesson)
+    foreach ( $Lessons as $key => $Lesson )
     {
-        if ($oMainLesson->isAbsent($date)) continue;
+        if ( $Lesson->isAbsent( $date ) )    continue;
 
         /**
          * Если у занятия изменено время на текущую дату то необходимо добавить
          * его в список занятий текущего расписания
          */
-        if ($oMainLesson != false && $oMainLesson->isTimeModified($date)) {
-            $oModify = Core::factory("Schedule_Lesson_TimeModified")
-                ->where("lesson_id", "=", $oMainLesson->getId())
-                ->where("date", "=", $date)
+        if ( $Lesson->isTimeModified( $date ) )
+        {
+            $Modify = Core::factory( "Schedule_Lesson_TimeModified" )
+                ->queryBuilder()
+                ->where( "lesson_id", "=", $Lesson->getId() )
+                ->where( "date", "=", $date )
                 ->find();
 
-            $oNewCurrentLesson = Core::factory("Schedule_Lesson")
-                ->timeFrom($oModify->timeFrom())
-                ->timeTo($oModify->timeTo())
-                ->classId($oMainLesson->classId())
-                ->areaId($oMainLesson->areaId())
-                ->teacherId($oMainLesson->teacherId())
-                ->clientId($oMainLesson->clientId())
-                ->lessonType($oMainLesson->lessonType())
-                ->typeId($oMainLesson->typeId());
-            $oNewCurrentLesson->oldid = $oMainLesson->getId();
+            $NewCurrentLesson = Core::factory( "Schedule_Lesson" )
+                ->timeFrom( $Modify->timeFrom() )
+                ->timeTo( $Modify->timeTo() )
+                ->classId( $Lesson->classId() )
+                ->areaId( $Lesson->areaId() )
+                ->teacherId( $Lesson->teacherId() )
+                ->clientId( $Lesson->clientId() )
+                ->lessonType( $Lesson->lessonType() )
+                ->typeId( $Lesson->typeId() );
+            $NewCurrentLesson->oldid = $Lesson->getId();
 
-            $oNewCurrentLesson->oldid = $oMainLesson->getId();
-            $aoCurrentLessons[] = $oNewCurrentLesson;
-        } else {
-            $aoCurrentLessons[] = $oMainLesson;
+            $CurrentLessons[] = $NewCurrentLesson;
+        }
+        else
+        {
+            $CurrentLessons[] = $Lesson;
         }
     }
 
-    $aoTeacherLessons = $aoCurrentLessons;
 
     echo "<div class='table-responsive'><table class='table table-bordered manager_table'>";
 
@@ -99,36 +103,32 @@ if(
      * Начало >>
      */
     echo "<tr>";
-    for ($i = 1; $i <= $oArea->countClassess(); $i++) {
+    for ( $i = 1; $i <= $Area->countClassess(); $i++ )
+    {
         echo "<th colspan='3'>КЛАСС $i</th>";
     }
     echo "</tr>";
 
     echo "<tr>";
-    for ($i = 1; $i <= $oArea->countClassess(); $i++) {
+    for ( $i = 1; $i <= $Area->countClassess(); $i++ )
+    {
         echo "<th>Время</th>";
-        echo "<th";
-        if (User::checkUserAccess(array("groups" => array(1, 2, 6)), $oUser))
-            echo " class='add_lesson' ";
-        echo "
-        title='Добавить занятие в основной график'
-        data-schedule_type='1'
-        data-class_id='" . $i . "'
-        data-date='" . $date . "'
-        data-area_id='" . $areaId . "'
-        data-dayName='" . $dayName . "'
-        >Основной график</th>";
-        echo "<th";
-        if (User::checkUserAccess(array("groups" => array(1, 2, 6)), $oUser))
-            echo " class='add_lesson' ";
-        echo "
-        title='Добавить занятие в актуальный график'
-        data-schedule_type='2'
-        data-class_id='" . $i . "'
-        data-date='" . $date . "'
-        data-area_id='" . $areaId . "'
-        data-dayName='" . $dayName . "'
-    >Актуальный график</th>";
+        echo "<th class='add_lesson' 
+            title='Добавить занятие в основной график'
+            data-schedule_type='1'
+            data-class_id='" . $i . "'
+            data-date='" . $date . "'
+            data-area_id='" . $areaId . "'
+            data-dayName='" . $dayName . "'
+            >Основной график</th>";
+        echo "<th class='add_lesson' 
+            title='Добавить занятие в актуальный график'
+            data-schedule_type='2'
+            data-class_id='" . $i . "'
+            data-date='" . $date . "'
+            data-area_id='" . $areaId . "'
+            data-dayName='" . $dayName . "'
+            >Актуальный график</th>";
     }
     echo "</tr>";
     /**
@@ -142,104 +142,131 @@ if(
      */
     $timeStart = "09:00:00";    //Начальная отметка временного промежутка
     $timeEnd = "22:00:00";      //Конечная отметка временного промежутка
-    $period = "00:15:00";       //Временной промежуток (временное значение одной ячейки)
-    if (defined("SCHEDULE_DELIMITER") != "") $period = SCHEDULE_DELIMITER;
+
+    //Временной промежуток (временное значение одной ячейки)
+    defined( "SCHEDULE_DELIMITER" )
+        ?   $period = SCHEDULE_DELIMITER
+        :   $period = "00:15:00";
+
     $time = $timeStart;
-    $maxLessonTime = array();
+    $maxLessonTime = [];
 
-    $LessonDate = new DateTime($date);
-    $CurrentDate = new DateTime($today);
-    $lessonTime = $LessonDate->format("U");
-    $currentTime = $CurrentDate->format("U");
+    $LessonDate = new DateTime( $date );
+    $CurrentDate = new DateTime( $today );
+    $lessonTime = $LessonDate->format( "U" );
+    $currentTime = $CurrentDate->format( "U" );
 
 
-    for ($i = 0; $i <= 1; $i++) {
-        for ($class = 1; $class <= $oArea->countClassess(); $class++) {
+    for ( $i = 0; $i <= 1; $i++ )
+    {
+        for ( $class = 1; $class <= $Area->countClassess(); $class++ )
+        {
             $maxLessonTime[$i][$class] = "00:00:00";
         }
     }
+
 
     /**
      * Формирование таблицы расписания
      * Начало >>
      */
-    while (!compareTime($time, ">=", addTime($timeEnd, $period))) {
+    while ( !compareTime( $time, ">=", addTime( $timeEnd, $period ) ) )
+    {
         echo "<tr>";
 
-        for ($class = 1; $class <= $oArea->countClassess(); $class++) {
-            if (!compareTime($time, ">=", $maxLessonTime[0][$class]) && !compareTime($time, ">=", $maxLessonTime[1][$class])) {
-                echo "<th>" . refactorTimeFormat($time) . "</th>";
+        for ( $class = 1; $class <= $Area->countClassess(); $class++ )
+        {
+            if ( !compareTime( $time, ">=", $maxLessonTime[0][$class] ) && !compareTime( $time, ">=", $maxLessonTime[1][$class] ) )
+            {
+                echo "<th>" . refactorTimeFormat( $time ) . "</th>";
                 continue;
             }
+
 
             /**
              * Основное расписание
              * Начало >>
              */
-            if (!compareTime($time, ">=", $maxLessonTime[0][$class])) {
-                echo "<th>" . refactorTimeFormat($time) . "</th>";
-            } else {
+            if ( !compareTime( $time, ">=", $maxLessonTime[0][$class] ) )
+            {
+                echo "<th>" . refactorTimeFormat( $time ) . "</th>";
+            }
+            else
+            {
                 //Урок из основного расписания
-                $oMainLesson = array_pop_lesson($aoMainLessons, $time, $class);
+                $MainLesson = array_pop_lesson( $Lessons, $time, $class );
 
-
-                if ($oMainLesson == false) {
-                    echo "<th>" . refactorTimeFormat($time) . "</th>";
+                if ( $MainLesson === false )
+                {
+                    echo "<th>" . refactorTimeFormat( $time ) . "</th>";
                     echo "<td class='clear'></td>";
-                } else {
-                    $minutes = deductTime($oMainLesson->timeTo(), $time);
-                    $rowspan = divTime($minutes, $period, "/");
-                    if (divTime($minutes, $period, "%")) $rowspan++;
+                }
+                else
+                {
+                    $minutes = deductTime( $MainLesson->timeTo(), $time );
+                    $rowspan = divTime( $minutes, $period, "/" );
+                    if ( divTime( $minutes, $period, "%" ) ) $rowspan++;
 
                     $tmpTime = $time;
-                    for ($i = 0; $i < $rowspan; $i++) {
-                        $tmpTime = addTime($tmpTime, $period);
+
+                    for ( $i = 0; $i < $rowspan; $i++ )
+                    {
+                        $tmpTime = addTime( $tmpTime, $period );
                     }
+
                     $maxLessonTime[0][$class] = $tmpTime;
+
 
                     /**
                      * Проверка периода отсутствия
                      * false - период отсутствия не найден
                      * true - период отсутсвия найден
                      */
-                    if ($oMainLesson != false) {
+                    if ( $MainLesson !== false )
+                    {
                         $checkClientAbsent = Core::factory("Schedule_Absent")
-                            ->where("client_id", "=", $oMainLesson->clientId())
+                            ->queryBuilder()
+                            ->where("client_id", "=", $MainLesson->clientId())
                             ->where("date_from", "<=", $date)
                             ->where("date_to", ">=", $date)
-                            ->where("type_id", "=", $oMainLesson->typeId())
+                            ->where("type_id", "=", $MainLesson->typeId())
                             ->find();
                     }
+
 
                     /**
                      * Получение информации об уроке (учитель, клиент, цвет фона)
                      * и формирование HTML-кода
                      */
-                    $aMainLessonData = getLessonData($oMainLesson);
+                    $MainLessonData = getLessonData( $MainLesson );
 
-                    echo "<th>" . refactorTimeFormat($time) . "</th>";
-                    echo "<td class='" . $aMainLessonData["client_status"] . "' rowspan='" . $rowspan . "'>";
+                    echo "<th>" . refactorTimeFormat( $time ) . "</th>";
+                    echo "<td class='" . $MainLessonData["client_status"] . "' rowspan='" . $rowspan . "'>";
 
-                    if ($checkClientAbsent == true) {
-                        echo "<span><b>Отсутствует <br> с " . refactorDateFormat($checkClientAbsent->dateFrom(), ".", "short") . "
-                    по " . refactorDateFormat($checkClientAbsent->dateTo(), ".", "short") . "</b></span><hr>";
-                    } elseif ($oMainLesson->isAbsent($date)) {
+                    if ( $checkClientAbsent == true )
+                    {
+                        echo "<span><b>Отсутствует <br> с " . refactorDateFormat( $checkClientAbsent->dateFrom(), ".", "short" ) . "
+                                по " . refactorDateFormat( $checkClientAbsent->dateTo(), ".", "short" ) . "</b></span><hr>";
+                    }
+                    elseif ( $MainLesson->isAbsent( $date ) )
+                    {
                         echo "<span><b>Отсутствует сегодня</b></span><hr>";
                     }
 
-                    echo "<span class='client'>" . $aMainLessonData["client"] . "</span><hr><span class='teacher'>преп. " . $aMainLessonData["teacher"] . "</span>";
+                    echo "<span class='client'>" . $MainLessonData["client"] . "</span><hr><span class='teacher'>преп. " . $MainLessonData["teacher"] . "</span>";
 
-                    if (User::checkUserAccess(array("groups" => array(1, 2, 6)), $oUser) && $lessonTime >= $currentTime) {
+                    if ( $lessonTime >= $currentTime )
+                    {
                         echo "<ul class=\"submenu\">
                         <li>
                             <a href=\"#\"></a>
                             <ul class=\"dropdown\"";
-                        echo "data-clientid='" . $oMainLesson->clientId() . "' data-typeid='" . $oMainLesson->typeId() . "'";
-                        echo " data-lessonid='" . $oMainLesson->getId() . "'>";
+                        echo "data-clientid='" . $MainLesson->clientId() . "' data-typeid='" . $MainLesson->typeId() . "'";
+                        echo " data-lessonid='" . $MainLesson->getId() . "'>";
                         echo "<li><a href=\"#\" class='schedule_absent'>Временно отсутствует</a></li>";
                         echo "
                                 <li>
-                                    <a href=\"#\" class='schedule_delete_main' data-date='" . $date . "' data-id='" . $oMainLesson->getId() . "'>
+                                    <a href=\"#\" class='schedule_delete_main' data-date='" . $date . "' data-id='" . $MainLesson->getId() . "'>
                                         Удалить из основного графика
                                     </a>
                                 </li>
@@ -260,37 +287,43 @@ if(
              * Текущее расписание
              * Начало >>
              */
-            if (compareTime($time, ">=", $maxLessonTime[1][$class])) {
+            if ( compareTime( $time, ">=", $maxLessonTime[1][$class] ) )
+            {
                 //Урок из текущего расписания
-                $oCurrentLesson = array_pop_lesson($aoCurrentLessons, $time, $class);
+                $CurrentLesson = array_pop_lesson( $CurrentLessons, $time, $class );
 
                 /**
                  * Текущий урок
                  */
-                if ($oCurrentLesson != false) {
+                if ( $CurrentLesson !== false )
+                {
                     // Поиск высоты ячейки (значение тэга rowspan) и обновление $maxLessonTime
-                    $rowspan = updateLastLessonTime($oCurrentLesson, $maxLessonTime[1][$class], $time, $period);
+                    $rowspan = updateLastLessonTime( $CurrentLesson, $maxLessonTime[1][$class], $time, $period );
+
 
                     /**
                      * Получение информации об текущем уроке (учитель, клиент, цвет фона)
                      * и формирование HTML-кода
                      */
-                    $aCurrentLessonData = getLessonData($oCurrentLesson);
+                    $CurrentLessonData = getLessonData( $CurrentLesson );
 
-                    echo "<td class='" . $aCurrentLessonData["client_status"] . "' rowspan='" . $rowspan . "'>";
-                    if (isset($oCurrentLesson->oldid)) echo "<span><b>Временно</b></span><hr>";
-                    echo "<span class='client'>" . $aCurrentLessonData["client"] . "</span><hr><span class='teacher'>преп. " . $aCurrentLessonData["teacher"] . "</span>";
+                    echo "<td class='" . $CurrentLessonData["client_status"] . "' rowspan='" . $rowspan . "'>";
+                    if ( isset( $CurrentLesson->oldid ) ) echo "<span><b>Временно</b></span><hr>";
+                    echo "<span class='client'>" . $CurrentLessonData["client"] . "</span><hr><span class='teacher'>преп. " . $CurrentLessonData["teacher"] . "</span>";
 
-                    if (User::checkUserAccess(array("groups" => array(1, 2, 6)), $oUser) && !$oCurrentLesson->isReported($date)) {
+                    if ( !$CurrentLesson->isReported( $date ) )
+                    {
                         echo "<ul class=\"submenu\">
                         <li>
                             <a href=\"#\"></a>
-                            <ul class=\"dropdown\" data-userid='" . $oUser->getId() . "' data-date='" . $date . "' ";
+                            <ul class=\"dropdown\" data-userid='" . $User->getId() . "' data-date='" . $date . "' ";
 
-                        if (isset($oCurrentLesson->oldid)) echo "data-id='" . $oCurrentLesson->oldid;
-                        else                                echo "data-id='" . $oCurrentLesson->getId();
+                        isset( $CurrentLesson->oldid )
+                            ?   $dataId = $CurrentLesson->oldid
+                            :   $dataId = $CurrentLesson->getId();
 
-                        echo "' data-type='" . $oCurrentLesson->lessonType() . "'>";
+                        echo "data-id='" . $dataId . "' ";
+                        echo "data-type='" . $CurrentLesson->lessonType() . "'>";
                         echo "
                                 <li><a href=\"#\" class='schedule_today_absent'>Отсутствует сегодня</a></li>
                                 <li><a href=\"#\" class='schedule_update_time'>Изменить на сегодня время</a></li>
@@ -299,10 +332,12 @@ if(
                     </ul>";
                         echo "</td>";
                     }
-                } /**
+                }
+                /**
                  * Занятие отсутствует
                  */
-                else {
+                else
+                {
                     echo "<td class='clear'></td>";
                 }
             }
@@ -311,14 +346,15 @@ if(
              * Текущее расписание
              */
 
-            $oCurrentLesson = false;
-            $oMainLesson = false;
+            $CurrentLesson = false;
+            $MainLesson = false;
             $rowspan = 0;
             $checkClientAbsent = false;
         }
 
-        $time = addTime($time, $period);
         echo "</tr>";
+
+        $time = addTime( $time, $period );
     }
 
 
@@ -327,35 +363,31 @@ if(
      * Начало >>
      */
     echo "<tr>";
-    for ($i = 1; $i <= $oArea->countClassess(); $i++) {
+    for ( $i = 1; $i <= $Area->countClassess(); $i++ )
+    {
         echo "<th>Время</th>";
-        echo "<th";
-        if (User::checkUserAccess(array("groups" => array(1, 2, 6)), $oUser))
-            echo " class='add_lesson' ";
-        echo "
-        title='Добавить занятие в основной график'
-        data-schedule_type='1'
-        data-class_id='" . $i . "'
-        data-date='" . $date . "'
-        data-area_id='" . $areaId . "'
-        data-dayName='" . $dayName . "'
-        >Основной график</th>";
-        echo "<th";
-        if (User::checkUserAccess(array("groups" => array(1, 2, 6)), $oUser))
-            echo " class='add_lesson' ";
-        echo "
-        title='Добавить занятие в актуальный график'
-        data-schedule_type='2'
-        data-class_id='" . $i . "'
-        data-date='" . $date . "'
-        data-area_id='" . $areaId . "'
-        data-dayName='" . $dayName . "'
-    >Актуальный график</th>";
+        echo "<th class='add_lesson' 
+            title='Добавить занятие в основной график'
+            data-schedule_type='1'
+            data-class_id='" . $i . "'
+            data-date='" . $date . "'
+            data-area_id='" . $areaId . "'
+            data-dayName='" . $dayName . "'
+            >Основной график</th>";
+        echo "<th class='add_lesson' 
+            title='Добавить занятие в актуальный график'
+            data-schedule_type='2'
+            data-class_id='" . $i . "'
+            data-date='" . $date . "'
+            data-area_id='" . $areaId . "'
+            data-dayName='" . $dayName . "'
+        >Актуальный график</th>";
     }
     echo "</tr>";
 
     echo "<tr>";
-    for ($i = 1; $i <= $oArea->countClassess(); $i++) {
+    for ( $i = 1; $i <= $Area->countClassess(); $i++ )
+    {
         echo "<th colspan='3'>КЛАСС $i</th>";
     }
     echo "</tr>";
@@ -376,50 +408,52 @@ if(
  * Формирование таблицы расписания для клиентов/преподавателей
  * Начало>>
  */
-if( $oUser->groupId() == 4 )
+if( $User->groupId() == 4 )
 {
-    $userId = $oUser->getId();
-    $getDate = Core_Array::getValue( $_GET, "date", date("Y-m-d") );
-    $month = getMonth( $getDate );
+    //$userId = $oUser->getId();
+    //$getDate = Core_Array::getValue( $_GET, "date", date("Y-m-d") );
+    //$month = getMonth( $getDate );
+
+    $month = getMonth( $date );
     if( intval( $month ) < 10 ) $month = "0" . $month;
-    $year = getYear( $getDate );
+    $year = getYear( $date );
 
     Core::factory( "Schedule_Controller" )
         ->userId( $userId )
         ->setCalendarPeriod( $month, $year )
         ->printCalendar();
 
-    $aoTeacherLessons = Core::factory( "Schedule_Controller" )
+    $TeacherLessons = Core::factory( "Schedule_Controller" )
         ->userId( $userId )
         ->unsetPeriod()
-        ->setDate( $getDate )
+        ->setDate( $date )
         ->getLessons();
 
     /**
      * Формирование таблицы с отметками о явке/неявке>>
      */
-    sortByTime($aoTeacherLessons, "timeFrom");
+    sortByTime( $TeacherLessons, "timeFrom" );
 
-    foreach ($aoTeacherLessons as $key => $lesson)
+    foreach ( $TeacherLessons as $key => $Lesson )
     {
-        $lesson->timeFrom(refactorTimeFormat($lesson->timeFrom()));
-        $lesson->timeTo(refactorTimeFormat($lesson->timeTo()));
-        $lesson->addEntity($lesson->getClient(), "client");
-        $lesson->addSimpleEntity("lesson_type", $lesson->lessonType());
+        $Lesson->timeFrom( refactorTimeFormat( $Lesson->timeFrom() ) );
+        $Lesson->timeTo( refactorTimeFormat( $Lesson->timeTo() ) );
+        $Lesson->addEntity( $Lesson->getClient(), "client" );
+        $Lesson->addSimpleEntity( "lesson_type", $Lesson->lessonType() );
 
-        $oReported = $lesson->isReported( $getDate );
+        $Reported = $Lesson->isReported( $date );
 
-        if($oReported != false)
+        if( $Reported !== false)
         {
-            $lesson->addEntity($oReported, "report");
+            $Lesson->addEntity( $Reported, "report" );
         }
     }
 
     $output = Core::factory( "Core_Entity" )
-        ->addSimpleEntity( "date", refactorDateFormat( $getDate ) )
-        ->addSimpleEntity( "real_date", $getDate )
-        ->addEntity( $oUser )
-        ->addEntities( $aoTeacherLessons, "lesson" );
+        ->addSimpleEntity( "date", refactorDateFormat( $date ) )
+        ->addSimpleEntity( "real_date", $date )
+        ->addEntity( $User )
+        ->addEntities( $TeacherLessons, "lesson" );
 
 
     User::checkUserAccess( ["groups" => [1, 6]], User::parentAuth() )
@@ -431,45 +465,48 @@ if( $oUser->groupId() == 4 )
         ->xsl( "musadm/schedule/teacher_table.xsl" )
         ->show();
 
-    $dateFrom = substr( $getDate, 0, 8 ) . "01";
-    $currentMonth = intval( substr( $getDate, 5, 2 ) );
-    $currentYear = intval( substr( $getDate, 0, 4 ) );
+    $dateFrom = substr( $date, 0, 8 ) . "01";
+    $currentMonth = intval( substr( $date, 5, 2 ) );
+    $currentYear = intval( substr( $date, 0, 4 ) );
     $countDays = cal_days_in_month( CAL_GREGORIAN, $currentMonth, $currentYear );
 
-    if( $currentMonth < 10 )    $currentMonth = "0" . $currentMonth;
+    if ( $currentMonth < 10 )   $currentMonth = "0" . $currentMonth;
 
     $dateTo = $currentYear . "-" . $currentMonth . "-" . $countDays;
 
-    $aoTeacherReports = Core::factory("Schedule_Lesson_Report")
-        ->where( "teacher_id", "=", $oUser->getId() )
+    $TeacherReports = Core::factory( "Schedule_Lesson_Report" );
+    $TeacherReports->queryBuilder()
+        ->where( "teacher_id", "=", $User->getId() )
         ->where( "date", ">=", $dateFrom )
         ->where( "date", "<=", $dateTo );
 
-    $totalCount = clone $aoTeacherReports;
-    $totalCount = $totalCount->where( "type_id", "<>", "3" )->getCount();
-
-    $attendenceIndivCount = clone $aoTeacherReports;
-    $attendenceIndivCount = $attendenceIndivCount
-        ->where("type_id", "=", 1)
-        ->where("attendance", "=", "1")
+    $totalCount = clone $TeacherReports;
+    $totalCount = $totalCount->queryBuilder()
+        ->where( "type_id", "<>", "3" )
         ->getCount();
 
-    $disAttendenceIndivCount = clone $aoTeacherReports;
-    $disAttendenceIndivCount = $disAttendenceIndivCount
-        ->where("type_id", "=", 1)
-        ->where("attendance", "=", "0")
+    $attendenceIndivCount = clone $TeacherReports;
+    $attendenceIndivCount = $attendenceIndivCount->queryBuilder()
+        ->where( "type_id", "=", 1 )
+        ->where( "attendance", "=", 1 )
         ->getCount();
 
-    $attendenceGroupCount = clone $aoTeacherReports;
-    $attendenceGroupCount = $attendenceGroupCount
-        ->where("type_id", "=", 2)
-        ->where("attendance", "=", "1")
+    $disAttendenceIndivCount = clone $TeacherReports;
+    $disAttendenceIndivCount = $disAttendenceIndivCount->queryBuilder()
+        ->where( "type_id", "=", 1 )
+        ->where( "attendance", "=", 0 )
         ->getCount();
 
-    $disAttendenceGroupCount = clone $aoTeacherReports;
-    $disAttendenceGroupCount = $disAttendenceGroupCount
-        ->where("type_id", "=", 2)
-        ->where("attendance", "=", "0")
+    $attendenceGroupCount = clone $TeacherReports;
+    $attendenceGroupCount = $attendenceGroupCount->queryBuilder()
+        ->where( "type_id", "=", 2 )
+        ->where( "attendance", "=", "1" )
+        ->getCount();
+
+    $disAttendenceGroupCount = clone $TeacherReports;
+    $disAttendenceGroupCount = $disAttendenceGroupCount->queryBuilder()
+        ->where( "type_id", "=", 2 )
+        ->where( "attendance", "=", 0 )
         ->getCount();
 
     echo "<div class='teacher_footer'>
@@ -483,40 +520,37 @@ if( $oUser->groupId() == 4 )
      * Подсчет сумм необходимых выплат преподавателю и того что уже выплачено
      * за текущий период (месяц)
      */
-//    if( User::checkUserAccess( ["groups" => [1, 6]], User::parentAuth() ) )
-//    {
-        $totalPayedSql = Core::factory( "Orm" )
-            ->select( "sum(value) AS payed" )
-            ->from( "Payment" )
-            ->where( "user", "=", $oUser->getId() )
-            ->where( "type", "=", 3 )
-            ->where( "datetime", ">=", $dateFrom )
-            ->where( "datetime", "<=", $dateTo )
-            ->getQueryString();
+    $totalPayedSql = Core::factory( "Orm" )
+        ->select( "sum(value) AS payed" )
+        ->from( "Payment" )
+        ->where( "user", "=", $User->getId() )
+        ->where( "type", "=", 3 )
+        ->where( "datetime", ">=", $dateFrom )
+        ->where( "datetime", "<=", $dateTo )
+        ->getQueryString();
 
-        $totalHaveToPaySql = Core::factory( "Orm" )
-            ->select( "sum(teacher_rate) AS total" )
-            ->from( "Schedule_Lesson_Report" )
-            ->where( "teacher_id", "=", $oUser->getId() )
-            ->where( "date", ">=", $dateFrom )
-            ->where( "date", "<=", $dateTo )
-            ->getQueryString();
+    $totalHaveToPaySql = Core::factory( "Orm" )
+        ->select( "sum(teacher_rate) AS total" )
+        ->from( "Schedule_Lesson_Report" )
+        ->where( "teacher_id", "=", $User->getId() )
+        ->where( "date", ">=", $dateFrom )
+        ->where( "date", "<=", $dateTo )
+        ->getQueryString();
 
-        $totalPayed = Core::factory( "Orm" )
-            ->executeQuery( $totalPayedSql )
-            ->fetch();
+    $totalPayed = Core::factory( "Orm" )
+        ->executeQuery( $totalPayedSql )
+        ->fetch();
 
-        $totalHaveToPay = Core::factory( "Orm" )
-            ->executeQuery( $totalHaveToPaySql )
-            ->fetch();
+    $totalHaveToPay = Core::factory( "Orm" )
+        ->executeQuery( $totalHaveToPaySql )
+        ->fetch();
 
-        $totalPayed = (int)Core_Array::getValue( $totalPayed, "payed", 0 );
-        $totalHaveToPay = (int)Core_Array::getValue( $totalHaveToPay, "total", 0 );
+    $totalPayed = Core_Array::getValue( $totalPayed, "payed", 0 );
+    $totalHaveToPay = Core_Array::getValue( $totalHaveToPay, "total", 0 );
 
-        echo "<div class='teacher_footer'>
-                За текущий месяц к выплате / уже выплачено: $totalHaveToPay / $totalPayed <br>
-            </div>";
-//    }
+    echo "<div class='teacher_footer'>
+            За текущий месяц к выплате / уже выплачено: <span id='teacherHaveToPay'>$totalHaveToPay</span> / <span id='teacherPayed'>$totalPayed</span><br>
+        </div>";
     /**
      * <<Формирование таблицы с отметками о явке/неявке
      */
@@ -526,30 +560,30 @@ if( $oUser->groupId() == 4 )
     /**
      * Формирование таблицы с выплатами>>
      */
-    $aoPayments = Core::factory("Payment")
+    $Payments = Core::factory( "Payment" )->queryBuilder()
         ->where( "type", "=", 3 )
-        ->where( "user", "=", $oUser->getId() )
+        ->where( "user", "=", $User->getId() )
         ->orderBy( "datetime", "DESC" )
         ->orderBy( "id", "DESC" )
         ->findAll();
 
-    $aoMonthesPayments = array();
+    $MonthesPayments = [];
     $prevMonth = 0;
     $index = 0;
 
-    foreach ($aoPayments as $payment)
+    foreach ( $Payments as $Payment )
     {
-        if( getMonth( $payment->datetime() ) != $prevMonth )
+        if ( getMonth( $Payment->datetime() ) != $prevMonth )
         {
-            $monthName = getMonthName( $payment->datetime() ) . " " . getYear( $payment->datetime() );
+            $monthName = getMonthName( $Payment->datetime() ) . " " . getYear( $Payment->datetime() );
             $index++;
-            $prevMonth = getMonth( $payment->datetime() );
-            $aoMonthesPayments[$index] = Core::factory("Core_Entity")->name("month");
-            $aoMonthesPayments[$index]->addSimpleEntity("month_name", $monthName);
+            $prevMonth = getMonth( $Payment->datetime() );
+            $MonthesPayments[$index] = Core::factory( "Core_Entity" )->_entityName( "month" );
+            $MonthesPayments[$index]->addSimpleEntity( "month_name", $monthName );
         }
 
-        $payment->datetime( date( "d.m.Y", strtotime( $payment->datetime() ) ) );
-        $aoMonthesPayments[$index]->addEntity($payment);
+        $Payment->datetime( date( "d.m.Y", strtotime( $Payment->datetime() ) ) );
+        $MonthesPayments[$index]->addEntity( $Payment );
     }
 
     //Проверка на авторизованность под видом текущего пользователя
@@ -560,8 +594,8 @@ if( $oUser->groupId() == 4 )
 
 
     Core::factory( "Core_Entity" )
-        ->addEntities( $aoMonthesPayments )
-        ->addSimpleEntity( "userid", $oUser->getId() )
+        ->addEntities( $MonthesPayments )
+        ->addSimpleEntity( "userid", $User->getId() )
         ->addSimpleEntity( "is_admin", $isAdmin )
         ->addSimpleEntity( "is_director", $isDirector )
         ->addSimpleEntity( "date", date("Y-m-d") )
@@ -574,11 +608,12 @@ if( $oUser->groupId() == 4 )
 
     /**
      * Таблица с настройками тарифов преподавателя>>
-     */;
+     */
     if( User::checkUserAccess( ["groups" => [1, 6]], User::parentAuth() ) )
     {
         //Общие значения
         $Director = User::current()->getDirector();
+
         $TeacherRateDefaultIndiv = Core::factory( "Property" )->getByTagName( "teacher_rate_indiv_default" );
         $TeacherRateDefaultGroup = Core::factory( "Property" )->getByTagName( "teacher_rate_group_default" );
         $TeacherRateDefaultConsult = Core::factory( "Property" )->getByTagName( "teacher_rate_consult_default" );
@@ -595,10 +630,10 @@ if( $oUser->groupId() == 4 )
         $IsTeacherRateDefaultConsult = Core::factory( "Property" )->getByTagName( "is_teacher_rate_default_consult" );
         $IsTeacherRateDefaultAbsent = Core::factory( "Property" )->getByTagName( "is_teacher_rate_default_absent" );
 
-        $isTeacherRateDefIndivValue = $IsTeacherRateDefaultIndiv->getPropertyValues( $oUser )[0]->value();
-        $isTeacherRateDefGroupValue = $IsTeacherRateDefaultGroup->getPropertyValues( $oUser )[0]->value();
-        $isTeacherRateDefConsultValue = $IsTeacherRateDefaultConsult->getPropertyValues( $oUser )[0]->value();
-        $isTeacherRateDefAbsentValue = $IsTeacherRateDefaultAbsent->getPropertyValues( $oUser )[0]->value();
+        $isTeacherRateDefIndivValue = $IsTeacherRateDefaultIndiv->getPropertyValues( $User )[0]->value();
+        $isTeacherRateDefGroupValue = $IsTeacherRateDefaultGroup->getPropertyValues( $User )[0]->value();
+        $isTeacherRateDefConsultValue = $IsTeacherRateDefaultConsult->getPropertyValues( $User )[0]->value();
+        $isTeacherRateDefAbsentValue = $IsTeacherRateDefaultAbsent->getPropertyValues( $User )[0]->value();
 
         //Значения индивидуальных тарифов преподавателя
         $TeacherRateIndiv = Core::factory( "Property" )->getByTagName( "teacher_rate_indiv" );
@@ -606,17 +641,17 @@ if( $oUser->groupId() == 4 )
         $TeacherRateConsult = Core::factory( "Property" )->getByTagName( "teacher_rate_consult" );
         $TeacherRateAbsent = Core::factory( "Property" )->getByTagName( "teacher_rate_absent" );
 
-        $teacherRateIndivValue = $TeacherRateIndiv->getPropertyValues( $oUser )[0]->value();
-        $teacherRateGroupValue = $TeacherRateGroup->getPropertyValues( $oUser )[0]->value();
-        $teacherRateConsultValue = $TeacherRateConsult->getPropertyValues( $oUser )[0]->value();
-        $teacherRateAbsentValue = $TeacherRateAbsent->getPropertyValues( $oUser )[0]->value();
+        $teacherRateIndivValue = $TeacherRateIndiv->getPropertyValues( $User )[0]->value();
+        $teacherRateGroupValue = $TeacherRateGroup->getPropertyValues( $User )[0]->value();
+        $teacherRateConsultValue = $TeacherRateConsult->getPropertyValues( $User )[0]->value();
+        $teacherRateAbsentValue = $TeacherRateAbsent->getPropertyValues( $User )[0]->value();
 
 
         $AbsentRateType = Core::factory( "Property" )->getByTagName( "teacher_rate_type_absent_default" );
         $absentRateType = $AbsentRateType->getPropertyValues( $Director )[0]->value();
 
         Core::factory( "Core_Entity" )
-            ->addSimpleEntity( "teacher_id", $oUser->getId() )
+            ->addSimpleEntity( "teacher_id", $User->getId() )
             ->addSimpleEntity( "is_teacher_rate_default_indiv", $isTeacherRateDefIndivValue )
             ->addSimpleEntity( "is_teacher_rate_default_gorup", $isTeacherRateDefGroupValue )
             ->addSimpleEntity( "is_teacher_rate_default_consult", $isTeacherRateDefConsultValue )
@@ -646,17 +681,17 @@ if( $oUser->groupId() == 4 )
 /**
  * Формирование списка филлиалов
  */
-if( $oUser->groupId() == 6 && !$this->oStructureItem )
+if( $User->groupId() == 6 && !Core_Page_Show::instance()->StructureItem )
 {
     global $CFG;
 
-    $aoAreas = Core::factory( "Schedule_Area" )
-        ->where( "subordinated", "=", $oUser->getId() )
+    $Areas = Core::factory( "Schedule_Area" )->queryBuilder()
+        ->where( "subordinated", "=", $User->getId() )
         ->orderBy( "sorting" )
         ->findAll();
 
     Core::factory( "Core_Entity" )
-        ->addEntities( $aoAreas )
+        ->addEntities( $Areas )
         ->addSimpleEntity( "wwwroot", $CFG->rootdir )
         ->xsl( "musadm/schedule/areas.xsl" )
         ->show();

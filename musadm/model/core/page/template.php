@@ -2,7 +2,7 @@
 /**
 *	Модель шаблона
 */
-class Page_Template extends Page_Template_Model
+class Core_Page_Template extends Core_Page_Template_Model
 {
 
     public function getParent()

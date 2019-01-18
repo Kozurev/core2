@@ -8,67 +8,59 @@
 /**
  * Блок проверки авторизации и проверки прав доступа
  */
-$oUser = Core::factory( "User" )->getCurrent();
+$User = User::current();
+$accessRules = ["groups"    => [1, 2, 6]];
 
-$accessRules = array(
-    "groups"    => array( 1, 2, 6 )
-);
-
-if( $oUser == false || !User::checkUserAccess( $accessRules, $oUser ) )
+if( !User::checkUserAccess( $accessRules, $User ) )
 {
-    $this->error404();
-    exit;
+    Core_Page_Show::instance()->error404();
 }
 
 
-$Director = User::current()->getDirector();
+$Director = $User->getDirector();
 if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
 $subordinated = $Director->getId();
 
 
 $breadcumbs[0] = new stdClass();
-$breadcumbs[0]->title = $this->oStructure->title();
+$breadcumbs[0]->title = Core_Page_Show::instance()->Structure->title();
 $breadcumbs[0]->active = 1;
 
-$this->setParam( "body-class", "body-blue" );
-$this->setParam( "title-first", "СПИСОК" );
-$this->setParam( "title-second", "ГРУПП" );
-$this->setParam( "breadcumbs", $breadcumbs );
+Core_Page_Show::instance()->setParam( "body-class", "body-blue" );
+Core_Page_Show::instance()->setParam( "title-first", "СПИСОК" );
+Core_Page_Show::instance()->setParam( "title-second", "ГРУПП" );
+Core_Page_Show::instance()->setParam( "breadcumbs", $breadcumbs );
 
 
-$action = Core_Array::getValue( $_GET, "action", null );
+$action = Core_Array::Get( "action", null );
 
 
 if( $action == "refreshGroupTable" )
 {
-    $this->execute();
-    exit;
+    Core_Page_Show::instance()->execute();
 }
 
 if( $action == "updateForm" )
 {
     $popupData =    Core::factory( "Core_Entity" );
-    $modelId =      Core_Array::getValue( $_GET, "groupid", 0 );
+    $modelId =      Core_Array::Get( "groupid", 0 );
 
-    $Director = User::current()->getDirector();
-    if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
-    $subordinated = $Director->getId();
-
-    if( $modelId != 0 )
+    if( $modelId !== 0 )
     {
-        $oGroup = Core::factory( "Schedule_Group", $modelId );
-        $oGroup->addEntity( $oGroup->getTeacher() );
-        $oGroup->addEntities( $oGroup->getClientList() );
+        $Group = Core::factory( "Schedule_Group", $modelId );
+        $Group->addEntity( $Group->getTeacher() );
+        $Group->addEntities( $Group->getClientList() );
     }
     else
     {
-        $oGroup = Core::factory( "Schedule_Group" );
+        $Group = Core::factory( "Schedule_Group" );
     }
 
-    $aoUsers = Core::factory( "User" )
+    $Users = Core::factory( "User" )
+        ->queryBuilder()
         ->open()
-        ->where( "group_id", "=", 4 )
-        ->where( "group_id", "=", 5, "or" )
+            ->where( "group_id", "=", 4 )
+            ->where( "group_id", "=", 5, "or" )
         ->close()
         ->where( "subordinated", "=", $subordinated )
         ->where( "active", "=", 1 )
@@ -76,8 +68,8 @@ if( $action == "updateForm" )
         ->findAll();
 
     $popupData
-        ->addEntity( $oGroup )
-        ->addEntities( $aoUsers )
+        ->addEntity( $Group )
+        ->addEntities( $Users )
         ->xsl( "musadm/groups/edit_group_popup.xsl" )
         ->show();
 
@@ -86,29 +78,29 @@ if( $action == "updateForm" )
 
 if( $action == "saveGroup" )
 {
-    $modelId =      Core_Array::getValue( $_GET, "id", 0 );
-    $teacherId =    Core_Array::getValue( $_GET, "teacher_id", 0 );
-    $duration =     Core_Array::getValue( $_GET, "duration", "00:00" );
-    $aClientIds =   Core_Array::getValue( $_GET, "clients", null );
-    $title =        Core_Array::getValue( $_GET, "title", null );
+    $modelId =      Core_Array::Get( "id", 0 );
+    $teacherId =    Core_Array::Get( "teacher_id", 0 );
+    $duration =     Core_Array::Get( "duration", "00:00" );
+    $ClientIds =    Core_Array::Get( "clients", null );
+    $title =        Core_Array::Get( "title", null );
 
     if( $modelId != 0 )
     {
-        $oGroup = Core::factory( "Schedule_Group", $modelId );
-        $oGroup->clearClientList();
+        $Group = Core::factory( "Schedule_Group", $modelId );
+        $Group->clearClientList();
     }
     else
     {
-        $oGroup = Core::factory( "Schedule_Group" );
+        $Group = Core::factory( "Schedule_Group" );
     }
 
-    $oGroup
+    $Group
         ->title( $title )
         ->duration( $duration )
-        ->teacherId( $teacherId );
-    $oGroup->save();
+        ->teacherId( $teacherId )
+        ->save();
 
-    if( !is_null( $aClientIds ) )
-    foreach ( $aClientIds as $clientid )  $oGroup->appendClient( $clientid );
+    if( !is_null( $ClientIds ) )
+    foreach ( $ClientIds as $clientId )  $Group->appendClient( $clientId );
     exit;
 }

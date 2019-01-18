@@ -1,36 +1,66 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 20.04.2018
- * Time: 15:05
+ * Класс платежа
+ * @author Kozurev Egor
+ * @date 20.04.2018 15:05
  */
+
 
 class Payment extends Payment_Model
 {
 
+    private $defaultUser;
+
+    public function __construct()
+    {
+        $this->defaultUser = Core::factory( "User" )->surname( "Неизвестно" );
+    }
+
+
+    /**
+     * Геттер для объекта пользователя к которому привязан платеж
+     *
+     * @return User
+     */
     public function getUser()
     {
-        $User = Core::factory("User", $this->user);
+        if ( $this->user == null || $this->user > 0 )
+        {
+            return $this->defaultUser;
+        }
 
-        if( $User != false )    return $User;
-        else    return Core::factory( "User" );
+        $User = Core::factory( "User", $this->user );
+
+        if ( $User !== false )
+        {
+            return $User;
+        }
+        else
+        {
+            return $this->defaultUser;
+        }
     }
 
-    public function save($obj = null)
+
+    public function save( $obj = null )
     {
-        Core::notify(array(&$this), "beforePaymentSave");
-        if($this->datetime == "")   $this->datetime = date("Y-m-d");
+        Core::notify( [&$this], "beforePaymentSave" );
+
+        if ( $this->datetime == "" )   $this->datetime = date( "Y-m-d" );
+
         parent::save();
-        Core::notify(array(&$this), "afterPaymentSave");
+
+        Core::notify( [&$this], "afterPaymentSave" );
     }
 
 
-    public function delete($obj = null)
+    public function delete( $obj = null )
     {
-        Core::notify(array(&$this), "beforePaymentDelete");
+        Core::notify( [&$this], "beforePaymentDelete" );
+
         parent::delete();
-        Core::notify(array(&$this), "beforePaymentDelete");
+
+        Core::notify( [&$this], "beforePaymentDelete" );
     }
 
 }

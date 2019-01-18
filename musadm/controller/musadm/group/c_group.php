@@ -6,26 +6,29 @@
  * Time: 19:46
  */
 
-$User = Core::factory( "User" )->getCurrent();
+
+$User = User::current();
 $subordinated = $User->getDirector()->getId();
 
-$aoGroups = Core::factory("Schedule_Group")
+$Groups = Core::factory( "Schedule_Group" )
+    ->queryBuilder()
     ->where( "active", "=", 1 )
     ->where( "subordinated", "=", $subordinated )
     ->findAll();
-$output = Core::factory("Core_Entity");
 
-foreach ($aoGroups as $oGroup)
+$output = Core::factory( "Core_Entity" );
+
+foreach ( $Groups as $Group )
 {
-    $oGroup->addEntity($oGroup->getTeacher());
-    $oGroup->addEntities($oGroup->getClientList());
+    $Group->addEntity( $Group->getTeacher() );
+    $Group->addEntities( $Group->getClientList() );
 }
 
 
 global $CFG;
 
 $output
-    ->addEntities( $aoGroups )
+    ->addEntities( $Groups )
     ->addSimpleEntity( "wwwroot", $CFG->rootdir )
     ->xsl( "musadm/groups/groups.xsl" )
     ->show();

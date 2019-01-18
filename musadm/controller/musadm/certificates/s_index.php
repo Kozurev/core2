@@ -10,34 +10,30 @@
 /**
  * Блок проверки авторизации и прав доступа
  */
-$oUser = Core::factory("User")->getCurrent();
+$User = User::current();
+$accessRules = [ "groups"    => [1, 2, 6] ];
 
-$accessRules = array(
-    "groups"    => array(1, 2, 6)
-);
-
-if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
+if( !User::checkUserAccess( $accessRules, $User ) )
 {
-    $this->error404();
-    exit;
+    Core_Page_Show::instance()->error404();
 }
 
 
 $breadcumbs[0] = new stdClass();
-$breadcumbs[0]->title = $this->oStructure->title();
+$breadcumbs[0]->title = Core_Page_Show::instance()->Structure->title();
 $breadcumbs[0]->active = 1;
 
-$this->setParam( "body-class", "body-pink" );
-$this->setParam( "title-first", "СПИСОК" );
-$this->setParam( "title-second", "СЕРТИФИКАТОВ" );
-$this->setParam( "breadcumbs", $breadcumbs );
+Core_Page_Show::instance()->setParam( "body-class", "body-pink" );
+Core_Page_Show::instance()->setParam( "title-first", "СПИСОК" );
+Core_Page_Show::instance()->setParam( "title-second", "СЕРТИФИКАТОВ" );
+Core_Page_Show::instance()->setParam( "breadcumbs", $breadcumbs );
 
 
 $action = Core_Array::getValue($_GET, "action", "");
 
 if( $action === "refreshCertificatesTable" )
 {
-    $this->execute();
+    Core_Page_Show::instance()->execute();
     exit;
 }
 
@@ -48,7 +44,6 @@ if( $action === "refreshCertificatesTable" )
 if( $action === "edit_popup" )
 {
     $id = Core_Array::Get( "id", 0 );
-
     $id == 0 ? $isNew = 1 : $isNew = 0;
 
     Core::factory( "Core_Entity" )
@@ -63,15 +58,17 @@ if( $action === "edit_popup" )
 }
 
 
+/**
+ * Сохранение / обновление данных сертификата
+ */
 if( $action === "saveCertificate" )
 {
-    $id =       Core_Array::getValue( $_GET, "id", 0 );
-    $sellDate = Core_Array::getValue( $_GET, "sellDate", date( "Y-m-d" ) );
-    $activeTo = Core_Array::getValue( $_GET, "activeTo", "" );
-    $number =   Core_Array::getValue( $_GET, "number", "000" );
-    $note =     Core_Array::getValue( $_GET, "note", "" );
+    $id =       Core_Array::Get( "id", 0 );
+    $sellDate = Core_Array::Get( "sellDate", date( "Y-m-d" ) );
+    $activeTo = Core_Array::Get( "activeTo", "" );
+    $number =   Core_Array::Get( "number", "000" );
+    $note =     Core_Array::Get( "note", "" );
 
-    $User = Core::factory( "User" )->getCurrent();
     $subordinated = $User->getDirector()->getId();
 
     $oCertificate = Core::factory( "Certificate", $id )
@@ -84,11 +81,6 @@ if( $action === "saveCertificate" )
 
     if( $note != "" )
     {
-//        $oCertificateNote = Core::factory( "Certificate_Note" )
-//            ->text( $note )
-//            ->certificateId( $oCertificate->getId() )
-//            ->save();
-
         $oCertificate->addNote( $note, false );
     }
 
@@ -96,17 +88,20 @@ if( $action === "saveCertificate" )
 }
 
 
+/**
+ * Сохранение комментария сертификата
+ */
 if( $action === "saveCertificateNote" )
 {
-    $note = Core_Array::getValue( $_GET, "note", "" );
-    $certId = Core_Array::getValue( $_GET, "certificate_id", 0 );
+    $note = Core_Array::Get( "note", "" );
+    $certId = Core_Array::Get( "certificate_id", 0 );
 
-//    $oCertificateNote = Core::factory( "Certificate_Note" )
-//        ->text( $note )
-//        ->certificateId( $certId )
-//        ->save();
+    $Certificate = Core::factory( "Certificate", $certId );
 
-    Core::factory( "Certificate", $certId )->addNote( $note );
+    if( $Certificate !== false )
+    {
+        $Certificate->addNote( $note );
+    }
 
     exit;
 }

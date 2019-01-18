@@ -10,35 +10,31 @@
 /**
  * Блок проверки авторизации и прав доступа
  */
-$oUser = Core::factory("User")->getCurrent();
+$User = User::current();
+$accessRules = ["groups"    => [1, 6]];
 
-$accessRules = array(
-    "groups"    => array(1, 6)
-);
-
-if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
+if( !User::checkUserAccess( $accessRules, $User ) )
 {
-    $this->error404();
-    exit;
+    Core_Page_Show::instance()->error404();
 }
 
 
 $breadcumbs[0] = new stdClass();
-$breadcumbs[0]->title = $this->oStructure->title();
+$breadcumbs[0]->title = Core_Page_Show::instance()->Structure->title();
 $breadcumbs[0]->active = 1;
 
-$this->setParam( "body-class", "body-green" );
-$this->setParam( "title-first", "ФИНАНСОВЫЕ" );
-$this->setParam( "title-second", "ОПЕРАЦИИ" );
-$this->setParam( "breadcumbs", $breadcumbs );
+Core_Page_Show::instance()->setParam( "body-class", "body-green" );
+Core_Page_Show::instance()->setParam( "title-first", "ФИНАНСОВЫЕ" );
+Core_Page_Show::instance()->setParam( "title-second", "ОПЕРАЦИИ" );
+Core_Page_Show::instance()->setParam( "breadcumbs", $breadcumbs );
 
 
 
-$action = Core_Array::getValue($_GET, "action", "");
+$action = Core_Array::Get("action", "" );
 
-if($action === "show")
+if( $action === "show" )
 {
-    $this->execute();
+    Core_Page_Show::instance()->execute();
     exit;
 }
 
@@ -46,22 +42,21 @@ if($action === "show")
 /**
  * Сохранение платежа типа "Хозрасходы"
  */
-if($action === "saveCustomPayment")
+if( $action === "saveCustomPayment" )
 {
-    $summ = Core_Array::getValue($_GET, "summ", 0);
-    $note = Core_Array::getValue($_GET, "note", "");
+    $summ = Core_Array::Get( "summ", 0 );
+    $note = Core_Array::Get( "note", "" );
 
     $note = "Хозрасходы. " . $note;
 
     Core::factory("Payment")
-        ->user(0)
-        ->type(4)
-        ->value($summ)
-        ->description($note)
+        ->user( 0 )
+        ->type( 4 )
+        ->value( $summ )
+        ->description( $note )
         ->save();
 
-    echo "0";
-    exit;
+    exit ( "0" );
 }
 
 
@@ -74,6 +69,8 @@ if( $action === "edit_tarif_popup" )
 
     if( $tarifId !== null ) $Tarif = Core::factory( "Payment_Tarif", $tarifId );
     else    $Tarif = Core::factory( "Payment_Tarif" );
+
+    if( $Tarif === false )  die( "Редактируемый тариф не найден" );
 
     Core::factory( "Core_Entity" )
         ->addEntity( $Tarif )

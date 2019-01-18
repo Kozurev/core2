@@ -194,6 +194,14 @@ $(function(){
             loaderOn();
             var id = $(this).data("id");
 
+            var totalPayed = $("#teacherPayed");
+            var totalPayedValue = Number(totalPayed.text());
+            var paymentValue = Number( $(this).parent().parent().parent().find(".value").text() );
+
+            totalPayed.text( totalPayedValue - paymentValue );
+
+            $(this).parent().parent().parent().remove();
+
             $.ajax({
                 type: "GET",
                 url: root + "/balance",
@@ -202,7 +210,7 @@ $(function(){
                     id: id
                 },
                 success: function(responce){
-                    $(".users").html(responce);
+                    //$(".page").html(responce);
                     closePopup();
                     loaderOff();
                 }

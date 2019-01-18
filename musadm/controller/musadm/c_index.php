@@ -7,20 +7,21 @@
  */
 
 global $CFG;
-$oUser = Core::factory( "User" )->getCurrent();
-$this->css("templates/template6/css/style.css");
+$User = User::current();
+$this->css( "templates/template6/css/style.css" );
 
 /**
  * Список директоров
  */
-if( User::checkUserAccess(["groups" => [1]]) )
+if( User::checkUserAccess( ["groups" => [1]], $User ) )
 {
-    $aoDirectors = Core::factory( "User")
+    $Directors = Core::factory( "User")
+        ->queryBuilder()
         ->where( "active", "=", 1 )
         ->where( "group_id", "=", 6 )
         ->findAll();
 
-    foreach ( $aoDirectors as $Director )
+    foreach ( $Directors as $Director )
     {
         $city = Core::factory( "Property", 29 )->getPropertyValues( $Director )[0];
         $organization = Core::factory( "Property", 30 )->getPropertyValues( $Director )[0];
@@ -33,7 +34,7 @@ if( User::checkUserAccess(["groups" => [1]]) )
     echo "<div class='users'>";
         Core::factory( "Core_Entity" )
             ->addSimpleEntity( "wwwroot", $CFG->rootdir )
-            ->addEntities( $aoDirectors )
+            ->addEntities( $Directors )
             ->xsl( "musadm/users/directors.xsl" )
             ->show();
     echo "</div>";
@@ -43,40 +44,45 @@ if( User::checkUserAccess(["groups" => [1]]) )
 /**
  * Страница для менеджера
  */
-if( User::checkUserAccess( ["groups" => [2]] ) )
+if( User::checkUserAccess( ["groups" => [2]], $User ) )
 {
+    $Director = $User->getDirector();
+    if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+    $subordinated = $Director->getId();
 
     /**
      * Формирование столбца лидов
      */
-    $Director = User::current()->getDirector();
-    if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
-    $subordinated = $Director->getId();
-
-    $aoLids = Core::factory("Lid")
+    $Lids = Core::factory( "Lid" )
+        ->queryBuilder()
         ->where( "subordinated", "=", $subordinated )
         ->where( "control_date", "=", date("Y-m-d") )
         ->orderBy("id", "DESC")
         ->findAll();
 
-    $aoComments = array();
-    $authorsId  = array();
-    $status = Core::factory("Property", 27);
+    $aoComments = [];
+    $authorsId  = [];
 
-    foreach ($aoLids as $lid)
+    $status = Core::factory( "Property", 27 );
+
+    foreach( $Lids as $lid )
     {
         $lidComments = $lid->getComments();
-        foreach ($lidComments as $comment)
+
+        foreach ( $lidComments as $comment )
         {
-            if(!in_array($comment->authorId(), $authorsId)) $authorsId[] = $comment->authorId();
+            if( !in_array( $comment->authorId(), $authorsId ) ) $authorsId[] = $comment->authorId();
         }
-        $lid->addEntities($lidComments);
-        $lid->addEntity(
-            $status->getPropertyValues($lid)[0], "property_value"
-        );
+
+        $lid
+            ->addEntities($lidComments)
+            ->addEntity(
+                $status->getPropertyValues( $lid )[0], "property_value"
+            );
     }
 
-    $aoAuthors = Core::factory("User")
+    $Authors = Core::factory( "User" )
+        ->queryBuilder()
         ->where("id", "in", $authorsId)
         ->findAll();
 
@@ -84,8 +90,8 @@ if( User::checkUserAccess( ["groups" => [2]] ) )
         ->addEntities(
             Core::factory( "Lid" )->getStatusList(), "status"
         )
-        ->addEntities( $aoAuthors )
-        ->addEntities( $aoLids )
+        ->addEntities( $Authors )
+        ->addEntities( $Lids )
         ->xsl( "musadm/lids/lids_for_manager.xsl" );
 
 
@@ -93,6 +99,7 @@ if( User::checkUserAccess( ["groups" => [2]] ) )
      * Формирование столбца Задач
      */
     $Tasks = Core::factory( "Task" )
+        ->queryBuilder()
         ->where( "date", "<=", date("Y-m-d") )
         ->where( "subordinated", "=", $subordinated )
         ->open()
@@ -105,11 +112,11 @@ if( User::checkUserAccess( ["groups" => [2]] ) )
 
     foreach ( $Tasks as $Task )
     {
-        $Task->date(refactorDateFormat($Task->date()));
+        $Task->date( refactorDateFormat( $Task->date() ) );
     }
 
-    $tasksIds = array();
-    $clientsAssignments = array();
+    $tasksIds = [];
+    $clientsAssignments = [];
 
     foreach ( $Tasks as $Task )
     {
@@ -119,6 +126,7 @@ if( User::checkUserAccess( ["groups" => [2]] ) )
         if( $Task->associate() !== 0 )
         {
             $Client = Core::factory( "User", $Task->associate() );
+
             if( $Client !== false )
             {
                 $clientsAssignments[] = $Client;
@@ -127,6 +135,7 @@ if( User::checkUserAccess( ["groups" => [2]] ) )
     }
 
     $Notes = Core::factory( "Task_Note" )
+        ->queryBuilder()
         ->select([
             "Task_Note.id AS id", "date", "task_id", "text", "usr.name AS name", "usr.surname AS surname"
         ])
@@ -198,7 +207,6 @@ if( User::checkUserAccess( ["groups" => [2]] ) )
      * Список действий менеджера
      * доступен только директорам
      */
-
     $LIMIT_STEP = 5;    //Лимит кол-ва отображаемых/подгружаемых событий
     $limit = Core_Array::Get( "limit", $LIMIT_STEP );
     $bEnableLoadButton = 1;  //Флаг активности кнопки подгрузки
@@ -206,7 +214,8 @@ if( User::checkUserAccess( ["groups" => [2]] ) )
     $dateTo = Core_Array::Get( "event_date_to", null );     //Конец временного периода
 
     $Events = Core::factory( "Event" )
-        ->where( "author_id", "=", $oUser->getId() )
+        ->queryBuilder()
+        ->where( "author_id", "=", $User->getId() )
         ->orderBy( "time", "DESC" );
 
     if ( $dateFrom === null && $dateTo === null )
@@ -249,7 +258,7 @@ if( User::checkUserAccess( ["groups" => [2]] ) )
 
     echo "<div class='events'>";
     Core::factory( "Core_Entity" )
-        ->addEntity( $oUser )
+        ->addEntity( $User )
         ->addEntities( $Events )
         ->addSimpleEntity( "limit", $limit += $LIMIT_STEP )
         ->addSimpleEntity( "date_from", $dateFrom )

@@ -6,6 +6,7 @@
  * Time: 13:45
  */
 
+
 class User_Controller_Show extends Core_Entity
 { 
 	private $Entity;

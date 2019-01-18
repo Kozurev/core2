@@ -87,7 +87,8 @@ $(function(){
         .on("click", ".change_login_submit", function(e){
             e.preventDefault();
             loaderOn();
-            userSave(loaderOff);
+            //userSave(loaderOff);
+            saveData("User", loaderOff);
 
             $("input[name=pass1]").val('');
             $("input[name=pass2]").val('');

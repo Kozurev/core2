@@ -4,15 +4,19 @@
 
         <script>
             $(function(){
+                var timestep = $("#timestep").val();
+
                 $("#createData").validate({
                     rules: {
-                        timeFrom:    {required: true},
-                        timeTo:      {required: true},
+                        teacherId:   {min: 1},
+                        timeFrom:    {required: true },
+                        timeTo:      {required: true },
                         typeId:      {required: true, min: 1},
                     },
                     messages: {
-                        timeFrom:   { required: "Это поле обязательноое к заполнению", },
-                        timeTo:     { required: "Это поле обязательноое к заполнению", },
+                        teacherId:  { min: "Необходимо указать преподавателя" },
+                        timeFrom:   { required: "Это поле обязательноое к заполнению" },
+                        timeTo:     { required: "Это поле обязательноое к заполнению" },
                         typeId:     { min: "Это поле обязательноое к заполнению"},
                     }
                 });
@@ -23,6 +27,8 @@
 
         <form name="createData" id="createData" action=".">
             <div class="center"><h2>Добавление урока в <xsl:value-of select="schedule_type" /> расписание</h2></div>
+
+            <input type="hidden" value="{//timestep}" id="timestep" />
 
             <div class="column">
                 <span>Учитель</span><span style="color:red" >*</span>
@@ -69,7 +75,7 @@
                 <span>Время начала</span><span style="color:red" >*</span>
             </div>
             <div class="column">
-                <input class="form-control" name="timeFrom" type="time" />
+                <input class="form-control" name="timeFrom" type="time"  />
             </div>
             <hr/>
 
@@ -77,7 +83,7 @@
                 <span>Время окончания</span><span style="color:red" >*</span>
             </div>
             <div class="column">
-                <input class="form-control" name="timeTo" type="time" />
+                <input class="form-control" name="timeTo" type="time"  />
             </div>
             <hr/>
 

@@ -6,7 +6,7 @@
  * Time: 16:31
  */
 
-class Page_Template_Dir_Model extends Core_Entity
+class Core_Page_Template_Dir_Model extends Core_Entity
 {
     protected $id;
     protected $title;

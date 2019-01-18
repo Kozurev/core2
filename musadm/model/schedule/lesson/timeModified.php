@@ -15,7 +15,6 @@ class Schedule_Lesson_TimeModified extends Core_Entity
     protected $time_to;
 
 
-    public function __construct(){}
 
 
     public function getId()
@@ -24,35 +23,54 @@ class Schedule_Lesson_TimeModified extends Core_Entity
     }
 
 
-    public function lessonId($val = null)
+    public function lessonId( $val = null )
     {
-        if(is_null($val))   return $this->lesson_id;
-        $this->lesson_id = intval($val);
+        if ( is_null( $val ) )   return intval( $this->lesson_id );
+
+        $this->lesson_id = intval( $val );
         return $this;
     }
 
 
-    public function date($val = null)
+    public function date( $val = null )
     {
-        if(is_null($val))   return $this->date;
-        $this->date = $val;
+        if ( is_null( $val ) )   return $this->date;
+
+        $this->date = strval( $val );
         return $this;
     }
 
 
-    public function timeFrom($val = null)
+    public function timeFrom( $val = null )
     {
-        if(is_null($val))   return $this->time_from;
-        $this->time_from = $val;
+        if ( is_null( $val ) )   return $this->time_from;
+
+        if ( strlen( $val ) == 5 ) $val .= ":00";
+
+        $this->time_from = strval( $val );
         return $this;
     }
 
 
-    public function timeTo($val = null)
+    public function timeTo( $val = null )
     {
-        if(is_null($val))   return $this->time_to;
-        $this->time_to = $val;
+        if ( is_null( $val ) )   return $this->time_to;
+
+        if ( strlen( $val ) == 5 ) $val .= ":00";
+
+        $this->time_to = strval( $val );
         return $this;
+    }
+
+
+    public function save( $obj = null )
+    {
+        if ( compareTime( $this->time_from, ">=", $this->time_to ) )
+        {
+            exit ( "Время начала занятия должно быть строго меньше времени окончания" );
+        }
+
+        parent::save();
     }
 
 

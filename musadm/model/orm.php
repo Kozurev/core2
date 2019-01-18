@@ -3,6 +3,8 @@ class Orm
 {
 	protected $queryString;	//Строка запроса
 
+    private $table;
+
 	//Параметры для строки запроса
     private $select;
     private $from;
@@ -17,16 +19,19 @@ class Orm
     private $open = 0;
     private $close = 0;
 
-	public function __construct()
-	{
 
-	}
 
 /**
 *	---------------------------------------------------------
 *	Вспомагательные методы
 * 	Начлао>>
 */
+
+
+    public function __construct( $table = null )
+    {
+        if( $table !== null )   $this->table = $table;
+    }
 
 
     /**
@@ -51,20 +56,6 @@ class Orm
     }
 
 
-	/**
-	 * Возвращает название таблицы для данного объекта
-     *
-	 * @return string
-	 */
-	public function getTableName()
-	{
-		if(method_exists($this, "databaseTableName"))
-			return $this->databaseTableName();
-		else
-			return get_class($this);
-	}
-
-
 	public function open()
     {
         $this->open++;
@@ -79,24 +70,6 @@ class Orm
     }
 
 
-	/**
-	 * Формирует из не пустых свойств объекта ассоциативный массив
-     *
-	 * @return array
-	 */
-	public function getObjectProperties()
-	{
-		$result = array();
-		$aVars = get_object_vars($this);
-		$aForbidden = array("open", "close");
-		foreach ($aVars as $key => $value) 
-		{
-			if((is_string($value) || is_numeric($value)) && !in_array($key, $aForbidden))
-				$result[$key] = $value;
-		}
-		return $result;
-	}
-
 
 	/**
 	 * Возвращает количество элементов в базе
@@ -105,9 +78,9 @@ class Orm
 	 */
 	public function getCount()
 	{
-		$this->select = "count(".$this->getTableName().".id) as count";
+		$this->select = "count(".$this->table.".id) as count";
 		$this->setQueryString();
-		$result = Core_Database::getConnect()->query($this->queryString);
+		$result = DB::instance()->query( $this->queryString );
 
         if( self::isDebugSql() )
         {
@@ -126,9 +99,9 @@ class Orm
      *
 	 * @return $this
 	 */
-	public function save()
+	public function save( $obj )
 	{
-		$objData = $this->getObjectProperties();
+		$objData = $obj->getObjectProperties();
 		$aRows = array_keys($objData);
 		$aValues = array_values($objData);
 
@@ -137,9 +110,9 @@ class Orm
 		$eventObjectName = implode( "", $eventObjectName );
 
 		//Если это существующий элемент
-		if($this->id)
+		if( $obj->getId() )
 		{
-			$queryStr = "UPDATE ".$this->getTableName()." ";
+			$queryStr = "UPDATE " . $this->table ." ";
 			$queryStr .= "SET ";
 
             $eventType = "Update";
@@ -164,14 +137,14 @@ class Orm
                 }
 			}
 
-			$queryStr .= "WHERE `id` = '".$this->getId()."'";
+			$queryStr .= "WHERE `id` = '" . $obj->getId() . "'";
 		}
 		//Если это новый элемент
 		else 
 		{
             $eventType = "Insert";
 
-			$queryStr = "INSERT INTO ".$this->getTableName()."(";
+			$queryStr = "INSERT INTO ".$this->table."(";
 
 			for($i = 0; $i < count($objData); $i++)
 			{
@@ -208,11 +181,11 @@ class Orm
 			echo "<br>Строка запроса метода <b>save()</b>: ".$queryStr;
 		}
 
-		Core::notify( array( &$this ), "before" . $eventObjectName . $eventType );
+		Core::notify( array( &$obj ), "before" . $eventObjectName . $eventType );
 
 		try
 		{
-			$result = Core_Database::getConnect()->query($queryStr);
+			DB::instance()->query( $queryStr );
 		}
 		catch(PDOException $Exception)
 		{
@@ -220,16 +193,17 @@ class Orm
 		}
 
 		/**
-		*	Добавление id 
-		*/
-		if(!$this->id)
+		 * Добавление id
+		 */
+		if( !$obj->getId() )
 		{
-            $this->id = Core_Database::getConnect()->lastInsertId();
+            $obj->setId( intval( DB::instance()->lastInsertId() ) );
 		}
 
-        Core::notify( array( &$this ), "after" . $eventObjectName . $eventType );
 
-		return $this;
+        Core::notify( array( &$obj ), "after" . $eventObjectName . $eventType );
+
+		return $obj;
 	}
 
 
@@ -248,7 +222,7 @@ class Orm
         if($this->from)
             $this->queryString .= " FROM ".$this->from;
         else
-            $this->queryString .= " FROM ".$this->getTableName();
+            $this->queryString .= " FROM ".$this->table;
 
         if($this->join != "")
             $this->queryString .= $this->join;
@@ -301,7 +275,7 @@ class Orm
 	public function executeQuery($sql)
 	{
 		if( self::isDebugSql() ) echo "<br>Строка из метода <b>executeQuery()</b>: ".$sql;
-		$result = Core_Database::getConnect()->query($sql);
+		$result = DB::instance()->query($sql);
 		return $result;
 	}
 
@@ -387,6 +361,8 @@ class Orm
 	 */
 	public function from( $aTables )
 	{
+	    if( $aTables === null ) return $this->from;
+
 		if( is_array( $aTables ) )
 		{
 		    $this->from .= implode( ", ", $aTables );
@@ -597,9 +573,9 @@ class Orm
 	/**
 	 * Метод выполняющий запрос к бд
      *
-	 * @return array | false
+	 * @return array
 	 */
-	public function findAll( $modelName = null )
+	public function findAll()
 	{
 		$this->setQueryString();
 
@@ -610,19 +586,21 @@ class Orm
 
 		try
 		{
-			$result = Core_Database::getConnect()->query($this->queryString);
+			$result = DB::instance()->query($this->queryString);
 
-			if(!$result)
-				return false;
+			if( !$result )    return [];
 
-			if( is_null( $modelName ) )	$modelName = $this->getTableName();
-			$result->setFetchMode(PDO::FETCH_CLASS, $modelName);
+            $this->table !== null
+                ?   $fetchClass = $this->table
+                :   $fetchClass = "stdClass";
+
+			$result->setFetchMode( PDO::FETCH_CLASS, $fetchClass );
 			return $result->fetchAll();
 		}
-		catch(PDOException $Exception)
+		catch( PDOException $Exception )
 		{
 			echo $Exception->getMessage();
-			return false;
+			return [];
 		}
 	}
 
@@ -643,18 +621,27 @@ class Orm
 
 		try
 		{
-			$result = Core_Database::getConnect()->query($this->queryString);
+			$result = DB::instance()->query( $this->queryString );
+			if( !$result ) return null;
 
-			if(!$result)
-				return false;
+			$this->table !== null
+                ?   $fetchClass = $this->table
+                :   $fetchClass = "stdClass";
 
-			$result->setFetchMode(PDO::FETCH_CLASS, $this->getTableName());
-			return $result->fetch();
+			$result->setFetchMode( PDO::FETCH_CLASS, $fetchClass );
+			$result = $result->fetch();
+
+			 if ( $result == false )
+             {
+                 return null;
+             }
+
+             return $result;
 		}
-		catch(PDOException $Exception)
+		catch( PDOException $Exception )
 		{
 			echo $Exception->getMessage();
-			return false;
+			return null;
 		}
 	}
 

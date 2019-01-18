@@ -1,12 +1,13 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 11.04.2018
- * Time: 22:16
+ * Настройки страницы со списком пользователей различных групп
+ *
+ * @author Kozurev Egor
+ * @date 11.04.2018 22:16
  */
 
-if( $this->oStructureItem->getId() == 5 )
+
+if( Core_Page_Show::instance()->StructureItem->getId() == 5 )
 {
     $title2 = "КЛИЕНТОВ";
     $breadcumb = "клиентов";
@@ -18,72 +19,83 @@ else
 }
 
 $breadcumbs[0] = new stdClass();
-$breadcumbs[0]->title = $this->oStructureItem->title();
+$breadcumbs[0]->title = Core_Page_Show::instance()->title;
 $breadcumbs[0]->active = 1;
 
-$this->setParam( "body-class", "body-primary" );
-$this->setParam( "title-first", "СПИСОК" );
-$this->setParam( "title-second", $title2 );
-$this->setParam( "breadcumbs", $breadcumbs );
+Core_Page_Show::instance()->setParam( "body-class", "body-primary" );
+Core_Page_Show::instance()->setParam( "title-first", "СПИСОК" );
+Core_Page_Show::instance()->setParam( "title-second", $title2 );
+Core_Page_Show::instance()->setParam( "breadcumbs", $breadcumbs );
 
 
 $Director = User::current()->getDirector();
-if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+if ( !$Director )    exit ( Core::getMessage("NOT_DIRECTOR") );
 $subordinated = $Director->getId();
 
 /**
  *	Блок проверки авторизации
  */
-$oUser = Core::factory("User")->getCurrent();
+$User = User::current();
+$accessRules = ["groups"    => [2, 6]];
 
-$accessRules = array(
-    "groups"    => array(1, 2, 6)
-);
-
-if( !User::checkUserAccess( $accessRules ) )
+if ( !User::checkUserAccess( $accessRules, $User ) )
 {
-    $this->error404();
+    Core_Page_Show::instance()->error404();
 }
 
-$action = Core_Array::getValue($_GET, "action", null);
+
+$action = Core_Array::Get( "action", null );
+
 
 /**
  * Форма редактирования клиента
  */
-if( $action == "updateFormClient" )
+if ( $action == "updateFormClient" )
 {
-    $userid = Core_Array::getValue( $_GET, "userid", 0 );
+    $userid = Core_Array::Get( "userid", 0 );
     $output = Core::factory( "Core_Entity" );
 
-    if( $userid )
+    if ( $userid )
     {
-        $oUser =            Core::factory( "User", $userid );
-        $aoProperties[] =   Core::factory( "Property", 16 )->getPropertyValues( $oUser )[0];    //Доп. телефон
-        $aoProperties[] =   Core::factory( "Property", 9  )->getPropertyValues( $oUser )[0];    //Ссылка вк
-        $aoProperties[] =   Core::factory( "Property", 17 )->getPropertyValues( $oUser )[0];    //Длительность урока
-        $aoProperties[] =   Core::factory( "Property", 15 )->getPropertyValues( $oUser )[0];    //Студия
-        $aoProperties[] =   Core::factory( "Property", 18 )->getPropertyValues( $oUser )[0];    //Соглашение подписано
-        $aoProperties[] =   Core::factory( "Property", 28 )->getPropertyValues( $oUser )[0];
-        $aoProperties =   array_merge( $aoProperties, Core::factory( "Property", 21 )->getPropertyValues( $oUser) );   //Учителя
+        $PaymentUser = Core::factory( "User", $userid );
+
+        if ( $PaymentUser === null )
+        {
+            exit ( Core::getMessage( "NOT_FOUND", ["Пользователь", $userId] ) );
+        }
+
+        if ( !User::isSubordinate( $PaymentUser, $User ) )
+        {
+            exit ( Core::getMessage( "NOT_SUBORDINATE", ["Пользователь", $userId] ) );
+        }
+
+
+        $Properties[] = Core::factory( "Property", 16 )->getPropertyValues( $PaymentUser )[0];    //Доп. телефон
+        $Properties[] = Core::factory( "Property", 9  )->getPropertyValues( $PaymentUser )[0];    //Ссылка вк
+        $Properties[] = Core::factory( "Property", 17 )->getPropertyValues( $PaymentUser )[0];    //Длительность урока
+        //$Properties[] = Core::factory( "Property", 15 )->getPropertyValues( $PaymentUser )[0];    //Студия
+        $Properties[] = Core::factory( "Property", 18 )->getPropertyValues( $PaymentUser )[0];    //Соглашение подписано
+        $Properties[] = Core::factory( "Property", 28 )->getPropertyValues( $PaymentUser )[0];
+        $Properties =   array_merge( $Properties, Core::factory( "Property", 21 )->getPropertyValues( $PaymentUser) );   //Учителя
     }
     else
     {
-        $oUser = Core::factory( "User" );
+        $PaymentUser = Core::factory( "User" );
 
-        $aoProperties[] =   Core::factory( "Property_Int" )
+        $Properties[] =   Core::factory( "Property_Int" )
             ->value(
                 Core::factory( "Property", 17 )->defaultValue()
             );
     }
 
-    $aoPropertyLists = Core::factory( "Property_List_Values" )
+    $PropertyLists = Core::factory( "Property_List_Values" )->queryBuilder()
         ->where( "subordinated", "=", $subordinated )
         ->where( "property_id", "=", 21 )
         ->orderBy( "value" )
         ->findAll();
 
-    $aoPropertyLists = array_merge( $aoPropertyLists,
-        Core::factory("Property_List_Values")
+    $PropertyLists = array_merge( $PropertyLists,
+        Core::factory( "Property_List_Values" )->queryBuilder()
             ->where( "subordinated", "=", $subordinated )
             ->where( "property_id", "=", 15 )
             ->orderBy( "sorting" )
@@ -91,9 +103,9 @@ if( $action == "updateFormClient" )
     );
 
     $output
-        ->addEntity( $oUser )
-        ->addEntities( $aoProperties,    "property_value" )
-        ->addEntities( $aoPropertyLists, "property_list" )
+        ->addEntity( $PaymentUser )
+        ->addEntities( $Properties, "property_value" )
+        ->addEntities( $PropertyLists, "property_list" )
         ->xsl( "musadm/users/edit_client_popup.xsl" )
         ->show();
 
@@ -104,34 +116,40 @@ if( $action == "updateFormClient" )
 /**
  * Форма редактирования учителя
  */
-if($action == "updateFormTeacher")
+if ( $action == "updateFormTeacher" )
 {
-    $userid = Core_Array::getValue($_GET, "userid", 0);
-    $output = Core::factory("Core_Entity");
+    $userId = Core_Array::Get( "userid", 0 );
+    $output = Core::factory( "Core_Entity" );
 
-    if($userid)
+    if ( $userId != 0 )
     {
-        $oUser =            Core::factory("User", $userid);
-        $aoProperties[] =   Core::factory("Property", 20)->getPropertyValues($oUser)[0];    //Инструмент
-        $aoProperties[] =   Core::factory("Property", 31)->getPropertyValues($oUser)[0];    //Инструмент
+        $Teacher = Core::factory( "User", $userId );
 
-        $output
-            ->addEntities($aoProperties,    "property_value");
+        if ( $Teacher === null )
+        {
+            exit ( Core::getMessage( "NOT_FOUND", ["Преподаватель", $userId] ) );
+        }
+
+        $Properties[] = Core::factory( "Property", 20 )->getPropertyValues( $Teacher )[0];    //Инструмент
+        $Properties[] = Core::factory( "Property", 31 )->getPropertyValues( $Teacher )[0];    //Инструмент
+
+        $output->addEntities( $Properties, "property_value" );
     }
     else
     {
-        $oUser = Core::factory("User");
+        $Teacher = Core::factory( "User" );
     }
 
-    $aoPropertyLists =  Core::factory("Property_List_Values")
-        ->where("property_id", "=", 20)
-        ->orderBy("sorting")
+    $PropertyLists =  Core::factory( "Property_List_Values" )->queryBuilder()
+        ->where( "property_id", "=", 20 )
+        ->where( "subordinated", "=", $subordinated )
+        ->orderBy( "sorting" )
         ->findAll();
 
     $output
-        ->addEntity($oUser)
-        ->addEntities($aoPropertyLists, "property_list")
-        ->xsl("musadm/users/edit_teacher_popup.xsl")
+        ->addEntity( $Teacher )
+        ->addEntities( $PropertyLists, "property_list" )
+        ->xsl( "musadm/users/edit_teacher_popup.xsl" )
         ->show();
 
     exit;
@@ -141,18 +159,23 @@ if($action == "updateFormTeacher")
 /**
  * Форма редактирования директора
  */
-if( $action == "updateFormDirector" )
+if ( $action == "updateFormDirector" )
 {
-    $userid = Core_Array::getValue($_GET, "userid", 0);
-    $output = Core::factory("Core_Entity");
+    $userId = Core_Array::Get( "userid", 0 );
+    $output = Core::factory( "Core_Entity" );
 
-    if( $userid )
+    if ( $userId != 0 )
     {
-        $oUser =  Core::factory( "User", $userid );
+        $Director = Core::factory( "User", $userId );
 
-        $City =   Core::factory( "Property", 29 )->getPropertyValues($oUser)[0]; //Город
-        $Link =   Core::factory( "Property", 33 )->getPropertyValues($oUser)[0]; //Город
-        $Organization = Core::factory( "Property", 30 )->getPropertyValues($oUser)[0]; //Организация
+        if ( $Director === null )
+        {
+            exit ( Core::getMessage( "NOT_FOUND", ["Директор", $userId] ) );
+        }
+
+        $City = Core::factory( "Property", 29 )->getPropertyValues( $Director )[0]; //Город
+        $Link = Core::factory( "Property", 33 )->getPropertyValues( $Director )[0]; //Город
+        $Organization = Core::factory( "Property", 30 )->getPropertyValues( $Director )[0]; //Организация
 
         $output->addEntity( $City, "property_value" );
         $output->addEntity( $Link, "property_value" );
@@ -160,11 +183,11 @@ if( $action == "updateFormDirector" )
     }
     else
     {
-        $oUser = Core::factory( "User" );
+        $Director = Core::factory( "User" );
     }
 
     $output
-        ->addEntity( $oUser )
+        ->addEntity( $Director )
         ->xsl( "musadm/users/edit_director_popup.xsl" )
         ->show();
 
@@ -175,22 +198,27 @@ if( $action == "updateFormDirector" )
 /**
  * Форма редактирования менеджера
  */
-if( $action == "updateFormManager" )
+if ( $action == "updateFormManager" )
 {
-    $userid = Core_Array::getValue($_GET, "userid", 0);
-    $output = Core::factory("Core_Entity");
+    $userId = Core_Array::Get( "userid", 0 );
+    $output = Core::factory( "Core_Entity" );
 
-    if( $userid )
+    if( $userId != 0 )
     {
-        $oUser = Core::factory( "User", $userid );
+        $Manager = Core::factory( "User", $userId );
+
+        if ( $Director === null )
+        {
+            exit ( Core::getMessage( "NOT_FOUND", ["Директор", $userId] ) );
+        }
     }
     else
     {
-        $oUser = Core::factory( "User" );
+        $Manager = Core::factory( "User" );
     }
 
     $output
-        ->addEntity( $oUser )
+        ->addEntity( $Manager )
         ->xsl( "musadm/users/edit_manager_popup.xsl" )
         ->show();
 
@@ -201,7 +229,7 @@ if( $action == "updateFormManager" )
 /**
  * Обновление таблиц
  */
-if($action == "refreshTableUsers")
+if ( $action == "refreshTableUsers" )
 {
     $this->execute();
     exit;
@@ -211,15 +239,20 @@ if($action == "refreshTableUsers")
 /**
  * Форма для создания платежа
  */
-if($action == "getPaymentPopup")
+if ( $action == "getPaymentPopup" )
 {
-    $userId =   Core_Array::getValue($_GET, "userid", 0);
-    $oUser =    Core::factory("User", $userId);
+    $userId = Core_Array::Get( "userid", 0 );
+    $PaymentUser = Core::factory( "User", $userId );
 
-    Core::factory("Core_Entity")
-        ->addEntity($oUser)
+    if ( $PaymentUser === null )
+    {
+        exit ( Core::getMessage( "NOT_FOUND", ["Пользователь", $userId] ) );
+    }
+
+    Core::factory( "Core_Entity" )
+        ->addEntity( $PaymentUser )
         ->addSimpleEntity( "function", "clients" )
-        ->xsl("musadm/users/balance/edit_payment_popup.xsl")
+        ->xsl( "musadm/users/balance/edit_payment_popup.xsl" )
         ->show();
 
     exit;
@@ -229,54 +262,66 @@ if($action == "getPaymentPopup")
 /**
  * Сохранение платежа
  */
-if($action == "savePayment")
+if ( $action == "savePayment" )
 {
-    $userid =       Core_Array::getValue($_GET, "userid", 0);
-    $value  =       Core_Array::getValue($_GET, "value", 0);
-    $description =  Core_Array::getValue($_GET, "description", "");
-    $type =         Core_Array::getValue($_GET, "type", 0);
+    $userid =       Core_Array::Get( "userid", 0 );
+    $value  =       Core_Array::Get( "value", 0 );
+    $description =  Core_Array::Get( "description", "" );
+    $type =         Core_Array::Get( "type", 0 );
 
-    $payment = Core::factory("Payment")
-        ->user($userid)
-        ->type($type)
-        ->value($value)
-        ->description($description)
+    $Payment = Core::factory( "Payment" )
+        ->user( $userid )
+        ->type( $type )
+        ->value( $value )
+        ->description( $description )
         ->save();
 
     //Корректировка баланса ученика
-    $oUser =        Core::factory("User", $userid);
-    $oUserBalance = Core::factory("Property", 12);
-    $oUserBalance = $oUserBalance->getPropertyValues($oUser)[0];
-    $balanceOld =   intval($oUserBalance->value());
+    $PaymentUser = Core::factory( "User", $userid );
+
+    if ( $PaymentUser === null )
+    {
+        exit ( Core::getMessage( "NOT_FOUND", ["Пользователь", $userId] ) );
+    }
+
+
+    $UserBalance = Core::factory( "Property", 12 );
+    $UserBalance = $UserBalance->getPropertyValues( $User )[0];
+    $balanceOld =  intval( $UserBalance->value() );
 
     $type == 1
-        ?   $balanceNew =   $balanceOld + intval($value)
-        :   $balanceNew =   $balanceOld - intval($value);
+        ?   $balanceNew =   $balanceOld + intval( $value )
+        :   $balanceNew =   $balanceOld - intval( $value );
 
-    $oUserBalance->value($balanceNew);
-    $oUserBalance->save();
+    $UserBalance->value( $balanceNew );
+    $UserBalance->save();
 
-    echo 0;
-    exit;
+    exit ( "0" );
 }
 
 
 /**
  * При сохранении пользователя идет проверка на дублирования логина
  */
-if( $action == "checkLoginExists" )
+if ( $action == "checkLoginExists" )
 {
-    $userid = Core_Array::getValue( $_GET, "userid", 0 );
-    $login = Core_Array::getValue( $_GET, "login", "" );
+    $userId = Core_Array::Get( "userid", 0 );
+    $login = Core_Array::Get( "login", "" );
 
-    if( $login == "" )  die("Логин не может быть пустым");
+    if( $login == "" )
+    {
+        exit ( "Логин не может быть пустым" );
+    }
 
-    $oUser = Core::factory( "User" )
-        ->where( "id", "<>", $userid )
+    $User = Core::factory(  "User" )->queryBuilder()
+        ->where( "id", "<>", $userId )
         ->where( "login", "=", $login )
         ->find();
 
-    if( $oUser != false )   die("Пользователь с таким логином уже существует");
+    if( $User !== null )
+    {
+        exit ( "Пользователь с таким логином уже существует" );
+    }
 
     exit;
 }
@@ -285,14 +330,14 @@ if( $action == "checkLoginExists" )
 /**
  * Экспорт пользователей в Excell
  */
-if( $action === "export" )
+if ( $action === "export" )
 {
-    User::checkUserAccess( ["groups" => [1, 2, 6]] );
+    User::checkUserAccess( ["groups" => [2, 6]] );
 
-    header("Content-type: application/vnd.ms-excel");
-    header("Content-Disposition: attachment; filename=demo.xls");
+    header( "Content-type: application/vnd.ms-excel" );
+    header( "Content-Disposition: attachment; filename=demo.xls" );
 
-    $Users = Core::factory( "User" )
+    $Users = Core::factory( "User" )->queryBuilder()
         ->select( ["name", "surname", "phone_number"] )
         ->where( "group_id", "=", 5 )
         ->where( "phone_number", "<>", "" )
@@ -318,11 +363,11 @@ if( $action === "export" )
 /**
  * Получение данных лида
  */
-if( $action === "getLidData" )
+if ( $action === "getLidData" )
 {
     $lidId = Core_Array::Get( "lidid", 0 );
     $Lid = Core::factory( "Lid", $lidId );
-    if( $Lid === false )    die( "0" );
+    if( $Lid === null )    exit ( Core::getMessage( "NOT_FOUND", ["Лид", $lidId] ) );
 
     $LidEncode = new stdClass();
     $LidEncode->name = $Lid->name();
@@ -335,12 +380,12 @@ if( $action === "getLidData" )
 }
 
 
-$aTitle[] = $this->oStructure->title();
+$aTitle[] = Core_Page_Show::instance()->Structure->title();
 
-if(get_class($this->oStructureItem) == "User_Group")
-    $aTitle[] = $this->oStructureItem->title();
+if( get_class( Core_Page_Show::instance()->StructureItem ) == "User_Group" )
+    $aTitle[] = $this->StructureItem->title();
 
-if(get_class($this->oStructureItem) == "User")
+if( get_class( Core_Page_Show::instance()->StructureItem) == "User" )
     $aTitle[] = $this->oStructureItem->surname() . " " . $this->oStructureItem->name();
 
-$this->title = array_pop($aTitle);
+$this->title = array_pop( $aTitle );

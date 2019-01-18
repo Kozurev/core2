@@ -9,10 +9,10 @@ error_reporting(E_ALL);
 define('ROOT', dirname(__FILE__));
 
 //Установление соединения с базой данных
-require_once ROOT."/model/database.php";
-require_once ROOT."/config/config.php";
-require_once ROOT."/includes.php";
-Core_Database::connect();
+require_once ROOT . "/model/db.php";
+require_once ROOT . "/config/config.php";
+require_once ROOT . "/includes.php";
+
 
 if( !isset( $_SESSION["core"] ) )
 {
@@ -37,6 +37,9 @@ require_once ROOT . "/model/property/assigment/model.php";
 require_once ROOT . "/model/property/assigment.php";
 require_once ROOT . "/model/user/model.php";
 require_once ROOT . "/model/user.php";
+require_once ROOT . "/model/constant/model.php";
+require_once ROOT . "/model/constant.php";
+require_once ROOT . "/model/core/page/show.php";
 
 //Установка системных констант
 define('TEST_MODE_PAGE', false);
@@ -47,7 +50,7 @@ define('TEST_MODE_FACTORY', false);
 Orm::Debug( false );
 
 //Объявление констант
-Core::factory("Constant")->setAllConstants();
+Constant::setAllConstants();
 
 //Создание страницы
-Core::factory('Page_Show')->createPage();
+Core_Page_Show::instance()->createPage();

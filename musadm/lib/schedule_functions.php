@@ -95,42 +95,37 @@ function getLessonData( $oLesson )
         $oTeacher = $oLesson->getTeacher();
         $oClient = $oLesson->getClient();
 
-        if( $oTeacher === false )   $output["teacher"] = "Пользователь был удален";
-        else $output["teacher"] = $oTeacher->surname() . " " . $oTeacher->name();
+        $output["teacher"] = $oTeacher->surname() . " " . $oTeacher->name();
+        $output["client"] = $oClient->surname() . " " . $oClient->name();
 
-        if( $oClient == false )
+        if( !$oClient->getId() )
         {
-            $output["client"] = "Неизвестен";
             $output["client_status"] = "neutral";
         }
         else
         {
-            $output["client"] = $oClient->surname() . " " . $oClient->name();
+            $countPrivateLessons = Core::factory( "Property", 13 )->getPropertyValues( $oClient )[0]->value();
+            $countGroupLessons = Core::factory( "Property", 14 )->getPropertyValues( $oClient )[0]->value();
 
-            /**
-             * Определение цвета "подцветки" занятия
-             */
-            $countPrivateLessons = Core::factory("Property", 13)->getPropertyValues($oClient)[0]->value();
-            $countGroupLessons = Core::factory("Property", 14)->getPropertyValues($oClient)[0]->value();
-
-            if ($countGroupLessons < 0 || $countPrivateLessons < 0) $output["client_status"] = "negative";
-            elseif ($countPrivateLessons > 1 || $countGroupLessons > 1) $output["client_status"] = "positive";
+            if ( $countGroupLessons < 0 || $countPrivateLessons < 0 ) $output["client_status"] = "negative";
+            elseif ( $countPrivateLessons > 1 || $countGroupLessons > 1 ) $output["client_status"] = "positive";
             else $output["client_status"] = "neutral";
 
-            $vk = Core::factory("Property", 9)->getPropertyValues($oClient)[0]->value();
-            if ($vk != "") $output["client_status"] .= " vk";
+            $vk = Core::factory( "Property", 9 )->getPropertyValues( $oClient )[0]->value();
+            if ( $vk != "" ) $output["client_status"] .= " vk";
         }
     }
     elseif ( $oLesson->typeId() == 3 )
     {
         $oTeacher = $oLesson->getTeacher();
-        if( $oTeacher === false )   $output["teacher"] = "Пользователь был удален";
-        else $output["teacher"] = $oTeacher->surname() . " " . $oTeacher->name();
+        $output["teacher"] = $oTeacher->surname() . " " . $oTeacher->name();
         $output["client"] = "Консультация";
         $output["client_status"] = "neutral";
 
-        if( $oLesson->clientId() != 0 )
+        if ( $oLesson->clientId() != 0 )
+        {
             $output["client"] .= " " . $oLesson->clientId();
+        }
     }
 
 
@@ -166,15 +161,15 @@ function sortByTime( &$arr, $prop )
  */
 function getLessons( $date, $userId = 0 )
 {
-    $dayName =  new DateTime($date);
-    $dayName =  $dayName->format("l");
+    $dayName =  new DateTime( $date );
+    $dayName =  $dayName->format( "l" );
 
-    $aoMainLessons = Core::factory( "Schedule_Lesson" )
+    $aoMainLessons = Core::factory(  "Schedule_Lesson" )
         ->open()
-        ->where("delete_date", ">", $date)
-        ->where("delete_date", "IS", Core::unchanged( "NULL" ), "or")
+            ->where( "delete_date", ">", $date )
+            ->where( "delete_date", "IS", Core::unchanged( "NULL" ), "or" )
         ->close()
-        ->orderBy("time_from");
+        ->orderBy( "time_from" );
 
     $aoCurrentLessons = clone $aoMainLessons;
     $aoCurrentLessons
@@ -188,61 +183,65 @@ function getLessons( $date, $userId = 0 )
 
     if( $userId != 0 )
     {
-        $oUser = Core::factory( "User", $userId );
+        $User = Core::factory( "User", $userId );
+
+        if ( $User === null )
+        {
+            exit ( Core::getMessage( "NOT_FOUND", ["Пользователь", $userId] ) );
+        }
+
 
         /**
          * Если страница клиента
          */
-        if($oUser->groupId() == 5)
+        if ( $User->groupId() == 5 )
         {
-            $aoClientGroups = Core::factory("Schedule_Group_Assignment")
-                ->where("user_id", "=", $userId)
+            $aoClientGroups = Core::factory("Schedule_Group_Assignment")->queryBuilder()
+                ->where( "user_id", "=", $userId )
                 ->findAll();
-            $aUserGroups = array();
-            foreach ($aoClientGroups as $group)
+
+            $aUserGroups = [];
+
+            foreach ( $aoClientGroups as $group )
             {
                 $aUserGroups[] = $group->groupId();
             }
 
-            $aoMainLessons
-                ->open()
-                ->where("client_id", "=", $userId);
+            $aoMainLessons->open()
+                ->where( "client_id", "=", $userId );
 
-            if( count( $aUserGroups) > 0 )
+            if ( count( $aUserGroups ) > 0 )
+            {
                 $aoMainLessons
                     ->open()
-                    ->where("client_id", "in", $aUserGroups, "or")
-                    ->where("type_id", "=", 2)
+                        ->where( "client_id", "in", $aUserGroups, "or" )
+                        ->where( "type_id", "=", 2 )
                     ->close();
+            }
 
-            $aoMainLessons
-                ->close();
+            $aoMainLessons->close();
 
-            $aoCurrentLessons
-                ->open()
-                ->where("client_id", "=", $userId);
+            $aoCurrentLessons->open()
+                ->where( "client_id", "=", $userId );
 
-            if( count( $aUserGroups ) > 0 )
+            if ( count( $aUserGroups ) > 0 )
+            {
                 $aoCurrentLessons
                     ->open()
-                    ->where("client_id", "in", $aUserGroups, "or")
-                    ->where("type_id", "=", 2)
+                        ->where("client_id", "in", $aUserGroups, "or")
+                        ->where("type_id", "=", 2)
                     ->close();
+            }
 
-            $aoCurrentLessons
-                ->close();
-
+            $aoCurrentLessons->close();
         }
         /**
          * Если страница учителя
          */
-        elseif($oUser->groupId() == 4)
+        elseif ( $User->groupId() == 4 )
         {
-            $aoMainLessons
-                ->where("teacher_id", "=", $userId);
-
-            $aoCurrentLessons
-                ->where("teacher_id", "=", $userId);
+            $aoMainLessons->where( "teacher_id", "=", $userId );
+            $aoCurrentLessons->where( "teacher_id", "=", $userId );
         }
     }
 
@@ -252,28 +251,28 @@ function getLessons( $date, $userId = 0 )
 
     foreach ( $aoMainLessons as $oMainLesson )
     {
-        if( $oMainLesson->isAbsent( $date ) )   continue;
+        if ( $oMainLesson->isAbsent( $date ) )   continue;
 
         /**
          * Если у занятия изменено время на текущую дату то необходимо добавить
          * его в список занятий текущего расписания
          */
-        if( $oMainLesson->isTimeModified( $date ) )
+        if ( $oMainLesson->isTimeModified( $date ) )
         {
-            $oModify = Core::factory("Schedule_Lesson_TimeModified")
-                ->where("lesson_id", "=", $oMainLesson->getId())
-                ->where("date", "=", $date)
+            $oModify = Core::factory("Schedule_Lesson_TimeModified")->queryBuilder()
+                ->where( "lesson_id", "=", $oMainLesson->getId() )
+                ->where( "date", "=", $date )
                 ->find();
 
             $oMainLesson
-                ->timeFrom($oModify->timeFrom())
-                ->timeTo($oModify->timeTo());
+                ->timeFrom( $oModify->timeFrom() )
+                ->timeTo( $oModify->timeTo() );
         }
 
         $aoCurrentLessons[] = $oMainLesson;
     }
 
-    sortByTime($aoCurrentLessons, "timeFrom");
+    sortByTime( $aoCurrentLessons, "timeFrom" );
 
     return $aoCurrentLessons;
 

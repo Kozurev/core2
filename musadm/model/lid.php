@@ -6,13 +6,13 @@
  * Time: 22:10
  */
 
+
 class Lid extends Lid_Model
 {
 
     public function __construct()
     {
-        if($this->control_date == null) $this->control_date = date("Y-m-d");
-        //$this->lid_id = Core_Array::getValue($_GET, "parent_id", 0);
+        if ( $this->control_date == null ) $this->control_date = date( "Y-m-d" );
     }
 
 
@@ -46,34 +46,32 @@ class Lid extends Lid_Model
 
     public function delete($obj = null)
     {
-        Core::notify(array(&$this), "beforeLidDelete");
+        Core::notify( [&$this], "beforeLidDelete" );
 
-        if($this->id != null)
+        if ( $this->id != null )
         {
-            $aoComments = Core::factory("Lid_Comment")
-                ->where("lid_id", "=", $this->id)
+            $Comments = Core::factory( "Lid_Comment" )->queryBuilder()
+                ->where( "lid_id", "=", $this->id )
                 ->findAll();
 
-            foreach ($aoComments as $comment)   $comment->delete();
+            foreach ( $Comments as $Comment )   $Comment->delete();
 
-            Core::factory("Property")->clearForObject($this);
+            Core::factory( "Property" )->clearForObject( $this );
         }
 
         parent::delete();
-        Core::notify(array(&$this), "afterLidDelete");
+        Core::notify( [&$this], "afterLidDelete" );
     }
 
 
     public function getComments()
     {
-        if($this->id == null)   return array();
+        if ( $this->id == null )   return array();
 
-        $aoComments = Core::factory("Lid_Comment")
-            ->where("lid_id", "=", $this->id)
-            ->orderBy("datetime", "DESC")
+        return Core::factory( "Lid_Comment" )->queryBuilder()
+            ->where( "lid_id", "=", $this->id )
+            ->orderBy( "datetime", "DESC" )
             ->findAll();
-
-        return $aoComments;
     }
 
 
@@ -86,9 +84,10 @@ class Lid extends Lid_Model
      */
     public function addComment( $text, $triggerObserver = true )
     {
-        if( !$this->id )    die( "Не указан id лида при сохранении комментария" );
+        if ( !$this->id )   exit( "Не указан id лида при сохранении комментария" );
 
-        $User = Core::factory( "User" )->getCurrent();
+        $User = User::current();
+
         $User == false
             ?   $authorId = 0
             :   $authorId = $User->getId();
@@ -98,15 +97,14 @@ class Lid extends Lid_Model
             ->authorId( $authorId )
             ->lidId( $this->id )
             ->text( $text );
-            //->save();
 
-        if( $triggerObserver == true )
-            Core::notify( array( &$Comment ), "beforeLidAddComment" );
+        if ( $triggerObserver == true )
+            Core::notify( [&$Comment], "beforeLidAddComment" );
 
         $Comment->save();
 
-        if( $triggerObserver == true )
-            Core::notify( array( &$Comment ), "afterLidAddComment" );
+        if ( $triggerObserver == true )
+            Core::notify( [&$Comment], "afterLidAddComment" );
 
         return $this;
     }
@@ -114,8 +112,13 @@ class Lid extends Lid_Model
 
     public function getStatusList()
     {
-        return Core::factory("Property_List_Values")
-            ->where("property_id", "=", 27)
+        $Director = User::current()->getDirector();
+        if ( !$Director )   die( Core::getMessage("NOT_DIRECTOR") );
+        $subordinated = $Director->getId();
+
+        return Core::factory( "Property_List_Values" )->queryBuilder()
+            ->where( "property_id", "=", 27 )
+            ->where( "subordinated", "=", $subordinated )
             ->findAll();
     }
 

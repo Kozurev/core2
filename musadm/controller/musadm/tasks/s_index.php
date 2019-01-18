@@ -10,48 +10,45 @@
 /**
  * Блок проверки авторизации и прав доступа
  */
-$oUser = Core::factory("User")->getCurrent();
+$User = User::current();
+$accessRules = [ "groups"    => [1, 2, 6] ];
 
-$accessRules = array(
-    "groups"    => array(1, 2, 6)
-);
+if( !User::checkUserAccess( $accessRules, $User ) )
+{
+    Core_Page_Show::instance()->error404();
+}
 
 $breadcumbs[0] = new stdClass();
 $breadcumbs[0]->title = $this->oStructure->title();
 $breadcumbs[0]->active = 1;
 
-$this->setParam( "body-class", "body-red" );
-$this->setParam( "title-first", "ЗАДАЧИ" );
-$this->setParam( "breadcumbs", $breadcumbs );
+Core_Page_Show::instance()->setParam( "body-class", "body-red" );
+Core_Page_Show::instance()->setParam( "title-first", "ЗАДАЧИ" );
+Core_Page_Show::instance()->setParam( "breadcumbs", $breadcumbs );
 
 
-$action = Core_Array::getValue($_GET, "action", null);
+$action = Core_Array::Get( "action", null );
 
 
-if($action === "refreshTasksTable")
+if( $action === "refreshTasksTable" )
 {
-    $this->execute();
+    Core_Page_Show::instance()->execute();
     exit;
 }
 
 if( $action === "markAsDone" )
 {
-    $taskId = Core_Array::getValue( $_GET, "task_id", 0 );
+    $taskId = Core_Array::Get( "task_id", 0 );
     $Task = Core::factory( "Task", $taskId )->markAsDone();
-//        ->done(1)
-//        ->save();
-//
-//    $Task->addNote( "Задача закрыта" );
 
-    echo "0";
-    exit;
+    exit ( "0" );
 }
 
 
 if( $action === "update_date" )
 {
-    $taskId = Core_Array::getValue( $_GET, "task_id", 0 );
-    $date = Core_Array::getValue( $_GET, "date", "" );
+    $taskId = Core_Array::Get( "task_id", 0 );
+    $date = Core_Array::Get( "date", "" );
 
     $Task = Core::factory( "Task", $taskId );
 
@@ -73,13 +70,11 @@ if( $action === "update_date" )
 
 if( $action === "new_task_popup" )
 {
-    //$TaskTypes = Core::factory("Task_Type")->findAll();
-
     $Director = User::current()->getDirector();
     if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
     $subordinated = $Director->getId();
 
-    $Clients = Core::factory( "User" )
+    $Clients = Core::factory( "User" )->queryBuilder()
         ->where( "active", "=", 1 )
         ->where( "group_id", "=", 5 )
         ->where( "subordinated", "=", $subordinated )
@@ -87,7 +82,6 @@ if( $action === "new_task_popup" )
         ->findAll();
 
     Core::factory("Core_Entity")
-        //->addEntities( $TaskTypes )
         ->addEntities( $Clients )
         ->addSimpleEntity( "date", date( "Y-m-d" ) )
         ->xsl( "musadm/tasks/new_task_popup.xsl" )
@@ -119,8 +113,7 @@ if( $action === "save_task" )
         ->taskId( $oTask->getId() )
         ->save();
 
-    echo "0";
-    exit;
+    exit ( "0" );
 }
 
 
@@ -133,7 +126,7 @@ if( $action === "task_assignment_popup" )
     if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
     $subordinated = $Director->getId();
 
-    $Clients = Core::factory( "User" )
+    $Clients = Core::factory( "User" )->queryBuilder()
         ->where( "active", "=", 1 )
         ->where( "group_id", "=", 5 )
         ->where( "subordinated", "=", $subordinated )

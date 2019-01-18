@@ -41,23 +41,45 @@ if( $User->subordinated() !== $subordinated )
 
 
 /**
+ * Пользовательские примечания и дата последней авторизации
+ */
+if( !is_null( $pageClientId ) )
+{
+    $oPropertyNotes = Core::factory( "Property", 19 );
+    $clienNotes = $oPropertyNotes->getPropertyValues( $User );
+
+    $oPropertyPerLesson = Core::factory( "Property", 32 );
+    $perLesson = $oPropertyPerLesson->getPropertyValues( $User );
+
+    $oPropertyLastEntry = Core::factory( "Property", 22 );
+    $lastEntry = $oPropertyLastEntry->getPropertyValues( $User );
+
+    Core::factory( "Core_Entity" )
+        ->addEntities( $clienNotes, "note" )
+        ->addEntities( $lastEntry, "entry" )
+        ->addEntities( $perLesson, "per_lesson" )
+        ->xsl( "musadm/client_notes.xsl" )
+        ->show();
+}
+
+/**
  * Баланс, кол-во индивидуальных занятий, кол-во групповых занятий
  */
 $oPropertyBalance           =   Core::factory("Property", 12);
 $oPropertyPrivateLessons    =   Core::factory("Property", 13);
 $oPropertyGroupLessons      =   Core::factory("Property", 14);
 
-$balance        =   $oPropertyBalance->getPropertyValues($User)[0];
-$privateLessons =   $oPropertyPrivateLessons->getPropertyValues($User)[0];
-$groupLessons   =   $oPropertyGroupLessons->getPropertyValues($User)[0];
+$balance        =   $oPropertyBalance->getPropertyValues( $User )[0];
+$privateLessons =   $oPropertyPrivateLessons->getPropertyValues( $User )[0];
+$groupLessons   =   $oPropertyGroupLessons->getPropertyValues( $User )[0];
 
-Core::factory("Core_Entity")
-    ->addEntity($User)
+Core::factory( "Core_Entity" )
+    ->addEntity( $User )
     ->addSimpleEntity( "is_admin", $isAdmin )
-    ->addEntity($balance,           "property")
-    ->addEntity($privateLessons,    "property")
-    ->addEntity($groupLessons,      "property")
-    ->xsl("musadm/users/balance/balance.xsl")
+    ->addEntity( $balance,          "property" )
+    ->addEntity( $privateLessons,   "property" )
+    ->addEntity( $groupLessons,     "property" )
+    ->xsl( "musadm/users/balance/balance.xsl" )
     ->show();
 
 
@@ -100,8 +122,8 @@ if( $User->groupId() == 5 )
     </div>
     <?
 
-    $month = Core_Array::getValue( $_GET, "month", date("m") );
-    $year = Core_Array::getValue( $_GET, "year", date("Y") );
+    $month = Core_Array::Get( "month", date("m") );
+    $year =  Core_Array::Get( "year", date("Y") );
     $aoTeacherLessons = array();
 
     ?>
@@ -130,38 +152,43 @@ if( $User->groupId() == 5 )
 /**
  * Блок статистики посещаемости
  */
-$UserReports = Core::factory( "Schedule_Lesson_Report" )
+$UserReports = Core::factory( "Schedule_Lesson_Report" );
+$UserReports
+    ->queryBuilder()
     ->select( ["Schedule_Lesson_Report.id", "attendance", "date", "lesson_id", "lesson_type", "surname", "name",
                 "client_rate", "teacher_rate", "total_rate"] )
     ->leftJoin( "User AS usr", "usr.id = teacher_id" )
     ->orderBy( "date", "DESC" );
 
-$aoClientGroups = Core::factory("Schedule_Group_Assignment")
+$ClientGroups = Core::factory("Schedule_Group_Assignment")
+    ->queryBuilder()
     ->where("user_id", "=", $User->getId())
     ->findAll();
 
-$aUserGroups = array();
+$UserGroups = array();
 
-foreach ($aoClientGroups as $group)
+foreach ( $ClientGroups as $group )
 {
-    $aUserGroups[] = $group->groupId();
+    $UserGroups[] = $group->groupId();
 }
 
-if( count( $aUserGroups ) > 0 )
+if( count( $UserGroups ) > 0 )
 {
     $UserReports
+        ->queryBuilder()
         ->open()
             ->where( "client_id", "=", $User->getId() )
             ->where( "type_id", "=", 1 )
         ->close()
         ->open()
-            ->where( "client_id", "IN", $aUserGroups, "OR" )
+            ->where( "client_id", "IN", $UserGroups, "OR" )
             ->where( "type_id", "=", 2 )
         ->close();
 }
 else
 {
     $UserReports
+        ->queryBuilder()
         ->where( "client_id", "=", $User->getId() )
         ->where( "type_id", "=", 1 );
 }
@@ -194,26 +221,26 @@ Core::factory( "Core_Entity" )
 /**
  * Платежи
  */
-$aoUserPayments = Core::factory( "Payment" )
+$UserPayments = Core::factory( "Payment" )
+    ->queryBuilder()
     ->orderBy( "id", "DESC" )
     ->where( "user", "=", $User->getId() )
     ->findAll();
 
-//$ParentUser = User::parentAuth();
 
-foreach ( $aoUserPayments as $payment )
+foreach ( $UserPayments as $payment )
 {
-    $aoUserPaymentsNotes = Core::factory( "Property", 26 )->getPropertyValues( $payment );
-    $aoUserPaymentsNotes = array_reverse( $aoUserPaymentsNotes );
-    $payment->addEntities( $aoUserPaymentsNotes, "notes" );
+    $UserPaymentsNotes = Core::factory( "Property", 26 )->getPropertyValues( $payment );
+    $UserPaymentsNotes = array_reverse( $UserPaymentsNotes );
+    $payment->addEntities( $UserPaymentsNotes, "notes" );
     $payment->datetime( refactorDateFormat( $payment->datetime() ) );
 }
 
-Core::factory("Core_Entity")
+Core::factory( "Core_Entity" )
     ->addSimpleEntity( "is_admin", $isAdmin )
-    ->addEntities($aoUserPayments)
+    ->addEntities( $UserPayments )
     ->addEntity( $ParentUser, "parent_user" )
-    ->xsl("musadm/users/balance/payments.xsl")
+    ->xsl( "musadm/users/balance/payments.xsl" )
     ->show();
 
 
@@ -226,7 +253,8 @@ if( $isAdmin === 1 )
     /**
      * Поиск событий, связанных с пользователем
      */
-    $UserEvents = Core::factory( "Event" )
+    $UserEvents = Core::factory( "Event" );
+    $UserEvents->queryBuilder()
         ->where( "user_assignment_id", "=", $User->getId() )
         ->where( "type_id", "IN", array(2, 3, 4, 5, 7, 8, 9) )
         ->orderBy( "time", "DESC" );
@@ -235,43 +263,11 @@ if( $isAdmin === 1 )
     /**
      * Поиск задачь, связанных с пользователем
      */
-    $Tasks = Core::factory( "Task" )
+    $Tasks = Core::factory( "Task" );
+    $Tasks->queryBuilder()
         ->where( "associate", "=", $User->getId() )
         ->orderBy( "date", "DESC" )
         ->orderBy( "id", "DESC" );
-
-
-    /**
-     * Задание условий выборки событий и задач за указанный период
-     */
-//    $dateFrom = Core_Array::Get( "event_date_from", null );
-//    $dateTo = Core_Array::Get( "event_date_to", null );
-
-    //Выборка за сегоднящний день
-//    if ( $dateFrom === null && $dateTo === null )
-//    {
-//        $dateFromTime = strtotime( date( "Y-m-d" ) );
-//        $dateToTime = strtotime("+1 day");
-//
-//        $UserEvents->between( "time", $dateFromTime, $dateToTime );
-//        $Tasks->where( "date", "=", date( "Y-m-d" ) );
-//    }
-//
-//    if ( $dateFrom !== null )
-//    {
-//        $dateFromTime = strtotime( $dateFrom );
-//
-//        $UserEvents->where( "time", ">=", $dateFromTime );
-//        $Tasks->where( "date", ">=", $dateFrom );
-//    }
-//
-//    if( $dateTo !== null )
-//    {
-//        $dateToTime = strtotime( $dateTo . " + 1 day" );
-//
-//        $UserEvents->where( "time", "<=", $dateToTime );
-//        $Tasks->where( "date", "<=", $dateTo );
-//    }
 
     $UserEvents = $UserEvents->findAll();
     $Tasks = $Tasks->findALl();
@@ -320,6 +316,7 @@ if( $isAdmin === 1 )
 
     //Поиск всех комментариев, связанных с выбранными задачами
     $Notes = Core::factory( "Task_Note" )
+        ->queryBuilder()
         ->select([
             "Task_Note.id AS id", "date", "task_id", "author_id", "text", "usr.name AS name", "usr.surname AS surname"
         ])

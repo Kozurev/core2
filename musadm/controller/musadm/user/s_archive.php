@@ -7,47 +7,44 @@
  */
 
 $breadcumbs[0] = new stdClass();
-$breadcumbs[0]->title = $this->oStructure->title();
+$breadcumbs[0]->title = Core_Page_Show::instance()->Structure->title();
 $breadcumbs[0]->active = 1;
 $breadcumbs[1] = new stdClass();
-$breadcumbs[1]->title = $this->oStructure->title();
+$breadcumbs[1]->title = Core_Page_Show::instance()->Structure->title();
 $breadcumbs[1]->active = 1;
 
-$this->setParam( "body-class", "body-primary" );
-$this->setParam( "title-first", "АРХИВ" );
-$this->setParam( "title-second", "ПОЛЬЗОВАТЕЛЕЙ" );
-$this->setParam( "breadcumbs", $breadcumbs );
+Core_Page_Show::instance()->setParam( "body-class", "body-primary" );
+Core_Page_Show::instance()->setParam( "title-first", "АРХИВ" );
+Core_Page_Show::instance()->setParam( "title-second", "ПОЛЬЗОВАТЕЛЕЙ" );
+Core_Page_Show::instance()->setParam( "breadcumbs", $breadcumbs );
 
 
 /*
 *	Блок проверки авторизации
 */
-$oUser = Core::factory("User")->getCurrent();
+$User = User::current();
+$accessRules = ["groups"    => [2, 6]];
 
-$accessRules = array(
-    "groups"    => array(1, 2, 6)
-);
-
-if($oUser == false || !User::checkUserAccess($accessRules, $oUser))
+if ( !User::checkUserAccess( $accessRules, $User ) )
 {
-    $this->error404();
+    Core_Page_Show::instance()->error404();
     exit;
 }
 
 
-$action = Core_Array::getValue($_GET, "action", 0);
+$action = Core_Array::Get( "action", 0 );
 
 /**
  * Обновление таблицы
  */
-if($action === "refreshTableUsers")
+if( $action === "refreshTableUsers" )
 {
-    $this->execute();
+    Core_Page_Show::instance()->execute();
     exit;
 }
 
-if($action === "refreshTableArchive")
+if( $action === "refreshTableArchive" )
 {
-    $this->execute();
+    Core_Page_Show::instance()->execute();
     exit;
 }

@@ -6,8 +6,8 @@
  * Time: 17:07
  */
 
-$from = Core_Array::getValue( $_GET, "date_from", "" );
-$to =   Core_Array::getValue( $_GET, "date_to", "" );
+$from = Core_Array::Get( "date_from", "" );
+$to =   Core_Array::Get( "date_to", "" );
 $today = date( "Y-m-d" );
 
 
@@ -20,7 +20,9 @@ $output = Core::factory( "Core_Entity" );
 
 if( $from == "" && $to == "" )
 {
-    $Tasks = Core::factory( "Task" )
+    $Tasks = Core::factory( "Task" );
+
+    $Tasks->queryBuilder()
         ->where( "date", "<=", $today )
         ->open()
             ->where( "done", "=", 0 )
@@ -33,24 +35,30 @@ else
 
     if( $from != "" )
     {
-        $Tasks->where( "date", ">=", $from );
+        $Tasks->queryBuilder()
+            ->where( "date", ">=", $from );
+
         $output->addSimpleEntity( "date_from", $from );
     }
     if( $to != "" )
     {
-        $Tasks->where( "date", "<=", $to );
+        $Tasks->queryBuilder()
+            ->where( "date", "<=", $to );
+
         $output->addSimpleEntity( "date_to", $to );
     }
 }
 
 //Поиск конкретной задачи по id
 $id = Core_Array::Get( "task_id", 0 );
+
 if( $id != 0 )
 {
-    $Tasks->where( "id", "=", $id );
+    $Tasks->queryBuilder()
+        ->where( "id", "=", $id );
 }
 
-$Tasks = $Tasks
+$Tasks = $Tasks->queryBuilder()
     ->where( "type", "<>", 3 )
     ->where( "subordinated", "=", $subordinated )
     ->orderBy( "date", "DESC" )
@@ -73,6 +81,7 @@ foreach ( $Tasks as $Task )
     if( $Task->associate() !== 0 )
     {
         $Client = Core::factory( "User", $Task->associate() );
+
         if( $Client !== false )
         {
             $clientsAssignments[] = $Client;
@@ -82,6 +91,7 @@ foreach ( $Tasks as $Task )
 
 //Поиск всех комментариев, связанных с выбранными задачами
 $Notes = Core::factory( "Task_Note" )
+    ->queryBuilder()
     ->select([
         "Task_Note.id AS id", "date", "task_id", "author_id", "text", "usr.name AS name", "usr.surname AS surname"
     ])

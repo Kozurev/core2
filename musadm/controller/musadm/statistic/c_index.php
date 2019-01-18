@@ -7,15 +7,10 @@
  */
 
 $dateFormat = "Y-m-d";
-$date = date( "Y-m-d" );
-//$Date = new DateTime(date($dateFormat));
-//$Interval = new DateInterval("P1M");
-//$defaultDateFrom = $Date->sub($Interval)->format($dateFormat);
-//$defaultDateTo = date($dateFormat);
+$date = date( $dateFormat );
 
-
-$dateFrom = Core_Array::getValue( $_GET, "date_from", null );
-$dateTo = Core_Array::getValue( $_GET, "date_to", null );
+$dateFrom = Core_Array::Get( "date_from", null );
+$dateTo = Core_Array::Get( "date_to", null );
 
 
 $Director = User::current()->getDirector();
@@ -25,10 +20,10 @@ $subordinated = $Director->getId();
 
 echo "<div class='row'>";
 
-Core::factory("Core_Entity")
-    ->addSimpleEntity("date_from", $dateFrom)
-    ->addSimpleEntity("date_to", $dateTo)
-    ->xsl("musadm/statistic/calendar.xsl")
+Core::factory( "Core_Entity" )
+    ->addSimpleEntity( "date_from", $dateFrom )
+    ->addSimpleEntity( "date_to", $dateTo )
+    ->xsl( "musadm/statistic/calendar.xsl" )
     ->show();
 
 /**
@@ -45,7 +40,7 @@ $queryString = Core::factory( "Orm" )
     ->where( "p.property_id", "=", 12 )
     ->getQueryString();
 
-$Result = Core::factory("Orm")->executeQuery( $queryString );
+$Result = Core::factory( "Orm" )->executeQuery( $queryString );
 $Result = $Result->fetch();
 $sum = $Result["sum"];
 
@@ -117,21 +112,23 @@ $Result = $Result->fetch();
 $group_lessons_neg = $Result["sum"];
 if( $group_lessons_neg == "" )  $group_lessons_neg = 0;
 
-Core::factory("Core_Entity")
-    ->addSimpleEntity("balance", $sum)
-    ->addSimpleEntity("indiv_pos", $indiv_lessons_pos)
-    ->addSimpleEntity("indiv_neg", $indiv_lessons_neg * -1)
-    ->addSimpleEntity("group_pos", $group_lessons_pos)
-    ->addSimpleEntity("group_neg", $group_lessons_neg * -1)
-    ->xsl("musadm/statistic/balance.xsl")
+Core::factory( "Core_Entity" )
+    ->addSimpleEntity( "balance", $sum )
+    ->addSimpleEntity( "indiv_pos", $indiv_lessons_pos )
+    ->addSimpleEntity( "indiv_neg", $indiv_lessons_neg * -1 )
+    ->addSimpleEntity( "group_pos", $group_lessons_pos )
+    ->addSimpleEntity( "group_neg", $group_lessons_neg * -1 )
+    ->xsl( "musadm/statistic/balance.xsl" )
     ->show();
 
 
 /**
  * Статистика по лидам
  */
-$oLidsOutput = Core::factory("Core_Entity");
-$totalCount = Core::factory("Lid")
+$LidsOutput = Core::factory( "Core_Entity" );
+
+$totalCount = Core::factory( "Lid" )
+    ->queryBuilder()
     ->where( "subordinated", "=", $subordinated );
 
 if( $dateFrom === null && $dateTo === null )
@@ -149,21 +146,23 @@ $countLidsStatus80 = $totalCount;
 
 $Orm = Core::factory( "Orm" );
 $queryString = $Orm->getQueryString();
-$aoResults = $Orm->executeQuery( $queryString );
+$Results = $Orm->executeQuery( $queryString );
 
-if( $aoResults != false )
+if( $Results != false )
 {
-    $aoResults = $aoResults->fetchAll();
+    $Results = $Results->fetchAll();
 }
 
-$aoStatuses = Core::factory( "Property_List_Values" )
+$Statuses = Core::factory( "Property_List_Values" )
+    ->queryBuilder()
 	->where( "property_id", "=", 27 )
+    ->where( "subordinated", "=", $subordinated )
     ->orderBy( "id", "DESC" )
 	->findAll();
 
-	if( count( $aoStatuses ) > 0 )
+	if( count( $Statuses ) > 0 )
 	{
-		foreach ( $aoStatuses as $status )
+		foreach ( $Statuses as $status )
 		{
 			$queryString = Core::factory( "Orm" )
 				->select( "count(Lid.id)", "count" )
@@ -210,11 +209,11 @@ $aoStatuses = Core::factory( "Property_List_Values" )
 
 			$status->addSimpleEntity( "count", $count );
 			$status->addSimpleEntity( "percents", round( $percents, 2 ) );
-			$oLidsOutput->addEntity( $status, "status" );
+			$LidsOutput->addEntity( $status, "status" );
 		}
 	}
 
-$oLidsOutput
+$LidsOutput
     ->addSimpleEntity( "total", $totalCount )
     ->xsl( "musadm/statistic/lids.xsl" )
     ->show();
@@ -257,11 +256,13 @@ Core::factory( "Core_Entity" )
  * Статистика по проведенным занятиям
  */
 $lessonReportsCount = Core::factory( "Schedule_Lesson_Report" )
+    ->queryBuilder()
     ->where( "type_id", "<>", "3" )
     ->leftJoin( "User as u", "u.id = teacher_id" )
     ->where( "u.subordinated", "=", $subordinated );
 
 $attendanceCount = Core::factory( "Schedule_Lesson_Report" )
+    ->queryBuilder()
     ->where( "type_id", "<>", "3" )
     ->where( "attendance", "=", 1 )
     ->join( "User as u", "u.id = teacher_id" )
@@ -319,7 +320,7 @@ else
     $lessonIndex = round( $attendanceCount / $countDaysInterval, 1 );
 
 
-Core::factory("Core_Entity")
+Core::factory( "Core_Entity" )
     ->addSimpleEntity( "day_index", $lessonIndex )
     ->addSimpleEntity( "total_count", $lessonReportsCount )
     ->addSimpleEntity( "attendance_count", $attendanceCount )
@@ -331,11 +332,13 @@ Core::factory("Core_Entity")
  * Статистика по доходам, расходам и прибыли
  */
 $finances = Core::factory( "Schedule_Lesson_Report" )
+    ->queryBuilder()
     ->join( "User AS u", "teacher_id = u.id" )
     ->where( "u.subordinated", "=", $subordinated );
 
 //Хозрасходы
 $hostExpenses = Core::factory( "Payment" )
+    ->queryBuilder()
     ->select( "sum(Payment.value)", "value" )
     ->where( "type", "=", 4 )
     ->where( "subordinated", "=", $subordinated );

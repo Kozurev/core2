@@ -1,26 +1,22 @@
 <?php
 
-class Core_Entity_Model extends Orm
+class Core_Entity_Model
 {
 
 	protected $aEntityVars = array(
 		"name" => "root",
 		"value" => "",
 		"xslPath" => "",
-		"custom_tag" => ""
+		"custom_tag" => "",
+        "orm" => null,
 	); 
 
 	//Массив дочерних сущьностей
 	protected $childrenObjects = array();
 
 
-	public function __construct()
-	{
 
-	}
-
-
-	public function name($val = null)
+	public function _entityName($val = null)
 	{
 		if(is_null($val)) return $this->aEntityVars["name"];
 		else $this->aEntityVars["name"] = $val;
@@ -28,7 +24,7 @@ class Core_Entity_Model extends Orm
 	}
 
 
-	public function value($val = null)
+	public function _entityValue($val = null)
 	{
 		if(is_null($val)) return $this->aEntityVars["value"];
 		else $this->aEntityVars["value"] = strval($val);

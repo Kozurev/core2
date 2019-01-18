@@ -119,38 +119,44 @@ class Schedule_Controller
         if( $this->userId )
         {
             $User = Core::factory( "User", $this->userId );
+
             if( $User->groupId() == 4 )
             {
-                $Lessons->where( "teacher_id", "=", $this->userId );
+                $Lessons->queryBuilder()
+                    ->where( "teacher_id", "=", $this->userId );
             }
             elseif( $User->groupId() == 5 )
             {
-                $aoClientGroups = Core::factory("Schedule_Group_Assignment")
+                $ClientGroups = Core::factory("Schedule_Group_Assignment")
+                    ->queryBuilder()
                     ->where("user_id", "=", $this->userId)
                     ->findAll();
 
-                $aUserGroups = array();
-                foreach ($aoClientGroups as $group)
+                $UserGroups = array();
+
+                foreach ( $ClientGroups as $group )
                 {
-                    $aUserGroups[] = $group->groupId();
+                    $UserGroups[] = $group->groupId();
                 }
 
                 $Lessons
+                    ->queryBuilder()
                     ->open()
                     ->where("client_id", "=", $this->userId)
                     ->where("type_id", "=", 1)
                     ->where("type_id", "<>", 3);
 
-                if( count( $aUserGroups) > 0 )
+                if( count( $UserGroups) > 0 )
                 {
                     $Lessons
+                        ->queryBuilder()
                         ->open()
-                            ->where("client_id", "in", $aUserGroups, "or")
-                            ->where("type_id", "=", 2)
+                            ->where( "client_id", "in", $UserGroups, "or" )
+                            ->where( "type_id", "=", 2 )
                         ->close();
                 }
 
-                $Lessons->close();
+                $Lessons->queryBuilder()->close();
             }
         }
 
@@ -160,6 +166,7 @@ class Schedule_Controller
             $this->unsetPeriod();
 
             $Lessons
+                ->queryBuilder()
                 ->open()
                     ->open()
                         ->where( "insert_date", "=", $this->date )
@@ -182,6 +189,7 @@ class Schedule_Controller
             $this->unsetDate();
 
             $Lessons
+                ->queryBuilder()
                 ->open()
                     ->open()
                         ->where( "insert_date", ">=", $this->periodFrom )
@@ -199,9 +207,8 @@ class Schedule_Controller
                 ->close();
         }
 
-        $Lessons = $Lessons
+        $Lessons = $Lessons->queryBuilder()
             ->orderBy( "time_from" )
-            //->orderBy(  )
             ->findAll();
 
         if( $this->date )
@@ -335,7 +342,12 @@ class Schedule_Controller
                 //echo "<hr/><span class='area'>". $Area->title() ."</span><hr/>";
                 $areasIds = [];
                 foreach ( $table[$i]["lessons"] as $Lesson )   $areasIds[] = $Lesson->areaId();
-                $Areas = Core::factory( "Schedule_Area" )->where( "id", "IN", $areasIds )->findAll();
+
+                $Areas = Core::factory( "Schedule_Area" )
+                    ->queryBuilder()
+                    ->where( "id", "IN", $areasIds )
+                    ->findAll();
+
                 foreach ( $Areas as $Area ) $Areas[$Area->getId()] = clone $Area;
             }
 
