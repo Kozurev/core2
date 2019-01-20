@@ -20,26 +20,29 @@ $Director = User::current()->getDirector();
 if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
 $subordinated = $Director->getId();
 
-
-$Tarifs = Core::factory( "Payment_Tarif" )
-    ->queryBuilder()
+//Тарифы
+$Tarifs = Core::factory( "Payment_Tarif" )->queryBuilder()
     ->where( "subordinated", "=", $subordinated )
     ->findAll();
 
-$LessonTypes = Core::factory( "Schedule_Lesson_Type" )
-    ->queryBuilder()
+//Типы занятий
+$LessonTypes = Core::factory( "Schedule_Lesson_Type" )->queryBuilder()
     ->where( "id", "<>", 3 )
     ->findAll();
+
+//Типы платежей
+$PaymentTypes = Core::factory( "Payment" )->getTypes( true, false );
 
 
 $Payments = Core::factory( "Payment" );
 $Payments->queryBuilder()
     ->where( "subordinated", "=", $subordinated )
-    ->open()
-        ->where("type", "=", 1)
-        ->where("type", "=", 3, "OR")
-        ->where("type", "=", 4, "OR")
-    ->close()
+    ->where( "type", "<>", 2 )
+//    ->open()
+//        ->where("type", "=", 1)
+//        ->where("type", "=", 3, "OR")
+//        ->where("type", "=", 4, "OR")
+//    ->close()
     ->orderBy("datetime", "DESC")
     ->orderBy( "id", "DESC" );
 
@@ -100,16 +103,18 @@ foreach ( $Payments as $payment )
     $payment->addEntity( $PaymentUser );
     $payment->datetime( refactorDateFormat( $payment->datetime() ) );
 
-    if( $PaymentUser->groupId() == 5 )
-    {
-        $Property = Core::factory( "Property", 15 );
-        $userAreaName = $Property->getPropertyValues( $PaymentUser )[0]->value();
+    $Area = Core::factory( "Schedule_Area_Assignment" )->getArea( $payment );
 
-        if( $userAreaName != $Property->defaultValue() )
-        {
-            $payment->addSimpleEntity( "area", $userAreaName );
-        }
-    }
+//    if( $PaymentUser->groupId() == 5 )
+//    {
+//        $Property = Core::factory( "Property", 15 );
+//        $userAreaName = $Property->getPropertyValues( $PaymentUser )[0]->value();
+//
+//        if( $userAreaName != $Property->defaultValue() )
+//        {
+//            $payment->addSimpleEntity( "area", $userAreaName );
+//        }
+//    }
 }
 
 

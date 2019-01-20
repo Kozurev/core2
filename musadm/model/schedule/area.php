@@ -17,6 +17,13 @@ class Schedule_Area extends Schedule_Area_Model
         {
             $User = User::current();
 
+            if ( $User === null )
+            {
+                exit ( "getList -> Для поиска филлиала принадлежащего одной организации что и пользователь необходимо авторизоваться" );
+            }
+
+            $this->queryBuilder()
+                ->where( "subordinated", "=", $User->getDirector()->getId() );
         }
 
         return $this->queryBuilder()

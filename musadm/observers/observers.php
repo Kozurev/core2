@@ -454,3 +454,23 @@ Core::attachObserver( "afterScheduleReportSave", function( $args ) {
         }
     }
 });
+
+
+Core::attachObserver( "beforePaymentSave", function( $args ) {
+    $Payment = $args[0];
+
+    if ( $Payment->areaId() == 0 )
+    {
+        $PaymentUser = $Payment->getUser();
+
+        if ( $PaymentUser !== null )
+        {
+            $UserAreas = Core::factory( "Schedule_Area_Assignment" )->getAreas( $PaymentUser, true );
+
+            if ( count( $UserAreas ) > 0 )
+            {
+                $Payment->areaId( $UserAreas[0]->getId() );
+            }
+        }
+    }
+});

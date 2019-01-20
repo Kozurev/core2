@@ -75,3 +75,14 @@ Core::attachObserver( "beforePropertyListValuesSave", function( $args ) {
         $PropertyListValue->subordinated( $User->getId() );
     }
 });
+
+
+Core::attachObserver( "beforePaymentTypeSave", function( $args ) {
+    $PaymentType = $args[0];
+
+    if ( $PaymentType->subordinated() == 0 )
+    {
+        $User = User::current()->getDirector();
+        $PaymentType->subordinated( $User->getId() );
+    }
+});

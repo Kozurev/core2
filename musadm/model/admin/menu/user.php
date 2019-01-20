@@ -2,130 +2,129 @@
 
 class Admin_Menu_User
 {
-    public function __construct(){}
 
-
-    public function show($aParams)
+    public function show( $aParams )
     {
-        $sXslPath = "admin/users/users.xsl";
-        $groupId = Core_Array::getValue($aParams, "parent_id", "0");
-        $oOutputEntity = Core::factory("Core_Entity");
+        $xslPath = "admin/users/users.xsl";
+        $groupId = Core_Array::getValue( $aParams, "parent_id", "0" );
+        $OutputEntity = Core::factory( "Core_Entity" );
         $title = "Пользователи";
 
-        $oUser = Core::factory("User");
-        $search = Core::factory("Core_Entity")->name("search");
+        $User = Core::factory( "User" );
+        $search = Core::factory( "Core_Entity" )->_entityName( "search" );
 
-        $searchData = Core_Array::getValue($aParams, "search", "");
-        if($searchData != "")
+        $searchData = Core_Array::getValue( $aParams, "search", "" );
+
+        if ( $searchData != "" )
         {
-            $data = explode(" ", $searchData);
+            $data = explode( " ", $searchData );
 
-            foreach ($data as $word)
-                $oUser
-                    ->where("name", "like", "%".$word."%", "or")
-                    ->where("surname", "like", "%".$word."%", "or");
+            foreach ( $data as $word )
+                $User->queryBuilder()
+                    ->where( "name", "like", "%".$word."%", "or" )
+                    ->where( "surname", "like", "%".$word."%", "or" );
 
-            $search->value($searchData);
+            $search->value( $searchData );
         }
 
-        $oUser->where("group_id", "=", $groupId);
+        $User->where( "group_id", "=", $groupId );
 
 
         //Пагинация
-        $page = intval(Core_Array::getValue($aParams, "page", 0));
+        $page = intval( Core_Array::getValue( $aParams, "page", 0 ) );
         $offset = $page * SHOW_LIMIT;
-        $oUserCount = clone $oUser;
-        $totalCount = $oUserCount->getCount();
-        if($groupId =="0")  $totalCount += Core::factory("User_Group")->getCount();
-        $countPages = intval($totalCount / SHOW_LIMIT);
-        if($totalCount % SHOW_LIMIT != 0)   $countPages++;
-        if($countPages == 0)    $countPages = 1;
+        $userCount = clone $User;
+        $totalCount = $userCount->getCount();
 
-        $oPagination = Core::factory("Core_Entity")
-            ->name("pagination")
-            ->addEntity(
-                Core::factory("Core_Entity")
-                    ->name("current_page")
-                    ->value(++$page)
-            )
-            ->addEntity(
-                Core::factory("Core_Entity")
-                    ->name("count_pages")
-                    ->value($countPages)
-            )
-            ->addEntity(
-                Core::factory("Core_Entity")
-                    ->name("total_count")
-                    ->value($totalCount)
-            );
+        if ( $groupId == "0" )
+        {
+            $totalCount += Core::factory( "User_Group" )->getCount();
+        }
 
-        $aoUsers = $oUser
-            ->limit(SHOW_LIMIT)
-            ->orderBy("id", "DESC")
-            ->offset($offset)
+        $countPages = intval( $totalCount / SHOW_LIMIT );
+
+        if ( $totalCount % SHOW_LIMIT != 0 )
+        {
+            $countPages++;
+        }
+
+        if ( $countPages == 0 )
+        {
+            $countPages = 1;
+        }
+
+        $Pagination = Core::factory( "Core_Entity" )
+            ->_entityName( "pagination" )
+            ->addSimpleEntity( "current_page", ++$page )
+            ->addSimpleEntity( "count_pages", $countPages )
+            ->addSimpleEntity( "total_count", $totalCount );
+
+        $Users = $User->queryBuilder()
+            ->limit( SHOW_LIMIT )
+            ->orderBy( "id", "DESC" )
+            ->offset( $offset )
             ->findAll();
 
-        if($groupId == "0")
+        if ( $groupId == "0" )
         {
-            $aoGroups = Core::factory("User_Group")
-                ->orderBy("sorting")
-                ->limit(SHOW_LIMIT)
-                ->offset($offset)
+            $Groups = Core::factory( "User_Group" )
+                ->orderBy( "sorting" )
+                ->limit( SHOW_LIMIT )
+                ->offset( $offset )
                 ->findAll();
-            $oOutputEntity->addEntities($aoGroups);
+
+            $OutputEntity->addEntities( $Groups );
         }
-        elseif($groupId != "0")
+        elseif ( $groupId != "0" )
         {
-            $oUserGroup = Core::factory("User_Group", $groupId);
-            $title = $oUserGroup->title();
-            $oOutputEntity->addEntity($oUserGroup);
+            $UserGroup = Core::factory( "User_Group", $groupId );
+
+            if ( $UserGroup === null )
+            {
+                exit ( Core::getMessage( "NOT_FOUND", ["Группа пользователя", $groupId] ) );
+            }
+
+            $title = $UserGroup->title();
+            $OutputEntity->addEntity( $UserGroup );
         }
 
-        $oOutputEntity
-            ->addEntity($oPagination)
-            ->addEntity($search)
-            ->addEntity(
-                Core::factory("Core_Entity")
-                    ->name("title")
-                    ->value($title)
-            )
-            ->addEntity(
-                Core::factory("Core_Entity")
-                    ->name("group_id")
-                    ->value($groupId)
-            )
-            ->addEntities($aoUsers)
-            ->xsl($sXslPath)
+        $OutputEntity
+            ->addEntity( $Pagination )
+            ->addEntity( $search )
+            ->addSimpleEntity( "title", $title )
+            ->addSimpleEntity( "group_id", $groupId )
+            ->addEntities( $Users )
+            ->xsl( $xslPath )
             ->show();
     }
 
 
-    public function updateAction($aParams)
+    public function updateAction( $aParams )
     {
-        //print_r($aParams);
-        $pass1 = Core_Array::getValue($aParams, "pass1", null);
-        $pass2 = Core_Array::getValue($aParams, "pass2", null);
-        unset($aParams["pass1"]);
-        unset($aParams["pass2"]);
+        $pass1 = Core_Array::getValue( $aParams, "pass1", null );
+        $pass2 = Core_Array::getValue( $aParams, "pass2", null );
 
-        if($pass1 != $pass2)    die("Введенные пароли не совпадают");
+        unset( $aParams["pass1"] );
+        unset( $aParams["pass2"] );
 
-        if($pass1 != "" && !is_null($pass1))
+        if ( $pass1 != $pass2 )
+        {
+            exit ( "Введенные пароли не совпадают" );
+        }
+
+        if( $pass1 != "" && !is_null($pass1) )
+        {
             $aParams["password"] = $pass1;
+        }
 
-        Core::factory("Admin_Menu_Main")->updateAction($aParams);
+        Core::factory( "Admin_Menu_Main" )->updateAction( $aParams );
     }
 
 
-    public function updateForm($aParams)
+    public function updateForm( $aParams )
     {
-        Core::factory("Admin_Menu_Main")->updateForm($aParams, "User", "admin/main/update_form.xsl");
+        Core::factory( "Admin_Menu_Main" )->updateForm( $aParams, "User", "admin/main/update_form.xsl" );
     }
 
-//
-//    public function updateFormForPopup($aParams)
-//    {
-//        Core::factory("Admin_Menu_Main")->updateForm($aParams, "User", "musadm/users/edit_popup.xsl");
-//    }
 
 }

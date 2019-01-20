@@ -6,8 +6,10 @@ $(function(){
         //Открытие всплывающего окна редактирования пользователя
         .on("click", ".user_edit", function(e){
             e.preventDefault();
+
             var userid = $(this).data("userid");
             var usergroupid = $(this).data("usergroup");
+
 
             switch(usergroupid)
             {

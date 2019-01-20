@@ -19,7 +19,7 @@ if( !User::checkUserAccess( $accessRules, $User ) )
 }
 
 $breadcumbs[0] = new stdClass();
-$breadcumbs[0]->title = $this->oStructure->title();
+$breadcumbs[0]->title = Core_Page_Show::instance()->Structure->title();
 $breadcumbs[0]->active = 1;
 
 Core_Page_Show::instance()->setParam( "body-class", "body-red" );

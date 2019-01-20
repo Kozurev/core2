@@ -7,6 +7,7 @@ class Orm
 
 	//Параметры для строки запроса
     private $select;
+    //private $addSelecting;
     private $from;
     private $where;
     private $order;
@@ -105,7 +106,7 @@ class Orm
 		$aRows = array_keys($objData);
 		$aValues = array_values($objData);
 
-		$eventObjectName = get_class( $this );
+		$eventObjectName = $obj->getTableName();
 		$eventObjectName = explode( "_", $eventObjectName );
 		$eventObjectName = implode( "", $eventObjectName );
 
@@ -181,7 +182,7 @@ class Orm
 			echo "<br>Строка запроса метода <b>save()</b>: ".$queryStr;
 		}
 
-		Core::notify( array( &$obj ), "before" . $eventObjectName . $eventType );
+		Core::notify( [&$obj], "before" . $eventObjectName . $eventType );
 
 		try
 		{
@@ -201,7 +202,7 @@ class Orm
 		}
 
 
-        Core::notify( array( &$obj ), "after" . $eventObjectName . $eventType );
+        Core::notify( [&$obj], "after" . $eventObjectName . $eventType );
 
 		return $obj;
 	}
@@ -285,10 +286,11 @@ class Orm
      *
      * @return self
      */
-    public function queryBuilder()
+    public function clearQuery()
     {
         $this->queryString = "";
         $this->select = "";
+        //$this->addSelecting = "";
         $this->where = "";
         $this->from = "";
         $this->order = "";
@@ -352,6 +354,47 @@ class Orm
 
 		return $this;
 	}
+
+
+    /**
+     * Дополнительные поля для выборки
+     *
+     * @date 20.01.2019 22:59
+     *
+     * @param $field
+     * @param null $as
+     * @return self
+     */
+//	public function addSelect( $field, $as = null )
+//    {
+//        if ( is_array( $field ) && count( $field ) > 0 )
+//        {
+//            if ( $this->addSelecting != "" )
+//            {
+//                $this->addSelecting .= ", ";
+//            }
+//
+//            $this->addSelecting .= implode( ", ", $field );
+//        }
+//        else
+//        {
+//            if ( $this->addSelecting == null || $this->addSelecting == "" )
+//            {
+//                $this->addSelecting = $field;
+//            }
+//            else
+//            {
+//                $this->addSelecting .= " , " . $field;
+//            }
+//
+//            if ( !is_null( $as ) )
+//            {
+//                $this->addSelecting .= " AS " . $as;
+//            }
+//        }
+//
+//        return $this;
+//    }
 
 
 	/**
@@ -608,7 +651,7 @@ class Orm
 	/**
 	 * Выполняет запрос к бд
      *
-	 * @return object | false
+	 * @return
 	 */
 	public function find()
 	{

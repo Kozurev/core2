@@ -22,12 +22,15 @@ $groupId == 5
     ?   $xsl = "musadm/users/clients.xsl"
     :   $xsl = "musadm/users/teachers.xsl";
 
-$Users = Core::factory( "User" )
-    ->queryBuilder()
-    ->where( "subordinated", "=", $subordinated )
+
+$Users = Core::factory( "User" )->queryBuilder()
+//    ->select( ["User.id", "name", "surname", "phone_number", "User.group_id", "ar.id AS area_id", "ar.title AS area_title"] )
+    ->where( "User.subordinated", "=", $subordinated )
     ->where( "group_id", "=", $groupId )
-    ->where( "active", "=", 1 )
-    ->orderBy( "id", "DESC" )
+    ->where( "User.active", "=", 1 )
+//    ->leftJoin( "Schedule_Area_Assignment AS asgm", "asgm.model_id = User.id AND asgm.model_name = 'User'" )
+//    ->leftJoin( "Schedule_Area AS ar", "ar.id = asgm.area_id AND ar.subordinated = " . $subordinated )
+    ->orderBy( "User.id", "DESC" )
     ->findAll();
 
 $UserGroup = Core::factory( "User_Group", $groupId );
@@ -40,6 +43,9 @@ foreach ( $Users as $User )
     {
         $User->addEntities( $prop->getPropertyValues( $User ), "property_value" );
     }
+
+    $UserAreas = Core::factory( "Schedule_Area_Assignment" )->getAreas( $User );
+    $User->addEntities( $UserAreas, "areas" );
 }
 
 $AreaAssignment = Core::factory( "Schedule_Area_Assignment" );

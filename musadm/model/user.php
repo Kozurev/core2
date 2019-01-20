@@ -400,8 +400,8 @@ class User extends User_Model
     {
         if ( is_null( $User ) ) $User = self::current();
 
-        if ( $User === false )          return false;
-        if ( $User->groupId() === 1 )   return false;
+        if ( $User === null )           return false;
+        if ( $User->groupId() === 1 )   return true;
         if ( !is_object( $Object ) )    return false;
 
         if ( !method_exists( $Object, "subordinated" ) )

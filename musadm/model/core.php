@@ -112,7 +112,7 @@ class Core //extends Orm
 
 		//Если был передан id тогда формируем условия поиска конкретного объекта
 		//или возвращаем пустой объект 
-		if ( is_numeric( $id ) && $id !== 0 )
+		if ( is_numeric( $id ) && intval( $id ) !== 0 )
 		{
 			return $obj->queryBuilder()
 				->where( "id", "=", $id )

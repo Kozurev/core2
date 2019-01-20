@@ -115,11 +115,19 @@
                 <span>Студия</span>
             </div>
             <div class="column">
-                <select class="form-control" name="property_15[]" >
+                <xsl:variable name="area_id" select="user/area_id" />
+
+                <select class="form-control" name="areas[]" >
                     <option value="0">...</option>
-                    <xsl:call-template name="property_list" >
-                        <xsl:with-param name="property_id" select="15" />
-                    </xsl:call-template>
+                    <xsl:for-each select="areas">
+                        <!--<xsl:variable name="id" select="id" />-->
+                        <option value="{id}">
+                            <xsl:if test="$area_id = id">
+                                <xsl:attribute name="selected">selected</xsl:attribute>
+                            </xsl:if>
+                            <xsl:value-of select="title" />
+                        </option>
+                    </xsl:for-each>
                 </select>
             </div>
                 <hr/>

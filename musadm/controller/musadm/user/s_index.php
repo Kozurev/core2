@@ -70,6 +70,14 @@ if ( $action == "updateFormClient" )
         }
 
 
+        $AreaAssignments = Core::factory( "Schedule_Area_Assignment" )->getAssignments( $PaymentUser );
+
+        if ( count( $AreaAssignments ) > 0 )
+        {
+            $PaymentUser->addSimpleEntity( "area_id", $AreaAssignments[0]->areaId() );
+        }
+
+
         $Properties[] = Core::factory( "Property", 16 )->getPropertyValues( $PaymentUser )[0];    //Доп. телефон
         $Properties[] = Core::factory( "Property", 9  )->getPropertyValues( $PaymentUser )[0];    //Ссылка вк
         $Properties[] = Core::factory( "Property", 17 )->getPropertyValues( $PaymentUser )[0];    //Длительность урока
@@ -88,6 +96,9 @@ if ( $action == "updateFormClient" )
             );
     }
 
+
+    $Areas = Core::factory( "Schedule_Area" )->getList( true );
+
     $PropertyLists = Core::factory( "Property_List_Values" )->queryBuilder()
         ->where( "subordinated", "=", $subordinated )
         ->where( "property_id", "=", 21 )
@@ -104,6 +115,7 @@ if ( $action == "updateFormClient" )
 
     $output
         ->addEntity( $PaymentUser )
+        ->addEntities( $Areas, "areas" )
         ->addEntities( $Properties, "property_value" )
         ->addEntities( $PropertyLists, "property_list" )
         ->xsl( "musadm/users/edit_client_popup.xsl" )
@@ -273,8 +285,8 @@ if ( $action == "savePayment" )
         ->user( $userid )
         ->type( $type )
         ->value( $value )
-        ->description( $description )
-        ->save();
+        ->description( $description );
+    $Payment->save();
 
     //Корректировка баланса ученика
     $PaymentUser = Core::factory( "User", $userid );

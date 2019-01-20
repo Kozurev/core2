@@ -49,4 +49,30 @@ class Payment_Type extends Core_Entity
         return $this;
     }
 
+
+    public function save( $obj = null )
+    {
+        Core::notify( [&$this],"beforePaymentTypeSave" );
+
+        if ( $this->isDeletable() !== 1 )   return;
+
+        parent::save();
+
+        Core::notify( [&$this],"afterPaymentTypeSave" );
+    }
+
+
+    public function delete()
+    {
+        Core::notify( [&$this], "beforePaymentTypeDelete" );
+
+        if ( $this->isDeletable() !== 1 )   return;
+
+        parent::delete();
+
+        Core::notify( [&$this], "afterPaymentTypeDelete" );
+    }
+
+
+
 }

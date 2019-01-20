@@ -32,6 +32,10 @@
             <div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
                 <a class="btn btn-green tarifs_show">Тарифы</a>
             </div>
+
+            <div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
+                <a class="btn btn-green finances_payment_types">Категории расходов</a>
+            </div>
         </div>
 
         <div class="tarifs table-responsive">

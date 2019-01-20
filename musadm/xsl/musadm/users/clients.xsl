@@ -140,7 +140,9 @@
             <td><xsl:value-of select="property_value[property_id = 17]/value" /></td>
 
             <!--Студия-->
-            <td><xsl:value-of select="property_value[property_id = 15]/value" /></td>
+            <td>
+                <xsl:value-of select="areas/title" />
+            </td>
 
             <!--Действия-->
             <xsl:if test="//table_type = 'active'">

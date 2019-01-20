@@ -11,7 +11,7 @@
  * Блок проверки авторизации и прав доступа
  */
 $User = User::current();
-$accessRules = ["groups"    => [1, 6]];
+$accessRules = ["groups"    => [6]];
 
 if( !User::checkUserAccess( $accessRules, $User ) )
 {
@@ -42,7 +42,7 @@ if( $action === "show" )
 /**
  * Сохранение платежа типа "Хозрасходы"
  */
-if( $action === "saveCustomPayment" )
+if ( $action === "saveCustomPayment" )
 {
     $summ = Core_Array::Get( "summ", 0 );
     $note = Core_Array::Get( "note", "" );
@@ -63,19 +63,74 @@ if( $action === "saveCustomPayment" )
 /**
  * Создание / редактирование тарифа
  */
-if( $action === "edit_tarif_popup" )
+if ( $action === "edit_tarif_popup" )
 {
     $tarifId = Core_Array::Get( "tarifid", null );
 
-    if( $tarifId !== null ) $Tarif = Core::factory( "Payment_Tarif", $tarifId );
-    else    $Tarif = Core::factory( "Payment_Tarif" );
+    $tarifId !== null
+        ?   $Tarif = Core::factory( "Payment_Tarif", $tarifId )
+        :   $Tarif = Core::factory( "Payment_Tarif" );
 
-    if( $Tarif === false )  die( "Редактируемый тариф не найден" );
+    if( $Tarif === null )  exit ( Core::getMessage( "NOT_FOUND", ["Тариф", $tarifId] ) );
 
     Core::factory( "Core_Entity" )
         ->addEntity( $Tarif )
         ->xsl( "musadm/finances/new_tarif_popup.xsl" )
         ->show();
+
+    exit;
+}
+
+
+if ( $action === "getPaymentTypesPopup" )
+{
+    $PaymentTypes = Core::factory( "Payment" )->getTypes( true, true );
+
+    Core::factory( "Core_Entity" )
+        ->addEntities( $PaymentTypes, "type" )
+        ->xsl( "musadm/finances/edit_payment_type.xsl" )
+        ->show();
+
+    exit;
+}
+
+
+if ( $action === "savePaymentType" )
+{
+    $typeId = Core_Array::Get( "id", 0 );
+    $title = Core_Array::Get( "title", "" );
+    $PaymentType = Core::factory( "Payment_Type", $typeId );
+
+    if ( $PaymentType === null )
+    {
+        exit ( Core::getMessage( "NOT_FOUND", ["Тип платежа", $typeId] ) );
+    }
+
+    if ( $typeId > 0 && User::isSubordinate( $PaymentType ) === false )
+    {
+        exit ( Core::getMessage( "NOT_SUBORDINATE", ["Тип платежа", $typeId] ) );
+    }
+
+    $PaymentType->title( $title )->save();
+
+    exit ( "<option id='" . $PaymentType->getId() . "'>" . $PaymentType->title() . "</option>" );
+}
+
+
+if ( $action === "deletePaymentTypes" )
+{
+    $typesIds = Core_Array::Get( "ids", null );
+    if ( $typesIds == null )    exit;
+
+    foreach ( $typesIds as $id )
+    {
+        $PaymentType = Core::factory( "Payment_Type", $id );
+
+        if ( $PaymentType !== null && User::isSubordinate( $PaymentType ) )
+        {
+            $PaymentType->delete();
+        }
+    }
 
     exit;
 }

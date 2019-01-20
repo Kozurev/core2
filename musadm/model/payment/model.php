@@ -18,7 +18,6 @@ class Payment_Model extends Core_Entity
     protected $subordinated = 0;
     protected $area_id = 0;
 
-
     public function __construct(){}
 
 

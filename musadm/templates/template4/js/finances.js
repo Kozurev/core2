@@ -89,6 +89,7 @@ $(function(){
             valueInput.val(oldValue);
             valueInput.css("display", "inline-block");
         })
+        //Сохранение значения одной из ставок преподавателей
         .on("click", ".teacher_rate_save", function(e){
             e.preventDefault();
 
@@ -109,7 +110,51 @@ $(function(){
             var teacherId = $("#teacher_id").val();
 
             savePropertyValue( propertyTagName, propertyValue, "User", teacherId );
+        })
+        //Открытие всплывающего окна добавления/удаления типов платежей
+        .on("click", ".finances_payment_types", function(e){
+            e.preventDefault();
+            showFinancesTypes();
+        })
+        //Сохранение нового типа платежа
+        .on("click", ".finances_payment_type_append", function(e){
+            e.preventDefault();
+            var newTypeName = $("#input_new_payment_type").val();
+
+            if(newTypeName.length == 0)
+            {
+                $("#input_new_payment_type").addClass("error");
+                $("label[for=input_new_payment_type]").addClass("error");
+                return false;
+            }
+
+            //loaderOn();
+            savePaymentType(0, newTypeName, function(response){
+                $(".finances_payment_type_list").append(response);
+                $("#input_new_payment_type").val("");
+                //loaderOff();
+            });
+        })
+        //Удаление типа(ов) платежа(эй)
+        .on("click", ".finances_payment_type_delete", function(e){
+            e.preventDefault();
+            var deletingTypes = $(".finances_payment_type_list").find("option:selected");
+
+            var deletingTypesIds = [];
+            $.each(deletingTypes, function(key, option){
+                deletingTypesIds.push($(option).val());
+            });
+
+            deletePaymentTypes(deletingTypesIds, function(response){
+                var options = $(".finances_payment_type_list").find("option:selected");
+                $.each(options, function(key, option){
+                    console.log(option);
+                    $(option).remove();
+                });
+            });
         });
+
+
 });
 
 
@@ -144,6 +189,72 @@ function showFinancesHistory(periodFrom, periodTo) {
             $(".finances").empty();
             $(".finances").append(responce);
             loaderOff();
+        }
+    });
+}
+
+
+/**
+ * Открытие всплывающего окна с созданием/удалением типов платежей
+ */
+function showFinancesTypes() {
+    $.ajax({
+        type: "GET",
+        url: root + "/finances",
+        data: {
+            action: "getPaymentTypesPopup"
+        },
+        success: function(response) {
+            loaderOff();
+            showPopup( response );
+        }
+    });
+}
+
+
+/**
+ * Сохранение типа платежа
+ *
+ * @date 20.10.2019 16:20
+ *
+ * @param id - id сохраняемого типа
+ * @param title - название
+ * @param func - обработчик после выполнения AJAX-запроса
+ */
+function savePaymentType(id, title, func) {
+    $.ajax({
+        type: "GET",
+        url: root + "/finances",
+        data: {
+            action: "savePaymentType",
+            id: id,
+            title: title
+        },
+        success: function(response) {
+            func(response);
+        }
+    });
+}
+
+
+/**
+ * Удаление типа/типов платежей по id
+ *
+ * @date 20.01.2019 17:50
+ *
+ * @param ids - массив идентификаторов платежей
+ * @param func - обработчик после выполнения AJAX-запроса
+ */
+function deletePaymentTypes(ids, func) {
+    $.ajax({
+        type: "GET",
+        url: root + "/finances",
+        data: {
+            action: "deletePaymentTypes",
+            ids: ids
+        },
+        success: function(response) {
+            func(response);
         }
     });
 }

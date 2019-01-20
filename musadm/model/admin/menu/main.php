@@ -46,6 +46,51 @@ class Admin_Menu_Main
         $oUpdatingItem->save();
 
 
+        /**
+         * Обновление связей объекта с филиалом/филиалами
+         *
+         * @date 20.01.2019 20:05
+         */
+        $areas = Core_Array::getValue( $aParams, "areas", null );
+
+        if ( $areas !== null && is_array( $areas ) == true )
+        {
+            $Assignment = Core::factory( "Schedule_Area_Assignment" );
+
+            if ( count( $areas ) == 0 )
+            {
+                $Assignment->clearAssignments( $oUpdatingItem );
+            }
+
+            $ExistingAssignments = $Assignment->getAssignments( $oUpdatingItem );
+
+            //Отсеивание уже существующих связей
+            foreach ( $areas as $areaKey => $areaId )
+            {
+                foreach ( $ExistingAssignments as $assignmentKey => $Assignment )
+                {
+                    if ( $Assignment->areaId() == $areaId )
+                    {
+                        unset( $areas[$areaKey] );
+                        unset( $ExistingAssignments[$assignmentKey] );
+                    }
+                }
+            }
+
+            //Создание новых связей
+            foreach ( $areas as $areaId )
+            {
+                Core::factory( "Schedule_Area_Assignment" )->createAssignment( $oUpdatingItem, $areaId );
+            }
+
+            //Удаление не актуальных старых связей
+            foreach ( $ExistingAssignments as $ExistingAssignment )
+            {
+                $ExistingAssignment->delete();
+            }
+        }
+
+
         //Создание доп. свойств объекта со значением по умолчанию либо пустых
         if ( !isset( $aParams["id"] ) || $aParams["id"] == "" )
         {
