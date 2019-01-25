@@ -43,13 +43,12 @@
     display: none;
 }
 
-
-.finances_payment_type_append,
-.finances_payment_type_delete{
-    width: 100%;
-    margin-top: 15px;
+.finances .teacher_rate_config_block {
+    display: none;
 }
 
-.finances_popup_row {
-    margin-top: 40px;
-}
+/*.finances_payment_type_append,*/
+/*.finances_payment_type_delete{*/
+    /*width: 100%;*/
+    /*margin-top: 15px;*/
+/*}*/

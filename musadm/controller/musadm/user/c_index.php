@@ -24,12 +24,9 @@ $groupId == 5
 
 
 $Users = Core::factory( "User" )->queryBuilder()
-//    ->select( ["User.id", "name", "surname", "phone_number", "User.group_id", "ar.id AS area_id", "ar.title AS area_title"] )
     ->where( "User.subordinated", "=", $subordinated )
     ->where( "group_id", "=", $groupId )
     ->where( "User.active", "=", 1 )
-//    ->leftJoin( "Schedule_Area_Assignment AS asgm", "asgm.model_id = User.id AND asgm.model_name = 'User'" )
-//    ->leftJoin( "Schedule_Area AS ar", "ar.id = asgm.area_id AND ar.subordinated = " . $subordinated )
     ->orderBy( "User.id", "DESC" )
     ->findAll();
 
@@ -66,16 +63,24 @@ Core::factory( "Core_Entity" )
  */
 if( $groupId == 4 && User::checkUserAccess(["groups" => [6]]) )
 {
-    $aoManagers = Core::factory( "User" )
-        ->queryBuilder()
+    $Managers = Core::factory( "User" )->queryBuilder()
         ->where( "subordinated", "=", $subordinated )
         ->where( "active", "=", 1 )
         ->where( "group_id", "=", 2 )
         ->findAll();
 
+    $AreaAssignments = Core::factory( "Schedule_Area_Assignment" );
+
+    foreach ( $Managers as $Manager )
+    {
+        $ManagerAreas = $AreaAssignments->getAreas( $Manager );
+        $Manager->addEntities( $ManagerAreas, "areas" );
+    }
+
+
     Core::factory( "Core_Entity" )
         ->addSimpleEntity( "wwwroot", $CFG->rootdir )
-        ->addEntities( $aoManagers )
+        ->addEntities( $Managers )
         ->xsl( "musadm/users/managers.xsl" )
         ->show();
 }

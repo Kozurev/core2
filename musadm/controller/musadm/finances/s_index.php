@@ -40,27 +40,6 @@ if( $action === "show" )
 
 
 /**
- * Сохранение платежа типа "Хозрасходы"
- */
-if ( $action === "saveCustomPayment" )
-{
-    $summ = Core_Array::Get( "summ", 0 );
-    $note = Core_Array::Get( "note", "" );
-
-    $note = "Хозрасходы. " . $note;
-
-    Core::factory("Payment")
-        ->user( 0 )
-        ->type( 4 )
-        ->value( $summ )
-        ->description( $note )
-        ->save();
-
-    exit ( "0" );
-}
-
-
-/**
  * Создание / редактирование тарифа
  */
 if ( $action === "edit_tarif_popup" )
@@ -95,6 +74,9 @@ if ( $action === "getPaymentTypesPopup" )
 }
 
 
+/**
+ * Сохранение типа платежа
+ */
 if ( $action === "savePaymentType" )
 {
     $typeId = Core_Array::Get( "id", 0 );
@@ -117,6 +99,9 @@ if ( $action === "savePaymentType" )
 }
 
 
+/**
+ * Удаление типа(ов) платежа
+ */
 if ( $action === "deletePaymentTypes" )
 {
     $typesIds = Core_Array::Get( "ids", null );
@@ -131,6 +116,52 @@ if ( $action === "deletePaymentTypes" )
             $PaymentType->delete();
         }
     }
+
+    exit;
+}
+
+
+
+/**
+ * Создание / редактирование платежа
+ */
+if( $action === "edit_payment" )
+{
+    $id = Core_Array::Get( "id", 0 );
+    $Payment = Core::factory( "Payment", $id );
+
+    if ( $Payment === null )
+    {
+        exit ( Core::getMessage( "NOT_FOUND", ["Платеж", $id] ) );
+    }
+
+
+    /**
+     * Указатель на тип обновляемого контента страницы после сохранения данных платежа
+     *
+     * На данный момент 16.10.2018 платеж редактируется из двух разделов
+     *  значение 'client' - редактирование платежа из личного кабинета клиента
+     *  значение 'teacher' - редактирование платежа из личного кабинета преподавателя
+     * 23.01.2019
+     *  значение 'payment' - редактирование платежа из раздела финансов
+     */
+    $afterSaveAction = Core_Array::Get( "afterSaveAction", null );
+
+    $PaymentTypes = $Payment->getTypes( true, true );
+    $PaymentAreas = Core::factory( "Schedule_Area" )->getList();
+
+    if ( $Payment->datetime() == "" )
+    {
+        $Payment->datetime( date( "Y-m-d" ) );
+    }
+
+    Core::factory( "Core_Entity" )
+        ->addEntity( $Payment )
+        ->addEntities( $PaymentTypes )
+        ->addEntities( $PaymentAreas )
+        ->addSimpleEntity( "afterSaveAction", $afterSaveAction )
+        ->xsl( "musadm/finances/edit_payment_popup.xsl" )
+        ->show();
 
     exit;
 }

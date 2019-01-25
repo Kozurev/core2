@@ -17,14 +17,24 @@
 /*.tasks .tasks-comments::-webkit-scrollbar { width: 0; }*/
 /*.tasks .tasks-comments { -ms-overflow-style: none; }*/
 
-.tasks .user-icon {
+
+.tasks .item .item-inner .row {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+
+.tasks .item .item-inner .row div .user-icon {
+    margin-top: 10px;
     display: inline-block;
     cursor: pointer;
-    width: 20px;
-    height: 20px;
-    background-image: url("../images/user.png");
+    width: 25px;
+    height: 25px;
+    background-image: url(../images/user.png);
     background-size: cover;
 }
+
+
 
 @media(min-width: 1024px) {
 

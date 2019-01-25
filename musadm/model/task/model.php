@@ -26,7 +26,8 @@ class Task_Model extends Core_Entity
 
     public function date( $val = null )
     {
-        if( is_null( $val ) )   return $this->date;
+        if ( is_null( $val ) )   return strval( $this->date );
+
         $this->date = strval( $val );
         return $this;
     }
@@ -34,14 +35,14 @@ class Task_Model extends Core_Entity
 
     public function done( $val = null )
     {
-        if( is_null( $val ) )   return intval( $this->done );
+        if ( is_null( $val ) )   return intval( $this->done );
 
-        if( $val == true )
+        if ( $val == true )
         {
             $this->done = 1;
             $this->done_date = date( "Y-m-d" );
         }
-        elseif( $val == false )
+        elseif ( $val == false )
         {
             $this->done = 0;
         }
@@ -52,7 +53,8 @@ class Task_Model extends Core_Entity
 
     public function type( $val = null )
     {
-        if( is_null( $val ) )   return intval( $this->type );
+        if ( is_null( $val ) )   return intval( $this->type );
+
         $this->type = intval( $val );
         return $this;
     }
@@ -60,7 +62,8 @@ class Task_Model extends Core_Entity
 
     public function associate( $val = null )
     {
-        if( is_null( $val ) )   return intval( $this->associate );
+        if ( is_null( $val ) )   return intval( $this->associate );
+
         $this->associate = intval( $val );
         return $this;
     }
@@ -68,7 +71,8 @@ class Task_Model extends Core_Entity
 
     public function subordinated( $val = null )
     {
-        if( is_null( $val ) )   return intval( $this->subordinated );
+        if ( is_null( $val ) )   return intval( $this->subordinated );
+
         $this->subordinated = intval( $val );
         return $this;
     }

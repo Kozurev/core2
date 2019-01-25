@@ -2,6 +2,8 @@
 <!DOCTYPE xsl:stylesheet>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+    <xsl:include href="../schedule/assignments/areas_assignments.xsl" />
+
     <xsl:template match="root">
 
         <h2>Список менеджеров</h2>
@@ -20,6 +22,7 @@
                         <!--<th>Имя</th>-->
                         <th>ФИО</th>
                         <th>Телефон</th>
+                        <th>Студия</th>
                         <th class="center">Действия</th>
                     </tr>
                 </thead>
@@ -48,8 +51,13 @@
             <!--<td><xsl:value-of select="name" /></td>-->
             <td><xsl:value-of select="phone_number" /><br/></td>
 
-            <td class="center">
+            <td>
+                <span data-areas="User_{id}"><xsl:apply-templates select="areas" /></span>
+            </td>
+
+            <td width="140px" class="center">
                 <a class="action edit user_edit"        href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
+                <a class="action associate areas_assignments" href="#" data-model-id="{id}" data-model-name="User"></a>
                 <a class="action archive user_archive"     href="#" data-userid="{id}"></a>
             </td>
 

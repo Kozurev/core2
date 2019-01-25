@@ -7,25 +7,11 @@
  */
 
 
-if( Core_Page_Show::instance()->StructureItem->getId() == 5 )
-{
-    $title2 = "КЛИЕНТОВ";
-    $breadcumb = "клиентов";
-}
-else 
-{
-    $title2 = "СОТРУДНИКОВ";
-    $breadcumb = "сотрудников";
-}
-
-$breadcumbs[0] = new stdClass();
-$breadcumbs[0]->title = Core_Page_Show::instance()->title;
-$breadcumbs[0]->active = 1;
-
-Core_Page_Show::instance()->setParam( "body-class", "body-primary" );
-Core_Page_Show::instance()->setParam( "title-first", "СПИСОК" );
-Core_Page_Show::instance()->setParam( "title-second", $title2 );
-Core_Page_Show::instance()->setParam( "breadcumbs", $breadcumbs );
+//if ( Core_Page_Show::instance()->StructureItem === null )
+//{
+//    global $CFG;
+//    header( "Location: " . $CFG->rootdir . "/user/client" );
+//}
 
 
 $Director = User::current()->getDirector();
@@ -36,7 +22,7 @@ $subordinated = $Director->getId();
  *	Блок проверки авторизации
  */
 $User = User::current();
-$accessRules = ["groups"    => [2, 6]];
+$accessRules = ["groups" => [2, 6]];
 
 if ( !User::checkUserAccess( $accessRules, $User ) )
 {
@@ -378,8 +364,18 @@ if ( $action === "export" )
 if ( $action === "getLidData" )
 {
     $lidId = Core_Array::Get( "lidid", 0 );
+
+    if ( $lidId == 0 )
+    {
+        exit ( Core::getMessage( "EMPTY_GET_PARAM", ["идентификатор лида"] ) );
+    }
+
     $Lid = Core::factory( "Lid", $lidId );
-    if( $Lid === null )    exit ( Core::getMessage( "NOT_FOUND", ["Лид", $lidId] ) );
+
+    if( $Lid === null )
+    {
+        exit ( Core::getMessage( "NOT_FOUND", ["Лид", $lidId] ) );
+    }
 
     $LidEncode = new stdClass();
     $LidEncode->name = $Lid->name();
@@ -390,6 +386,145 @@ if ( $action === "getLidData" )
     echo json_encode( $LidEncode );
     exit;
 }
+
+
+/**
+ * Открытие всплывающего окна создания/удаления связей сущьности с филиалами
+ * для типа связи многие ко многим
+ */
+if ( $action === "showAssignmentsPopup" )
+{
+    $modelId = Core_Array::Get( "model_id", 0 );
+    $modelName = Core_Array::Get( "model_name", "" );
+
+    if ( $modelId <= 0 || $modelName == "" )
+    {
+        exit ( "Ошибка: отсутствует один из обязательных параметров" );
+    }
+
+    $Object = Core::factory( $modelName, $modelId );
+
+    if ( $Object === null )
+    {
+        exit ( Core::getMessage( "NOT_FOUND", [$modelName, $modelId] ) );
+    }
+
+    if ( method_exists( $Object, "subordinated" ) && $Object->subordinated() != $subordinated )
+    {
+        exit ( Core::getMessage( "NOT_SUBORDINATE", [$modelName, $modelId] ) );
+    }
+
+
+    $AreasList = Core::factory( "Schedule_Area" )->getList( true );
+    $AreaAssignments = Core::factory( "Schedule_Area_Assignment" )->getAssignments( $Object );
+
+
+    Core::factory( "Core_Entity" )
+        ->addSimpleEntity( "model-id", $modelId )
+        ->addSimpleEntity( "model-name", $modelName )
+        ->addEntities( $AreasList, "areas" )
+        ->addEntities( $AreaAssignments, "assignments" )
+        ->xsl( "musadm/schedule/assignments/areas_assignments_edit.xsl" )
+        ->show();
+
+    exit;
+}
+
+
+/**
+ * Обработчик для создания новой связи сущьности и филиала
+ */
+if ( $action === "appendAreaAssignment" )
+{
+    $modelId = Core_Array::Get( "model_id", 0 );
+    $modelName = Core_Array::Get( "model_name", "" );
+    $areaId = Core_Array::Get( "area_id", 0 );
+
+    if ( $modelId <= 0 || $modelName == "" || $areaId <= 0 )
+    {
+        exit ( "Ошибка: отсутствует один из обязательных параметров" );
+    }
+
+
+    $Object = Core::factory( $modelName, $modelId );
+
+    if ( $Object === null )
+    {
+        exit ( Core::getMessage( "NOT_FOUND", [$modelName, $modelId] ) );
+    }
+
+
+    $Area = Core::factory( "Schedule_Area" )->queryBuilder()
+        ->where( "id", "=", $areaId )
+        ->where( "subordinated", "=", $subordinated )
+        ->find();
+
+    if ( $Area === null )
+    {
+        exit ( Core::getMessage( "NOT_FOUND", ["Филиал", $areaId] ) );
+    }
+
+
+    $Assignment = Core::factory( "Schedule_Area_Assignment" )->createAssignment( $Object, $areaId );
+
+    $outputJson = new stdClass();
+    $outputJson->id = $Assignment->getId();
+    $outputJson->title = $Area->title();
+    echo json_encode( $outputJson );
+    exit;
+}
+
+
+/**
+ * Обработчик удаления связи объекта с филмалом
+ */
+if ( $action === "deleteAreaAssignment" )
+{
+    $modelId = Core_Array::Get( "model_id", 0 );
+    $modelName = Core_Array::Get( "model_name", "" );
+    $areaId = Core_Array::Get( "area_id", 0 );
+
+    if ( $modelId <= 0 || $modelName == "" || $areaId <= 0 )
+    {
+        exit ( "Ошибка: отсутствует один из обязательных параметров" );
+    }
+
+
+    $Object = Core::factory( $modelName, $modelId );
+
+    if ( $Object === null )
+    {
+        exit ( Core::getMessage( "NOT_FOUND", [$modelName, $modelId] ) );
+    }
+
+
+    Core::factory( "Schedule_Area_Assignment" )->deleteAssignment( $Object, $areaId );
+    exit;
+}
+
+
+
+
+
+if( Core_Page_Show::instance()->StructureItem->getId() == 5 )
+{
+    $title2 = "КЛИЕНТОВ";
+    $breadcumb = "клиентов";
+}
+else
+{
+    $title2 = "СОТРУДНИКОВ";
+    $breadcumb = "сотрудников";
+}
+
+$breadcumbs[0] = new stdClass();
+$breadcumbs[0]->title = Core_Page_Show::instance()->title;
+$breadcumbs[0]->active = 1;
+
+Core_Page_Show::instance()->setParam( "body-class", "body-primary" );
+Core_Page_Show::instance()->setParam( "title-first", "СПИСОК" );
+Core_Page_Show::instance()->setParam( "title-second", $title2 );
+Core_Page_Show::instance()->setParam( "breadcumbs", $breadcumbs );
 
 
 $aTitle[] = Core_Page_Show::instance()->Structure->title();

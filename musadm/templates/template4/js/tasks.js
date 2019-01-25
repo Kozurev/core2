@@ -21,37 +21,48 @@ $(function(){
                 loaderOff();
             }
         })
-        .on("click", ".task_date_edit", function(e){
+        // .on("click", ".task_date_edit", function(e){
+        //     e.preventDefault();
+        //     var taskId = $(this).data("task_id");
+        //
+        //     var taskDate = $(this).parent().find("span");
+        //     var taskDateVal = taskDate.text();
+        //     var taskDay = taskDateVal.substr(0, 2);
+        //     var taskMonth = taskDateVal.substr(3, 2);
+        //     var taskYear = taskDateVal.substr(6, 4);
+        //     taskDateVal = taskYear + "-" + taskMonth + "-" + taskDay;
+        //
+        //     taskDate.remove();
+        //     $(this).parent().append("<input type='date' value='" + taskDateVal + "' class='form-control'> ");
+        //     $(this).parent().append("<a href='#' class='action save save_task_date' data-task_id='" + taskId + "' title='Сохранить изменения'></a>");
+        //     $(this).remove();
+        // })
+        // .on("click", ".save_task_date", function(e){
+        //     e.preventDefault();
+        //     var taskId = $(this).data("task_id");
+        //     var taskDate = $(this).parent().find("input[type=date]").val();
+        //     updateTaskDate(taskId, taskDate);
+        //
+        //     var taskYear = taskDate.substr(0, 4);
+        //     var taskMonth = taskDate.substr(5, 2);
+        //     var taskDay = taskDate.substr(8, 2);
+        //     var taskDateVal = taskDay + "." + taskMonth + "." + taskYear;
+        //
+        //     $(this).parent().find("input[type=date]").remove();
+        //     $(this).parent().append("<span>"+taskDateVal+"</span>");
+        //     $(this).parent().append("<a href='#' class='action edit task_date_edit' data-task_id='"+taskId+"'></a>");
+        //     $(this).remove();
+        // })
+        .on("change", ".task_date", function (e) {
             e.preventDefault();
-            var taskId = $(this).data("task_id");
-
-            var taskDate = $(this).parent().find("span");
-            var taskDateVal = taskDate.text();
-            var taskDay = taskDateVal.substr(0, 2);
-            var taskMonth = taskDateVal.substr(3, 2);
-            var taskYear = taskDateVal.substr(6, 4);
-            taskDateVal = taskYear + "-" + taskMonth + "-" + taskDay;
-
-            taskDate.remove();
-            $(this).parent().append("<input type='date' value='" + taskDateVal + "' class='form-control'> ");
-            $(this).parent().append("<a href='#' class='action save save_task_date' data-task_id='" + taskId + "' title='Сохранить изменения'></a>");
-            $(this).remove();
+            var taskId = $(this).data("taskid");
+            var date = $(this).val();
+            updateTaskDate(taskId, date);
         })
-        .on("click", ".save_task_date", function(e){
-            e.preventDefault();
-            var taskId = $(this).data("task_id");
-            var taskDate = $(this).parent().find("input[type=date]").val();
-            updateTaskDate(taskId, taskDate);
-
-            var taskYear = taskDate.substr(0, 4);
-            var taskMonth = taskDate.substr(5, 2);
-            var taskDay = taskDate.substr(8, 2);
-            var taskDateVal = taskDay + "." + taskMonth + "." + taskYear;
-
-            $(this).parent().find("input[type=date]").remove();
-            $(this).parent().append("<span>"+taskDateVal+"</span>");
-            $(this).parent().append("<a href='#' class='action edit task_date_edit' data-task_id='"+taskId+"'></a>");
-            $(this).remove();
+        .on("change", ".task_area", function(e){
+            var taskId = $(this).data("taskid");
+            var areaId = $(this).val();
+            updateTaskArea(taskId, areaId);
         })
         .on("click", ".task_append_done", function(e){
             e.preventDefault();
@@ -67,7 +78,7 @@ $(function(){
         .on("click", ".popop_task_note_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("Main", refreshTasksTable);
+            saveData("Main", function(response){refreshTasksTable();});
         })
         .on("click", ".tasks_show", function(){
             loaderOn();
@@ -82,7 +93,7 @@ $(function(){
         .on("click", ".popop_task_assignment_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("Main", refreshTasksTable);
+            saveData("Main", function(response){refreshTasksTable();});
         });
 
 });
@@ -150,6 +161,20 @@ function updateTaskDate(taskId, taskDate) {
             date: taskDate
         },
         success: function(responce){}
+    });
+}
+
+
+function updateTaskArea(taskId, areaId) {
+    $.ajax({
+        type: "GET",
+        url: root + "/tasks",
+        data: {
+            action: "update_area",
+            task_id: taskId,
+            area_id: areaId
+        },
+        success: function(response){}
     });
 }
 

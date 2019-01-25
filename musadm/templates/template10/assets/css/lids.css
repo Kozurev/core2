@@ -8,7 +8,7 @@
     height: 100%;
 }
 
-.lids .cards-section .item-inner {
+.cards-section .item-inner {
     padding: 15px 15px;
     height: 300px !important;
     overflow-y: auto;
@@ -17,7 +17,7 @@
 /*.lids .cards-section .item-inner::-webkit-scrollbar { width: 0; }*/
 /*.lids .cards-section .item-inner { -ms-overflow-style: none; }*/
 
-.lids .cards-section .cards-wrapper {
+.cards-section .cards-wrapper {
     max-width: 100%;
 }
 

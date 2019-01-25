@@ -1,32 +1,19 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+    <xsl:include href="rate_config.xsl" />
+
+
     <xsl:template match="root">
 
-        <div class="row finances_calendar">
-            <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
-                <span>Период с:</span>
-            </div>
-
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
-                <input type="date" class="form-control" name="date_from" value="{date_from}"/>
-            </div>
-
-            <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
-                <span>по:</span>
-            </div>
-
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
-                <input type="date" class="form-control" name="date_to" value="{date_to}"/>
-            </div>
-
-            <div class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-1 col-md-offset-1 col-xs-12">
-                <a class="btn btn-green finances_show" >Показать</a>
+        <div class="row finances_total">
+            <div class="col-lg-12">
+                За данный период суммарные поступления составили <xsl:value-of select="total_summ" /> руб.
             </div>
         </div>
 
         <div class="row finances_calendar">
             <div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
-                <a class="btn btn-green finances_payment">Хозрасходы</a>
+                <a class="btn btn-green finances_payment" data-after_save_action="payments">Добавить расход</a>
             </div>
 
             <div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
@@ -36,6 +23,23 @@
             <div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
                 <a class="btn btn-green finances_payment_types">Категории расходов</a>
             </div>
+
+            <div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
+                <a class="btn btn-green finances_payment_rate_config">Настройки</a>
+            </div>
+        </div>
+
+
+        <div class="teacher_rate_config_block">
+            <xsl:call-template name="rate_config_table" >
+                <xsl:with-param name="director_id" select="director_id" />
+                <xsl:with-param name="teacher_indiv_rate" select="teacher_indiv_rate" />
+                <xsl:with-param name="teacher_group_rate" select="teacher_group_rate" />
+                <xsl:with-param name="teacher_consult_rate" select="teacher_consult_rate" />
+                <xsl:with-param name="absent_rate" select="absent_rate" />
+                <xsl:with-param name="absent_rate_type" select="absent_rate_type" />
+                <xsl:with-param name="absent_rate_val" select="absent_rate_val" />
+            </xsl:call-template>
         </div>
 
         <div class="tarifs table-responsive">
@@ -64,9 +68,25 @@
         </div>
 
 
-        <div class="row finances_total">
-            <div class="col-lg-12">
-                За данный период суммарные поступления составили <xsl:value-of select="total_summ" /> руб.
+        <div class="row finances_calendar" style="margin-top:20px">
+            <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                <span>Период с:</span>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                <input type="date" class="form-control" name="date_from" value="{date_from}"/>
+            </div>
+
+            <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                <span>по:</span>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                <input type="date" class="form-control" name="date_to" value="{date_to}"/>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-1 col-md-offset-1 col-xs-12">
+                <a class="btn btn-green finances_show" >Показать</a>
             </div>
         </div>
 
@@ -80,6 +100,8 @@
                         <th>Примечание</th>
                         <th>Дата</th>
                         <th>Студия</th>
+                        <th>Категория</th>
+                        <th></th>
                     </tr>
                 </thead>
 
@@ -93,6 +115,9 @@
 
 
     <xsl:template match="payment">
+        <xsl:variable name="type" select="type" />
+        <xsl:variable name="areaId" select="area_id" />
+
         <tr>
             <td><xsl:value-of select="position()" /></td>
             <td>
@@ -102,23 +127,17 @@
                         <xsl:text>  </xsl:text>
                         <xsl:value-of select="user/name" />
                     </xsl:when>
-                    <xsl:when test="type = 4">
-                        Хозрасходы
-                    </xsl:when>
                     <xsl:otherwise>
-                        Пользователь удален
+                        Расходы организации
                     </xsl:otherwise>
                 </xsl:choose>
             </td>
             <td><xsl:value-of select="value" /></td>
-            <td>
-                <xsl:if test="type = 3">
-                    <xsl:text>Выплата преподавателю. </xsl:text>
-                </xsl:if>
-                <xsl:value-of select="description" />
-            </td>
+            <td><xsl:value-of select="description" /></td>
             <td><xsl:value-of select="datetime" /></td>
-            <td><xsl:value-of select="area" /></td>
+            <td><xsl:value-of select="//schedule_area[id = $areaId]/title" /></td>
+            <td><xsl:value-of select="//payment_type[id = $type]/title" /></td>
+            <td><a class="action edit payment_edit" href="#" data-id="{id}" data-after_save_action="payment" data-type="{type}" title="Редактирование платежа"></a></td>
         </tr>
     </xsl:template>
 

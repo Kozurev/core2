@@ -60,3 +60,13 @@ Core::factory( "Property", 15 )->delete();
 $Orm->executeQuery( 'DELETE FROM Property_List_Assigment WHERE property_id = 15' );
 $Orm->executeQuery( 'DELETE FROM Property_List WHERE property_id = 15' );
 $Orm->executeQuery( 'DELETE FROM Property_List_Values WHERE property_id = 15' );
+
+Core::factory( "Core_Page_Template" )
+    ->title( "Задачи" )
+    ->parent_id( 10 )
+    ->dir( 0 )
+    ->save();
+
+Core::factory( "Structure", 30 )
+    ->template_id( 11 )
+    ->save();

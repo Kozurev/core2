@@ -51,7 +51,7 @@ $(function(){
                 addAbsentTask(dateTo, clientId);
             }
 
-            saveData("Main", refreshSchedule);
+            saveData("Main", function(response){refreshSchedule();});
         })
 
         /**
@@ -138,7 +138,7 @@ $(function(){
                 });
             }
 
-            saveData("Main", refreshSchedule);
+            saveData("Main", function(response){refreshSchedule();});
         })
 
         /**
@@ -384,7 +384,7 @@ $(function(){
         .on("click", ".popop_schedule_area_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("Main", refreshAreasTable);
+            saveData("Main", function(response){refreshAreasTable();});
         })
 
         /**

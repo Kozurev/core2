@@ -2,6 +2,8 @@
 <!DOCTYPE xsl:stylesheet>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+    <xsl:include href="../schedule/assignments/areas_assignments.xsl" />
+
     <xsl:template match="root">
 
         <xsl:if test="is_director = 1">
@@ -22,7 +24,8 @@
                         <th>Телефон</th>
                         <th>Инструмент</th>
                         <th>График для занятий</th>
-                        <th>Действия</th>
+                        <th>Филиал</th>
+                        <th class="center">Действия</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -48,11 +51,15 @@
             <td><xsl:value-of select="phone_number" /></td>
             <td><xsl:value-of select="property_value[property_id = 20]/value" /></td>
             <td><xsl:value-of select="property_value[property_id = 31]/value" /></td>
+
             <td>
-                <!--<xsl:if test="/root/is_director = 1">-->
-                    <a class="action edit user_edit" href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
-                    <a class="action archive user_archive"     href="#" data-userid="{id}"></a>
-                <!--</xsl:if>-->
+                <span data-areas="User_{id}"><xsl:apply-templates select="areas" /></span>
+            </td>
+
+            <td width="140px">
+                <a class="action edit user_edit" href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
+                <a class="action associate areas_assignments" href="#" data-model-id="{id}" data-model-name="User"></a>
+                <a class="action archive user_archive"     href="#" data-userid="{id}"></a>
             </td>
         </tr>
     </xsl:template>

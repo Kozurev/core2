@@ -68,11 +68,45 @@ if( $action === "update_date" )
 }
 
 
+if ( $action === "update_area" )
+{
+    $taskId = Core_Array::Get( "task_id", 0 );
+    $areaId = Core_Array::Get( "area_id", 0 );
+
+    if ( $taskId <= 0 )
+    {
+        exit ( Core::getMessage( "EMPTY_GET_PARAM", ["идентификатор задачи"] ) );
+    }
+
+
+    $Task = Core::factory( "Task", $taskId );
+
+    if ( $Task === null || User::isSubordinate( $Task ) === false )
+    {
+        exit (Core::getMessage("NOT_FOUND", ["Задача", $taskId]));
+    }
+
+
+    $Area = Core::factory( "Schedule_Area", $areaId );
+
+    if ( $Area === null || ( $areaId > 0 && User::isSubordinate( $Area ) === false ) )
+    {
+        exit ( Core::getMessage( "NOT_FOUND", ["Филиал", $taskId] ) );
+    }
+
+
+    $Task->areaId( $areaId )->save();
+    exit;
+}
+
+
 if( $action === "new_task_popup" )
 {
     $Director = User::current()->getDirector();
     if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
     $subordinated = $Director->getId();
+
+    $Areas = Core::factory( "Schedule_Area" )->getList( true );
 
     $Clients = Core::factory( "User" )->queryBuilder()
         ->where( "active", "=", 1 )
@@ -82,6 +116,7 @@ if( $action === "new_task_popup" )
         ->findAll();
 
     Core::factory("Core_Entity")
+        ->addEntities( $Areas )
         ->addEntities( $Clients )
         ->addSimpleEntity( "date", date( "Y-m-d" ) )
         ->xsl( "musadm/tasks/new_task_popup.xsl" )
@@ -95,35 +130,47 @@ if( $action === "save_task" )
 {
     $date = Core_Array::Get( "date", "" );
     $note = Core_Array::Get( "text", "" );
+    $areaId = Core_Array::Get( "areaId", 0 );
     $associate = Core_Array::Get( "associate", 0 );
 
-    $authorId = $oUser->getId();
+    $authorId = $User->getId();
     $noteDate = date( "Y-m-d H:i:s" );
 
-    $oTask = Core::factory( "Task" )
-        ->associate( $associate )
-        ->date( $date );
+    if ( $areaId > 0 )
+    {
+        $Area = Core::factory( "Schedule_Area", $areaId );
 
-    $oTask = $oTask->save();
+        if ( $Area === null || User::isSubordinate( $Area ) === false )
+        {
+            exit ( Core::getMessage( "NOT_FOUND", ["Филиал", $areaId] ) );
+        }
+    }
+
+
+    $Task = Core::factory( "Task" )
+        ->associate( $associate )
+        ->areaId( $areaId )
+        ->date( $date );
+    $Task->save();
 
     Core::factory( "Task_Note" )
         ->authorId( $authorId )
         ->date( $noteDate )
         ->text( $note )
-        ->taskId( $oTask->getId() )
+        ->taskId( $Task->getId() )
         ->save();
 
-    exit ( "0" );
+    exit( "0" );
 }
 
 
-if( $action === "task_assignment_popup" )
+if ( $action === "task_assignment_popup" )
 {
     $taskId = Core_Array::Get( "taskid", 0 );
     $Task = Core::factory( "Task", $taskId );
 
     $Director = User::current()->getDirector();
-    if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
+    //if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
     $subordinated = $Director->getId();
 
     $Clients = Core::factory( "User" )->queryBuilder()

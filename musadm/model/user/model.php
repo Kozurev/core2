@@ -36,9 +36,12 @@ class User_Model extends Core_Entity
 
 	public function groupId( $val = null )
 	{
-		if( is_null($val) )	return intval( $this->group_id );
-		if( $val < 0 )
-            die( Core::getMessage( "UNSIGNED_VALUE", ["group_id", "User"] ) );
+		if ( is_null( $val ) )  return intval( $this->group_id );
+
+		if ( $val < 0 )
+        {
+            exit ( Core::getMessage( "UNSIGNED_VALUE", ["group_id", "User"] ) );
+        }
 
 		$this->group_id = intval( $val );
 		return $this;
@@ -47,25 +50,29 @@ class User_Model extends Core_Entity
 
 	public function active( $val = null )
 	{
-		if( is_null( $val ) )	return intval( $this->active );
-		if( $val == true )		$this->active = 1;
+		if ( is_null( $val ) )  return intval( $this->active );
+
+		if ( $val == true )		$this->active = 1;
 		elseif( $val == false )	$this->active = 0;
+
 		return $this;
 	}
 
 
 	public function password( $val = null, $type = false )
 	{
-		if( is_null( $val ) ) 		return $this->password;
-		if( strlen( $val ) > 255 )
-		    die( Core::getMessage( "TOO_LARGE_VALUE", ["password", "User", 255] ) );
+		if ( is_null( $val ) ) 		return $this->password;
+
+		if ( strlen( $val ) > 255 )
+        {
+            exit ( Core::getMessage( "TOO_LARGE_VALUE", ["password", "User", 255] ) );
+        }
 
 		$val = trim( $val );
 
-		if( $type == false )
-		    $this->password = md5( $val );
-		else
-		    $this->password = strval( $val );
+		$type == false
+		    ?   $this->password = md5( $val )
+		    :   $this->password = strval( $val );
 
 		return $this;
 	}
@@ -73,20 +80,26 @@ class User_Model extends Core_Entity
 
 	public function phoneNumber( $val = null )
 	{
-		if( is_null( $val ) )		return $this->phone_number;
-		if( strlen( $val ) > 255 )
-            die( Core::getMessage( "TOO_LARGE_VALUE", ["phone_number", "User", 255] ) );
+		if ( is_null( $val ) )		return $this->phone_number;
 
-		$this->phone_number = $val;
+		if ( strlen( $val ) > 255 )
+        {
+            exit ( Core::getMessage( "TOO_LARGE_VALUE", ["phone_number", "User", 255] ) );
+        }
+
+		$this->phone_number = strval( $val );
 		return $this;
 	}
 
 
 	public function name( $val = null )
 	{
-		if( is_null( $val ) )	return $this->name;
+		if ( is_null( $val ) )	return $this->name;
+
 		if( strlen( $val ) > 255 )
-            die( Core::getMessage( "TOO_LARGE_VALUE", ["name", "User", 255] ) );
+        {
+            exit ( Core::getMessage( "TOO_LARGE_VALUE", ["name", "User", 255] ) );
+        }
 
 		$this->name = trim( $val );
 		return $this;
@@ -95,9 +108,12 @@ class User_Model extends Core_Entity
 
 	public function surname( $val = null )
 	{
-		if( is_null( $val ) )	return $this->surname;
-		if( strlen( $val ) > 255 )
-            die(Core::getMessage("TOO_LARGE_VALUE", array("surname", "User", 255)));
+		if ( is_null( $val ) )	return $this->surname;
+
+		if ( strlen( $val ) > 255 )
+        {
+            exit (Core::getMessage( "TOO_LARGE_VALUE", ["surname", "User", 255] ) );
+        }
 
 		$this->surname = trim( $val );
 		return $this;
@@ -106,20 +122,26 @@ class User_Model extends Core_Entity
 
 	public function patronimyc( $val = null )
 	{
-		if( is_null( $val ) )		return $this->patronimyc;
-		if( strlen( $val ) > 255 )
-            die( Core::getMessage( "TOO_LARGE_VALUE", ["patronimyc", "User", 255] ) );
+		if ( is_null( $val ) )		return $this->patronimyc;
 
-		$this->patronimyc = trim($val);
+		if ( strlen( $val ) > 255 )
+        {
+            exit ( Core::getMessage( "TOO_LARGE_VALUE", ["patronimyc", "User", 255] ) );
+        }
+
+		$this->patronimyc = trim( $val );
 		return $this;
 	}
 
 
 	public function email( $val = null )
 	{
-		if( is_null( $val ) )	return $this->email;
-		if( strlen( $val ) > 255 )
-            die( Core::getMessage( "TOO_LARGE_VALUE", ["email", "User", 255] ) );
+		if ( is_null( $val ) )	return $this->email;
+
+		if ( strlen( $val ) > 255 )
+        {
+            exit ( Core::getMessage( "TOO_LARGE_VALUE", ["email", "User", 255] ) );
+        }
 
 		$this->email = $val;
 		return $this;
@@ -128,9 +150,12 @@ class User_Model extends Core_Entity
 
 	public function login( $val = null )
 	{
-		if( is_null( $val) ) 	return $this->login;
-		if( strlen( $val ) > 255 )
-            die( Core::getMessage("TOO_LARGE_VALUE", ["login", "User", 255] ) );
+		if ( is_null( $val) ) 	return $this->login;
+
+		if ( strlen( $val ) > 255 )
+        {
+            exit ( Core::getMessage("TOO_LARGE_VALUE", ["login", "User", 255] ) );
+        }
 
 		$this->login = trim( $val );
 		return $this;
@@ -145,16 +170,19 @@ class User_Model extends Core_Entity
 
 	public function superuser( $val = null )
 	{
-		if( is_null( $val ) ) 	return intval( $this->superuser );
-		if( $val == true )		$this->superuser = 1;
+		if ( is_null( $val ) ) 	return intval( $this->superuser );
+
+		if ( $val == true )		$this->superuser = 1;
 		elseif($val == false)	$this->superuser = 0;
+
 		return $this;
 	}
 
 
 	public function subordinated( $val = null )
     {
-        if( is_null( $val ) )   return intval( $this->subordinated );
+        if ( is_null( $val ) )   return intval( $this->subordinated );
+
         $this->subordinated = intval( $val );
         return $this;
     }

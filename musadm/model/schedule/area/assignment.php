@@ -9,12 +9,14 @@
 class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
 {
 
-    private $defaultArea;
-
-
-    public function __construct()
+    public function getObject()
     {
-        $this->defaultArea = Core::factory( "Schedule_Area" )->title( "Неизвестно" )->setId( 0 );
+        if ( $this->modelName() != "" && $this->modelId() > 0 )
+        {
+            return Core::factory( $this->modelName(), $this->modelId() );
+        }
+
+        return null;
     }
 
 
@@ -53,7 +55,7 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
 
 
         //Поиск филиала по свойству area_id
-        if ( method_exists( $object, "areaId" ) )
+        if ( method_exists( $object, "areaId" ) && $object->areaId() > 0 )
         {
             return $Area->queryBuilder()
                 ->where( "id", "=", $object->areaId() )
@@ -86,6 +88,8 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
 
 
         $Area = Core::factory( "Schedule_Area" );
+        $Area->queryBuilder()
+            ->orderBy( "sorting", "ASC" );
 
         if ( $isSubordinate === true )
         {
@@ -101,7 +105,7 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
         }
 
 
-        $Assignments = $this->queryBuilder()
+        $Assignments = Core::factory( "Schedule_Area_Assignment" )->queryBuilder()
             ->clearQuery()
             ->where( "model_name", "=", $object->getTableName() )
             ->where( "model_id", "=", $object->getId() )
@@ -140,7 +144,7 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
             exit ( "getAssignments -> Передаваемый параметр должен быть объектом" );
         }
 
-        return $this->queryBuilder()
+        return Core::factory( "Schedule_Area_Assignment" )->queryBuilder()
             ->clearQuery()
             ->where( "model_name", "=", $object->getTableName() )
             ->where( "model_id", "=", $object->getId() )
@@ -161,6 +165,11 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
         if ( !is_object( $object ) )
         {
             exit ( "clearAssignments -> Передаваемый параметр должен быть объектом" );
+        }
+
+        if ( !method_exists( $object, "getId" ) || !method_exists( $object, "getTableName" ) )
+        {
+            return null;
         }
 
         $Assignments = $this->getAssignments( $object );
@@ -202,7 +211,7 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
         
 
         //Проверка на наличие связи с объектом для избежания дубликатов
-        $ExistingAssignment = $this->queryBuilder()
+        $ExistingAssignment = Core::factory( "Schedule_Area_Assignment" )->queryBuilder()
             ->clearQuery()
             ->where( "model_name", "=", $object->getTableName() )
             ->where( "model_id", "=", $object->getId() )
@@ -224,6 +233,50 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
 
         return $NewAssignment;
     }
+
+
+    /**
+     * Удаление связи объекта с филиалом
+     *
+     * @date 22.01.2019 09:19
+     *
+     * @param $object
+     * @param $areaId
+     * @return Schedule_Area_Assignment|null
+     */
+    public function deleteAssignment( $object, $areaId )
+    {
+        if ( !is_object( $object ) )
+        {
+            exit ( "createAssignment -> Передаваемый параметр должен быть объектом" );
+        }
+
+        if ( !method_exists( $object, "getId" ) || !method_exists( $object, "getTableName" ) )
+        {
+            return null;
+        }
+
+        if ( $object->getId() <= 0 || $object->getId() == null || $areaId <= 0 )
+        {
+            return null;
+        }
+
+
+        $ExistingAssignment = Core::factory( "Schedule_Area_Assignment" )->queryBuilder()
+            ->clearQuery()
+            ->where( "model_id", "=", $object->getId() )
+            ->where( "model_name", "=", $object->getTableName() )
+            ->where( "area_id", "=", $areaId )
+            ->find();
+
+        if ( $ExistingAssignment !== null )
+        {
+            $ExistingAssignment->delete();
+        }
+
+        return $this;
+    }
+
 
 
 

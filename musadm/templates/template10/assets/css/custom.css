@@ -190,6 +190,16 @@ header {
     background: url("../images/plus.png");
     background-size: cover;
 }
+
+.arrow-left {
+    background: url("../images/arrow-left.png");
+    background-size: cover;
+}
+
+.arrow-right {
+    background: url("../images/arrow-right.png");
+    background-size: cover;
+}
 /**
  *  <<Конец
  *  Иконки действий
@@ -355,6 +365,22 @@ header {
     vertical-align: top;
     margin-right: 50px;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @media(min-width: 1024px) {

@@ -43,7 +43,7 @@
             </xsl:choose>
         </div>
 
-        <section class="cards-section text-center tasks-section">
+        <section class="cards-section text-center tasks">
             <div id="cards-wrapper" class="cards-wrapper row">
                 <xsl:apply-templates select="task[done = 0]" />
                 <xsl:apply-templates select="task[done = 1]" />
@@ -116,7 +116,7 @@
                 </div>
 
                 <div class="row comments">
-                    <xsl:apply-templates select="comments/task_note" />
+                    <xsl:apply-templates select="//task_note[task_id = $id]" />
                     <input type="hidden" />
                 </div>
 

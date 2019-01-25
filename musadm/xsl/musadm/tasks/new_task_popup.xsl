@@ -48,6 +48,21 @@
                 </select>
             </div>
 
+            <div class="column">
+                <span>Филиал</span>
+            </div>
+            <div class="column">
+                <select class="form-control" name="areaId">
+                    <xsl:variable name="areaId" select="area_id" />
+                    <option value="0"> ... </option>
+                    <xsl:for-each select="schedule_area">
+                        <xsl:if test="id = $areaId">
+                            <xsl:attribute name="selected">selected</xsl:attribute>
+                        </xsl:if>
+                        <option value="{id}"><xsl:value-of select="title" /></option>
+                    </xsl:for-each>
+                </select>
+            </div>
 
             <!--<input type="hidden" name="user" value="{user/id}" />-->
 

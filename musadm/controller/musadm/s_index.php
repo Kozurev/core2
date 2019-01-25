@@ -143,49 +143,58 @@ if( $action == "refreshLidTable" )
  */
 if( $action === "refreshTasksTable" )
 {
-    $Tasks = Core::factory( "Task" )->queryBuilder()
-        ->where( "date", "<=", date("Y-m-d") )
-        ->where( "subordinated", "=", $subordinated )
-        ->open()
-            ->where( "done", "=", 0 )
-            ->where( "done_date", "=", date( "Y-m-d" ), "OR" )
-        ->close()
-        ->orderBy( "date", "DESC" )
-        ->orderBy( "id", "DESC" )
-        ->findAll();
+//    $Tasks = Core::factory( "Task" )->queryBuilder()
+//        ->where( "date", "<=", date("Y-m-d") )
+//        ->where( "subordinated", "=", $subordinated )
+//        ->open()
+//            ->where( "done", "=", 0 )
+//            ->where( "done_date", "=", date( "Y-m-d" ), "OR" )
+//        ->close()
+//        ->orderBy( "date", "DESC" )
+//        ->orderBy( "id", "DESC" )
+//        ->findAll();
+//
+//    foreach ( $Tasks as $Task )
+//    {
+//        $Task->date(refactorDateFormat($Task->date()));
+//    }
+//
+//    $tasksIds = [];
+//
+//    foreach ( $Tasks as $Task )
+//    {
+//        $tasksIds[] = $Task->getId();
+//    }
+//
+//    $Notes = Core::factory( "Task_Note" )->queryBuilder()
+//        ->select([
+//            "Task_Note.id AS id", "date", "task_id", "text", "usr.name AS name", "usr.surname AS surname"
+//        ])
+//        ->where( "task_id", "IN", $tasksIds )
+//        ->leftJoin( "User AS usr", "author_id = usr.id" )
+//        ->orderBy( "date", "DESC" )
+//        ->findAll();
+//
+//    foreach ( $Notes as $Note )
+//    {
+//        $time = strtotime( $Note->date() );
+//        $Note->date( date( "d.m.Y H:i", $time ) );
+//    }
+//
+//    $TasksOutput = Core::factory( "Core_Entity" )
+//        ->addEntities( $Tasks )
+//        ->addEntities( $Notes )
+//        ->addSimpleEntity( "periods", "0" )
+//        ->xsl( "musadm/tasks/all.xsl" )
+//        ->show();
 
-    foreach ( $Tasks as $Task )
-    {
-        $Task->date(refactorDateFormat($Task->date()));
-    }
-
-    $tasksIds = [];
-
-    foreach ( $Tasks as $Task )
-    {
-        $tasksIds[] = $Task->getId();
-    }
-
-    $Notes = Core::factory( "Task_Note" )->queryBuilder()
-        ->select([
-            "Task_Note.id AS id", "date", "task_id", "text", "usr.name AS name", "usr.surname AS surname"
-        ])
-        ->where( "task_id", "IN", $tasksIds )
-        ->leftJoin( "User AS usr", "author_id = usr.id" )
-        ->orderBy( "date", "DESC" )
-        ->findAll();
-
-    foreach ( $Notes as $Note )
-    {
-        $time = strtotime( $Note->date() );
-        $Note->date( date( "d.m.Y H:i", $time ) );
-    }
-
-    $TasksOutput = Core::factory( "Core_Entity" )
-        ->addEntities( $Tasks )
-        ->addEntities( $Notes )
-        ->addSimpleEntity( "periods", "0" )
-        ->xsl( "musadm/tasks/all.xsl" )
+    Core::factory( "Task_Controller" );
+    $TaskController = new Task_Controller( User::current() );
+    $TaskController
+        ->isShowPeriods( false )
+        ->isSubordinate( true )
+        ->isLimitedAreasAccess( true )
+        ->addSimpleEntity( "card-size", "large" )
         ->show();
 
     exit;

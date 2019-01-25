@@ -23,7 +23,7 @@ $(function(){
             e.preventDefault();
             loaderOn();
             var userid = $(this).data("userid");
-            saveData("Main", loaderOff);
+            saveData("Main", function(response){loaderOff();});
             refreshPaymentsTable(userid, loaderOff);
         })
         //Открытие формы пополнения баланса
@@ -103,6 +103,21 @@ $(function(){
             }
         })
 
+        .on("click", ".finances_payment_rate_config", function(e){
+            e.preventDefault();
+
+            var teacherRateConfigBlock = $(".teacher_rate_config_block");
+
+            if(teacherRateConfigBlock.css("display") == "none")
+            {
+                teacherRateConfigBlock.show("slow");
+            }
+            else
+            {
+                teacherRateConfigBlock.hide("slow");
+            }
+        })
+
         /**
          * Удаление тарифа
          */
@@ -127,7 +142,7 @@ $(function(){
         .on("click", ".popop_tarif_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("Main", refreshPayments);
+            saveData("Main", function(response){refreshPayments();});
         })
 
         /**
@@ -137,7 +152,18 @@ $(function(){
             e.preventDefault();
             var id = $(this).data("id");
             var afterSaveAction = $(this).data("after_save_action");
-            editPaymentPopup(id, afterSaveAction);
+
+            if(afterSaveAction == "payment" && $(this).data("type") < 3)
+            {
+                if(confirm("Редактирование суммы данного платежа не повлияет на баланс клиента. Вы хотите продолжить?"))
+                {
+                    editPaymentPopup(id, afterSaveAction);
+                }
+            }
+            else
+            {
+                editPaymentPopup(id, afterSaveAction);
+            }
         })
 
         /**
@@ -146,83 +172,80 @@ $(function(){
         .on("click", ".popop_payment_submit", function(e){
             e.preventDefault();
             loaderOn();
-            var Form = $("#createData");
-            var id = Form.find("input[name=id]").val();
-            var value = Form.find("input[name=summ]").val();
-            var date = Form.find("input[name=date]").val();
-            var description = Form.find("textarea[name=description]").val();
-            var afterSaveAction = Form.find("input[name=after_save_action]").val();
 
-            $.ajax({
-                type: "GET",
-                url: "",
-                data: {
-                    action: "payment_save",
-                    id: id,
-                    value: value,
-                    date: date,
-                    description: description
-                },
-                success: function(responce){
-                    closePopup();
+            var afterSaveAction = $("#createData").find("input[name=after_save_action]").val();
 
-                    /**
-                     * Сохранение изменений свойств платежа может происходить из разных разделов и требуют
-                     * различных действия для обновления контента страницы.
-                     * На данный момент информация о платеже редактируется из разделов клиента и страницы расписания преподавателя
-                     */
-                    switch (afterSaveAction)
-                    {
-                        case 'client':  //обновление контента страницы клиента
-                            $(".users").empty();
-                            $(".users").html(responce);
-                            loaderOff();
-                            break;
-                        case 'teacher': //обновление контента страницы преподавателя
-                            $(".schedule").empty();
-                            $(".schedule").html(responce);
-                            loaderOff();
-                            //refreshSchedule();
-                            break;
-                        default: loaderOff();
-                    }
+            saveData("Main", function(response){
+                /**
+                 * Сохранение изменений свойств платежа может происходить из разных разделов и требуют
+                 * различных действия для обновления контента страницы.
+                 * На данный момент информация о платеже редактируется из разделов клиента и страницы расписания преподавателя
+                 */
+                switch (afterSaveAction)
+                {
+                    case 'client':  //обновление контента страницы клиента
+                        refreshUserTable();
+                        break;
+                    case 'teacher': //обновление контента страницы преподавателя
+                        refreshSchedule();
+                        break;
+                    case 'payment': //обновление контента страницы финансов
+                        refreshPayments();
+                        break;
+                    default: loaderOff();
                 }
             });
         })
-        .on("click", ".payment_delete", function(e){
+        .on("click", ".teacher_payment_delete", function(e){
             e.preventDefault();
             loaderOn();
             var id = $(this).data("id");
-
-            var totalPayed = $("#teacherPayed");
-            var totalPayedValue = Number(totalPayed.text());
             var paymentValue = Number( $(this).parent().parent().parent().find(".value").text() );
 
-            totalPayed.text( totalPayedValue - paymentValue );
+            var debt = $("#teacher-debt");
+            var alreadyPayed = $("#teacher-payed");
+
+            var debtVal = Number(debt.text());
+            var alreadyPayedVal = Number(alreadyPayed.text());
+
+            debt.text(debtVal + paymentValue);
+            alreadyPayed.text(alreadyPayedVal - paymentValue);
 
             $(this).parent().parent().parent().remove();
 
-            $.ajax({
-                type: "GET",
-                url: root + "/balance",
-                data: {
-                    action: "payment_delete",
-                    id: id
-                },
-                success: function(responce){
-                    //$(".page").html(responce);
-                    closePopup();
-                    loaderOff();
-                }
+            deletePayment(id, function(response){
+                loaderOff();
             });
         });
 });
 
 
-function editPaymentPopup(id, afterSaveAction) {
+/**
+ * Функция удаления платежа
+ *
+ * @date 21.01.2019 09:50
+ * @param paymentId
+ * @param func
+ */
+function deletePayment(paymentId, func) {
     $.ajax({
         type: "GET",
         url: root + "/balance",
+        data: {
+            action: "payment_delete",
+            id: paymentId
+        },
+        success: function(response) {
+            func(response);
+        }
+    });
+}
+
+
+function editPaymentPopup(id, afterSaveAction) {
+    $.ajax({
+        type: "GET",
+        url: root + "/finances",
         data: {
             action: "edit_payment",
             id: id,
@@ -235,6 +258,11 @@ function editPaymentPopup(id, afterSaveAction) {
 }
 
 
+/**
+ * Открытие всплывающего окна создания / редактирования тарифа
+ *
+ * @param tarifid
+ */
 function editTarifPopup(tarifid) {
     $.ajax({
         type: "GET",

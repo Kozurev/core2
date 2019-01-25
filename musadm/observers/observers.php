@@ -467,7 +467,7 @@ Core::attachObserver( "beforePaymentSave", function( $args ) {
         {
             $UserAreas = Core::factory( "Schedule_Area_Assignment" )->getAreas( $PaymentUser, true );
 
-            if ( count( $UserAreas ) > 0 )
+            if ( count( $UserAreas ) == 1 )
             {
                 $Payment->areaId( $UserAreas[0]->getId() );
             }

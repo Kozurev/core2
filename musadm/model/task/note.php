@@ -10,8 +10,8 @@ class Task_Note extends Core_Entity
 {
     protected $id;
     protected $date;
-    protected $task_id;
-    protected $author_id;
+    protected $task_id = 0;
+    protected $author_id = 0;
     protected $text;
 
     public function __construct(){}
@@ -19,68 +19,88 @@ class Task_Note extends Core_Entity
 
     public function getId()
     {
-        return $this->id;
+        return intval( $this->id );
     }
 
 
-    public function date($val = null)
+    public function date( $val = null )
     {
-        if(is_null($val))   return $this->date;
-        $this->date = strval($val);
+        if ( is_null( $val ) )  return strval( $this->date );
+
+        $this->date = strval( $val );
         return $this;
     }
 
 
-    public function authorId($val = null)
+    public function authorId( $val = null )
     {
-        if(is_null($val))   return $this->author_id;
-        $this->author_id = intval($val);
+        if ( is_null( $val ) )  return intval( $this->author_id );
+
+        $this->author_id = intval( $val );
         return $this;
     }
 
 
-    public function taskId($val = null)
+    public function taskId( $val = null )
     {
-        if(is_null($val))   return $this->task_id;
-        $this->task_id = intval($val);
+        if ( is_null( $val ) )  return intval( $this->task_id );
+
+        $this->task_id = intval( $val );
         return $this;
     }
 
 
-    public function text($val = null)
+    public function text( $val = null )
     {
-        if(is_null($val))   return $this->text;
-        $this->text = strval($val);
+        if ( is_null( $val ) )  return strval( $this->text );
+
+        $this->text = strval( $val );
         return $this;
     }
 
 
+    /**
+     * Поиск автора текста задачи
+     *
+     * @return User|null
+     */
     public function getAuthor()
     {
-        return Core::factory("User", $this->author_id);
+        if ( $this->authorId() === 0 )
+        {
+            return null;
+        }
+
+        $Author = Core::factory( "User", $this->author_id );
+
+        return $Author;
     }
 
 
-    public function save($obj = null)
+    public function save( $obj = null )
     {
-        Core::notify(array(&$this), "beforeTaskNoteSave");
+        Core::notify( [&$this], "beforeTaskNoteSave" );
 
-        if( $this->date == null )       $this->date = date("Y-m-d H:i:s");
+        if( $this->date == null )       $this->date = date( "Y-m-d H:i:s" );
 
         if( $this->author_id === null )
         {
             $this->author_id = User::parentAuth()->getId();
         }
+
         parent::save();
-        Core::notify(array(&$this), "afterTaskNoteSave");
+
+        Core::notify( [&$this], "afterTaskNoteSave" );
     }
 
 
-    public function delete($obj = null)
+    public function delete( $obj = null )
     {
-        Core::notify(array(&$this), "beforeTaskNoteDelete");
+        Core::notify( [&$this], "beforeTaskNoteDelete" );
+
         parent::delete();
-        Core::notify(array(&$this), "afterTaskNoteDelete");
+
+        Core::notify( [&$this], "afterTaskNoteDelete" );
     }
 
 }

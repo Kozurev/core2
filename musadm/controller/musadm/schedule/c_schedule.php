@@ -547,9 +547,11 @@ if( $User->groupId() == 4 )
 
     $totalPayed = Core_Array::getValue( $totalPayed, "payed", 0 );
     $totalHaveToPay = Core_Array::getValue( $totalHaveToPay, "total", 0 );
+    $debt = $totalHaveToPay - $totalPayed;
 
     echo "<div class='teacher_footer'>
-            За текущий месяц к выплате / уже выплачено: <span id='teacherHaveToPay'>$totalHaveToPay</span> / <span id='teacherPayed'>$totalPayed</span><br>
+            <!--За текущий месяц к выплате / уже выплачено: <span id='teacherHaveToPay'>$totalHaveToPay</span> / <span id='teacherPayed'>$totalPayed</span><br>-->
+            К выплате: <span id='teacher-debt'>$debt</span>руб; Уже выплачено: <span id='teacher-payed'>$totalPayed</span> руб.
         </div>";
     /**
      * <<Формирование таблицы с отметками о явке/неявке

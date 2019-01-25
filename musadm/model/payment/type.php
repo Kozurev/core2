@@ -40,7 +40,7 @@ class Payment_Type extends Core_Entity
 
     public function isDeletable( $val = null )
     {
-        if ( is_null( $val ) )  return $this->is_deletable;
+        if ( is_null( $val ) )  return intval( $this->is_deletable );
 
         $val == true
             ?   $this->is_deletable = 1

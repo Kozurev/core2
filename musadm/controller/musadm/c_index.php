@@ -98,67 +98,73 @@ if( User::checkUserAccess( ["groups" => [2]], $User ) )
     /**
      * Формирование столбца Задач
      */
-    $Tasks = Core::factory( "Task" )
-        ->queryBuilder()
-        ->where( "date", "<=", date("Y-m-d") )
-        ->where( "subordinated", "=", $subordinated )
-        ->open()
-            ->where( "done", "=", 0 )
-            ->where( "done_date", "=", date( "Y-m-d" ), "OR" )
-        ->close()
-        ->orderBy( "date", "DESC" )
-        ->orderBy( "id", "DESC" )
-        ->findAll();
+    Core::factory( "Task_Controller" );
+    $TaskController = new Task_Controller( User::current() );
+    $TaskController
+        ->isShowPeriods( false )
+        ->isSubordinate( true )
+        ->isLimitedAreasAccess( true )
+        ->addSimpleEntity( "card-size", "large" );
 
-    foreach ( $Tasks as $Task )
-    {
-        $Task->date( refactorDateFormat( $Task->date() ) );
-    }
 
-    $tasksIds = [];
-    $clientsAssignments = [];
-
-    foreach ( $Tasks as $Task )
-    {
-        $tasksIds[] = $Task->getId();
-
-        //Поиск пользователей, с которыми связаны задачи
-        if( $Task->associate() !== 0 )
-        {
-            $Client = Core::factory( "User", $Task->associate() );
-
-            if( $Client !== false )
-            {
-                $clientsAssignments[] = $Client;
-            }
-        }
-    }
-
-    $Notes = Core::factory( "Task_Note" )
-        ->queryBuilder()
-        ->select([
-            "Task_Note.id AS id", "date", "task_id", "text", "usr.name AS name", "usr.surname AS surname"
-        ])
-        ->where( "task_id", "IN", $tasksIds )
-        ->leftJoin( "User AS usr", "author_id = usr.id" )
-        ->orderBy( "date", "DESC" )
-        ->findAll();
-
-    foreach ( $Notes as $Note )
-    {
-        $time = strtotime( $Note->date() );
-        $Note->date( date( "d.m.Y H:i", $time ) );
-    }
-
-    global $CFG;
-
-    $TasksOutput = Core::factory( "Core_Entity" )
-        ->addSimpleEntity( "wwwroot", $CFG->rootdir )
-        ->addEntities( $Tasks )
-        ->addEntities( $Notes )
-        ->addEntities( $clientsAssignments, "assignment" )
-        ->addSimpleEntity( "periods", "0" )
-        ->xsl( "musadm/tasks/all.xsl" );
+//    $Tasks = Core::factory( "Task" )
+//        ->queryBuilder()
+//        ->where( "date", "<=", date("Y-m-d") )
+//        ->where( "subordinated", "=", $subordinated )
+//        ->open()
+//            ->where( "done", "=", 0 )
+//            ->where( "done_date", "=", date( "Y-m-d" ), "OR" )
+//        ->close()
+//        ->orderBy( "date", "DESC" )
+//        ->orderBy( "id", "DESC" )
+//        ->findAll();
+//
+//
+//    $tasksIds = [];
+//    $clientsAssignments = [];
+//
+//    foreach ( $Tasks as $Task )
+//    {
+//        $tasksIds[] = $Task->getId();
+//
+//        //Поиск пользователей, с которыми связаны задачи
+//        if( $Task->associate() !== 0 )
+//        {
+//            $Client = Core::factory( "User", $Task->associate() );
+//
+//            if( $Client !== false )
+//            {
+//                $clientsAssignments[] = $Client;
+//            }
+//        }
+//    }
+//
+//    $Notes = Core::factory( "Task_Note" )
+//        ->queryBuilder()
+//        ->select([
+//            "Task_Note.id AS id", "date", "task_id", "text", "usr.name AS name", "usr.surname AS surname"
+//        ])
+//        ->where( "task_id", "IN", $tasksIds )
+//        ->leftJoin( "User AS usr", "author_id = usr.id" )
+//        ->orderBy( "date", "DESC" )
+//        ->findAll();
+//
+//    foreach ( $Notes as $Note )
+//    {
+//        $time = strtotime( $Note->date() );
+//        $Note->date( date( "d.m.Y H:i", $time ) );
+//    }
+//
+//    global $CFG;
+//
+//    $TasksOutput = Core::factory( "Core_Entity" )
+//        ->addSimpleEntity( "wwwroot", $CFG->rootdir )
+//        ->addSimpleEntity( "card-size", "large" )
+//        ->addEntities( $Tasks )
+//        ->addEntities( $Notes )
+//        ->addEntities( $clientsAssignments, "assignment" )
+//        ->addSimpleEntity( "periods", "0" )
+//        ->xsl( "musadm/tasks/all.xsl" );
 
     ?>
     <div class="dynamic-fixed-row">
@@ -197,7 +203,7 @@ if( User::checkUserAccess( ["groups" => [2]], $User ) )
         </div>
 
         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 tasks">
-            <?$TasksOutput->show();?>
+            <?$TaskController->show();?>
         </div>
     </div>
     <?

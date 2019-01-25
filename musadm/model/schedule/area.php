@@ -27,6 +27,7 @@ class Schedule_Area extends Schedule_Area_Model
         }
 
         return $this->queryBuilder()
+            ->where( "active", "=", "1" )
             ->orderBy( "sorting" )
             ->findAll();
     }

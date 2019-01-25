@@ -41,12 +41,12 @@ function showPopup(data) {
     $(".popup").empty();
     $(".popup").append('<a href="#" class="popup_close"></a>');
     $(".popup").append(data);
-    $(".popup").show("slow");
+    $(".popup").show("fast");
 }
 
 function closePopup() {
     $(".overlay").hide();
-    $(".popup").hide("slow");
+    $(".popup").hide("fast");
     $(".popup").empty();
 }
 
@@ -82,10 +82,11 @@ function saveData(tab, func) {
         url: link,
         data: data,
         async: false,
-        success: function(responce) {
+        success: function(response) {
             closePopup();
-            if(responce != "0" && responce != "") alert(responce);
-            if($.isFunction(func)) func();
+            if(response != "0" && response != "") alert(response);
+            //if($.isFunction(func)) func(response);
+            func(response);
         }
     });
 }

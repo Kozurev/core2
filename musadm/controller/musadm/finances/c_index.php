@@ -16,9 +16,14 @@ $dateFrom = Core_Array::Get( "date_from", null );
 $dateTo = Core_Array::Get( "date_to", null );
 
 
+if ( !User::checkUserAccess( ["groups" => [6]] ) )
+{
+    Core_Page_Show::instance()->error404();
+}
+
 $Director = User::current()->getDirector();
-if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
 $subordinated = $Director->getId();
+
 
 //Тарифы
 $Tarifs = Core::factory( "Payment_Tarif" )->queryBuilder()
@@ -33,17 +38,15 @@ $LessonTypes = Core::factory( "Schedule_Lesson_Type" )->queryBuilder()
 //Типы платежей
 $PaymentTypes = Core::factory( "Payment" )->getTypes( true, false );
 
+//Доступные филиалы
+$PaymentAreas = Core::factory( "Schedule_Area" )->getList( true );
+
 
 $Payments = Core::factory( "Payment" );
 $Payments->queryBuilder()
     ->where( "subordinated", "=", $subordinated )
     ->where( "type", "<>", 2 )
-//    ->open()
-//        ->where("type", "=", 1)
-//        ->where("type", "=", 3, "OR")
-//        ->where("type", "=", 4, "OR")
-//    ->close()
-    ->orderBy("datetime", "DESC")
+    ->orderBy( "datetime", "DESC" )
     ->orderBy( "id", "DESC" );
 
 //Сумма поступлений
@@ -57,7 +60,7 @@ $summ = Core::factory( "Orm" )
 /**
  * Указание временного промежутка выборки
  */
-if( $dateFrom === null && $dateTo === null )
+if ( $dateFrom === null && $dateTo === null )
 {
     $Payments->queryBuilder()
         ->where( "datetime", "=", $date );
@@ -66,7 +69,7 @@ if( $dateFrom === null && $dateTo === null )
 }
 else
 {
-    if( $dateFrom !== null )
+    if ( $dateFrom !== null )
     {
         $Payments->queryBuilder()
             ->where( "datetime", ">=", $dateFrom );
@@ -74,7 +77,7 @@ else
         $summ->where( "datetime", ">=", $dateFrom );
     }
 
-    if( $dateTo !== "" )
+    if ( $dateTo !== "" )
     {
         $Payments->queryBuilder()
             ->where( "datetime", "<=", $dateTo );
@@ -90,7 +93,7 @@ $Payments = $Payments->findAll();
  * Поступления за период
  */
 $summ = $summ->find()->value;
-if( $summ === null )    $summ = 0;
+if ( $summ === null )    $summ = 0;
 
 
 /**
@@ -100,21 +103,12 @@ foreach ( $Payments as $payment )
 {
     $PaymentUser = $payment->getUser();
 
-    $payment->addEntity( $PaymentUser );
+    if ( $PaymentUser !== null )
+    {
+        $payment->addEntity( $PaymentUser );
+    }
+
     $payment->datetime( refactorDateFormat( $payment->datetime() ) );
-
-    $Area = Core::factory( "Schedule_Area_Assignment" )->getArea( $payment );
-
-//    if( $PaymentUser->groupId() == 5 )
-//    {
-//        $Property = Core::factory( "Property", 15 );
-//        $userAreaName = $Property->getPropertyValues( $PaymentUser )[0]->value();
-//
-//        if( $userAreaName != $Property->defaultValue() )
-//        {
-//            $payment->addSimpleEntity( "area", $userAreaName );
-//        }
-//    }
 }
 
 
@@ -135,7 +129,17 @@ $defAbsentRate =        $DefAbsentRate->getPropertyValues( $Director )[0]->value
 $defAbsentRateType =    $DefAbsentRateType->getPropertyValues( $Director )[0]->value();
 $defAbsentRateVal =     $DefAbsentRateVal->getPropertyValues( $Director )[0]->value();
 
-Core::factory( "Core_Entity" )
+
+Core::factory("Core_Entity")
+    ->addEntities( $Payments )
+    ->addEntities( $Tarifs )
+    ->addEntities( $LessonTypes )
+    ->addEntities( $PaymentTypes )
+    ->addEntities( $PaymentAreas )
+    ->addSimpleEntity( "date_from", $dateFrom )
+    ->addSimpleEntity( "date_to", $dateTo )
+    ->addSimpleEntity( "total_summ", $summ )
+    //Настройки тарифов
     ->addSImpleEntity( "director_id", $Director->getId() )
     ->addSimpleEntity( "teacher_indiv_rate", $defTeacherIndivRate )
     ->addSimpleEntity( "teacher_group_rate", $defTeacherGroupRate )
@@ -143,16 +147,5 @@ Core::factory( "Core_Entity" )
     ->addSimpleEntity( "absent_rate", $defAbsentRate )
     ->addSimpleEntity( "absent_rate_type", $defAbsentRateType )
     ->addSimpleEntity( "absent_rate_val", $defAbsentRateVal )
-    ->xsl( "musadm/finances/rate_config.xsl" )
-    ->show();
-
-
-Core::factory("Core_Entity")
-    ->addEntities( $Payments )
-    ->addEntities( $Tarifs )
-    ->addEntities( $LessonTypes )
-    ->addSimpleEntity( "date_from", $dateFrom )
-    ->addSimpleEntity( "date_to", $dateTo )
-    ->addSimpleEntity( "total_summ", $summ )
     ->xsl( "musadm/finances/client_payments.xsl" )
     ->show();

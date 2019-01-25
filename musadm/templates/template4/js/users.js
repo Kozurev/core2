@@ -90,7 +90,7 @@ $(function(){
             e.preventDefault();
             loaderOn();
             //userSave(loaderOff);
-            saveData("User", loaderOff);
+            saveData("User", function(response){ loaderOff(); });
 
             $("input[name=pass1]").val('');
             $("input[name=pass2]").val('');
@@ -226,7 +226,7 @@ $(function(){
         .on("click", ".report_data_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("Main", refreshUserTable);
+            saveData("Main", function(response){ refreshUserTable(); });
         });
 });
 
@@ -295,7 +295,9 @@ function userSave(func) {
             else
             {
                 if( $("#createData").valid() )
-                    saveData("User", func);
+                    saveData("User", function(func){
+                        func();
+                    });
                 else
                     loaderOff();
             }

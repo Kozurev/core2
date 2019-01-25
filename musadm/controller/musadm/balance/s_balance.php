@@ -242,33 +242,6 @@ if( $action == "savePayment" )
 
 
 /**
- * Создание / редактирование платежа
- */
-if( $action === "edit_payment" )
-{
-    $id = Core_Array::Get( "id", null );
-    $Payment = Core::factory( "Payment", $id );
-
-    /**
-     * Указатель на тип обновляемого контента страницы после сохранения данных платежа
-     *
-     * На данный момент 16.10.2018 платеж редактируется из двух разделов
-     *  значение 'client' - редактирование платежа из личного кабинета клиента
-     *  значение 'teacher' - редактирование платежа из личного кабинета преподавателя
-     */
-    $afterSaveAction = Core_Array::Get( "afterSaveAction", null );
-
-    Core::factory( "Core_Entity" )
-        ->addEntity( $Payment )
-        ->addSimpleEntity( "afterSaveAction", $afterSaveAction )
-        ->xsl( "musadm/finances/edit_payment_popup.xsl" )
-        ->show();
-
-    exit;
-}
-
-
-/**
  * Добавление комментария к платежу
  */
 if( $action == "add_note" )

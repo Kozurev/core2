@@ -47,7 +47,8 @@
         else
         {
             //$disauthorizeLink = "href='#' onclick='history.back()'";
-            $disauthorizeLink = "href='" . $CFG->rootdir . "/user/client'";
+            $UserGroup = Core::factory( "User_Group", $User->groupId() );
+            $disauthorizeLink = "href='" . $CFG->rootdir . "/user/" . $UserGroup->path() . "/'";
         }
 
         $name = $User->name();
@@ -92,20 +93,13 @@
                             <a class="navbar-brand" href="<?=$CFG->rootdir?>" >Musicmetod</a>
                         </div>
                         <ul class="nav navbar-nav">
-                            <?
-                            if( $User->groupId() == 2 )
-                            { ?>
+                            <? if( $User->groupId() == 2 ) { ?>
                             <li class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$CFG->rootdir?>/user">Расписание
                                     <span class="caret"></span></a>
                                 <ul class="dropdown-menu">
                                     <?
-                                    $Areas = Core::factory("Schedule_Area")
-                                        ->queryBuilder()
-                                        ->where( "active", "=", 1 )
-                                        ->where( "subordinated", "=", $subordinated )
-                                        ->orderBy("sorting")
-                                        ->findAll();
+                                    $Areas = Core::factory( "Schedule_Area_Assignment" )->getAreas( $User, true );
 
                                     foreach ( $Areas as $area )
                                     {
@@ -223,7 +217,7 @@
 <footer class="footer text-center">
     <div class="container">
         <small class="copyright"><a href="http://musicmetod.ru/" target="_blank">ООО"Мьюзикметод"</a></small>
-        <small class="copyright">Щорса 54, оф.307 37-42-11, +79092012550</small>
+        <small class="copyright">Щорса 54, оф.307 тел. 37-42-11, моб. +7 909 201 25 50</small>
     </div><!--//container-->
 </footer><!--//footer-->
 
@@ -241,7 +235,7 @@ Core_Page_Show::instance()
     ->js( "/templates/template10/assets/plugins/lightbox/dist/ekko-lightbox.min.js" )
     ->js( "/templates/template10/assets/plugins/jquery-match-height/jquery.matchHeight-min.js" )
     ->js( "/templates/template10/assets/js/main.js" )
-    ->js("/templates/template4/js/bootstrap.min.js")
+    ->js( "/templates/template4/js/bootstrap.min.js")
     ->js( "/templates/template4/js/jquery.validate.min.js" )
     ->js( "/templates/template4/js/bootstrap.min.js" )
     ->js( "/templates/template4/lib/tablesorter/js/jquery.tablesorter.js" )
@@ -258,6 +252,7 @@ Core_Page_Show::instance()
     ->js( "/templates/template4/js/certificates.js" )
     ->js( "/templates/template4/js/finances.js" )
     ->js( "/templates/template4/js/statistic.js" )
+    ->js( "/templates/template4/js/areas_assignments.js" )
     ->js( "/templates/template4/js/js.js" );
 ?>
 

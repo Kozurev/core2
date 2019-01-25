@@ -63,7 +63,7 @@
                             <!--</div>-->
                             <!--<div class="col-lg-6 col-sm-6 col-xs-12">-->
                                 <!--<a class="btn btn-red payment_delete" href="#" data-id="{id}" data-after_save_action="teacher">Удалить</a>-->
-                                <a class="action delete payment_delete" href="#" data-id="{id}" data-after_save_action="teacher" title="Удалить платеж"></a>
+                                <a class="action delete teacher_payment_delete" href="#" data-id="{id}" data-after_save_action="teacher" title="Удалить платеж"></a>
                             <!--</div>-->
                         </div>
                     </td>
