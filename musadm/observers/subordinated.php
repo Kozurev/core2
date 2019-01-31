@@ -86,3 +86,15 @@ Core::attachObserver( "beforePaymentTypeSave", function( $args ) {
         $PaymentType->subordinated( $User->getId() );
     }
 });
+
+
+Core::attachObserver( 'beforeLidStatusInsert', function( $args ) {
+    $LidStatus = $args[0];
+
+    if ( $LidStatus->subordinated() == 0 )
+    {
+        $User = User::current()->getDirector();
+        $LidStatus->subordinated( $User->getId() );
+    }
+
+});

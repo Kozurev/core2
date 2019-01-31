@@ -1,4 +1,6 @@
 var root = $("#rootdir").val();
+var taskAfterActionValue = $("#taskAfterAction").val();
+
 
 $(function(){
     $("body")
@@ -68,7 +70,9 @@ $(function(){
             e.preventDefault();
             loaderOn();
             var task_id = $(this).data("task_id");
-            markAsDone(task_id, loaderOff);
+            markAsDone(task_id, function(response){
+                taskAfterAction();
+            });
         })
         .on("click", ".task_add_note", function(e){
             e.preventDefault();
@@ -78,7 +82,7 @@ $(function(){
         .on("click", ".popop_task_note_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("Main", function(response){refreshTasksTable();});
+            saveData("Main", function(response){taskAfterAction();});
         })
         .on("click", ".tasks_show", function(){
             loaderOn();
@@ -93,7 +97,19 @@ $(function(){
         .on("click", ".popop_task_assignment_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("Main", function(response){refreshTasksTable();});
+            saveData("Main", function(response){taskAfterAction();});
+        })
+        .on("change", "input[data-type=task_priority]", function(e){
+            var priorityId = $(this).val();
+            var taskId = $(this).data("taskid");
+            var cardSize = $(this).data("card-size");
+
+            loaderOn();
+            changeTaskPriority(taskId, priorityId, cardSize, function(response){
+                // $(".tasks").html(response);
+                // loaderOff();
+                taskAfterAction();
+            });
         });
 
 });
@@ -111,6 +127,38 @@ function addTaskNotePopup(task_id) {
         "</form>";
 
     showPopup(popupData);
+}
+
+
+function taskAfterAction() {
+    loaderOn();
+
+    switch(taskAfterActionValue)
+    {
+        case 'balance':
+            var userId = $("#userid").val();
+            refreshPaymentsTable(userId, loaderOff);
+            break;
+        case 'tasks':
+            refreshTasksTable();
+    }
+}
+
+
+function changeTaskPriority(taskId, priorityId, cardSize, func) {
+    $.ajax({
+        type: "GET",
+        url: root + "/tasks",
+        data: {
+            action: "changeTaskPriority",
+            task_id: taskId,
+            priority_id: priorityId,
+            card_size: cardSize
+        },
+        success: function(response){
+            func(response);
+        }
+    });
 }
 
 
@@ -144,8 +192,8 @@ function markAsDone(task_id, func) {
                 loaderOff();
                 return;
             }
-            refreshTasksTable();
-            func();
+
+            func(responce);
         }
     });
 }

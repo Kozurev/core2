@@ -7,9 +7,7 @@
  */
 ?>
 
-<input type='hidden' id='taskAfterAction' value='tasks' />
-
-<div class="tasks">
+<div class="lids">
     <?php
     Core_Page_Show::instance()->execute();
     ?>

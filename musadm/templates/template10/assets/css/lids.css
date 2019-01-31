@@ -1,3 +1,6 @@
+.lids .row {
+    margin: 8px 0;
+}
 
 .lids .form-control {
     min-width: 95px;
@@ -8,26 +11,13 @@
     height: 100%;
 }
 
-.cards-section .item-inner {
-    padding: 15px 15px;
-    height: 300px !important;
-    overflow-y: auto;
-}
-
-/*.lids .cards-section .item-inner::-webkit-scrollbar { width: 0; }*/
-/*.lids .cards-section .item-inner { -ms-overflow-style: none; }*/
-
-.cards-section .cards-wrapper {
-    max-width: 100%;
-}
-
 .lids .lid_date {
-    width: 40%;
+    /*width: 40%;*/
     display: inline-block;
 }
 
 .lids .lid_status {
-    width: 40%;
+    /*width: 40%;*/
     margin-left: 5%;
     display: inline-block;
 }

@@ -47,7 +47,7 @@
         </div>
 
         <div class="row buttons-panel">
-            <div class="col-lg-3 col-md-6 col-sm-12">
+            <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
                 <a class="btn btn-green schedule_task_create">Написать администратору</a>
             </div>
         </div>

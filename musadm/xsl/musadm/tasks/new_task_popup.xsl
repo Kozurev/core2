@@ -49,6 +49,19 @@
             </div>
 
             <div class="column">
+                <span>Приоритет</span>
+            </div>
+            <div class="column">
+                <select name="priority_id" class="form-control">
+                    <xsl:for-each select="task_priority">
+                        <option value="{id}">
+                            <xsl:value-of select="title" />
+                        </option>
+                    </xsl:for-each>
+                </select>
+            </div>
+
+            <div class="column">
                 <span>Филиал</span>
             </div>
             <div class="column">

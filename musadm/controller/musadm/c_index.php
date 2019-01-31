@@ -8,34 +8,35 @@
 
 global $CFG;
 $User = User::current();
-$this->css( "templates/template6/css/style.css" );
+$this->css( '/templates/template6/css/style.css' );
+
 
 /**
  * Список директоров
  */
-if( User::checkUserAccess( ["groups" => [1]], $User ) )
+if( User::checkUserAccess( ['groups' => [1]], $User ) )
 {
-    $Directors = Core::factory( "User")
+    $Directors = Core::factory( 'User')
         ->queryBuilder()
-        ->where( "active", "=", 1 )
-        ->where( "group_id", "=", 6 )
+        ->where( 'active', '=', 1 )
+        ->where( 'group_id', '=', 6 )
         ->findAll();
 
     foreach ( $Directors as $Director )
     {
-        $city = Core::factory( "Property", 29 )->getPropertyValues( $Director )[0];
-        $organization = Core::factory( "Property", 30 )->getPropertyValues( $Director )[0];
-        $link = Core::factory( "Property", 33 )->getPropertyValues( $Director )[0];
-        $Director->addEntity( $city, "property_value" );
-        $Director->addEntity( $organization, "property_value" );
-        $Director->addEntity( $link, "property_value" );
+        $city = Core::factory( 'Property', 29 )->getPropertyValues( $Director )[0];
+        $organization = Core::factory( 'Property', 30 )->getPropertyValues( $Director )[0];
+        $link = Core::factory( 'Property', 33 )->getPropertyValues( $Director )[0];
+        $Director->addEntity( $city, 'property_value' );
+        $Director->addEntity( $organization, 'property_value' );
+        $Director->addEntity( $link, 'property_value' );
     }
 
     echo "<div class='users'>";
-        Core::factory( "Core_Entity" )
-            ->addSimpleEntity( "wwwroot", $CFG->rootdir )
+        Core::factory( 'Core_Entity' )
+            ->addSimpleEntity( 'wwwroot', $CFG->rootdir )
             ->addEntities( $Directors )
-            ->xsl( "musadm/users/directors.xsl" )
+            ->xsl( 'musadm/users/directors.xsl' )
             ->show();
     echo "</div>";
 }
@@ -44,55 +45,59 @@ if( User::checkUserAccess( ["groups" => [1]], $User ) )
 /**
  * Страница для менеджера
  */
-if( User::checkUserAccess( ["groups" => [2]], $User ) )
+if( User::checkUserAccess( ['groups' => [2]], $User ) )
 {
     $Director = $User->getDirector();
-    if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
     $subordinated = $Director->getId();
 
     /**
      * Формирование столбца лидов
      */
-    $Lids = Core::factory( "Lid" )
-        ->queryBuilder()
-        ->where( "subordinated", "=", $subordinated )
-        ->where( "control_date", "=", date("Y-m-d") )
-        ->orderBy("id", "DESC")
-        ->findAll();
+    Core::factory( 'Lid_Controller' );
+    $LidController = new Lid_Controller( $User );
+    $LidController
+        ->isShowPeriods( false );
 
-    $aoComments = [];
-    $authorsId  = [];
-
-    $status = Core::factory( "Property", 27 );
-
-    foreach( $Lids as $lid )
-    {
-        $lidComments = $lid->getComments();
-
-        foreach ( $lidComments as $comment )
-        {
-            if( !in_array( $comment->authorId(), $authorsId ) ) $authorsId[] = $comment->authorId();
-        }
-
-        $lid
-            ->addEntities($lidComments)
-            ->addEntity(
-                $status->getPropertyValues( $lid )[0], "property_value"
-            );
-    }
-
-    $Authors = Core::factory( "User" )
-        ->queryBuilder()
-        ->where("id", "in", $authorsId)
-        ->findAll();
-
-    $LidsOutput = Core::factory( "Core_Entity" )
-        ->addEntities(
-            Core::factory( "Lid" )->getStatusList(), "status"
-        )
-        ->addEntities( $Authors )
-        ->addEntities( $Lids )
-        ->xsl( "musadm/lids/lids_for_manager.xsl" );
+//    $Lids = Core::factory( 'Lid' )
+//        ->queryBuilder()
+//        ->where( 'subordinated', '=', $subordinated )
+//        ->where( 'control_date', '=', date('Y-m-d' ) )
+//        ->orderBy( 'id', 'DESC' )
+//        ->findAll();
+//
+//    $aoComments = [];
+//    $authorsId  = [];
+//
+//    $status = Core::factory( "Property", 27 );
+//
+//    foreach( $Lids as $lid )
+//    {
+//        $lidComments = $lid->getComments();
+//
+//        foreach ( $lidComments as $comment )
+//        {
+//            if( !in_array( $comment->authorId(), $authorsId ) ) $authorsId[] = $comment->authorId();
+//        }
+//
+//        $lid
+//            ->addEntities($lidComments)
+//            ->addEntity(
+//                $status->getPropertyValues( $lid )[0], "property_value"
+//            );
+//    }
+//
+//    $Authors = Core::factory( "User" )
+//        ->queryBuilder()
+//        ->where("id", "in", $authorsId)
+//        ->findAll();
+//
+//    $LidsOutput = Core::factory( "Core_Entity" )
+//        ->addEntities(
+//            Core::factory( "Lid" )->getStatusList(), "status"
+//        )
+//        ->addEntities( $Authors )
+//        ->addEntities( $Lids )
+//        ->xsl( "musadm/lids/lids_for_manager.xsl" );
 
 
     /**
@@ -103,8 +108,8 @@ if( User::checkUserAccess( ["groups" => [2]], $User ) )
     $TaskController
         ->isShowPeriods( false )
         ->isSubordinate( true )
-        ->isLimitedAreasAccess( true )
-        ->addSimpleEntity( "card-size", "large" );
+        ->isLimitedAreasAccess( true );
+        //->addSimpleEntity( "card-size", "large" );
 
 
 //    $Tasks = Core::factory( "Task" )
@@ -199,7 +204,7 @@ if( User::checkUserAccess( ["groups" => [2]], $User ) )
 
     <div class="row">
         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 lids">
-            <?$LidsOutput->show();?>
+            <?$LidController->show();?>
         </div>
 
         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 tasks">

@@ -1,3 +1,4 @@
+'use strict';
 //var root = "/musadm";
 var root = $("#rootdir").val();
 
@@ -296,7 +297,7 @@ function userSave(func) {
             {
                 if( $("#createData").valid() )
                     saveData("User", function(func){
-                        func();
+                        refreshUserTable();
                     });
                 else
                     loaderOff();

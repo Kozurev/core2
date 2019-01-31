@@ -11,7 +11,7 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
 
     public function getObject()
     {
-        if ( $this->modelName() != "" && $this->modelId() > 0 )
+        if ( $this->modelName() != '' && $this->modelId() > 0 )
         {
             return Core::factory( $this->modelName(), $this->modelId() );
         }

@@ -1130,7 +1130,7 @@ select {
   display: inline-block;
 }
 .cards-section {
-  padding: 60px 0;
+  padding: 10px 0;
   background: #f9f9fb;
 }
 .cards-section .title {
@@ -1151,7 +1151,11 @@ select {
   margin-right: auto;
 }
 .cards-section .item {
-  margin-bottom: 30px;
+  margin: 20px 10px;
+  width: 540px;
+  display: inline-block;
+  max-width: 94%;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
 }
 .cards-section .item .icon-holder {
   margin-bottom: 15px;
@@ -1274,6 +1278,11 @@ select {
 
 
 @media(max-width: 420px) {
+
+  .cards-section .item {
+    width: 94%;
+    margin-left: 3%;
+  }
 
   .footer {
     height: 70px;

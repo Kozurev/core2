@@ -16,6 +16,8 @@ class Task_Model extends Core_Entity
     protected $associate = 0;
     protected $subordinated = 0;
     protected $area_id = 0;
+    protected $priority_id = 1;
+
 
 
     public function getId()
@@ -29,6 +31,7 @@ class Task_Model extends Core_Entity
         if ( is_null( $val ) )   return strval( $this->date );
 
         $this->date = strval( $val );
+
         return $this;
     }
 
@@ -56,6 +59,7 @@ class Task_Model extends Core_Entity
         if ( is_null( $val ) )   return intval( $this->type );
 
         $this->type = intval( $val );
+
         return $this;
     }
 
@@ -65,6 +69,7 @@ class Task_Model extends Core_Entity
         if ( is_null( $val ) )   return intval( $this->associate );
 
         $this->associate = intval( $val );
+
         return $this;
     }
 
@@ -74,6 +79,7 @@ class Task_Model extends Core_Entity
         if ( is_null( $val ) )   return intval( $this->subordinated );
 
         $this->subordinated = intval( $val );
+
         return $this;
     }
 
@@ -83,8 +89,20 @@ class Task_Model extends Core_Entity
         if ( is_null( $val ) )  return intval( $this->area_id );
 
         $this->area_id = intval( $val );
+
         return $this;
     }
+
+
+    public function priorityId( $priority_id = null )
+    {
+        if ( is_null( $priority_id ) )  return intval( $this->priority_id );
+
+        $this->priority_id = intval( $priority_id );
+
+        return $this;
+    }
+
 
 
 }

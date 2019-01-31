@@ -38,6 +38,7 @@ $action = Core_Array::Get( "action", null );
 if( $action == "refreshGroupTable" )
 {
     Core_Page_Show::instance()->execute();
+    exit;
 }
 
 if( $action == "updateForm" )

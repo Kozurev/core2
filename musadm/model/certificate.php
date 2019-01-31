@@ -12,8 +12,7 @@ class Certificate extends Core_Entity
     protected $sell_date;
     protected $number;
     protected $active_to;
-    protected $note;
-    protected $subordinated;
+    protected $subordinated = 0;
 
     public function __construct(){}
 
@@ -44,14 +43,6 @@ class Certificate extends Core_Entity
     {
         if(is_null($val))   return $this->active_to;
         $this->active_to = strval($val);
-        return $this;
-    }
-
-
-    public function note($val = null)
-    {
-        if(is_null($val))   return $this->note;
-        $this->note = strval($val);
         return $this;
     }
 

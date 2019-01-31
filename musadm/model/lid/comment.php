@@ -15,59 +15,74 @@ class Lid_Comment extends Core_Entity
     protected $datetime;
 
 
-    public function __construct()
-    {
-        //$this->author_id = Core::factory("User")->getCurrent()->getId();
-        //$this->datetime = date("Y-m-d H:i:s");
-    }
-
 
     public function getId()
     {
-        return $this->id;
+        return intval( $this->id );
     }
 
 
-    public function authorId($val = null)
+    public function authorId( $val = null )
     {
-        if(is_null($val))   return $this->author_id;
-        $this->author_id = intval($val);
+        if ( is_null( $val ) )  return intval( $this->author_id );
+
+        $this->author_id = intval( $val );
+
         return $this;
     }
 
 
-    public function lidId($val = null)
+    public function lidId( $val = null )
     {
-        if(is_null($val))   return $this->lid_id;
-        $this->lid_id = intval($val);
+        if ( is_null( $val ) )  return intval( $this->lid_id );
+
+        $this->lid_id = intval( $val );
+
         return $this;
     }
 
 
-    public function text($val = null)
+    public function text( $val = null )
     {
-        if(is_null($val))   return $this->text;
-        $this->text = strval($val);
+        if ( is_null( $val ) )  return $this->text;
+
+        $this->text = strval( $val );
+
         return $this;
     }
 
 
-    public function datetime($val = null)
+    public function datetime( $val = null )
     {
-        if(is_null($val))   return $this->datetime;
-        $this->datetime = $val;
+        if ( is_null( $val ) )  return $this->datetime;
+
+        $this->datetime = strval( $val );
+
         return $this;
     }
 
 
-    public function save($obj = null)
+    public function save( $obj = null )
     {
-        Core::notify(array(&$this), "beforeLidCommentSave");
-        $oUser = Core::factory("User")->getCurrent();
-        if($this->author_id == "")  $this->author_id = $oUser->getId();
-        if($this->datetime == "")   $this->datetime = date("Y-m-d H:i:s");
+        Core::notify( [&$this], 'beforeLidCommentSave' );
+
+        $User = User::current();
+
+        if ( $this->author_id === null )
+        {
+            $this->author_id = $User->getId();
+        }
+
+        if ( $this->datetime === null )
+        {
+            $this->datetime = date( 'Y-m-d H:i:s' );
+        }
+
         parent::save();
-        Core::notify(array(&$this), "afterLidCommentSave");
+
+        Core::notify( [&$this], 'afterLidCommentSave' );
     }
+
+
 
 }

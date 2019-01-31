@@ -6,17 +6,16 @@
  * Time: 17:07
  */
 
-$from = Core_Array::Get( "date_from", null );
-$to =   Core_Array::Get( "date_to", null );
-$today = date( "Y-m-d" );
+$from = Core_Array::Get( 'date_from', null );
+$to =   Core_Array::Get( 'date_to', null );
+$today = date( 'Y-m-d' );
 
 
 $Director = User::current()->getDirector();
-if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
 $subordinated = $Director->getId();
 
 
-Core::factory( "Task_Controller" );
+Core::factory( 'Task_Controller' );
 $TaskController = new Task_Controller( User::current() );
 $TaskController
     ->periodFrom( $from )
@@ -24,7 +23,6 @@ $TaskController
     ->isShowPeriods( true )
     ->isSubordinate( true )
     ->isLimitedAreasAccess( true )
-    ->addSimpleEntity( "card-size", "small" )
     ->show();
 
 //$output = Core::factory( "Core_Entity" );

@@ -1,15 +1,15 @@
 <?php
 /**
-*	Модель пользователя
-*/
+ * Класс-модель пользователя
+ */
 class User_Model extends Core_Entity
 {
 	protected $id = 0;
 	protected $name; //
 	protected $surname; //
-	protected $patronimyc; //
-	protected $phone_number; //
-	protected $email; //
+	protected $patronimyc = ""; //
+	protected $phone_number = ""; //
+	protected $email = ""; //
 	protected $login; //
 	protected $password; //
 	protected $group_id; //
@@ -17,14 +17,14 @@ class User_Model extends Core_Entity
 	protected $active = 1; //
 	protected $superuser = 0;
 	protected $subordinated = 0;
-	//protected $properties_list;
+
 
 	function __construct()
 	{
-		if(!$this->register_date)
-			$this->register_date = date("Y-m-d");
-
-        //$this->properties_list = unserialize($this->properties_list);
+		if ( !$this->register_date )
+        {
+            $this->register_date = date(  'Y-m-d' );
+        }
 	}
 
 
@@ -40,7 +40,7 @@ class User_Model extends Core_Entity
 
 		if ( $val < 0 )
         {
-            exit ( Core::getMessage( "UNSIGNED_VALUE", ["group_id", "User"] ) );
+            exit ( Core::getMessage( 'UNSIGNED_VALUE', ['group_id', 'User'] ) );
         }
 
 		$this->group_id = intval( $val );
@@ -53,7 +53,7 @@ class User_Model extends Core_Entity
 		if ( is_null( $val ) )  return intval( $this->active );
 
 		if ( $val == true )		$this->active = 1;
-		elseif( $val == false )	$this->active = 0;
+		elseif ( $val == false )$this->active = 0;
 
 		return $this;
 	}
@@ -65,7 +65,7 @@ class User_Model extends Core_Entity
 
 		if ( strlen( $val ) > 255 )
         {
-            exit ( Core::getMessage( "TOO_LARGE_VALUE", ["password", "User", 255] ) );
+            exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['password', 'User', 255] ) );
         }
 
 		$val = trim( $val );
@@ -84,7 +84,7 @@ class User_Model extends Core_Entity
 
 		if ( strlen( $val ) > 255 )
         {
-            exit ( Core::getMessage( "TOO_LARGE_VALUE", ["phone_number", "User", 255] ) );
+            exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['phone_number', 'User', 255] ) );
         }
 
 		$this->phone_number = strval( $val );
@@ -98,7 +98,7 @@ class User_Model extends Core_Entity
 
 		if( strlen( $val ) > 255 )
         {
-            exit ( Core::getMessage( "TOO_LARGE_VALUE", ["name", "User", 255] ) );
+            exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['name', 'User', 255] ) );
         }
 
 		$this->name = trim( $val );
@@ -112,7 +112,7 @@ class User_Model extends Core_Entity
 
 		if ( strlen( $val ) > 255 )
         {
-            exit (Core::getMessage( "TOO_LARGE_VALUE", ["surname", "User", 255] ) );
+            exit (Core::getMessage( 'TOO_LARGE_VALUE', ['surname', 'User', 255] ) );
         }
 
 		$this->surname = trim( $val );
@@ -126,7 +126,7 @@ class User_Model extends Core_Entity
 
 		if ( strlen( $val ) > 255 )
         {
-            exit ( Core::getMessage( "TOO_LARGE_VALUE", ["patronimyc", "User", 255] ) );
+            exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['patronimyc', 'User', 255] ) );
         }
 
 		$this->patronimyc = trim( $val );
@@ -140,7 +140,7 @@ class User_Model extends Core_Entity
 
 		if ( strlen( $val ) > 255 )
         {
-            exit ( Core::getMessage( "TOO_LARGE_VALUE", ["email", "User", 255] ) );
+            exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['email', 'User', 255] ) );
         }
 
 		$this->email = $val;
@@ -154,7 +154,7 @@ class User_Model extends Core_Entity
 
 		if ( strlen( $val ) > 255 )
         {
-            exit ( Core::getMessage("TOO_LARGE_VALUE", ["login", "User", 255] ) );
+            exit ( Core::getMessage('TOO_LARGE_VALUE', ['login', 'User', 255] ) );
         }
 
 		$this->login = trim( $val );
@@ -173,7 +173,7 @@ class User_Model extends Core_Entity
 		if ( is_null( $val ) ) 	return intval( $this->superuser );
 
 		if ( $val == true )		$this->superuser = 1;
-		elseif($val == false)	$this->superuser = 0;
+		elseif ($val == false)	$this->superuser = 0;
 
 		return $this;
 	}

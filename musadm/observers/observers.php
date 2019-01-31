@@ -347,7 +347,7 @@ Core::attachObserver( "beforeLidSave", function( $args ) {
 /**
  * При создании лида присваивает ему дополнительное своство "Статус лида"
  */
-Core::attachObserver( "afterLidSave", function( $args ) {
+Core::attachObserver( "afterLidInsert", function( $args ) {
     $Lid = $args[0];
     Core::factory( "Property" )->addToPropertiesList( $Lid, 27 );
 });

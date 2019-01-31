@@ -1,5 +1,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+    <xsl:include href="../tasks/task.xsl" />
+
     <xsl:template match="root">
 
         <style>
@@ -90,46 +92,52 @@
             <xsl:when test="id = ''">
                 <xsl:variable name="id" select="task/id" />
 
-                <div class="tasks event_task">
-                    <h4>
-                        Задача №<xsl:value-of select="task/id" />
-                        на <xsl:value-of select="task/date" />
-                    </h4>
-                    <div class="tasks-comments">
-                        <xsl:for-each select="/root/task_note[task_id = $id]">
-                            <div class="block">
-                                <div class="comment_header">
-                                    <div class="author">
-                                        <xsl:choose>
-                                            <xsl:when test="author_id = 0">
-                                                Система
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <xsl:choose>
-                                                    <xsl:when test="author_id = 0">
-                                                        Система
-                                                    </xsl:when>
-                                                    <xsl:otherwise>
-                                                        <xsl:value-of select="surname" />
-                                                        <xsl:text> </xsl:text>
-                                                        <xsl:value-of select="name" />
-                                                    </xsl:otherwise>
-                                                </xsl:choose>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </div>
-                                    <div class="date">
-                                        <xsl:value-of select="date" />
-                                    </div>
-                                </div>
-
-                                <div class="comment_body">
-                                    <p><xsl:value-of select="text" /></p>
-                                </div>
-                            </div>
-                        </xsl:for-each>
+                <section class="cards-section text-center tasks-section tasks">
+                    <div id="cards-wrapper" class="cards-wrapper row">
+                        <xsl:apply-templates select="task" />
                     </div>
-                </div>
+                </section>
+
+                <!--<div class="tasks event_task">-->
+                    <!--<h4>-->
+                        <!--Задача №<xsl:value-of select="task/id" />-->
+                        <!--на <xsl:value-of select="task/date" />-->
+                    <!--</h4>-->
+                    <!--<div class="tasks-comments">-->
+                        <!--<xsl:for-each select="/root/task_note[task_id = $id]">-->
+                            <!--<div class="block">-->
+                                <!--<div class="comment_header">-->
+                                    <!--<div class="author">-->
+                                        <!--<xsl:choose>-->
+                                            <!--<xsl:when test="author_id = 0">-->
+                                                <!--Система-->
+                                            <!--</xsl:when>-->
+                                            <!--<xsl:otherwise>-->
+                                                <!--<xsl:choose>-->
+                                                    <!--<xsl:when test="author_id = 0">-->
+                                                        <!--Система-->
+                                                    <!--</xsl:when>-->
+                                                    <!--<xsl:otherwise>-->
+                                                        <!--<xsl:value-of select="surname" />-->
+                                                        <!--<xsl:text> </xsl:text>-->
+                                                        <!--<xsl:value-of select="name" />-->
+                                                    <!--</xsl:otherwise>-->
+                                                <!--</xsl:choose>-->
+                                            <!--</xsl:otherwise>-->
+                                        <!--</xsl:choose>-->
+                                    <!--</div>-->
+                                    <!--<div class="date">-->
+                                        <!--<xsl:value-of select="date" />-->
+                                    <!--</div>-->
+                                <!--</div>-->
+
+                                <!--<div class="comment_body">-->
+                                    <!--<p><xsl:value-of select="text" /></p>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</xsl:for-each>-->
+                    <!--</div>-->
+                <!--</div>-->
             </xsl:when>
             <!--Если это просто событие-->
             <xsl:otherwise>

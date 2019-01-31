@@ -16,70 +16,68 @@ $subordinated = User::current()->getDirector()->getId();
 User::isAuthAs() ? $isAdmin = 1 : $isAdmin = 0;
 
 //id клиента под которым авторизован менеджер/директор
-$pageClientId = Core_Array::Get( "userid", null );
+$pageClientId = Core_Array::Get( 'userid', null );
 
 //Получение объекта пользователя клиента
-if( is_null( $pageClientId ) )
+if ( is_null( $pageClientId ) )
 {
     $User = User::current();
 }
 else
 {
-    $User = Core::factory( "User", $pageClientId );
+    $User = Core::factory( 'User', $pageClientId );
 }
 
 /**
  * Проверка на принадлежность клиента, под которым происходит авторизация,
  * тому же директору, которому принадлежит и менеджер
  */
-if( $User->subordinated() !== $subordinated )
+if ( $User->subordinated() !== $subordinated )
 {
-    debug( $User->subordinated(), 1 );
-    debug( $subordinated, 1 );
-    die( "Доступ к личному кабинету данного пользователя заблокирован, так как он принадлежит другой организации" );
+    Core_Page_Show::instance()->error( 403 );
 }
 
 
 /**
  * Пользовательские примечания и дата последней авторизации
  */
-if( !is_null( $pageClientId ) )
+if ( !is_null( $pageClientId ) )
 {
-    $oPropertyNotes = Core::factory( "Property", 19 );
-    $clienNotes = $oPropertyNotes->getPropertyValues( $User );
+    $ClientNote = Core::factory( 'Property', 19 );
+    $clientNote = $ClientNote->getPropertyValues( $User );
 
-    $oPropertyPerLesson = Core::factory( "Property", 32 );
-    $perLesson = $oPropertyPerLesson->getPropertyValues( $User );
+    $PropertyPerLesson = Core::factory( 'Property', 32 );
+    $perLesson = $PropertyPerLesson->getPropertyValues( $User );
 
-    $oPropertyLastEntry = Core::factory( "Property", 22 );
-    $lastEntry = $oPropertyLastEntry->getPropertyValues( $User );
+    $LastEntry = Core::factory( 'Property', 22 );
+    $lastEntry = $LastEntry->getPropertyValues( $User );
 
-    Core::factory( "Core_Entity" )
-        ->addEntities( $clienNotes, "note" )
-        ->addEntities( $lastEntry, "entry" )
-        ->addEntities( $perLesson, "per_lesson" )
-        ->xsl( "musadm/client_notes.xsl" )
+    Core::factory( 'Core_Entity' )
+        ->addEntities( $clientNote, 'note' )
+        ->addEntities( $lastEntry, 'entry' )
+        ->addEntities( $perLesson, 'per_lesson' )
+        ->xsl( 'musadm/client_notes.xsl' )
         ->show();
 }
 
 /**
  * Баланс, кол-во индивидуальных занятий, кол-во групповых занятий
  */
-$oPropertyBalance           =   Core::factory("Property", 12);
-$oPropertyPrivateLessons    =   Core::factory("Property", 13);
-$oPropertyGroupLessons      =   Core::factory("Property", 14);
+$oPropertyBalance = Core::factory( 'Property', 12 );
+$oPropertyPrivateLessons = Core::factory( 'Property', 13 );
+$oPropertyGroupLessons = Core::factory( 'Property', 14 );
 
-$balance        =   $oPropertyBalance->getPropertyValues( $User )[0];
-$privateLessons =   $oPropertyPrivateLessons->getPropertyValues( $User )[0];
-$groupLessons   =   $oPropertyGroupLessons->getPropertyValues( $User )[0];
+$balance = $oPropertyBalance->getPropertyValues( $User )[0];
+$privateLessons = $oPropertyPrivateLessons->getPropertyValues( $User )[0];
+$groupLessons = $oPropertyGroupLessons->getPropertyValues( $User )[0];
 
-Core::factory( "Core_Entity" )
+Core::factory( 'Core_Entity' )
     ->addEntity( $User )
-    ->addSimpleEntity( "is_admin", $isAdmin )
-    ->addEntity( $balance,          "property" )
-    ->addEntity( $privateLessons,   "property" )
-    ->addEntity( $groupLessons,     "property" )
-    ->xsl( "musadm/users/balance/balance.xsl" )
+    ->addSimpleEntity( 'is_admin', $isAdmin )
+    ->addEntity( $balance, 'property' )
+    ->addEntity( $privateLessons, 'property' )
+    ->addEntity( $groupLessons, 'property' )
+    ->xsl( 'musadm/users/balance/balance.xsl' )
     ->show();
 
 
@@ -87,7 +85,7 @@ Core::factory( "Core_Entity" )
  * Формирование таблицы расписания для клиентов
  * Начало>>
  */
-if( $User->groupId() == 5 )
+if ( $User->groupId() == 5 )
 {
     $userId = $User->getId();
     ?>
@@ -122,9 +120,10 @@ if( $User->groupId() == 5 )
     </div>
     <?
 
-    $month = Core_Array::Get( "month", date("m") );
-    $year =  Core_Array::Get( "year", date("Y") );
-    $aoTeacherLessons = array();
+    $month = Core_Array::Get( 'month', date( 'm' ) );
+    $year =  Core_Array::Get( 'year', date( 'Y' ) );
+
+    //$TeacherLessons = [];
 
     ?>
     <script>
@@ -133,11 +132,7 @@ if( $User->groupId() == 5 )
     </script>
     <?
 
-    /**
-     * Заголовок таблицы
-     * Начало>>
-     */
-    Core::factory( "Schedule_Controller" )
+    Core::factory( 'Schedule_Controller' )
         ->userId( $userId )
         ->setCalendarPeriod( $month, $year )
         ->printCalendar();
@@ -152,54 +147,57 @@ if( $User->groupId() == 5 )
 /**
  * Блок статистики посещаемости
  */
-$UserReports = Core::factory( "Schedule_Lesson_Report" );
+$UserReports = Core::factory( 'Schedule_Lesson_Report' );
 $UserReports
     ->queryBuilder()
-    ->select( ["Schedule_Lesson_Report.id", "attendance", "date", "lesson_id", "lesson_type", "surname", "name",
-                "client_rate", "teacher_rate", "total_rate"] )
-    ->leftJoin( "User AS usr", "usr.id = teacher_id" )
-    ->orderBy( "date", "DESC" );
+    ->select( ['Schedule_Lesson_Report.id', 'attendance', 'date', 'lesson_id', 'lesson_type',
+        'surname', 'name', 'client_rate', 'teacher_rate', 'total_rate'] )
+    ->leftJoin( 'User AS usr', 'usr.id = teacher_id' )
+    ->orderBy( 'date', 'DESC' );
 
-$ClientGroups = Core::factory("Schedule_Group_Assignment")
+$ClientGroups = Core::factory( 'Schedule_Group_Assignment' )
     ->queryBuilder()
-    ->where("user_id", "=", $User->getId())
+    ->where( 'user_id', '=', $User->getId() )
     ->findAll();
 
-$UserGroups = array();
+$UserGroups = [];
 
 foreach ( $ClientGroups as $group )
 {
     $UserGroups[] = $group->groupId();
 }
 
-if( count( $UserGroups ) > 0 )
+if ( count( $UserGroups ) > 0 )
 {
     $UserReports
         ->queryBuilder()
         ->open()
-            ->where( "client_id", "=", $User->getId() )
-            ->where( "type_id", "=", 1 )
+            ->where( 'client_id', '=', $User->getId() )
+            ->where( 'type_id', '=', 1 )
         ->close()
         ->open()
-            ->where( "client_id", "IN", $UserGroups, "OR" )
-            ->where( "type_id", "=", 2 )
+            ->orWhereIn( 'client_id', $UserGroups )
+            ->where( 'type_id', '=', 2 )
         ->close();
 }
 else
 {
-    $UserReports
-        ->queryBuilder()
-        ->where( "client_id", "=", $User->getId() )
-        ->where( "type_id", "=", 1 );
+    $UserReports->queryBuilder()
+        ->where( 'client_id', '=', $User->getId() )
+        ->where( 'type_id', '=', 1 );
 }
 
 $UserReports = $UserReports->findAll();
 
 foreach ( $UserReports as $rep )
 {
-    $RepLesson = Core::factory( "Schedule_Lesson", $rep->lessonId() );
+    $RepLesson = Core::factory( 'Schedule_Lesson', $rep->lessonId() );
 
-    if( $RepLesson == false )   continue;
+    if ( $RepLesson === null )
+    {
+        continue;
+    }
+
     $RepLesson->setRealTime( $rep->date() );
 
     $rep->time_from = refactorTimeFormat( $RepLesson->timeFrom() );
@@ -207,40 +205,40 @@ foreach ( $UserReports as $rep )
     $rep->date( refactorDateFormat( $rep->date() ) );
 }
 
-User::checkUserAccess( ["groups" => [1, 6]], User::parentAuth() )
+User::checkUserAccess( ['groups' => [6]], User::parentAuth() )
     ?   $isDirector = 1
     :   $isDirector = 0;
 
-Core::factory( "Core_Entity" )
+Core::factory( 'Core_Entity' )
     ->addEntities( $UserReports )
-    ->addSimpleEntity( "is_director", $isDirector )
-    ->xsl( "musadm/users/balance/attendance_report.xsl" )
+    ->addSimpleEntity( 'is_director', $isDirector )
+    ->xsl( 'musadm/users/balance/attendance_report.xsl' )
     ->show();
 
 
 /**
  * Платежи
  */
-$UserPayments = Core::factory( "Payment" )
+$UserPayments = Core::factory( 'Payment' )
     ->queryBuilder()
-    ->orderBy( "id", "DESC" )
-    ->where( "user", "=", $User->getId() )
+    ->orderBy( 'id', 'DESC' )
+    ->where( 'user', '=', $User->getId() )
     ->findAll();
 
 
 foreach ( $UserPayments as $payment )
 {
-    $UserPaymentsNotes = Core::factory( "Property", 26 )->getPropertyValues( $payment );
+    $UserPaymentsNotes = Core::factory( 'Property', 26 )->getPropertyValues( $payment );
     $UserPaymentsNotes = array_reverse( $UserPaymentsNotes );
-    $payment->addEntities( $UserPaymentsNotes, "notes" );
+    $payment->addEntities( $UserPaymentsNotes, 'notes' );
     $payment->datetime( refactorDateFormat( $payment->datetime() ) );
 }
 
-Core::factory( "Core_Entity" )
-    ->addSimpleEntity( "is_admin", $isAdmin )
+Core::factory( 'Core_Entity' )
+    ->addSimpleEntity( 'is_admin', $isAdmin )
     ->addEntities( $UserPayments )
-    ->addEntity( $ParentUser, "parent_user" )
-    ->xsl( "musadm/users/balance/payments.xsl" )
+    ->addEntity( $ParentUser, 'parent_user' )
+    ->xsl( 'musadm/users/balance/payments.xsl' )
     ->show();
 
 
@@ -253,37 +251,55 @@ if( $isAdmin === 1 )
     /**
      * Поиск событий, связанных с пользователем
      */
-    $UserEvents = Core::factory( "Event" );
+    $UserEvents = Core::factory( 'Event' );
     $UserEvents->queryBuilder()
-        ->where( "user_assignment_id", "=", $User->getId() )
-        ->where( "type_id", "IN", array(2, 3, 4, 5, 7, 8, 9) )
-        ->orderBy( "time", "DESC" );
+        ->where( 'user_assignment_id', '=', $User->getId() )
+        ->whereIn( 'type_id', [2, 3, 4, 5, 7, 8, 9] )
+        ->orderBy( 'time', 'DESC' );
+
+    $UserEvents = $UserEvents->findAll();
 
 
     /**
      * Поиск задачь, связанных с пользователем
      */
-    $Tasks = Core::factory( "Task" );
-    $Tasks->queryBuilder()
-        ->where( "associate", "=", $User->getId() )
-        ->orderBy( "date", "DESC" )
-        ->orderBy( "id", "DESC" );
+    Core::factory( 'Task_Controller' );
+    $TaskController = new Task_Controller( $User );
 
-    $UserEvents = $UserEvents->findAll();
-    $Tasks = $Tasks->findALl();
+    $Tasks = $TaskController
+        ->isPeriodControl( false )
+        ->isLimitedAreasAccess( false )
+        ->getTasks();
 
+    $TasksPriorities = Core::factory( 'Task_Priority' )
+        ->queryBuilder()
+        ->orderBy( 'priority', 'DESC' )
+        ->findAll();
+
+    $Areas = Core::factory( 'Schedule_Area' )->getList( true );
+
+
+//    $Tasks = Core::factory( "Task" );
+//    $Tasks->queryBuilder()
+//        ->where( "associate", "=", $User->getId() )
+//        ->orderBy( "date", "DESC" )
+//        ->orderBy( "id", "DESC" );
+
+//    $Tasks = $Tasks->findALl();
+//
     foreach ( $Tasks as $Task )
     {
-        $Task->date( refactorDateFormat( $Task->date() ) );
-        $Event = Core::factory( "Event" );
+//        $Task->date( refactorDateFormat( $Task->date() ) );
+        $Event = Core::factory( 'Event' );
         $Event->addEntity( $Task );
+//        $Event->addSimpleEntity( "periods", "0" );
         $Event->time( strtotime( $Task->date() ) );
         $UserEvents[] = $Event;
     }
 
     foreach ( $UserEvents as $Event )
     {
-        $Event->date = date( "d.m.Y H:i", $Event->time() );
+        $Event->date = date( 'd.m.Y H:i', $Event->time() );
 
         if( $Event->getId() )
         {
@@ -307,40 +323,40 @@ if( $isAdmin === 1 )
         }
     }
 
-    $tasksIds = array();
-
-    foreach ( $Tasks as $Task )
-    {
-        $tasksIds[] = $Task->getId();
-    }
-
-    //Поиск всех комментариев, связанных с выбранными задачами
-    $Notes = Core::factory( "Task_Note" )
-        ->queryBuilder()
-        ->select([
-            "Task_Note.id AS id", "date", "task_id", "author_id", "text", "usr.name AS name", "usr.surname AS surname"
-        ])
-        ->where( "task_id", "IN", $tasksIds )
-        ->leftJoin( "User AS usr", "author_id = usr.id" )
-        ->orderBy( "date", "DESC" )
-        ->findAll();
-
-    //Изменение формата даты и времени комментариев
-    foreach ( $Notes as $Note )
-    {
-        $time = strtotime( $Note->date() );
-
-        if( date( "H:i", $time ) == "00:00" )
-        {
-            $dateFormat = "d.m.Y";
-        }
-        else
-        {
-            $dateFormat = "d.m.Y H:i";
-        }
-
-        $Note->date( date( $dateFormat, $time ) );
-    }
+//    $tasksIds = [];
+//
+//    foreach ( $Tasks as $Task )
+//    {
+//        $tasksIds[] = $Task->getId();
+//    }
+//
+//    //Поиск всех комментариев, связанных с выбранными задачами
+//    $Notes = Core::factory( "Task_Note" )
+//        ->queryBuilder()
+//        ->select([
+//            "Task_Note.id AS id", "date", "task_id", "author_id", "text", "usr.name AS name", "usr.surname AS surname"
+//        ])
+//        ->where( "task_id", "IN", $tasksIds )
+//        ->leftJoin( "User AS usr", "author_id = usr.id" )
+//        ->orderBy( "date", "DESC" )
+//        ->findAll();
+//
+//    //Изменение формата даты и времени комментариев
+//    foreach ( $Notes as $Note )
+//    {
+//        $time = strtotime( $Note->date() );
+//
+//        if( date( "H:i", $time ) == "00:00" )
+//        {
+//            $dateFormat = "d.m.Y";
+//        }
+//        else
+//        {
+//            $dateFormat = "d.m.Y H:i";
+//        }
+//
+//        $Note->date( date( $dateFormat, $time ) );
+//    }
 
 
     global $CFG;
@@ -348,7 +364,10 @@ if( $isAdmin === 1 )
         ->addSimpleEntity( "wwwroot", $CFG->rootdir )
         ->addEntity( $User )
         ->addEntities( $UserEvents )
-        ->addEntities( $Notes )
+        ->addEntities( $TasksPriorities )
+        ->addEntities( $Areas )
+        //->addEntities( $Tasks )
+        //->addEntities( $Notes )
         ->xsl( "musadm/users/events.xsl" )
         ->show();
 }

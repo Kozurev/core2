@@ -54,7 +54,7 @@
             </xsl:choose>
         </xsl:variable>
 
-        <div class="item item-{$status} col-md-12 col-sm-6 col-xs-12">
+        <div class="item item-{$status}">
             <div class="item-inner">
                 <h3 class="title">
                     <xsl:value-of select="id" /> <xsl:text> </xsl:text>

@@ -144,15 +144,6 @@ else
 $totalCount = $totalCount->getCount();
 $countLidsStatus80 = $totalCount;
 
-$Orm = Core::factory( "Orm" );
-$queryString = $Orm->getQueryString();
-$Results = $Orm->executeQuery( $queryString );
-
-if( $Results != false )
-{
-    $Results = $Results->fetchAll();
-}
-
 $Statuses = Core::factory( "Property_List_Values" )
     ->queryBuilder()
 	->where( "property_id", "=", 27 )
@@ -356,7 +347,7 @@ else
         $hostExpenses->where( "datetime", ">=", $dateFrom );
     }
 
-    if($dateTo !== "")
+    if( $dateTo !== null )
     {
         $finances->where( "date", "<=", $dateTo );
         $hostExpenses->where( "datetime", "<=", $dateTo );

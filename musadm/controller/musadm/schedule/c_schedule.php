@@ -1,19 +1,26 @@
 <?php
 
 
-$userId = Core_Array::Get( "userid", null );
+$userId = Core_Array::Get( 'userid', null );
 
 is_null( $userId )
     ?   $User = User::current()
-    :   $User = Core::factory( "User", $userId );
+    :   $User = Core::factory( 'User', $userId );
 
-if ( $User === false )   $this->error404();
+if ( $User === null )
+{
+    $this->error( 404 );
+}
 
 $userId = $User->getId();
 
-$today = date( "Y-m-d" );
-$date = Core_Array::Get( "date", $today );
-if ( is_null( $date ) ) $date = $today;
+$today = date( 'Y-m-d' );
+$date = Core_Array::Get( 'date', $today );
+
+if ( is_null( $date ) )
+{
+    $date = $today;
+}
 
 
 /**

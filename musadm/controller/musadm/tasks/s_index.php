@@ -103,10 +103,11 @@ if ( $action === "update_area" )
 if( $action === "new_task_popup" )
 {
     $Director = User::current()->getDirector();
-    if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
     $subordinated = $Director->getId();
 
     $Areas = Core::factory( "Schedule_Area" )->getList( true );
+
+    $Priorities = Core::factory( "Task_Priority" )->findAll();
 
     $Clients = Core::factory( "User" )->queryBuilder()
         ->where( "active", "=", 1 )
@@ -118,6 +119,7 @@ if( $action === "new_task_popup" )
     Core::factory("Core_Entity")
         ->addEntities( $Areas )
         ->addEntities( $Clients )
+        ->addEntities( $Priorities )
         ->addSimpleEntity( "date", date( "Y-m-d" ) )
         ->xsl( "musadm/tasks/new_task_popup.xsl" )
         ->show();
@@ -132,6 +134,7 @@ if( $action === "save_task" )
     $note = Core_Array::Get( "text", "" );
     $areaId = Core_Array::Get( "areaId", 0 );
     $associate = Core_Array::Get( "associate", 0 );
+    $priorityId = Core_Array::Get( "priority_id", 1 );
 
     $authorId = $User->getId();
     $noteDate = date( "Y-m-d H:i:s" );
@@ -150,8 +153,11 @@ if( $action === "save_task" )
     $Task = Core::factory( "Task" )
         ->associate( $associate )
         ->areaId( $areaId )
-        ->date( $date );
+        ->date( $date )
+        ->priorityId( $priorityId );
+
     $Task->save();
+
 
     Core::factory( "Task_Note" )
         ->authorId( $authorId )
@@ -170,10 +176,10 @@ if ( $action === "task_assignment_popup" )
     $Task = Core::factory( "Task", $taskId );
 
     $Director = User::current()->getDirector();
-    //if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
     $subordinated = $Director->getId();
 
-    $Clients = Core::factory( "User" )->queryBuilder()
+    $Clients = Core::factory( "User" )
+        ->queryBuilder()
         ->where( "active", "=", 1 )
         ->where( "group_id", "=", 5 )
         ->where( "subordinated", "=", $subordinated )
@@ -186,5 +192,40 @@ if ( $action === "task_assignment_popup" )
         ->xsl( "musadm/tasks/assignment_task_popup.xsl" )
         ->show();
 
+    exit;
+}
+
+
+/**
+ * Обработчик изменения приоритета задачи
+ */
+if ( $action === 'changeTaskPriority' )
+{
+    $taskId = Core_Array::Get( 'task_id', null );
+    $priorityId = Core_Array::Get( 'priority_id', null );
+
+    if ( $taskId === null || $priorityId === null )
+    {
+       Core_Page_Show::instance()->error( 403 );
+    }
+
+
+    $Task = Core::factory( 'Task', $taskId );
+    $Priority = Core::factory( 'Task_Priority', $priorityId );
+
+    if ( $Task === null || $Priority === null )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
+
+    if ( !User::isSubordinate( $Task ) )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
+
+
+    $Task->priorityId( $priorityId )->save();
+
+    //$this->execute();
     exit;
 }

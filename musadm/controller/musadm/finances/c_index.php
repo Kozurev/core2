@@ -92,8 +92,11 @@ $Payments = $Payments->findAll();
 /**
  * Поступления за период
  */
-$summ = $summ->find()->value;
-if ( $summ === null )    $summ = 0;
+$summ = $summ->find();
+
+$summ === null
+    ?   $summ = 0
+    :   $summ = $summ->value;
 
 
 /**

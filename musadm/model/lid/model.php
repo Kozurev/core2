@@ -18,6 +18,7 @@ class Lid_Model extends Core_Entity
     protected $control_date;
     protected $subordinated;
     protected $area_id;
+    protected $status_id;
 
 
     public function getId()
@@ -30,9 +31,10 @@ class Lid_Model extends Core_Entity
     {
         if ( is_null( $val ) )   return $this->name;
 
-        if ( strlen( $val ) > 255 ) exit ( Core::getMessage( "TOO_LARGE_VALUE", ["name", "Lid", 255] ) );
+        if ( strlen( $val ) > 255 ) exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['name', 'Lid', 255] ) );
 
         $this->name = trim( $val );
+
         return $this;
     }
 
@@ -41,9 +43,10 @@ class Lid_Model extends Core_Entity
     {
         if ( is_null( $val ) )   return $this->surname;
 
-        if ( strlen( $val ) > 255 ) exit ( Core::getMessage( "TOO_LARGE_VALUE", ["surname", "Lid", 255] ) );
+        if ( strlen( $val ) > 255 ) exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['surname', 'Lid', 255] ) );
 
         $this->surname = trim( $val );
+
         return $this;
     }
 
@@ -52,9 +55,10 @@ class Lid_Model extends Core_Entity
     {
         if ( is_null( $val ) )   return $this->number;
 
-        if ( strlen( $val ) > 255 ) exit ( Core::getMessage( "TOO_LARGE_VALUE", ["number", "Lid", 255] ) );
+        if ( strlen( $val ) > 255 ) exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['number', 'Lid', 255] ) );
 
         $this->number = trim( $val );
+
         return $this;
     }
 
@@ -63,9 +67,10 @@ class Lid_Model extends Core_Entity
     {
         if ( is_null( $val ) )   return $this->vk;
 
-        if ( strlen( $val ) > 255 ) exit( Core::getMessage( "TOO_LARGE_VALUE", ["vk", "Lid", 255] ) );
+        if ( strlen( $val ) > 255 ) exit( Core::getMessage( 'TOO_LARGE_VALUE', ['vk', 'Lid', 255] ) );
 
-        $this->vk = $val;
+        $this->vk = strval( $val );
+
         return $this;
     }
 
@@ -74,9 +79,10 @@ class Lid_Model extends Core_Entity
     {
         if ( is_null( $val ) )   return $this->source;
 
-        if ( strlen( $val ) > 255 ) exit ( Core::getMessage( "TOO_LARGE_VALUE", ["source", "Lid", 255] ) );
+        if ( strlen( $val ) > 255 ) exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['source', 'Lid', 255] ) );
 
         $this->source = trim( $val );
+
         return $this;
     }
 
@@ -86,6 +92,7 @@ class Lid_Model extends Core_Entity
         if ( is_null( $val ) )   return $this->control_date;
 
         $this->control_date = trim( $val );
+
         return $this;
     }
 
@@ -95,6 +102,7 @@ class Lid_Model extends Core_Entity
         if( is_null( $val ) )   return intval( $this->subordinated );
 
         $this->subordinated = intval( $val );
+
         return $this;
     }
 
@@ -104,8 +112,21 @@ class Lid_Model extends Core_Entity
         if ( is_null( $val ) )  return intval( $this->area_id );
 
         $this->area_id = intval( $val );
+
         return $this;
     }
+
+
+    public function statusId( $statusId = null )
+    {
+        if ( is_null( $statusId ) ) return intval( $this->status_id );
+
+
+        $this->status_id = intval( $statusId );
+
+        return $this;
+    }
+
 
 
 }

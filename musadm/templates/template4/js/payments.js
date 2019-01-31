@@ -57,8 +57,9 @@ $(function(){
             }
             else
             {
-                savePayment(userid, value, description, description2, type, "balance", function(){});
-                refreshPaymentsTable(userid, loaderOff);
+                savePayment(userid, value, description, description2, type, "balance", function(){
+                    refreshPaymentsTable(userid, loaderOff);
+                });
             }
         })
         //Открытие формы покупки индивидуальных уроков

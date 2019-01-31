@@ -9,6 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Bitter' rel='stylesheet'>
     <?
     Core_Page_Show::instance()
         ->css( "/templates/template10/assets/plugins/bootstrap/css/bootstrap.min.css" )
@@ -226,6 +227,7 @@
 Core_Page_Show::instance()
     ->js( "/templates/template10/assets/plugins/bootstrap/js/bootstrap.min.js" )
     ->js( "/templates/template10/assets/js/jquery.validate.min.js" )
+    ->js( "/templates/template10/assets/js/jquery.maskedinput.min.js" )
     ->js( "/templates/template4/lib/tablesorter/js/jquery.tablesorter.js" )
     ->js( "/templates/template4/lib/tablesorter/js/jquery.tablesorter.widgets.js" )
     ->js( "/templates/template4/lib/tablesorter/addons/pager/jquery.tablesorter.pager.js" )

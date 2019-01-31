@@ -87,27 +87,23 @@ if( $action === "save_lid" )
 
 if( $action === "changeStatus" )
 {
-    $modelId =  Core_Array::Get( "model_id", 0 );
-    $statusId = Core_Array::Get( "status_id", 0 );
+    $modelId =  Core_Array::Get( 'model_id', 0 );
+    $statusId = Core_Array::Get( 'status_id', 0 );
 
-    $LidStatus = Core::factory( "Property_List" )
-        ->queryBuilder()
-        ->where( "property_id", "=", 27 )
-        ->where( "model_name", "=", "Lid" )
-        ->where( "object_id", "=", $modelId )
-        ->find();
+    $Lid = Core::factory( 'Lid', $modelId );
 
-    if( $LidStatus === false )
+    if ( $Lid === null )
     {
-        $PropertyStatus = Core::factory( "Property", 27 );
-        $LidStatus = Core::factory( "Property_List" )
-            ->property_id( 27 )
-            ->model_name( "Lid" )
-            ->object_id( $modelId );
+        Core_Page_Show::instance()->error( 404 );
     }
 
-    $LidStatus->value( $statusId );
-    $LidStatus->save();
+    if ( !User::isSubordinate( $Lid ) )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
+
+
+    $Lid->changeStatus( $statusId );
 
     exit;
 }
