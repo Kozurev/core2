@@ -14,7 +14,7 @@ class Core_Entity extends Core_Entity_Model
     {
         if( is_null( $this->aEntityVars["orm"] ) )
         {
-            $this->aEntityVars["orm"] = new Orm( $this->getTableName() );
+            $this->aEntityVars["orm"] = new Orm( $this );
         }
 
         return $this->aEntityVars["orm"];
@@ -56,10 +56,14 @@ class Core_Entity extends Core_Entity_Model
      */
     public function getTableName()
     {
-        if( method_exists( $this, "databaseTableName" ) )
+        if ( method_exists( $this, "databaseTableName" ) )
+        {
             return $this->databaseTableName();
+        }
         else
+        {
             return get_class( $this );
+        }
     }
 
 
@@ -70,19 +74,89 @@ class Core_Entity extends Core_Entity_Model
      */
     public function getObjectProperties()
     {
-        $result = array();
-        $aVars = get_object_vars( $this );
-        $aForbidden = array( "open", "close" );
+        $result = [];
 
-        foreach ( $aVars as $key => $value )
+        $Model = $this->getModel(); //Модель данного объекта если такая существует
+
+        if ( !is_null( $Model ) )
         {
-            if( ( is_string( $value ) || is_numeric( $value ) ) && !in_array( $key, $aForbidden ) )
-                $result[$key] = $value;
+            $modelProperties = get_object_vars( $Model );
+
+            foreach ( $modelProperties as $propertyName => $propertyValue )
+            {
+                $value = $Model->$propertyName;
+
+                if ( !is_object( $value ) && !is_array( $value ) )
+                {
+                    $result[$propertyName] = $value;
+                }
+            }
+        }
+        else
+        {
+            $properties = get_object_vars( $this );
+
+            foreach ( $properties as $propertyName => $propertyValue )
+            {
+                if( !is_array( $propertyValue ) && !is_object( $propertyValue ) )
+                {
+                    $result[$propertyName] = $propertyValue;
+                }
+            }
         }
 
         return $result;
     }
 
+
+    /**
+     * Поиск класса-модели для объекта
+     *
+     * @return mixed | null
+     */
+    public function getModel()
+    {
+        $modelClassName = get_class( $this ) . "_Model";
+        $Model = Core::factory( $modelClassName );
+
+        if ( !is_null( $Model ) )
+        {
+            $properties = get_object_vars( $Model );
+
+            foreach ( $properties as $propertyName => $propertyValue )
+            {
+                //Формирование названия сеттера для свойства
+                if ( $propertyName == 'id' )
+                {
+                    $snakeCaseSetter = 'getId';
+                    $camelCaseSetter = 'getId';
+                }
+                else
+                {
+                    $snakeCaseSetter = $propertyName;
+                    $camelCaseSetter = toCamelCase( $propertyName );
+                }
+
+                $value = $this->$propertyName;
+
+                if ( is_array( $value ) || is_object( $value ) )
+                {
+                    continue;
+                }
+
+                if ( method_exists( $Model, $snakeCaseSetter ) )
+                {
+                    $Model->$snakeCaseSetter( $value );
+                }
+                elseif ( method_exists( $Model, $camelCaseSetter ) )
+                {
+                    $Model->$camelCaseSetter( $value );
+                }
+            }
+        }
+
+        return $Model;
+    }
 
 
     /**
@@ -118,8 +192,6 @@ class Core_Entity extends Core_Entity_Model
 	{
 	    if( !is_object( $obj ) )
         {
-//            echo "<br>Переданный параметр в метод addEntity не является объектом:<br>";
-//            debug( $obj );
             return $this;
         }
 

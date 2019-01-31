@@ -2,36 +2,92 @@
 
 class Core_Page_Show extends Core
 {
+    /**
+     * @var Core_Page_Show
+     */
     private static $_instance = null;
 
+
     /**
+     * Объект текущей структуры
+     *
      * @var Structure
      */
     public $Structure;
 
-    public $StructureItem;
 
     /**
+     * Объект текущего элемента структуры
+     *
+     * @var Structure_Item
+     */
+    public $StructureItem;
+
+
+    /**
+     * Объект конечного макета страницы
+     *
      * @var Core_Page_Template
      */
     public $Template;
 
+
+    /**
+     * Массив идентификаторов макетов от того, который принадлежит структуре
+     * до родительского
+     *
+     * @var array
+     */
     public $templatesPath = [];
 
+
+    /**
+     * Заголовок страницы
+     *
+     * @var string
+     */
     public $title;
 
+
+    /**
+     * Мета-тэги
+     *
+     * @var string
+     */
     public $meta_title;
-
     public $meta_description;
-
     public $meta_keywords;
 
+
+    /**
+     * Кастомные параметры страницы
+     *
+     * @var array
+     */
     private $params = [];
+
+
+    /**
+     * Тексты ошибок страницы
+     *
+     * @var array
+     */
+    private $errorCodes = [
+        '400' => 'Bad request',
+        '403' => 'Access forbidden',
+        '404' => 'Page not found'
+    ];
+
 
 
     private function __construct(){}
 
 
+    /**
+     * Реализация шаблона проектирования Singleton
+     *
+     * @return Core_Page_Show
+     */
     public static function instance()
     {
         if ( self::$_instance === null )
@@ -94,11 +150,23 @@ class Core_Page_Show extends Core
 
     /**
      * Метод иммитации ошибки 404
+     * Данный метод не актуален но оставлен для обратной совместимости со старым кодом системы
      */
     public function error404()
     {
-        Core::getMessage( "ERROR_404", [] );
-        exit;
+        $this->error( 404 );
+    }
+
+
+    /**
+     * Метод для задания кода заголовка страницы и вывода текста ошибки
+     *
+     * @param int $code - код ошибки
+     */
+    public function error( int $code )
+    {
+        http_response_code( $code );
+        exit ( Core_Array::getValue( $this->errorCodes, $code, 'Ошибка' ) );
     }
 
 
@@ -109,7 +177,7 @@ class Core_Page_Show extends Core
      * @param $id - id шаблона, принадлежащего структуре
      * @return void
      */
-    private function searchTemplatesPath($id)
+    private function searchTemplatesPath( $id )
     {
         $Structure = $this->Structure;
 
@@ -332,14 +400,20 @@ class Core_Page_Show extends Core
         $this->Structure = Core::factory( "Structure" );
 
         while ( count( $segments ) > 0 )
-        {   
+        {
             $path = array_shift( $segments );
 
-            $TmpStructure = $this->Structure->queryBuilder()
-                ->where( "parent_id", "=", $this->Structure->getId() )
+            $this->Structure->queryBuilder()
                 ->where( "path", "=", $path )
-                ->where( "active", "=", "1" )
-                ->find();
+                ->where( "active", "=", "1" );
+
+            if ( $this->Structure->getId() > 0 )
+            {
+                $this->Structure->queryBuilder()
+                    ->where( "parent_id", "=", $this->Structure->getId() );
+            }
+
+            $TmpStructure = $this->Structure->find();
 
             if ( $TmpStructure !== null )
             {
@@ -356,7 +430,7 @@ class Core_Page_Show extends Core
                 {
                     if ( !isset( $CFG->items_mapping[$children_name]) )
                     {
-                        $this->error404();
+                        $this->error( 404 );
                     }
 
                     $this->StructureItem = Core::factory( $children_name );
@@ -385,7 +459,7 @@ class Core_Page_Show extends Core
 
                     if( $this->StructureItem === null )
                     {
-                        $this->error404();
+                        $this->error( 404 );
                     }
 
                     if( method_exists( $this->StructureItem, "children_name" ) && $this->StructureItem->children_name() != "" )
@@ -400,7 +474,7 @@ class Core_Page_Show extends Core
         }
 
         //print_r($this->oStructure);
-        if( !$this->Structure->getId() ) $this->error404();
+        if( !$this->Structure->getId() ) $this->error( 404 );
 
 
         //Установка заголовка страницы
