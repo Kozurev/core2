@@ -58,47 +58,6 @@ if( User::checkUserAccess( ['groups' => [2]], $User ) )
     $LidController
         ->isShowPeriods( false );
 
-//    $Lids = Core::factory( 'Lid' )
-//        ->queryBuilder()
-//        ->where( 'subordinated', '=', $subordinated )
-//        ->where( 'control_date', '=', date('Y-m-d' ) )
-//        ->orderBy( 'id', 'DESC' )
-//        ->findAll();
-//
-//    $aoComments = [];
-//    $authorsId  = [];
-//
-//    $status = Core::factory( "Property", 27 );
-//
-//    foreach( $Lids as $lid )
-//    {
-//        $lidComments = $lid->getComments();
-//
-//        foreach ( $lidComments as $comment )
-//        {
-//            if( !in_array( $comment->authorId(), $authorsId ) ) $authorsId[] = $comment->authorId();
-//        }
-//
-//        $lid
-//            ->addEntities($lidComments)
-//            ->addEntity(
-//                $status->getPropertyValues( $lid )[0], "property_value"
-//            );
-//    }
-//
-//    $Authors = Core::factory( "User" )
-//        ->queryBuilder()
-//        ->where("id", "in", $authorsId)
-//        ->findAll();
-//
-//    $LidsOutput = Core::factory( "Core_Entity" )
-//        ->addEntities(
-//            Core::factory( "Lid" )->getStatusList(), "status"
-//        )
-//        ->addEntities( $Authors )
-//        ->addEntities( $Lids )
-//        ->xsl( "musadm/lids/lids_for_manager.xsl" );
-
 
     /**
      * Формирование столбца Задач
@@ -108,69 +67,11 @@ if( User::checkUserAccess( ['groups' => [2]], $User ) )
     $TaskController
         ->isShowPeriods( false )
         ->isSubordinate( true )
-        ->isLimitedAreasAccess( true );
-        //->addSimpleEntity( "card-size", "large" );
+        ->isLimitedAreasAccess( true )
+        ->addSimpleEntity( 'taskAfterAction', 'tasks' );
 
 
-//    $Tasks = Core::factory( "Task" )
-//        ->queryBuilder()
-//        ->where( "date", "<=", date("Y-m-d") )
-//        ->where( "subordinated", "=", $subordinated )
-//        ->open()
-//            ->where( "done", "=", 0 )
-//            ->where( "done_date", "=", date( "Y-m-d" ), "OR" )
-//        ->close()
-//        ->orderBy( "date", "DESC" )
-//        ->orderBy( "id", "DESC" )
-//        ->findAll();
-//
-//
-//    $tasksIds = [];
-//    $clientsAssignments = [];
-//
-//    foreach ( $Tasks as $Task )
-//    {
-//        $tasksIds[] = $Task->getId();
-//
-//        //Поиск пользователей, с которыми связаны задачи
-//        if( $Task->associate() !== 0 )
-//        {
-//            $Client = Core::factory( "User", $Task->associate() );
-//
-//            if( $Client !== false )
-//            {
-//                $clientsAssignments[] = $Client;
-//            }
-//        }
-//    }
-//
-//    $Notes = Core::factory( "Task_Note" )
-//        ->queryBuilder()
-//        ->select([
-//            "Task_Note.id AS id", "date", "task_id", "text", "usr.name AS name", "usr.surname AS surname"
-//        ])
-//        ->where( "task_id", "IN", $tasksIds )
-//        ->leftJoin( "User AS usr", "author_id = usr.id" )
-//        ->orderBy( "date", "DESC" )
-//        ->findAll();
-//
-//    foreach ( $Notes as $Note )
-//    {
-//        $time = strtotime( $Note->date() );
-//        $Note->date( date( "d.m.Y H:i", $time ) );
-//    }
-//
-//    global $CFG;
-//
-//    $TasksOutput = Core::factory( "Core_Entity" )
-//        ->addSimpleEntity( "wwwroot", $CFG->rootdir )
-//        ->addSimpleEntity( "card-size", "large" )
-//        ->addEntities( $Tasks )
-//        ->addEntities( $Notes )
-//        ->addEntities( $clientsAssignments, "assignment" )
-//        ->addSimpleEntity( "periods", "0" )
-//        ->xsl( "musadm/tasks/all.xsl" );
-
+    //TODO: Перенести данный статический HTML код в отдельный XSL шаблон
     ?>
     <div class="dynamic-fixed-row">
         <div class="row searching-row">
@@ -199,7 +100,6 @@ if( User::checkUserAccess( ['groups' => [2]], $User ) )
                 </div>
             </form>
         </div>
-
     </div>
 
     <div class="row">

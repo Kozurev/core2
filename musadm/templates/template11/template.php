@@ -7,7 +7,6 @@
  */
 ?>
 
-<input type='hidden' id='taskAfterAction' value='tasks' />
 
 <div class="tasks">
     <?php

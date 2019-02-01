@@ -2,16 +2,13 @@
 
 
 $User = User::current();
-
-
 $Director = $User->getDirector();
-if ( !$Director )    exit( Core::getMessage("NOT_DIRECTOR") );
 $subordinated = $Director->getId();
 
 
-if ( !User::checkUserAccess( ["groups" => [2, 4, 5, 6]] ) )
+if ( !User::checkUserAccess( ['groups' => [2, 4, 5, 6]] ) )
 {
-    Core_Page_Show::instance()->error404();
+    Core_Page_Show::instance()->error( 404 );
 }
 
 
@@ -19,28 +16,47 @@ $breadcumbs[0] = new stdClass();
 $breadcumbs[0]->title = Core_Page_Show::instance()->Structure->title();
 $breadcumbs[0]->active = 1;
 
-if ( Core_Page_Show::instance()->StructureItem != false )
+if ( Core_Page_Show::instance()->StructureItem != null )
 {
     $breadcumbs[1] = new stdClass();
     $breadcumbs[1]->title = Core_Page_Show::instance()->StructureItem->title();
     $breadcumbs[1]->active = 1;
 }
 
-Core_Page_Show::instance()->setParam( "title-first", "РАСПИСАНИЕ" );
-Core_Page_Show::instance()->setParam( "body-class", "body-green" );
+Core_Page_Show::instance()->setParam( 'title-first', 'РАСПИСАНИЕ' );
+Core_Page_Show::instance()->setParam( 'body-class', 'body-green' );
 
-if ( Core_Page_Show::instance()->StructureItem != false )
+if ( Core_Page_Show::instance()->StructureItem != null )
 {
-    Core_Page_Show::instance()->setParam( "title-second", Core_Page_Show::instance()->StructureItem->title() );
-    Core_Page_Show::instance()->setParam( "breadcumbs", $breadcumbs );
+    Core_Page_Show::instance()->setParam( 'title-second', Core_Page_Show::instance()->StructureItem->title() );
+    Core_Page_Show::instance()->setParam( 'breadcumbs', $breadcumbs );
+
+    /**
+     * Проверка на наличие прав доступа пользователя к расписанию текущего филиала
+     */
+    $isAccessDenied = true;
+
+    $UserAreaAssignments = Core::factory( 'Schedule_Area_Assignment' )->getAssignments( $User );
+
+    foreach ( $UserAreaAssignments as $Assignment )
+    {
+        if ( $Assignment->areaId() == Core_Page_Show::instance()->StructureItem->getId() )
+        {
+            $isAccessDenied = false;
+        }
+    }
+
+    if ( $isAccessDenied === true )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
 }
 else 
 {
     $breadcumbs[1] = new stdClass();
-    $breadcumbs[1]->title = "Список филиалов";
+    $breadcumbs[1]->title = 'Список филиалов';
     $breadcumbs[1]->active = 1;
 
-    //$this->setParam( "title-second", "Филиалов" );
     Core_Page_Show::instance()->setParam( "breadcumbs", $breadcumbs );
 }
 

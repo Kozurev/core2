@@ -474,3 +474,28 @@ Core::attachObserver( "beforePaymentSave", function( $args ) {
         }
     }
 });
+
+
+/**
+ * Добавление связи задачи с тем филиалом что и клиент, к которому он привязан
+ * в случае если для задачи не был заранее прикреплен филиал
+ */
+Core::attachObserver( 'beforeTaskSave', function( $args ) {
+    $Task = $args[0];
+
+    if ( $Task->areaId() == 0 && $Task->associate() > 0 )
+    {
+        $AssociateClient = Core::factory( 'User', $Task->associate() );
+
+        if ( $AssociateClient !== null )
+        {
+            $Assignments = Core::factory( 'Schedule_Area_Assignment' )
+                ->getAssignments( $AssociateClient );
+
+            if ( count( $Assignments ) > 0 )
+            {
+                Core::factory( 'Schedule_Area_Assignment' )->createAssignment( $AssociateClient, $Assignments[0]->areaId() );
+            }
+        }
+    }
+});

@@ -10,7 +10,7 @@
 *	Блок проверки авторизации
 */
 $User = User::current();
-$access = ['groups' => [2, 3, 6]];
+$access = ['groups' => [1, 2, 6]];
 
 if( $User === null )
 {

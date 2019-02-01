@@ -4,7 +4,7 @@
 
     <xsl:template match="root">
 
-        <input id="table_type" type="hidden" value="{table_name}" />
+        <input type='hidden' id='taskAfterAction' value='{taskAfterAction}' />
 
         <xsl:if test="periods = 1">
             <div class="row finances_calendar">
@@ -30,13 +30,6 @@
             </div>
         </xsl:if>
 
-        <!--<xsl:for-each select="task_priority" >-->
-            <!--<style>-->
-                <!--#label_priority_<xsl:value-of select="id" />:before {-->
-                    <!--border-color: <xsl:value-of select="color" />;-->
-                <!--}-->
-            <!--</style>-->
-        <!--</xsl:for-each>-->
 
         <xsl:if test="buttons-panel = 1">
             <div class="row buttons-panel">

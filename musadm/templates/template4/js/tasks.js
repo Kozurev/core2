@@ -23,38 +23,6 @@ $(function(){
                 loaderOff();
             }
         })
-        // .on("click", ".task_date_edit", function(e){
-        //     e.preventDefault();
-        //     var taskId = $(this).data("task_id");
-        //
-        //     var taskDate = $(this).parent().find("span");
-        //     var taskDateVal = taskDate.text();
-        //     var taskDay = taskDateVal.substr(0, 2);
-        //     var taskMonth = taskDateVal.substr(3, 2);
-        //     var taskYear = taskDateVal.substr(6, 4);
-        //     taskDateVal = taskYear + "-" + taskMonth + "-" + taskDay;
-        //
-        //     taskDate.remove();
-        //     $(this).parent().append("<input type='date' value='" + taskDateVal + "' class='form-control'> ");
-        //     $(this).parent().append("<a href='#' class='action save save_task_date' data-task_id='" + taskId + "' title='Сохранить изменения'></a>");
-        //     $(this).remove();
-        // })
-        // .on("click", ".save_task_date", function(e){
-        //     e.preventDefault();
-        //     var taskId = $(this).data("task_id");
-        //     var taskDate = $(this).parent().find("input[type=date]").val();
-        //     updateTaskDate(taskId, taskDate);
-        //
-        //     var taskYear = taskDate.substr(0, 4);
-        //     var taskMonth = taskDate.substr(5, 2);
-        //     var taskDay = taskDate.substr(8, 2);
-        //     var taskDateVal = taskDay + "." + taskMonth + "." + taskYear;
-        //
-        //     $(this).parent().find("input[type=date]").remove();
-        //     $(this).parent().append("<span>"+taskDateVal+"</span>");
-        //     $(this).parent().append("<a href='#' class='action edit task_date_edit' data-task_id='"+taskId+"'></a>");
-        //     $(this).remove();
-        // })
         .on("change", ".task_date", function (e) {
             e.preventDefault();
             var taskId = $(this).data("taskid");
@@ -102,12 +70,9 @@ $(function(){
         .on("change", "input[data-type=task_priority]", function(e){
             var priorityId = $(this).val();
             var taskId = $(this).data("taskid");
-            var cardSize = $(this).data("card-size");
 
             loaderOn();
-            changeTaskPriority(taskId, priorityId, cardSize, function(response){
-                // $(".tasks").html(response);
-                // loaderOff();
+            changeTaskPriority(taskId, priorityId, function(response){
                 taskAfterAction();
             });
         });
@@ -145,15 +110,14 @@ function taskAfterAction() {
 }
 
 
-function changeTaskPriority(taskId, priorityId, cardSize, func) {
+function changeTaskPriority(taskId, priorityId, func) {
     $.ajax({
         type: "GET",
         url: root + "/tasks",
         data: {
             action: "changeTaskPriority",
             task_id: taskId,
-            priority_id: priorityId,
-            card_size: cardSize
+            priority_id: priorityId
         },
         success: function(response){
             func(response);

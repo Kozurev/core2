@@ -265,10 +265,10 @@ if( $isAdmin === 1 )
      */
     Core::factory( 'Task_Controller' );
     $TaskController = new Task_Controller( $User );
-
     $Tasks = $TaskController
         ->isPeriodControl( false )
         ->isLimitedAreasAccess( false )
+        ->addSimpleEntity( 'taskAfterAction', 'balance' )
         ->getTasks();
 
     $TasksPriorities = Core::factory( 'Task_Priority' )
@@ -279,20 +279,10 @@ if( $isAdmin === 1 )
     $Areas = Core::factory( 'Schedule_Area' )->getList( true );
 
 
-//    $Tasks = Core::factory( "Task" );
-//    $Tasks->queryBuilder()
-//        ->where( "associate", "=", $User->getId() )
-//        ->orderBy( "date", "DESC" )
-//        ->orderBy( "id", "DESC" );
-
-//    $Tasks = $Tasks->findALl();
-//
     foreach ( $Tasks as $Task )
     {
-//        $Task->date( refactorDateFormat( $Task->date() ) );
         $Event = Core::factory( 'Event' );
         $Event->addEntity( $Task );
-//        $Event->addSimpleEntity( "periods", "0" );
         $Event->time( strtotime( $Task->date() ) );
         $UserEvents[] = $Event;
     }
@@ -323,51 +313,14 @@ if( $isAdmin === 1 )
         }
     }
 
-//    $tasksIds = [];
-//
-//    foreach ( $Tasks as $Task )
-//    {
-//        $tasksIds[] = $Task->getId();
-//    }
-//
-//    //Поиск всех комментариев, связанных с выбранными задачами
-//    $Notes = Core::factory( "Task_Note" )
-//        ->queryBuilder()
-//        ->select([
-//            "Task_Note.id AS id", "date", "task_id", "author_id", "text", "usr.name AS name", "usr.surname AS surname"
-//        ])
-//        ->where( "task_id", "IN", $tasksIds )
-//        ->leftJoin( "User AS usr", "author_id = usr.id" )
-//        ->orderBy( "date", "DESC" )
-//        ->findAll();
-//
-//    //Изменение формата даты и времени комментариев
-//    foreach ( $Notes as $Note )
-//    {
-//        $time = strtotime( $Note->date() );
-//
-//        if( date( "H:i", $time ) == "00:00" )
-//        {
-//            $dateFormat = "d.m.Y";
-//        }
-//        else
-//        {
-//            $dateFormat = "d.m.Y H:i";
-//        }
-//
-//        $Note->date( date( $dateFormat, $time ) );
-//    }
-
 
     global $CFG;
-    Core::factory( "Core_Entity" )
-        ->addSimpleEntity( "wwwroot", $CFG->rootdir )
+    Core::factory( 'Core_Entity' )
+        ->addSimpleEntity( 'wwwroot', $CFG->rootdir )
         ->addEntity( $User )
         ->addEntities( $UserEvents )
         ->addEntities( $TasksPriorities )
         ->addEntities( $Areas )
-        //->addEntities( $Tasks )
-        //->addEntities( $Notes )
-        ->xsl( "musadm/users/events.xsl" )
+        ->xsl( 'musadm/users/events.xsl' )
         ->show();
 }
