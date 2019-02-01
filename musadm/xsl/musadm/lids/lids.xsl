@@ -138,8 +138,17 @@
 
                 <div class="row">
                     <div class="col-ld-6 col-md-6 col-sm-12 col-xs-12">
-                        <select class="form-control">
+                        <select class="form-control lid-area" data-lid-id="{id}">
                             <option value="0"> ... </option>
+                            <xsl:variable name="areaId" select="area_id" />
+                            <xsl:for-each select="//schedule_area">
+                                <option value="{id}">
+                                    <xsl:if test="id = $areaId">
+                                        <xsl:attribute name="selected">selected</xsl:attribute>
+                                    </xsl:if>
+                                    <xsl:value-of select="title" />
+                                </option>
+                            </xsl:for-each>
                         </select>
                     </div>
                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 center">

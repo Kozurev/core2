@@ -102,6 +102,9 @@ if( $action == 'refreshLidTable' )
     Core::factory( 'Lid_Controller' );
     $LidController = new Lid_Controller( $User );
     $LidController
+        ->lidId(
+            Core_Array::Get( 'lidid', null )
+        )
         ->isShowPeriods( false )
         ->show();
 

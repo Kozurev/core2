@@ -106,6 +106,8 @@ function taskAfterAction() {
             break;
         case 'tasks':
             refreshTasksTable();
+            break;
+        default: loaderOff();
     }
 }
 

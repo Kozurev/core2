@@ -255,6 +255,7 @@ Core_Page_Show::instance()
     ->js( "/templates/template4/js/finances.js" )
     ->js( "/templates/template4/js/statistic.js" )
     ->js( "/templates/template4/js/areas_assignments.js" )
+    ->js( "/templates/template4/js/property_list.js" )
     ->js( "/templates/template4/js/js.js" );
 ?>
 

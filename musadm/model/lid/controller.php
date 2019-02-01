@@ -358,7 +358,8 @@ class Lid_Controller
 
         $Lids = $this->LidQuery
             ->leftJoin( 'Lid_Status', 'Lid_Status.id = Lid.status_id' )
-            ->orderBy( 'Lid_Status.sorting', 'DESC' )
+            //>orderBy( 'Lid_Status.sorting', 'DESC' )
+            ->orderBy( 'Lid.id', 'DESC' )
             ->findAll();
 
 

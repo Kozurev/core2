@@ -321,6 +321,7 @@ if( $isAdmin === 1 )
         ->addEntities( $UserEvents )
         ->addEntities( $TasksPriorities )
         ->addEntities( $Areas )
+        ->addSimpleEntity( 'afterTaskAction', 'balance' )
         ->xsl( 'musadm/users/events.xsl' )
         ->show();
 }

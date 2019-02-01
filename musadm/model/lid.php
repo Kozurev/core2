@@ -28,9 +28,7 @@ class Lid extends Lid_Model
 
         Core::notify( $ObserverArgs, 'beforeLidChangeDate' );
 
-        $this
-            ->controlDate( $date )
-            ->save();
+        $this->controlDate( $date )->save();
 
         Core::notify( $ObserverArgs, 'afterLidChangeDate' );
     }
@@ -50,7 +48,8 @@ class Lid extends Lid_Model
 
         if ( $this->id != null )
         {
-            $Comments = Core::factory( 'Lid_Comment' )->queryBuilder()
+            $Comments = Core::factory( 'Lid_Comment' )
+                ->queryBuilder()
                 ->where( 'lid_id', '=', $this->id )
                 ->findAll();
 
@@ -60,6 +59,7 @@ class Lid extends Lid_Model
         }
 
         parent::delete();
+        
         Core::notify( [&$this], 'afterLidDelete' );
     }
 
@@ -128,8 +128,11 @@ class Lid extends Lid_Model
      */
     public function getStatusList()
     {
-        $Director = User::current()->getDirector();
-        $subordinated = $Director->getId();
+        $User = User::current();
+
+        $User !== null
+            ?   $subordinated = $User->getDirector()->getId()
+            :   $subordinated = 0;
 
         return Core::factory( 'Lid_Status' )
             ->queryBuilder()

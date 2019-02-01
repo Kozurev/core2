@@ -15,6 +15,8 @@
             }
         </style>
 
+        <input type="hidden" id='taskAfterAction' value='{afterTaskAction}' />
+
         <xsl:if test="user/group_id = 5">
             <div class="row">
                 <div class="col-md-4 col-xs-12 right">
