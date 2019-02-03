@@ -337,7 +337,7 @@ class Task_Controller
             }
         }
 
-        if ( $this->isEnableCommonTasks === true && count( $areasIds ) > 0 )
+        if ( $this->isEnableCommonTasks === true )
         {
             $areasIds[] = 0;
         }
