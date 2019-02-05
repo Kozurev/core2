@@ -46,7 +46,7 @@ if ( Core_Page_Show::instance()->StructureItem != null )
         }
     }
 
-    if ( $isAccessDenied === true )
+    if ( $isAccessDenied === true && $User->groupId() !== 6 )
     {
         Core_Page_Show::instance()->error( 403 );
     }
@@ -190,7 +190,7 @@ if ( $action === "teacherReport" )
     if ( $lessonId === 0 )  exit ( Core::getMessage( "EMPTY_GET_PARAM", ["идентификатор занятия"] ) );
     if ( $lessonType === 0 )exit ( Core::getMessage( "EMPTY_GET_PARAM", ["тип графика"] ) );
     if ( $teacherId === 0 ) exit ( Core::getMessage( "EMPTY_GET_PARAM", ["идентификатор преподавателя"] ) );
-    if ( $clientId === 0 )  exit ( Core::getMessage( "EMPTY_GET_PARAM", ["идентификатор клиента (группы)"] ) );
+    //if ( $clientId === 0 )  exit ( Core::getMessage( "EMPTY_GET_PARAM", ["идентификатор клиента (группы)"] ) );
     if ( $typeId === 0 )    exit ( Core::getMessage( "EMPTY_GET_PARAM", ["тип занятия"] ) );
     if ( $date === 0 )      exit ( Core::getMessage( "EMPTY_GET_PARAM", ["дата"] ) );
 
@@ -219,8 +219,11 @@ if ( $action === "teacherReport" )
     if ( $Teacher === null )   exit ( Core::getMessage( "NOT_FOUND", ["Преподватаель", $teacherId] ) );
     if ( !User::isSubordinate( $Teacher, $User ) )  exit ( Core::getMessage( "NOT_SUBORDINATE", ["Преподватаель", $teacherId] ) );
 
-    $LessonClient = $Lesson->getClient();
-    if ( !User::isSubordinate( $LessonClient ) )    exit ( Core::getMessage( "NOT_SUBORDINATE", ["Клиент занятия", $Lesson->clientId()] ) );
+    if ( $clientId > 0 )
+    {
+        $LessonClient = $Lesson->getClient();
+        if ( !User::isSubordinate( $LessonClient ) )    exit ( Core::getMessage( "NOT_SUBORDINATE", ["Клиент занятия", $Lesson->clientId()] ) );
+    }
 
 
     /**
@@ -313,13 +316,14 @@ if ( $action === "teacherReport" )
         $teacherRateValue = $TeacherRate->getPropertyValues( $Teacher )[0]->value();
     }
 
+
     $Report->teacherRate( $teacherRateValue );
 
 
     /**
      * Обработчик для индивидуальных настроек тарифов с пропуском занятия для преподавателя
      */
-    if ( $attendance == 0 )
+    if ( $attendance == 0 && $Report->typeId() != 3 )
     {
         $IsTeacherDefaultAbsentRate = Core::factory( "Property" )->getByTagName( "is_teacher_rate_default_absent" );
         $isTeacherDefaultAbsentRate = $IsTeacherDefaultAbsentRate->getPropertyValues( $Teacher )[0]->value();
@@ -348,9 +352,14 @@ if ( $action === "teacherReport" )
                 $teacherAbsentValue = $TeacherRateAbsentDefault->getPropertyValues( $Director )[0]->value();
             }
         }
-
-        $Report->teacherRate( $teacherAbsentValue );
     }
+    elseif ( $attendance == 0 && $Report->typeId() == 3 )
+    {
+        $teacherAbsentValue = 0;
+    }
+
+
+    $Report->teacherRate( $teacherAbsentValue );
 
 
     /**

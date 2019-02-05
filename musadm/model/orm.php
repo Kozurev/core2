@@ -110,6 +110,7 @@ class Orm
         if( $obj !== null )
         {
             $this->table = $obj->getTableName();
+            $this->class = get_class( $obj );
             $this->object = $obj;
         }
     }
@@ -182,7 +183,7 @@ class Orm
 
         if( self::isDebugSql() )
         {
-            echo "<br>Строка запроса метода <b>getCount()</b>: ".$this->queryString;
+            echo "<br>Строка запроса метода <b>getCount()</b>: " . $this->queryString;
         }
 
 		if ( $result == false )
@@ -421,16 +422,6 @@ class Orm
             }
         }
 
-
-//        if ( $this->join != '' )
-//        {
-//            $this->queryString .= $this->join;
-//        }
-
-//        if ( $this->leftJoin != '' )
-//        {
-//            $this->queryString .= $this->leftJoin;
-//        }
 
         if ( $this->where != '' )
         {
@@ -1119,8 +1110,8 @@ class Orm
 
 			if( !$result )    return [];
 
-            $this->table !== null
-                ?   $fetchClass = $this->table
+            $this->class !== null
+                ?   $fetchClass = $this->class
                 :   $fetchClass = 'stdClass';
 
 			$result->setFetchMode( PDO::FETCH_CLASS, $fetchClass );
@@ -1157,8 +1148,8 @@ class Orm
                 return null;
             }
 
-			$this->table !== null
-                ?   $fetchClass = $this->table
+            $this->class !== null
+                ?   $fetchClass = $this->class
                 :   $fetchClass = 'stdClass';
 
 			$result->setFetchMode( PDO::FETCH_CLASS, $fetchClass );

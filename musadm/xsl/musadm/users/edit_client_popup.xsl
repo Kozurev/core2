@@ -59,7 +59,7 @@
                 <span>Телефон</span>
             </div>
             <div class="column">
-                <input class="form-control" type="text" value="{user/phone_number}" name="phoneNumber" />
+                <input class="form-control masked-phone" type="text" value="{user/phone_number}" name="phoneNumber" />
             </div>
                 <hr/>
             <div class="column">
@@ -182,6 +182,10 @@
 
             <button class="popop_user_submit btn btn-default">Сохранить</button>
         </form>
+
+        <script>
+            $(".masked-phone").mask("7(999) 999-99-99");
+        </script>
     </xsl:template>
 
 

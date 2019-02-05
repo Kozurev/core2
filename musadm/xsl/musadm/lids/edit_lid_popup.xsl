@@ -48,7 +48,7 @@
                 <span>Номер телефона</span>
             </div>
             <div class="column">
-                <input class="form-control" type="text" value="{lid/number}" name="number"  />
+                <input class="form-control masked-phone" type="text" value="{lid/number}" name="number"  />
             </div>
             <hr/>
             <div class="column">
@@ -113,6 +113,9 @@
             <button class="lid_submit btn btn-default">Сохранить</button>
         </form>
 
+        <script>
+            $(".masked-phone").mask("7(999) 999-9999");
+        </script>
 
     </xsl:template>
 
