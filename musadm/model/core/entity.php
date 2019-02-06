@@ -84,7 +84,7 @@ class Core_Entity extends Core_Entity_Model
 
             foreach ( $modelProperties as $propertyName => $propertyValue )
             {
-                $value = $Model->$propertyName;
+                $value = $this->$propertyName;
 
                 if ( !is_object( $value ) && !is_array( $value ) )
                 {

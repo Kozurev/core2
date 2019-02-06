@@ -28,7 +28,7 @@ if( isset($_POST["login"]) && isset($_POST["password"]) )
 
     $User = $User->authorize( $rememberMe );
 
-    if( $User !== false )
+    if( $User !== null )
     {
         if( $User->groupId() == 3 || $User->groupId() == 4 )      $back = $CFG->rootdir . "/schedule/";
         elseif( $User->groupId() < 3 || $User->groupId() == 6 )   $back = $CFG->rootdir . "/";
