@@ -6,6 +6,21 @@
  * Time: 22:17
  */
 
+//$groupId = Core_Page_Show::instance()->StructureItem->getId();
+//
+//Core::factory( 'User_Controller' );
+//$UserController = new User_Controller( User::current() );
+//$UserController
+//    ->active( true )
+//    ->properties( true )
+//    ->groupId( $groupId )
+//    ->xsl(
+//        $groupId == 5
+//            ?   $xsl = "musadm/users/clients.xsl"
+//            :   $xsl = "musadm/users/teachers.xsl"
+//    )
+//    ->show();
+
 
 global $CFG;
 $Property = Core::factory( "Property" );
@@ -63,24 +78,24 @@ Core::factory( "Core_Entity" )
  */
 if( $groupId == 4 && User::checkUserAccess(["groups" => [6]]) )
 {
-    $Managers = Core::factory( "User" )->queryBuilder()
-        ->where( "subordinated", "=", $subordinated )
-        ->where( "active", "=", 1 )
-        ->where( "group_id", "=", 2 )
-        ->findAll();
-
-    $AreaAssignments = Core::factory( "Schedule_Area_Assignment" );
-
-    foreach ( $Managers as $Manager )
-    {
-        $ManagerAreas = $AreaAssignments->getAreas( $Manager );
-        $Manager->addEntities( $ManagerAreas, "areas" );
-    }
-
-
-    Core::factory( "Core_Entity" )
-        ->addSimpleEntity( "wwwroot", $CFG->rootdir )
-        ->addEntities( $Managers )
-        ->xsl( "musadm/users/managers.xsl" )
-        ->show();
+//    $Managers = Core::factory( "User" )->queryBuilder()
+//        ->where( "subordinated", "=", $subordinated )
+//        ->where( "active", "=", 1 )
+//        ->where( "group_id", "=", 2 )
+//        ->findAll();
+//
+//    $AreaAssignments = Core::factory( "Schedule_Area_Assignment" );
+//
+//    foreach ( $Managers as $Manager )
+//    {
+//        $ManagerAreas = $AreaAssignments->getAreas( $Manager );
+//        $Manager->addEntities( $ManagerAreas, "areas" );
+//    }
+//
+//
+//    Core::factory( "Core_Entity" )
+//        ->addSimpleEntity( "wwwroot", $CFG->rootdir )
+//        ->addEntities( $Managers )
+//        ->xsl( "musadm/users/managers.xsl" )
+//        ->show();
 }

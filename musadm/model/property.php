@@ -6,61 +6,61 @@ class Property extends Property_Model
     public function getByTagName( $tag_name )
     {
         return $this->queryBuilder()
-            ->where( "tag_name", "=", $tag_name )
+            ->where( 'tag_name', '=', $tag_name )
             ->find();
     }
 
 
-	public function getPropertyValuesArr( $arr )
-	{
-		$ids = array();
-		foreach ($arr as $val)	$ids[] = $val->getId();
-		if( count( $ids ) == 0 ) return array();
-		$modelName = get_class( $arr[0] ); 
-		$valueType = "Property_".ucfirst($this->type());
-
-		$emptyValue = Core::factory( $valueType )
-            ->property_id($this->id)
-            ->model_name($modelName)
-            ->value(strval($this->default_value));
-
-		$aoValues = Core::factory( "Orm" )
-			->select(array( 
-				"User.id AS real_id",
-				"val.id", 
-				"val.property_id", 
-				"val.model_name", 
-				"val.object_id", 
-			))
-			->from( $modelName ) 
-			->leftJoin( $valueType . " AS val", $modelName . ".id = val.object_id AND val.model_name = '" . $modelName . "' AND val.property_id = " . $this->id )
-			->where( $modelName . ".id", "IN", $ids );
-
-		if( $this->type == "list" )
-		{
-			$aoValues
-				->select( "val.value_id" )
-				->select( "plv.value" )
-				->leftJoin( "Property_List_Values AS plv", "plv.id = val.value_id" );
-		}
-		else 
-		{
-			$aoValues->select( "val.value" );
-		}
-
-		$aoValues = $aoValues->findAll( $valueType );
-
-		foreach ( $aoValues as $key => $value ) 
-		{
-			if( $value->getId() == "" )
-			{
-				$aoValues[$key] = $emptyValue;
-				$aoValues[$key]->object_id( $value->real_id );
-			}
-		}
-
-		return $aoValues;
-	}
+//	public function getPropertyValuesArr( $arr )
+//	{
+//		$ids = array();
+//		foreach ($arr as $val)	$ids[] = $val->getId();
+//		if( count( $ids ) == 0 ) return array();
+//		$modelName = get_class( $arr[0] );
+//		$valueType = "Property_".ucfirst($this->type());
+//
+//		$emptyValue = Core::factory( $valueType )
+//            ->property_id($this->id)
+//            ->model_name($modelName)
+//            ->value(strval($this->default_value));
+//
+//		$aoValues = Core::factory( "Orm" )
+//			->select(array(
+//				"User.id AS real_id",
+//				"val.id",
+//				"val.property_id",
+//				"val.model_name",
+//				"val.object_id",
+//			))
+//			->from( $modelName )
+//			->leftJoin( $valueType . " AS val", $modelName . ".id = val.object_id AND val.model_name = '" . $modelName . "' AND val.property_id = " . $this->id )
+//			->where( $modelName . ".id", "IN", $ids );
+//
+//		if( $this->type == "list" )
+//		{
+//			$aoValues
+//				->select( "val.value_id" )
+//				->select( "plv.value" )
+//				->leftJoin( "Property_List_Values AS plv", "plv.id = val.value_id" );
+//		}
+//		else
+//		{
+//			$aoValues->select( "val.value" );
+//		}
+//
+//		$aoValues = $aoValues->findAll( $valueType );
+//
+//		foreach ( $aoValues as $key => $value )
+//		{
+//			if( $value->getId() == "" )
+//			{
+//				$aoValues[$key] = $emptyValue;
+//				$aoValues[$key]->object_id( $value->real_id );
+//			}
+//		}
+//
+//		return $aoValues;
+//	}
 
 
 	/**
@@ -69,285 +69,303 @@ class Property extends Property_Model
 	 * @param $obj - объект, значения свойства которого будет возвращено
 	 * @return array
 	 */
-	public function getPropertyValues($obj)
+	public function getPropertyValues( $obj )
 	{
-		/**
-		 * Чтобы полдучить значения свойства необходимо чтобы
-		 * это объект представлял из себя существующее свойство
-		 * и это свойство принадлежало объекту, для которого ищется значение
-		 * данного свойства
-		 */
-		if(!$this->id) die("Неопределенное свойство"); 
-
-		if(!$this->active())
-			die('Свойство "'.$this->title().'" не активно');
-
-
-        $sTableName = "Property_".ucfirst($this->type());
-        $sModelName = $obj->getTableName();
-
-        $emptyValue = Core::factory($sTableName)
-            ->property_id($this->id)
-            ->model_name($sModelName)
-            ->value(strval($this->default_value));
-
-		if($obj->getId() == null)
+		if ( !$this->id || !$this->active() )
         {
-            return array($emptyValue);
+            return [];
         }
 
-        $emptyValue->object_id($obj->getId());
 
-		$oPropertyValue = Core::factory($sTableName);
-		$aPropertyValues = $oPropertyValue->queryBuilder()
-			->where("property_id", "=", $this->getId())
-			->where("model_name", "=", $sModelName)
-			->where("object_id", "=", $obj->getId())
+        $tableName = "Property_" . ucfirst( $this->type() );
+        $modelName = $obj->getTableName();
+
+        $EmptyValue = Core::factory( $tableName )
+            ->property_id( $this->id )
+            ->model_name( $modelName )
+            ->value( strval( $this->default_value ) );
+
+		if ( $obj->getId() == 0 )
+        {
+            return [$EmptyValue];
+        }
+
+        $EmptyValue->object_id( $obj->getId() );
+
+		$PropertyValues = Core::factory( $tableName )->queryBuilder()
+			->where( 'property_id', '=', $this->getId() )
+			->where( 'model_name', '=', $modelName )
+			->where( 'object_id', '=', $obj->getId() )
 			->findAll();
 
-		if($this->type == "list")
-		{
-			$result = $this->getPropertyListValues($obj);
-		}
-		else
-		{
-			$result = $aPropertyValues;
-		}
 
-		if(count($result) == 0)
+		if ( count( $PropertyValues ) == 0 )
         {
-            return array($emptyValue);
+            return [$EmptyValue];
         }
-        else return $result;
+        else
+        {
+            return $PropertyValues;
+        }
 	}
 
 
 	/**
-	*	Метод возвращает список свойств объекта
-	*	@param $obj - объект, свойства которого бутуд возвращены
-	*	@return array of objects
-	*/
-	public function getPropertiesList($obj)
+	 * Метод возвращает список свойств объекта
+     *
+	 * @param $obj - объект, свойства которого бутуд возвращены
+	 * @return array
+	 */
+	public function getPropertiesList( $obj )
 	{
-	    if(!is_object($obj) || !method_exists($obj, "getId"))
-	        die("Переданный объект не подходит для работы с доп. свойствами.");
+	    if ( !is_object( $obj ) || !method_exists( $obj, "getId" ) )
+        {
+            return [];
+        }
 
 	    $types = $this->getPropertyTypes();
-        $aProperties = array();
+        $Properties = [];
 
-        foreach($types as $type)
+        foreach( $types as $type )
         {
-            $sTableName = "Property_" . $type . "_Assigment";
-            $aoTypeProperties = Core::factory($sTableName)
+            $tableName = "Property_" . $type . "_Assigment";
+
+            $TypeProperties = Core::factory( $tableName )
                 ->queryBuilder()
-                ->where("object_id", "=", $obj->getId())
-                ->where("model_name", "=", get_class($obj))
+                ->where( 'object_id', '=', $obj->getId() )
+                ->where( 'model_name', '=', $obj->getTableName() )
                 ->findAll();
 
-            if(is_array($aoTypeProperties))
-            foreach ($aoTypeProperties as $result)
+            foreach ( $TypeProperties as $PropertyAssignment )
             {
-                $aProperties[] = Core::factory("Property", $result->property_id());
+                $Properties[] = Core::factory( 'Property', $PropertyAssignment->property_id() );
             }
-
         }
 
-		return $aProperties;
+		return $Properties;
 	}
 
 
 	/**
-	*	Добавление свойства в список свойств объекта
-	*	@param $obj - объект, которому добавляется свойство 
-	*	@param $propertyId - id свойства, которое необходимо добавить в список свойств
-	*	@return bool
-	*/
-	public function addToPropertiesList($obj, $propertyId)
+	 * Добавление свойства в список свойств объекта
+     *
+	 * @param $obj - объект, которому добавляется свойство
+	 * @param $propertyId - id свойства, которое необходимо добавить в список свойств
+	 * @return null|object
+	 */
+	public function addToPropertiesList( $obj, $propertyId )
 	{
-		//if(!is_int($propertyId)) return false;
-        $oProperty = Core::factory("Property", $propertyId);
-        if($oProperty == false) return false;
-        $sTableName = "Property_" . $oProperty->type() . "_Assigment";
+        $Property = Core::factory( 'Property', $propertyId );
 
-        $obj->getId() == null
-            ?   $objectId = 0
-            :   $objectId = $obj->getId();
-
-        $assigment = Core::factory($sTableName)
-            ->queryBuilder()
-            ->where("object_id", "=", $objectId)
-	        ->where("property_id", "=", $propertyId)
-            ->where("model_name", "=", get_class($obj))
-            ->find();
-
-        if($assigment != false) return true;
-
-        Core::factory($sTableName)
-            ->property_id($propertyId)
-            ->object_id($obj->getId())
-            ->model_name(get_class($obj))
-            ->save();
-
-        return true;
-	}
-
-
-	/**
-	*	Удаление свойства из списка 
-	*	@param $obj - объект, у которого удаляется свойство
-	*	@param $propertyId - id свойства, которое необходимо удалить из списка свойств
-	*	@return bool
-	*/
-	public function deleteFromPropertiesList($obj, $propertyId)
-	{
-        //if(!is_int($propertyId)) return false;
-        $oProperty = Core::factory("Property", $propertyId);
-        if($oProperty == false) return false;
-        $sTableName = "Property_" . $oProperty->type() . "_Assigment";
-
-        $obj->getId() == null
-            ?   $objectId = 0
-            :   $objectId = $obj->getId();
-
-        $assigment = Core::factory($sTableName)
-            ->where("object_id", "=", $objectId)
-            ->where("property_id", "=", $propertyId)
-            ->where("model_name", "=", get_class($obj))
-            ->find();
-
-        if($assigment != false)
+        if ( $Property === null )
         {
-            $assigment->delete();
+            return null;
         }
 
-        return true;
+        $tableName = "Property_" . $Property->type() . "_Assigment";
+
+        $obj->getId() == 0
+            ?   $objectId = 0
+            :   $objectId = $obj->getId();
+
+        $Assignment = Core::factory( $tableName )
+            ->queryBuilder()
+            ->where( 'object_id', '=', $objectId )
+	        ->where( 'property_id', '=', $propertyId )
+            ->where( 'model_name', '=', $obj->getTableName() )
+            ->find();
+
+        if ( $Assignment !== null )
+        {
+            return null;
+        }
+
+        $NewAssignment = Core::factory( $tableName )
+            ->property_id( $propertyId )
+            ->object_id( $obj->getId() )
+            ->model_name( $obj->getTableName() );
+        $NewAssignment->save();
+
+        return $NewAssignment;
+	}
+
+
+	/**
+	 * Удаление свойства из списка
+     *
+	 * @param $obj - объект, у которого удаляется свойство
+	 * @param $propertyId - id свойства, которое необходимо удалить из списка свойств
+	 * @return null|Property
+	 */
+	public function deleteFromPropertiesList( $obj, $propertyId )
+	{
+        $Property = Core::factory('Property', $propertyId );
+
+        if ( $Property === null )
+        {
+            return null;
+        }
+
+        $tableName = "Property_" . $Property->type() . "_Assigment";
+
+        $obj->getId() == 0
+            ?   $objectId = 0
+            :   $objectId = $obj->getId();
+
+        $Assignment = Core::factory( $tableName )
+            ->where( 'object_id', '=', $objectId )
+            ->where( 'property_id', '=', $propertyId )
+            ->where( 'model_name', '=', $obj->getTableName() )
+            ->find();
+
+        if ( $Assignment !== null )
+        {
+            $Assignment->delete();
+        }
+
+        return $this;
 	}
 
 
 
 	/**
-	*	Добавление нового значения свойства
-	*	@param $obj - объект, для которого добавляется новое значение
-	*	@param $val - значение добавляемого свойства к объекту
-	*	@return void 
-	*/
-	public function addNewValue($obj, $val)
+	 * Добавление нового значения свойства
+     *
+	 * @param $obj - объект, для которого добавляется новое значение
+	 * @param $val - значение добавляемого свойства к объекту
+	 * @return null|object
+	 */
+	public function addNewValue( $obj, $val )
 	{
-		if(!$this->active())
-			die('Свойство "'.$this->title().'" не активно');
+		if ( !$this->active() )
+        {
+            return null;
+        }
 
-		$sTableName = "Property_".ucfirst($this->type());
-		$oNewPropertyValue = Core::factory($sTableName);
-		$oNewPropertyValue
-			->property_id((int)$this->id)
-			->model_name(get_class($obj))
-			->object_id((int)$obj->getId())
-			->value($val)
-			->save();
+		$tableName = "Property_" . ucfirst( $this->type() );
+
+		$NewPropertyValue = Core::factory( $tableName )
+			->property_id( $this->id )
+			->model_name( $obj->getTableName() )
+			->object_id( $obj->getId() )
+			->value( $val );
+        $NewPropertyValue->save();
+
+        return $NewPropertyValue;
 	}
 
 
 	/**
-	*	Возвращает значения свойства типа "список" (list)
-	*	@return array of objects
-	*/
-	private function getPropertyListValues($obj)
+	 * Возвращает значения свойства типа "список" (list)
+     *
+     * @return array of objects
+	 */
+	private function getPropertyListValues( $obj )
 	{
-		if($this->type != "list") return array();
-		$aoPropertyList = Core::factory("Property_List");
-		$aoPropertyList = $aoPropertyList->queryBuilder()
-			->where("property_id", "=", $this->id)
-			->where("object_id", "=", $obj->getId())
-            ->where("model_name", "=", get_class($obj))
+		if ( $this->type != 'list' )
+        {
+            return [];
+        }
+
+		$PropertyListValues = Core::factory( 'Property_List' )
+		    ->queryBuilder()
+			->where( 'property_id', '=', $this->id )
+			->where( 'object_id', '=', $obj->getId() )
+            ->where( 'model_name', '=', $obj->getTableName() )
 			->findAll();
 
-		if( count( $aoPropertyList ) == 0 && $this->default_value != "" )
+		if( count( $PropertyListValues ) == 0 && $this->default_value != '' )
         {
-            $aoPropertyList[] = Core::factory( "Property_List" )
+            $PropertyListValues[] = Core::factory( 'Property_List' )
                 ->property_id( $this->id )
                 ->object_id( $obj->getId() )
-                ->model_name( get_class( $obj ) )
+                ->model_name( $obj->getTableName() )
                 ->value( $this->default_value );
         }
 
-		$aoOutputData = array();
+		$ListItems = [];
 
-		foreach ($aoPropertyList as $oPropertyList)
+		foreach ( $PropertyListValues as $ListValue )
 		{
-		    if( $oPropertyList->value() == 0 ) continue;
-			$aoOutputData[] = Core::factory("Property_List_Values")
+		    if ( $ListValue->value() == 0 )
+            {
+                continue;
+            }
+
+			$ListItems[] = Core::factory( 'Property_List_Values' )
                 ->queryBuilder()
-				->where("property_id", "=", $this->id)
-				->where("id", "=", $oPropertyList->value())
+				->where( 'property_id', '=', $this->id )
+				->where( 'id', '=', $ListValue->value() )
 				->find();
 		}
 
-        //return $aoPropertyList;
-		return $aoOutputData;
+		return $ListItems;
 	}
 
 
-    public function delete($obj = null)
+    public function delete( $obj = null )
     {
-        $sTableName = "Property_".ucfirst($this->type());
-        $aoAssigments = Core::factory($sTableName . "_Assigment")
+        $tableName = 'Property_' . ucfirst( $this->type() );
+
+        $Assignments = Core::factory( $tableName . "_Assigment" )
             ->queryBuilder()
-            ->where("property_id", "=", $this->id)
+            ->where( 'property_id', '=', $this->id )
             ->findAll();
 
-        foreach ($aoAssigments as $assigment) $assigment->delete();
+        foreach ( $Assignments as $Assignment )
+        {
+            $Assignment->delete();
+        }
 
-        $aoValues = Core::factory($sTableName)
+        $Values = Core::factory( $tableName )
             ->queryBuilder()
-            ->where("property_id", "=", $this->id)
+            ->where( 'property_id', '=', $this->id )
             ->findAll();
 
-        foreach ($aoValues as $value)   $value->delete();
+        foreach ( $Values as $Value)
+        {
+            $Value->delete();
+        }
 
         parent::delete();
     }
 
 
-    public function clearForObject($obj)
+    /**
+     * @param $obj
+     * @return $this|null
+     */
+    public function clearForObject( $obj )
     {
-        if(!is_object($obj) || !method_exists($obj, "getId"))
-            die("Переданный объект не подходит для работы с доп. свойствами.");
-
-        $modelName =    $obj->getTableName();
-        $modelId =      $obj->getId();
-
-        $types =        $this->getPropertyTypes();
-        $aoProperties = $this->getPropertiesList($obj);
-
-
-        foreach ($aoProperties as $prop)
+        if ( !is_object( $obj ) || !method_exists( $obj, "getId" ) )
         {
-            if($prop->type() == "list")
-            {
-                $aoValues = Core::factory("Property_List")
-                    ->queryBuilder()
-                    ->where("model_name", "=", $modelName)
-                    ->where("object_id", "=", $modelId)
-                    ->findAll();
-            }
-            else
-            {
-                $aoValues = $prop->getPropertyValues($obj);
-            }
-
-            foreach ($aoValues as $value)   $value->delete();
+            return null;
         }
 
-        foreach ($types as $type)
+        foreach ( $this->getPropertiesList( $obj ) as $prop )
+        {
+            $Values = $prop->getPropertyValues( $obj );
+
+            foreach ( $Values as $Value )
+            {
+                $Value->delete();
+            }
+        }
+
+        foreach ( $this->getPropertyTypes() as $type )
         {
             $tableName = "Property_" . $type . "_Assigment";
-            $assignments = Core::factory($tableName)
+
+            $Assignments = Core::factory( $tableName )
                 ->queryBuilder()
-                ->where("model_name", "=", $modelName)
-                ->where("object_id", "=", $modelId)
+                ->where( 'model_name', '=', $obj->getTableName() )
+                ->where( 'object_id', '=', $obj->getId() )
                 ->findAll();
 
-            foreach ($assignments as $assignment) $assignment->delete();
+            foreach ( $Assignments as $Assignment )
+            {
+                $Assignment->delete();
+            }
         }
 
         return $this;
@@ -367,30 +385,32 @@ class Property extends Property_Model
         {
             $Assignments = Core::factory( "Property_" . $type . "_Assigment" )
                 ->queryBuilder()
-                ->where( "model_name", "=", get_class( $obj ) )
-                ->where( "object_id", "=", $objectId )
-                ->where( "object_id", "=", 0 )
+                ->where( 'model_name', '=', $obj->getTableName() )
+                ->where( 'object_id', '=', $objectId )
+                ->where( 'object_id', "=", 0 )
                 ->findAll();
 
-            foreach ( $Assignments as $assignment )
-                $Properties[] = Core::factory( "Property", $assignment->property_id() );
+            foreach ( $Assignments as $Assignment )
+            {
+                $Properties[] = Core::factory( 'Property', $Assignment->property_id() );
+            }
         }
 
         if( method_exists( $obj, "getParent" ) )
         {
             $Parent = $obj->getParent();
 
-            if( $Parent->getId() !== null )
+            if( $Parent->getId() != null )
             {
-                $ParentProperties = Core::factory( "Property" )->getAllPropertiesList( $Parent );
+                $ParentProperties = Core::factory( 'Property' )->getAllPropertiesList( $Parent );
                 $Properties = array_merge( $ParentProperties, $Properties );
             }
         }
 
 
         //Отсеивание повторяющихся свойств
-        $propertiesIds = array();
-        $returnsProperties = array();
+        $propertiesIds = [];
+        $returnsProperties = [];
 
         foreach ( $Properties as $Property )
         {
