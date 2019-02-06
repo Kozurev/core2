@@ -6,71 +6,91 @@
  * Time: 22:17
  */
 
-//$groupId = Core_Page_Show::instance()->StructureItem->getId();
-//
-//Core::factory( 'User_Controller' );
-//$UserController = new User_Controller( User::current() );
-//$UserController
-//    ->active( true )
-//    ->properties( true )
-//    ->groupId( $groupId )
-//    ->xsl(
-//        $groupId == 5
-//            ?   $xsl = "musadm/users/clients.xsl"
-//            :   $xsl = "musadm/users/teachers.xsl"
-//    )
-//    ->show();
-
-
-global $CFG;
-$Property = Core::factory( "Property" );
-
-$User = User::current()->getDirector();
-$subordinated = $User->getId();
-
-User::parentAuth()->groupId() == 6 || User::parentAuth()->superuser() == 1
-    ?   $isDirector = 1
-    :   $isDirector = 0;
-
 $groupId = Core_Page_Show::instance()->StructureItem->getId();
-$groupId == 5
-    ?   $xsl = "musadm/users/clients.xsl"
-    :   $xsl = "musadm/users/teachers.xsl";
 
-
-$Users = Core::factory( "User" )->queryBuilder()
-    ->where( "User.subordinated", "=", $subordinated )
-    ->where( "group_id", "=", $groupId )
-    ->where( "User.active", "=", 1 )
-    ->orderBy( "User.id", "DESC" )
-    ->findAll();
-
-$UserGroup = Core::factory( "User_Group", $groupId );
-
-foreach ( $Users as $User )
+if ( $groupId == 5 )
 {
-    $PropertiesList = $Property->getPropertiesList( $UserGroup );
+    $propertiesIds = [
+        4,  //Примечание пользователя
+        9,  //Ссылка вконтакте
+        12, //Баланс
+        13, //Кол-во индивидуальных занятий
+        14, //Кол-во групповых занятий
+        16, //Дополнительный телефон
+        17, //Длительность занятия
+        18, //Соглашение подписано
+        28  //Год рождения
+    ];
 
-    foreach ( $PropertiesList as $prop )
-    {
-        $User->addEntities( $prop->getPropertyValues( $User ), "property_value" );
-    }
+    $xsl = 'musadm/users/clients.xsl';
+}
+elseif ( $groupId == 4 )
+{
+    $propertiesIds = [
+        20, //Инструмент
+        31  //Расписание занятий
+    ];
 
-    $UserAreas = Core::factory( "Schedule_Area_Assignment" )->getAreas( $User );
-    $User->addEntities( $UserAreas, "areas" );
+    $xsl = 'musadm/users/teachers.xsl';
 }
 
-$AreaAssignment = Core::factory( "Schedule_Area_Assignment" );
-
-Core::factory( "Core_Entity" )
+Core::factory( 'User_Controller' );
+$UserController = new User_Controller( User::current() );
+$UserController
+    ->active( true )
+    ->properties( true )
+    ->groupId( $groupId )
     ->xsl( $xsl )
-    ->addSimpleEntity( "page-theme-color", "primary" )
-    ->addSimpleEntity( "is_director", $isDirector )
-    ->addSimpleEntity( "export_button_disable", 0 )
-    ->addSimpleEntity( "wwwroot", $CFG->rootdir )
-    ->addSimpleEntity( "table_type", "active" )
-    ->addEntities( $Users )
     ->show();
+
+//global $CFG;
+//$Property = Core::factory( "Property" );
+//
+//$User = User::current()->getDirector();
+//$subordinated = $User->getId();
+//
+//User::parentAuth()->groupId() == 6 || User::parentAuth()->superuser() == 1
+//    ?   $isDirector = 1
+//    :   $isDirector = 0;
+//
+//$groupId = Core_Page_Show::instance()->StructureItem->getId();
+//$groupId == 5
+//    ?   $xsl = "musadm/users/clients.xsl"
+//    :   $xsl = "musadm/users/teachers.xsl";
+//
+//
+//$Users = Core::factory( "User" )->queryBuilder()
+//    ->where( "User.subordinated", "=", $subordinated )
+//    ->where( "group_id", "=", $groupId )
+//    ->where( "User.active", "=", 1 )
+//    ->orderBy( "User.id", "DESC" )
+//    ->findAll();
+//
+//$UserGroup = Core::factory( "User_Group", $groupId );
+//$PropertiesList = $Property->getPropertiesList( $UserGroup );
+//
+//foreach ( $Users as $User )
+//{
+//    foreach ( $PropertiesList as $prop )
+//    {
+//        $User->addEntities( $prop->getPropertyValues( $User ), "property_value" );
+//    }
+//
+//    $UserAreas = Core::factory( "Schedule_Area_Assignment" )->getAreas( $User );
+//    $User->addEntities( $UserAreas, "areas" );
+//}
+//
+//$AreaAssignment = Core::factory( "Schedule_Area_Assignment" );
+//
+//Core::factory( "Core_Entity" )
+//    ->xsl( $xsl )
+//    ->addSimpleEntity( "page-theme-color", "primary" )
+//    ->addSimpleEntity( "is_director", $isDirector )
+//    ->addSimpleEntity( "export_button_disable", 0 )
+//    ->addSimpleEntity( "wwwroot", $CFG->rootdir )
+//    ->addSimpleEntity( "table_type", "active" )
+//    ->addEntities( $Users )
+//    ->show();
 
 
 /**

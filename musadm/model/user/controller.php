@@ -68,6 +68,50 @@ class User_Controller
     private $xsl = '';
 
 
+    /**
+     * Указатель на выборку только активных пользователей
+     *
+     * @var bool
+     */
+    private $active = true;
+
+
+    /**
+     * Указатель отвечающий за подгрузку доп. свойств
+     * При значении: true|false - подгружаются все свойства родительской группы или не подгружаются вообще
+     * При значении array - список идентификаторов доп. свойств которые будут подгружаться
+     *
+     * @var array|bool
+     */
+    private $properties = false;
+
+
+    /**
+     * Идентификаторы групп для которых будет производиться выборка пользователей
+     *
+     * @var array
+     */
+    private $groupIds = [];
+
+
+    /**
+     * Массив объектов пользовательских групп учавствующих в выборке
+     * а также доп. свойства связанные с этими группами
+     *
+     * @var array
+     */
+    private $Groups = [
+//Примерно такая структура будет у этого свойства
+//        [
+//            'group' => null,
+//            'properties' => [],
+//            'groupUserIds' => []
+//        ]
+    ];
+
+
+
+
 
 
     public function __construct( User $User = null )
@@ -149,5 +193,263 @@ class User_Controller
     }
 
 
+    /**
+     * @param bool $isActive
+     * @return User_Controller
+     */
+    public function active( bool $isActive )
+    {
+        if ( is_null( $isActive ) )
+        {
+            $this->active = null;
+        }
 
+        if ( $isActive === true )
+        {
+            $this->active = true;
+        }
+        elseif ( $isActive === false )
+        {
+            $this->active = false;
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @param $groupId
+     * @return User_Controller
+     */
+    public function groupId( $groupId )
+    {
+        if ( is_array( $groupId ) && count( $groupId ) )
+        {
+            $this->gorupIds = $groupId;
+        }
+        elseif ( is_numeric( $groupId ) && $groupId > 0 )
+        {
+            $this->groupIds[] = $groupId;
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @param $properties
+     * @return User_Controller
+     */
+    public function properties( $properties )
+    {
+        if ( is_array( $properties ) && count( $properties ) > 0 )
+        {
+            if ( !is_array( $this->properties ) )
+            {
+                $this->properties = [];
+            }
+
+            foreach ( $properties as $propId )
+            {
+                $Property = Core::factory( 'Property', $propId );
+
+                if ( $Property !== null )
+                {
+                    $this->properties[] = $Property;
+                }
+            }
+        }
+        elseif ( is_bool( $properties ) )
+        {
+            $this->properties = $properties;
+        }
+
+        return $this;
+    }
+
+
+    public function getUsers()
+    {
+        /**
+         * Добавление условия выборки пользователей принадлежащих той же организации что и текущий пользователь
+         * Также этот параметр будет использоваться для выборки филиалов
+         */
+        $subordinated = 0;
+
+        if ( $this->User !== null && $this->isSubordinate === true )
+        {
+            $subordinated = $this->User->getDirector()->getId();
+            $this->UserQuery->where( 'subordinated', '=', $subordinated );
+        }
+
+
+        /**
+         * Поиск указанных групп и связанных с ними дополнительных свйоств
+         */
+        if ( count( $this->groupIds ) > 0 )
+        {
+            foreach ( $this->groupIds as $groupId )
+            {
+                $Group = Core::factory( 'User_Group', $groupId );
+
+                if ( $Group !== null )
+                {
+                    $this->Groups[$groupId]['group'] = $Group;
+                }
+            }
+        }
+
+
+        /**
+         * Поиск только тех пользователей что принадлежат заданым филиалам
+         * либо тем же филиалам что и текущий пользователь
+         */
+        $areasIds[] = 0; //Массив идентификаторов филиалов для которох идет выборка пользователей
+
+        if ( count( $this->forAreas ) > 0 )
+        {
+            foreach ( $this->forAreas as $Area )
+            {
+                $areasIds[] = $Area->getId();
+            }
+        }
+        elseif ( $this->isLimitedAreasAccess === true && $this->User !== null && $this->User->groupId() != 6 )
+        {
+            $UserAreaAssignments = Core::factory( 'Schedule_Area_Assignment' )->getAssignments( $this->User );
+
+            foreach ( $UserAreaAssignments as $Assignment )
+            {
+                $areasIds[] = $Assignment->areaId();
+            }
+        }
+
+        if ( count( $areasIds ) > 1 )
+        {
+            $this->UserQuery
+                ->join(
+                    'Schedule_Area_Assignment AS saa',
+                    'saa.model_name = "User" AND ass.model_id = User.id AND saa.area_id in(' . implode( ', ', $areasIds ) . ')'
+                );
+        }
+
+
+        /**
+         * Фильт по активности пользователей
+         */
+        if ( $this->active === true )
+        {
+            $this->UserQuery->where( 'active', '=', '1' );
+        }
+        elseif ( $this->active === false )
+        {
+            $this->UserQuery->where( 'active', '=', '0' );
+        }
+
+
+        /**
+         * Фильтр по группам
+         */
+        if ( count( $this->groupIds ) > 0 )
+        {
+            $this->UserQuery->whereIn( 'group_id', $this->groupIds );
+        }
+
+
+        $Users = $this->UserQuery
+            ->select( ['User.id', 'User.name', 'User.surname', 'phone_number', 'email', 'group_id' ] )
+            ->orderBy( 'User.id', 'DESC' )
+            ->limit( 10 )
+            ->findAll();
+
+
+        /**
+         * Поиск доп. свйоств для групп и значений доп. свойств для каждого из пользователей
+         */
+        if ( $this->properties !== false )
+        {
+            /**
+             * Поиск списка доп. свойств для пользователей
+             */
+            if ( $this->properties === true )
+            {
+                foreach ( $this->Groups as $Group )
+                {
+                    $this->Groups[$Group['group']->getId()]['properties'] = Core::factory( 'Property' )
+                        ->getPropertiesList( $Group['group'] );
+                }
+            }
+            elseif ( is_array( $this->properties ) && count( $this->properties ) > 0 )
+            {
+                foreach ( $this->Groups as $Group )
+                {
+                    $Group['properties'] = $this->properties;
+                }
+            }
+
+
+            /**
+             * Поиск значений доп. свойств пользователей
+             */
+            foreach ( $Users as $User )
+            {
+                $this->Groups[$User->groupId()]['groupUserIds'][] = $User->getId();
+            }
+
+            foreach ( $this->Groups as $Group )
+            {
+                foreach ( $Group['properties'] as $GroupProperty )
+                {
+                    $propValueTable = 'Property_' . ucfirst( $GroupProperty->type() );
+                    $PropertyValues = Core::factory( $propValueTable )
+                        ->queryBuilder()
+                        ->where( 'model_name', '=', 'User' )
+                        ->whereIn( 'object_id', $Group['groupUserIds'] )
+                        ->where( 'property_id', '=', $GroupProperty->getId() )
+                        ->orderBy( 'object_id', 'DESC' )
+                        ->findAll();
+
+                    foreach ( $PropertyValues as $key => $Value )
+                    {
+                        foreach ( $Users as $User )
+                        {
+                            if ( $User->getId() == $Value->object_id() )
+                            {
+                                $User->addEntity( $Value, 'property_value' );
+                                unset ( $PropertyValues[$key] );
+                            }
+                        }
+                    }
+                    //TODO: Придумать что-то с подгрузкой значений по умолчанию для доп. свйоств
+                }
+            }
+        }
+
+
+        //TODO: Подгрузка связей с филиалами
+
+
+
+        return $Users;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function show( $isEcho = true )
+    {
+        //TODO: Подгрузка списков значений доп. свойства типа "список"
+        debug( $this->getUsers() );
+        debug( $this );
+    }
 }

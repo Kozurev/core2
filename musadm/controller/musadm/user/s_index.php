@@ -60,7 +60,7 @@ if ( $action == 'updateFormClient' )
         $Properties[] = Core::factory( 'Property', 9  )->getPropertyValues( $PaymentUser )[0];    //Ссылка вк
         $Properties[] = Core::factory( 'Property', 17 )->getPropertyValues( $PaymentUser )[0];    //Длительность урока
         $Properties[] = Core::factory( 'Property', 18 )->getPropertyValues( $PaymentUser )[0];    //Соглашение подписано
-        $Properties[] = Core::factory( 'Property', 28 )->getPropertyValues( $PaymentUser )[0];
+        $Properties[] = Core::factory( 'Property', 28 )->getPropertyValues( $PaymentUser )[0];    //Год рождения
         $Properties =   array_merge( $Properties, Core::factory( 'Property', 21 )->getPropertyValues( $PaymentUser) );   //Учителя
     }
     else

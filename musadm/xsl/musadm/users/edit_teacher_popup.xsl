@@ -121,7 +121,7 @@
         <xsl:for-each select="property_list[property_id=$property_id]">
             <xsl:variable name="id" select="id" />
             <option value="{$id}">
-                <xsl:if test="count(//property_value[id=$id]/value) != 0">
+                <xsl:if test="//property_value[property_id = $property_id]/value_id = $id">
                     <xsl:attribute name="selected">selected</xsl:attribute>
                 </xsl:if>
                 <xsl:value-of select="value" />
