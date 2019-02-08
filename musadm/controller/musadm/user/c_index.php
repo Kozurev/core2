@@ -38,51 +38,52 @@ Core::factory( 'User_Controller' );
 $UserController = new User_Controller( User::current() );
 $UserController
     ->active( true )
-    ->properties( true )
+    ->properties( $propertiesIds )
+    //->properties( true )
     ->groupId( $groupId )
     ->xsl( $xsl )
     ->show();
 
-//global $CFG;
-//$Property = Core::factory( "Property" );
-//
-//$User = User::current()->getDirector();
-//$subordinated = $User->getId();
-//
-//User::parentAuth()->groupId() == 6 || User::parentAuth()->superuser() == 1
+// global $CFG;
+// $Property = Core::factory( "Property" );
+
+// $User = User::current()->getDirector();
+// $subordinated = $User->getId();
+
+// User::parentAuth()->groupId() == 6 || User::parentAuth()->superuser() == 1
 //    ?   $isDirector = 1
 //    :   $isDirector = 0;
-//
-//$groupId = Core_Page_Show::instance()->StructureItem->getId();
-//$groupId == 5
+
+// $groupId = Core_Page_Show::instance()->StructureItem->getId();
+// $groupId == 5
 //    ?   $xsl = "musadm/users/clients.xsl"
 //    :   $xsl = "musadm/users/teachers.xsl";
-//
-//
-//$Users = Core::factory( "User" )->queryBuilder()
+
+
+// $Users = Core::factory( "User" )->queryBuilder()
 //    ->where( "User.subordinated", "=", $subordinated )
 //    ->where( "group_id", "=", $groupId )
 //    ->where( "User.active", "=", 1 )
 //    ->orderBy( "User.id", "DESC" )
 //    ->findAll();
-//
-//$UserGroup = Core::factory( "User_Group", $groupId );
-//$PropertiesList = $Property->getPropertiesList( $UserGroup );
-//
-//foreach ( $Users as $User )
-//{
+
+// $UserGroup = Core::factory( "User_Group", $groupId );
+// $PropertiesList = $Property->getPropertiesList( $UserGroup );
+
+// foreach ( $Users as $User )
+// {
 //    foreach ( $PropertiesList as $prop )
 //    {
 //        $User->addEntities( $prop->getPropertyValues( $User ), "property_value" );
 //    }
-//
+
 //    $UserAreas = Core::factory( "Schedule_Area_Assignment" )->getAreas( $User );
 //    $User->addEntities( $UserAreas, "areas" );
-//}
-//
-//$AreaAssignment = Core::factory( "Schedule_Area_Assignment" );
-//
-//Core::factory( "Core_Entity" )
+// }
+
+// $AreaAssignment = Core::factory( "Schedule_Area_Assignment" );
+
+// Core::factory( "Core_Entity" )
 //    ->xsl( $xsl )
 //    ->addSimpleEntity( "page-theme-color", "primary" )
 //    ->addSimpleEntity( "is_director", $isDirector )

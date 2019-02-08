@@ -53,6 +53,14 @@ class User_Controller
 
 
     /**
+     * Указатель на то стоит ли подгружать связи пользователей
+     *
+     * @var bool
+     */
+    private $isWithAreaAssignments = true;
+
+
+    /**
      * Дополнительные простые тэги
      *
      * @var array
@@ -103,7 +111,7 @@ class User_Controller
     private $Groups = [
 //Примерно такая структура будет у этого свойства
 //        [
-//            'group' => null,
+//            'group' => User_Group,
 //            'properties' => [],
 //            'groupUserIds' => []
 //        ]
@@ -268,6 +276,9 @@ class User_Controller
     }
 
 
+    /**
+     * Поиск
+     */
     public function getUsers()
     {
         /**
@@ -356,10 +367,12 @@ class User_Controller
 
 
         $Users = $this->UserQuery
-            ->select( ['User.id', 'User.name', 'User.surname', 'phone_number', 'email', 'group_id' ] )
+            ->select( ['User.id', 'User.name', 'User.surname', 'phone_number', 'email', 'group_id'] )
             ->orderBy( 'User.id', 'DESC' )
             ->limit( 10 )
             ->findAll();
+
+        $countUsers = count( $Users );  //Кол-во найденных пользователей для последующих циклов
 
 
         /**
@@ -380,21 +393,30 @@ class User_Controller
             }
             elseif ( is_array( $this->properties ) && count( $this->properties ) > 0 )
             {
-                foreach ( $this->Groups as $Group )
+                foreach ( $this->Groups as $groupId => $Group )
                 {
-                    $Group['properties'] = $this->properties;
+                    $this->Groups[$groupId]['properties'] = $this->properties;
                 }
+            }
+
+
+            //Массив идентификаторов пользователей
+            $userIds = [];
+
+
+            /**
+             * Сопоставление id пользователей с группами, которым они принадлежат
+             */
+            for ( $i = 0; $i < $countUsers; $i++ )
+            {
+                $userIds[] = $Users[$i]->getId();
+                $this->Groups[$Users[$i]->groupId()]['groupUserIds'][] = $Users[$i]->getId();
             }
 
 
             /**
              * Поиск значений доп. свойств пользователей
              */
-            foreach ( $Users as $User )
-            {
-                $this->Groups[$User->groupId()]['groupUserIds'][] = $User->getId();
-            }
-
             foreach ( $this->Groups as $Group )
             {
                 foreach ( $Group['properties'] as $GroupProperty )
@@ -408,25 +430,38 @@ class User_Controller
                         ->orderBy( 'object_id', 'DESC' )
                         ->findAll();
 
-                    foreach ( $PropertyValues as $key => $Value )
+                    $countValues = count( $PropertyValues );
+                    $valueIndex = 0;
+
+
+                    /**
+                     * Сопостовлений значений доп. свойств с пользователями, которым они принадлежат
+                     * С точки зрения читабельности кода лучше было использовать за место while/for 2 foreach-а
+                     * но с точки зрения производительности из-за больших объемов данных
+                     */
+                    while ( $countValues > 0 )
                     {
-                        foreach ( $Users as $User )
+                        for ( $userIndex = 0; $userIndex < $countUsers; $userIndex++ )
                         {
-                            if ( $User->getId() == $Value->object_id() )
+                            if ( $Users[$userIndex]->getId() == $PropertyValues[$valueIndex]->object_id() )
                             {
-                                $User->addEntity( $Value, 'property_value' );
-                                unset ( $PropertyValues[$key] );
+                                $Users[$userIndex]->addEntity( $PropertyValues[$valueIndex], 'property_value' );
+                                unset ( $PropertyValues[$valueIndex] );
+                                $PropertyValues = array_values( $PropertyValues );
+                                $countValues--;
+                            }
+
+                            if ( $countValues === 0 )
+                            {
+                                break;
                             }
                         }
+                        
+                        $valueIndex++;
                     }
-                    //TODO: Придумать что-то с подгрузкой значений по умолчанию для доп. свйоств
                 }
             }
-        }
-
-
-        //TODO: Подгрузка связей с филиалами
-
+        }//Конец работы с доп. свойствами
 
 
         return $Users;
@@ -449,7 +484,9 @@ class User_Controller
     public function show( $isEcho = true )
     {
         //TODO: Подгрузка списков значений доп. свойства типа "список"
-        debug( $this->getUsers() );
+        //debug( $this->getUsers() );
+        //Orm::Debug( true );
+        $this->getUsers();
         debug( $this );
     }
 }

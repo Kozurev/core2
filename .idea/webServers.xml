@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="d01031b4-4267-4740-864d-d745d25581c5" name="musicmetod" url="http://37.140.192.32">
+        <fileTransfer host="37.140.192.32" port="21" rootFolder="/httpdocs/musicmetod.ru/">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" />
+          </advancedOptions>
+          <option name="port" value="21" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
