@@ -430,6 +430,39 @@ class Property extends Property_Model
     }
 
 
+    /**
+     * Поиск элементов списка дополнительного свойства
+     *
+     * @param bool $isSubordinate
+     * @return array
+     */
+    public function getList( $isSubordinate = true )
+    {
+        if ( $this->type != 'list' || $this->getId() == 0 )
+        {
+            return [];
+        }
 
+        $List = Core::factory( 'Property_List_Values' );
+
+        if ( $isSubordinate === true )
+        {
+            $User = User::current();
+
+            if ( $User === null )
+            {
+                return [];
+            }
+
+            $List->queryBuilder()
+                ->where( 'subordinated', '=', $User->getDirector()->getId() );
+        }
+
+        return $List->queryBuilder()
+            ->where( 'property_id', '=', $this->id )
+            ->orderBy( 'sorting' )
+            ->findAll();
+
+    }
 
 }
