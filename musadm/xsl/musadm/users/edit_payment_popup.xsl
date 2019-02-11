@@ -36,8 +36,16 @@
                 <span>Тип операци</span>
             </div>
             <div class="column">
-                <p><input type="radio" name="type" value="1" style="height: auto" checked="checked" /><span>Зачисление</span></p>
-                <p><input type="radio" name="type" value="2" style="height: auto"/><span>Списание</span></p>
+                <p style="margin-top: 5px">
+                    <input type="radio" name="type" id="type1" value="1" style="height: auto" checked="checked" />
+                    <!--<span>Зачисление</span>-->
+                    <label for="type1">Зачисление</label>
+                </p>
+                <p style="margin-top: 5px">
+                    <input type="radio" name="type" id="type2" value="2" style="height: auto"/>
+                    <!--<span>Списание</span>-->
+                    <label for="type2">Списание</label>
+                </p>
             </div>
 
             <!--<input type="hidden" name="user" value="{user/id}" />-->

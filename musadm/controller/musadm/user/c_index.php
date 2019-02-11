@@ -6,6 +6,7 @@
  * Time: 22:17
  */
 
+Core::factory( 'User_Controller' );
 $groupId = Core_Page_Show::instance()->StructureItem->getId();
 
 if ( $groupId == 5 )
@@ -34,13 +35,14 @@ elseif ( $groupId == 4 )
     $xsl = 'musadm/users/teachers.xsl';
 }
 
-Core::factory( 'User_Controller' );
-$UserController = new User_Controller( User::current() );
-$UserController
+
+$ClientController = new User_Controller( User::current() );
+$ClientController
     ->active( true )
     ->properties( $propertiesIds )
-    //->properties( true )
+    ->tableType( User_Controller::TABLE_ACTIVE )
     ->groupId( $groupId )
+    ->addSimpleEntity( 'page-theme-color', 'primary' )
     ->xsl( $xsl )
     ->show();
 
@@ -87,9 +89,9 @@ $UserController
 //    ->xsl( $xsl )
 //    ->addSimpleEntity( "page-theme-color", "primary" )
 //    ->addSimpleEntity( "is_director", $isDirector )
-//    ->addSimpleEntity( "export_button_disable", 0 )
+//    //->addSimpleEntity( "disable-export-button", 0 )
 //    ->addSimpleEntity( "wwwroot", $CFG->rootdir )
-//    ->addSimpleEntity( "table_type", "active" )
+//    //->addSimpleEntity( "disable-buttons-row", "0" )
 //    ->addEntities( $Users )
 //    ->show();
 
@@ -99,24 +101,32 @@ $UserController
  */
 if( $groupId == 4 && User::checkUserAccess(["groups" => [6]]) )
 {
-//    $Managers = Core::factory( "User" )->queryBuilder()
-//        ->where( "subordinated", "=", $subordinated )
-//        ->where( "active", "=", 1 )
-//        ->where( "group_id", "=", 2 )
-//        ->findAll();
-//
-//    $AreaAssignments = Core::factory( "Schedule_Area_Assignment" );
-//
-//    foreach ( $Managers as $Manager )
-//    {
-//        $ManagerAreas = $AreaAssignments->getAreas( $Manager );
-//        $Manager->addEntities( $ManagerAreas, "areas" );
-//    }
-//
-//
-//    Core::factory( "Core_Entity" )
-//        ->addSimpleEntity( "wwwroot", $CFG->rootdir )
-//        ->addEntities( $Managers )
-//        ->xsl( "musadm/users/managers.xsl" )
-//        ->show();
+    $TeacherController = new User_Controller( User::current() );
+    $TeacherController
+        ->properties( true )
+        ->groupId( 2 )
+        ->addSimpleEntity( 'page-theme-color', 'primary' )
+        ->xsl( 'musadm/users/managers.xsl' )
+        ->show();
+
+   // $Managers = Core::factory( "User" )->queryBuilder()
+   //     ->where( "subordinated", "=", $subordinated )
+   //     ->where( "active", "=", 1 )
+   //     ->where( "group_id", "=", 2 )
+   //     ->findAll();
+
+   // $AreaAssignments = Core::factory( "Schedule_Area_Assignment" );
+
+   // foreach ( $Managers as $Manager )
+   // {
+   //     $ManagerAreas = $AreaAssignments->getAreas( $Manager );
+   //     $Manager->addEntities( $ManagerAreas, "areas" );
+   // }
+
+
+   // Core::factory( "Core_Entity" )
+   //     ->addSimpleEntity( "wwwroot", $CFG->rootdir )
+   //     ->addEntities( $Managers )
+   //     ->xsl( "musadm/users/managers.xsl" )
+   //     ->show();
 }

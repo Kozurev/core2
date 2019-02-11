@@ -2,9 +2,11 @@
 <!DOCTYPE xsl:stylesheet>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+    <xsl:include href="client_one.xsl" />
+
     <xsl:template match="root">
 
-        <xsl:if test="export_button_disable = 1">
+        <!-- <xsl:if test="buttons-panel = 1"> -->
             <style>
                 .table {
                 margin-bottom: 0px;
@@ -31,22 +33,22 @@
                 cursor: help;
                 }
             </style>
-        </xsl:if>
+        <!-- </xsl:if> -->
 
 
-        <xsl:if test="table_type = 'active'">
-            <xsl:if test="count(buttons_row) = 0 or buttons_row != 0">
+        <xsl:if test="buttons-panel = 1">
+            <!-- <xsl:if test="count(buttons_row) = 0 or buttons_row != 0"> -->
                 <div class="row buttons-panel">
                     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                         <a href="#" class="btn btn-{page-theme-color} user_create" data-usergroup="5">Создать пользователя</a>
                     </div>
-                    <xsl:if test="export_button_disable != 1">
+                    <xsl:if test="disable-export-button != 1">
                         <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                             <a href="client?action=export" class="btn btn-{page-theme-color}">Экспорт в Excel</a>
                         </div>
                     </xsl:if>
                 </div>
-            </xsl:if>
+            <!-- </xsl:if> -->
         </xsl:if>
 
 
@@ -72,94 +74,6 @@
     </xsl:template>
 
 
-    <xsl:template match="user">
-
-        <xsl:variable name="class" >
-            <xsl:choose>
-                <xsl:when test="property_value[property_id = 13]/value &lt; 0 or property_value[property_id = 14]/value &lt; 0">
-                    negative
-                </xsl:when>
-                <xsl:when test="property_value[property_id = 13]/value &gt; 1 or property_value[property_id = 14]/value &gt; 1">
-                    positive
-                </xsl:when>
-                <xsl:otherwise>
-                    neutral
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-
-        <tr class="{$class}">
-            <!--Фамилия-->
-            <td>
-                <!--<a href="/{/root/wwwroot}authorize?auth_as={id}">-->
-                <a href="{/root/wwwroot}/balance/?userid={id}">
-                    <xsl:value-of select="surname" />
-                    <xsl:text> </xsl:text>
-                    <xsl:value-of select="name" />
-                </a>
-
-                <!--Анкета (соглашение подписано)-->
-                <xsl:if test="property_value[property_id = 18]/value = '1'">
-                    <span class="contract" title="Соглашение подписано"><input type="hidden"/></span>
-                </xsl:if>
-
-                <!--Год рождения-->
-                <xsl:if test="property_value[property_id = 28]/value != ''">
-                    <xsl:text> </xsl:text>
-                    <xsl:value-of select="property_value[property_id = 28]/value" />
-                    <xsl:text> г.р.</xsl:text>
-                </xsl:if>
-
-                <!--Поурочная оплата-->
-                <xsl:if test="property_value[property_id = 32]/value = '1'">
-                    <div class="notes">«Сменный график»</div>
-                </xsl:if>
-
-                <!--Примечания-->
-                <div class="notes">
-                    <xsl:value-of select="property_value[property_id = 19]/value" />
-                </div>
-            </td>
-
-            <!--номер (номера) телефона-->
-            <td>
-                <xsl:value-of select="phone_number" /><br/>
-                <xsl:value-of select="property_value[property_id = 16]/value" />
-            </td>
-
-            <!--Баланс-->
-            <td ><xsl:value-of select="property_value[property_id = 12]/value" /></td>
-
-            <td width="150px">
-                <xsl:value-of select="property_value[property_id = 13]/value" />
-                <xsl:text> / </xsl:text>
-                <xsl:value-of select="property_value[property_id = 14]/value" />
-            </td>
-
-            <!--Продрлжительность урока-->
-            <td><xsl:value-of select="property_value[property_id = 17]/value" /></td>
-
-            <!--Студия-->
-            <td>
-                <xsl:value-of select="areas/title" />
-            </td>
-
-            <!--Действия-->
-            <xsl:if test="//table_type = 'active'">
-                <td width="140px">
-                    <a class="action add_payment user_add_payment" href="#" data-userid="{id}" title="Добавить платеж"></a>
-                    <a class="action edit user_edit"        href="#" data-userid="{id}" data-usergroup="{group_id}" title="Редактировать данные"></a>
-                    <a class="action archive user_archive"     href="#" data-userid="{id}" title="Переместить в архив"></a>
-                </td>
-            </xsl:if>
-
-            <xsl:if test="//table_type = 'archive'">
-                <td>
-                    <a class="action unarchive user_unarchive"   href="#" data-userid="{id}" title="Восстановить из архива"></a>
-                    <a class="action delete user_delete"      href="#" data-model_id="{id}" data-model_name="User" title="Безвозвратное удаление"></a>
-                </td>
-            </xsl:if>
-        </tr>
-    </xsl:template>
+    
 
 </xsl:stylesheet>

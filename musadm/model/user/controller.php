@@ -8,6 +8,11 @@
 
 class User_Controller
 {
+
+    const TABLE_ACTIVE = 'active';
+    const TABLE_ARCHIVE = 'archive';
+
+
     /**
      * Объект пользователя для которого происходит выборка лидов
      *
@@ -49,7 +54,7 @@ class User_Controller
      *
      * @var array
      */
-    private $forAreas = [];
+    private $forAreas = null;
 
 
     /**
@@ -66,6 +71,22 @@ class User_Controller
      * @var array
      */
     private $simpleEntities = [];
+
+
+    /**
+     * Указатель на показ панели с кнопками
+     *
+     * @var bool
+     */
+    private $isShowButtons = true;
+
+
+    /**
+     * Тип таблицы (таблица активных пользователей или архивных)
+     *
+     * @var string
+     */
+    private $tableType = self::TABLE_ACTIVE;
 
 
     /**
@@ -120,12 +141,29 @@ class User_Controller
 
 
 
-
-
     public function __construct( User $User = null )
     {
         $this->User = $User;
         $this->UserQuery = Core::factory( 'User' )->queryBuilder();
+        //$this->tableType = self::TABLE_ACTIVE;
+    }
+
+
+    /**
+     * @param string $tableType
+     * @return User_Controller
+     */
+    public function tableType( string $tableType )
+    {
+        $requiredTypes = [self::TABLE_ACTIVE,self::TABLE_ARCHIVE];
+
+        if ( !in_array( $tableType, $requiredTypes ) )
+        {
+            return $this;
+        }
+
+        $this->tableType = $tableType;
+        return $this;
     }
 
 
@@ -136,6 +174,17 @@ class User_Controller
     public function isSubordinate( bool $isSubordinate )
     {
         $this->isSubordinate = $isSubordinate;
+        return $this;
+    }
+
+
+    /**
+     * @param bool $isShowButtons
+     * @return User_Controller
+     */
+    public function isShowButtons( bool $isShowButtons )
+    {
+        $this->isShowButtons = $isShowButtons;
         return $this;
     }
 
@@ -156,6 +205,8 @@ class User_Controller
      */
     public function forAreas( array $Areas )
     {
+        $this->forAreas = [];
+
         foreach ( $Areas as $Area )
         {
             if ( !is_object( $Area ) )
@@ -231,9 +282,9 @@ class User_Controller
      */
     public function groupId( $groupId )
     {
-        if ( is_array( $groupId ) && count( $groupId ) )
+        if ( is_array( $groupId ) && count( $groupId ) > 0 )
         {
-            $this->gorupIds = $groupId;
+            $this->groupIds = $groupId;
         }
         elseif ( is_numeric( $groupId ) && $groupId > 0 )
         {
@@ -277,7 +328,7 @@ class User_Controller
 
 
     /**
-     * Поиск
+     * Поиск пользователей по указанным параметрам
      */
     public function getUsers()
     {
@@ -285,7 +336,7 @@ class User_Controller
          * Добавление условия выборки пользователей принадлежащих той же организации что и текущий пользователь
          * Также этот параметр будет использоваться для выборки филиалов
          */
-        $subordinated = 0;
+        //$subordinated = 0;
 
         if ( $this->User !== null && $this->isSubordinate === true )
         {
@@ -306,6 +357,8 @@ class User_Controller
                 if ( $Group !== null )
                 {
                     $this->Groups[$groupId]['group'] = $Group;
+                    $this->Groups[$groupId]['properties'] = [];
+                    $this->Groups[$groupId]['groupUserIds'] = [];
                 }
             }
         }
@@ -315,9 +368,9 @@ class User_Controller
          * Поиск только тех пользователей что принадлежат заданым филиалам
          * либо тем же филиалам что и текущий пользователь
          */
-        $areasIds[] = 0; //Массив идентификаторов филиалов для которох идет выборка пользователей
+        $areasIds = [];
 
-        if ( count( $this->forAreas ) > 0 )
+        if ( $this->forAreas !== null )
         {
             foreach ( $this->forAreas as $Area )
             {
@@ -334,13 +387,18 @@ class User_Controller
             }
         }
 
-        if ( count( $areasIds ) > 1 )
+        if ( isset( $areasIds ) && count( $areasIds ) > 0 )
         {
             $this->UserQuery
-                ->join(
+                ->leftJoin(
                     'Schedule_Area_Assignment AS saa',
-                    'saa.model_name = "User" AND ass.model_id = User.id AND saa.area_id in(' . implode( ', ', $areasIds ) . ')'
+                    'saa.model_name = "User" AND saa.model_id = User.id'
                 );
+            $this->UserQuery
+                ->open()
+                    ->whereIn( 'saa.area_id', $areasIds )
+                    ->orWhere( 'saa.area_id', 'is', NULL )
+                ->close();
         }
 
 
@@ -365,12 +423,12 @@ class User_Controller
             $this->UserQuery->whereIn( 'group_id', $this->groupIds );
         }
 
-
+        //Orm::Debug( true );
         $Users = $this->UserQuery
             ->select( ['User.id', 'User.name', 'User.surname', 'phone_number', 'email', 'group_id'] )
             ->orderBy( 'User.id', 'DESC' )
-            ->limit( 10 )
             ->findAll();
+        //Orm::Debug( false );
 
         $countUsers = count( $Users );  //Кол-во найденных пользователей для последующих циклов
 
@@ -399,6 +457,19 @@ class User_Controller
                 }
             }
 
+            foreach ( $this->Groups as $Group )
+            {
+                foreach ( $Group['properties'] as $Property )
+                {
+                    $ValuesList = $Property->getList();
+                    $Property->addEntity(
+                        Core::factory( 'Core_Entity' )
+                            ->_entityName( 'values' )
+                            ->addEntities( $ValuesList, 'item' )
+                    );
+                }
+            }
+
 
             //Массив идентификаторов пользователей
             $userIds = [];
@@ -415,8 +486,36 @@ class User_Controller
 
 
             /**
+             * Поиск и сопоставлений пользователей со связями с филиалами
+             */
+            if ( $this->isWithAreaAssignments === true )
+            {
+                $AreaAssignments = Core::factory( 'Schedule_Area_Assignment' )
+                    ->queryBuilder()
+                    ->where( 'model_name', '=', 'User' )
+                    ->whereIn( 'model_id', $userIds )
+                    ->orderBy( 'model_id', 'DESC' )
+                    ->findAll();
+
+                $countAssignments = count( $AreaAssignments );
+
+                for ( $assignmentIndex = 0; $assignmentIndex < $countAssignments; $assignmentIndex++ )
+                {
+                    for ( $userIndex = 0; $userIndex < $countUsers; $userIndex++ )
+                    {
+                        if ( $Users[$userIndex]->getId() == $AreaAssignments[$assignmentIndex]->modelId() )
+                        {
+                            $Users[$userIndex]->addEntity( $AreaAssignments[$assignmentIndex] );
+                        }
+                    }
+                }
+            }//
+
+
+            /**
              * Поиск значений доп. свойств пользователей
              */
+            //debug( $this->Groups );
             foreach ( $this->Groups as $Group )
             {
                 foreach ( $Group['properties'] as $GroupProperty )
@@ -425,13 +524,12 @@ class User_Controller
                     $PropertyValues = Core::factory( $propValueTable )
                         ->queryBuilder()
                         ->where( 'model_name', '=', 'User' )
-                        ->whereIn( 'object_id', $Group['groupUserIds'] )
                         ->where( 'property_id', '=', $GroupProperty->getId() )
+                        ->whereIn( 'object_id', $Group['groupUserIds'] )
                         ->orderBy( 'object_id', 'DESC' )
                         ->findAll();
 
                     $countValues = count( $PropertyValues );
-                    $valueIndex = 0;
 
 
                     /**
@@ -439,26 +537,17 @@ class User_Controller
                      * С точки зрения читабельности кода лучше было использовать за место while/for 2 foreach-а
                      * но с точки зрения производительности из-за больших объемов данных
                      */
-                    while ( $countValues > 0 )
+                    for ( $valueIndex = 0; $valueIndex < $countValues; $valueIndex++ )
                     {
                         for ( $userIndex = 0; $userIndex < $countUsers; $userIndex++ )
                         {
                             if ( $Users[$userIndex]->getId() == $PropertyValues[$valueIndex]->object_id() )
                             {
                                 $Users[$userIndex]->addEntity( $PropertyValues[$valueIndex], 'property_value' );
-                                unset ( $PropertyValues[$valueIndex] );
-                                $PropertyValues = array_values( $PropertyValues );
-                                $countValues--;
-                            }
-
-                            if ( $countValues === 0 )
-                            {
-                                break;
                             }
                         }
-                        
-                        $valueIndex++;
                     }
+
                 }
             }
         }//Конец работы с доп. свойствами
@@ -469,24 +558,50 @@ class User_Controller
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     public function show( $isEcho = true )
     {
         //TODO: Подгрузка списков значений доп. свойства типа "список"
-        //debug( $this->getUsers() );
-        //Orm::Debug( true );
-        $this->getUsers();
-        debug( $this );
+    
+        global $CFG;
+
+        $OutputXml = Core::factory( 'Core_Entity' )
+            ->addSimpleEntity( 'wwwroot', $CFG->rootdir )
+            ->addSimpleEntity( 'table-type', $this->tableType )
+            ->addEntities( 
+                $this->getUsers() 
+            )
+            ->addEntities( 
+                Core::factory( 'Schedule_Area' )->getList() 
+            )
+            ->xsl( $this->xsl );
+
+
+        /**
+         * Добавление объектов доп. свойств
+         */
+        foreach ( $this->Groups as $Group )
+        {
+            foreach ( $Group['properties'] as $Property )
+            {
+                $Group['group']->addEntity( $Property );
+            }
+
+            $OutputXml->addEntity( $Group['group'] );
+        }
+
+
+        //Условие вывода панели с кнопками
+        $this->isShowButtons === true
+            ?   $OutputXml->addSimpleEntity( 'buttons-panel', '1' )
+            :   $OutputXml->addSimpleEntity( 'buttons-panel', '0' );
+
+
+        //Добавление кастомных тэгов
+        foreach ( $this->simpleEntities as $Entity )
+        {
+            $OutputXml->addEntity( $Entity );
+        }
+//debug( $OutputXml );
+        return $OutputXml->show( $isEcho );
     }
 }

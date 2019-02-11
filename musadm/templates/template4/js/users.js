@@ -37,7 +37,9 @@ $(function(){
         .on("click", ".popop_user_submit", function(e){
             e.preventDefault();
             loaderOn();
-            userSave(refreshUserTable);
+            userSave(function(response){
+                refreshUserTable();
+            });
         })
         //Добавление пользователя в архив
         .on("click", ".user_archive", function(){
@@ -296,8 +298,9 @@ function userSave(func) {
             else
             {
                 if( $("#createData").valid() )
-                    saveData("User", function(func){
-                        refreshUserTable();
+                    saveData("User", function(response){
+                        func(response);
+                        //refreshUserTable();
                     });
                 else
                     loaderOff();
