@@ -76,9 +76,17 @@ class User_Controller
     /**
      * Указатель на показ панели с кнопками
      *
-     * @var bool
+     * @var int
      */
-    private $isShowButtons = true;
+    private $isActiveBtnPanel = 1;
+
+
+    /**
+     * Указатель на активность кнопки экспорта пользователей
+     *
+     * @var int
+     */
+    private $isActiveExportBtn = 1;
 
 
     /**
@@ -179,12 +187,39 @@ class User_Controller
 
 
     /**
-     * @param bool $isShowButtons
+     * @param bool $isActiveBtnPanel
      * @return User_Controller
      */
-    public function isShowButtons( bool $isShowButtons )
+    public function isActiveBtnPanel( bool $isActiveBtnPanel )
     {
-        $this->isShowButtons = $isShowButtons;
+        if ( $isActiveBtnPanel === true )
+        {
+            $this->isActiveBtnPanel = 1;
+        }
+        elseif ( $isActiveBtnPanel === false )
+        {
+            $this->isActiveBtnPanel = 0;
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @param bool $isActiveExportBtn
+     * @return User_Controller
+     */
+    public function isActiveExportBtn( bool $isActiveExportBtn )
+    {
+        if ( $isActiveExportBtn === true )
+        {
+            $this->isActiveExportBtn = 1;
+        }
+        elseif ( $isActiveExportBtn === false )
+        {
+            $this->isActiveExportBtn = 0;
+        }
+
         return $this;
     }
 
@@ -515,7 +550,6 @@ class User_Controller
             /**
              * Поиск значений доп. свойств пользователей
              */
-            //debug( $this->Groups );
             foreach ( $this->Groups as $Group )
             {
                 foreach ( $Group['properties'] as $GroupProperty )
@@ -552,7 +586,6 @@ class User_Controller
             }
         }//Конец работы с доп. свойствами
 
-
         return $Users;
     }
 
@@ -567,9 +600,9 @@ class User_Controller
         $OutputXml = Core::factory( 'Core_Entity' )
             ->addSimpleEntity( 'wwwroot', $CFG->rootdir )
             ->addSimpleEntity( 'table-type', $this->tableType )
-            ->addEntities( 
-                $this->getUsers() 
-            )
+            ->addSimpleEntity( 'active-btn-panel', $this->isActiveBtnPanel )
+            ->addSImpleEntity( 'active-export-btn', $this->isActiveExportBtn )
+            ->addEntities( $this->getUsers() )
             ->addEntities( 
                 Core::factory( 'Schedule_Area' )->getList() 
             )
@@ -591,9 +624,9 @@ class User_Controller
 
 
         //Условие вывода панели с кнопками
-        $this->isShowButtons === true
-            ?   $OutputXml->addSimpleEntity( 'buttons-panel', '1' )
-            :   $OutputXml->addSimpleEntity( 'buttons-panel', '0' );
+//        $this->isShowButtons === true
+//            ?   $OutputXml->addSimpleEntity( 'buttons-panel', '1' )
+//            :   $OutputXml->addSimpleEntity( 'buttons-panel', '0' );
 
 
         //Добавление кастомных тэгов
@@ -601,7 +634,7 @@ class User_Controller
         {
             $OutputXml->addEntity( $Entity );
         }
-//debug( $OutputXml );
+
         return $OutputXml->show( $isEcho );
     }
 }

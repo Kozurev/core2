@@ -36,13 +36,14 @@
         <!-- </xsl:if> -->
 
 
-        <xsl:if test="buttons-panel = 1">
+        <xsl:if test="active-btn-panel = 1">
             <!-- <xsl:if test="count(buttons_row) = 0 or buttons_row != 0"> -->
                 <div class="row buttons-panel">
                     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                         <a href="#" class="btn btn-{page-theme-color} user_create" data-usergroup="5">Создать пользователя</a>
                     </div>
-                    <xsl:if test="disable-export-button != 1">
+                    <xsl:value-of select="disable-export-button" />
+                    <xsl:if test="active-export-btn = 1">
                         <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                             <a href="client?action=export" class="btn btn-{page-theme-color}">Экспорт в Excel</a>
                         </div>
