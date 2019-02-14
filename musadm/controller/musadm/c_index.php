@@ -9,36 +9,51 @@
 global $CFG;
 $User = User::current();
 $this->css( '/templates/template6/css/style.css' );
-
+Core::factory( 'User_Controller' );
 
 /**
  * Список директоров
  */
 if( User::checkUserAccess( ['groups' => [1]], $User ) )
 {
-    $Directors = Core::factory( 'User')
-        ->queryBuilder()
-        ->where( 'active', '=', 1 )
-        ->where( 'group_id', '=', 6 )
-        ->findAll();
+    $DirectorController = new User_Controller( User::current() );
+    $DirectorController
+        ->properties( [29, 30, 33] )
+        ->groupId( 6 )
+        ->isSubordinate( false )
+        ->addSimpleEntity( 'page-theme-color', 'green' )
+        ->xsl( 'musadm/users/directors.xsl' );
 
-    foreach ( $Directors as $Director )
-    {
-        $city = Core::factory( 'Property', 29 )->getPropertyValues( $Director )[0];
-        $organization = Core::factory( 'Property', 30 )->getPropertyValues( $Director )[0];
-        $link = Core::factory( 'Property', 33 )->getPropertyValues( $Director )[0];
-        $Director->addEntity( $city, 'property_value' );
-        $Director->addEntity( $organization, 'property_value' );
-        $Director->addEntity( $link, 'property_value' );
-    }
+    $DirectorController->queryBuilder()
+        ->orderBy( 'User.id', 'ASC' );
 
     echo "<div class='users'>";
-        Core::factory( 'Core_Entity' )
-            ->addSimpleEntity( 'wwwroot', $CFG->rootdir )
-            ->addEntities( $Directors )
-            ->xsl( 'musadm/users/directors.xsl' )
-            ->show();
+    $DirectorController->show();
     echo "</div>";
+
+//    $Directors = Core::factory( 'User')
+//        ->queryBuilder()
+//        ->where( 'active', '=', 1 )
+//        ->where( 'group_id', '=', 6 )
+//        ->findAll();
+//
+//    foreach ( $Directors as $Director )
+//    {
+//        $city = Core::factory( 'Property', 29 )->getPropertyValues( $Director )[0];
+//        $organization = Core::factory( 'Property', 30 )->getPropertyValues( $Director )[0];
+//        $link = Core::factory( 'Property', 33 )->getPropertyValues( $Director )[0];
+//        $Director->addEntity( $city, 'property_value' );
+//        $Director->addEntity( $organization, 'property_value' );
+//        $Director->addEntity( $link, 'property_value' );
+//    }
+//
+//    echo "<div class='users'>";
+//        Core::factory( 'Core_Entity' )
+//            ->addSimpleEntity( 'wwwroot', $CFG->rootdir )
+//            ->addEntities( $Directors )
+//            ->xsl( 'musadm/users/directors.xsl' )
+//            ->show();
+//    echo "</div>";
 }
 
 
@@ -69,37 +84,12 @@ if( User::checkUserAccess( ['groups' => [2]], $User ) )
         ->isSubordinate( true )
         ->isLimitedAreasAccess( true )
         ->addSimpleEntity( 'taskAfterAction', 'tasks' );
-
-
-    //TODO: Перенести данный статический HTML код в отдельный XSL шаблон
     ?>
+
     <div class="dynamic-fixed-row">
-        <div class="row searching-row">
-            <form action="." method="GET" id="search_client">
-                <div class="right col-md-1">
-                    <h4>Поиск клиента</h4>
-                </div>
-                <div class="col-md-2">
-                    <input type="text" id="surname" class="form-control" placeholder="Фамилия" />
-                </div>
-                <div class="col-md-2">
-                    <input type="text" id="name" class="form-control" placeholder="Имя" />
-                </div>
-                <div class="col-md-2">
-                    <input type="text" id="phone" class="form-control" placeholder="Телефон" />
-                </div>
-                <input type="hidden" name="canceled" value="1">
-                <div class="col-md-1">
-                    <input type="submit" class="btn btn-green" value="Поиск" />
-                </div>
-                <div class="col-md-2">
-                    <a href="#" class="btn btn-red" id="user_search_clear">Очистить</a>
-                </div>
-                <div class="col-md-2">
-                    <a href="#" class="btn btn-primary user_create" data-usergroup="5">Создать</a>
-                </div>
-            </form>
-        </div>
+        <?Core::factory( 'Core_Entity' )
+            ->xsl( 'musadm/users/search-form.xsl' )
+            ->show(); ?>
     </div>
 
     <div class="row">
@@ -111,9 +101,9 @@ if( User::checkUserAccess( ['groups' => [2]], $User ) )
             <?$TaskController->show();?>
         </div>
     </div>
+
+
     <?
-
-
     /**
      * Список действий менеджера
      * доступен только директорам

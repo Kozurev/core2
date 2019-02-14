@@ -38,10 +38,10 @@ elseif ( $groupId == 4 )
 
 $ClientController = new User_Controller( User::current() );
 $ClientController
-    ->active( true )
     ->properties( $propertiesIds )
     ->tableType( User_Controller::TABLE_ACTIVE )
     ->groupId( $groupId )
+    ->isShowCount( true )
     ->addSimpleEntity( 'page-theme-color', 'primary' )
     ->xsl( $xsl )
     ->show();

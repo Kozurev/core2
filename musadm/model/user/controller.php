@@ -30,6 +30,14 @@ class User_Controller
 
 
     /**
+     * Количество найденых пользователей
+     *
+     * @var int
+     */
+    private $countUsers = 0;
+
+
+    /**
      * В выборке учавствуют только пользователи принадлежащие той же организации что и
      * авторизованный пользователь пользователь
      *
@@ -87,6 +95,14 @@ class User_Controller
      * @var int
      */
     private $isActiveExportBtn = 1;
+
+
+    /**
+     * Указатель на отображение количества выводимых пользователей
+     *
+     * @var int
+     */
+    private $isShowCount = 0;
 
 
     /**
@@ -152,8 +168,19 @@ class User_Controller
     public function __construct( User $User = null )
     {
         $this->User = $User;
-        $this->UserQuery = Core::factory( 'User' )->queryBuilder();
-        //$this->tableType = self::TABLE_ACTIVE;
+
+        $this->UserQuery = Core::factory( 'User' )->queryBuilder()
+            ->select( ['User.id', 'User.name', 'User.surname', 'phone_number', 'email', 'group_id'] )
+            ->orderBy( 'User.id', 'DESC' );
+    }
+
+
+    /**
+     * @return Orm
+     */
+    public function queryBuilder()
+    {
+        return $this->UserQuery;
     }
 
 
@@ -218,6 +245,25 @@ class User_Controller
         elseif ( $isActiveExportBtn === false )
         {
             $this->isActiveExportBtn = 0;
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @param bool $isShowCount
+     * @return User_Controller
+     */
+    public function isShowCount( bool $isShowCount )
+    {
+        if ( $isShowCount === true )
+        {
+            $this->isShowCount = 1;
+        }
+        elseif ( $isShowCount === false )
+        {
+            $this->isShowCount = 0;
         }
 
         return $this;
@@ -363,6 +409,15 @@ class User_Controller
 
 
     /**
+     * @return int
+     */
+    public function count()
+    {
+        return $this->countUsers;
+    }
+
+
+    /**
      * Поиск пользователей по указанным параметрам
      */
     public function getUsers()
@@ -371,8 +426,6 @@ class User_Controller
          * Добавление условия выборки пользователей принадлежащих той же организации что и текущий пользователь
          * Также этот параметр будет использоваться для выборки филиалов
          */
-        //$subordinated = 0;
-
         if ( $this->User !== null && $this->isSubordinate === true )
         {
             $subordinated = $this->User->getDirector()->getId();
@@ -458,14 +511,9 @@ class User_Controller
             $this->UserQuery->whereIn( 'group_id', $this->groupIds );
         }
 
-        //Orm::Debug( true );
-        $Users = $this->UserQuery
-            ->select( ['User.id', 'User.name', 'User.surname', 'phone_number', 'email', 'group_id'] )
-            ->orderBy( 'User.id', 'DESC' )
-            ->findAll();
-        //Orm::Debug( false );
+        $Users = $this->UserQuery->findAll();
 
-        $countUsers = count( $Users );  //Кол-во найденных пользователей для последующих циклов
+        $this->countUsers = count( $Users );  //Кол-во найденных пользователей для последующих циклов
 
 
         /**
@@ -513,7 +561,7 @@ class User_Controller
             /**
              * Сопоставление id пользователей с группами, которым они принадлежат
              */
-            for ( $i = 0; $i < $countUsers; $i++ )
+            for ( $i = 0; $i < $this->countUsers; $i++ )
             {
                 $userIds[] = $Users[$i]->getId();
                 $this->Groups[$Users[$i]->groupId()]['groupUserIds'][] = $Users[$i]->getId();
@@ -536,7 +584,7 @@ class User_Controller
 
                 for ( $assignmentIndex = 0; $assignmentIndex < $countAssignments; $assignmentIndex++ )
                 {
-                    for ( $userIndex = 0; $userIndex < $countUsers; $userIndex++ )
+                    for ( $userIndex = 0; $userIndex < $this->countUsers; $userIndex++ )
                     {
                         if ( $Users[$userIndex]->getId() == $AreaAssignments[$assignmentIndex]->modelId() )
                         {
@@ -573,7 +621,7 @@ class User_Controller
                      */
                     for ( $valueIndex = 0; $valueIndex < $countValues; $valueIndex++ )
                     {
-                        for ( $userIndex = 0; $userIndex < $countUsers; $userIndex++ )
+                        for ( $userIndex = 0; $userIndex < $this->countUsers; $userIndex++ )
                         {
                             if ( $Users[$userIndex]->getId() == $PropertyValues[$valueIndex]->object_id() )
                             {
@@ -593,8 +641,6 @@ class User_Controller
 
     public function show( $isEcho = true )
     {
-        //TODO: Подгрузка списков значений доп. свойства типа "список"
-    
         global $CFG;
 
         $OutputXml = Core::factory( 'Core_Entity' )
@@ -602,6 +648,7 @@ class User_Controller
             ->addSimpleEntity( 'table-type', $this->tableType )
             ->addSimpleEntity( 'active-btn-panel', $this->isActiveBtnPanel )
             ->addSImpleEntity( 'active-export-btn', $this->isActiveExportBtn )
+            ->addSimpleEntity( 'show-count-users', $this->isShowCount )
             ->addEntities( $this->getUsers() )
             ->addEntities( 
                 Core::factory( 'Schedule_Area' )->getList() 
