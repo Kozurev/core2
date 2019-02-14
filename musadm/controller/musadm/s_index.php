@@ -65,9 +65,105 @@ $subordinated = $Director->getId();
 
 
 /**
+ *
+ */
+if ( $action === 'getPropertyListPopup' )
+{
+    $propId = Core_Array::Get( 'prop_id', null );
+
+    if ( $propId === null )
+    {
+        Core_Page_Show::instance()->error( 404 );
+    }
+
+
+    $Property = Core::factory( 'Property', $propId );
+
+    if ( $Property === null )
+    {
+        Core_Page_Show::instance()->error( 404 );
+    }
+
+
+    $Values = $Property->getList();
+
+    Core::factory( 'Core_Entity' )
+        ->addEntity( $Property )
+        ->addEntities( $Values )
+        ->xsl( 'musadm/edit_property_list.xsl' )
+        ->show();
+
+    exit;
+}
+
+
+/**
+ * Сохранение элемента списка дополнительного свойства
+ */
+if ( $action === 'savePropertyListValue' )
+{
+    $id =     Core_Array::Get( 'id', 0 );
+    $propId = Core_Array::Get( 'prop_id', null );
+    $value =  Core_Array::Get( 'value', null );
+
+    if ( $propId === null || $value === null || $propId <= 0 || $value == '' )
+    {
+        Core_Page_Show::instance()->error( 404 );
+    }
+
+    $NewValue = Core::factory( 'Property_List_Values', $id );
+
+    if ( $NewValue === null )
+    {
+        Core_Page_Show::instance()->error( 404 );
+    }
+
+    $NewValue
+        ->property_id( $propId )
+        ->value( $value )
+        ->sorting( 0 );
+    $NewValue->save();
+
+    $returnJson = new stdClass();
+    $returnJson->id = $NewValue->getId();
+    $returnJson->propertyId = $propId;
+    $returnJson->value = $value;
+
+    echo json_encode( $returnJson );
+    exit;
+}
+
+
+/**
+ * Удаление элемента списка дополнения свйоства
+ */
+if ( $action === 'deletePropertyListValue' )
+{
+    $id = Core_Array::Get( 'id', null );
+
+    if ( $id === null )
+    {
+        Core_Page_Show::instance()->error( 404 );
+    }
+
+
+    $PropertyListValue = Core::factory( 'Property_List_Values', $id );
+
+    if ( $PropertyListValue === null )
+    {
+        Core_Page_Show::instance()->error( 404 );
+    }
+
+    $PropertyListValue->delete();
+
+    exit;
+}
+
+
+/**
  * Обработчик для сохранения значения доп. свойства
  */
-if( $action === 'savePropertyValue' )
+if ( $action === 'savePropertyValue' )
 {
     $propertyName = Core_Array::Get( 'prop_name', null );
     $propertyValue= Core_Array::Get( 'value', null );
@@ -75,13 +171,15 @@ if( $action === 'savePropertyValue' )
     $modelName =    Core_Array::Get( 'model_name', null );
 
     $Property = Core::factory( 'Property' )->getByTagName( $propertyName );
-    if( $Property === null )
+
+    if ( $Property === null )
     {
         exit ( 'Свойство с названием ' . $propertyName . ' не существует' );
     }
 
     $Object = Core::factory( $modelName, $modelId );
-    if( !is_object( $Object ) || $Object->getId() == 0 )
+
+    if ( !is_object( $Object ) || $Object->getId() == 0 )
     {
         exit ( "Объекта класса $modelName с id $modelId не существует" );
     }
@@ -91,7 +189,6 @@ if( $action === 'savePropertyValue' )
 
     exit;
 }
-
 
 
 /**
@@ -135,14 +232,44 @@ if( $action === 'search_client' )
     $name    = Core_Array::Get( 'name', null );
     $phone   = Core_Array::Get( 'phone', null );
 
-    $User = Core::factory( 'User' )->queryBuilder()
+    $User = Core::factory( 'User' );
+    $User->queryBuilder()
         ->where( 'group_id', '=', 5 )
         ->where( 'subordinated', '=', $subordinated )
         ->where( 'active', '=', 1 );
 
-    if( !is_null( $surname ) )      $User->where( 'surname', 'LIKE', "%$surname%" );
-    if( !is_null( $name ) )         $User->where( 'name', 'LIKE', "%$name%" );
-    if( !is_null( $phone ) )        $User->where( 'phone_number', 'LIKE', "%$phone%" );
+    if( !is_null( $surname ) )
+    {
+        $User->queryBuilder()
+            ->open()
+                ->where( 'surname', 'LIKE', "%$surname%" )
+                ->orWhere( 'surname', 'LIKE', "$surname%" )
+                ->orWhere( 'surname', 'LIKE', "%$surname" )
+                ->orWhere( 'surname', '=', $surname )
+            ->close();
+    }
+
+    if( !is_null( $name ) )
+    {
+        $User->queryBuilder()
+            ->open()
+                ->where( 'name', 'LIKE', "%$name%" )
+                ->orWhere( 'name', 'LIKE', "$name%" )
+                ->orWhere( 'name', 'LIKE', "%$name" )
+                ->orWhere( 'name', '=', $name )
+            ->close();
+    }
+
+    if( !is_null( $phone ) )
+    {
+        $User->queryBuilder()
+            ->open()
+                ->where( 'phone_number', 'LIKE', "%$phone%" )
+                ->orWhere( 'phone_number', 'LIKE', "$phone%" )
+                ->orWhere( 'phone_number', 'LIKE', "%$phone" )
+                ->orWhere( 'phone_number', '=', $phone )
+            ->close();
+    }
 
     $Users = $User->findAll();
 
@@ -162,9 +289,9 @@ if( $action === 'search_client' )
         echo "<div class='users'>";
         Core::factory( 'Core_Entity' )
             ->addSimpleEntity( 'page-theme-color', 'green' )
-            ->addSimpleEntity( 'buttons_row', '0' )
+            ->addSimpleEntity( 'active-btn-panel', '0' )
             ->addSimpleEntity( 'wwwroot', $CFG->rootdir )
-            ->addSimpleEntity( 'table_type', 'active' )
+            ->addSimpleEntity( 'table-type', 'active' )
             ->addEntities( $Users )
             ->xsl( 'musadm/users/clients.xsl' )
             ->show();

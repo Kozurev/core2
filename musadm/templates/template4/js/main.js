@@ -184,34 +184,3 @@ function savePayment(userid, value, description, description2, type, url, func) 
         }
     });
 }
-
-
-/**
- * Сохранение значения дополнительного свойства объекта
- *
- * @param prop_name  - tag_name дополнительного свойства
- * @param value      - значение
- * @param model_name - название объекта к которому задается значение
- * @param model_id   - id объекта к которому задается значение
- * @param func       - исполняемая функция после выполнения запроса
- */
-function savePropertyValue( prop_name, value, model_name, model_id, func )
-{
-    $.ajax({
-        type: "GET",
-        url: root + "/",
-        data: {
-            ajax: 1,
-            action: "savePropertyValue",
-            prop_name: prop_name,
-            value: value,
-            model_name: model_name,
-            model_id: model_id
-        },
-        success: function(responce){
-            if( responce != "" )    alert("Ошибка: " + responce);
-            if(typeof func === "function") func();
-            loaderOff();
-        }
-    });
-}
