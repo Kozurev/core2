@@ -1,7 +1,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <div class="row areas-popup">
+        <div class="row popup-row-block areas-popup">
             <div class="col-md-5">
                 <h4>Список филиалов:</h4>
                 <select id="areas-list" class="form-control" multiple="multiple" size="6">

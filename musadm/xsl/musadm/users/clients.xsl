@@ -37,19 +37,23 @@
 
 
         <xsl:if test="active-btn-panel = 1">
-            <!-- <xsl:if test="count(buttons_row) = 0 or buttons_row != 0"> -->
-                <div class="row buttons-panel">
-                    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                        <a href="#" class="btn btn-{page-theme-color} user_create" data-usergroup="5">Создать пользователя</a>
-                    </div>
-                    <xsl:value-of select="disable-export-button" />
-                    <xsl:if test="active-export-btn = 1">
-                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                            <a href="client?action=export" class="btn btn-{page-theme-color}">Экспорт в Excel</a>
-                        </div>
-                    </xsl:if>
+            <div class="row buttons-panel">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <a href="#" class="btn btn-{page-theme-color} user_create" data-usergroup="5">Создать пользователя</a>
                 </div>
-            <!-- </xsl:if> -->
+
+                <xsl:if test="active-export-btn = 1">
+                    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                        <a href="client?action=export" class="btn btn-{page-theme-color}">Экспорт в Excel</a>
+                    </div>
+                </xsl:if>
+
+                <xsl:if test="show-count-users = 1">
+                    <div class="col-lg-1 col-md-2 col-sm-3 col-xs-4">
+                        <span>Всего:</span><span><xsl:value-of select="count(user)" /></span>
+                    </div>
+                </xsl:if>
+            </div>
         </xsl:if>
 
 

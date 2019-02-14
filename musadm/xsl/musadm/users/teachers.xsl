@@ -6,15 +6,25 @@
 
     <xsl:template match="root">
 
-        <!-- <xsl:if test="is_director = 1"> -->
-            <h2>Список преподавателей</h2>
+        <h2>Список преподавателей</h2>
 
+        <xsl:if test="active-btn-panel = 1">
             <div class="row buttons-panel">
                 <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                     <a class="btn btn-primary user_create" data-usergroup="4">Создать пользователя</a>
                 </div>
+
+                <div class="col-lg-2 col-md-4 col-sm-4 col-xs-6">
+                    <a href="#" class="btn btn-primary edit_property_list" data-prop-id="20">Инструмент</a>
+                </div>
+
+                <xsl:if test="show-count-users = 1">
+                    <div class="col-lg-1 col-md-2 col-sm-3 col-xs-4">
+                        <span>Всего:</span><span><xsl:value-of select="count(user)" /></span>
+                    </div>
+                </xsl:if>
             </div>
-        <!-- </xsl:if> -->
+        </xsl:if>
 
         <div class="table-responsive">
             <table id="sortingTable" class="table table-striped">

@@ -139,7 +139,7 @@ $(function(){
 
             $.ajax({
                 type: "GET",
-                url: "",
+                url: root + "/user/client",
                 dataType: 'json',
                 data: {
                     action: "getLidData",

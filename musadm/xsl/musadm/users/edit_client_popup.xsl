@@ -163,7 +163,7 @@
                 </label>
             </div>
 
-            <xsl:if test="user/id = ''">
+            <xsl:if test="user/id = '0'">
                 <hr style="margin: 10px 0px" />
                 <div class="column get_lid_data_row">
                     <span>Данные из лида:</span>

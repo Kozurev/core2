@@ -88,7 +88,7 @@
         </form>
 
         <script>
-            $(".masked-phone").mask("+7(999) 999-9999");
+            $(".masked-phone").mask("+7(999) 999-99-99");
         </script>
     </xsl:template>
 

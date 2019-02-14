@@ -305,7 +305,7 @@ header {
 
 .buttons-panel div {
     margin-bottom: 10px;
-    padding-left: 0px;
+    padding-left: 0;
     padding-right: 14px;
     float: none;
     display: inline-block;
@@ -313,6 +313,10 @@ header {
 
 .buttons-panel div a {
     width: 100%;
+}
+
+.buttons-panel span {
+    font-weight: bold;
 }
 
 .tasks .buttons-panel {
