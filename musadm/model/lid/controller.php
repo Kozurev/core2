@@ -130,7 +130,18 @@ class Lid_Controller
     public function __construct( User $User = null )
     {
         $this->User = $User;
-        $this->LidQuery = Core::factory( 'Lid' )->queryBuilder();
+
+        $this->LidQuery = Core::factory( 'Lid' )->queryBuilder()
+            ->orderBy( 'Lid.id', 'DESC' );
+    }
+
+
+    /**
+     * @return Orm
+     */
+    public function queryBuilder()
+    {
+        return $this->LidQuery;
     }
 
 
@@ -358,8 +369,6 @@ class Lid_Controller
 
         $Lids = $this->LidQuery
             ->leftJoin( 'Lid_Status', 'Lid_Status.id = Lid.status_id' )
-            //>orderBy( 'Lid_Status.sorting', 'DESC' )
-            ->orderBy( 'Lid.id', 'DESC' )
             ->findAll();
 
 

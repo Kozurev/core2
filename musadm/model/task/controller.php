@@ -131,10 +131,23 @@ class Task_Controller
 
 
 
+
     public function __construct( User $CurrentUser = null )
     {
         $this->User = $CurrentUser;
-        $this->TaskQuery = Core::factory( 'Task' )->queryBuilder();
+
+        $this->TaskQuery = Core::factory( 'Task' )->queryBuilder()
+            ->orderBy( 'Task_Priority.priority', 'DESC' )
+            ->orderBy( 'associate' );
+    }
+
+
+    /**
+     * @return Orm
+     */
+    public function queryBuilder()
+    {
+        return $this->TaskQuery;
     }
 
 
@@ -384,8 +397,6 @@ class Task_Controller
 
         $Tasks = $this->TaskQuery
             ->leftJoin( 'Task_Priority', 'Task_Priority.id = Task.priority_id' )
-            ->orderBy( 'Task_Priority.priority', 'DESC' )
-            ->orderBy( 'associate' )
             ->findAll();
 
 
