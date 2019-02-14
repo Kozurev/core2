@@ -461,6 +461,7 @@ class Property extends Property_Model
         return $List->queryBuilder()
             ->where( 'property_id', '=', $this->id )
             ->orderBy( 'sorting' )
+            ->orderBy( 'id', 'DESC' )
             ->findAll();
 
     }

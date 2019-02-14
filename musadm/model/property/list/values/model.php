@@ -9,43 +9,70 @@ class Property_List_Values_Model extends Core_Entity
     protected $sorting = 0;
     protected $subordinated = 0;
 
-	public function getId(){
-		return $this->id;}
+	public function getId()
+    {
+		return intval( $this->id );
+    }
 
 
-	public function property_id($val = null)
+	public function property_id( $val = null )
 	{
-		if(is_null($val))   return $this->property_id;
+		if ( is_null( $val ) )
+        {
+            return intval( $this->property_id );
+        }
 
-		$this->property_id = intval($val);
+		$this->property_id = intval( $val );
 		return $this;
 	}
 
+	public function propertyId( $val = null )
+    {
+        if ( is_null( $val ) )
+        {
+            return intval( $this->property_id );
+        }
 
-	public function value($val = null)
+        $this->property_id = intval( $val );
+        return $this;
+    }
+
+	public function value( $val = null )
 	{
-		if(is_null($val))   return $this->value;
+		if ( is_null( $val ) )
+        {
+            return $this->value;
+        }
 
-		if(strlen($val) > 100)
-		    die(Core::getMessage("TOO_LARGE_VALUE", array("value", "Property_List_Values", 100)));
+		if ( strlen( $val ) > 100 )
+        {
+            die( Core::getMessage( 'TOO_LARGE_VALUE', ['value', 'Property_List_Values', 100] ) );
+        }
 
 		$this->value = $val;
 		return $this;
 	}
 
 
-    public function sorting($val = null)
+    public function sorting( $val = null )
     {
-        if(is_null($val))	return $this->sorting;
-        //if(!is_int($val))   die(Core::getMessage("INVALID_TYPE", array("sorting", "Property_Values", "int")));
-        $this->sorting = intval($val);
+        if ( is_null( $val ) )
+        {
+            return intval( $this->sorting );
+        }
+
+        $this->sorting = intval( $val );
         return $this;
     }
 
 
     public function subordinated( $val = null )
     {
-        if( is_null( $val ) )   return $this->subordinated;
+        if ( is_null( $val ) )
+        {
+            return $this->subordinated;
+        }
+
         $this->subordinated = intval( $val );
         return $this;
     }
