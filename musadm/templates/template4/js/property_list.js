@@ -1,47 +1,61 @@
 $(function(){
 
     $('body')
+
+        /**
+         * Открытие всплывающего окна редактирования скписка доп. свйоства
+         */
         .on('click', '.edit_property_list', function(e){
             e.preventDefault();
             var propertyId = $(this).data('prop-id');
             getPropertyListPopup(propertyId);
         })
+
+        /**
+         * Сохранение значения списка - создание / редактирование
+         */
         .on('click', '#property_list_save', function(e){
             e.preventDefault();
-            var id = $(this).data('id');
-            var propId = $(this).data('prop-id');
-            var value = $('#property_list_value').val();
 
-            $('.btn-cancel-block').css('display', 'none');
+            var
+                id = $(this).data('id'),
+                propId = $(this).data('prop-id'),
+                value = $('#property_list_value').val(),
+                saveBtn = $('#property_list_save'),
+                canselBtn = $('.btn-cancel-block'),
+                itemsList = $('#property_list_select'),
+                valueInput = $('#property_list_value');
 
-            savePropertyListValue(id, propId, value, function(response){
-                var select = $('#property_list_select');
+            canselBtn.css('display', 'none');
 
-                $('#property_list_value').val('');
+            savePropertyListValue(id, propId, value, function(response) {
+                valueInput.val('');
 
                 //Создание нового элемента
-                if($('#property_list_save').data('id') == 0)
+                if(saveBtn.data('id') == 0)
                 {
-                    var previousOptions = select.html();
-                    select.html(
+                    var previousOptions = itemsList.html();
+                    itemsList.html(
                         '<option value="' + response.id + '"' +
                         ' data-prop-id="' + response.propertyId + '">' +
                         response.value + '</option>'
                     );
-                    select.append(previousOptions);
+                    itemsList.append(previousOptions);
                 }
                 //Редаткирование предыдущего
                 else
                 {
-                    var id = $('#property_list_save').data('id');
-
-                    $('#property_list_save').data('id', 0);
-
-                    var editingOption = select.find('option[value='+id+']');
+                    var id = saveBtn.data('id');
+                    var editingOption = itemsList.find('option[value='+id+']');
+                    saveBtn.data('id', 0);
                     editingOption.text(response.value);
                 }
             });
         })
+
+        /**
+         * Удаление выбранных элементов доп. свойства
+         */
         .on('click', '#property_list_delete', function(e){
             e.preventDefault();
             var options = $('#property_list_select').find("option:selected");
@@ -52,7 +66,7 @@ $(function(){
 
             $.each(options, function(key, option){
                 deletePropertyListValue($(option).val(), function(response){
-                    if (response != '')
+                    if(response != '')
                     {
                         alert(response);
                     }
@@ -61,16 +75,26 @@ $(function(){
                 });
             });
         })
+
+        /**
+         * Редактирование элемента списка доп. свойства
+         */
         .on('click', '#property_list_edit', function(e){
             e.preventDefault();
-            var option = $('#property_list_select').find("option:selected")[0];
-            var id = $(option).val();
-            var value = $(option).text();
+
+            var
+                option = $('#property_list_select').find("option:selected")[0],
+                id = $(option).val(),
+                value = $(option).text();
 
             $('.btn-cancel-block').css('display', 'inline-block');
             $('#property_list_save').data('id', id);
             $('#property_list_value').val(value);
         })
+
+        /**
+         * Отмена редактирования элемента доп свйоства
+         */
         .on('click', '#property_list_cancel', function(e){
             e.preventDefault();
             $('#property_list_save').data('id', 0);
@@ -97,8 +121,11 @@ function deletePropertyListValue(id, callback)
             action: 'deletePropertyListValue',
             id: id
         },
-        success: function(response){
-            callback(response);
+        success: function(response) {
+            if(typeof callback === 'function')
+            {
+                callback(response);
+            }
         }
     });
 }
@@ -125,8 +152,11 @@ function savePropertyListValue(id, propertyId, value, callback)
             prop_id: propertyId,
             value: value
         },
-        success: function(response){
-            callback(response);
+        success: function(response) {
+            if(typeof callback === 'function')
+            {
+                callback(response);
+            }
         }
     });
 }
@@ -149,7 +179,7 @@ function getPropertyListPopup(propertyId)
             action: 'getPropertyListPopup',
             prop_id: propertyId
         },
-        success: function(response){
+        success: function(response) {
             showPopup(response);
             loaderOff();
         }
@@ -166,7 +196,7 @@ function getPropertyListPopup(propertyId)
  * @param model_id   - id объекта к которому задается значение
  * @param func       - исполняемая функция после выполнения запроса
  */
-function savePropertyValue( prop_name, value, model_name, model_id, func )
+function savePropertyValue(prop_name, value, model_name, model_id, func)
 {
     $.ajax({
         type: "GET",
@@ -179,9 +209,17 @@ function savePropertyValue( prop_name, value, model_name, model_id, func )
             model_name: model_name,
             model_id: model_id
         },
-        success: function(responce){
-            if( responce != "" )    alert("Ошибка: " + responce);
-            if(typeof func === "function") func();
+        success: function(responce) {
+            if(responce != '')
+            {
+                alert("Ошибка: " + responce);
+            }
+
+            if(typeof func === 'function')
+            {
+                func();
+            }
+
             loaderOff();
         }
     });
