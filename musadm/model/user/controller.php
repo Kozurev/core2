@@ -163,6 +163,13 @@ class User_Controller
     ];
 
 
+    /**
+     * Фильтр
+     *
+     * @var array|null
+     */
+    private $filter;
+
 
 
     public function __construct( User $User = null )
@@ -171,6 +178,7 @@ class User_Controller
 
         $this->UserQuery = Core::factory( 'User' )->queryBuilder()
             ->select( ['User.id', 'User.name', 'User.surname', 'phone_number', 'email', 'group_id'] )
+            ->from( Core::factory( 'User' )->getTableName() )
             ->orderBy( 'User.id', 'DESC' );
     }
 
@@ -286,7 +294,10 @@ class User_Controller
      */
     public function forAreas( array $Areas )
     {
-        $this->forAreas = [];
+        if ( $this->forAreas === null )
+        {
+            $this->forAreas = [];
+        }
 
         foreach ( $Areas as $Area )
         {
@@ -409,6 +420,18 @@ class User_Controller
 
 
     /**
+     * @param string $paramName
+     * @param $searchingValue
+     * @return User_Controller
+     */
+    public function appendFilter( string $paramName, $searchingValue )
+    {
+        $this->filter[$paramName][] = $searchingValue;
+        return $this;
+    }
+
+
+    /**
      * @return int
      */
     public function count()
@@ -453,6 +476,7 @@ class User_Controller
 
 
         /**
+         * Фильтр фо филиалам
          * Поиск только тех пользователей что принадлежат заданым филиалам
          * либо тем же филиалам что и текущий пользователь
          */
@@ -511,6 +535,75 @@ class User_Controller
             $this->UserQuery->whereIn( 'group_id', $this->groupIds );
         }
 
+
+        /**
+         * Фильтры
+         */
+        if ( $this->filter !== null )
+        {
+            $joins = [];    //Список присоедененных таблиц
+
+            foreach ( $this->filter as $paramName => $values )
+            {
+                //По доп. свойствам
+                if ( strpos( $paramName, 'property_' ) !== false )
+                {
+                    $propertyId = explode( 'property_', $paramName )[1];
+                    $Property = Core::factory( 'Property', $propertyId );
+
+                    if ( $Property === null )
+                    {
+                        continue;
+                    }
+
+                    $propTableName = 'Property_' . ucfirst( $Property->type() );
+                    $propTableSynonym = 'prop_' . $Property->type();
+                    $propColumn = $Property->type() == 'list'
+                        ?   $propTableSynonym . '.value_id'
+                        :   $propTableSynonym . '.value';
+
+                    if ( Core_Array::getValue( $joins, $propTableName, null ) == null )
+                    {
+                        $conditions = $propTableSynonym . '.object_id = User.id';
+                        $this->UserQuery->leftJoin( $propTableName . ' AS ' . $propTableSynonym, $conditions );
+                        $joins[$propTableName] = true;
+                    }
+
+
+                    $this->UserQuery
+                        ->open()
+                        ->where( $propTableSynonym . '.property_id', '=', $propertyId );
+
+                    if ( in_array( $Property->defaultValue(), $values ) )
+                    {
+                        $this->UserQuery
+                            ->open()
+                            ->where( $propColumn, 'is', 'NULL' )
+                            ->orWhereIn( $propColumn, $values )
+                            ->close();
+                    }
+                    else
+                    {
+                        $this->UserQuery->whereIn( $propColumn, $values );
+                    }
+
+                    $this->UserQuery->close();
+                    continue;
+                }
+
+                //По свойствам пользователя
+                if ( count( $values ) == 1 )
+                {
+                    $this->where( $paramName, '=', $values[0] );
+                }
+                elseif ( count( $values ) > 1 )
+                {
+                    $this->whereIn( $paramName, $values );
+                }
+            }
+        }
+
+
         $Users = $this->UserQuery->findAll();
 
         $this->countUsers = count( $Users );  //Кол-во найденных пользователей для последующих циклов
@@ -554,8 +647,7 @@ class User_Controller
             }
 
 
-            //Массив идентификаторов пользователей
-            $userIds = [];
+            $userIds = [];  //Массив идентификаторов пользователей
 
 
             /**
@@ -592,7 +684,7 @@ class User_Controller
                         }
                     }
                 }
-            }//
+            }
 
 
             /**
@@ -668,13 +760,6 @@ class User_Controller
 
             $OutputXml->addEntity( $Group['group'] );
         }
-
-
-        //Условие вывода панели с кнопками
-//        $this->isShowButtons === true
-//            ?   $OutputXml->addSimpleEntity( 'buttons-panel', '1' )
-//            :   $OutputXml->addSimpleEntity( 'buttons-panel', '0' );
-
 
         //Добавление кастомных тэгов
         foreach ( $this->simpleEntities as $Entity )
