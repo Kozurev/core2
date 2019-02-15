@@ -18,13 +18,13 @@ $(function(){
             e.preventDefault();
 
             var
-                id = $(this).data('id'),
-                propId = $(this).data('prop-id'),
-                value = $('#property_list_value').val(),
-                saveBtn = $('#property_list_save'),
-                canselBtn = $('.btn-cancel-block'),
-                itemsList = $('#property_list_select'),
-                valueInput = $('#property_list_value');
+                id =            $(this).data('id'),
+                propId =        $(this).data('prop-id'),
+                value =         $('#property_list_value').val(),
+                saveBtn =       $('#property_list_save'),
+                canselBtn =     $('.btn-cancel-block'),
+                itemsList =     $('#property_list_select'),
+                valueInput =    $('#property_list_value');
 
             canselBtn.css('display', 'none');
 
@@ -45,8 +45,10 @@ $(function(){
                 //Редаткирование предыдущего
                 else
                 {
-                    var id = saveBtn.data('id');
-                    var editingOption = itemsList.find('option[value='+id+']');
+                    var
+                        id =            saveBtn.data('id'),
+                        editingOption = itemsList.find('option[value='+id+']');
+
                     saveBtn.data('id', 0);
                     editingOption.text(response.value);
                 }
@@ -83,9 +85,9 @@ $(function(){
             e.preventDefault();
 
             var
-                option = $('#property_list_select').find("option:selected")[0],
-                id = $(option).val(),
-                value = $(option).text();
+                option =    $('#property_list_select').find("option:selected")[0],
+                id =        $(option).val(),
+                value =     $(option).text();
 
             $('.btn-cancel-block').css('display', 'inline-block');
             $('#property_list_save').data('id', id);

@@ -37,14 +37,46 @@ elseif ( $groupId == 4 )
 
 
 $ClientController = new User_Controller( User::current() );
+
 $ClientController
     ->properties( $propertiesIds )
     ->tableType( User_Controller::TABLE_ACTIVE )
     ->groupId( $groupId )
     ->isShowCount( true )
     ->addSimpleEntity( 'page-theme-color', 'primary' )
-    ->xsl( $xsl )
-    ->show();
+    ->xsl( $xsl );
+    //->show();
+
+
+foreach ( $_GET as $paramName => $values )
+{
+    if ( $paramName === 'areas' )
+    {
+        foreach ( $_GET['areas'] as $areaId )
+        {
+            $Area = Core::factory( 'Schedule_Area', $areaId );
+
+            if ( $areaId > 0 && $Area !== null )
+            {
+                $ClientController->forAreas( [$Area] );
+            }
+        }
+
+        continue;
+    }
+
+    if ( strpos( $paramName, 'property_' ) !== false )
+    {
+        foreach ( $_GET[$paramName] as $value )
+        {
+            $propId = explode( 'property_', $value )[0];
+            $ClientController->appendFilter( $paramName, $value );
+        }
+    }
+}
+
+$ClientController->show();
+
 
 // global $CFG;
 // $Property = Core::factory( "Property" );

@@ -498,6 +498,13 @@ if ( $action === 'deleteAreaAssignment' )
 }
 
 
+if ( $action === 'applyUserFilter' )
+{
+    Core_Page_Show::instance()->execute();
+    exit;
+}
+
+
 
 
 if( Core_Page_Show::instance()->StructureItem->getId() == 5 )

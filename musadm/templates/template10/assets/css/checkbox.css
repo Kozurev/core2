@@ -54,7 +54,8 @@
 /*input[type="checkbox"] {*/
 .checkbox-new {
     position: absolute;
-    left: -1000px;
+    /*left: -1000px;*/
+    visibility: hidden;
 }
 
 .tick {

@@ -230,11 +230,60 @@ $(function(){
             e.preventDefault();
             loaderOn();
             saveData("Main", function(response){ refreshUserTable(); });
+        })
+        .on('click', '#show-client-filter', function() {
+            var
+                form = $('#client-filter'),
+                i    = $(this).find('i');
+
+
+            if(form.css('display') == 'none')
+            {
+                i.css('transform', 'rotate(180deg)');
+                form.show('fast');
+            }
+            else
+            {
+                i.css('transform', 'none');
+                form.hide('fast');
+            }
+        })
+        .on('submit', '#client-filter', function(e){
+            e.preventDefault();
+            applyClientFilter($('#client-filter'), function(response) {
+                $(".users").html(response);
+            });
         });
 });
 
 
-function getObjectPopupInfo( id, model ) {
+function applyClientFilter(form, callback) {
+    loaderOn();
+
+    var
+        action =    form.attr('action'),
+        data =      form.serialize();
+
+
+    data += '&action=applyUserFilter';
+
+    $.ajax({
+        type: 'GET',
+        url: action,
+        data: data,
+        success: function(response) {
+            if(typeof callback === 'function')
+            {
+                callback(response);
+            }
+
+            loaderOff();
+        }
+    });
+}
+
+
+function getObjectPopupInfo(id, model) {
     loaderOn();
     $.ajax({
         url: root,
@@ -244,8 +293,8 @@ function getObjectPopupInfo( id, model ) {
             id: id,
             model: model
         },
-        success: function( responce ) {
-            showPopup( responce );
+        success: function(responce) {
+            showPopup(responce);
             loaderOff();
         }
     });
@@ -267,6 +316,7 @@ function searchClients( surname, name, phone ) {
         },
         success: function(response) {
             if( response == "" )    alert( "Пользователи с указаными параметрами не найдены" );
+
             $(".users").remove();
             $(".dynamic-fixed-row").find(".buttons-panel").remove();
             $(".dynamic-fixed-row").find(".table-responsive").remove();
