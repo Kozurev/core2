@@ -12,10 +12,10 @@
 $User = User::current();
 $access = ['groups' => [1, 2, 6]];
 
-if( $User === null )
+if ( $User === null )
 {
-    $host  = $_SERVER['HTTP_HOST'];
-    $uri   = rtrim( dirname( $_SERVER['PHP_SELF'] ), '/\\' );
+    $host  = Core_Array::Server( 'HTTP_HOST', '' );
+    $uri   = rtrim( dirname( Core_Array::Server( 'PHP_SELF', '' ) ), '/\\' );
     header( "Location: http://$host$uri/authorize?back=$host$uri/" );
     exit;
 }
@@ -24,8 +24,8 @@ if( $User === null )
 /**
  * Настроки редиректа
  */
-$host  = $_SERVER['HTTP_HOST'];
-$uri   = rtrim( dirname( $_SERVER['PHP_SELF'] ), '/\\' );
+$host  = Core_Array::Server( 'HTTP_HOST', '' );
+$uri   = rtrim( dirname( Core_Array::Server( 'PHP_SELF', '' ) ), '/\\' );
 
 
 Core_Page_Show::instance()->setParam( 'body-class', 'body-green' );
@@ -33,24 +33,24 @@ Core_Page_Show::instance()->setParam( 'title-first', 'ГЛАВНАЯ' );
 Core_Page_Show::instance()->setParam( 'title-second', 'СТРАНИЦА' );
 
 
-if( Core_Array::Get( 'ajax', null ) === null )
+if ( Core_Array::Get( 'ajax', null ) === null )
 {
-    if( !User::checkUserAccess( $access, $User ) )
+    if ( !User::checkUserAccess( $access, $User ) )
     {
         header( "Location: http://$host$uri/authorize?back=/$uri" );
     }
 
-    if( $User->groupId() == 6 )
+    if ( $User->groupId() == 6 )
     {
         header( "Location: http://$host$uri/user/client" );
     }
 
-    if( $User->groupId() == 5 )
+    if ( $User->groupId() == 5 )
     {
         header( "Location: http://$host$uri/balance" );
     }
 
-    if( $User->groupId() == 4 )
+    if ( $User->groupId() == 4 )
     {
         header( "Location: http://$host$uri/schedule" );
     }
@@ -63,13 +63,17 @@ $action = Core_Array::Get(  'action', null );
 $Director = $User->getDirector();
 $subordinated = $Director->getId();
 
+COre::factory( 'User_Controller' );
+Core::factory( 'Lid_Controller' );
+Core::factory( 'Task_Controller' );
+
 
 /**
  *
  */
 if ( $action === 'getPropertyListPopup' )
 {
-    $propId = Core_Array::Get( 'prop_id', null );
+    $propId = Core_Array::Get( 'prop_id', null, PARAM_INT );
 
     if ( $propId === null )
     {
@@ -102,16 +106,20 @@ if ( $action === 'getPropertyListPopup' )
  */
 if ( $action === 'savePropertyListValue' )
 {
-    $id =     Core_Array::Get( 'id', 0 );
-    $propId = Core_Array::Get( 'prop_id', null );
-    $value =  Core_Array::Get( 'value', null );
+    $id =     Core_Array::Get( 'id', 0, PARAM_INT );
+    $propId = Core_Array::Get( 'prop_id', null, PARAM_INT );
+    $value =  Core_Array::Get( 'value', null, PARAM_STRING );
 
     if ( $propId === null || $value === null || $propId <= 0 || $value == '' )
     {
         Core_Page_Show::instance()->error( 404 );
     }
 
-    $NewValue = Core::factory( 'Property_List_Values', $id );
+    $NewValue = Core::factory( 'Property_List_Values' )
+        ->queryBuilder()
+        ->where( 'id', '=', $id )
+        ->where( 'subordinated', '=', $subordinated )
+        ->find();
 
     if ( $NewValue === null )
     {
@@ -139,7 +147,7 @@ if ( $action === 'savePropertyListValue' )
  */
 if ( $action === 'deletePropertyListValue' )
 {
-    $id = Core_Array::Get( 'id', null );
+    $id = Core_Array::Get( 'id', null, PARAM_INT );
 
     if ( $id === null )
     {
@@ -147,7 +155,11 @@ if ( $action === 'deletePropertyListValue' )
     }
 
 
-    $PropertyListValue = Core::factory( 'Property_List_Values', $id );
+    $PropertyListValue = Core::factory( 'Property_List_Values' )
+        ->queryBuilder()
+        ->where( 'id', '=', $id )
+        ->where( 'subordinated', '=', $subordinated )
+        ->find();
 
     if ( $PropertyListValue === null )
     {
@@ -165,10 +177,10 @@ if ( $action === 'deletePropertyListValue' )
  */
 if ( $action === 'savePropertyValue' )
 {
-    $propertyName = Core_Array::Get( 'prop_name', null );
-    $propertyValue= Core_Array::Get( 'value', null );
-    $modelId =      Core_Array::Get( 'model_id', null );
-    $modelName =    Core_Array::Get( 'model_name', null );
+    $propertyName = Core_Array::Get( 'prop_name', null, PARAM_STRING );
+    $propertyValue= Core_Array::Get( 'value', null, PARAM_FLOAT );
+    $modelId =      Core_Array::Get( 'model_id', null, PARAM_INT );
+    $modelName =    Core_Array::Get( 'model_name', null, PARAM_STRING );
 
     $Property = Core::factory( 'Property' )->getByTagName( $propertyName );
 
@@ -177,7 +189,11 @@ if ( $action === 'savePropertyValue' )
         exit ( 'Свойство с названием ' . $propertyName . ' не существует' );
     }
 
-    $Object = Core::factory( $modelName, $modelId );
+    $Object = Core::factory( $modelName )
+        ->queryBuilder()
+        ->where( 'id', '=', $modelId )
+        ->where( 'subordinated', '=', $subordinated )
+        ->find();
 
     if ( !is_object( $Object ) || $Object->getId() == 0 )
     {
@@ -194,13 +210,12 @@ if ( $action === 'savePropertyValue' )
 /**
  * Обновление таблицы лидов
  */
-if( $action == 'refreshLidTable' )
+if ( $action == 'refreshLidTable' )
 {
-    Core::factory( 'Lid_Controller' );
     $LidController = new Lid_Controller( $User );
     $LidController
         ->lidId(
-            Core_Array::Get( 'lidid', null )
+            Core_Array::Get( 'lidid', null, PARAM_INT )
         )
         ->isShowPeriods( false )
         ->show();
@@ -214,7 +229,6 @@ if( $action == 'refreshLidTable' )
  */
 if( $action === 'refreshTasksTable' )
 {
-    Core::factory( 'Task_Controller' );
     $TaskController = new Task_Controller( User::current() );
     $TaskController
         ->isShowPeriods( false )
@@ -226,75 +240,43 @@ if( $action === 'refreshTasksTable' )
 }
 
 
-if( $action === 'search_client' )
+if ( $action === 'search_client' )
 {
-    $surname = Core_Array::Get( 'surname', null );
-    $name    = Core_Array::Get( 'name', null );
-    $phone   = Core_Array::Get( 'phone', null );
+    $surname = Core_Array::Get( 'surname', null, PARAM_STRING );
+    $name    = Core_Array::Get( 'name', null, PARAM_STRING );
+    $phone   = Core_Array::Get( 'phone', null, PARAM_STRING );
 
-    $User = Core::factory( 'User' );
-    $User->queryBuilder()
-        ->where( 'group_id', '=', 5 )
-        ->where( 'subordinated', '=', $subordinated )
-        ->where( 'active', '=', 1 );
+    $ClientController = new User_Controller( User::current() );
+    $ClientController
+        ->isSubordinate( true )
+        ->filterType( User_Controller::FILTER_NOT_STRICT )
+        ->isActiveBtnPanel( false )
+        ->groupId( 5 )
+        ->properties( true )
+        ->isLimitedAreasAccess( true )
+        ->xsl( 'musadm/users/clients.xsl' );
 
-    if( !is_null( $surname ) )
+    if ( !is_null( $surname ) )
     {
-        $User->queryBuilder()
-            ->open()
-                ->where( 'surname', 'LIKE', "%$surname%" )
-                ->orWhere( 'surname', 'LIKE', "$surname%" )
-                ->orWhere( 'surname', 'LIKE', "%$surname" )
-                ->orWhere( 'surname', '=', $surname )
-            ->close();
+        $ClientController->appendFilter( 'surname', $surname );
     }
 
-    if( !is_null( $name ) )
+    if ( !is_null( $name ) )
     {
-        $User->queryBuilder()
-            ->open()
-                ->where( 'name', 'LIKE', "%$name%" )
-                ->orWhere( 'name', 'LIKE', "$name%" )
-                ->orWhere( 'name', 'LIKE', "%$name" )
-                ->orWhere( 'name', '=', $name )
-            ->close();
+        $ClientController->appendFilter( 'name', $name );
     }
 
-    if( !is_null( $phone ) )
+    if ( !is_null( $phone ) )
     {
-        $User->queryBuilder()
-            ->open()
-                ->where( 'phone_number', 'LIKE', "%$phone%" )
-                ->orWhere( 'phone_number', 'LIKE', "$phone%" )
-                ->orWhere( 'phone_number', 'LIKE', "%$phone" )
-                ->orWhere( 'phone_number', '=', $phone )
-            ->close();
+        $ClientController->appendFilter( 'phone_number', $phone );
     }
 
-    $Users = $User->findAll();
+    $SearchingClientsHtml = $ClientController->show( false );
 
-    if( count( $Users ) !== 0 )
+    if ( $ClientController->count() > 0 )
     {
-        $UserGroup = Core::factory( 'User_Group', 5 );
-        $PropertiesList = Core::factory( 'Property' )->getPropertiesList( $UserGroup );
-
-        foreach ( $Users as $User )
-        {
-            foreach ( $PropertiesList as $prop )
-            {
-                $User->addEntities( $prop->getPropertyValues( $User ), 'property_value' );
-            }
-        }
-
         echo "<div class='users'>";
-        Core::factory( 'Core_Entity' )
-            ->addSimpleEntity( 'page-theme-color', 'green' )
-            ->addSimpleEntity( 'active-btn-panel', '0' )
-            ->addSimpleEntity( 'wwwroot', $CFG->rootdir )
-            ->addSimpleEntity( 'table-type', 'active' )
-            ->addEntities( $Users )
-            ->xsl( 'musadm/users/clients.xsl' )
-            ->show();
+        echo $SearchingClientsHtml;
         echo "</div>";
     }
 
@@ -302,14 +284,18 @@ if( $action === 'search_client' )
 }
 
 
-if( $action === 'getObjectInfoPopup' )
+if ( $action === 'getObjectInfoPopup' )
 {
-    $id =     Core_Array::Get( 'id', 0 );
-    $model =  Core_Array::Get( 'model', '' );
+    $id =     Core_Array::Get( 'id', 0, PARAM_INT );
+    $model =  Core_Array::Get( 'model', '', PARAM_STRING );
 
-    $Object = Core::factory( $model, $id );
+    $Object = Core::factory( $model )
+        ->queryBuilder()
+        ->where( 'id', '=', $id )
+        ->where( 'subordinated', '=', $subordinated )
+        ->find();
 
-    if( $Object === null )
+    if ( $Object === null )
     {
         exit ( "<h2>Объект с переданными данными не найден или был удален</h2>" );
     }
@@ -320,7 +306,6 @@ if( $action === 'getObjectInfoPopup' )
     switch ( $model )
     {
         case 'Task' :
-            Core::factory( 'Task_Controller' );
             $TaskController = new Task_Controller( User::current() );
             $TaskController
                 ->isShowPeriods( false )
@@ -332,7 +317,6 @@ if( $action === 'getObjectInfoPopup' )
             exit;
 
         case 'Lid' :
-            Core::factory( 'Lid_Controller' );
             $LidController = new Lid_Controller( User::current() );
             $LidController
                 ->isShowPeriods( false )
@@ -347,12 +331,12 @@ if( $action === 'getObjectInfoPopup' )
             $Object->sellDate( refactorDateFormat( $Object->sellDate() ) );
             $Object->activeTo( refactorDateFormat( $Object->activeTo() ) );
 
-            $Notes = Core::factory( "Certificate_Note" )->queryBuilder()
-                ->select( [ "certificate_id", "author_id", "date", "text", "surname", "name"] )
-                ->where( "certificate_id", "=", $id )
-                ->leftJoin( "User AS u", "u.id = author_id" )
-                ->orderBy( "date", "DESC" )
-                ->orderBy( "Certificate_Note.id", "DESC" )
+            $Notes = Core::factory( 'Certificate_Note' )->queryBuilder()
+                ->select( [ 'certificate_id', 'author_id', 'date', 'text', 'surname', 'name'] )
+                ->where( 'certificate_id', '=', $id )
+                ->leftJoin( 'User AS u', 'u.id = author_id' )
+                ->orderBy( 'date', 'DESC' )
+                ->orderBy( 'Certificate_Note.id', 'DESC' )
                 ->findAll();
 
             foreach ( $Notes as $Note )
@@ -360,7 +344,7 @@ if( $action === 'getObjectInfoPopup' )
                 $Note->date( refactorDateFormat( $Note->date() ) );
             }
 
-            $Output->addEntities( $Notes, "note" );
+            $Output->addEntities( $Notes, 'note' );
             break;
 
         default: echo "<h2>Ошибка: отсутствует обработчик для модели '". $model ."'</h2>";
@@ -374,7 +358,7 @@ if( $action === 'getObjectInfoPopup' )
 }
 
 
-if( $action === "refreshTableUsers" )
+if ( $action === 'refreshTableUsers' )
 {
     Core_Page_Show::instance()->execute();
     exit;

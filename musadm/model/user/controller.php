@@ -4,13 +4,19 @@
  *
  * @author Egor
  * @date 03.02.2019 20:13
+ * @version 20190218
+ * Class User_Controller
  */
-
 class User_Controller
 {
 
+    //Тип таблиц пользователей
     const TABLE_ACTIVE = 'active';
     const TABLE_ARCHIVE = 'archive';
+
+    //Тип фильтров
+    const FILTER_STRICT = 'strict';
+    const FILTER_NOT_STRICT = 'not-strict';
 
 
     /**
@@ -164,11 +170,25 @@ class User_Controller
 
 
     /**
-     * Фильтр
+     * Список фильтров по типу ключ - название свойства => значение - искомое згначение
      *
      * @var array|null
      */
     private $filter;
+
+
+    /**
+     * Тип фильтрации: мягкий или строгий
+     * Мягкая фильтрация - частичное совпадение существующего и искомого значения
+     * Строгая фильтрация - полное совпадение существующего и искомого значения
+     * Свойство принимает только значение одной из констант с префиксом 'FILTER_'
+     *
+     * TODO: для значений доп. свойств пока что применяется только строгая фильтрация. Надо бы потом поправить
+     *
+     * @var string
+     */
+    private $filterType = self::FILTER_NOT_STRICT;
+
 
 
 
@@ -184,11 +204,69 @@ class User_Controller
 
 
     /**
+     * Кастомная фабрика для пользователей
+     *
+     * @param int|null $id
+     * @param bool $isSubordinate
+     * @return User|null
+     */
+    public static function factory( int $id = null, bool $isSubordinate = true )
+    {
+        if ( is_null( $id ) )
+        {
+            return Core::factory( 'User' );
+        }
+
+        $ResUser = Core::factory( 'User' )
+            ->queryBuilder()
+            ->where( 'id', '=', $id );
+
+        if ( $isSubordinate === true )
+        {
+            $AuthUser = User::current();
+
+            if ( is_null( $AuthUser ) )
+            {
+                return null;
+            }
+
+            $Director = $AuthUser->getDirector();
+
+            if ( is_null( $Director ) )
+            {
+                return null;
+            }
+
+            $ResUser->where( 'subordinated', '=', $Director->getId() );
+        }
+
+        return $ResUser->find();
+    }
+
+
+    /**
      * @return Orm
      */
     public function queryBuilder()
     {
         return $this->UserQuery;
+    }
+
+
+    /**
+     * Метод добавления в окончательный XML различных простых тэгов
+     *
+     * @param string $entityName - название тэга
+     * @param string $entityValue - значение тэга
+     * @return User_Controller
+     */
+    public function addSimpleEntity( string $entityName, string $entityValue )
+    {
+        $this->simpleEntities[] = Core::factory( 'Core_Entity' )
+            ->_entityName( $entityName )
+            ->_entityValue( $entityValue );
+
+        return $this;
     }
 
 
@@ -317,23 +395,6 @@ class User_Controller
 
 
     /**
-     * Метод добавления в окончательный XML различных простых тэгов
-     *
-     * @param string $entityName - название тэга
-     * @param string $entityValue - значение тэга
-     * @return User_Controller
-     */
-    public function addSimpleEntity( string $entityName, string $entityValue )
-    {
-        $this->simpleEntities[] = Core::factory( 'Core_Entity' )
-            ->_entityName( $entityName )
-            ->_entityValue( $entityValue );
-
-        return $this;
-    }
-
-
-    /**
      * @param string $xslPath
      * @return User_Controller
      */
@@ -427,6 +488,26 @@ class User_Controller
     public function appendFilter( string $paramName, $searchingValue )
     {
         $this->filter[$paramName][] = $searchingValue;
+        return $this;
+    }
+
+
+    /**
+     * @param string $filterType
+     * @return User_Controller
+     */
+    public function filterType( string $filterType )
+    {
+        $existingTypes = [
+            self::FILTER_STRICT,
+            self::FILTER_NOT_STRICT
+        ];
+
+        if ( !in_array( $filterType, $existingTypes ) )
+        {
+            $this->filterType = $filterType;
+        }
+
         return $this;
     }
 
@@ -594,11 +675,48 @@ class User_Controller
                 //По свойствам пользователя
                 if ( count( $values ) == 1 )
                 {
-                    $this->where( $paramName, '=', $values[0] );
+                    if ( $this->filterType === self::FILTER_STRICT )
+                    {
+                        $this->UserQuery->where( $paramName, '=', $values[0] );
+                    }
+                    elseif ( $this->filterType === self::FILTER_NOT_STRICT )
+                    {
+                        $this->UserQuery
+                            ->open()
+                                ->where( $paramName, 'LIKE', "%$values[0]%" )
+                                ->orWhere( $paramName, 'LIKE', "$values[0]%" )
+                                ->orWhere( $paramName, 'LIKE', "%$values[0]" )
+                                ->orWhere( $paramName, '=', $values[0] )
+                            ->close();
+                    }
                 }
                 elseif ( count( $values ) > 1 )
                 {
-                    $this->whereIn( $paramName, $values );
+                    if ( $this->filterType === self::FILTER_STRICT )
+                    {
+                        $this->UserQuery->whereIn( $paramName, $values );
+                    }
+                    elseif ( $this->filterType === self::FILTER_NOT_STRICT )
+                    {
+                        for ( $i = 0; $i < count( $values ); $i++ )
+                        {
+                            if ( $i === 0 )
+                            {
+                                $this->UserQuery
+                                    ->open()
+                                    ->where( $paramName, '=', $values[$i] );
+                            }
+                            else
+                            {
+                                $this->UserQuery
+                                    ->orWhere( $paramName, 'LIKE', "%$values[$i]%" )
+                                    ->orWhere( $paramName, 'LIKE', "$values[$i]%" )
+                                    ->orWhere( $paramName, 'LIKE', "%$values[$i]" );
+                            }
+                        }
+
+                        $this->UserQuery->close();
+                    }
                 }
             }
         }

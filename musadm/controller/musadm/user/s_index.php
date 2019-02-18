@@ -10,6 +10,11 @@
 $Director = User::current()->getDirector();
 $subordinated = $Director->getId();
 
+Core::factory( 'User_Controller' );
+Core::factory( 'Lid_Controller' );
+Core::factory( 'Schedule_Area_Controller' );
+
+
 /**
  *	Блок проверки авторизации
  */
@@ -30,42 +35,42 @@ $action = Core_Array::Get( 'action', null );
  */
 if ( $action == 'updateFormClient' )
 {
-    $userId = Core_Array::Get( 'userid', 0 );
+    $userId = Core_Array::Get( 'userid', 0, PARAM_INT );
     $output = Core::factory( 'Core_Entity' );
 
     if ( $userId )
     {
-        $PaymentUser = Core::factory( 'User', $userId );
+        $Client = User_Controller::factory( $userId );
 
-        if ( $PaymentUser === null )
+        if ( $Client === null )
         {
             exit ( Core::getMessage( 'NOT_FOUND', ['Пользователь', $userId] ) );
         }
 
-        if ( !User::isSubordinate( $PaymentUser, $User ) )
+        if ( !User::isSubordinate( $Client, $User ) )
         {
             exit ( Core::getMessage( 'NOT_SUBORDINATE', ['Пользователь', $userId] ) );
         }
 
 
-        $AreaAssignments = Core::factory( 'Schedule_Area_Assignment' )->getAssignments( $PaymentUser );
+        $AreaAssignments = Core::factory( 'Schedule_Area_Assignment' )->getAssignments( $Client );
 
         if ( count( $AreaAssignments ) > 0 )
         {
-            $PaymentUser->addSimpleEntity( 'area_id', $AreaAssignments[0]->areaId() );
+            $Client->addSimpleEntity( 'area_id', $AreaAssignments[0]->areaId() );
         }
 
 
-        $Properties[] = Core::factory( 'Property', 16 )->getPropertyValues( $PaymentUser )[0];    //Доп. телефон
-        $Properties[] = Core::factory( 'Property', 9  )->getPropertyValues( $PaymentUser )[0];    //Ссылка вк
-        $Properties[] = Core::factory( 'Property', 17 )->getPropertyValues( $PaymentUser )[0];    //Длительность урока
-        $Properties[] = Core::factory( 'Property', 18 )->getPropertyValues( $PaymentUser )[0];    //Соглашение подписано
-        $Properties[] = Core::factory( 'Property', 28 )->getPropertyValues( $PaymentUser )[0];    //Год рождения
-        $Properties =   array_merge( $Properties, Core::factory( 'Property', 21 )->getPropertyValues( $PaymentUser) );   //Учителя
+        $Properties[] = Core::factory( 'Property', 16 )->getPropertyValues( $Client )[0];    //Доп. телефон
+        $Properties[] = Core::factory( 'Property', 9  )->getPropertyValues( $Client )[0];    //Ссылка вк
+        $Properties[] = Core::factory( 'Property', 17 )->getPropertyValues( $Client )[0];    //Длительность урока
+        $Properties[] = Core::factory( 'Property', 18 )->getPropertyValues( $Client )[0];    //Соглашение подписано
+        $Properties[] = Core::factory( 'Property', 28 )->getPropertyValues( $Client )[0];    //Год рождения
+        $Properties =   array_merge( $Properties, Core::factory( 'Property', 21 )->getPropertyValues( $Client) );   //Учителя
     }
     else
     {
-        $PaymentUser = Core::factory( 'User' );
+        $Client = User_Controller::factory();
 
         $Properties[] =   Core::factory( 'Property_Int' )
             ->value(
@@ -73,27 +78,14 @@ if ( $action == 'updateFormClient' )
             );
     }
 
+    $Areas = Core::factory( 'Schedule_Area' )->getList();
 
-    $Areas = Core::factory( 'Schedule_Area' )->getList( true );
-
-    $PropertyLists = Core::factory( 'Property_List_Values' )
-        ->queryBuilder()
-        ->where( 'subordinated', '=', $subordinated )
-        ->where( 'property_id', '=', 21 )
-        ->orderBy( 'value' )
-        ->findAll();
-
-    $PropertyLists = array_merge( $PropertyLists,
-        Core::factory( 'Property_List_Values' )
-            ->queryBuilder()
-            ->where( 'subordinated', '=', $subordinated )
-            ->where( 'property_id', '=', 15 )
-            ->orderBy( 'sorting' )
-            ->findAll()
-    );
+    $PropertyLists = Core::factory( 'Property' )
+        ->getByTagName( 'teachers' )
+        ->getList();
 
     $output
-        ->addEntity( $PaymentUser )
+        ->addEntity( $Client )
         ->addEntities( $Areas, 'areas' )
         ->addEntities( $Properties, 'property_value' )
         ->addEntities( $PropertyLists, 'property_list' )
@@ -109,12 +101,12 @@ if ( $action == 'updateFormClient' )
  */
 if ( $action == 'updateFormTeacher' )
 {
-    $userId = Core_Array::Get( 'userid', 0 );
+    $userId = Core_Array::Get( 'userid', 0, PARAM_INT );
     $output = Core::factory( 'Core_Entity' );
 
     if ( $userId != 0 )
     {
-        $Teacher = Core::factory( 'User', $userId );
+        $Teacher = User_Controller::factory( $userId );
 
         if ( $Teacher === null )
         {
@@ -128,14 +120,13 @@ if ( $action == 'updateFormTeacher' )
     }
     else
     {
-        $Teacher = Core::factory( 'User' );
+        $Teacher = User_Controller::factory();
     }
 
-    $PropertyLists =  Core::factory( 'Property_List_Values' )->queryBuilder()
-        ->where( 'property_id', '=', 20 )
-        ->where( 'subordinated', "=", $subordinated )
-        ->orderBy( 'sorting' )
-        ->findAll();
+
+    $PropertyLists = Core::factory( 'Property' )
+        ->getByTagName( 'instrument' )
+        ->getList();
 
     $output
         ->addEntity( $Teacher )
@@ -152,12 +143,12 @@ if ( $action == 'updateFormTeacher' )
  */
 if ( $action == 'updateFormDirector' )
 {
-    $userId = Core_Array::Get( 'userid', 0 );
+    $userId = Core_Array::Get( 'userid', 0, PARAM_INT );
     $output = Core::factory( 'Core_Entity' );
 
     if ( $userId != 0 )
     {
-        $Director = Core::factory( 'User', $userId );
+        $Director = User_Controller::factory( $userId, false );
 
         if ( $Director === null )
         {
@@ -174,7 +165,7 @@ if ( $action == 'updateFormDirector' )
     }
     else
     {
-        $Director = Core::factory( 'User' );
+        $Director = User_Controller::factory();
     }
 
     $output
@@ -191,12 +182,12 @@ if ( $action == 'updateFormDirector' )
  */
 if ( $action == 'updateFormManager' )
 {
-    $userId = Core_Array::Get( 'userid', 0 );
+    $userId = Core_Array::Get( 'userid', 0, PARAM_INT );
     $output = Core::factory( 'Core_Entity' );
 
-    if( $userId != 0 )
+    if ( $userId != 0 )
     {
-        $Manager = Core::factory( 'User', $userId );
+        $Manager = User_Controller::factory( $userId );
 
         if ( $Director === null )
         {
@@ -205,7 +196,7 @@ if ( $action == 'updateFormManager' )
     }
     else
     {
-        $Manager = Core::factory( 'User' );
+        $Manager = User_Controller::factory();
     }
 
     $output
@@ -232,16 +223,16 @@ if ( $action == 'refreshTableUsers' )
  */
 if ( $action == 'getPaymentPopup' )
 {
-    $userId = Core_Array::Get( 'userid', 0 );
-    $PaymentUser = Core::factory( 'User', $userId );
+    $userId =   Core_Array::Get( 'userid', 0, PARAM_INT );
+    $User =     User_Controller::factory( $userId );
 
-    if ( $PaymentUser === null )
+    if ( $User === null )
     {
         exit ( Core::getMessage( 'NOT_FOUND', ['Пользователь', $userId] ) );
     }
 
     Core::factory( 'Core_Entity' )
-        ->addEntity( $PaymentUser )
+        ->addEntity( $User )
         ->addSimpleEntity( 'function', 'clients' )
         ->xsl( 'musadm/users/balance/edit_payment_popup.xsl' )
         ->show();
@@ -255,10 +246,10 @@ if ( $action == 'getPaymentPopup' )
  */
 if ( $action == 'savePayment' )
 {
-    $userId =       Core_Array::Get( 'userid', 0 );
-    $value  =       Core_Array::Get( 'value', 0 );
-    $description =  Core_Array::Get( 'description', '' );
-    $type =         Core_Array::Get( 'type', 0 );
+    $userId =       Core_Array::Get( 'userid', 0, PARAM_INT );
+    $value  =       Core_Array::Get( 'value', 0, PARAM_FLOAT );
+    $description =  Core_Array::Get( 'description', '', PARAM_STRING );
+    $type =         Core_Array::Get( 'type', 0, PARAM_INT );
 
     $Payment = Core::factory( 'Payment' )
         ->user( $userId )
@@ -268,9 +259,9 @@ if ( $action == 'savePayment' )
     $Payment->save();
 
     //Корректировка баланса ученика
-    $PaymentUser = Core::factory( 'User', $userId );
+    $User = User_Controller::factory( $userId );
 
-    if ( $PaymentUser === null )
+    if ( $User === null )
     {
         exit ( Core::getMessage( 'NOT_FOUND', ['Пользователь', $userId] ) );
     }
@@ -296,12 +287,12 @@ if ( $action == 'savePayment' )
  */
 if ( $action == 'checkLoginExists' )
 {
-    $userId = Core_Array::Get( 'userid', 0 );
-    $login = Core_Array::Get( 'login', '' );
+    $userId =   Core_Array::Get( 'userid', 0, PARAM_INT );
+    $login =    Core_Array::Get( 'login', '', PARAM_STRING );
 
-    if( $login == "" )
+    if ( $login == '' )
     {
-        exit ( "Логин не может быть пустым" );
+        exit ( 'Логин не может быть пустым' );
     }
 
     $User = Core::factory(  'User' )
@@ -310,7 +301,7 @@ if ( $action == 'checkLoginExists' )
         ->where( 'login', '=', $login )
         ->find();
 
-    if( $User !== null )
+    if ( $User !== null )
     {
         exit ( 'Пользователь с таким логином уже существует' );
     }
@@ -320,7 +311,7 @@ if ( $action == 'checkLoginExists' )
 
 
 /**
- * Экспорт пользователей в Excell
+ * Экспорт пользователей в Excel
  */
 if ( $action === 'export' )
 {
@@ -329,23 +320,11 @@ if ( $action === 'export' )
     header( 'Content-type: application/vnd.ms-excel' );
     header( 'Content-Disposition: attachment; filename=demo.xls' );
 
-    $Users = Core::factory( 'User' )
-        ->queryBuilder()
-        ->select( ['name', 'surname', 'phone_number'] )
-        ->where( 'group_id', '=', 5 )
-        ->where( 'phone_number', '<>', '' )
-        ->where( 'active', '=', 1 )
-        ->findAll();
-
-    foreach ( $Users as $User )
-    {
-        $Property = Core::factory( 'Property', 16 );
-        $Numbers = $Property->getPropertyValues( $User );
-        $User->addEntities( $Numbers, 'numbers' );
-    }
-
-    Core::factory( 'Core_Entity' )
-        ->addEntities( $Users )
+    Core::factory( 'User_Controller' );
+    $ClientController = new User_Controller( User::current() );
+    $ClientController
+        ->properties( [16] )
+        ->groupId( 5 )
         ->xsl( 'musadm/users/export.xsl' )
         ->show();
 
@@ -358,16 +337,16 @@ if ( $action === 'export' )
  */
 if ( $action === 'getLidData' )
 {
-    $lidId = Core_Array::Get( 'lidid', 0 );
+    $lidId = Core_Array::Get( 'lidid', 0, PARAM_INT );
 
     if ( $lidId == 0 )
     {
         exit ( Core::getMessage( 'EMPTY_GET_PARAM', ['идентификатор лида'] ) );
     }
 
-    $Lid = Core::factory( 'Lid', $lidId );
+    $Lid = Lid_Controller::factory( $lidId );
 
-    if( $Lid === null )
+    if ( $Lid === null )
     {
         exit ( Core::getMessage( 'NOT_FOUND', ['Лид', $lidId] ) );
     }
@@ -389,12 +368,12 @@ if ( $action === 'getLidData' )
  */
 if ( $action === 'showAssignmentsPopup' )
 {
-    $modelId =   Core_Array::Get( 'model_id', 0 );
-    $modelName = Core_Array::Get( 'model_name', '' );
+    $modelId =   Core_Array::Get( 'model_id', 0, PARAM_INT );
+    $modelName = Core_Array::Get( 'model_name', '', PARAM_STRING );
 
-    if ( $modelId <= 0 || $modelName == "" )
+    if ( $modelId <= 0 || $modelName == '' )
     {
-        Core_Page_Show::instance()->error404();
+        Core_Page_Show::instance()->error( 404 );
     }
 
     $Object = Core::factory( $modelName, $modelId );
@@ -410,9 +389,8 @@ if ( $action === 'showAssignmentsPopup' )
     }
 
 
-    $AreasList = Core::factory( 'Schedule_Area' )->getList( true );
+    $AreasList = Core::factory( 'Schedule_Area' )->getList();
     $AreaAssignments = Core::factory( 'Schedule_Area_Assignment' )->getAssignments( $Object );
-
 
     Core::factory( 'Core_Entity' )
         ->addSimpleEntity( 'model-id', $modelId )
@@ -431,9 +409,9 @@ if ( $action === 'showAssignmentsPopup' )
  */
 if ( $action === 'appendAreaAssignment' )
 {
-    $modelId =   Core_Array::Get( 'model_id', 0 );
-    $modelName = Core_Array::Get( 'model_name', '' );
-    $areaId =    Core_Array::Get( 'area_id', 0 );
+    $modelId =   Core_Array::Get( 'model_id', 0, PARAM_INT );
+    $modelName = Core_Array::Get( 'model_name', '', PARAM_STRING );
+    $areaId =    Core_Array::Get( 'area_id', 0, PARAM_INT );
 
     if ( $modelId <= 0 || $modelName == '' || $areaId <= 0 )
     {
@@ -448,11 +426,13 @@ if ( $action === 'appendAreaAssignment' )
         exit ( Core::getMessage( 'NOT_FOUND', [$modelName, $modelId] ) );
     }
 
+    if ( method_exists( $Object, 'subordinated' ) && $Object->subordinated() != $subordinated )
+    {
+        exit ( Core::getMessage( 'NOT_SUBORDINATE', [$modelName, $modelId] ) );
+    }
 
-    $Area = Core::factory( 'Schedule_Area' )->queryBuilder()
-        ->where( 'id', '=', $areaId )
-        ->where( 'subordinated', '=', $subordinated )
-        ->find();
+
+    $Area = Schedule_Area_Controller::factory( $areaId );
 
     if ( $Area === null )
     {
@@ -475,21 +455,25 @@ if ( $action === 'appendAreaAssignment' )
  */
 if ( $action === 'deleteAreaAssignment' )
 {
-    $modelId =   Core_Array::Get( 'model_id', 0 );
-    $modelName = Core_Array::Get( 'model_name', '' );
-    $areaId =    Core_Array::Get( 'area_id', 0 );
+    $modelId =   Core_Array::Get( 'model_id', 0, PARAM_INT );
+    $modelName = Core_Array::Get( 'model_name', '', PARAM_STRING );
+    $areaId =    Core_Array::Get( 'area_id', 0, PARAM_INT );
 
     if ( $modelId <= 0 || $modelName == '' || $areaId <= 0 )
     {
-        Core_Page_Show::instance()->error404();
+        Core_Page_Show::instance()->error( 404 );
     }
-
 
     $Object = Core::factory( $modelName, $modelId );
 
     if ( $Object === null )
     {
         exit ( Core::getMessage( 'NOT_FOUND', [$modelName, $modelId] ) );
+    }
+
+    if ( method_exists( $Object, 'subordinated' ) && $Object->subordinated() != $subordinated )
+    {
+        exit ( Core::getMessage( 'NOT_SUBORDINATE', [$modelName, $modelId] ) );
     }
 
 
@@ -507,7 +491,7 @@ if ( $action === 'applyUserFilter' )
 
 
 
-if( Core_Page_Show::instance()->StructureItem->getId() == 5 )
+if ( Core_Page_Show::instance()->StructureItem->getId() == 5 )
 {
     $title2 = 'КЛИЕНТОВ';
     $breadcumb = 'клиентов';
@@ -530,10 +514,10 @@ Core_Page_Show::instance()->setParam( 'breadcumbs', $breadcumbs );
 
 $title[] = Core_Page_Show::instance()->Structure->title();
 
-if( get_class( Core_Page_Show::instance()->StructureItem ) == 'User_Group' )
+if ( get_class( Core_Page_Show::instance()->StructureItem ) == 'User_Group' )
     $title[] = $this->StructureItem->title();
 
-if( get_class( Core_Page_Show::instance()->StructureItem) == 'User' )
+if ( get_class( Core_Page_Show::instance()->StructureItem) == 'User' )
     $title[] = $this->StructureItem->surname() . ' ' . $this->StructureItem->name();
 
 $this->title = array_pop( $title );
