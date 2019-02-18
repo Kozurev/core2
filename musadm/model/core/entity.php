@@ -1,9 +1,16 @@
 <?php
 /**
-*	Класс, реализующий XML-сущьности
-*	Простой тэг имеет значение и не может иметь вложенных XMK-сущьностей
-*	Сложный тэг не имеет значнеия но может иметь вложенные XML-сущьности
-*/
+ * Класс, реализующий методы для преобразования объектов в XML,
+ * парсинг сформированного XML документа XSL шаблоном и вывод результата
+ *
+ * Простой тэг имеет значение и не может иметь вложенных XML-сущьностей
+ * Сложный тэг не имеет значнеия но может иметь вложенные XML-сущьности
+ *
+ * @author Bad Wolf
+ * @date 02.08.2018
+ * @version 20190218
+ * Class Core_Entity
+ */
 class Core_Entity extends Core_Entity_Model
 {
 
@@ -12,12 +19,12 @@ class Core_Entity extends Core_Entity_Model
      */
     public function queryBuilder()
     {
-        if( is_null( $this->aEntityVars["orm"] ) )
+        if ( is_null( $this->aEntityVars['orm'] ) )
         {
-            $this->aEntityVars["orm"] = new Orm( $this );
+            $this->aEntityVars['orm'] = new Orm( $this );
         }
 
-        return $this->aEntityVars["orm"];
+        return $this->aEntityVars['orm'];
     }
 
 
@@ -48,7 +55,6 @@ class Core_Entity extends Core_Entity_Model
     }
 
 
-
     /**
      * Возвращает название таблицы для данного объекта
      *
@@ -56,7 +62,7 @@ class Core_Entity extends Core_Entity_Model
      */
     public function getTableName()
     {
-        if ( method_exists( $this, "databaseTableName" ) )
+        if ( method_exists( $this, 'databaseTableName' ) )
         {
             return $this->databaseTableName();
         }
@@ -116,7 +122,7 @@ class Core_Entity extends Core_Entity_Model
      */
     public function getModel()
     {
-        $modelClassName = get_class( $this ) . "_Model";
+        $modelClassName = get_class( $this ) . '_Model';
         $Model = Core::factory( $modelClassName );
 
         if ( !is_null( $Model ) )
@@ -167,14 +173,19 @@ class Core_Entity extends Core_Entity_Model
      */
 	protected function renameModelName( $inputName )
 	{
-		$aSegments = explode( "_", $inputName );
-		$outputName = "";
-
+		$aSegments = explode( '_', $inputName );
+		$outputName = '';
 
 		foreach ( $aSegments as $segment )
 		{
-			if( $outputName == "" ) $outputName .= lcfirst( $segment );
-			else $outputName .= "_" . lcfirst( $segment );
+			if( $outputName == '' )
+            {
+                $outputName .= lcfirst( $segment );
+            }
+			else
+            {
+                $outputName .= '_' . lcfirst( $segment );
+            }
 		}
 
 		return $outputName;
@@ -190,23 +201,31 @@ class Core_Entity extends Core_Entity_Model
      */
 	public function addEntity( $obj, $tag = null )
 	{
-	    if( !is_object( $obj ) )
+	    if ( !is_object( $obj ) )
         {
             return $this;
         }
 
-		if( !is_null( $tag ) )
+		if ( !is_null( $tag ) )
 		{
-		    if( method_exists( $obj,  "custom_tag" ) )
-			    $obj->custom_tag( $tag );
-            elseif( get_class( $obj ) == "stdClass" )
+		    if ( method_exists( $obj,  'custom_tag' ) )
+            {
+                $obj->custom_tag( $tag );
+            }
+            elseif ( get_class( $obj ) == 'stdClass' )
+            {
                 $obj->custom_tag = $tag;
+            }
 		}
 
-		if( $this->_entityValue() == "" )
-			$this->childrenObjects[] = $obj;
+		if ( $this->_entityValue() == '' )
+        {
+            $this->childrenObjects[] = $obj;
+        }
 		else
-			echo "Невозможно добавыить элемент к простой XML-сущьности";
+        {
+            echo 'Невозможно добавыить элемент к простой XML-сущьности';
+        }
 
 		return $this;
 	}
@@ -221,11 +240,14 @@ class Core_Entity extends Core_Entity_Model
      */
 	public function addEntities( $aoChildren, $tags = null )
 	{
-		if( is_array( $aoChildren ) && count( $aoChildren ) > 0 )
+		if ( is_array( $aoChildren ) && count( $aoChildren ) > 0 )
 
 		foreach ( $aoChildren as $oChild )
 		{
-			if( is_object( $oChild ) ) 	$this->addEntity( $oChild, $tags );
+			if ( is_object( $oChild ) )
+            {
+                $this->addEntity( $oChild, $tags );
+            }
 		}
 
 		return $this;
@@ -241,10 +263,13 @@ class Core_Entity extends Core_Entity_Model
      */
 	public function addSimpleEntity( $name, $value )
     {
-        if( $value === null )   $value = "";
+        if ( $value === null )
+        {
+            $value = '';
+        }
 
         $this->addEntity(
-            Core::factory("Core_Entity")
+            Core::factory( 'Core_Entity' )
                 ->_entityName( $name )
                 ->_entityValue( $value )
         );
@@ -254,117 +279,131 @@ class Core_Entity extends Core_Entity_Model
 
 
 	/**
-	*	Преобразование объекта в XML-сущьность
-	*	так же выполняется рекурсивное преобразование дочерних сущьностей
-	*	@param $obj - объект, который необходимо преобразовать в XML-сущьность
-	*	@param $xmlUbj - объект конечной XML-сущьности
-	*/
-	public function createEntity($obj, $xmlObj)
+	 * Преобразование объекта в XML-сущьность
+	 * так же выполняется рекурсивное преобразование дочерних сущьностей
+     *
+	 * @param $obj - объект, который необходимо преобразовать в XML-сущьность
+	 * @param $xmlUbj - объект конечной XML-сущьности
+     * @return DOMElement
+	 */
+	public function createEntity( $obj, $xmlObj )
 	{
 		$xml = $xmlObj;
 
 		//Формирование названия тэга
-		$tagName = "";
-		$objClass = explode("_", get_class($obj));
+//		$tagName = '';
+//		$objClass = explode( '_', get_class( $obj ) );
 
-		if(get_class($obj) == "Core_Entity")
+		if ( get_class( $obj ) == 'Core_Entity' )
 		{
-			if($obj->aEntityVars["value"] != "") 
-				//Формирование простого тэга
-				return $xml->createElement($obj->aEntityVars["name"], $obj->aEntityVars["value"]);
+			if ( $obj->aEntityVars['value'] != '' ) //Формирование простого тэга
+            {
+                return $xml->createElement( $obj->aEntityVars['name'], $obj->aEntityVars['value'] );
+            }
 			else 
-				$tagName = $obj->aEntityVars["name"];
+            {
+                $tagName = $obj->aEntityVars['name'];
+            }
 		}
 		else
 		{
-			if(isset($obj->aEntityVars["custom_tag"]) && $obj->aEntityVars["custom_tag"] != "")
+			if ( isset( $obj->aEntityVars['custom_tag'] ) && $obj->aEntityVars['custom_tag'] != '' )
 			{
-				$tagName = $obj->aEntityVars["custom_tag"];
+				$tagName = $obj->aEntityVars['custom_tag'];
 			}
-			elseif(isset($obj->custom_tag) && $obj->custom_tag != "")
+			elseif ( isset( $obj->custom_tag ) && $obj->custom_tag != '' )
             {
                 $tagName = $obj->custom_tag;
             }
-			else 	$tagName = $this->renameModelName(get_class($obj));
+			else
+            {
+                $tagName = $this->renameModelName( get_class( $obj ) );
+            }
 		}
 
 
 		//Создание тэга
-		$objTag = $xml->createElement($tagName);
+		$objTag = $xml->createElement( $tagName );
 		//Получение значений свойств от объекта
-		$objData = get_object_vars($obj);
+		$objData = get_object_vars( $obj );
 
-		/*
-		*	Преобразование объекта в XML сущьность
-		*/
-		foreach ($objData as $key => $val) 
+		/**
+		 * Преобразование объекта в XML сущьность
+		 */
+		foreach ( $objData as $key => $val )
 		{
-			if(is_array($val) && $key != "childrenObjects") continue;
+			if ( is_array( $val ) && $key != 'childrenObjects' )
+            {
+                continue;
+            }
 
 			//Если переменная представляет из себя массив дочерних сущьностей
-			if($key == "childrenObjects")
+			if ( $key == 'childrenObjects' )
 			{
-				foreach($val as $childObject)
+				foreach ( $val as $childObject )
 				{
-					$objChildTag = $this->createEntity($childObject, $xml);
-					$objTag->appendChild($objChildTag);
+					$objChildTag = $this->createEntity( $childObject, $xml );
+					$objTag->appendChild( $objChildTag );
 				}
 			}
-			elseif($val !== "" && !is_null($val))
+			elseif ( $val !== '' && !is_null( $val ) )
 			{
-				$objTag->appendChild($xml->createElement($key, strval($val)));
+				$objTag->appendChild( $xml->createElement( $key, strval( $val ) ) );
 			}
-			elseif( $val === "" || is_null( $val ) )
+			elseif ( $val === '' || is_null( $val ) )
             {
-                $objTag->appendChild($xml->createElement($key, ""));
+                $objTag->appendChild( $xml->createElement( $key, '' ) );
             }
 		}
-
-		/*
-		*	Добавление свойств в XML если необходимо
-		*/
-		//$objTag = $this->addProperties($objTag, $obj, $xml);
 		
 		return $objTag;
 	}
 
 
-	public function show()
+	public function show( $isEcho = true )
 	{
-		if($this->aEntityVars["xslPath"] == "") die("Не указан путь к XSL шаблону");
+		if ( $this->aEntityVars['xslPath'] == '' )
+        {
+            die ( 'Не указан путь к XSL шаблону' );
+        }
 
 		$xmlText = '<?xml version="1.0" encoding="utf-8"?>
-		<?xml-stylesheet type="text/xsl" href="'.$this->aEntityVars["xslPath"].'"?>';
+		<?xml-stylesheet type="text/xsl" href="' . $this->aEntityVars['xslPath'] . '"?>';
 
-		$xmlText .= '<'.$this->aEntityVars["name"].'></'.$this->aEntityVars["name"].'>';
+		$xmlText .= '<'.$this->aEntityVars['name'] . '></' . $this->aEntityVars['name'] . '>';
 
 		$xml = new DOMDocument();
-		$xml->loadXML($xmlText);
+		$xml->loadXML( $xmlText );
 
-		$rootTag = $xml->getElementsByTagName($this->aEntityVars["name"])->item(0);
+		$rootTag = $xml->getElementsByTagName( $this->aEntityVars['name'] )->item( 0 );
 
-		foreach ($this->childrenObjects as $obj) 
+		foreach ( $this->childrenObjects as $obj )
 		{
-			$rootTag->appendChild($this->createEntity($obj, $xml));
+			$rootTag->appendChild( $this->createEntity( $obj, $xml ) );
 		}
 
-		$xml->save("xml.xml");
+		$xml->save('xml.xml');
 
 		// Объект стиля
 		$xsl = new DOMDocument();
-		$xsl->load($this->aEntityVars["xslPath"]);  
+		$xsl->load( $this->aEntityVars['xslPath'] );
 
 		// Создание парсера
 		$proc = new XSLTProcessor();
 
 		// Подключение стиля к парсеру
-		$proc->importStylesheet($xsl);
+		$proc->importStylesheet( $xsl );
 
 		// Обработка парсером исходного XML-документа
-		$parsed = $proc->transformToXml($xml);
+		$parsed = $proc->transformToXml( $xml );
 
 		// Вывод результирующего кода
-		echo $parsed;	
+		if ( $isEcho === true )
+        {
+            echo $parsed;
+        }
+
+        return $parsed;
 	}
 
 
