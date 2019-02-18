@@ -11,13 +11,13 @@ Core::factory( 'Lid_Controller' );
 $LidController = new Lid_Controller( User::current() );
 $LidController
     ->periodFrom(
-        Core_Array::Get( "date_from", null )
+        Core_Array::Get( 'date_from', null, PARAM_STRING )
     )
     ->periodTo(
-        Core_Array::Get( "date_to", null )
+        Core_Array::Get( 'date_to', null, PARAM_STRING )
     )
     ->lidId(
-        Core_Array::Get( "lidid", null )
+        Core_Array::Get( 'lidid', null, PARAM_INT )
     )
     ->show();
 

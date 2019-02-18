@@ -32,6 +32,8 @@ if ( !User::checkUserAccess( $accessRules, $User ) )
 
 $action = Core_Array::Get( 'action', 0 );
 
+Core::factory( 'Lid_Controller' );
+
 
 if ( $action === 'refreshLidTable' )
 {
@@ -42,12 +44,12 @@ if ( $action === 'refreshLidTable' )
 
 if ( $action === 'add_note_popup' )
 {
-    $modelId = Core_Array::Get( 'model_id', 0 );
-    $Lid = Core::factory( 'Lid', $modelId );
+    $modelId = Core_Array::Get( 'model_id', 0, PARAM_INT );
+    $Lid = Lid_Controller::factory( $modelId );
 
     if ( $Lid === null )
     {
-        exit ( 'Не найден лид к которому добавляется комментарий. Обновите, пожалуйста, страницу' );
+        Core_Page_Show::instance()->error( 404 );
     }
 
     Core::factory( 'Core_Entity' )
@@ -60,18 +62,18 @@ if ( $action === 'add_note_popup' )
 
 if ( $action === 'save_lid' )
 {
-    $surname =  Core_Array::Get( 'surname', '' );
-    $name =     Core_Array::Get( 'name', '' );
-    $source =   Core_Array::Get( 'source', '' );
-    $number =   Core_Array::Get( 'number', '' );
-    $vk =       Core_Array::Get( 'vk', '' );
-    $date =     Core_Array::Get( 'control_date', date( 'Y-m-d' ) );
-    $statusId = Core_Array::Get( 'status_id', 0 );
-    $areaId =   Core_Array::Get( 'area_id', 0 );
-    $comment =  Core_Array::Get( 'comment', '' );
+    $surname =  Core_Array::Get( 'surname', '', PARAM_STRING );
+    $name =     Core_Array::Get( 'name', '', PARAM_STRING );
+    $source =   Core_Array::Get( 'source', '', PARAM_STRING );
+    $number =   Core_Array::Get( 'number', '', PARAM_STRING );
+    $vk =       Core_Array::Get( 'vk', '', PARAM_STRING );
+    $date =     Core_Array::Get( 'control_date', date( 'Y-m-d' ), PARAM_STRING );
+    $statusId = Core_Array::Get( 'status_id', 0, PARAM_INT );
+    $areaId =   Core_Array::Get( 'area_id', 0, PARAM_INT );
+    $comment =  Core_Array::Get( 'comment', '', PARAM_STRING );
 
 
-    $Lid = Core::factory( 'Lid' )
+    $Lid = Lid_Controller::factory()
         ->surname( $surname )
         ->name( $name )
         ->source( $source )
@@ -93,19 +95,14 @@ if ( $action === 'save_lid' )
 
 if ( $action === 'changeStatus' )
 {
-    $modelId =  Core_Array::Get( 'model_id', 0 );
-    $statusId = Core_Array::Get( 'status_id', 0 );
+    $modelId =  Core_Array::Get( 'model_id', 0, PARAM_INT );
+    $statusId = Core_Array::Get( 'status_id', 0, PARAM_INT );
 
-    $Lid = Core::factory( 'Lid', $modelId );
+    $Lid = Lid_Controller::factory( $modelId );
 
     if ( $Lid === null )
     {
         Core_Page_Show::instance()->error( 404 );
-    }
-
-    if ( !User::isSubordinate( $Lid ) )
-    {
-        Core_Page_Show::instance()->error( 403 );
     }
 
 
@@ -117,8 +114,8 @@ if ( $action === 'changeStatus' )
 
 if ( $action === 'changeDate' )
 {
-    $modelId =  Core_Array::Get( 'model_id', 0 );
-    $date =     Core_Array::Get( 'date', '' );
+    $modelId =  Core_Array::Get( 'model_id', 0, PARAM_INT );
+    $date =     Core_Array::Get( 'date', '', PARAM_STRING );
 
     if ( $modelId == 0 || $date == '' )
     {
@@ -126,19 +123,15 @@ if ( $action === 'changeDate' )
     }
 
 
-    $Lid = Core::factory( 'Lid', $modelId );
+    $Lid = Lid_Controller::factory( $modelId );
 
     if ( $Lid === null )
     {
         Core_Page_Show::instance()->error( 404 );
     }
 
-    if ( !User::isSubordinate( $Lid ) )
-    {
-        Core_Page_Show::instance()->error( 403 );
-    }
-
     $Lid->changeDate( $date );
+    exit;
 }
 
 
@@ -147,8 +140,8 @@ if ( $action === 'changeDate' )
  */
 if ( $action === 'updateLidArea' )
 {
-    $lidId =  Core_Array::Get( 'lid_id', 0 );
-    $areaId = Core_Array::Get( 'area_id', 0 );
+    $lidId =  Core_Array::Get( 'lid_id', 0, PARAM_INT );
+    $areaId = Core_Array::Get( 'area_id', 0, PARAM_INT );
 
     if ( $lidId == 0 || $areaId == 0 )
     {
@@ -156,18 +149,12 @@ if ( $action === 'updateLidArea' )
     }
 
 
-    $Lid = Core::factory( 'Lid', $lidId );
+    $Lid = Lid_Controller::factory( $lidId );
 
     if ( $Lid === null )
     {
         Core_Page_Show::instance()->error( 404 );
     }
-
-    if ( !User::isSubordinate( $Lid ) )
-    {
-        Core_Page_Show::instance()->error( 403 );
-    }
-
 
     Core::factory( 'Schedule_Area_Assignment' )->createAssignment( $Lid, $areaId );
 
@@ -180,7 +167,7 @@ if ( $action === 'updateLidArea' )
  */
 if ( $action === 'editLidPopup' )
 {
-    $lidId = Core_Array::Get( 'lid_id', null );
+    $lidId = Core_Array::Get( 'lid_id', null, PARAM_INT );
 
     if ( $lidId === null )
     {
@@ -188,7 +175,7 @@ if ( $action === 'editLidPopup' )
     }
 
 
-    $Lid = Core::factory( 'Lid', $lidId );
+    $Lid = Lid_Controller::factory( $lidId );
 
     if ( $Lid === null )
     {
@@ -201,7 +188,7 @@ if ( $action === 'editLidPopup' )
     }
 
 
-    $Areas = Core::factory( 'Schedule_Area' )->getList( true );
+    $Areas = Core::factory( 'Schedule_Area' )->getList();
     $Statuses = $Lid->getStatusList();
 
     //TODO: пока что реализован лишь механизм создания лида но с заделом и под редактирование

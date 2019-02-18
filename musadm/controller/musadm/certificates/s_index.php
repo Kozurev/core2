@@ -11,7 +11,7 @@
  * Блок проверки авторизации и прав доступа
  */
 $User = User::current();
-$accessRules = [ "groups"    => [1, 2, 6] ];
+$accessRules = [ 'groups' => [1, 2, 6] ];
 
 if( !User::checkUserAccess( $accessRules, $User ) )
 {
@@ -23,15 +23,15 @@ $breadcumbs[0] = new stdClass();
 $breadcumbs[0]->title = Core_Page_Show::instance()->Structure->title();
 $breadcumbs[0]->active = 1;
 
-Core_Page_Show::instance()->setParam( "body-class", "body-pink" );
-Core_Page_Show::instance()->setParam( "title-first", "СПИСОК" );
-Core_Page_Show::instance()->setParam( "title-second", "СЕРТИФИКАТОВ" );
-Core_Page_Show::instance()->setParam( "breadcumbs", $breadcumbs );
+Core_Page_Show::instance()->setParam( 'body-class', 'body-pink' );
+Core_Page_Show::instance()->setParam( 'title-first', 'СПИСОК' );
+Core_Page_Show::instance()->setParam( 'title-second', 'СЕРТИФИКАТОВ' );
+Core_Page_Show::instance()->setParam( 'breadcumbs', $breadcumbs );
 
 
-$action = Core_Array::getValue($_GET, "action", "");
+$action = Core_Array::Get( 'action', '' );
 
-if( $action === "refreshCertificatesTable" )
+if ( $action === 'refreshCertificatesTable' )
 {
     Core_Page_Show::instance()->execute();
     exit;
@@ -41,17 +41,20 @@ if( $action === "refreshCertificatesTable" )
 /**
  * Содержание всплывающего окна создания / редактирования сертификата
  */
-if( $action === "edit_popup" )
+if ( $action === 'edit_popup' )
 {
-    $id = Core_Array::Get( "id", 0 );
-    $id == 0 ? $isNew = 1 : $isNew = 0;
+    $id = Core_Array::Get( 'id', 0, PARAM_INT );
 
-    Core::factory( "Core_Entity" )
-        ->addSimpleEntity( "is_new", $isNew )
+    $id == 0
+        ?   $isNew = 1
+        :   $isNew = 0;
+
+    Core::factory( 'Core_Entity' )
+        ->addSimpleEntity( 'is_new', $isNew )
         ->addEntity(
-            Core::factory( "Certificate", $id )
+            Core::factory( 'Certificate', $id )
         )
-        ->xsl( "musadm/certificates/new_certificate_popup.xsl" )
+        ->xsl( 'musadm/certificates/new_certificate_popup.xsl' )
         ->show();
 
     exit;
@@ -61,17 +64,17 @@ if( $action === "edit_popup" )
 /**
  * Сохранение / обновление данных сертификата
  */
-if( $action === "saveCertificate" )
+if ( $action === 'saveCertificate' )
 {
-    $id =       Core_Array::Get( "id", 0 );
-    $sellDate = Core_Array::Get( "sellDate", date( "Y-m-d" ) );
-    $activeTo = Core_Array::Get( "activeTo", "" );
-    $number =   Core_Array::Get( "number", "000" );
-    $note =     Core_Array::Get( "note", "" );
+    $id =       Core_Array::Get( 'id', 0, PARAM_INT );
+    $sellDate = Core_Array::Get( 'sellDate', date( 'Y-m-d' ), PARAM_STRING );
+    $activeTo = Core_Array::Get( 'activeTo', '', PARAM_STRING );
+    $number =   Core_Array::Get( 'number', '000', PARAM_STRING );
+    $note =     Core_Array::Get( 'note', '', PARAM_STRING );
 
     $subordinated = $User->getDirector()->getId();
 
-    $oCertificate = Core::factory( "Certificate", $id )
+    $oCertificate = Core::factory( 'Certificate', $id )
         ->sellDate( $sellDate )
         ->activeTo( $activeTo )
         ->number( $number )
@@ -79,7 +82,7 @@ if( $action === "saveCertificate" )
 
     $oCertificate->save();
 
-    if( $note != "" )
+    if ( $note != '' )
     {
         $oCertificate->addNote( $note, false );
     }
@@ -91,14 +94,14 @@ if( $action === "saveCertificate" )
 /**
  * Сохранение комментария сертификата
  */
-if( $action === "saveCertificateNote" )
+if ( $action === 'saveCertificateNote' )
 {
-    $note = Core_Array::Get( "note", "" );
-    $certId = Core_Array::Get( "certificate_id", 0 );
+    $note =     Core_Array::Get( 'note', '', PARAM_STRING );
+    $certId =   Core_Array::Get( 'certificate_id', 0, PARAM_INT );
 
-    $Certificate = Core::factory( "Certificate", $certId );
+    $Certificate = Core::factory( 'Certificate', $certId );
 
-    if( $Certificate !== false )
+    if ( $Certificate !== null )
     {
         $Certificate->addNote( $note );
     }

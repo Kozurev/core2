@@ -169,6 +169,8 @@ foreach ( $Lids as $Lid )
     $Lid->save();
 }
 
+Core::factory( 'Orm' )->executeQuery( 'UPDATE Lid SET status_id = 1 WHERE status_id IS NULL' );
+
 Core::factory( 'Property', 27 )->delete();
 $Orm->executeQuery( 'DELETE FROM Property_List_Assigment WHERE model_name = \'Lid\' AND property_id = 27' );
 $Orm->executeQuery( 'DELETE FROM Property_List WHERE model_name = \'Lid\' AND property_id = 27' );
@@ -190,3 +192,29 @@ CREATE TABLE Comment
     model_name varchar(255),
     model_id int
 );' );
+
+
+
+//$arr = [
+//    0 => 23,
+//    1 => '34',
+//    2 => 'UNION(idfgnboid)',
+//    3 => '1',
+//    4 => 'false',
+//    5 => true,
+//    6 => '0',
+//];
+//
+//debug( Core_Array::getValue( $arr, 0, null, PARAM_INT ), true );
+//debug( Core_Array::getValue( $arr, 1, null, PARAM_INT ), true );
+//debug( Core_Array::getValue( $arr, 2, null, PARAM_INT ), true );
+//
+//debug( Core_Array::getValue( $arr, 3, null, PARAM_BOOL ), true );
+//debug( Core_Array::getValue( $arr, 4, null, PARAM_BOOL ), true );
+//debug( Core_Array::getValue( $arr, 5, null, PARAM_BOOL ), true );
+//debug( Core_Array::getValue( $arr, 6, null, PARAM_BOOL ), true );
+//
+////debug( boolval( '1' ), true );
+//
+//$arr = [];
+//debug( array_pop( $arr ), true );

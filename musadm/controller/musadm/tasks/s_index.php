@@ -13,7 +13,7 @@
 $User = User::current();
 $accessRules = ['groups' => [1, 2, 6]];
 
-if( !User::checkUserAccess( $accessRules, $User ) )
+if ( !User::checkUserAccess( $accessRules, $User ) )
 {
     Core_Page_Show::instance()->error404();
 }
@@ -29,16 +29,21 @@ Core_Page_Show::instance()->setParam( 'breadcumbs', $breadcumbs );
 
 $action = Core_Array::Get( 'action', null );
 
+Core::factory( 'User_Controller' );
+Core::factory( 'Task_Controller' );
+Core::factory( 'Schedule_Area_Controller' );
 
-if( $action === 'refreshTasksTable' )
+
+if ( $action === 'refreshTasksTable' )
 {
     Core_Page_Show::instance()->execute();
     exit;
 }
 
-if( $action === 'markAsDone' )
+
+if ( $action === 'markAsDone' )
 {
-    $taskId = Core_Array::Get( "task_id", 0 );
+    $taskId = Core_Array::Get( "task_id", 0, PARAM_INT );
 
     if ( $taskId == 0 )
     {
@@ -46,16 +51,11 @@ if( $action === 'markAsDone' )
     }
 
 
-    $Task = Core::factory( "Task", $taskId );
+    $Task = Task_Controller::factory( $taskId );
 
     if ( $Task === null )
     {
         Core_Page_Show::instance()->error( 404 );
-    }
-
-    if ( !User::isSubordinate( $Task ) )
-    {
-        Core_Page_Show::instance()->error( 403 );
     }
 
     $Task->markAsDone();
@@ -64,26 +64,22 @@ if( $action === 'markAsDone' )
 }
 
 
-if( $action === 'update_date' )
+if ( $action === 'update_date' )
 {
-    $taskId = Core_Array::Get( 'task_id', 0 );
-    $date =   Core_Array::Get( 'date', '' );
+    $taskId = Core_Array::Get( 'task_id', 0, PARAM_INT );
+    $date =   Core_Array::Get( 'date', '', PARAM_STRING );
 
     if ( $taskId == 0 )
     {
         Core_Page_Show::instance()->error( 404 );
     }
 
-    $Task = Core::factory( 'Task', $taskId );
+
+    $Task = Task_Controller::factory( $taskId );
 
     if ( $Task === null )
     {
         Core_Page_Show::instance()->error( 404 );
-    }
-
-    if ( !User::isSubordinate( $Task ) )
-    {
-        Core_Page_Show::instance()->error( 403 );
     }
 
     $ObserverArgs = [
@@ -91,19 +87,17 @@ if( $action === 'update_date' )
         'old_date' => $Task->date(),
         'new_date' => $date
     ];
-
-    Core::notify( $ObserverArgs, "ChangeTaskControlDate" );
+    Core::notify( $ObserverArgs, 'ChangeTaskControlDate' );
 
     $Task->date( $date )->save();
-
     exit;
 }
 
 
 if ( $action === 'update_area' )
 {
-    $taskId = Core_Array::Get( 'task_id', 0 );
-    $areaId = Core_Array::Get( 'area_id', 0 );
+    $taskId = Core_Array::Get( 'task_id', 0, PARAM_INT );
+    $areaId = Core_Array::Get( 'area_id', 0, PARAM_INT );
 
     if ( $taskId <= 0 )
     {
@@ -111,29 +105,19 @@ if ( $action === 'update_area' )
     }
 
 
-    $Task = Core::factory( 'Task', $taskId );
+    $Task = Task_Controller::factory( $taskId );
 
     if ( $Task === null )
     {
         Core_Page_Show::instance()->error( 404 );
     }
 
-    if ( !User::isSubordinate( $Task ) )
-    {
-        Core_Page_Show::instance()->error( 403 );
-    }
 
-
-    $Area = Core::factory( 'Schedule_Area', $areaId );
+    $Area = Schedule_Area_Controller::factory( $areaId );
 
     if ( $Area === null )
     {
         Core_Page_Show::instance()->error( 404 );
-    }
-
-    if ( !User::isSubordinate( $Area ) )
-    {
-        Core_Page_Show::instance()->error( 403 );
     }
 
 
@@ -148,7 +132,7 @@ if ( $action === 'new_task_popup' )
     $Director = User::current()->getDirector();
     $subordinated = $Director->getId();
 
-    $Areas = Core::factory( 'Schedule_Area' )->getList( true );
+    $Areas = Core::factory( 'Schedule_Area' )->getList();
     $Priorities = Core::factory( 'Task_Priority' )->findAll();
 
     $Clients = Core::factory( 'User' )
@@ -173,32 +157,14 @@ if ( $action === 'new_task_popup' )
 
 if ( $action === 'save_task' )
 {
-    $date =         Core_Array::Get( 'date', '' );
-    $note =         Core_Array::Get( 'text', '' );
-    $areaId =       Core_Array::Get( 'areaId', 0 );
-    $associate =    Core_Array::Get( 'associate', 0 );
-    $priorityId =   Core_Array::Get( 'priority_id', 1 );
+    $date =         Core_Array::Get( 'date', '', PARAM_STRING );
+    $note =         Core_Array::Get( 'text', '', PARAM_STRING );
+    $areaId =       Core_Array::Get( 'areaId', 0, PARAM_INT );
+    $associate =    Core_Array::Get( 'associate', 0, PARAM_INT );
+    $priorityId =   Core_Array::Get( 'priority_id', 1, PARAM_INT );
 
     $authorId = $User->getId();
     $noteDate = date( 'Y-m-d H:i:s' );
-
-
-    if ( $areaId > 0 )
-    {
-        $Area = Core::factory( 'Schedule_Area', $areaId );
-
-        if ( $Area === null )
-        {
-            Core_Page_Show::instance()->error( 404 );
-        }
-
-        if ( !User::isSubordinate( $Area ) )
-        {
-            Core_Page_Show::instance()->error( 403 );
-        }
-
-        $Task->areaId( $areaId );
-    }
 
 
     $Task = Core::factory( 'Task' )
@@ -206,6 +172,19 @@ if ( $action === 'save_task' )
         ->areaId( $areaId )
         ->date( $date )
         ->priorityId( $priorityId );
+
+    if ( $areaId > 0 )
+    {
+        $Area = Schedule_Area_Controller::factory( $areaId );
+
+        if ( $Area === null )
+        {
+            Core_Page_Show::instance()->error( 404 );
+        }
+
+        $Task->areaId( $areaId );
+    }
+
     $Task->save();
 
 
@@ -222,23 +201,18 @@ if ( $action === 'save_task' )
 
 if ( $action === 'task_assignment_popup' )
 {
-    $taskId = Core_Array::Get( 'taskid', 0 );
+    $taskId = Core_Array::Get( 'taskid', 0, PARAM_INT );
 
     if ( $taskId == 0 )
     {
         Core_Page_Show::instance()->error( 404 );
     }
 
-    $Task = Core::factory( 'Task', $taskId );
+    $Task = Task_Controller::factory( $taskId );
 
     if ( $Task === null )
     {
         Core_Page_Show::instance()->error( 404 );
-    }
-
-    if ( !User::isSubordinate( $Task ) )
-    {
-        Core_Page_Show::instance()->error( 403 );
     }
 
 
@@ -268,28 +242,22 @@ if ( $action === 'task_assignment_popup' )
  */
 if ( $action === 'changeTaskPriority' )
 {
-    $taskId =       Core_Array::Get( 'task_id', null );
-    $priorityId =   Core_Array::Get( 'priority_id', null );
+    $taskId =       Core_Array::Get( 'task_id', null, PARAM_INT );
+    $priorityId =   Core_Array::Get( 'priority_id', null, PARAM_INT );
 
     if ( $taskId === null || $priorityId === null )
     {
-       Core_Page_Show::instance()->error( 403 );
+       Core_Page_Show::instance()->error( 404 );
     }
 
 
-    $Task = Core::factory( 'Task', $taskId );
+    $Task = Task_Controller::factory( $taskId );
     $Priority = Core::factory( 'Task_Priority', $priorityId );
 
     if ( $Task === null || $Priority === null )
     {
-        Core_Page_Show::instance()->error( 403 );
+        Core_Page_Show::instance()->error( 404 );
     }
-
-    if ( !User::isSubordinate( $Task ) )
-    {
-        Core_Page_Show::instance()->error( 403 );
-    }
-
 
     $Task->priorityId( $priorityId )->save();
 

@@ -14,13 +14,13 @@ $breadcumbs[1] = new stdClass();
 $breadcumbs[1]->title = Core_Page_Show::instance()->Structure->title();
 $breadcumbs[1]->active = 1;
 
-Core_Page_Show::instance()->setParam( "body-class", "body-orange" );
-Core_Page_Show::instance()->setParam( "title-first", "ЛИЧНЫЙ" );
-Core_Page_Show::instance()->setParam( "title-second", "КАБИНЕТ" );
-Core_Page_Show::instance()->setParam( "breadcumbs", $breadcumbs );
+Core_Page_Show::instance()->setParam( 'body-class', 'body-orange' );
+Core_Page_Show::instance()->setParam( 'title-first', 'ЛИЧНЫЙ' );
+Core_Page_Show::instance()->setParam( 'title-second', 'КАБИНЕТ' );
+Core_Page_Show::instance()->setParam( 'breadcumbs', $breadcumbs );
 
 
-if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
+if ( isset( $_GET['ajax'] ) && $_GET['ajax'] == 1 )
 {
     Core_Page_Show::instance()->execute();
     exit;
@@ -31,22 +31,24 @@ if(isset($_GET["ajax"]) && $_GET["ajax"] == 1)
  */
 $User = User::current();
 
-if( !$User )
+if ( !$User )
 {
-    $host  = $_SERVER['HTTP_HOST'];
-    $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-    $extra = "";
-    header("Location: http://$host$uri/authorize");
+    $host  = Core_Array::Server( 'HTTP_HOST', '', PARAM_STRING );
+    $uri   = rtrim( dirname( Core_Array::Server( 'PHP_SELF', '', PARAM_STRING ) ), '/\\' );
+    $extra = '';
+    header( "Location: http://$host$uri/authorize" );
     exit;
 }
 
-$action = Core_Array::Get( "action", "" );
+$action = Core_Array::Get( 'action', '' );
+
+Core::factory( 'User_Controller' );
 
 
 /**
  * Обновление сожержимого страницы
  */
-if( $action == "refreshTablePayments" )
+if ( $action == 'refreshTablePayments' )
 {
     Core_Page_Show::instance()->execute();
     exit;
@@ -56,15 +58,16 @@ if( $action == "refreshTablePayments" )
 /**
  * Открытие всплывающего окна для начисления оплаты (создания платежа клиента с 2 полями для примечания)
  */
-if( $action == "getPaymentPopup" )
+if ( $action == 'getPaymentPopup' )
 {
-    $userId =   Core_Array::Get("userid", 0 );
-    $User =    Core::factory( "User", $userId );
+    $userId = Core_Array::Get('userid', null, PARAM_INT );
 
-    Core::factory( "Core_Entity" )
+    $User = User_Controller::factory( $userId );
+
+    Core::factory( 'Core_Entity' )
         ->addEntity( $User )
-        ->addSimpleEntity( "function", "balance" )
-        ->xsl( "musadm/users/balance/edit_payment_popup.xsl" )
+        ->addSimpleEntity( 'function', 'balance' )
+        ->xsl( 'musadm/users/balance/edit_payment_popup.xsl' )
         ->show();
 
     exit;
@@ -74,24 +77,27 @@ if( $action == "getPaymentPopup" )
 /**
  * Открытие всплывающего окна для покупки тарифа
  */
-if( $action == "getTarifPopup" )
+if ( $action == 'getTarifPopup' )
 {
-    $userId =   Core_Array::Get( "userid", 0 );
-    $Director = User::current()->getDirector();
+    $userId =   Core_Array::Get( 'userid', null, PARAM_INT );
+    $Director = $User->getDirector();
 
-    $Tarifs = Core::factory( "Payment_Tarif" )
+    $Tarifs = Core::factory( 'Payment_Tarif' )
         ->queryBuilder()
-        ->where( "subordinated", "=", $Director->getId() );
+        ->where( 'subordinated', '=', $Director->getId() );
 
-    if( !User::isAuthAs() ) $Tarifs->where( "access", "=", "1" );
+    if ( !User::isAuthAs() )
+    {
+        $Tarifs->where( 'access', '=', '1' );
+    }
 
     $Tarifs = $Tarifs->findAll();
-    $User = Core::factory( "User", $userId );
+    $User = User_Controller::factory( $userId );
 
-    Core::factory( "Core_Entity" )
+    Core::factory( 'Core_Entity' )
         ->addEntity( $User )
         ->addEntities( $Tarifs )
-        ->xsl( "musadm/users/balance/buy_tarif_popup.xsl" )
+        ->xsl( 'musadm/users/balance/buy_tarif_popup.xsl' )
         ->show();
 
     exit;
@@ -101,13 +107,14 @@ if( $action == "getTarifPopup" )
 /**
  * Редактирование
  */
-if( $action == "updateNote" )
+if ( $action == 'updateNote' )
 {
-    $userId =   Core_Array::Get( "userid", 0 );
-    $note =     Core_Array::Get( "note", "" );
-    $User =     Core::factory( "User", $userId );
+    $userId =   Core_Array::Get( 'userid', null, PARAM_INT );
+    $note =     Core_Array::Get( 'note', '', PARAM_STRING );
 
-    Core::factory( "Property", 19 )
+    $User = User_Controller::factory( $userId );
+
+    Core::factory( 'Property', 19 )
         ->getPropertyValues( $User )[0]
         ->value( $note )
         ->save();
@@ -116,13 +123,14 @@ if( $action == "updateNote" )
 }
 
 
-if( $action === "updatePerLesson" )
+if ( $action === 'updatePerLesson' )
 {
-    $userId =   Core_Array::Get( "userid", 0 );
-    $value =    Core_Array::Get( "value", 0 );
-    $User =     Core::factory( "User", $userId );
+    $userId =   Core_Array::Get( 'userid', null, PARAM_INT );
+    $value =    Core_Array::Get( 'value', 0, PARAM_INT );
 
-    Core::factory( "Property", 32 )
+    $User = User_Controller::factory( $userId );
+
+    Core::factory( 'Property', 32 )
         ->getPropertyValues( $User )[0]
         ->value( $value )
         ->save();
@@ -134,98 +142,109 @@ if( $action === "updatePerLesson" )
 /**
  * Покупка тарифа
  */
-if( $action == "buyTarif" )
+if ( $action == 'buyTarif' )
 {
-    $userId =   Core_Array::Get( "userid", 0 );
-    $tarifId =  Core_Array::Get( "tarifid", 0 );
+    $userId =   Core_Array::Get( 'userid', null, PARAM_INT );
+    $tarifId =  Core_Array::Get( 'tarifid', 0, PARAM_INT );
 
-    $oUser =    Core::factory( "User", $userId );
-    $oTarif =   Core::factory( "Payment_Tarif", $tarifId );
+    $User = User_Controller::factory( $userId );
+    $Tarif = Core::factory( 'Payment_Tarif', $tarifId );
 
-    $oUserBalance =     Core::factory( "Property", 12 );
-    $oUserBalance =     $oUserBalance->getPropertyValues( $oUser )[0];
+    $UserBalance = Core::factory( 'Property', 12 );
+    $UserBalance = $UserBalance->getPropertyValues( $User )[0];
 
-    $oCountIndivLessons = Core::factory( "Property", 13 );
-    $oCountGroupLessons = Core::factory( "Property", 14 );
+    $CountIndivLessons = Core::factory( 'Property', 13 );
+    $CountGroupLessons = Core::factory( 'Property', 14 );
 
-    $oCountIndivLessons = $oCountIndivLessons->getPropertyValues( $oUser )[0];
-    $oCountGroupLessons = $oCountGroupLessons->getPropertyValues( $oUser )[0];
+    $CountIndivLessons = $CountIndivLessons->getPropertyValues( $User )[0];
+    $CountGroupLessons = $CountGroupLessons->getPropertyValues( $User )[0];
 
-    if( $oUserBalance->value() < $oTarif->price() )   die( "Недостаточно средств для покупки данного тарифа" );
+    if ( $UserBalance->value() < $Tarif->price() )
+    {
+        die( "Недостаточно средств для покупки данного тарифа" );
+    }
 
 
     //Корректировка баланса
-    $oldBalance = intval( $oUserBalance->value() );
-    $newBalance = $oldBalance - intval( $oTarif->price() );
-    $oUserBalance->value( $newBalance )->save();
+    $oldBalance = intval( $UserBalance->value() );
+    $newBalance = $oldBalance - intval( $Tarif->price() );
+    $UserBalance->value( $newBalance )->save();
 
 
     //Корректировка кол-ва занятий
-    if( $oTarif->countIndiv() != 0 ) $oCountIndivLessons->value( $oCountIndivLessons->value() + $oTarif->countIndiv() )->save();
-    if( $oTarif->countGroup() != 0 ) $oCountGroupLessons->value( $oCountGroupLessons->value() + $oTarif->countGroup() )->save();
+    if ( $Tarif->countIndiv() != 0 )
+    {
+        $CountIndivLessons->value( $CountIndivLessons->value() + $Tarif->countIndiv() )->save();
+    }
+
+    if ( $Tarif->countGroup() != 0 )
+    {
+        $CountGroupLessons->value( $CountGroupLessons->value() + $Tarif->countGroup() )->save();
+    }
 
 
     //Корректировка пользовательской медианы (средняя стоимость занятия)
     $countLessons = 0;
-    if( $oTarif->countIndiv() != 0 )
+    if ( $Tarif->countIndiv() != 0 )
     {
-        $clientRate = "client_rate_indiv";
-        $countLessons = $oTarif->countIndiv();
+        $clientRate = 'client_rate_indiv';
+        $countLessons = $Tarif->countIndiv();
     }
-    if( $oTarif->countGroup() != 0 )
+    if ( $Tarif->countGroup() != 0 )
     {
-        $clientRate = "client_rate_group";
-        $countLessons = $oTarif->countGroup();
+        $clientRate = 'client_rate_group';
+        $countLessons = $Tarif->countGroup();
     }
-    if( $oTarif->countIndiv() != 0 && $oTarif->countGroup() != 0 )
+    if ( $Tarif->countIndiv() != 0 && $Tarif->countGroup() != 0 )
     {
-        $clientRate = "";
+        $clientRate = '';
     }
 
-    if( $clientRate != "" && $countLessons !== 0 )
+    if ( $clientRate != '' && $countLessons !== 0 )
     {
-        $ClientRateProperty = Core::factory( "Property" )->getByTagName( $clientRate );
-        $newClientRateValue = $oTarif->price() / $countLessons;
+        $ClientRateProperty = Core::factory( 'Property' )->getByTagName( $clientRate );
+        $newClientRateValue = $Tarif->price() / $countLessons;
         $newClientRateValue = round( $newClientRateValue, 2 );
-        $OldClientRateValue = $ClientRateProperty->getPropertyValues( $oUser )[0];
+        $OldClientRateValue = $ClientRateProperty->getPropertyValues( $User )[0];
         $OldClientRateValue->value( $newClientRateValue )->save();
     }
 
 
     //Создание платежа
-    $oPayment = Core::factory( "Payment" )
+    $oPayment = Core::factory( 'Payment' )
         ->type( 2 )
         ->user( $userId )
-        ->value( $oTarif->price() )
-        ->description( "Покупка тарифа \"" . $oTarif->title() . "\"" )
+        ->value( $Tarif->price() )
+        ->description( "Покупка тарифа \"" . $Tarif->title() . "\"" )
         ->save();
 
     exit;
 }
 
 
-if( $action == "savePayment" )
+if ( $action == 'savePayment' )
 {
-    $userId =       Core_Array::Get( "userid", 0 );
-    $value  =       Core_Array::Get( "value", 0 );
-    $description =  Core_Array::Get( "description", "" );
-    $type =         Core_Array::Get( "type", 0 );
-    $description2 = Core_Array::Get( "property_26", "" );
+    $userId =       Core_Array::Get( 'userid', null, PARAM_INT );
+    $value  =       Core_Array::Get( 'value', 0, PARAM_INT );
+    $description =  Core_Array::Get( 'description', '', PARAM_STRING );
+    $type =         Core_Array::Get( 'type', 0, PARAM_INT );
+    $description2 = Core_Array::Get( 'property_26', '' );
 
-    $Payment = Core::factory( "Payment" )
+    $Payment = Core::factory( 'Payment' )
         ->user( $userId )
         ->type( $type )
         ->value( $value )
         ->description( $description );
     $Payment->save();
 
-    Core::factory( "Property", 26 )->addNewValue( $Payment, $description2 );
+    Core::factory( 'Property', 26 )->addNewValue( $Payment, $description2 );
+
 
     /**
      * Корректировка баланса ученика
      */
-    $User =        Core::factory( "User", $userId );
-    $UserBalance = Core::factory( "Property", 12 );
+    $User =        Core::factory( 'User', $userId );
+    $UserBalance = Core::factory( 'Property', 12 );
     $UserBalance = $UserBalance->getPropertyValues( $User )[0];
     $balanceOld =  intval( $UserBalance->value() );
 
@@ -237,23 +256,23 @@ if( $action == "savePayment" )
         ->value( $balanceNew )
         ->save();
 
-    exit ( "0" );
+    exit ( '0' );
 }
 
 
 /**
  * Добавление комментария к платежу
  */
-if( $action == "add_note" )
+if ( $action == 'add_note' )
 {
-    $modelId =  Core_Array::Get( "model_id", 0 );
-    $Payment =  Core::factory( "Payment", $modelId );
-    $Notes =    Core::factory( "Property", 26 )->getPropertyValues( $Payment );
+    $modelId =  Core_Array::Get( 'model_id', 0, PARAM_INT );
+    $Payment =  Core::factory( 'Payment', $modelId );
+    $Notes =    Core::factory( 'Property', 26 )->getPropertyValues( $Payment );
 
-    Core::factory( "Core_Entity" )
+    Core::factory( 'Core_Entity' )
         ->addEntity( $Payment )
-        ->addEntities( $Notes, "notes" )
-        ->xsl( "musadm/users/balance/add_payment_note.xsl" )
+        ->addEntities( $Notes, 'notes' )
+        ->xsl( 'musadm/users/balance/add_payment_note.xsl' )
         ->show();
 
     exit;
@@ -263,21 +282,21 @@ if( $action == "add_note" )
 /**
  * Сохранение данных платежа
  */
-if( $action === "payment_save" )
+if ( $action === 'payment_save' )
 {
-    $id =     Core_Array::Get( "id", 0 );
-    $value =  Core_Array::Get( "value", 0 );
-    $date =   Core_Array::Get( "date", date( "Y-m-d" ) );
-    $description = Core_Array::Get( "description", "" );
+    $id =     Core_Array::Get( 'id', 0, PARAM_INT );
+    $value =  Core_Array::Get( 'value', 0, PARAM_INT );
+    $date =   Core_Array::Get( 'date', date( 'Y-m-d' ), PARAM_STRING );
+    $description = Core_Array::Get( 'description', '', PARAM_STRING );
 
-    $Payment = Core::factory( "Payment", $id );
+    $Payment = Core::factory( 'Payment', $id );
 
     $difference = intval( $Payment->value() ) - intval( $value );
 
-    if( $difference !== 0 )
+    if ( $difference !== 0 )
     {
-        $User =        Core::factory( "User", $Payment->user() );
-        $UserBalance = Core::factory( "Property", 12 );
+        $User =        User_Controller::factory( $Payment->user() );
+        $UserBalance = Core::factory( 'Property', 12 );
         $UserBalance = $UserBalance->getPropertyValues( $User )[0];
         $balanceOld =  $UserBalance->value();
 
@@ -301,13 +320,13 @@ if( $action === "payment_save" )
 }
 
 
-if( $action === "payment_delete" )
+if ( $action === 'payment_delete' )
 {
-    $id = Core_Array::Get( "id", 0 );
-    $Payment = Core::factory( "Payment", $id );
+    $id = Core_Array::Get( 'id', 0, PARAM_INT );
+    $Payment = Core::factory( 'Payment', $id );
 
-    $User =         Core::factory( "User", $Payment->user() );
-    $UserBalance =  Core::factory( "Property", 12 );
+    $User =         User_Controller::factory( $Payment->user() );
+    $UserBalance =  Core::factory( 'Property', 12 );
     $UserBalance =  $UserBalance->getPropertyValues( $User )[0];
     $balanceOld =   $UserBalance->value();
 
@@ -321,18 +340,17 @@ if( $action === "payment_delete" )
 
     $Payment->delete();
 
-    //$this->execute();
     exit;
 }
 
 
-if( $action == "refreshTasksTable" )
+if ( $action == 'refreshTasksTable' )
 {
-    $Tasks = Core::factory( "Task" )
+    $Tasks = Core::factory( 'Task' )
         ->queryBuilder()
-        ->where( "associate", "=", $oUser->getId() )
-        ->orderBy( "date", "DESC" )
-        ->orderBy( "id", "DESC" )
+        ->where( 'associate', '=', $oUser->getId() )
+        ->orderBy( 'date', 'DESC' )
+        ->orderBy( 'id', 'DESC' )
         ->findAll();
 
     foreach ( $Tasks as $Task )
@@ -340,7 +358,7 @@ if( $action == "refreshTasksTable" )
         $Task->date( refactorDateFormat( $Task->date() ) );
     }
 
-    $tasksIds = array();
+    $tasksIds = [];
 
     foreach ( $Tasks as $Task )
     {
@@ -348,14 +366,14 @@ if( $action == "refreshTasksTable" )
     }
 
     //Поиск всех комментариев, связанных с выбранными задачами
-    $Notes = Core::factory( "Task_Note" )
+    $Notes = Core::factory( 'Task_Note' )
         ->queryBuilder()
         ->select([
-            "Task_Note.id AS id", "date", "task_id", "author_id", "text", "usr.name AS name", "usr.surname AS surname"
+            'Task_Note.id AS id', 'date', 'task_id', 'author_id', 'text', 'usr.name AS name', 'usr.surname AS surname'
         ])
-        ->where( "task_id", "IN", $tasksIds )
-        ->leftJoin( "User AS usr", "author_id = usr.id" )
-        ->orderBy( "date", "DESC" )
+        ->whereIn( 'task_id', $tasksIds )
+        ->leftJoin( 'User AS usr', 'author_id = usr.id' )
+        ->orderBy( 'date', 'DESC' )
         ->findAll();
 
     //Изменение формата даты и времени комментариев
@@ -363,13 +381,13 @@ if( $action == "refreshTasksTable" )
     {
         $time = strtotime( $Note->date() );
 
-        if( date( "H:i", $time ) == "00:00" )
+        if( date( 'H:i', $time ) == '00:00' )
         {
-            $dateFormat = "d.m.Y";
+            $dateFormat = 'd.m.Y';
         }
         else
         {
-            $dateFormat = "d.m.Y H:i";
+            $dateFormat = 'd.m.Y H:i';
         }
 
         $Note->date( date( $dateFormat, $time ) );
@@ -377,23 +395,23 @@ if( $action == "refreshTasksTable" )
 
     global $CFG;
 
-    Core::factory( "Core_Entity" )
-        ->addSimpleEntity( "wwwroot", $CFG->rootdir )
+    Core::factory( 'Core_Entity' )
+        ->addSimpleEntity( 'wwwroot', $CFG->rootdir )
         ->addEntities( $Tasks )
         ->addEntities( $Notes )
-        ->xsl( "musadm/tasks/client_tasks.xsl" )
+        ->xsl( 'musadm/tasks/client_tasks.xsl' )
         ->show();
 
     exit;
 }
 
 
-if( $action === "saveUserComment" )
+if ( $action === 'saveUserComment' )
 {
-    $userId =   Core_Array::Get( "userid", 0 );
-    $text =     Core_Array::Get( "text", "" );
+    $userId =   Core_Array::Get( 'userid', 0, PARAM_INT );
+    $text =     Core_Array::Get( 'text', '', PARAM_STRING );
 
-    Core::factory( "User" )->addComment( $text, $userId );
+    Core::factory( 'User' )->addComment( $text, $userId );
 
     echo "<div class='users'>";
     Core_Page_Show::instance()->execute();
@@ -406,26 +424,26 @@ if( $action === "saveUserComment" )
 /**
  * Открытие всплывающего окна для редактирования данных отчета о проведенном занятии
  */
-if( $action === "edit_report_popup" )
+if ( $action === 'edit_report_popup' )
 {
-    $id = Core_Array::Get( "id", 0 );
-    $Report = Core::factory( "Schedule_Lesson_Report", $id );
+    $id = Core_Array::Get( 'id', 0, PARAM_INT );
+    $Report = Core::factory( 'Schedule_Lesson_Report', $id );
 
-    if( $Report == false || $Report->getId() == null )
+    if ( $Report == false || $Report->getId() == null )
     {
-        die("Отчета с id $id не существует");
+        die ( "Отчета с id $id не существует" );
     }
 
-    Core::factory( "Core_Entity" )
-        ->addEntity( $Report, "rep" )
-        ->xsl( "musadm/users/balance/edit_report_popup.xsl" )
+    Core::factory( 'Core_Entity' )
+        ->addEntity( $Report, 'rep' )
+        ->xsl( 'musadm/users/balance/edit_report_popup.xsl' )
         ->show();
 
     exit;
 }
 
 
-if( $action === "refreshTableUsers" )
+if ( $action === 'refreshTableUsers' )
 {
     echo "<div class='users'>";
     Core_Page_Show::instance()->execute();

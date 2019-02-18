@@ -11,11 +11,11 @@
  * Блок проверки авторизации и прав доступа
  */
 $User = User::current();
-$accessRules = ["groups"    => [1, 6]];
+$accessRules = ['groups' => [1, 6]];
 
-if( !User::checkUserAccess( $accessRules, $User ) )
+if ( !User::checkUserAccess( $accessRules, $User ) )
 {
-    Core_Page_Show::instance()->error404();
+    Core_Page_Show::instance()->error( 403 );
 }
 
 
@@ -23,14 +23,14 @@ $breadcumbs[0] = new stdClass();
 $breadcumbs[0]->title = $this->Structure->title();
 $breadcumbs[0]->active = 1;
 
-Core_Page_Show::instance()->setParam( "body-class", "body-orange" );
-Core_Page_Show::instance()->setParam( "title-first", "СТАТИСТИКА" );
-Core_Page_Show::instance()->setParam( "title-second", "" );
-Core_Page_Show::instance()->setParam( "breadcumbs", $breadcumbs );
+Core_Page_Show::instance()->setParam( 'body-class', 'body-orange' );
+Core_Page_Show::instance()->setParam( 'title-first', 'СТАТИСТИКА' );
+Core_Page_Show::instance()->setParam( 'title-second', '' );
+Core_Page_Show::instance()->setParam( 'breadcumbs', $breadcumbs );
 
-$action = Core_Array::Get( "action", "" );
+$action = Core_Array::Get( 'action', '' );
 
-if( $action === "refresh" )
+if ( $action === 'refresh' )
 {
     Core_Page_Show::instance()->execute();
     exit;

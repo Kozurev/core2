@@ -10,13 +10,13 @@
 $User = User::current();
 $subordinated = $User->getDirector()->getId();
 
-$Groups = Core::factory( "Schedule_Group" )
+$Groups = Core::factory( 'Schedule_Group' )
     ->queryBuilder()
-    ->where( "active", "=", 1 )
-    ->where( "subordinated", "=", $subordinated )
+    ->where( 'active', '=', 1 )
+    ->where( 'subordinated', '=', $subordinated )
     ->findAll();
 
-$output = Core::factory( "Core_Entity" );
+$output = Core::factory( 'Core_Entity' );
 
 foreach ( $Groups as $Group )
 {
@@ -29,6 +29,6 @@ global $CFG;
 
 $output
     ->addEntities( $Groups )
-    ->addSimpleEntity( "wwwroot", $CFG->rootdir )
-    ->xsl( "musadm/groups/groups.xsl" )
+    ->addSimpleEntity( 'wwwroot', $CFG->rootdir )
+    ->xsl( 'musadm/groups/groups.xsl' )
     ->show();
