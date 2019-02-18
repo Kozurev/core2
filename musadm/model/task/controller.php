@@ -5,8 +5,9 @@
  *
  * @author Kozurev Egor
  * @date 25.01.2019 17:00
+ * @version 20190218
+ * Class Task_Controller
  */
-
 class Task_Controller
 {
 
@@ -139,6 +140,47 @@ class Task_Controller
         $this->TaskQuery = Core::factory( 'Task' )->queryBuilder()
             ->orderBy( 'Task_Priority.priority', 'DESC' )
             ->orderBy( 'associate' );
+    }
+
+
+    /**
+     * Кастомная фабрика для задачи
+     *
+     * @param int|null $id
+     * @param bool $isSubordinate
+     * @return Task|null
+     */
+    public static function factory( int $id = null, bool $isSubordinate = true )
+    {
+        if ( is_null( $id ) )
+        {
+            return Core::factory( 'Task' );
+        }
+
+        $ResTask = Core::factory( 'Task' )
+            ->queryBuilder()
+            ->where( 'id', '=', $id );
+
+        if ( $isSubordinate === true )
+        {
+            $AuthUser = User::current();
+
+            if ( is_null( $AuthUser ) )
+            {
+                return null;
+            }
+
+            $Director = $AuthUser->getDirector();
+
+            if ( is_null( $Director ) )
+            {
+                return null;
+            }
+
+            $ResTask->where( 'subordinated', '=', $Director->getId() );
+        }
+
+        return $ResTask->find();
     }
 
 

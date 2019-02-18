@@ -4,6 +4,8 @@
  *
  * @author Kozurev Egor
  * @date 30.01.2019 13:36
+ * @version 20190218
+ * Class Lid_Controller
  */
 class Lid_Controller
 {
@@ -133,6 +135,47 @@ class Lid_Controller
 
         $this->LidQuery = Core::factory( 'Lid' )->queryBuilder()
             ->orderBy( 'Lid.id', 'DESC' );
+    }
+
+
+    /**
+     * Кастомная фабрика для лида
+     *
+     * @param int|null $id
+     * @param bool $isSubordinate
+     * @return Lid|null
+     */
+    public static function factory( int $id = null, bool $isSubordinate = true )
+    {
+        if ( is_null( $id ) )
+        {
+            return Core::factory( 'Lid' );
+        }
+
+        $ResLid = Core::factory( 'Lid' )
+            ->queryBuilder()
+            ->where( 'id', '=', $id );
+
+        if ( $isSubordinate === true )
+        {
+            $AuthUser = User::current();
+
+            if ( is_null( $AuthUser ) )
+            {
+                return null;
+            }
+
+            $Director = $AuthUser->getDirector();
+
+            if ( is_null( $Director ) )
+            {
+                return null;
+            }
+
+            $ResLid->where( 'subordinated', '=', $Director->getId() );
+        }
+
+        return $ResLid->find();
     }
 
 
