@@ -95,31 +95,47 @@ if ( $action == 'getScheduleAreaPopup' )
  */
 if ( $action === 'getScheduleAbsentPopup' )
 {
-    $clientId = Core_Array::Get( 'client_id', 0, PARAM_INT );
-    $typeId =   Core_Array::Get( 'type_id', 0, PARAM_INT );
+    $clientId = Core_Array::Get( 'client_id', null, PARAM_INT );
+    $typeId =   Core_Array::Get( 'type_id', null, PARAM_INT );
+    $date =     Core_Array::Get( 'date', date( 'Y-m-d' ), PARAM_INT );
+    $id =       Core_Array::Get( 'id', null, PARAM_INT );
 
-    if ( $clientId === 0 )
+
+    if ( ( is_null( $clientId ) || is_null( $typeId ) ) && is_null( $id ) )
     {
         Core_Page_Show::instance()->error( 404 );
     }
 
-    if ( $typeId === 0 )
+
+    if ( !is_null( $clientId ) )
     {
-        Core_Page_Show::instance()->error( 404 );
+        $Client = User_Controller::factory( $clientId );
+
+        if ( $Client === null )
+        {
+            Core_Page_Show::instance()->error( 404 );
+        }
     }
 
-
-    $Client = User_Controller::factory( $clientId );
-
-    if ( $Client === null )
+    if ( is_null( $id ) )
     {
-        Core_Page_Show::instance()->error( 404 );
+        $AbsentPeriod = Core::factory( 'Schedule_Absent' )
+            ->queryBuilder()
+            ->where( 'client_id', '=', $clientId )
+            ->where( 'date_from', '<=', $date )
+            ->where( 'date_to', '>=', $date )
+            ->find();
     }
-
+    else
+    {
+        $AbsentPeriod = Core::factory( 'Schedule_Absent', $id );
+    }
 
     Core::factory( 'Core_Entity' )
-        ->addSimpleEntity( 'clientid', $clientId )
-        ->addSimpleEntity( 'typeid', $typeId )
+        ->addSimpleEntity( 'client_id', $clientId )
+        ->addSimpleEntity( 'type_id', $typeId )
+        ->addSimpleEntity( 'date_from', $date )
+        ->addEntity( $AbsentPeriod, 'absent' )
         ->xsl( 'musadm/schedule/absent_popup.xsl' )
         ->show();
 
@@ -399,10 +415,8 @@ if ( $action === 'teacherReport' )
         $teacherAbsentValue = 0;
     }
 
-    if ( $attendance == 0 )
-    {
-        $Report->teacherRate( $teacherAbsentValue );
-    }
+    if ( $att )
+    $Report->teacherRate( $teacherAbsentValue );
 
 
     /**

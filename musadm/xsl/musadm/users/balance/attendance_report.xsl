@@ -1,40 +1,39 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-
-        <style>
-            .attendance {
-                margin-top: 40px;
-                margin-bottom: 40px;
-            }
-        </style>
-
-        <div class="attendance">
+        <section class="user-attendance">
             <h3>История занятий</h3>
 
-            <div class="balance-lessons table-responsive">
-                <table class="table table-bordered">
-                    <tr class="header">
-                        <th>Дата</th>
-                        <th>Время</th>
-                        <th>Статус</th>
-                        <th>Преподаватель</th>
-                        <xsl:if test="is_director = 1">
-                            <th colspan="2">Финансы</th>
-                        </xsl:if>
-                    </tr>
-                    <xsl:apply-templates select="schedule_lesson_report" />
-                </table>
-            </div>
+            <xsl:choose>
+                <xsl:when test="count(schedule_lesson_report) = 0">
+                    <p>История посещений пуста</p>
+                </xsl:when>
+                <xsl:otherwise>
+                    <div class="balance-lessons table-responsive">
+                        <table class="table table-bordered">
+                            <tr class="header">
+                                <th>Дата</th>
+                                <th>Время</th>
+                                <th>Статус</th>
+                                <th>Преподаватель</th>
+                                <xsl:if test="is_director = 1">
+                                    <th colspan="2">Финансы</th>
+                                </xsl:if>
+                            </tr>
+                            <xsl:apply-templates select="schedule_lesson_report" />
+                        </table>
+                    </div>
 
-            <p>Всего занятий за данный период: <xsl:value-of select="count(schedule_lesson_report)" /></p>
-            <p>Из них явки/неявки:
-                <xsl:value-of select="count(schedule_lesson_report[attendance = 1])" />
-                <xsl:text>/</xsl:text>
-                <xsl:value-of select="count(schedule_lesson_report[attendance = 0])" />
-            </p>
+                    <p>Всего занятий за данный период: <xsl:value-of select="count(schedule_lesson_report)" /></p>
+                    <p>Из них явки/неявки:
+                        <xsl:value-of select="count(schedule_lesson_report[attendance = 1])" />
+                        <xsl:text>/</xsl:text>
+                        <xsl:value-of select="count(schedule_lesson_report[attendance = 0])" />
+                    </p>
+                </xsl:otherwise>
+            </xsl:choose>
 
-        </div>
+        </section>
     </xsl:template>
 
 

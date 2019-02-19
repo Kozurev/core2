@@ -17,30 +17,67 @@
         </script>
 
 
+        <xsl:variable name="date_from">
+            <xsl:choose>
+                <xsl:when test="absent/date_from != ''">
+                    <xsl:value-of select="absent/date_from" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="//date_from" />
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="clientId">
+            <xsl:choose>
+                <xsl:when test="absent/client_id != ''">
+                    <xsl:value-of select="absent/client_id" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="//client_id" />
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="typeId">
+            <xsl:choose>
+                <xsl:when test="absent/type_id != ''">
+                    <xsl:value-of select="absent/type_id" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="//type_id" />
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+
         <form name="createData" id="createData" action=".">
             <div class="column">
                 <span>Период "С" (включительно)</span><span style="color:red" >*</span>
             </div>
             <div class="column">
-                <input class="form-control" type="date" name="dateFrom" />
+                <input class="form-control" type="date" name="dateFrom" value="{$date_from}" />
             </div>
             <hr/>
             <div class="column">
                 <span>Период "До (включительно)"</span><span style="color:red" >*</span>
             </div>
             <div class="column">
-                <input class="form-control" type="date" name="dateTo"  />
-            </div>
-            <div class="column">
-                <span>Напомнить администратору о выходе ученика</span>
-            </div>
-            <div class="column">
-                <input type="checkbox" id="absent_add_task" />
+                <input class="form-control" type="date" name="dateTo" value="{absent/date_to}" />
             </div>
 
-            <input type="hidden" name="id" value="" />
-            <input type="hidden" value="{//clientid}" name="clientId" />
-            <input type="hidden" value="{//typeid}" name="typeId" />
+            <xsl:if test="count(absent) = 0">
+                <div class="column">
+                    <span>Напомнить администратору о выходе ученика</span>
+                </div>
+                <div class="column">
+                    <input type="checkbox" id="absent_add_task" />
+                </div>
+            </xsl:if>
+
+            <input type="hidden" name="id" value="{absent/id}" />
+            <input type="hidden" value="{$clientId}" name="clientId" />
+            <input type="hidden" value="{$typeId}" name="typeId" />
             <input type="hidden" value="Schedule_Absent" name="modelName" />
 
             <button class="popop_schedule_absent_submit btn btn-default">Сохранить</button>

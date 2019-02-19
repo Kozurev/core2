@@ -233,15 +233,21 @@ function refactorTimeFormat( $time )
  */
 function refactorDateFormat ( $date, $glue = '.', $type = 'full' )
 {
-    $segments = explode( '-', $date );
+//    $segments = explode( '-', $date );
+//
+//    if ( $type === 'short' )
+//    {
+//        unset ( $segments[0] );
+//    }
+//
+//    $segments = array_reverse( $segments );
+//    return implode( $glue, $segments );
 
-    if ( $type === 'short' )
-    {
-        unset ( $segments[0] );
-    }
+    $type === 'short'
+        ?   $format = 'd' . $glue . 'm'
+        :   $format = 'd' . $glue . 'm' . $glue . 'y';
 
-    $segments = array_reverse( $segments );
-    return implode( $glue, $segments );
+    return date( $format, strtotime( $date ) );
 }
 
 

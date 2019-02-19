@@ -3,11 +3,20 @@
     <xsl:template match="root">
         <hr/>
         <div class="row client-notes">
-            <div class="col-lg-6 col-md-6 col-sm-12" >
-                <input class="form-control" placeholder="Заметки" value="{note/value}" id="client_notes" data-userid="{note/object_id}" />
+            <div class="col-lg-4 col-md-6 col-sm-6" >
+                <textarea class="form-control" placeholder="Заметки" id="client_notes" data-userid="{note/object_id}" >
+                    <xsl:choose>
+                        <xsl:when test="note/value != ''">
+                            <xsl:value-of select="note/value" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:text>&#x0A;</xsl:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </textarea>
             </div>
 
-            <div class="col-lg-3 col-md-2 col-sm-2">
+            <div class="col-lg-2 col-md-3 col-sm-6">
                 <span>Сменный график: </span>
 
                 <input type="checkbox" id="per_lesson" class="checkbox-new" data-userid="{note/object_id}" >
@@ -20,9 +29,21 @@
                 </label>
             </div>
 
+            <xsl:if test="absent/id != ''">
+                <div class="col-lg-2 col-md-2 col-sm-6">
+                    <span>Отсутствует:</span>
+                    <br/>
+                    <span id="absent-from"><xsl:value-of select="absent/date_from" /></span>
+                    <span> - </span>
+                    <span id="absent-to"><xsl:value-of select="absent/date_to" /></span>
+                    <a class="action edit"><xsl:text>&#x0A;</xsl:text></a>
+                    <a class="action delete"><xsl:text>&#x0A;</xsl:text></a>
+                </div>
+            </xsl:if>
+
             <xsl:if test="entry/value != ''">
-                <div class="col-lg-3 col-md-4 col-sm-4">
-                    <span>Последний раз онлайн: <xsl:value-of select="entry/value" /></span>
+                <div class="col-lg-4 col-md-3 col-sm-6">
+                    <span>Последяя авторизация: <xsl:value-of select="entry/value" /></span>
                 </div>
             </xsl:if>
         </div>

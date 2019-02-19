@@ -3,6 +3,10 @@
     margin-bottom: 20px;
 }
 
+.client-notes div {
+    min-height: 60px;
+}
+
 .balance-lessons {
     max-height: 430px;
     overflow-y: auto;

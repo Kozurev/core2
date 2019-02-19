@@ -352,27 +352,20 @@ class Task_Controller
      */
     public function getTasks()
     {
-        /**
-         * Поиск конкретной задачи
-         */
+        //Поиск конкретной задачи
         if ( $this->taskId !== null )
         {
             $this->TaskQuery->where( 'Task.id', '=', $this->taskId );
         }
 
-        /**
-         * Задание условия принадлежности той же организации что и пользователь
-         */
+        //Задание условия принадлежности той же организации что и пользователь
         if ( $this->isSubordinate === true && $this->User !== null )
         {
             $subordinated = $this->User->getDirector()->getId();
             $this->TaskQuery->where( 'subordinated', '=', $subordinated );
         }
 
-
-        /**
-         * Задание условий принадлежности филлиалам
-         */
+        //Задание условий принадлежности филлиалам
         $areasIds = [];
 
         if ( count( $this->forAreas ) > 0 )
@@ -397,15 +390,12 @@ class Task_Controller
             $areasIds[] = 0;
         }
 
-        if ( count( $areasIds ) > 0 )
+        if ( ( $this->isLimitedAreasAccess === true || count( $this->forAreas ) > 0 ) && $this->User->groupId() !== 6 )
         {
             $this->TaskQuery->whereIn( 'area_id', $areasIds );
         }
 
-
-        /**
-         * Задание условий временного промежутка
-         */
+        //Задание условий временного промежутка
         if ( $this->isPeriodControl === true && $this->taskId === null )
         {
             if ( $this->periodFrom !== null )
@@ -429,7 +419,6 @@ class Task_Controller
                     ->close();
             }
         }
-
 
         if ( $this->User !== null && $this->User->groupId() === 5 )
         {

@@ -32,9 +32,12 @@ $(function(){
          */
         .on("click", ".schedule_absent", function(e){
             e.preventDefault();
-            var clientid = $(this).parent().parent().data("clientid");
-            var typeid = $(this).parent().parent().data("typeid");
-            getScheduleAbsentPopup(clientid, typeid);
+            var
+                clientid =  $(this).parent().parent().data('clientid'),
+                typeid =    $(this).parent().parent().data('typeid'),
+                date =      $('#schedule_calendar').val();
+
+            getScheduleAbsentPopup(clientid, typeid, date);
         })
 
         /**
@@ -44,14 +47,32 @@ $(function(){
             e.preventDefault();
             loaderOn();
 
+            var
+                dateTo = $('input[name=dateTo]').val(),
+                dateFrom = $('input[name=dateFrom]').val(),
+                clientId = $("input[name=clientId]").val();
+
             if( $("#absent_add_task").is(":checked") )
             {
-                var dateTo = $("input[name=dateTo]").val();
-                var clientId = $("input[name=clientId]").val();
                 addAbsentTask(dateTo, clientId);
             }
 
-            saveData("Main", function(response){refreshSchedule();});
+            saveData("Main", function(response){
+                if ($('.users').length == 0)
+                {
+                    refreshSchedule();
+                }
+                else
+                {
+                    refreshUserTable();
+                    // if (response == '0')
+                    // {
+                    //     $('#absent-from').text(dateFrom);
+                    //     $('#absent-to').text(dateTo);
+                    // }
+                    // loaderOff();
+                }
+            });
         })
 
         /**
@@ -536,15 +557,17 @@ function getSchedule(userid, date, func) {
 }
 
 
-function getScheduleAbsentPopup(clientid, typeid) {
+function getScheduleAbsentPopup(clientid, typeid, date, id) {
     $.ajax({
         type: "GET",
-        url: "",
+        url: root + "/schedule",
         async: false,
         data: {
             action: "getScheduleAbsentPopup",
             client_id: clientid,
-            type_id: typeid
+            type_id: typeid,
+            date: date,
+            id: id
         },
         success: function(responce){
             showPopup(responce);

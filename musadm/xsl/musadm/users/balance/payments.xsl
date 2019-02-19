@@ -1,35 +1,35 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
+        <section class="user-payments">
+            <h3>Список платежей</h3>
 
-        <h3>Список платежей</h3>
+            <xsl:choose>
+                <xsl:when test="count(payment) = 0">
+                    <p>Финансовых операций не найдено</p>
+                </xsl:when>
+                <xsl:otherwise>
+                    <div class="balance-payments tab">
+                        <table id="sortingTable" class="table table-statused">
+                            <thead>
+                                <tr class="header">
+                                    <th>Дата</th>
+                                    <th>Сумма</th>
+                                    <th>Примечание</th>
+                                    <xsl:if test="is_admin = 1">
+                                        <th><!--Костыль--></th>
+                                    </xsl:if>
+                                </tr>
+                            </thead>
 
-        <xsl:choose>
-            <xsl:when test="count(payment) = 0">
-                <p>Ничего не найдено</p>
-            </xsl:when>
-            <xsl:otherwise>
-                <div class="balance-payments tab">
-                    <table id="sortingTable" class="table table-statused">
-                        <thead>
-                            <tr class="header">
-                                <th>Дата</th>
-                                <th>Сумма</th>
-                                <th>Примечание</th>
-                                <xsl:if test="is_admin = 1">
-                                    <th></th>
-                                </xsl:if>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <xsl:apply-templates select="payment" />
-                        </tbody>
-                    </table>
-                </div>
-            </xsl:otherwise>
-        </xsl:choose>
-        <br/>
+                            <tbody>
+                                <xsl:apply-templates select="payment" />
+                            </tbody>
+                        </table>
+                    </div>
+                </xsl:otherwise>
+            </xsl:choose>
+        </section>
     </xsl:template>
 
 

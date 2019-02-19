@@ -1,3 +1,7 @@
+.users section {
+	margin-bottom: 60px;
+}
+
 .users h2 {
 	display: inline-block;
 }
@@ -21,9 +25,24 @@
 }
 
 
+.user-events .cards-section {
+	margin-bottom: 10px;
+}
+
+.user-events .events .tasks-comments {
+	margin-bottom: 30px;
+}
+
+/*.user-events .event_task .tasks-comments {*/
+	/*padding-left: 30px;*/
+	/*margin-top: -15px;*/
+/*}*/
+
+
 h3 {
 	cursor: pointer;
 }
+
 
 #client-filter {
 	margin-bottom: 10px;
@@ -39,3 +58,7 @@ h3 {
 #client-filter ul li span {
 	vertical-align: super;
 }
+
+/*.users .client-info .table {*/
+	/*font-size: 16px;*/
+/*}*/

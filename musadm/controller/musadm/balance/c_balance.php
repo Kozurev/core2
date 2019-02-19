@@ -16,7 +16,9 @@ $subordinated = User::current()->getDirector()->getId();
 User::isAuthAs() ? $isAdmin = 1 : $isAdmin = 0;
 
 //id клиента под которым авторизован менеджер/директор
-$pageClientId = Core_Array::Get( 'userid', null );
+$pageClientId = Core_Array::Get( 'userid', null, PARAM_INT );
+
+Core::factory( 'User_Controller' );
 
 //Получение объекта пользователя клиента
 if ( is_null( $pageClientId ) )
@@ -25,18 +27,20 @@ if ( is_null( $pageClientId ) )
 }
 else
 {
-    $User = Core::factory( 'User', $pageClientId );
+    $User = User_Controller::factory( $pageClientId );
 }
 
 /**
  * Проверка на принадлежность клиента, под которым происходит авторизация,
  * тому же директору, которому принадлежит и менеджер
  */
-if ( $User->subordinated() !== $subordinated )
+if ( is_null( $User ) )
 {
     Core_Page_Show::instance()->error( 403 );
 }
 
+
+$OutputXml = Core::factory( 'Core_Entity' );
 
 /**
  * Пользовательские примечания и дата последней авторизации
@@ -44,34 +48,48 @@ if ( $User->subordinated() !== $subordinated )
 if ( !is_null( $pageClientId ) )
 {
     $ClientNote = Core::factory( 'Property', 19 );
-    $clientNote = $ClientNote->getPropertyValues( $User );
+    $clientNote = $ClientNote->getPropertyValues( $User )[0];
 
     $PropertyPerLesson = Core::factory( 'Property', 32 );
-    $perLesson = $PropertyPerLesson->getPropertyValues( $User );
+    $perLesson = $PropertyPerLesson->getPropertyValues( $User )[0];
 
     $LastEntry = Core::factory( 'Property', 22 );
-    $lastEntry = $LastEntry->getPropertyValues( $User );
+    $lastEntry = $LastEntry->getPropertyValues( $User )[0];
 
-    Core::factory( 'Core_Entity' )
-        ->addEntities( $clientNote, 'note' )
-        ->addEntities( $lastEntry, 'entry' )
-        ->addEntities( $perLesson, 'per_lesson' )
-        ->xsl( 'musadm/client_notes.xsl' )
-        ->show();
+    $today = date( 'Y-m-d' );
+
+    $AbsentPeriod = Core::factory( 'Schedule_Absent' )
+        ->queryBuilder()
+        ->where( 'client_id', '=', $User->getId() )
+        ->where( 'date_from', '<=', $today )
+        ->where( 'date_to', '>=', $today )
+        ->find();
+
+    if ( !is_null( $AbsentPeriod ) )
+    {
+        $AbsentPeriod->dateFrom( refactorDateFormat( $AbsentPeriod->dateFrom() ) );
+        $AbsentPeriod->dateTo( refactorDateFormat( $AbsentPeriod->dateTo() ) );
+    }
+
+    $OutputXml
+        ->addEntity( $clientNote, 'note' )
+        ->addEntity( $lastEntry, 'entry' )
+        ->addEntity( $perLesson, 'per_lesson' )
+        ->addEntity( $AbsentPeriod, 'absent' );
 }
 
 /**
  * Баланс, кол-во индивидуальных занятий, кол-во групповых занятий
  */
-$oPropertyBalance = Core::factory( 'Property', 12 );
-$oPropertyPrivateLessons = Core::factory( 'Property', 13 );
-$oPropertyGroupLessons = Core::factory( 'Property', 14 );
+$Balance =          Core::factory( 'Property' )->getByTagName( 'balance' );
+$PrivateLessons =   Core::factory( 'Property' )->getByTagName( 'indiv_lessons' );
+$GroupLessons =     Core::factory( 'Property' )->getByTagName( 'group_lessons' );
 
-$balance = $oPropertyBalance->getPropertyValues( $User )[0];
-$privateLessons = $oPropertyPrivateLessons->getPropertyValues( $User )[0];
-$groupLessons = $oPropertyGroupLessons->getPropertyValues( $User )[0];
+$balance =          $Balance->getPropertyValues( $User )[0];
+$privateLessons =   $PrivateLessons->getPropertyValues( $User )[0];
+$groupLessons =     $GroupLessons->getPropertyValues( $User )[0];
 
-Core::factory( 'Core_Entity' )
+$OutputXml
     ->addEntity( $User )
     ->addSimpleEntity( 'is_admin', $isAdmin )
     ->addEntity( $balance, 'property' )
@@ -91,40 +109,39 @@ if ( $User->groupId() == 5 )
     ?>
     <input type="hidden" id="userid" value="<?=$User->getId()?>" />
 
-    <h3>Расписание занятий</h3>
-    <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-12">
-            <select class="form-control client_schedule" id="month">
-                <option value="01">Январь</option>
-                <option value="02">Февраль</option>
-                <option value="03">Март</option>
-                <option value="04">Апрель</option>
-                <option value="05">Май</option>
-                <option value="06">Июнь</option>
-                <option value="07">Июль</option>
-                <option value="08">Август</option>
-                <option value="09">Сентябрь</option>
-                <option value="10">Октябрь</option>
-                <option value="11">Ноябрь</option>
-                <option value="12">Декабрь</option>
-            </select>
-        </div>
+    <section class="user-schedule">
+        <h3>Расписание занятий</h3>
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-12">
+                <select class="form-control client_schedule" id="month">
+                    <option value="01">Январь</option>
+                    <option value="02">Февраль</option>
+                    <option value="03">Март</option>
+                    <option value="04">Апрель</option>
+                    <option value="05">Май</option>
+                    <option value="06">Июнь</option>
+                    <option value="07">Июль</option>
+                    <option value="08">Август</option>
+                    <option value="09">Сентябрь</option>
+                    <option value="10">Октябрь</option>
+                    <option value="11">Ноябрь</option>
+                    <option value="12">Декабрь</option>
+                </select>
+            </div>
 
-        <div class="col-lg-6 col-md-6 col-sm-12">
-            <select class="form-control client_schedule" id="year">
-                <option value="2017">2017</option>
-                <option value="2018">2018</option>
-                <option value="2019">2019</option>
-            </select>
+            <div class="col-lg-6 col-md-6 col-sm-12">
+                <select class="form-control client_schedule" id="year">
+                    <option value="2017">2017</option>
+                    <option value="2018">2018</option>
+                    <option value="2019">2019</option>
+                    <option value="2020">2020</option>
+                    <option value="2021">2021</option>
+                </select>
+            </div>
         </div>
-    </div>
     <?
-
     $month = Core_Array::Get( 'month', date( 'm' ) );
     $year =  Core_Array::Get( 'year', date( 'Y' ) );
-
-    //$TeacherLessons = [];
-
     ?>
     <script>
         $("#month").val("<?=$month?>");
@@ -136,6 +153,9 @@ if ( $User->groupId() == 5 )
         ->userId( $userId )
         ->setCalendarPeriod( $month, $year )
         ->printCalendar();
+    ?>
+    </section>
+    <?
 }
 /**
  * <<Конец
@@ -242,15 +262,11 @@ Core::factory( 'Core_Entity' )
     ->show();
 
 
-/**
- * Новый раздел со списком событий
- */
+//Новый раздел со списком событий
 if( $isAdmin === 1 )
 {
 
-    /**
-     * Поиск событий, связанных с пользователем
-     */
+    //Поиск событий, связанных с пользователем
     $UserEvents = Core::factory( 'Event' );
     $UserEvents->queryBuilder()
         ->where( 'user_assignment_id', '=', $User->getId() )
@@ -259,10 +275,7 @@ if( $isAdmin === 1 )
 
     $UserEvents = $UserEvents->findAll();
 
-
-    /**
-     * Поиск задачь, связанных с пользователем
-     */
+    //Поиск задачь, связанных с пользователем
     Core::factory( 'Task_Controller' );
     $TaskController = new Task_Controller( $User );
     $Tasks = $TaskController
