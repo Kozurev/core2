@@ -4,7 +4,7 @@
  *
  * @author Egor
  * @date 03.02.2019 20:13
- * @version 20190218
+ * @version 20190219
  * Class User_Controller
  */
 class User_Controller
@@ -523,23 +523,19 @@ class User_Controller
 
     /**
      * Поиск пользователей по указанным параметрам
+     *
+     * @return array
      */
     public function getUsers()
     {
-        /**
-         * Добавление условия выборки пользователей принадлежащих той же организации что и текущий пользователь
-         * Также этот параметр будет использоваться для выборки филиалов
-         */
+        //Фильтр по принадлежности организации
         if ( $this->User !== null && $this->isSubordinate === true )
         {
             $subordinated = $this->User->getDirector()->getId();
             $this->UserQuery->where( 'subordinated', '=', $subordinated );
         }
 
-
-        /**
-         * Поиск указанных групп и связанных с ними дополнительных свйоств
-         */
+        //Поиск указанных групп и связанных с ними дополнительных свйоств
         if ( count( $this->groupIds ) > 0 )
         {
             foreach ( $this->groupIds as $groupId )
@@ -555,11 +551,10 @@ class User_Controller
             }
         }
 
-
         /**
          * Фильтр фо филиалам
          * Поиск только тех пользователей что принадлежат заданым филиалам
-         * либо тем же филиалам что и текущий пользователь
+         * либо тем же филиалам которые связаны с текущим пользователем
          */
         $areasIds = [];
 
@@ -594,10 +589,7 @@ class User_Controller
                 ->close();
         }
 
-
-        /**
-         * Фильт по активности пользователей
-         */
+        //Фильт по активности пользователей
         if ( $this->active === true )
         {
             $this->UserQuery->where( 'active', '=', '1' );
@@ -607,19 +599,13 @@ class User_Controller
             $this->UserQuery->where( 'active', '=', '0' );
         }
 
-
-        /**
-         * Фильтр по группам
-         */
+        //Фильтрация по группам
         if ( count( $this->groupIds ) > 0 )
         {
             $this->UserQuery->whereIn( 'group_id', $this->groupIds );
         }
 
-
-        /**
-         * Фильтры
-         */
+        //Фильтры
         if ( $this->filter !== null )
         {
             /**
@@ -718,9 +704,7 @@ class User_Controller
                 }
             }
 
-            /**
-             * Присоединение необходимых таблиц при фильтрации по доп. свойствам
-             */
+            //Присоединение необходимых таблиц при фильтрации по доп. свойствам
             foreach ( $joins as $tableName => $params )
             {
                 $conditions = 'User.id = ' . $params['as'] . '.object_id AND ' . $params['as'] . '.model_name = \'User\' ';
@@ -733,17 +717,13 @@ class User_Controller
 
         $Users = $this->UserQuery->findAll();
 
-        $this->countUsers = count( $Users );  //Кол-во найденных пользователей для последующих циклов
+        $this->countUsers = count( $Users );
 
 
-        /**
-         * Поиск доп. свйоств для групп и значений доп. свойств для каждого из пользователей
-         */
+        //Поиск доп. свйоств для групп и значений доп. свойств для каждого из пользователей
         if ( $this->properties !== false )
         {
-            /**
-             * Поиск списка доп. свойств для пользователей
-             */
+            //Поиск списка доп. свойств для пользователей
             if ( $this->properties === true )
             {
                 foreach ( $this->Groups as $Group )
@@ -773,23 +753,16 @@ class User_Controller
                 }
             }
 
+            $userIds = [];
 
-            $userIds = [];  //Массив идентификаторов пользователей
-
-
-            /**
-             * Сопоставление id пользователей с группами, которым они принадлежат
-             */
+            //Сопоставление id пользователей с группами, которым они принадлежат
             for ( $i = 0; $i < $this->countUsers; $i++ )
             {
                 $userIds[] = $Users[$i]->getId();
                 $this->Groups[$Users[$i]->groupId()]['groupUserIds'][] = $Users[$i]->getId();
             }
 
-
-            /**
-             * Поиск и сопоставлений пользователей со связями с филиалами
-             */
+            //Поиск и сопоставлений пользователей со связями с филиалами
             if ( $this->isWithAreaAssignments === true )
             {
                 $AreaAssignments = Core::factory( 'Schedule_Area_Assignment' )
@@ -813,10 +786,7 @@ class User_Controller
                 }
             }
 
-
-            /**
-             * Поиск значений доп. свойств пользователей
-             */
+            //Поиск значений доп. свойств пользователей
             foreach ( $this->Groups as $Group )
             {
                 foreach ( $Group['properties'] as $GroupProperty )
@@ -835,8 +805,8 @@ class User_Controller
 
                     /**
                      * Сопостовлений значений доп. свойств с пользователями, которым они принадлежат
-                     * С точки зрения читабельности кода лучше было использовать за место while/for 2 foreach-а
-                     * но с точки зрения производительности из-за больших объемов данных
+                     * С точки зрения читабельности кода лучше было использовать за место for - foreach
+                     * но с точки зрения производительности из-за больших объемов данных так лучше, хотя хз :)
                      */
                     for ( $valueIndex = 0; $valueIndex < $countValues; $valueIndex++ )
                     {
@@ -848,7 +818,6 @@ class User_Controller
                             }
                         }
                     }
-
                 }
             }
         }//Конец работы с доп. свойствами
@@ -857,7 +826,12 @@ class User_Controller
     }
 
 
-
+    /**
+     * Вывод сформированного HTML на основании указаных параметров и XSL шаблона
+     *
+     * @param bool $isEcho
+     * @return mixed
+     */
     public function show( $isEcho = true )
     {
         global $CFG;
@@ -874,10 +848,7 @@ class User_Controller
             )
             ->xsl( $this->xsl );
 
-
-        /**
-         * Добавление объектов доп. свойств
-         */
+        //Добавление объектов доп. свойств
         foreach ( $this->Groups as $Group )
         {
             foreach ( $Group['properties'] as $Property )
