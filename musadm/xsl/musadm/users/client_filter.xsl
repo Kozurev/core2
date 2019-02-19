@@ -41,23 +41,17 @@
                 <div class="col-lg-3">
                     <h4>Сменный график</h4>
                     <div class="row">
-                        <!--<input class="checkbox" id="property_18" type="checkbox" name="property_18" />-->
-                        <!--<label for="property_18" class="checkbox-label">-->
-                            <!--<span class="off">Нет</span>-->
-                            <!--<span class="on">Да</span>-->
-                        <!--</label>-->
-
                         <ul class="list">
                             <li>
-                                <input class="checkbox-new" type="checkbox" name="property_18[]" id="property_18_1" value="1" />
-                                <label class="label-new" for="property_18_1">
+                                <input class="checkbox-new" type="checkbox" name="property_32[]" id="property_32_1" value="1" />
+                                <label class="label-new" for="property_32_1">
                                     <div class="tick"><input type="hidden" name="kostul"/></div>
                                 </label>
                                 <span>Да</span>
                             </li>
                             <li>
-                                <input class="checkbox-new" type="checkbox" name="property_18[]" id="property_18_2" value="0" />
-                                <label class="label-new" for="property_18_2">
+                                <input class="checkbox-new" type="checkbox" name="property_32[]" id="property_32_2" value="0" />
+                                <label class="label-new" for="property_32_2">
                                     <div class="tick"><input type="hidden" name="kostul"/></div>
                                 </label>
                                 <span>Нет</span>

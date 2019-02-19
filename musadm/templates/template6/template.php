@@ -5,7 +5,7 @@ Core_Page_Show::instance()->css( "/templates/template6/css/style.css" );
 /**
  * Фильтры для страницы клиентов
  */
-if ( Core_Page_Show::instance()->StructureItem->getId() == 5 )
+if ( Core_Page_Show::instance()->StructureItem !== null && Core_Page_Show::instance()->StructureItem->getId() == 5 )
 {
     $Areas =        Core::factory( 'Schedule_Area' )->getList();
     $Instruments =  Core::factory( 'Property' )->getByTagName( 'instrument' )->getList();

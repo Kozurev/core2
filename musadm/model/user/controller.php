@@ -622,7 +622,13 @@ class User_Controller
          */
         if ( $this->filter !== null )
         {
-            $joins = [];    //Список присоедененных таблиц
+            /**
+             * Массив параметров присоеденяемых таблиц со значениями доп. свйоств где:
+             *  ключ: название присоеденяемой таблицы
+             *  ['as']: синоним таблицы (Property_Bool => prop_bool)
+             *  ['propid']: массив идентификаторов свойств
+             */
+            $joins = [];
 
             foreach ( $this->filter as $paramName => $values )
             {
@@ -643,17 +649,10 @@ class User_Controller
                         ?   $propTableSynonym . '.value_id'
                         :   $propTableSynonym . '.value';
 
-                    if ( Core_Array::getValue( $joins, $propTableName, null ) == null )
-                    {
-                        $conditions = $propTableSynonym . '.object_id = User.id';
-                        $this->UserQuery->leftJoin( $propTableName . ' AS ' . $propTableSynonym, $conditions );
-                        $joins[$propTableName] = true;
-                    }
 
+                    $joins[$propTableName]['as'] = $propTableSynonym;
+                    $joins[$propTableName]['propid'][] = $Property->getId();
 
-                    $this->UserQuery
-                        ->open()
-                        ->where( $propTableSynonym . '.property_id', '=', $propertyId );
 
                     if ( in_array( $Property->defaultValue(), $values ) )
                     {
@@ -668,7 +667,6 @@ class User_Controller
                         $this->UserQuery->whereIn( $propColumn, $values );
                     }
 
-                    $this->UserQuery->close();
                     continue;
                 }
 
@@ -718,6 +716,17 @@ class User_Controller
                         $this->UserQuery->close();
                     }
                 }
+            }
+
+            /**
+             * Присоединение необходимых таблиц при фильтрации по доп. свойствам
+             */
+            foreach ( $joins as $tableName => $params )
+            {
+                $conditions = 'User.id = ' . $params['as'] . '.object_id AND ' . $params['as'] . '.model_name = \'User\' ';
+                $conditions .= ' AND ' . $params['as'] . '.property_id IN (' . implode( ', ', $params['propid'] ) . ')';
+
+                $this->UserQuery->leftJoin( $tableName . ' AS ' . $params['as'], $conditions );
             }
         }
 
