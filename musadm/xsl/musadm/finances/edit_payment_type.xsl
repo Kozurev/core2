@@ -2,12 +2,16 @@
 
     <xsl:template match="root">
 
-        <div class="row popup_row">
+        <div class="row popup-row-block">
             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                 <label for="input_new_payment_type">Введите название:</label>
                 <input type="text" id="input_new_payment_type" class="form-control" placeholder="Тип платежа" />
 
-                <a href="#" class="btn btn-green btn-large finances_payment_type_append">Сохранить</a>
+                <div class="row">
+                    <div class="col-lg-6 col-md-8 col-sm-12 col-xs-12">
+                        <a href="#" class="btn btn-large btn-green finances_payment_type_append">Сохранить</a>
+                    </div>
+                </div>
             </div>
 
 
@@ -16,7 +20,11 @@
                     <xsl:apply-templates select="type" />
                 </select>
 
-                <a href="#" class="btn btn-red btn-large finances_payment_type_delete">Удалить</a>
+                <div class="row">
+                    <div class="col-lg-6 col-md-8 col-sm-12 col-xs-12">
+                        <a href="#" class="btn btn-red btn-large finances_payment_type_delete">Удалить</a>
+                    </div>
+                </div>
             </div>
         </div>
     </xsl:template>

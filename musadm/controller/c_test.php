@@ -11,6 +11,9 @@
 Orm::Debug( true );
 $Orm = new Orm();
 
+$Orm->executeQuery( 'alter table Schedule_Area change count_classess count_classes int not null;' );
+
+
 $Orm->executeQuery( 'ALTER TABLE Page_Template RENAME TO Core_Page_Template;' );
 $Orm->executeQuery( 'ALTER TABLE Page_Template_Dir RENAME TO Core_Page_Template_Dir;' );
 
