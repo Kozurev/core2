@@ -8,7 +8,7 @@
 
         <div class="row buttons-panel">
             <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                <a href="#" class="btn btn-green schedule_area_edit" data-area_id="0">Создать филиал</a>
+                <a href="#" class="btn btn-green schedule_area_edit" data-area_id="">Создать филиал</a>
             </div>
         </div>
 
@@ -35,16 +35,8 @@
 
         <tr>
             <td><a href="{/root/wwwroot}/schedule/{path}"><xsl:value-of select="title" /></a></td>
-            <td><xsl:value-of select="count_classess" /></td>
+            <td><xsl:value-of select="count_classes" /></td>
             <td>
-                <!--<input type="checkbox" name="schedule_area_active" id="schedule_area_active{position()}" data-area_id="{id}" class="checkbox-new" >-->
-                    <!--<xsl:if test="active = 1">-->
-                        <!--<xsl:attribute name="checked">checked</xsl:attribute>-->
-                    <!--</xsl:if>-->
-                <!--</input>-->
-                <!--<label for="schedule_area_active{position()}" class="label-new">-->
-                    <!--<div class="tick"><input type="hidden" name="kostul"/></div>-->
-                <!--</label>-->
                 <input class="checkbox" id="checkbox{id}" type="checkbox" name="schedule_area_active" data-area_id="{id}" >
                     <xsl:if test="active = 1">
                         <xsl:attribute name="checked">true</xsl:attribute>

@@ -71,7 +71,7 @@ $action = Core_Array::Get(  'action', null );
  */
 if ( $action == 'getScheduleAreaPopup' )
 {
-    $areaId = Core_Array::Get( 'areaId', 0, PARAM_INT );
+    $areaId = Core_Array::Get( 'areaId', null, PARAM_INT );
 
     $Area = Schedule_Area_Controller::factory( $areaId );
 
@@ -378,7 +378,7 @@ if ( $action === 'teacherReport' )
         //Общее значение
         else
         {
-            $AbsentRateType = Core::factory( "Property" )->getByTagName( 'teacher_rate_type_absent_default' );
+            $AbsentRateType = Core::factory( 'Property' )->getByTagName( 'teacher_rate_type_absent_default' );
             $absentRateType = $AbsentRateType->getPropertyValues( $Director )[0]->value();
 
             //По формуле "пропорционально"
@@ -399,7 +399,10 @@ if ( $action === 'teacherReport' )
         $teacherAbsentValue = 0;
     }
 
-    $Report->teacherRate( $teacherAbsentValue );
+    if ( $attendance == 0 )
+    {
+        $Report->teacherRate( $teacherAbsentValue );
+    }
 
 
     /**

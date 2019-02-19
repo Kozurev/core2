@@ -1,11 +1,11 @@
 <?php
 /**
- * Created by PhpStorm.
+ * Класс-контроллер для работы с филиалами
  *
  * @author Kozurev Egor
  * @date 18.02.2019 15:31
- * @version 20190218
- * CLass Schedule_Area_Controller
+ * @version 20190219
+ * Class Schedule_Area_Controller
  */
 class Schedule_Area_Controller
 {
@@ -19,12 +19,14 @@ class Schedule_Area_Controller
      */
     public static function factory( int $id = null, bool $isSubordinate = true )
     {
+        $ResArea = Core::factory( 'Schedule_Area' );
+
         if ( is_null( $id ) )
         {
-            return Core::factory( 'Schedule_Area' );
+            return $ResArea;
         }
 
-        $ResArea = Core::factory( 'Schedule_Area' )
+        $ResArea
             ->queryBuilder()
             ->where( 'id', '=', $id );
 
@@ -44,7 +46,9 @@ class Schedule_Area_Controller
                 return null;
             }
 
-            $ResArea->where( 'subordinated', '=', $Director->getId() );
+            $ResArea
+                ->queryBuilder()
+                ->where( 'subordinated', '=', $Director->getId() );
         }
 
         return $ResArea->find();

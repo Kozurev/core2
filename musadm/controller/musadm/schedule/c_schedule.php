@@ -110,14 +110,14 @@ if (
      * Начало >>
      */
     echo "<tr>";
-    for ( $i = 1; $i <= $Area->countClassess(); $i++ )
+    for ( $i = 1; $i <= $Area->countClasses(); $i++ )
     {
         echo "<th colspan='3'>КЛАСС $i</th>";
     }
     echo "</tr>";
 
     echo "<tr>";
-    for ( $i = 1; $i <= $Area->countClassess(); $i++ )
+    for ( $i = 1; $i <= $Area->countClasses(); $i++ )
     {
         echo "<th>Время</th>";
         echo "<th class='add_lesson' 
@@ -165,7 +165,7 @@ if (
 
     for ( $i = 0; $i <= 1; $i++ )
     {
-        for ( $class = 1; $class <= $Area->countClassess(); $class++ )
+        for ( $class = 1; $class <= $Area->countClasses(); $class++ )
         {
             $maxLessonTime[$i][$class] = '00:00:00';
         }
@@ -180,7 +180,7 @@ if (
     {
         echo '<tr>';
 
-        for ( $class = 1; $class <= $Area->countClassess(); $class++ )
+        for ( $class = 1; $class <= $Area->countClasses(); $class++ )
         {
             if ( !compareTime( $time, '>=', $maxLessonTime[0][$class] )
                 && !compareTime( $time, '>=', $maxLessonTime[1][$class] )
@@ -375,7 +375,7 @@ if (
      * Начало >>
      */
     echo '<tr>';
-    for ( $i = 1; $i <= $Area->countClassess(); $i++ )
+    for ( $i = 1; $i <= $Area->countClasses(); $i++ )
     {
         echo '<th>Время</th>';
         echo "<th class='add_lesson' 
@@ -398,7 +398,7 @@ if (
     echo '</tr>';
 
     echo '<tr>';
-    for ( $i = 1; $i <= $Area->countClassess(); $i++ )
+    for ( $i = 1; $i <= $Area->countClasses(); $i++ )
     {
         echo "<th colspan='3'>КЛАСС $i</th>";
     }

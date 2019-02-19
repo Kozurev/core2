@@ -27,7 +27,7 @@
                 <span>Кол-во классов</span><span style="color:red" >*</span>
             </div>
             <div class="column">
-                <input type="number" name="countClassess" class="form-control" value="{schedule_area/count_classess}" />
+                <input type="number" name="countClasses" class="form-control" value="{schedule_area/count_classes}" />
             </div><hr/>
 
             <div class="column">
