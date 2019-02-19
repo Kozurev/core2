@@ -4,14 +4,12 @@
  *
  * @author Kozurev Egor
  * @date 30.10.2018 10:35
+ * @version 20190219
  */
 
 
-/**
- * Проверка на совпадения по свойству path
- * и транслитное автоматическое задание данного свойства
- */
-Core::attachObserver(  "beforeScheduleAreaSave", function( $args ) {
+
+Core::attachObserver(  'beforeScheduleAreaInsert', function( $args ) {
     $Area = $args[0];
 
     if ( $Area->subordinated() == 0 )
@@ -22,7 +20,7 @@ Core::attachObserver(  "beforeScheduleAreaSave", function( $args ) {
 });
 
 
-Core::attachObserver( "beforePaymentSave", function( $args ) {
+Core::attachObserver( 'beforePaymentInsert', function( $args ) {
     $Payment = $args[0];
 
     if ( $Payment->subordinated() == 0 )
@@ -33,7 +31,7 @@ Core::attachObserver( "beforePaymentSave", function( $args ) {
 });
 
 
-Core::attachObserver("beforeScheduleGroupSave", function( $args ) {
+Core::attachObserver('beforeScheduleGroupInsert', function( $args ) {
     $Group = $args[0];
 
     if ( $Group->subordinated() == 0 )
@@ -44,7 +42,7 @@ Core::attachObserver("beforeScheduleGroupSave", function( $args ) {
 });
 
 
-Core::attachObserver( "beforeTaskSave", function( $args ) {
+Core::attachObserver( 'beforeTaskInsert', function( $args ) {
     $Task = $args[0];
 
     if ( $Task->subordinated() == 0 )
@@ -55,7 +53,7 @@ Core::attachObserver( "beforeTaskSave", function( $args ) {
 });
 
 
-Core::attachObserver( "beforePaymentTarifSave", function( $args ) {
+Core::attachObserver( 'beforePaymentTarifInsert', function( $args ) {
     $Tarif = $args[0];
 
     if ( $Tarif->subordinated() == 0 )
@@ -66,7 +64,7 @@ Core::attachObserver( "beforePaymentTarifSave", function( $args ) {
 });
 
 
-Core::attachObserver( "beforePropertyListValuesSave", function( $args ) {
+Core::attachObserver( 'beforePropertyListValuesInsert', function( $args ) {
     $PropertyListValue = $args[0];
 
     if ( $PropertyListValue->subordinated() == 0 )
@@ -77,7 +75,7 @@ Core::attachObserver( "beforePropertyListValuesSave", function( $args ) {
 });
 
 
-Core::attachObserver( "beforePaymentTypeSave", function( $args ) {
+Core::attachObserver( 'beforePaymentTypeInsert', function( $args ) {
     $PaymentType = $args[0];
 
     if ( $PaymentType->subordinated() == 0 )
@@ -97,4 +95,18 @@ Core::attachObserver( 'beforeLidStatusInsert', function( $args ) {
         $LidStatus->subordinated( $User->getId() );
     }
 
+});
+
+
+/**
+ * При создании лида задание значения свойства subordinated
+ */
+Core::attachObserver( 'beforeLidInsert', function( $args ) {
+    $Lid = $args[0];
+
+    if ( $Lid->subordinated() == 0 )
+    {
+        $User = User::current()->getDirector();
+        $Lid->subordinated( $User->getId() );
+    }
 });
