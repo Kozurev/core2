@@ -389,7 +389,7 @@ if ( $action === 'showAssignmentsPopup' )
     }
 
 
-    $AreasList = Core::factory( 'Schedule_Area' )->getList();
+    $AreasList = Core::factory( 'Schedule_Area' )->getList( true, false );
     $AreaAssignments = Core::factory( 'Schedule_Area_Assignment' )->getAssignments( $Object );
 
     Core::factory( 'Core_Entity' )
