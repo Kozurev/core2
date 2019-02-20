@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Класс реализующий методы для работы с доп. свойствами объектов
+ *
+ * @author Bad Wolf
+ * @date ...
+ * @version 20190220
+ * Class Property
+ */
 class Property extends Property_Model
 {
 
@@ -9,58 +17,6 @@ class Property extends Property_Model
             ->where( 'tag_name', '=', $tag_name )
             ->find();
     }
-
-
-//	public function getPropertyValuesArr( $arr )
-//	{
-//		$ids = array();
-//		foreach ($arr as $val)	$ids[] = $val->getId();
-//		if( count( $ids ) == 0 ) return array();
-//		$modelName = get_class( $arr[0] );
-//		$valueType = "Property_".ucfirst($this->type());
-//
-//		$emptyValue = Core::factory( $valueType )
-//            ->property_id($this->id)
-//            ->model_name($modelName)
-//            ->value(strval($this->default_value));
-//
-//		$aoValues = Core::factory( "Orm" )
-//			->select(array(
-//				"User.id AS real_id",
-//				"val.id",
-//				"val.property_id",
-//				"val.model_name",
-//				"val.object_id",
-//			))
-//			->from( $modelName )
-//			->leftJoin( $valueType . " AS val", $modelName . ".id = val.object_id AND val.model_name = '" . $modelName . "' AND val.property_id = " . $this->id )
-//			->where( $modelName . ".id", "IN", $ids );
-//
-//		if( $this->type == "list" )
-//		{
-//			$aoValues
-//				->select( "val.value_id" )
-//				->select( "plv.value" )
-//				->leftJoin( "Property_List_Values AS plv", "plv.id = val.value_id" );
-//		}
-//		else
-//		{
-//			$aoValues->select( "val.value" );
-//		}
-//
-//		$aoValues = $aoValues->findAll( $valueType );
-//
-//		foreach ( $aoValues as $key => $value )
-//		{
-//			if( $value->getId() == "" )
-//			{
-//				$aoValues[$key] = $emptyValue;
-//				$aoValues[$key]->object_id( $value->real_id );
-//			}
-//		}
-//
-//		return $aoValues;
-//	}
 
 
 	/**
@@ -77,7 +33,7 @@ class Property extends Property_Model
         }
 
 
-        $tableName = "Property_" . ucfirst( $this->type() );
+        $tableName = 'Property_' . ucfirst( $this->type() );
         $modelName = $obj->getTableName();
 
         $EmptyValue = Core::factory( $tableName )
@@ -128,7 +84,7 @@ class Property extends Property_Model
 
         foreach( $types as $type )
         {
-            $tableName = "Property_" . $type . "_Assigment";
+            $tableName = 'Property_' . $type . '_Assigment';
 
             $TypeProperties = Core::factory( $tableName )
                 ->queryBuilder()
@@ -162,7 +118,7 @@ class Property extends Property_Model
             return null;
         }
 
-        $tableName = "Property_" . $Property->type() . "_Assigment";
+        $tableName = 'Property_' . $Property->type() . '_Assigment';
 
         $obj->getId() == 0
             ?   $objectId = 0
@@ -206,7 +162,7 @@ class Property extends Property_Model
             return null;
         }
 
-        $tableName = "Property_" . $Property->type() . "_Assigment";
+        $tableName = 'Property_' . $Property->type() . '_Assigment';
 
         $obj->getId() == 0
             ?   $objectId = 0
@@ -242,7 +198,7 @@ class Property extends Property_Model
             return null;
         }
 
-		$tableName = "Property_" . ucfirst( $this->type() );
+		$tableName = 'Property_' . ucfirst( $this->type() );
 
 		$NewPropertyValue = Core::factory( $tableName )
 			->property_id( $this->id )
@@ -307,7 +263,7 @@ class Property extends Property_Model
     {
         $tableName = 'Property_' . ucfirst( $this->type() );
 
-        $Assignments = Core::factory( $tableName . "_Assigment" )
+        $Assignments = Core::factory( $tableName . '_Assigment' )
             ->queryBuilder()
             ->where( 'property_id', '=', $this->id )
             ->findAll();
@@ -337,7 +293,7 @@ class Property extends Property_Model
      */
     public function clearForObject( $obj )
     {
-        if ( !is_object( $obj ) || !method_exists( $obj, "getId" ) )
+        if ( !is_object( $obj ) || !method_exists( $obj, 'getId' ) )
         {
             return null;
         }
@@ -354,7 +310,7 @@ class Property extends Property_Model
 
         foreach ( $this->getPropertyTypes() as $type )
         {
-            $tableName = "Property_" . $type . "_Assigment";
+            $tableName = 'Property_' . $type . '_Assigment';
 
             $Assignments = Core::factory( $tableName )
                 ->queryBuilder()
@@ -383,11 +339,13 @@ class Property extends Property_Model
 
         foreach ( $types as $type )
         {
-            $Assignments = Core::factory( "Property_" . $type . "_Assigment" )
+            $Assignments = Core::factory( 'Property_' . $type . '_Assigment' )
                 ->queryBuilder()
                 ->where( 'model_name', '=', $obj->getTableName() )
-                ->where( 'object_id', '=', $objectId )
-                ->where( 'object_id', "=", 0 )
+                ->open()
+                    ->where( 'object_id', '=', $objectId )
+                    ->orWhere( 'object_id', "=", 0 )
+                ->close()
                 ->findAll();
 
             foreach ( $Assignments as $Assignment )
@@ -396,17 +354,16 @@ class Property extends Property_Model
             }
         }
 
-        if( method_exists( $obj, "getParent" ) )
+        if ( method_exists( $obj, 'getParent' ) )
         {
             $Parent = $obj->getParent();
 
-            if( $Parent->getId() != null )
+            if ( $Parent->getId() != null )
             {
                 $ParentProperties = Core::factory( 'Property' )->getAllPropertiesList( $Parent );
                 $Properties = array_merge( $ParentProperties, $Properties );
             }
         }
-
 
         //Отсеивание повторяющихся свойств
         $propertiesIds = [];
