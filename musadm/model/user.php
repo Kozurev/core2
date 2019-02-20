@@ -10,10 +10,14 @@ class User extends User_Model
      */
     public function getParent()
     {
-        if( $this->id )
-            return Core::factory( "User_Group", $this->group_id );
+        if ( $this->id )
+        {
+            return Core::factory( 'User_Group', $this->group_id );
+        }
         else
-            return Core::factory( "User_Group" );
+        {
+            return Core::factory( 'User_Group' );
+        }
     }
 
 
@@ -24,15 +28,12 @@ class User extends User_Model
 	 */
 	public function isUserExists( $login )
 	{
-		$oUser = Core::factory('User');
-		$oUser = $oUser->queryBuilder()
-			->where("login", "=", $login)
+		$User = Core::factory( 'User' )
+            ->queryBuilder()
+			->where( 'login', '=', $login )
 			->find();
 	
-		if( $oUser )
-			return true;
-		else 
-			return false;
+		return !is_null( $User );
 	}
 
 
@@ -44,9 +45,9 @@ class User extends User_Model
 	 */
 	public function save()
 	{
-        Core::notify(array(&$this), "beforeUserSave");
+        Core::notify( [&$this], 'beforeUserSave' );
 
-		if( !$this->id && $this->isUserExists( $this->login ) )
+		if ( !$this->id && $this->isUserExists( $this->login ) )
 		{
 			echo "<br>Пользователь с такими данными уже существует( $this->login ) <br/>";
 			return $this;
@@ -54,7 +55,7 @@ class User extends User_Model
 
 		parent::save();
 
-        Core::notify(array(&$this), "afterUserSave");
+        Core::notify( [&$this], 'afterUserSave' );
 
         return $this;
 	}
@@ -62,9 +63,9 @@ class User extends User_Model
 
 	public function delete( $obj = null )
     {
-        Core::notify(array(&$this), "beforeUserDelete");
+        Core::notify( [&$this], 'beforeUserDelete' );
         parent::delete();
-        Core::notify(array(&$this), "afterUserDelete");
+        Core::notify( [&$this], 'afterUserDelete' );
     }
 
 
@@ -76,39 +77,29 @@ class User extends User_Model
 	 */
 	public function authorize( $remember = false )
 	{
-        Core::notify( array( &$this ), "beforeUserAuthorize" );
+        Core::notify( [&$this], 'beforeUserAuthorize' );
 
 		$result = $this->queryBuilder()
-			->where( "login", "=", $this->login )
-			->where( "password", "=", $this->password )
-            ->where( "active", "=", "1" )
+			->where( 'login', '=', $this->login )
+			->where( 'password', '=', $this->password )
+            ->where( 'active', '=', 1 )
 			->find();
 
-		if( $result )
+		if ( $result )
 		{
-		    if( $remember == true )
+		    if ( $remember == true )
             {
-                $_SESSION['core']['user'] = $result->getId();
                 $cookieData = $result->getId();
-                $cookieTime = 3600 * 24;
-
-                if( defined( "REMEMBER_USER_TIME" ) || REMEMBER_USER_TIME != "" )
-                {
-                    $cookieTime *= REMEMBER_USER_TIME;
-                }
-                else
-                {
-                    $cookieTime *= 30;
-                }
-
-                setcookie( "userdata", $cookieData, time() + $cookieTime, "/" );
+                $cookieTime = 3600 * 24 * 30;
+                setcookie( 'userdata', $cookieData, time() + $cookieTime, '/' );
             }
+
             $_SESSION['core']['user'] = $result->getId();
 		    $_SESSION['core']['user_backup'] = [];
-		    unset( $_SESSION["core"]["user_object"] );
+		    unset( $_SESSION['core']['user_object'] );
 		}
 
-        Core::notify(array(&$result), "afterUserAuthorize");
+        Core::notify( [&$result], 'afterUserAuthorize' );
 		return $result;
 	}
 
@@ -157,28 +148,30 @@ class User extends User_Model
      */
     public static function current()
     {
-        if( isset($_COOKIE["userdata"]) )
+        if ( Core_Array::Cookie( 'userdata', 0, PARAM_INT ) != 0 )
         {
-            $_SESSION['core']['user'] = $_COOKIE["userdata"];
+            $_SESSION['core']['user'] = Core_Array::Cookie( 'userdata', 0, PARAM_INT );
         }
 
-        if( Core_Array::getValue( $_SESSION["core"], "user_object", null ) !== null )
+        if ( Core_Array::Session( 'core/user_object', null ) !== null )
         {
-            $User = Core_Array::getValue( $_SESSION["core"], "user_object", false );
+            $User = Core_Array::Session( 'core/user_object', null );
             return unserialize( $User );
         }
 
-        if( isset($_SESSION['core']['user']) && $_SESSION['core']['user'] )
+        if ( Core_Array::Session( 'core/user', 0, PARAM_INT ) != 0 )
         {
-            $oCurrentUser = Core::factory( 'User', $_SESSION['core']['user'] );
+            $CurrentUser = Core::factory( 'User', Core_Array::Session( 'core/user', 0, PARAM_INT ) );
 
-            if( $oCurrentUser !== null && $oCurrentUser->active() == 1 )
+            if ( $CurrentUser !== null && $CurrentUser->active() == 1 )
             {
-                $_SESSION["core"]["user_object"] = serialize( $oCurrentUser );
-                return $oCurrentUser;
+                $_SESSION['core']['user_object'] = serialize( $CurrentUser );
+                return $CurrentUser;
             }
             else
+            {
                 return null;
+            }
         }
         else
         {
@@ -192,57 +185,51 @@ class User extends User_Model
 	 */
 	static public function disauthorize()
 	{	
-		unset( $_SESSION["core"]["user"] );
-		unset( $_SESSION["core"]["user_object"] );
-		unset( $_SESSION["core"]["user_backup"] );
+		unset( $_SESSION['core']['user'] );
+		unset( $_SESSION['core']['user_object'] );
+		unset( $_SESSION['core']['user_backup'] );
 
-		$cookieTime = 3600 * 24;
+		$cookieTime = 3600 * 24 * 30;
 
-        if( defined( "REMEMBER_USER_TIME" ) && REMEMBER_USER_TIME != "" )
-        {
-            $cookieTime *= REMEMBER_USER_TIME;
-        }
-        else
-        {
-            $cookieTime = 30;
-        }
-
-        setcookie( "userdata", "", 0 - time() - $cookieTime, "/" );
+        setcookie( 'userdata', '', 0 - time() - $cookieTime, '/' );
 	}
 
 
     /**
      * Проверка авторизации пользователя (объявляется в самом начале страницы)
      *
-     * @param $aParams - ассоциативный массив параметров -> список идентификаторов допустимых групп пользователей и проверка на свойство superuser
-     * @param null $oUser - объект пользователя (по умолчанию используется авторизованный пользователь)
+     * @param $params - ассоциативный массив параметров -> список идентификаторов допустимых групп пользователей и проверка на свойство superuser
+     * @param null $User - объект пользователя (по умолчанию используется авторизованный пользователь)
      * @return bool
      */
-	static public function checkUserAccess( $aParams, $oUser = null )
+	static public function checkUserAccess( $params, $User = null )
     {
-        $aGroups = Core_Array::getValue( $aParams, "groups", null );
-        $bOnlyForSuperuser = Core_Array::getValue( $aParams, "superuser", null );
+        $groups =       Core_Array::getValue( $params, 'groups', null, PARAM_ARRAY );
+        $forSuperuser = Core_Array::getValue( $params, 'superuser', null, PARAM_BOOL );
 
-        if( is_null( $oUser ) )
-            $oCurrentUser = User::current();
+        if ( is_null( $User ) )
+        {
+            $CurrentUser = User::current();
+        }
         else
-            $oCurrentUser = $oUser;
+        {
+            $CurrentUser = $User;
+        }
 
-        if($oCurrentUser == false)
+        if ( $CurrentUser == null )
         {
             return false;
         }
 
-        if(!is_null($aGroups) && !in_array($oCurrentUser->groupId(), $aGroups))
+        if ( !is_null( $groups ) && !in_array( $CurrentUser->groupId(), $groups ) )
         {
             return false;
         }
 
-        if(!is_null($bOnlyForSuperuser) && $oCurrentUser->superuser() != 1)
+        if ( $forSuperuser == true && $CurrentUser->superuser() != 1 )
         {
             return false;
         }
-
 
         return true;
     }
@@ -253,19 +240,17 @@ class User extends User_Model
      * Особенностью является то, что сохраняется исходный id
      * и есть возможность вернуться к предыдущей учетной записи при помощи метода authRevert
      *
-     * @param $userid - id пользователя, от имени которого происходит авторизация
+     * @param $userId - id пользователя, от имени которого происходит авторизация
      */
-    public static function authAs( $userid )
+    public static function authAs( $userId )
     {
         $CurrentUser = self::current();
 
-        if( $CurrentUser !== false && self::checkUserAccess( ["groups" => [1, 2, 6]], $CurrentUser ) )
+        if ( $CurrentUser !== null && self::checkUserAccess( ['groups' => [ROLE_ADMIN, ROLE_MANAGER, ROLE_DIRECTOR]], $CurrentUser ) )
         {
-            $cookieTime = 3600 * 24;
-            //setcookie("userdata", "", 0 - time() - $cookieTime, "/");
-            $_SESSION["core"]["user_backup"][] = $_SESSION['core']['user'];
-            $_SESSION['core']['user'] = $userid;
-            $_SESSION["core"]["user_object"] = serialize( Core::factory( "User", $userid ) );
+            $_SESSION['core']['user_backup'][] = Core_Array::Session( 'core/user', 0, PARAM_INT );
+            $_SESSION['core']['user'] = $userId;
+            $_SESSION['core']['user_object'] = serialize( Core::factory( 'User', $userId ) );
         }
     }
 
@@ -276,12 +261,16 @@ class User extends User_Model
      */
     public static function authRevert()
     {
-        $userId = array_pop( $_SESSION["core"]["user_backup"] );
-        if( $userId === null )  self::disauthorize();
+        $userId = array_pop( $_SESSION['core']['user_backup'] );
+
+        if ( $userId === null )
+        {
+            self::disauthorize();
+        }
         else
         {
-            $_SESSION["core"]["user"] = $userId;
-            $_SESSION["core"]["user_object"] = serialize( Core::factory( "User", $userId ) );
+            $_SESSION['core']['user'] = $userId;
+            $_SESSION['core']['user_object'] = serialize( Core::factory( 'User', $userId ) );
         }
     }
 
@@ -293,13 +282,17 @@ class User extends User_Model
      */
     public static function isAuthAs()
     {
-        $sessionAuthAs = Core_Array::getValue( $_SESSION["core"], "user_backup", false );
-        $getParamAuthAs = Core_Array::Get( "userid", false );
+        $sessionAuthAs =    Core_Array::Session( 'core/user_backup', false, PARAM_ARRAY );
+        $getParamAuthAs =   Core_Array::Get( 'userid', false, PARAM_INT );
 
-        if( $sessionAuthAs || $getParamAuthAs )
+        if ( $sessionAuthAs || $getParamAuthAs )
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
 
 
@@ -310,11 +303,19 @@ class User extends User_Model
      */
     public static function parentAuth()
     {
-        $backup = Core_Array::getValue( $_SESSION["core"], "user_backup", false );
-        if( $backup == false )      return self::current();
-        if( count( $backup ) == 0 ) return self::current();
+        $backup = Core_Array::Session( 'core/user_backup', null, PARAM_ARRAY );
 
-        return Core::factory( "User", $backup[0] );
+        if ( $backup == null )
+        {
+            return self::current();
+        }
+
+        if ( count( $backup ) == 0 )
+        {
+            return self::current();
+        }
+
+        return Core::factory( 'User', $backup[0] );
     }
 
 
@@ -345,28 +346,31 @@ class User extends User_Model
      */
     public function addComment( $text, $userId = 0, $authorId = 0 )
     {
-        if( $userId === 0 && $this->id == null )
+        if ( $userId === 0 && $this->id == null )
         {
             die( "Невозможно добавить комментарий не указав id пользователя" );
         }
 
-        if( !is_string( $text ) )
+        if ( !is_string( $text ) )
         {
             die( "Параметр <b>text</b> метода <b>addComment</b> должен быть типа 'string'" );
         }
 
-        if( $userId === 0 )    $userId = $this->getId();
+        if ( $userId === 0 )
+        {
+            $userId = $this->getId();
+        }
 
-        $Comment = Core::factory( "User_Comment" )
+        $Comment = Core::factory( 'User_Comment' )
             ->authorId( $authorId )
             ->userId( $userId )
             ->text( $text );
 
-        Core::notify( array( &$Comment ), "beforeUserAddComment" );
+        Core::notify( [&$Comment], 'beforeUserAddComment' );
 
         $Comment->save();
 
-        Core::notify( array( &$Comment ), "afterUserAddComment" );
+        Core::notify( [&$Comment], 'afterUserAddComment' );
 
         return $this;
     }
@@ -381,8 +385,13 @@ class User extends User_Model
     public function getOrganizationName()
     {
         $Director = $this->getDirector();
-        if ( $Director->groupId() !== 6 )    return "";
-        $Property = Core::factory( "Property", 30 );
+
+        if ( $Director->groupId() !== ROLE_DIRECTOR )
+        {
+            return "";
+        }
+
+        $Property = Core::factory( 'Property', 30 );
         $organization = $Property->getPropertyValues( $Director )[0]->value();
 
         return $organization;
@@ -404,12 +413,12 @@ class User extends User_Model
         if ( $User->groupId() === 1 )   return true;
         if ( !is_object( $Object ) )    return false;
 
-        if ( !method_exists( $Object, "subordinated" ) )
+        if ( !method_exists( $Object, 'subordinated' ) )
         {
             return true;
         }
 
-        if( $User->getId() > 0 && $User->groupId() == 6 && $Object->subordinated() == $User->getId() )
+        if ( $User->getId() > 0 && $User->groupId() == ROLE_DIRECTOR && $Object->subordinated() == $User->getId() )
         {
             return true;
         }
