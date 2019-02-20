@@ -4,7 +4,7 @@
  *
  * @author Bad Wolf
  * @date 20.03.2018 16:03
- * @version 20190218
+ * @version 20190220
  */
 class Core_Array
 {
@@ -19,7 +19,8 @@ class Core_Array
         'PARAM_INT'     => 'int',
         'PARAM_FLOAT'   => 'float',
         'PARAM_STRING'  => 'string',
-        'PARAM_BOOL'    => 'bool'
+        'PARAM_BOOL'    => 'bool',
+        'PARAM_ARRAY'   => 'array'
     ];
 
 
@@ -229,6 +230,20 @@ class Core_Array
     public static function Server( $key, $default = null, $type = null )
     {
         return self::getValue( $_SERVER, $key, $default, $type );
+    }
+
+
+    /**
+     * Метод для получения значения из массива $_COOKIE
+     *
+     * @param $key - ключь
+     * @param null $default - значение по умолчанию
+     * @param null $type - тип возвращаемого значнеия
+     * @return mixed
+     */
+    public static function Cookie( $key, $default = null, $type = null )
+    {
+        return self::getValue( $_COOKIE, $key, $default, $type );
     }
 
 }
