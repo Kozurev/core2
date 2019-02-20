@@ -8,12 +8,19 @@ $subordinated = $Director->getId();
 Core::factory( 'User_Controller' );
 Core::factory( 'Schedule_Area_Controller' );
 
+
+$action = Core_Array::Get(  'action', null, PARAM_STRING );
+
+
 if ( !User::checkUserAccess( ['groups' => [ROLE_MANAGER, ROLE_TEACHER, ROLE_DIRECTOR]] ) )
 {
     Core_Page_Show::instance()->error( 403 );
 }
 
-if ( User::checkUserAccess( ['groups' => [ROLE_MANAGER]] ) && Core_Page_Show::instance()->StructureItem == null )
+if ( User::checkUserAccess( ['groups' => [ROLE_MANAGER]] )
+    && Core_Page_Show::instance()->StructureItem == null
+    && $action == null
+)
 {
     Core_Page_Show::instance()->error( 403 );
 }
@@ -69,8 +76,6 @@ else
     Core_Page_Show::instance()->setParam( 'breadcumbs', $breadcumbs );
 }
 
-
-$action = Core_Array::Get(  'action', null, PARAM_STRING );
 
 
 /**

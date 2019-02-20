@@ -270,7 +270,7 @@ if( $isAdmin === 1 )
     $UserEvents = Core::factory( 'Event' );
     $UserEvents->queryBuilder()
         ->where( 'user_assignment_id', '=', $User->getId() )
-        ->whereIn( 'type_id', [2, 3, 4, 5, 7, 8, 9] )
+        ->whereIn( 'type_id', [2, 3, 4, 5, 7, 8, 9, 27] )
         ->orderBy( 'time', 'DESC' );
 
     $UserEvents = $UserEvents->findAll();
