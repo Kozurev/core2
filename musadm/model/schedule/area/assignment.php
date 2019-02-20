@@ -2,10 +2,11 @@
 /**
  * Класс реализующий методы для работы со связями объектов и филиалов
  *
- * @author Kozurev Egor
+ * @author Bad Wolf
  * @date 18.01.2019 16:28
+ * @version 20190220
+ * Class Schedule_Area_Assignment
  */
-
 class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
 {
 
@@ -58,7 +59,6 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
                 ->where( 'subordinated', '=', $User->getDirector()->getId() );
         }
 
-
         //Поиск филиала по свойству area_id
         if ( method_exists( $object, 'areaId' ) && $object->areaId() > 0 )
         {
@@ -109,29 +109,19 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
                 ->where( 'subordinated', '=', $User->getDirector()->getId() );
         }
 
+        //Исключительный случай: если объект является пользователем который имеет роль директора в системе
+        //то ему по умолчанию доступен список всех филиалов, принадлежащих его организации
+        if ( get_class( $object ) === 'User' && $object->groupId() === ROLE_DIRECTOR )
+        {
+            return Core::factory( 'Schedule_Area' )->getList( true, false );
+        }
 
-        $Assignments = Core::factory( 'Schedule_Area_Assignment' )
+        return Core::factory( 'Schedule_Area' )
             ->queryBuilder()
-            ->clearQuery()
-            ->where( 'model_name', '=', $object->getTableName() )
-            ->where( 'model_id', '=', $object->getId() )
-            ->findAll();
-
-        if ( count( $Assignments ) == 0 )
-        {
-            return [];
-        }
-        else
-        {
-            foreach ( $Assignments as $Assignment )
-            {
-                $areasIds[] = $Assignment->areaId();
-            }
-
-            return $Area->queryBuilder()
-                ->whereIn( 'id', $areasIds )
-                ->findAll();
-        }
+            ->join( 'Schedule_Area_Assignment AS saa', 'saa.area_id = Schedule_Area.id' )
+            ->where( 'saa.model_name', '=', $object->getTableName() )
+            ->where( 'saa.model_id', '=', $object->getId() )
+            ->findALl();
     }
 
 
@@ -196,7 +186,7 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
      *
      * @param $object
      * @param $areaId
-     * @return mixed
+     * @return Schedule_Area_Assignment
      */
     public function createAssignment( $object, $areaId )
     {
@@ -224,23 +214,16 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
                 $object->save();
             }
 
-            return $object;
+            return $this;
         }
 
-
         //Проверка на наличие связи (многие ко многим) с объектом для избежания дубликатов
-        $ExistingAssignment = Core::factory( 'Schedule_Area_Assignment' )
-            ->queryBuilder()
-            ->where( 'model_name', '=', $object->getTableName() )
-            ->where( 'model_id', '=', $object->getId() )
-            ->where( 'area_id', '=', $areaId )
-            ->find();
+        $ExistingAssignment = $this->issetAssignment( $object, $areaId );
 
         if ( $ExistingAssignment !== null )
         {
             return $ExistingAssignment;
         }
-
 
         //Создание нвой связи филиала с объектом
         $NewAssignment = Core::factory( 'Schedule_Area_Assignment' )
@@ -287,13 +270,7 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
             return $object;
         }
 
-
-        $ExistingAssignment = Core::factory( 'Schedule_Area_Assignment' )
-            ->queryBuilder()
-            ->where( 'model_id', '=', $object->getId() )
-            ->where( 'model_name', '=', $object->getTableName() )
-            ->where( 'area_id', '=', $areaId )
-            ->find();
+        $ExistingAssignment = $this->issetAssignment( $object, $areaId );
 
         if ( $ExistingAssignment !== null )
         {
@@ -304,7 +281,30 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
     }
 
 
+    /**
+     * Метод для проверки/поиска существоования?существующей связи объекта и филиала
+     *
+     * @date 20.02.2019 09:29
+     * @param $object
+     * @param $areaId
+     * @return Schedule_Area_Assignment|null
+     */
+    public function issetAssignment( $object, $areaId )
+    {
+        if ( !is_object( $object ) )
+        {
+            exit ( 'createAssignment -> Передаваемый параметр должен быть объектом' );
+        }
 
+        $ExistingAssignment = Core::factory( 'Schedule_Area_Assignment' )
+            ->queryBuilder()
+            ->where( 'model_id', '=', $object->getId() )
+            ->where( 'model_name', '=', $object->getTableName() )
+            ->where( 'area_id', '=', $areaId )
+            ->find();
+
+        return $ExistingAssignment;
+    }
 
 
 }
