@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Универсальный обработчик для CRUD
+ * Методы данного класса используются как для раздела администрирования так и для других за счет своей универсальности
+ *
+ * Class Admin_Menu_Main
+ */
 class Admin_Menu_Main
 {
 
@@ -9,41 +15,40 @@ class Admin_Menu_Main
     /**
      *	Обработчик для редактрования или создания объектов
      */
-    public function updateAction($aParams)
+    public function updateAction( $aParams )
     {
-        $User = User::current();
-
-        $User->groupId() == 1
-            ?   $subordinated = null
-            :   $subordinated = $User->getId();
-
-
-
         //Список параметров, не имеющих отношения к свойствам редактируемого/создаваемого объекта
-        $aForbiddenTags = ["menuTab", "menuAction", "ajax", "id", "modelName", "getId"];
+        $forbiddenTags = ['menuTab', 'menuAction', 'ajax', 'id', 'modelName', 'getId'];
 
-        /**
-         *	Обновление свойств самого объекта
-         */
-        isset ( $aParams["id"] ) && $aParams["id"] != "0"
-            ?	$oUpdatingItem = Core::factory( $aParams["modelName"], $aParams["id"] )
-            : 	$oUpdatingItem = Core::factory( $aParams["modelName"] );
+        //Обновление свойств объекта
+        $modelName =    Core_Array::getValue( $aParams, 'modelName', '', PARAM_STRING );
+        $modelId =      Core_Array::getValue( $aParams, 'id', 0, PARAM_INT );
+
+         $modelId == 0
+            ?   $UpdatingItem = Core::factory( $modelName )
+            :	$UpdatingItem = Core::factory( $modelName, $modelId );
 
         //Проверка на существование редактируемого объекта
-        if ( $oUpdatingItem === null )
+        if ( $UpdatingItem === null )
         {
-            exit ( Core::getMessage( "NOT_FOUND", [$aParams["modelName"], $aParams["id"]] ) );
+            Core_Page_Show::instance()->error( 403 );
         }
 
 
         foreach ( $aParams as $key => $value )
         {
-            if ( in_array( $key, $aForbiddenTags ) ) continue;
-            if ( method_exists( $oUpdatingItem, $key ) ) $oUpdatingItem->$key( $value );
+            if ( in_array( $key, $forbiddenTags ) )
+            {
+                continue;
+            }
+
+            if ( method_exists( $UpdatingItem, $key ) )
+            {
+                $UpdatingItem->$key( $value );
+            }
         }
 
-
-        $oUpdatingItem->save();
+        $UpdatingItem->save();
 
 
         /**
@@ -51,18 +56,18 @@ class Admin_Menu_Main
          *
          * @date 20.01.2019 20:05
          */
-        $areas = Core_Array::getValue( $aParams, "areas", null );
+        $areas = Core_Array::getValue( $aParams, 'areas', null, PARAM_ARRAY );
 
-        if ( $areas !== null && is_array( $areas ) == true )
+        if ( $areas !== null )
         {
-            $Assignment = Core::factory( "Schedule_Area_Assignment" );
+            $Assignment = Core::factory( 'Schedule_Area_Assignment' );
 
             if ( count( $areas ) == 0 )
             {
-                $Assignment->clearAssignments( $oUpdatingItem );
+                $Assignment->clearAssignments( $UpdatingItem );
             }
 
-            $ExistingAssignments = $Assignment->getAssignments( $oUpdatingItem );
+            $ExistingAssignments = $Assignment->getAssignments( $UpdatingItem );
 
             //Отсеивание уже существующих связей
             foreach ( $areas as $areaKey => $areaId )
@@ -80,7 +85,7 @@ class Admin_Menu_Main
             //Создание новых связей
             foreach ( $areas as $areaId )
             {
-                Core::factory( "Schedule_Area_Assignment" )->createAssignment( $oUpdatingItem, $areaId );
+                Core::factory( 'Schedule_Area_Assignment' )->createAssignment( $UpdatingItem, $areaId );
             }
 
             //Удаление не актуальных старых связей
@@ -90,101 +95,92 @@ class Admin_Menu_Main
             }
         }
 
-
         //Создание доп. свойств объекта со значением по умолчанию либо пустых
-        if ( !isset( $aParams["id"] ) || $aParams["id"] == "" )
+        if ( $modelId == 0 )
         {
-            $Property = Core::factory( "Property" );
-            $Properties = $Property->getAllPropertiesList( $oUpdatingItem );
+            $Property = Core::factory( 'Property' );
+            $Properties = $Property->getAllPropertiesList( $UpdatingItem );
 
             foreach ( $Properties as $Prop )
             {
-                $Prop->addNewValue( $oUpdatingItem, $Prop->defaultValue() );
+                if ( $Prop->getId() == 17 )
+                {
+                    debug( $Prop );
+                    debug( $Prop->defaultValue(), 1 );
+                }
+                $Prop->addNewValue( $UpdatingItem, $Prop->defaultValue() );
             }
         }
 
-
-        /**
-         *	Обновление дополнительных свойств объекта
-         */
-        foreach ( $aParams as $sFieldName => $aFieldValues )
+        //Обновление значений дополнительных свойств объекта
+        foreach ( $aParams as $fieldName => $fieldValues )
         {
-            //Получение id свойства
-            if ( !stristr( $sFieldName, "property_" )
-                || $aParams["modelName"] == "Property"
-                || $sFieldName == "property_id" )   continue;
-
-            $iPropertyId = explode( "property_", $sFieldName )[1];
-            $oProperty = Core::factory( "Property", $iPropertyId );
-
-            if( $aFieldValues[0] === $oProperty->defaultValue() )
+            if ( !stristr( $fieldName, 'property_' )
+                || $modelName == 'Property'
+                || $fieldName == 'property_id' )
             {
-                $aoPropertyValues = $oProperty->getPropertyValues( $oUpdatingItem );
+                continue;
+            }
 
-                if( count( $aoPropertyValues ) > 0 && $aoPropertyValues[0]->value() === $aFieldValues[0] )
+            //Получение id свойства и создание его объекта
+            $propertyId =   explode( 'property_', $fieldName )[1];
+            $Property =     Core::factory( 'Property', $propertyId );
+
+            if ( $fieldValues[0] === $Property->defaultValue() )
+            {
+                $PropertyValues = $Property->getPropertyValues( $UpdatingItem );
+
+                if ( count( $PropertyValues ) > 0 && $PropertyValues[0]->value() === $fieldValues[0] )
                 {
                     continue;
                 }
             }
 
-
-            $oProperty->addToPropertiesList( $oUpdatingItem, $iPropertyId );
-
-            $oProperty->type() == "list"
-                ?   $aoPropertyValues = Core::factory("Property_List")->queryBuilder()
-                        ->where( "model_name", "=", $oUpdatingItem->getTableName() )
-                        ->where( "property_id", "=", $oProperty->getId() )
-                        ->where( "object_id", "=", $oUpdatingItem->getId() )
-                        //->where( "subordinated", "=", $subordinated )
-                        ->findAll()
-                :   $aoPropertyValues = $oProperty->getPropertyValues($oUpdatingItem);
-
+            $Property->addToPropertiesList( $UpdatingItem, $propertyId );
+            $PropertyValues = $Property->getPropertyValues( $UpdatingItem );
 
             //Список значений свойства
-            $aoValuesList = [];
+            $ValuesList = [];
 
             //Разница количества переданных значений и существующих
-            $iResidual = count( $aFieldValues ) - count( $aoPropertyValues );
-
+            $residual = count( $fieldValues ) - count( $PropertyValues );
 
             /**
              *	Формирование списка значений дополнительного свойства
              *	удаление лишних (если было передано меньше значений, чем существует) или
              *	создание новых значений (если передано больше значений, чем существует)
              */
-            if ( $iResidual > 0 )	//Если переданных значений больше чем существующих
+            if ( $residual > 0 )    //Если переданных значений больше чем существующих
             {
-                for ( $i = 0; $i < $iResidual; $i++ )
+                for ( $i = 0; $i < $residual; $i++ )
                 {
-                    $oNewValue = Core::factory( "Property_" . ucfirst( $oProperty->type() ) )
-                        ->property_id( $oProperty->getId() )
-                        ->model_name( $oUpdatingItem->getTableName() )
-                        ->object_id( $oUpdatingItem->getId() );
-
-                    $aoValuesList[] = $oNewValue;
+                    $ValuesList[] = Core::factory( 'Property_' . ucfirst( $Property->type() ) )
+                        ->property_id( $Property->getId() )
+                        ->model_name( $UpdatingItem->getTableName() )
+                        ->object_id( $UpdatingItem->getId() );
                 }
 
-                $aoValuesList = array_merge( $aoValuesList, $aoPropertyValues );
+                $ValuesList = array_merge( $ValuesList, $PropertyValues );
             }
-            elseif ( $iResidual < 0 )	//Если существующих значений больше чем переданных
+            elseif ( $residual < 0 )    //Если существующих значений больше чем переданных
             {
-                for ( $i = 0; $i < abs( $iResidual ); $i++ )
+                for ( $i = 0; $i < abs( $residual ); $i++ )
                 {
-                    $aoPropertyValues[$i]->delete();
-                    unset ( $aoPropertyValues[$i] );
+                    $PropertyValues[$i]->delete();
+                    unset ( $PropertyValues[$i] );
                 }
 
-                $aoValuesList = array_values( $aoPropertyValues );
+                $ValuesList = array_values( $PropertyValues );
             }
-            elseif ( $iResidual == 0 )	//Если количество переданных значений равно количеству существующих
+            elseif ( $residual == 0 )	//Если количество переданных значений равно количеству существующих
             {
-                $aoValuesList = $aoPropertyValues;
+                $ValuesList = $PropertyValues;
             }
 
             //Обновление значений
-            for ( $i = 0; $i < count( $aFieldValues ); $i++ )
+            for ( $i = 0; $i < count( $fieldValues ); $i++ )
             {
-                $aoValuesList[$i]->object_id( $oUpdatingItem->getId() )->value( $aFieldValues[$i] )->save();
+                $ValuesList[$i]->object_id( $UpdatingItem->getId() )->value( $fieldValues[$i] )->save();
             }
         }
 
@@ -193,197 +189,174 @@ class Admin_Menu_Main
 
 
     /**
-     *	Формирование формы для создания или редактирования объектов
+     * Формирование формы для создания или редактирования объектов
      *
-     *	@param $aParams - array, массив параметров вывода информации
+     * @param array $aParams - массив параметров вывода информации
+     * @param string $saveTab - название вкладки для отображения формы редактирования
+     * @param string $usingXslLink - используемый кастомный шаблон
      */
-    public function updateForm( $aParams, $saveTab = "Main", $usingXslLink = "admin/main/update_form.xsl" )
+    public function updateForm( $aParams, $saveTab = 'Main', $usingXslLink = 'admin/main/update_form.xsl' )
     {
-        $oOutputXml = Core::factory( "Core_Entity" );
+        $OutputXml = Core::factory( 'Core_Entity' );
 
-        //Получение значения id родительского объекта, если таков указан
-        isset ( $aParams["parent_id"] )
-            ?	$parentId = (string)$aParams["parent_id"]
-            :	$parentId = "0";
+        //id редактируемого/создаваемого объекта
+        $objectId = Core_Array::getValue( $aParams, 'model_id', 0, PARAM_INT );
 
-        //Получение id редактируемого объекта
-        isset ( $aParams["model_id"] )
-            ?	$objectId = (string)$aParams["model_id"]
-            :	$objectId = "0";
+        //Название класса редактируемого/создаваемого объекта
+        $modelName = Core_Array::getValue( $aParams, 'model', '', PARAM_STRING );
 
+        //id родительского объекта
+        $parentId = Core_Array::getValue( $aParams, 'parent_id', 0, PARAM_INT );
 
         //Поиск полей формы
-        $aoFields = Core::factory( "Admin_Form" )->queryBuilder()
-            ->orderBy( "sorting" )
-            ->where( "active", "=", 1 )
-            ->join( "Admin_Form_Modelname", "Admin_Form.model_id = Admin_Form_Modelname.id" )
-            ->where( "Admin_Form_Modelname.model_name", "=", $aParams["model"] )
+        $Fields = Core::factory( 'Admin_Form' )
+            ->queryBuilder()
+            ->orderBy( 'sorting' )
+            ->where( 'active', '=', 1 )
+            ->join( 'Admin_Form_Modelname', 'Admin_Form.model_id = Admin_Form_Modelname.id' )
+            ->where( 'Admin_Form_Modelname.model_name', '=', $modelName )
             ->findAll();
 
-
-        /**
-         *	Создание редактируемого объекта
-         *	и добавление значений объекта в поля формы
-         */
-        $oUpdatingItem = Core::factory( $aParams["model"], $objectId );
+        //Создание редактируемого объекта и добавление значений объекта в поля формы
+        $UpdatingItem = Core::factory( $modelName, $objectId );
 
         //Проверка на существование редактируемого объекта
-        if ( $oUpdatingItem === null )
+        if ( $UpdatingItem === null )
         {
-            exit ( Core::getMessage( "NOT_FOUND", [$aParams["modelName"], $aParams["id"]] ) );
+            Core_Page_Show::instance()->error( 403 );
         }
 
-
-        foreach ( $aoFields as $oField )
+        foreach ( $Fields as $Field )
         {
-            $methodName = $oField->varName();
+            $methodName = $Field->varName();
 
-            if ( method_exists( $oUpdatingItem, $methodName ) )
+            if ( method_exists( $UpdatingItem, $methodName ) )
             {
-                $oField->value( $oUpdatingItem->$methodName() );
+                $Field->value( $UpdatingItem->$methodName() );
             }
         }
 
-
-        if ( $oUpdatingItem->getId() )
+        if ( $UpdatingItem->getId() )
         {
-            $oOutputXml->addEntity( $oUpdatingItem );
+            $OutputXml->addEntity( $UpdatingItem );
         }
 
-
-        /**
-         *	Добавление дополнительных свойств
-         */
-        if ( $aParams["model"] != "Property" )
+        //Добавление дополнительных свойств
+        if ( $modelName != 'Property' )
         {
-            $parentModelName = Core_Array::getValue( $aParams, "parent_name", null );
-            $parentModelId = Core_Array::getValue( $aParams, "parent_id", 0 );
+            $parentModelName =  Core_Array::getValue( $aParams, 'parent_name', '', PARAM_STRING );
+            $parentModelId =    Core_Array::getValue( $aParams, "parent_id", 0, PARAM_INT );
 
-            if ( Core_Array::getValue( $aParams, "properties", null ) !== null )
+            if ( Core_Array::getValue( $aParams, 'properties', null, PARAM_ARRAY ) !== null )
             {
-                $aoPropertiesId = Core_Array::getValue( $aParams, "properties", null );
+                $propertiesId = Core_Array::getValue( $aParams, 'properties', null, PARAM_ARRAY );
 
-                foreach ( $aoPropertiesId as $id )
+                foreach ( $propertiesId as $id )
                 {
-                    $TmpProperty = Core::factory( "Property", $id );
+                    $TmpProperty = Core::factory( 'Property', $id );
 
                     if ( $TmpProperty === null )
                     {
-                        exit ( Core::getMessage( "NOT_FOUND", ["Свойство", $id] ) );
+                        Core_Page_Show::instance()->error( 403 );
                     }
 
-                    $aoPropertiesList[] = $TmpProperty;
+                    $PropertiesList[] = $TmpProperty;
                 }
             }
             elseif ( $parentModelId != 0 && !is_null( $parentModelName ) )
             {
-                $oParent = Core::factory( $parentModelName, $parentModelId );
+                $Parent = Core::factory( $parentModelName, $parentModelId );
 
-                if ( $oParent === null )
+                if ( $Parent === null )
                 {
-                    exit ( Core::getMessage( "NOT_FOUND", [$parentModelName, $parentModelId] ) );
+                    Core_Page_Show::instance()->error( 403 );
                 }
 
-                $aoPropertiesList = Core::factory( "Property" )->getPropertiesList( $oParent );
+                $PropertiesList = Core::factory( 'Property' )->getPropertiesList( $Parent );
             }
             else
             {
-                $oParent = $oUpdatingItem;
-                $aoPropertiesList = Core::factory( "Property" )->getPropertiesList( $oParent );
+                $Parent = $UpdatingItem;
+                $PropertiesList = Core::factory( 'Property' )->getPropertiesList( $Parent );
             }
 
-
-            //Получения списка дополнительных свойств объекта
-
-
             //Поиск значений дополнительных свойств
-            foreach ( $aoPropertiesList as $oProperty )
+            foreach ( $PropertiesList as $Property )
             {
-                if ( $oProperty->active() == 0 )
+                if ( $Property->active() == 0 )
                 {
                     continue;
                 }
 
-                if ( $oProperty->type() == "list" )
+                if ( $Property->type() == 'list' )
                 {
                     //Добавление значений свойства типа "список"
-                    $aoListValues = Core::factory( "Property_List_Values" )->queryBuilder()
-                        ->where( "property_id", "=", $oProperty->getId() )
-                        ->findAll();
+                    $ListValues = $Property->getList();
 
-                    if ( $oUpdatingItem->getId() != "" )
+                    if ( $UpdatingItem->getId() != 0 )
                     {
-                        $oPropertyList = Core::factory( "Property_List" )->queryBuilder()
-                            ->where( "property_id", "=", $oProperty->getId() )
-                            ->where( "model_name", "=", $oUpdatingItem->getTableName() )
-                            ->where( "object_id", "=", $oUpdatingItem->getId() )
-                            ->findAll();
+                        $PropertyList = $Property->getPropertyValues( $UpdatingItem );
 
-                        if ( count( $oPropertyList ) == 0 )
+                        if ( count( $PropertyList ) == 0 )
                         {
-                            $oPropertyList = [
-                                Core::factory( "Property_List" )->value( $oProperty->defaultValue() )
+                            $PropertyList = [
+                                Core::factory( 'Property_List' )->value( $Property->defaultValue() )
                             ];
                         }
                     }
                     else
                     {
-                        $oPropertyList = [
-                            Core::factory( "Property_List" )->value( $oProperty->defaultValue() )
+                        $PropertyList = [
+                            Core::factory( 'Property_List' )->value( $Property->defaultValue() )
                         ];
                     }
 
-                    foreach ( $oPropertyList as $prop )
+                    foreach ( $PropertyList as $prop )
                     {
-                        $prop->addEntities( $aoListValues, "item" );
+                        $prop->addEntities( $ListValues, 'item' );
                     }
 
-                    $oProperty->addEntities( $oPropertyList, "property_value" );
+                    $Property->addEntities( $PropertyList, 'property_value' );
                 }
                 else
                 {
-                    $aoValues = $oProperty->getPropertyValues( $oUpdatingItem );
-                    $oProperty->addEntities( $aoValues, "property_value" );
+                    $Values = $Property->getPropertyValues( $UpdatingItem );
+                    $Property->addEntities( $Values, 'property_value' );
                 }
 
-                $oOutputXml->addEntity( $oProperty );
+                $OutputXml->addEntity( $Property );
             }
         }
-
 
 
         //Поиск типов полей
-        $aoFieldsTypes = Core::factory( "Admin_Form_Type" )->findAll();
+        $FieldsTypes = Core::factory( 'Admin_Form_Type' )->findAll();
 
-        /**
-         *	Формитрование выходного XML
-         */
-        $oOutputXml
-            ->addSimpleEntity( "model_name", $aParams["model"] )
-            ->addSimpleEntity( "object_id", $objectId )
-            ->addSimpleEntity( "parent_id", $parentId )
-            ->addSimpleEntity( "tab", $saveTab )
-            ->addEntities( $aoFields )
-            ->addEntities( $aoFieldsTypes );
+        //Формитрование выходного XML
+        $OutputXml
+            ->addSimpleEntity( 'model_name', $modelName )
+            ->addSimpleEntity( 'object_id', $objectId )
+            ->addSimpleEntity( 'parent_id', $parentId )
+            ->addSimpleEntity( 'tab', $saveTab )
+            ->addEntities( $Fields )
+            ->addEntities( $FieldsTypes );
 
 
-        /**
-         *	Добавление значений для полей типа "список"
-         */
-        foreach ( $aoFields as $oField )
+        //Добавление значений для полей типа "список"
+        foreach ( $Fields as $Field )
         {
-            if ( $oField->listName() )
+            if ( $Field->listName() )
             {
-                $sMethodName = "getList" . $oField->listName();
+                $methodName = 'getList' . $Field->listName();
 
-                if ( method_exists( $oField, $sMethodName ) )
+                if ( method_exists( $Field, $methodName ) )
                 {
-                    $oField->$sMethodName( $aParams );
+                    $Field->$methodName( $aParams );
                 }
             }
         }
 
-        $oOutputXml
+        $OutputXml
             ->xsl( $usingXslLink )
             ->show();
     }
@@ -394,34 +367,30 @@ class Admin_Menu_Main
      */
     public function updateActive( $aParams )
     {
-        $modelName = $aParams["model_name"];
-        $modelId = $aParams["model_id"];
-        $value = $aParams["value"];
+        $modelName =    Core_Array::getValue( $aParams, 'model_name', '', PARAM_STRING );
+        $modelId =      Core_Array::getValue( $aParams, 'model_id', 0, PARAM_INT );
+        $value =        Core_Array::getValue( $aParams, 'value', null, PARAM_BOOL );
 
-        $value == "true"
-            ?   $bValue = true
-            :   $bValue = false;
+        $eventObjectName = explode( '_', $modelName );
+        $eventObjectName = implode( '', $eventObjectName );
 
-        $eventObjectName = explode( "_", $modelName );
-        $eventObjectName = implode( "", $eventObjectName );
-
-        $bValue === true
-            ?   $eventType = "Activate"
-            :   $eventType = "Deactivate";
+        $value === true
+            ?   $eventType = 'Activate'
+            :   $eventType = 'Deactivate';
 
         $obj = Core::factory( $modelName, $modelId );
 
         //Проверка на существование объекта
         if ( $obj === null )
         {
-            exit ( Core::getMessage( "NOT_FOUND", [$modelName, $modelId] ) );
+            Core_Page_Show::instance()->error( 403 );
         }
 
-        Core::notify( array( $obj ), "before" . $eventObjectName . $eventType );
+        Core::notify( [$obj], 'before' . $eventObjectName . $eventType );
 
-        $obj->active($bValue)->save();
+        $obj->active( $value )->save();
 
-        Core::notify( array( $obj ), "after" . $eventObjectName . $eventType );
+        Core::notify( [$obj], 'after' . $eventObjectName . $eventType );
 
         echo 0;
     }
@@ -432,19 +401,18 @@ class Admin_Menu_Main
      */
     public function deleteAction( $aParams )
     {
-        $modelName = $aParams["model_name"];
-        $modelId = $aParams["model_id"];
+        $modelName =    Core_Array::getValue( $aParams, 'model_name', '', PARAM_STRING );
+        $modelId =      Core_Array::getValue( $aParams, 'model_id', 0, PARAM_INT );
 
         $obj = Core::factory( $modelName, $modelId );
 
         //Проверка на существование объекта
         if ( $obj === null )
         {
-            exit ( Core::getMessage( "NOT_FOUND", [$modelName, $modelId] ) );
+            Core_Page_Show::instance()->error( 403 );
         }
 
         $obj->delete();
-
         echo 0;
     }
 
