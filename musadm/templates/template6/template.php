@@ -7,7 +7,7 @@ Core_Page_Show::instance()->css( "/templates/template6/css/style.css" );
  */
 if ( Core_Page_Show::instance()->StructureItem !== null && Core_Page_Show::instance()->StructureItem->getId() == 5 )
 {
-    $Areas =        Core::factory( 'Schedule_Area' )->getList();
+    $Areas =        Core::factory( 'Schedule_Area_Assignment' )->getAreas( User::current() );
     $Instruments =  Core::factory( 'Property' )->getByTagName( 'instrument' )->getList();
     $Teachers =     Core::factory( 'Property' )->getByTagName( 'teachers' )->getList();
 
