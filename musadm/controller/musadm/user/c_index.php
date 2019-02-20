@@ -45,8 +45,8 @@ $ClientController
     ->isShowCount( true )
     ->addSimpleEntity( 'page-theme-color', 'primary' )
     ->xsl( $xsl );
-    //->show();
 
+$ScheduleAssignment = Core::factory( 'Schedule_Area_Assignment' );
 
 foreach ( $_GET as $paramName => $values )
 {
@@ -54,11 +54,14 @@ foreach ( $_GET as $paramName => $values )
     {
         foreach ( $_GET['areas'] as $areaId )
         {
-            $Area = Core::factory( 'Schedule_Area', $areaId );
-
-            if ( $areaId > 0 && $Area !== null )
+            if ( $areaId > 0 && $ScheduleAssignment->issetAssignment( User::current(), intval( $areaId ) ) !== null )
             {
-                $ClientController->forAreas( [$Area] );
+                $Area = Core::factory( 'Schedule_Area', intval( $areaId ) );
+
+                if ( $Area !== null )
+                {
+                    $ClientController->forAreas( [$Area] );
+                }
             }
         }
 
@@ -131,7 +134,7 @@ $ClientController->show();
 /**
  * Список менеджеров для директора
  */
-if( $groupId == 4 && User::checkUserAccess(["groups" => [6]]) )
+if( $groupId == ROLE_TEACHER && User::checkUserAccess( ['groups' => [ROLE_DIRECTOR]] ) )
 {
     $TeacherController = new User_Controller( User::current() );
     $TeacherController
