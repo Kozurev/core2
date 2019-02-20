@@ -19,7 +19,7 @@ Core::factory( 'Schedule_Area_Controller' );
  *	Блок проверки авторизации
  */
 $User = User::current();
-$accessRules = ['groups' => [1, 2, 6]];
+$accessRules = ['groups' => [ROLE_ADMIN, ROLE_DIRECTOR, ROLE_MANAGER]];
 
 if ( !User::checkUserAccess( $accessRules, $User ) )
 {
@@ -78,7 +78,7 @@ if ( $action == 'updateFormClient' )
             );
     }
 
-    $Areas = Core::factory( 'Schedule_Area' )->getList();
+    $Areas = Core::factory( 'Schedule_Area' )->getList( true, false );
 
     $PropertyLists = Core::factory( 'Property' )
         ->getByTagName( 'teachers' )

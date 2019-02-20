@@ -844,7 +844,7 @@ class User_Controller
             ->addSimpleEntity( 'show-count-users', $this->isShowCount )
             ->addEntities( $this->getUsers() )
             ->addEntities( 
-                Core::factory( 'Schedule_Area' )->getList() 
+                Core::factory( 'Schedule_Area' )->getList( true, false )
             )
             ->xsl( $this->xsl );
 
