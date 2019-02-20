@@ -8,7 +8,16 @@ $subordinated = $Director->getId();
 Core::factory( 'User_Controller' );
 Core::factory( 'Schedule_Area_Controller' );
 
-if ( !User::checkUserAccess( ['groups' => [2, 4, 5, 6]] ) )
+if ( !User::checkUserAccess( ['groups' => [ROLE_MANAGER, ROLE_TEACHER, ROLE_DIRECTOR]] ) )
+{
+    Core_Page_Show::instance()->error( 403 );
+}
+
+if ( User::checkUserAccess( ['groups' => [ROLE_MANAGER]] ) && Core_Page_Show::instance()->StructureItem == null )
+{
+    Core_Page_Show::instance()->error( 403 );
+}
+elseif ( User::checkUserAccess( ['groups' => [ROLE_TEACHER]] ) && Core_Page_Show::instance()->StructureItem != null )
 {
     Core_Page_Show::instance()->error( 403 );
 }
@@ -33,9 +42,7 @@ if ( Core_Page_Show::instance()->StructureItem != null )
     Core_Page_Show::instance()->setParam( 'title-second', Core_Page_Show::instance()->StructureItem->title() );
     Core_Page_Show::instance()->setParam( 'breadcumbs', $breadcumbs );
 
-    /**
-     * Проверка на наличие прав доступа пользователя к расписанию текущего филиала
-     */
+    //Проверка на наличие прав доступа пользователя к расписанию текущего филиала
     $isAccessDenied = true;
 
     $UserAreaAssignments = Core::factory( 'Schedule_Area_Assignment' )->getAssignments( $User );
@@ -63,7 +70,7 @@ else
 }
 
 
-$action = Core_Array::Get(  'action', null );
+$action = Core_Array::Get(  'action', null, PARAM_STRING );
 
 
 /**

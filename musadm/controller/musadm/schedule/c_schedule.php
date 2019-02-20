@@ -7,10 +7,6 @@ is_null( $userId )
     ?   $User = User::current()
     :   $User = Core::factory( 'User', $userId );
 
-if ( $User === null )
-{
-    $this->error( 404 );
-}
 
 $userId = $User->getId();
 
@@ -27,10 +23,9 @@ if ( is_null( $date ) )
  * Формирование таблицы расписания для менеджеров
  * Начало >>
  */
-if (
-    User::checkUserAccess( ['groups' => [2]], $User )
-    || ( User::checkUserAccess( ['groups' => [6]], $User ) && is_object( Core_Page_Show::instance()->StructureItem ) )
-    )
+if ( User::checkUserAccess( ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User )
+    && is_object( Core_Page_Show::instance()->StructureItem )
+)
 {
     $Area = Core_Page_Show::instance()->StructureItem;
     $areaId = $Area->getId();
@@ -47,7 +42,7 @@ if (
         ->where( 'area_id', '=', $areaId )
         ->orderBy( 'time_from' );
 
-    if ( $User->groupId() == 4 )
+    if ( $User->groupId() == ROLE_TEACHER )
     {
         $Lessons->where( 'teacher_id', '=', $User->getId() );
     }
@@ -71,10 +66,8 @@ if (
     {
         if ( $Lesson->isAbsent( $date ) )    continue;
 
-        /**
-         * Если у занятия изменено время на текущую дату то необходимо добавить
-         * его в список занятий текущего расписания
-         */
+        //Если у занятия изменено время на текущую дату то необходимо установить актуальное время
+        //и добавить его в список занятий текущего расписания
         if ( $Lesson->isTimeModified( $date ) )
         {
             $Modify = Core::factory( 'Schedule_Lesson_TimeModified' )
@@ -93,7 +86,6 @@ if (
                 ->lessonType( $Lesson->lessonType() )
                 ->typeId( $Lesson->typeId() );
             $NewCurrentLesson->oldid = $Lesson->getId();
-
             $CurrentLessons[] = $NewCurrentLesson;
         }
         else
@@ -105,10 +97,6 @@ if (
 
     echo "<div class='table-responsive'><table class='table table-bordered manager_table'>";
 
-    /**
-     * Заголовок таблицы
-     * Начало >>
-     */
     echo "<tr>";
     for ( $i = 1; $i <= $Area->countClasses(); $i++ )
     {
@@ -138,15 +126,9 @@ if (
             >Актуальный график</th>";
     }
     echo "</tr>";
-    /**
-     * << Конец
-     * Заголовок таблицы
-     */
 
 
-    /**
-     * Установка первоначальных значений
-     */
+    //Установка первоначальных значений
     $timeStart = '09:00:00';    //Начальная отметка временного промежутка
     $timeEnd = '22:00:00';      //Конечная отметка временного промежутка
 
@@ -190,11 +172,7 @@ if (
                 continue;
             }
 
-
-            /**
-             * Основное расписание
-             * Начало >>
-             */
+            //Основное расписание
             if ( !compareTime( $time, '>=', $maxLessonTime[0][$class] ) )
             {
                 echo '<th>' . refactorTimeFormat( $time ) . '</th>';
@@ -228,12 +206,7 @@ if (
 
                     $maxLessonTime[0][$class] = $tmpTime;
 
-
-                    /**
-                     * Проверка периода отсутствия
-                     * false - период отсутствия не найден
-                     * true - период отсутсвия найден
-                     */
+                    //Проверка периода отсутствия
                     if ( $MainLesson !== false )
                     {
                         $checkClientAbsent = Core::factory( 'Schedule_Absent' )
@@ -245,11 +218,7 @@ if (
                             ->find();
                     }
 
-
-                    /**
-                     * Получение информации об уроке (учитель, клиент, цвет фона)
-                     * и формирование HTML-кода
-                     */
+                    //Получение информации об уроке (учитель, клиент, цвет фона)
                     $MainLessonData = getLessonData( $MainLesson );
 
                     echo '<th>' . refactorTimeFormat( $time ) . '</th>';
@@ -289,34 +258,20 @@ if (
                     echo "</td>";
                 }
             }
-            /**
-             * << Конец
-             * Основное расписание
-             */
 
-
-            /**
-             * Текущее расписание
-             * Начало >>
-             */
+            //Текущее расписание
             if ( compareTime( $time, '>=', $maxLessonTime[1][$class] ) )
             {
                 //Урок из текущего расписания
                 $CurrentLesson = array_pop_lesson( $CurrentLessons, $time, $class );
 
-                /**
-                 * Текущий урок
-                 */
+                //Текущий урок
                 if ( $CurrentLesson !== false )
                 {
-                    // Поиск высоты ячейки (значение тэга rowspan) и обновление $maxLessonTime
+                    //Поиск высоты ячейки (значение тэга rowspan) и обновление $maxLessonTime
                     $rowspan = updateLastLessonTime( $CurrentLesson, $maxLessonTime[1][$class], $time, $period );
 
-
-                    /**
-                     * Получение информации об текущем уроке (учитель, клиент, цвет фона)
-                     * и формирование HTML-кода
-                     */
+                    //Получение информации об текущем уроке (учитель, клиент, цвет фона)
                     $CurrentLessonData = getLessonData( $CurrentLesson );
 
                     echo "<td class='" . $CurrentLessonData["client_status"] . "' rowspan='" . $rowspan . "'>";
@@ -345,18 +300,11 @@ if (
                         echo "</td>";
                     }
                 }
-                /**
-                 * Занятие отсутствует
-                 */
                 else
                 {
                     echo '<td class="clear"></td>';
                 }
             }
-            /**
-             * <<Конец
-             * Текущее расписание
-             */
 
             $CurrentLesson = false;
             $MainLesson = false;
@@ -369,11 +317,6 @@ if (
         $time = addTime( $time, $period );
     }
 
-
-    /**
-     * Заголовок таблицы
-     * Начало >>
-     */
     echo '<tr>';
     for ( $i = 1; $i <= $Area->countClasses(); $i++ )
     {
@@ -403,24 +346,15 @@ if (
         echo "<th colspan='3'>КЛАСС $i</th>";
     }
     echo '</tr>';
-    /**
-     * << Конец
-     * Заголовок таблицы
-     */
 
-    /**
-     * << Конец
-     * Формирование таблицы расписания
-     */
     echo '</table></div>';
 }
 
 
 /**
- * Формирование таблицы расписания для клиентов/преподавателей
- * Начало>>
+ * Формирование таблицы расписания для преподавателей
  */
-if ( $User->groupId() == 4 )
+if ( $User->groupId() == ROLE_TEACHER )
 {
     $month = getMonth( $date );
 
@@ -442,9 +376,7 @@ if ( $User->groupId() == 4 )
         ->setDate( $date )
         ->getLessons();
 
-    /**
-     * Формирование таблицы с отметками о явке/неявке>>
-     */
+    //Формирование таблицы с отметками о явке/неявке>>
     sortByTime( $TeacherLessons, 'timeFrom' );
 
     foreach ( $TeacherLessons as $key => $Lesson )
@@ -456,7 +388,7 @@ if ( $User->groupId() == 4 )
 
         $Reported = $Lesson->isReported( $date );
 
-        if( $Reported !== false )
+        if ( $Reported !== false )
         {
             $Lesson->addEntity( $Reported, 'report' );
         }
@@ -469,7 +401,7 @@ if ( $User->groupId() == 4 )
         ->addEntities( $TeacherLessons, 'lesson' );
 
 
-    User::checkUserAccess( ['groups' => [1, 6]], User::parentAuth() )
+    User::checkUserAccess( ['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]], User::parentAuth() )
         ?   $isAdmin = 1
         :   $isAdmin = 0;
 
@@ -569,15 +501,9 @@ if ( $User->groupId() == 4 )
             <!--За текущий месяц к выплате / уже выплачено: <span id='teacherHaveToPay'>$totalHaveToPay</span> / <span id='teacherPayed'>$totalPayed</span><br>-->
             К выплате: <span id='teacher-debt'>$debt</span>руб; Уже выплачено: <span id='teacher-payed'>$totalPayed</span> руб.
         </div>";
-    /**
-     * <<Формирование таблицы с отметками о явке/неявке
-     */
 
 
-
-    /**
-     * Формирование таблицы с выплатами>>
-     */
+    //Формирование таблицы с выплатами>>
     $Payments = Core::factory( 'Payment' )
         ->queryBuilder()
         ->where( 'type', '=', 3 )
@@ -606,10 +532,14 @@ if ( $User->groupId() == 4 )
     }
 
     //Проверка на авторизованность под видом текущего пользователя
-    User::isAuthAs() ? $isAdmin = 1 : $isAdmin = 0;
+    User::isAuthAs()
+        ?   $isAdmin = 1
+        :   $isAdmin = 0;
 
     //Проверка на авторизованность директора ? администратора под видом преподавателя
-    User::parentAuth()->groupId() === 6 || User::parentAuth()->superuser() == 1 ? $isDirector = 1 : $isDirector = 0;
+    User::parentAuth()->groupId() === ROLE_DIRECTOR || User::parentAuth()->superuser() == 1
+        ?   $isDirector = 1
+        :   $isDirector = 0;
 
 
     Core::factory( 'Core_Entity' )
@@ -620,15 +550,10 @@ if ( $User->groupId() == 4 )
         ->addSimpleEntity( 'date', date( 'Y-m-d' ) )
         ->xsl( 'musadm/finances/teacher_payments.xsl' )
         ->show();
-    /**
-     * <<Формирование таблицы с выплатами
-     */
 
 
-    /**
-     * Таблица с настройками тарифов преподавателя>>
-     */
-    if( User::checkUserAccess( ['groups' => [1, 6]], User::parentAuth() ) )
+    //Таблица с настройками тарифов преподавателя
+    if( User::checkUserAccess( ['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]], User::parentAuth() ) )
     {
         //Общие значения
         $Director = User::current()->getDirector();
@@ -687,28 +612,18 @@ if ( $User->groupId() == 4 )
             ->xsl( 'musadm/finances/teacher_rate_config.xsl' )
             ->show();
     }
-    /**
-     * <<Таблица с настройками тарифов преподавателя
-     */
 }
-/**
- * <<Формирование таблицы с отметками и выплатами для учителей
- */
 
 
 
 /**
  * Формирование списка филлиалов
  */
-if ( $User->groupId() == 6 && !Core_Page_Show::instance()->StructureItem )
+if ( $User->groupId() == ROLE_DIRECTOR && !Core_Page_Show::instance()->StructureItem )
 {
     global $CFG;
 
-    $Areas = Schedule_Area_Controller::factory()
-        ->queryBuilder()
-        ->where( 'subordinated', '=', $User->getId() )
-        ->orderBy( 'sorting' )
-        ->findAll();
+    $Areas = Schedule_Area_Controller::factory()->getList( true, false );
 
     Core::factory( 'Core_Entity' )
         ->addEntities( $Areas )
