@@ -11,11 +11,11 @@
  * Блок проверки авторизации и прав доступа
  */
 $User = User::current();
-$accessRules = ['groups' => [6]];
+$accessRules = ['groups' => [ROLE_DIRECTOR]];
 
 if ( !User::checkUserAccess( $accessRules, $User ) )
 {
-    Core_Page_Show::instance()->error( 404 );
+    Core_Page_Show::instance()->error( 403 );
 }
 
 
@@ -30,7 +30,7 @@ Core_Page_Show::instance()->setParam( 'breadcumbs', $breadcumbs );
 
 
 
-$action = Core_Array::Get('action', null );
+$action = Core_Array::Get('action', null, PARAM_STRING );
 
 
 if ( $action === 'show' )

@@ -62,7 +62,8 @@ foreach ( $userAreaAssignments->fetchAll() AS $assignment )
         ->save();
 }
 
-Core::factory( "Property", 15 )->delete();
+$Prop = Core::factory( "Property", 15 );
+if ( !is_null( $Prop ) )    $Prop->delete();
 $Orm->executeQuery( 'DELETE FROM Property_List_Assigment WHERE property_id = 15' );
 $Orm->executeQuery( 'DELETE FROM Property_List WHERE property_id = 15' );
 $Orm->executeQuery( 'DELETE FROM Property_List_Values WHERE property_id = 15' );

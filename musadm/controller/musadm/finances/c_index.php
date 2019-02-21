@@ -11,15 +11,8 @@ $date = date( $dateFormat );
 $oDate = new DateTime( date( $dateFormat ) );
 $interval = new DateInterval( 'P1M' );
 
-
 $dateFrom = Core_Array::Get( 'date_from', null, PARAM_STRING );
 $dateTo =   Core_Array::Get( 'date_to', null, PARAM_STRING );
-
-
-if ( !User::checkUserAccess( ['groups' => [6]] ) )
-{
-    Core_Page_Show::instance()->error( 404 );
-}
 
 $Director = User::current()->getDirector();
 $subordinated = $Director->getId();

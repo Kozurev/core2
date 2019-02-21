@@ -1,16 +1,16 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 21.05.2018
- * Time: 15:32
+ * Макет для раздела "Финансы"
+ *
+ * @author Bad Wolf
+ * @date 21.05.2018 15:32
+ * @version 20190221
  */
-
 ?>
 
 
-<div class="finances">
-    <?
-        $this->execute();
+<section class="finances">
+    <?php
+        Core_Page_Show::instance()->execute();
     ?>
-</div>
+</section>
