@@ -306,7 +306,7 @@ if( $isAdmin === 1 )
 
         if( $Event->getId() )
         {
-            $Event->text = $Event->getTemplateString();
+            $Event->text = $Event->getTemplateString( Event::STRING_SHORT );
         }
     }
 
