@@ -5,6 +5,10 @@ body {
     font-size: 14px;
 }
 
+section {
+    margin-bottom: 60px;
+}
+
 #header {
     padding: 15px 0;
 }
