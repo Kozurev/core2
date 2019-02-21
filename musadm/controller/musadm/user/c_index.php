@@ -1,12 +1,15 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kopzurev Egor
- * Date: 11.04.2018
- * Time: 22:17
+ * Файл обработчик контента разделов клиенты/штат
+ *
+ * @author Bad Wolf
+ * @date 11.04.2018 22:17
+ * @version 20190221
  */
 
 Core::factory( 'User_Controller' );
+Core::factory( 'Schedule_Area_Controller' );
+
 $groupId = Core_Page_Show::instance()->StructureItem->getId();
 
 if ( $groupId == 5 )
@@ -54,9 +57,12 @@ foreach ( $_GET as $paramName => $values )
     {
         foreach ( $_GET['areas'] as $areaId )
         {
-            if ( $areaId > 0 && $ScheduleAssignment->issetAssignment( User::current(), intval( $areaId ) ) !== null )
+            if ( $areaId > 0 &&
+                ( $ScheduleAssignment->issetAssignment( User::current(), intval( $areaId ) ) !== null ) ||
+                User::checkUserAccess( ['groups' => [ROLE_DIRECTOR]] )
+            )
             {
-                $Area = Core::factory( 'Schedule_Area', intval( $areaId ) );
+                $Area = Schedule_Area_Controller::factory( intval( $areaId ) );
 
                 if ( $Area !== null )
                 {
@@ -81,56 +87,6 @@ foreach ( $_GET as $paramName => $values )
 $ClientController->show();
 
 
-// global $CFG;
-// $Property = Core::factory( "Property" );
-
-// $User = User::current()->getDirector();
-// $subordinated = $User->getId();
-
-// User::parentAuth()->groupId() == 6 || User::parentAuth()->superuser() == 1
-//    ?   $isDirector = 1
-//    :   $isDirector = 0;
-
-// $groupId = Core_Page_Show::instance()->StructureItem->getId();
-// $groupId == 5
-//    ?   $xsl = "musadm/users/clients.xsl"
-//    :   $xsl = "musadm/users/teachers.xsl";
-
-
-// $Users = Core::factory( "User" )->queryBuilder()
-//    ->where( "User.subordinated", "=", $subordinated )
-//    ->where( "group_id", "=", $groupId )
-//    ->where( "User.active", "=", 1 )
-//    ->orderBy( "User.id", "DESC" )
-//    ->findAll();
-
-// $UserGroup = Core::factory( "User_Group", $groupId );
-// $PropertiesList = $Property->getPropertiesList( $UserGroup );
-
-// foreach ( $Users as $User )
-// {
-//    foreach ( $PropertiesList as $prop )
-//    {
-//        $User->addEntities( $prop->getPropertyValues( $User ), "property_value" );
-//    }
-
-//    $UserAreas = Core::factory( "Schedule_Area_Assignment" )->getAreas( $User );
-//    $User->addEntities( $UserAreas, "areas" );
-// }
-
-// $AreaAssignment = Core::factory( "Schedule_Area_Assignment" );
-
-// Core::factory( "Core_Entity" )
-//    ->xsl( $xsl )
-//    ->addSimpleEntity( "page-theme-color", "primary" )
-//    ->addSimpleEntity( "is_director", $isDirector )
-//    //->addSimpleEntity( "disable-export-button", 0 )
-//    ->addSimpleEntity( "wwwroot", $CFG->rootdir )
-//    //->addSimpleEntity( "disable-buttons-row", "0" )
-//    ->addEntities( $Users )
-//    ->show();
-
-
 /**
  * Список менеджеров для директора
  */
@@ -143,25 +99,4 @@ if( $groupId == ROLE_TEACHER && User::checkUserAccess( ['groups' => [ROLE_DIRECT
         ->addSimpleEntity( 'page-theme-color', 'primary' )
         ->xsl( 'musadm/users/managers.xsl' )
         ->show();
-
-   // $Managers = Core::factory( "User" )->queryBuilder()
-   //     ->where( "subordinated", "=", $subordinated )
-   //     ->where( "active", "=", 1 )
-   //     ->where( "group_id", "=", 2 )
-   //     ->findAll();
-
-   // $AreaAssignments = Core::factory( "Schedule_Area_Assignment" );
-
-   // foreach ( $Managers as $Manager )
-   // {
-   //     $ManagerAreas = $AreaAssignments->getAreas( $Manager );
-   //     $Manager->addEntities( $ManagerAreas, "areas" );
-   // }
-
-
-   // Core::factory( "Core_Entity" )
-   //     ->addSimpleEntity( "wwwroot", $CFG->rootdir )
-   //     ->addEntities( $Managers )
-   //     ->xsl( "musadm/users/managers.xsl" )
-   //     ->show();
 }

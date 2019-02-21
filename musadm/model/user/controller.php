@@ -565,7 +565,7 @@ class User_Controller
                 $areasIds[] = $Area->getId();
             }
         }
-        elseif ( $this->isLimitedAreasAccess === true && $this->User !== null && $this->User->groupId() != 6 )
+        elseif ( $this->isLimitedAreasAccess === true && $this->User !== null && $this->User->groupId() != ROLE_DIRECTOR )
         {
             $UserAreaAssignments = Core::factory( 'Schedule_Area_Assignment' )->getAssignments( $this->User );
 
@@ -577,16 +577,25 @@ class User_Controller
 
         if ( isset( $areasIds ) && count( $areasIds ) > 0 )
         {
-            $this->UserQuery
-                ->leftJoin(
-                    'Schedule_Area_Assignment AS saa',
-                    'saa.model_name = "User" AND saa.model_id = User.id'
-                );
-            $this->UserQuery
-                ->open()
-                    ->whereIn( 'saa.area_id', $areasIds )
-                    ->orWhere( 'saa.area_id', 'is', NULL )
-                ->close();
+            $this->forAreas === null
+                ?   $this->UserQuery
+                        ->leftJoin(
+                            'Schedule_Area_Assignment AS saa',
+                            'saa.model_name = "User" AND saa.model_id = User.id'
+                        )
+                :   $this->UserQuery
+                        ->join(
+                            'Schedule_Area_Assignment AS saa',
+                            'saa.model_name = "User" AND saa.model_id = User.id'
+                        );
+
+            $this->forAreas === null
+                ?   $this->UserQuery
+                        ->open()
+                            ->whereIn( 'saa.area_id', $areasIds )
+                            ->orWhere( 'saa.area_id', 'is', NULL )
+                        ->close()
+                :   $this->UserQuery->whereIn( 'saa.area_id', $areasIds );
         }
 
         //Фильт по активности пользователей
