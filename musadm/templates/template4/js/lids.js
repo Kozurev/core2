@@ -67,7 +67,7 @@ $(function () {
         })
         .on("click", ".create_lid", function (e) {
             e.preventDefault();
-            editLidPopup(0);
+            editLidPopup('');
         });
 });
 

@@ -1,9 +1,10 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 26.04.2018
- * Time: 14:23
+ * Настройки раздела "Лиды"
+ *
+ * @author Bad Wolf
+ * @date 26.04.2018 14:23
+ * @version 20190221
  */
 
 
@@ -17,20 +18,17 @@ Core_Page_Show::instance()->setParam( 'title-second', 'ЛИДОВ' );
 Core_Page_Show::instance()->setParam( 'breadcumbs', $breadcumbs );
 
 
-/**
- * Блок проверки авторизации и прав доступа
- */
 $User = User::current();
-$accessRules = ['groups' => [1, 2, 6]];
+$accessRules = ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]];
 
 if ( !User::checkUserAccess( $accessRules, $User ) )
 {
-    Core_Page_Show::instance()->error404();
+    Core_Page_Show::instance()->error( 403 );
 }
 
 
 
-$action = Core_Array::Get( 'action', 0 );
+$action = Core_Array::Get( 'action', '',PARAM_STRING );
 
 Core::factory( 'Lid_Controller' );
 
@@ -168,13 +166,6 @@ if ( $action === 'updateLidArea' )
 if ( $action === 'editLidPopup' )
 {
     $lidId = Core_Array::Get( 'lid_id', null, PARAM_INT );
-
-    if ( $lidId === null )
-    {
-        Core_Page_Show::instance()->error( 404 );
-    }
-
-
     $Lid = Lid_Controller::factory( $lidId );
 
     if ( $Lid === null )
@@ -186,7 +177,6 @@ if ( $action === 'editLidPopup' )
     {
         Core_Page_Show::instance()->error( 403 );
     }
-
 
     $Areas = Core::factory( 'Schedule_Area' )->getList();
     $Statuses = $Lid->getStatusList();
