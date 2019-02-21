@@ -6,48 +6,48 @@
 
         <input type='hidden' id='taskAfterAction' value='{taskAfterAction}' />
 
-        <xsl:if test="periods = 1">
-            <div class="row finances_calendar">
-                <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
-                    <h4>Период с:</h4>
+        <section class="section-bordered center">
+            <xsl:if test="periods = 1">
+                <div class="row finances-calendar">
+                    <div class="right">
+                        <h4>Период с:</h4>
+                    </div>
+
+                    <div>
+                        <input type="date" class="form-control" name="date_from" value="{date_from}"/>
+                    </div>
+
+                    <div class="right">
+                        <h4>по:</h4>
+                    </div>
+
+                    <div>
+                        <input type="date" class="form-control" name="date_to" value="{date_to}"/>
+                    </div>
+
+                    <div>
+                        <a class="btn btn-red tasks_show" >Показать</a>
+                    </div>
                 </div>
+            </xsl:if>
 
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
-                    <input type="date" class="form-control" name="date_from" value="{date_from}"/>
+            <xsl:if test="buttons-panel = 1">
+                <div class="row buttons-panel">
+                    <xsl:choose>
+                        <xsl:when test="periods = 1">
+                            <div>
+                                <a class="btn btn-red task_create">Добавить задачу</a>
+                            </div>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <div>
+                                <a class="btn btn-red task_create">Добавить задачу</a>
+                            </div>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </div>
-
-                <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
-                    <h4>по:</h4>
-                </div>
-
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
-                    <input type="date" class="form-control" name="date_to" value="{date_to}"/>
-                </div>
-
-                <div class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-1 col-md-offset-1 col-xs-12">
-                    <a class="btn btn-red tasks_show" >Показать</a>
-                </div>
-            </div>
-        </xsl:if>
-
-
-        <xsl:if test="buttons-panel = 1">
-            <div class="row buttons-panel">
-                <xsl:choose>
-                    <xsl:when test="periods = 1">
-                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                            <a class="btn btn-red task_create">Добавить задачу</a>
-                        </div>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:attribute name="class" >row buttons-panel center</xsl:attribute>
-                        <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
-                            <a class="btn btn-red task_create">Добавить задачу</a>
-                        </div>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </div>
-        </xsl:if>
+            </xsl:if>
+        </section>
 
         <section class="cards-section text-center tasks-section">
             <div id="cards-wrapper" class="cards-wrapper row">

@@ -4,30 +4,31 @@
 
     <xsl:template match="root">
 
-        <h2>Филиалы</h2>
+        <section>
+            <h3>Филиалы</h3>
 
-        <div class="row buttons-panel">
-            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                <a href="#" class="btn btn-green schedule_area_edit" data-area_id="">Создать филиал</a>
+            <div class="row buttons-panel">
+                <div>
+                    <a href="#" class="btn btn-green schedule_area_edit" data-area_id="">Создать филиал</a>
+                </div>
             </div>
-        </div>
+            <div class="table-responsive">
+                <table id="sortingTable" class="table table-striped">
+                    <thead>
+                        <tr class="header">
+                            <th>Название</th>
+                            <th>Кол-во классов</th>
+                            <th>Активность</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
 
-        <div class="table-responsive">
-            <table id="sortingTable" class="table table-striped">
-                <thead>
-                    <tr class="header">
-                        <th>Название</th>
-                        <th>Кол-во классов</th>
-                        <th>Активность</th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <xsl:apply-templates select="schedule_area" />
-                </tbody>
-            </table>
-        </div>
+                    <tbody>
+                        <xsl:apply-templates select="schedule_area" />
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </xsl:template>
 
 

@@ -1,20 +1,21 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 18.03.2018
- * Time: 21:21
+ *
+ * @author Kozurev Egor
+ * @date 18.03.2018 21:21
+ * @version 20190221
  */
 
 global $CFG;
 $User = User::current();
-$this->css( '/templates/template6/css/style.css' );
+Core_Page_Show::instance()->css( '/templates/template6/css/style.css' );
 Core::factory( 'User_Controller' );
 
 /**
  * Список директоров
  */
-if( User::checkUserAccess( ['groups' => [1]], $User ) )
+if ( User::checkUserAccess( ['groups' => [ROLE_ADMIN]], $User ) )
 {
     $DirectorController = new User_Controller( User::current() );
     $DirectorController
@@ -30,37 +31,13 @@ if( User::checkUserAccess( ['groups' => [1]], $User ) )
     echo "<div class='users'>";
     $DirectorController->show();
     echo "</div>";
-
-//    $Directors = Core::factory( 'User')
-//        ->queryBuilder()
-//        ->where( 'active', '=', 1 )
-//        ->where( 'group_id', '=', 6 )
-//        ->findAll();
-//
-//    foreach ( $Directors as $Director )
-//    {
-//        $city = Core::factory( 'Property', 29 )->getPropertyValues( $Director )[0];
-//        $organization = Core::factory( 'Property', 30 )->getPropertyValues( $Director )[0];
-//        $link = Core::factory( 'Property', 33 )->getPropertyValues( $Director )[0];
-//        $Director->addEntity( $city, 'property_value' );
-//        $Director->addEntity( $organization, 'property_value' );
-//        $Director->addEntity( $link, 'property_value' );
-//    }
-//
-//    echo "<div class='users'>";
-//        Core::factory( 'Core_Entity' )
-//            ->addSimpleEntity( 'wwwroot', $CFG->rootdir )
-//            ->addEntities( $Directors )
-//            ->xsl( 'musadm/users/directors.xsl' )
-//            ->show();
-//    echo "</div>";
 }
 
 
 /**
  * Страница для менеджера
  */
-if( User::checkUserAccess( ['groups' => [2]], $User ) )
+if ( User::checkUserAccess( ['groups' => [ROLE_MANAGER]], $User ) )
 {
     $Director = $User->getDirector();
     $subordinated = $Director->getId();
@@ -87,37 +64,41 @@ if( User::checkUserAccess( ['groups' => [2]], $User ) )
     ?>
 
     <div class="dynamic-fixed-row">
-        <?Core::factory( 'Core_Entity' )
+        <?php
+        Core::factory( 'Core_Entity' )
             ->xsl( 'musadm/users/search-form.xsl' )
-            ->show(); ?>
+            ->show();
+        ?>
     </div>
 
-    <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 lids">
-            <?$LidController->show();?>
+    <section class="section-bordered">
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 lids">
+                <?$LidController->show();?>
+            </div>
+
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 tasks">
+                <?$TaskController->show();?>
+            </div>
         </div>
-
-        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 tasks">
-            <?$TaskController->show();?>
-        </div>
-    </div>
+    </section>
 
 
-    <?
+    <?php
     /**
      * Список действий менеджера
      * доступен только директорам
      */
-    $LIMIT_STEP = 5;    //Лимит кол-ва отображаемых/подгружаемых событий
-    $limit = Core_Array::Get( "limit", $LIMIT_STEP );
+    $LIMIT_STEP = 10;    //Лимит кол-ва отображаемых/подгружаемых событий
+    $limit = Core_Array::Get( 'limit', $LIMIT_STEP );
     $bEnableLoadButton = 1;  //Флаг активности кнопки подгрузки
-    $dateFrom = Core_Array::Get( "event_date_from", null ); //Начала временного периода
-    $dateTo = Core_Array::Get( "event_date_to", null );     //Конец временного периода
+    $dateFrom = Core_Array::Get( 'event_date_from', null ); //Начала временного периода
+    $dateTo = Core_Array::Get( 'event_date_to', null );     //Конец временного периода
 
-    $Events = Core::factory( "Event" )
+    $Events = Core::factory( 'Event' )
         ->queryBuilder()
-        ->where( "author_id", "=", $User->getId() )
-        ->orderBy( "time", "DESC" );
+        ->where( 'author_id', '=', $User->getId() )
+        ->orderBy( 'time', 'DESC' );
 
     if ( $dateFrom === null && $dateTo === null )
     {
@@ -126,7 +107,7 @@ if( User::checkUserAccess( ['groups' => [2]], $User ) )
 
         $Events->limit( $limit );
 
-        if( $totalCount <= $limit )
+        if ( $totalCount <= $limit )
         {
             $bEnableLoadButton = 0;
         }
@@ -137,12 +118,12 @@ if( User::checkUserAccess( ['groups' => [2]], $User ) )
 
         if ( $dateFrom !== null )
         {
-            $Events->where( "time", ">=", strtotime( $dateFrom ) );
+            $Events->where( 'time', '>=', strtotime( $dateFrom ) );
         }
 
         if( $dateTo !== null )
         {
-            $Events->where( "time", "<=", strtotime( $dateTo . " + 1 day" ) );
+            $Events->where( 'time', '<=', strtotime( $dateTo . ' + 1 day' ) );
         }
     }
 
@@ -151,21 +132,21 @@ if( User::checkUserAccess( ['groups' => [2]], $User ) )
 
     foreach ( $Events as $Event )
     {
-        $Event->date = date( "d.m.Y H:i", $Event->time() );
+        $Event->date = date( 'd.m.Y H:i', $Event->time() );
         $Event->text = $Event->getTemplateString();
     }
 
     global $CFG;
 
     echo "<div class='events'>";
-    Core::factory( "Core_Entity" )
+    Core::factory( 'Core_Entity' )
         ->addEntity( $User )
         ->addEntities( $Events )
-        ->addSimpleEntity( "limit", $limit += $LIMIT_STEP )
-        ->addSimpleEntity( "date_from", $dateFrom )
-        ->addSimpleEntity( "date_to", $dateTo )
-        ->addSimpleEntity( "enable_load_button", $bEnableLoadButton )
-        ->xsl( "musadm/users/events.xsl" )
+        ->addSimpleEntity( 'limit', $limit += $LIMIT_STEP )
+        ->addSimpleEntity( 'date_from', $dateFrom )
+        ->addSimpleEntity( 'date_to', $dateTo )
+        ->addSimpleEntity( 'enable_load_button', $bEnableLoadButton )
+        ->xsl( 'musadm/users/events.xsl' )
         ->show();
     echo "</div>";
 

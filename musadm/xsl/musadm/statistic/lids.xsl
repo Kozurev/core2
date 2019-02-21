@@ -3,13 +3,13 @@
     <xsl:template match="root">
         <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
         <!--<h3>Лиды</h3>-->
-            <table class="table table-bordered statistic_lids_table">
-                <tr class="header">
-                    <td colspan="2">Лиды</td>
+            <table class="table table-bordered table-hover statistic_lids_table">
+                <tr>
+                    <th colspan="2">Лиды</th>
                 </tr>
                 <tr>
-                    <th>Всего:</th>
-                    <th><xsl:value-of select="total" /></th>
+                    <td>Всего:</td>
+                    <td><xsl:value-of select="total" /></td>
                 </tr>
                 <xsl:apply-templates select="status" />
             </table>

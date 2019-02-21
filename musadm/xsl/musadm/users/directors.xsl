@@ -6,16 +6,16 @@
 
     <xsl:template match="root">
 
-        <h2>Список директоров</h2>
+        <h4>Список директоров</h4>
 
         <xsl:if test="active-btn-panel = 1">
             <div class="row buttons-panel">
-                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                <div>
                     <a href="#" class="btn btn-green user_create" data-usergroup="6">Добавить директора</a>
                 </div>
 
                 <xsl:if test="show-count-users = 1">
-                    <div class="col-lg-1 col-md-2 col-sm-3 col-xs-4">
+                    <div>
                         <span>Всего:</span><span><xsl:value-of select="count(user)" /></span>
                     </div>
                 </xsl:if>

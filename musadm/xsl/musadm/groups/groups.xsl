@@ -2,30 +2,32 @@
 
     <xsl:template match="root">
 
-        <div class="row buttons-panel">
-            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                <a class="btn btn-blue group_create">Создать группу</a>
+        <section>
+            <div class="row buttons-panel">
+                <div>
+                    <a class="btn btn-blue group_create">Создать группу</a>
+                </div>
             </div>
-        </div>
 
-        <div class="table-responsive">
-            <table id="sortingTable" class="table table-striped">
-                <thead>
-                    <tr class="header">
-                        <th>id</th>
-                        <th>Название</th>
-                        <th>Учитель</th>
-                        <th>Длительность</th>
-                        <th>Состав группы</th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
+            <div class="table-responsive">
+                <table id="sortingTable" class="table table-striped">
+                    <thead>
+                        <tr class="header">
+                            <th>id</th>
+                            <th>Название</th>
+                            <th>Учитель</th>
+                            <th>Длительность</th>
+                            <th>Состав группы</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
 
-                <tbody>
-                    <xsl:apply-templates select="schedule_group" />
-                </tbody>
-            </table>
-        </div>
+                    <tbody>
+                        <xsl:apply-templates select="schedule_group" />
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </xsl:template>
 
     <xsl:template match="schedule_group">

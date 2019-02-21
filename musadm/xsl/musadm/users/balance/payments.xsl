@@ -1,7 +1,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <section class="user-payments">
+        <section class="user-payments section-bordered">
             <h3>Список платежей</h3>
 
             <xsl:choose>

@@ -365,10 +365,12 @@ if ( $User->groupId() == ROLE_TEACHER )
 
     $year = getYear( $date );
 
+    echo '<section class="section-bordered">';
     Core::factory( 'Schedule_Controller' )
         ->userId( $userId )
         ->setCalendarPeriod( $month, $year )
         ->printCalendar();
+    echo '</section>';
 
     $TeacherLessons = Core::factory( 'Schedule_Controller' )
         ->userId( $userId )
@@ -405,6 +407,7 @@ if ( $User->groupId() == ROLE_TEACHER )
         ?   $isAdmin = 1
         :   $isAdmin = 0;
 
+    echo '<section class="section-bordered">';
     $output
         ->addSimpleEntity( 'is_admin', $isAdmin )
         ->xsl( 'musadm/schedule/teacher_table.xsl' )
@@ -422,46 +425,56 @@ if ( $User->groupId() == ROLE_TEACHER )
 
     $dateTo = $currentYear . '-' . $currentMonth . '-' . $countDays;
 
-    $TeacherReports = Core::factory( 'Schedule_Lesson_Report' );
-    $TeacherReports->queryBuilder()
+
+    $totalCount = Core::factory( 'Schedule_Lesson_Report' )
+        ->queryBuilder()
         ->where( 'teacher_id', '=', $User->getId() )
         ->where( 'date', '>=', $dateFrom )
-        ->where( 'date', '<=', $dateTo );
-
-    $totalCount = clone $TeacherReports;
-    $totalCount = $totalCount->queryBuilder()
+        ->where( 'date', '<=', $dateTo )
         ->where( 'type_id', '<>', '3' )
         ->getCount();
 
-    $attendenceIndivCount = clone $TeacherReports;
-    $attendenceIndivCount = $attendenceIndivCount->queryBuilder()
+    $attendenceIndivCount = Core::factory( 'Schedule_Lesson_Report' )
+        ->queryBuilder()
+        ->where( 'teacher_id', '=', $User->getId() )
+        ->where( 'date', '>=', $dateFrom )
+        ->where( 'date', '<=', $dateTo )
         ->where( 'type_id', '=', 1 )
         ->where( 'attendance', '=', 1 )
         ->getCount();
 
-    $disAttendenceIndivCount = clone $TeacherReports;
-    $disAttendenceIndivCount = $disAttendenceIndivCount->queryBuilder()
+    $disAttendenceIndivCount = Core::factory( 'Schedule_Lesson_Report' )
+        ->queryBuilder()
+        ->where( 'teacher_id', '=', $User->getId() )
+        ->where( 'date', '>=', $dateFrom )
+        ->where( 'date', '<=', $dateTo )
         ->where( 'type_id', '=', 1 )
         ->where( 'attendance', '=', 0 )
         ->getCount();
 
-    $attendenceGroupCount = clone $TeacherReports;
-    $attendenceGroupCount = $attendenceGroupCount->queryBuilder()
+    $attendenceGroupCount = Core::factory( 'Schedule_Lesson_Report' )
+        ->queryBuilder()
+        ->where( 'teacher_id', '=', $User->getId() )
+        ->where( 'date', '>=', $dateFrom )
+        ->where( 'date', '<=', $dateTo )
         ->where( 'type_id', '=', 2 )
         ->where( 'attendance', '=', '1' )
         ->getCount();
 
-    $disAttendenceGroupCount = clone $TeacherReports;
-    $disAttendenceGroupCount = $disAttendenceGroupCount->queryBuilder()
+    $disAttendenceGroupCount = Core::factory( 'Schedule_Lesson_Report' )
+        ->queryBuilder()
+        ->where( 'teacher_id', '=', $User->getId() )
+        ->where( 'date', '>=', $dateFrom )
+        ->where( 'date', '<=', $dateTo )
         ->where( 'type_id', '=', 2 )
         ->where( 'attendance', '=', 0 )
         ->getCount();
 
-    echo "<div class='teacher_footer'>
-            Общее число проведенных занятий в этом месяце: $totalCount <br>
-            из них явки/неявки: $attendenceIndivCount / $disAttendenceIndivCount (индивидуальные), 
-            $attendenceGroupCount / $disAttendenceGroupCount (групповые).<br>          
-        </div>";
+
+    echo "<h4>Общее число проведенных занятий в этом месяце: $totalCount</h4>";
+    echo "<h4>из них явки/неявки: $attendenceIndivCount / $disAttendenceIndivCount (индивидуальные), 
+            $attendenceGroupCount / $disAttendenceGroupCount (групповые).</h4>";
+    echo '</section>';
 
 
     /**
@@ -497,11 +510,7 @@ if ( $User->groupId() == ROLE_TEACHER )
     $totalHaveToPay = Core_Array::getValue( $totalHaveToPay, "total", 0, PARAM_INT );
     $debt = $totalHaveToPay - $totalPayed;
 
-    echo "<div class='teacher_footer'>
-            <!--За текущий месяц к выплате / уже выплачено: <span id='teacherHaveToPay'>$totalHaveToPay</span> / <span id='teacherPayed'>$totalPayed</span><br>-->
-            К выплате: <span id='teacher-debt'>$debt</span>руб; Уже выплачено: <span id='teacher-payed'>$totalPayed</span> руб.
-        </div>";
-
+    //echo "<h4>К выплате: <span id='teacher-debt'>$debt</span>руб; Уже выплачено: <span id='teacher-payed'>$totalPayed</span> руб.</h4>";
 
     //Формирование таблицы с выплатами>>
     $Payments = Core::factory( 'Payment' )
@@ -548,12 +557,14 @@ if ( $User->groupId() == ROLE_TEACHER )
         ->addSimpleEntity( 'is_admin', $isAdmin )
         ->addSimpleEntity( 'is_director', $isDirector )
         ->addSimpleEntity( 'date', date( 'Y-m-d' ) )
+        ->addSimpleEntity( 'debt', $debt )
+        ->addSimpleEntity( 'total-payed', $totalPayed )
         ->xsl( 'musadm/finances/teacher_payments.xsl' )
         ->show();
 
 
     //Таблица с настройками тарифов преподавателя
-    if( User::checkUserAccess( ['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]], User::parentAuth() ) )
+    if ( User::checkUserAccess( ['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]], User::parentAuth() ) )
     {
         //Общие значения
         $Director = User::current()->getDirector();

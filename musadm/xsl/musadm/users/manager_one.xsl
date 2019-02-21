@@ -20,7 +20,7 @@
                 <span data-areas="User_{id}"><xsl:apply-templates select="schedule_area_assignment" /></span>
             </td>
 
-            <td width="140px" class="center">
+            <td width="140px" class="right">
                 <a class="action edit user_edit" href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
                 <a class="action associate areas_assignments" href="#" data-model-id="{id}" data-model-name="User"></a>
                 <a class="action archive user_archive" href="#" data-userid="{id}"></a>

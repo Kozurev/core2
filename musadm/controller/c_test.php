@@ -30,7 +30,7 @@ $Orm->executeQuery( 'ALTER TABLE Payment_Type ADD subordinated int DEFAULT 0 NUL
 //$Orm->executeQuery( 'UPDATE Payment_Type SET subordinated = 516 WHERE id < 4' );
 
 $Orm->executeQuery( 'ALTER TABLE Payment_Type ADD is_deletable smallint(1) DEFAULT 1 NULL;' );
-$Orm->executeQuery( 'UPDATE Payment_Type SET is_deletable = 0 WHERE id <= 4' );
+$Orm->executeQuery( 'UPDATE Payment_Type SET is_deletable = 0 WHERE id < 4' );
 
 $Orm->executeQuery( 'ALTER TABLE Task ADD area_id int DEFAULT 0 NULL;' );
 $Orm->executeQuery( 'ALTER TABLE Lid ADD area_id int DEFAULT 0 NULL;' );

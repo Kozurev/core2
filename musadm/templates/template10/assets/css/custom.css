@@ -6,15 +6,26 @@ body {
 }
 
 section {
-    margin-bottom: 60px;
+    margin-top: 10px;
+    margin-bottom: 40px;
+}
+
+.section-bordered {
+    border-bottom: 3px solid;
+    border-color: #494d55;
 }
 
 #header {
     padding: 15px 0;
 }
 
-.page-wrapper {
+.page {
+    padding: 10px 20px 20px 15px;
     background: #f9f9fb;
+}
+
+.page-wrapper {
+    background: #edeef0;
 }
 
 .row {
@@ -42,12 +53,18 @@ section {
     text-align: center;
 }
 
-.center,
-.left,
-.right div {
+.center-blocks,
+.left-blocks,
+.right-blocks div {
     display: inline-block;
     float: none;
 }
+
+/*.center,*/
+/*.left,*/
+/*.right div {*/
+    /*float: none;*/
+/*}*/
 
 
 
@@ -91,10 +108,6 @@ section {
 .navbar-inverse {
     background-color: #494d55 !important;
     border-color: #494d55 !important;
-}
-
-header {
-    margin-bottom: 20px;
 }
 
 /*.table {*/
@@ -248,40 +261,43 @@ header {
  */
 
 .positive {
-    /*background-color:#78FC5A !important;*/
-    background-color: rgba(120, 252, 90, 0.7) !important;
-    /*border-color: rgba(120, 252, 90, 0.7) !important;*/
-}
-.negative {
-    /*background-color:#f77b6b !important;*/
-    background-color: rgba(247, 123, 107, 0.7) !important;
-    /*border-color: rgba(247, 123, 107, 0.7) !important;*/
-}
-.neutral {
-    /*background-color:#F0EDEA !important;*/
-    background-color: rgba(240, 237, 234, 0.7) !important;
-    /*border-color: rgba(240, 237, 234, 0.7) !important;*/
-}
-
-.group {
-    background: lightblue !important;
-}
-
-.users .positive {
-    /*background-color:#78FC5A !important;*/
-    background-color: inherit !important;
     border-color: rgba(120, 252, 90, 0.7) !important;
 }
-.users .negative {
-    /*background-color:#f77b6b !important;*/
-    background-color: inherit !important;
+.negative {
     border-color: rgba(247, 123, 107, 0.7) !important;
 }
-.users .neutral {
-    /*background-color:#F0EDEA !important;*/
-    background-color: inherit !important;
+.neutral {
     border-color: rgba(240, 237, 234, 0.7) !important;
 }
+
+.contract {
+    background: url("templates/template10/assets/images/contract.png");
+    background-size: cover;
+    display: inline-block;
+    width:20px;
+    height: 20px;
+    margin-left: 5px;
+    cursor: help;
+}
+
+
+
+
+.schedule .group {
+    background-color: lightblue !important;
+}
+.schedule .positive {
+    background-color: rgba(120, 252, 90, 0.7) !important;
+}
+.schedule .negative {
+    background-color: rgba(247, 123, 107, 0.7) !important;
+}
+.schedule .neutral {
+    background-color: rgba(240, 237, 234, 0.7) !important;
+}
+
+
+
 /**
  *  <<Конец 
  *  Подсветка пользователей
@@ -308,10 +324,19 @@ header {
 }
 
 
+.finances-calendar {
+    text-align: center;
+    margin: 15px 0;
+}
 
+.finances-calendar div {
+    display: inline-block;
+    margin: 0 15px;
+}
 
 .buttons-panel {
-    /*text-align: right;*/
+    margin: 15px 0;
+    display: block;
 }
 
 .buttons-panel div {
@@ -351,7 +376,8 @@ header {
 }
 
 .calendar_small div {
-    margin-bottom: 20px;
+    margin: 10px 20px;
+    display: inline-block;
 }
 
 .teacher_table td,
@@ -382,7 +408,7 @@ header {
     width: 1140px;
     z-index: 998;
     background-color: #f9f9fb;
-    top: 0px;
+    top: 0;
     padding-top: 10px;
     margin-bottom: 20px;
     max-height: 315px;
@@ -391,11 +417,14 @@ header {
     max-width: 100%;
 }
 
-/*.dynamic-fixed-row::-webkit-scrollbar { width: 0; }*/
-/*.dynamic-fixed-row { -ms-overflow-style: none; }*/
-
 .dynamic-fixed-row .searching-row {
     margin-bottom: 20px;
+    text-align: center;
+}
+
+.dynamic-fixed-row .searching-row div {
+    display: inline-block;
+    margin: 0 15px;
 }
 
 /**
@@ -415,7 +444,9 @@ header {
 
 
 
-
+.table-statused tr:last-child {
+    border-bottom: 5px solid;
+}
 
 
 

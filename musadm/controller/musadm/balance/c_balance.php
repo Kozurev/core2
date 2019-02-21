@@ -109,7 +109,7 @@ if ( $User->groupId() == 5 )
     ?>
     <input type="hidden" id="userid" value="<?=$User->getId()?>" />
 
-    <section class="user-schedule">
+    <section class="user-schedule section-bordered">
         <h3>Расписание занятий</h3>
         <div class="row">
             <div class="col-lg-6 col-md-6 col-sm-12">

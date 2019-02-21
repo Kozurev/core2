@@ -3,8 +3,8 @@
     <xsl:template match="root">
         <div class="col-lg-12">
             <!--<h3>Выплаты преподавателям</h3>-->
-            <table class="table table-bordered statistic_teacher_payments_table" style="margin-bottom: 20px">
-                <tr class="header">
+            <table class="table table-bordered table-hover statistic_teacher_payments_table" >
+                <tr>
                     <th colspan="2">Выплаты преподавателям</th>
                 </tr>
                 <tr>

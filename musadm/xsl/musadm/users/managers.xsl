@@ -6,38 +6,40 @@
 
     <xsl:template match="root">
 
-        <h2>Список менеджеров</h2>
+        <section class="section-bordered">
+            <h4>Список менеджеров</h4>
 
-        <xsl:if test="active-btn-panel = 1">
-            <div class="row buttons-panel">
-                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                    <a href="#" class="btn btn-primary user_create" data-usergroup="2">Добавить менеджера</a>
-                </div>
-
-                <xsl:if test="show-count-users = 1">
-                    <div class="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                        <span>Всего:</span><span><xsl:value-of select="count(user)" /></span>
+            <xsl:if test="active-btn-panel = 1">
+                <div class="row buttons-panel">
+                    <div>
+                        <a href="#" class="btn btn-primary user_create" data-usergroup="2">Добавить менеджера</a>
                     </div>
-                </xsl:if>
-            </div>
-        </xsl:if>
 
-        <div class="table-responsive">
-            <table id="sortingTable" class="table table-striped">
-                <thead>
-                    <tr class="header">
-                        <th>ФИО</th>
-                        <th>Телефон</th>
-                        <th>Студия</th>
-                        <th class="center">Действия</th>
-                    </tr>
-                </thead>
-    
-                <tbody>
-                    <xsl:apply-templates select="user" />
-                </tbody>
-            </table>
-        </div>
+                    <xsl:if test="show-count-users = 1">
+                        <div>
+                            <span>Всего:</span><span><xsl:value-of select="count(user)" /></span>
+                        </div>
+                    </xsl:if>
+                </div>
+            </xsl:if>
+
+            <div class="table-responsive">
+                <table id="sortingTable" class="table table-striped">
+                    <thead>
+                        <tr class="header">
+                            <th>ФИО</th>
+                            <th>Телефон</th>
+                            <th>Студия</th>
+                            <th class="center">Действия</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <xsl:apply-templates select="user" />
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
     </xsl:template>
 

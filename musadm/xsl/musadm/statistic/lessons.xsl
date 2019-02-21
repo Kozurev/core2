@@ -3,12 +3,12 @@
     <xsl:template match="root">
         <div class="col-lg-12">
             <!--<h3>Занятия</h3>-->
-            <table class="table table-bordered statistic_lessons_table">
-                <tr class="header">
-                    <td colspan="2">Занятия</td>
+            <table class="table table-bordered table-hover statistic_lessons_table">
+                <tr>
+                    <th colspan="2">Занятия</th>
                 </tr>
                 <tr>
-                    <th>Всего проведено занятий:</th>
+                    <td>Всего проведено занятий:</td>
                     <td><xsl:value-of select="total_count" /></td>
                 </tr>
 

@@ -152,8 +152,8 @@
                                 </li>
                                 <li><a href="<?=$CFG->rootdir?>/groups">Группы</a></li>
                                 <li><a href="<?=$CFG->rootdir?>/lids">Лиды</a></li>
-                                <li><a href="<?=$CFG->rootdir?>/certificates">Сертификаты</a></li>
                                 <li><a href="<?=$CFG->rootdir?>/tasks">Задачи</a></li>
+                                <li><a href="<?=$CFG->rootdir?>/certificates">Сертификаты</a></li>
                                 <?php
                                 if ( User::checkUserAccess( ['groups' => [ROLE_DIRECTOR]] ) )
                                 {

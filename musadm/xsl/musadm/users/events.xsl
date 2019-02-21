@@ -28,33 +28,33 @@
 
             <xsl:choose>
                 <xsl:when test="count(event) = 0">
-                    <h4>Не найдено ни одного события, связанного с <xsl:value-of select="$role_name" /></h4>
+                    <h3>Не найдено ни одного события, связанного с <xsl:value-of select="$role_name" /></h3>
                 </xsl:when>
                 <xsl:otherwise>
-                    <h4>События, связанные с <xsl:value-of select="$role_name" />:</h4>
+                    <h3>События, связанные с <xsl:value-of select="$role_name" />:</h3>
                 </xsl:otherwise>
             </xsl:choose>
 
             <xsl:if test="user/group_id = 2">
-                <div class="row finances_calendar">
-                    <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                <div class="row finances-calendar">
+                    <div class="right">
                         <h4>Период с:</h4>
                     </div>
 
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                    <div>
                         <input type="date" class="form-control" name="event_date_from" value="{date_from}"/>
                     </div>
 
-                    <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                    <div class="right">
                         <h4>по:</h4>
                     </div>
 
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                    <div>
                         <input type="date" class="form-control" name="event_date_to" value="{date_to}"/>
                     </div>
 
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-1 col-md-offset-1 col-xs-12">
-                        <a class="btn btn-green events_show" >Показать</a>
+                    <div>
+                        <a class="btn btn-green events_show">Показать</a>
                     </div>
                 </div>
             </xsl:if>

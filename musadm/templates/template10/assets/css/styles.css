@@ -730,7 +730,12 @@ select {
   visibility: visible;
 }
 /* Color Schemes */
-.body-green .header {
+.body-primary .header,
+.body-primary section {
+  border-color: #40babd;
+}
+.body-green .header,
+.body-green section {
   border-color: #75c181;
 }
 .body-green a {
@@ -739,7 +744,8 @@ select {
 .body-green a:hover {
   color: #52b161;
 }
-.body-blue .header {
+.body-blue .header,
+.body-blue section {
   border-color: #58bbee;
 }
 .body-blue a {
@@ -748,7 +754,8 @@ select {
 .body-blue a:hover {
   color: #2aa8e9;
 }
-.body-orange .header {
+.body-orange .header,
+.body-orange section {
   border-color: #F88C30;
 }
 .body-orange a {
@@ -757,7 +764,8 @@ select {
 .body-orange a:hover {
   color: #ed7108;
 }
-.body-pink .header {
+.body-pink .header,
+.body-pink section {
   border-color: #EA5395;
 }
 .body-pink a {
@@ -766,7 +774,8 @@ select {
 .body-pink a:hover {
   color: #e42679;
 }
-.body-purple .header {
+.body-purple .header,
+.body-purple section {
   border-color: #8A40A7;
 }
 .body-purple a {
@@ -775,7 +784,8 @@ select {
 .body-purple a:hover {
   color: #6c3282;
 }
-.body-red .header {
+.body-red .header,
+.body-red section {
   border-color: #f77b6b;
 }
 .body-red a {

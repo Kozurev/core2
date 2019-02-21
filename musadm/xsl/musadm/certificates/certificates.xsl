@@ -1,8 +1,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <div class="certificate">
-
+        <section class="certificate">
             <div class="row buttons-panel">
                 <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                     <a class="btn btn-pink certificate_edit" data-id="">Добавить сертификат</a>
@@ -33,8 +32,7 @@
                     </tbody>
                 </table>
             </div>
-
-        </div>
+        </section>
     </xsl:template>
 
 

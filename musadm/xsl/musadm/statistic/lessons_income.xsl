@@ -3,9 +3,9 @@
     <xsl:template match="root">
         <div class='row'>
             <div class='col-lg-12 col-md-12 col-sm-12'>
-                <table class="table table-bordered">
-                    <tr class="header">
-                        <td colspan="2">Доходы-расходы</td>
+                <table class="table table-hover table-bordered">
+                    <tr>
+                        <th colspan="2">Доходы-расходы</th>
                     </tr>
                     <tr>
                         <td>Выручка от занятий</td>

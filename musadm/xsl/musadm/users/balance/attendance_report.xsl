@@ -1,7 +1,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <section class="user-attendance">
+        <section class="user-attendance section-bordered">
             <h3>История занятий</h3>
 
             <xsl:choose>

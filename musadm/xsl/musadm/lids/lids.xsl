@@ -1,62 +1,60 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <!--<div class="lids">-->
-
+        <section class="section-bordered">
             <xsl:if test="periods = 1">
-                <div class="row finances_calendar buttons-panel center">
-                    <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                <div class="row finances-calendar">
+                    <div class="right">
                         <h4>Период с:</h4>
                     </div>
 
-                    <div class="col-lg-3 col-md-2 col-sm-2 col-xs-8">
+                    <div>
                         <input type="date" class="form-control" name="date_from" value="{date_from}"/>
                     </div>
 
-                    <div class="right col-lg-1 col-md-1 col-sm-1 col-xs-4">
+                    <div class="right">
                         <h4>по:</h4>
                     </div>
 
-                    <div class="col-lg-3 col-md-2 col-sm-2 col-xs-8">
+                    <div>
                         <input type="date" class="form-control" name="date_to" value="{date_to}"/>
                     </div>
 
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                    <div>
                         <a class="btn btn-purple lids_show">Показать</a>
                     </div>
                 </div>
             </xsl:if>
 
-
             <xsl:if test="buttons-panel = 1">
                 <div class="row buttons-panel center">
-                    <div class="col-lg-5 col-md-3 col-sm-3 col-xs-12">
+                    <div>
                         <input class="form-control" type="number" id="search_id" placeholder="Номер лида" value="{lid_id}" />
                     </div>
 
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <div>
                         <a class="btn btn-purple search">Поиск</a>
                     </div>
 
-                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                    <div>
                         <a class="btn btn-purple create_lid">Создать лида</a>
                     </div>
                 </div>
             </xsl:if>
+        </section>
 
-            <section class="cards-section text-center">
-                <div id="cards-wrapper" class="cards-wrapper row">
-                    <xsl:choose>
-                        <xsl:when test="count(lid) != 0">
-                            <xsl:apply-templates select="lid" />
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <h2 class="section-title">Ничего не найдено</h2>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </div>
-            </section>
-        <!--</div>-->
+        <section class="cards-section text-center">
+            <div id="cards-wrapper" class="cards-wrapper row">
+                <xsl:choose>
+                    <xsl:when test="count(lid) != 0">
+                        <xsl:apply-templates select="lid" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <h2 class="section-title">Ничего не найдено</h2>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </div>
+        </section>
     </xsl:template>
 
 

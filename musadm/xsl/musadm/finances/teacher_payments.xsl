@@ -1,40 +1,46 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <h3>История выплат</h3>
+        <section class="section-bordered">
+            <h3>История выплат</h3>
 
-        <div class="teacher_payments_block table-responsive">
-            <table class="table table-striped teacher_payments">
-                <xsl:if test="is_admin = 1">
-                    <tr class="header">
-                        <td><input name="date" class="form-control" type="date" value="{date}"/></td>
-                        <td><input name="summ" class="form-control" type="number" placeholder="Сумма" /></td>
-                        <td><input name="description" class="form-control" type="text" placeholder="Примечание к платежу" /></td>
-                        <td class="center">
-                            <input type="hidden" name="userid" value="{userid}" />
-                            <!--<a class="btn btn-green add_teacher_payment">Добавить</a>-->
-                            <a class="action pay add_teacher_payment" title="Добавить выплату"></a>
-                        </td>
-                    </tr>
-                </xsl:if>
-                <tr>
-                    <th>Дата</th>
-                    <th>Сумма</th>
-                    <th>Примечание к платежу</th>
-                    <th></th>
-                </tr>
-                <xsl:choose>
-                    <xsl:when test="count(month) != 0">
-                        <xsl:apply-templates select="month" />
-                    </xsl:when>
-                    <xsl:otherwise>
+            <h4>
+                К выплате: <span id='teacher-debt'><xsl:value-of select="debt" /></span>руб;
+                Уже выплачено: <span id='teacher-payed'><xsl:value-of select="total-payed" /></span> руб.
+            </h4>
+
+            <div class="teacher_payments_block table-responsive">
+                <table class="table table-striped teacher_payments">
+                    <xsl:if test="is_admin = 1">
                         <tr>
-                            <td colspan="4">Выплат не найдено</td>
+                            <td><input name="date" class="form-control" type="date" value="{date}"/></td>
+                            <td><input name="summ" class="form-control" type="number" placeholder="Сумма" /></td>
+                            <td><input name="description" class="form-control" type="text" placeholder="Примечание к платежу" /></td>
+                            <td class="center">
+                                <input type="hidden" name="userid" value="{userid}" />
+                                <a class="action pay add_teacher_payment" title="Добавить выплату"></a>
+                            </td>
                         </tr>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </table>
-        </div>
+                    </xsl:if>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Сумма</th>
+                        <th>Примечание к платежу</th>
+                        <th><!----></th>
+                    </tr>
+                    <xsl:choose>
+                        <xsl:when test="count(month) != 0">
+                            <xsl:apply-templates select="month" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <tr>
+                                <td colspan="4">Выплат не найдено</td>
+                            </tr>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </table>
+            </div>
+        </section>
 
     </xsl:template>
 
