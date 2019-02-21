@@ -13,6 +13,8 @@ $Orm = new Orm();
 
 $Orm->executeQuery( 'INSERT INTO `musadm`.`Event_Type` (`parent_id`, `name`, `title`) VALUES (1, \'schedule_edit_absent_period\', \'Редактирование периода отсутствия\')' );
 $Orm->executeQuery( 'INSERT INTO `musadm`.`Event_Type` (`parent_id`, `name`, `title`) VALUES (1, \'schedule_append_consult\', \'Создание консультации\')' );
+$Orm->executeQuery( 'UPDATE Event SET type_id = 28 WHERE type_id = 27' );
+$Orm->executeQuery( 'DELETE FROM Event WHERE type_id = 28 AND data = ""' );
 
 $Orm->executeQuery( 'alter table Schedule_Area change count_classess count_classes int not null;' );
 

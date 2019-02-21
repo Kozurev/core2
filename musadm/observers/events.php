@@ -4,12 +4,9 @@
  *
  * @author Kozurev Egor
  * @date 27.11.2018 18:24
- * @version 20190220
+ * @version 20190221
  */
 
-//Core::factory( 'User_Controller' );
-//Core::factory( 'Task_Controller' );
-//Core::factory( 'Lid_Controller' );
 
 /**
  * Добавление клиента в расписание
@@ -17,13 +14,13 @@
 Core::attachObserver( 'afterScheduleLessonInsert', function( $args ) {
     $Lesson = $args[0];
 
+    $EventData = new stdClass();
+    $EventData->Lesson = $Lesson;
+
     if ( $Lesson->typeId() == 1 )
     {
         $Client =       $Lesson->getClient();
         $ClientFio =    $Client->surname() . ' ' . $Client->name();
-
-        $EventData = new stdClass();
-        $EventData->Lesson = $Lesson;
 
         Core::factory( 'Event' )
             ->userAssignmentId( $Client->getId() )
@@ -39,19 +36,16 @@ Core::attachObserver( 'afterScheduleLessonInsert', function( $args ) {
 
         if ( $Lesson->clientId() )
         {
-            $Lid = $Lesson->getClient();
-            $LidFio = $Lid->surname() . ' ' . $Lid->name();
-
-            $EventData = new stdClass();
+            $Lid =      $Lesson->getClient();
+            $LidFio =   $Lid->surname() . ' ' . $Lid->name();
             $EventData->Lid =       $Lid;
             $EventData->Lesson =    $Lesson;
-
-            $Event
-                ->userAssignmentFio( $LidFio )
-                ->data( $EventData );
+            $Event->userAssignmentFio( $LidFio );
         }
 
-        $Event->save();
+        $Event
+            ->data( $EventData )
+            ->save();
     }
 });
 
