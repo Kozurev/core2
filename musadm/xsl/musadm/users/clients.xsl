@@ -50,7 +50,7 @@
 
                 <xsl:if test="show-count-users = 1">
                     <div class="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                        <span>Всего:</span><span><xsl:value-of select="count(user)" /></span>
+                        <span>Всего:</span><span id="total-clients-count"><xsl:value-of select="count(user)" /></span>
                     </div>
                 </xsl:if>
             </div>

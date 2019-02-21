@@ -1,5 +1,4 @@
 'use strict';
-//var root = "/musadm";
 var root = $("#rootdir").val();
 
 $(function(){
@@ -11,13 +10,13 @@ $(function(){
             var userid = $(this).data("userid");
             var usergroupid = $(this).data("usergroup");
 
-
             switch(usergroupid)
             {
                 case 2: getManagerPopup(userid);    break;
                 case 4: getTeacherPopup(userid);    break;
                 case 5: getClientPopup(userid);     break;
                 case 6: getDirectorPopup(userid);   break;
+                default:    break;
             }
         })
         .on("click", ".user_create", function(e){
@@ -31,6 +30,7 @@ $(function(){
                 case 4: getTeacherPopup(userid);    break;
                 case 5: getClientPopup(userid);     break;
                 case 6: getDirectorPopup(userid);   break;
+                default:    break;
             }
         })
         //Сохранение данных
@@ -42,20 +42,39 @@ $(function(){
             });
         })
         //Добавление пользователя в архив
-        .on("click", ".user_archive", function(){
-            var agree = confirm("Перенести пользователя в архив?");
+        .on('click', '.user_archive', function(e) {
+            e.preventDefault();
+            var agree = confirm('Перенести пользователя в архив?');
             if(agree != true) return;
-            var userid = $(this).data("userid");
             loaderOn();
-            updateActive("User", userid, "false", refreshUserTable);
+            var userid = $(this).data('userid');
+            var userTr = $(this).parent().parent();
+            updateActive('User', userid, 'false', function(response) {
+                var
+                    totalCountSpan =    $('#total-clients-count'),
+                    totalCount =        Number(totalCountSpan.text());
+
+                userTr.remove();
+                totalCountSpan.text(totalCount - 1);
+                loaderOff();
+            });
         })
         //"Разархивирование пользователя"
-        .on("click", ".user_unarchive", function(){
-            var agree = confirm("Убрать пользователя из архива?");
+        .on('click', '.user_unarchive', function(e) {
+            e.preventDefault();
+            var agree = confirm('Убрать пользователя из архива?');
             if(agree != true) return;
             loaderOn();
-            var userid = $(this).data("userid");
-            updateActive("User", userid, "true", refreshUserTable);
+            var userid = $(this).data('userid');
+            var userTr = $(this).parent().parent();
+            updateActive('User', userid, 'true', function(response) {
+                var
+                    totalCountSpan =    $('#total-clients-count'),
+                    totalCount =        Number(totalCountSpan.text());
+
+                totalCountSpan.text(totalCount - 1);
+                userTr.remove();
+            });
         })
         //Удаление пользователя
         .on("click", ".user_delete", function(e){

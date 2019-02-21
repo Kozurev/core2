@@ -1,3 +1,4 @@
+"use strict";
 var loaderTime = 0;
 //var root = "/musadm";
 var root = $("#rootdir").val();
@@ -101,11 +102,11 @@ function saveData(tab, func) {
  */
 function deleteItem(model_name, model_id, func){
 
-    var url = root + "/admin?menuTab=Main&menuAction=deleteAction&ajax=1";
-    url += "&model_name=" + model_name;
-    url += "&model_id=" + model_id;
+    var url = root + '/admin?menuTab=Main&menuAction=deleteAction&ajax=1';
+    url += '&model_name=' + model_name;
+    url += '&model_id=' + model_id;
 
-    var agree = confirm("Подтвердите действие");
+    var agree = confirm('Подтвердите действие');
     if(agree != true)
     {
         loaderOff();
@@ -113,13 +114,20 @@ function deleteItem(model_name, model_id, func){
     }
 
     $.ajax({
-        type: "GET",
+        type: 'GET',
         url: url,
-        success: function(answer){
-            if(typeof func === "function") func();
+        success: function(response) {
+            if(typeof func === 'function')
+            {
+                func(response);
+            }
+
+            if(response != '0')
+            {
+                alert('Ошибка: ' + response);
+            }
+
             loaderOff();
-            if(answer != "0")
-                alert("Ошибка: " + answer);
         }
     });
 }
