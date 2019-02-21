@@ -5,29 +5,31 @@
 
     <xsl:template match="root">
 
-        <div class="row finances_total">
-            <div class="col-lg-12">
-                За данный период суммарные поступления составили <xsl:value-of select="total_summ" /> руб.
-            </div>
-        </div>
-
-        <div class="row finances_calendar">
-            <div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
-                <a class="btn btn-green finances_payment" data-after_save_action="payments">Добавить расход</a>
+        <section>
+            <div class="row finances_total">
+                <div class="col-lg-12">
+                    <h4>За данный период суммарные поступления составили <xsl:value-of select="total_summ" /> руб.</h4>
+                </div>
             </div>
 
-            <div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
-                <a class="btn btn-green tarifs_show">Тарифы</a>
-            </div>
+            <div class="row finances_calendar">
+                <div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
+                    <a class="btn btn-green finances_payment" data-after_save_action="payments">Добавить расход</a>
+                </div>
 
-            <div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
-                <a class="btn btn-green finances_payment_types">Категории расходов</a>
-            </div>
+                <div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
+                    <a class="btn btn-green tarifs_show">Тарифы</a>
+                </div>
 
-            <div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
-                <a class="btn btn-green finances_payment_rate_config">Настройки</a>
+                <div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
+                    <a class="btn btn-green finances_payment_types">Категории расходов</a>
+                </div>
+
+                <div class="col-lg-2 col-md-6 col-sm-6 col-xs-6">
+                    <a class="btn btn-green finances_payment_rate_config">Настройки</a>
+                </div>
             </div>
-        </div>
+        </section>
 
 
         <div class="teacher_rate_config_block">
@@ -68,27 +70,29 @@
         </div>
 
 
-        <div class="row finances_calendar" style="margin-top:20px">
-            <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
-                <span>Период с:</span>
-            </div>
+        <section>
+            <div class="row finances_calendar" style="margin-top:20px">
+                <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                    <h4>Период с:</h4>
+                </div>
 
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
-                <input type="date" class="form-control" name="date_from" value="{date_from}"/>
-            </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                    <input type="date" class="form-control" name="date_from" value="{date_from}"/>
+                </div>
 
-            <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
-                <span>по:</span>
-            </div>
+                <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                    <h4>по:</h4>
+                </div>
 
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
-                <input type="date" class="form-control" name="date_to" value="{date_to}"/>
-            </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                    <input type="date" class="form-control" name="date_to" value="{date_to}"/>
+                </div>
 
-            <div class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-1 col-md-offset-1 col-xs-12">
-                <a class="btn btn-green finances_show" >Показать</a>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-1 col-md-offset-1 col-xs-12">
+                    <a class="btn btn-green finances_show" >Показать</a>
+                </div>
             </div>
-        </div>
+        </section>
 
         <div class="table-responsive">
             <table id="sortingTable" class="table table-striped task">
@@ -144,31 +148,19 @@
 
     <xsl:template match="payment_tarif">
         <tr>
-            <xsl:variable name="type_id" select="lessons_type" />
-
             <td><xsl:value-of select="title" /></td>
             <td><xsl:value-of select="price" /></td>
             <td><xsl:value-of select="count_indiv" /></td>
             <td><xsl:value-of select="count_group" /></td>
-            <!--<td><xsl:value-of select="/root/schedule_lesson_type[id = $type_id]/title" /></td>-->
             <td>
                 <input type="checkbox" name="access" id="access{id}" class="checkbox-new" disabled="true" >
                     <xsl:if test="access = 1">
                         <xsl:attribute name="checked">checked</xsl:attribute>
                     </xsl:if>
                 </input>
-                <label for="access{id}" class="label-new">
+                <label for="access{id}" class="label-new label-new-disabled">
                     <div class="tick"><input type="hidden" name="kostul"/></div>
                 </label>
-                <!--<input class="checkbox" id="checkbox{id}" type="checkbox" disabled="true">-->
-                    <!--<xsl:if test="access = 1">-->
-                        <!--<xsl:attribute name="checked">true</xsl:attribute>-->
-                    <!--</xsl:if>-->
-                <!--</input>-->
-                <!--<label for="checkbox{id}" class="checkbox-label">-->
-                    <!--<span class="off">скрытый</span>-->
-                    <!--<span class="on">общий</span>-->
-                <!--</label>-->
             </td>
             <td>
                 <a class="action edit tarif_edit"       href="#" data-tarifid="{id}"></a>

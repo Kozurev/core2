@@ -1,37 +1,14 @@
 @import url('https://fonts.googleapis.com/css?family=Nunito');
 
-/*:root {*/
-    /*--checkbox-size: 100px;*/
-    /*--bg-color: #FFA69E;*/
-    /*--checkbox-color: #FFFFFF;*/
-    /*--hover-color: #FF686B;*/
-    /*--tick-color: #84DCC6;*/
-/*}*/
-
 :root {
     --checkbox-size: 25px;
     --bg-color: white;
     --checkbox-color: black;
-    /*--hover-color: orange;*/
+    --checkbox-disabled-color: grey;
     --tick-color: black;
+    --tick-disabled-color: grey;
 }
 
-/*body{*/
-    /*width: 100vw;*/
-    /*height: 100vh;*/
-    /*overflow: hidden;*/
-    /*text-align: center;*/
-    /*font-family: 'Nunito', sans-serif;*/
-    /*background-color: var(--bg-color);*/
-/*}*/
-
-/*h1 {*/
-    /*color: var(--checkbox-color);*/
-    /*font-size: 3rem;*/
-    /*margin: 50px 0;*/
-/*}*/
-
-/*label {*/
 .label-new {
     display: inline-block;
     margin: 0 calc(var(--checkbox-size) * 0.25);
@@ -42,19 +19,15 @@
     -webkit-transition: 400ms 100ms ease-out;
     -o-transition: 400ms 100ms ease-out;
     transition: 400ms 100ms ease-out;
-
 }
 
-/*label:hover {*/
 .label-new:hover {
     border-color: var(--hover-color);
     cursor: pointer;
 }
 
-/*input[type="checkbox"] {*/
 .checkbox-new {
     position: absolute;
-    /*left: -1000px;*/
     visibility: hidden;
 }
 
@@ -93,20 +66,6 @@
     border-radius: 50%;
 }
 
-/*.tick:hover {*/
-    /*border-right: calc(var(--checkbox-size) * 0.25) solid var(--tick-hover);*/
-    /*border-bottom: calc(var(--checkbox-size) * 0.25) solid var(--tick-hover);*/
-/*}*/
-
-/*.tick:hover::before {*/
-    /*border: calc(var(--checkbox-size) * 0.125) solid var(--tick-hover);*/
-/*}*/
-
-/*.tick:hover::after {*/
-    /*border: calc(var(--checkbox-size) * 0.125) solid var(--tick-hover);*/
-/*}*/
-
-/*input[type="checkbox"]:checked + label .tick{*/
 .checkbox-new:checked + .label-new .tick {
     opacity: 1;
     -webkit-transform: rotate(45deg) scale(1);
@@ -114,7 +73,6 @@
     transform: rotate(45deg) scale(1);
 }
 
-/*input[type="checkbox"]:focus + label {*/
 .checkbox-new:focus + .label {
     -webkit-animation-name: cb-pop;
     animation-name: cb-pop;
@@ -125,6 +83,27 @@
     -webkit-animation-timing-function: linear;
     animation-timing-function: linear;
 }
+
+
+
+.label-new-disabled {
+    border: calc(var(--checkbox-size) * 0.125) solid var(--checkbox-disabled-color);
+}
+
+.label-new-disabled .tick {
+    border-right: calc(var(--checkbox-size) * 0.25) solid var(--tick-disabled-color);
+    border-bottom: calc(var(--checkbox-size) * 0.25) solid var(--tick-disabled-color);
+}
+
+.label-new-disabled .tick:before {
+    border: calc(var(--checkbox-size) * 0.125) solid var(--tick-disabled-color);
+}
+
+.label-new-disabled .tick:after {
+    border: calc(var(--checkbox-size) * 0.125) solid var(--tick-disabled-color);
+}
+
+
 
 @-webkit-keyframes cb-pop {
     0% {

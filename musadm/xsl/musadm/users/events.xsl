@@ -31,14 +31,14 @@
                     <h4>Не найдено ни одного события, связанного с <xsl:value-of select="$role_name" /></h4>
                 </xsl:when>
                 <xsl:otherwise>
-                    <h3>События, связанные с <xsl:value-of select="$role_name" />:</h3>
+                    <h4>События, связанные с <xsl:value-of select="$role_name" />:</h4>
                 </xsl:otherwise>
             </xsl:choose>
 
             <xsl:if test="user/group_id = 2">
                 <div class="row finances_calendar">
                     <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
-                        <span>Период с:</span>
+                        <h4>Период с:</h4>
                     </div>
 
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
@@ -46,7 +46,7 @@
                     </div>
 
                     <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
-                        <span>по:</span>
+                        <h4>по:</h4>
                     </div>
 
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">

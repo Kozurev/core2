@@ -9,7 +9,7 @@
         <xsl:if test="periods = 1">
             <div class="row finances_calendar">
                 <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
-                    <span>Период с:</span>
+                    <h4>Период с:</h4>
                 </div>
 
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
@@ -17,7 +17,7 @@
                 </div>
 
                 <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
-                    <span>по:</span>
+                    <h4>по:</h4>
                 </div>
 
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">

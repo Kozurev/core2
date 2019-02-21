@@ -6,18 +6,18 @@
             <xsl:if test="periods = 1">
                 <div class="row finances_calendar buttons-panel center">
                     <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
-                        <span>Период с:</span>
+                        <h4>Период с:</h4>
                     </div>
 
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                    <div class="col-lg-3 col-md-2 col-sm-2 col-xs-8">
                         <input type="date" class="form-control" name="date_from" value="{date_from}"/>
                     </div>
 
                     <div class="right col-lg-1 col-md-1 col-sm-1 col-xs-4">
-                        <span>по:</span>
+                        <h4>по:</h4>
                     </div>
 
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                    <div class="col-lg-3 col-md-2 col-sm-2 col-xs-8">
                         <input type="date" class="form-control" name="date_to" value="{date_to}"/>
                     </div>
 
@@ -30,42 +30,19 @@
 
             <xsl:if test="buttons-panel = 1">
                 <div class="row buttons-panel center">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <div class="col-lg-5 col-md-3 col-sm-3 col-xs-12">
                         <input class="form-control" type="number" id="search_id" placeholder="Номер лида" value="{lid_id}" />
                     </div>
 
-                    <div class="col-lg-2 col-md-3 col-sm-3 col-xs-12">
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                         <a class="btn btn-purple search">Поиск</a>
                     </div>
 
-                    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                         <a class="btn btn-purple create_lid">Создать лида</a>
                     </div>
                 </div>
             </xsl:if>
-
-            <!--<div class="table-responsive">-->
-                <!--<table class="table lids">-->
-                    <!--<form name="lid_form">-->
-                        <!--<tr class="header">-->
-                            <!--<td class="date" colspan="2"><input type="date" class="form-control date_inp"    name="control_date"/></td>-->
-                            <!--<td class="string"><input type="text" class="form-control" name="surname"  placeholder="Фамилия"/></td>-->
-                            <!--<td class="string"><input type="text" class="form-control" name="name"     placeholder="Имя"/></td>-->
-                            <!--<td class="string"><input type="text" class="form-control" name="number"   placeholder="Телефон"/></td>-->
-                            <!--<td class="string"><input type="text" class="form-control" name="vk"       placeholder="Ссылка вк"/></td>-->
-                            <!--<td class="string"><input type="text" class="form-control" name="source"   placeholder="Источник"/></td>-->
-                            <!--<td class="last">-->
-                                <!--<a class="btn btn-purple lid_submit">Добавить</a>-->
-                            <!--</td>-->
-                        <!--</tr>-->
-                        <!--<tr class="header">-->
-                            <!--<td colspan="8">-->
-                                <!--<input type="text" class="form-control" name="comment"  placeholder="Комментарий"/>-->
-                            <!--</td>-->
-                        <!--</tr>-->
-                    <!--</form>-->
-                <!--</table>-->
-            <!--</div>-->
 
             <section class="cards-section text-center">
                 <div id="cards-wrapper" class="cards-wrapper row">

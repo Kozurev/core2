@@ -42,6 +42,13 @@ section {
     text-align: center;
 }
 
+.center,
+.left,
+.right div {
+    display: inline-block;
+    float: none;
+}
+
 
 
 
