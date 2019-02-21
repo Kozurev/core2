@@ -1,9 +1,10 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 03.06.2018
- * Time: 12:46
+ * Обработчик ормирования контента раздела "Статистика"
+ *
+ * @author Bad Wolf
+ * @date 03.06.2018 12:46
+ * @version 20190221
  */
 
 $dateFormat = 'Y-m-d';
@@ -11,27 +12,16 @@ $date = date( $dateFormat );
 
 $dateFrom = Core_Array::Get( 'date_from', null, PARAM_STRING );
 $dateTo =   Core_Array::Get( 'date_to', null, PARAM_STRING );
+$areaId =   Core_Array::Get( 'area_id', 0, PARAM_INT );
 
 
 $Director = User::current()->getDirector();
-if ( !$Director )
-{
-    die( Core::getMessage( 'NOT_DIRECTOR' ) );
-}
 $subordinated = $Director->getId();
 
 
 echo "<div class='row'>";
 
-Core::factory( "Core_Entity" )
-    ->addSimpleEntity( 'date_from', $dateFrom )
-    ->addSimpleEntity( 'date_to', $dateTo )
-    ->xsl( 'musadm/statistic/calendar.xsl' )
-    ->show();
-
-/**
- * Статистика по балансу и урокам
- */
+//Статистика по балансу и урокам
 $queryString = Core::factory( 'Orm' )
     ->select( 'sum(value)', 'sum' )
     ->from( 'Property_Int AS p' )
@@ -40,12 +30,22 @@ $queryString = Core::factory( 'Orm' )
     ->where( 'u.subordinated', '=', $subordinated )
     ->where( 'u.group_id', '=', 5 )
     ->where( 'p.model_name', '=', 'User' )
-    ->where( 'p.property_id', '=', 12 )
-    ->getQueryString();
+    ->where( 'p.property_id', '=', 12 );
 
+if ( $areaId !== 0 )
+{
+    $queryString->join(
+        'Schedule_Area_Assignment as saa',
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+    );
+}
+
+$queryString = $queryString->getQueryString();
 $Result = Core::factory( 'Orm' )->executeQuery( $queryString );
 $Result = $Result->fetch();
-$sum = $Result['sum'];
+$Result['sum'] != null
+    ?   $sum = $Result['sum']
+    :   $sum = 0;
 
 //Кол-во оплаченных индивидуальных уроков
 $queryString = Core::factory( 'Orm' )
@@ -57,12 +57,22 @@ $queryString = Core::factory( 'Orm' )
     ->where( 'u.group_id', '=', 5 )
     ->where( 'p.model_name', '=', 'User' )
     ->where( 'p.property_id', '=', 13 )
-    ->where( 'value', '>', 0 )
-    ->getQueryString();
+    ->where( 'value', '>', 0 );
 
+if ( $areaId !== 0 )
+{
+    $queryString->join(
+        'Schedule_Area_Assignment as saa',
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+    );
+}
+
+$queryString = $queryString->getQueryString();
 $Result = Core::factory( 'Orm' )->executeQuery( $queryString );
 $Result = $Result->fetch();
-$indiv_lessons_pos = $Result['sum'];
+$Result['sum'] != null
+    ?   $indiv_lessons_pos = $Result['sum']
+    :   $indiv_lessons_pos = 0;
 
 //Кол-во неоплаченных индивидуальных уроков
 $queryString = Core::factory( 'Orm' )
@@ -74,12 +84,22 @@ $queryString = Core::factory( 'Orm' )
     ->where( 'p.model_name', '=', 'User' )
     ->where( 'u.subordinated', '=', $subordinated )
     ->where( 'p.property_id', '=', 13 )
-    ->where( 'value', '<', 0 )
-    ->getQueryString();
+    ->where( 'value', '<', 0 );
 
+if ( $areaId !== 0 )
+{
+    $queryString->join(
+        'Schedule_Area_Assignment as saa',
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+    );
+}
+
+$queryString = $queryString->getQueryString();
 $Result = Core::factory( 'Orm' )->executeQuery($queryString);
 $Result = $Result->fetch();
-$indiv_lessons_neg = $Result['sum'];
+$Result['sum'] != null
+    ?   $indiv_lessons_neg = $Result['sum']
+    :   $indiv_lessons_neg = 0;
 
 //Кол-во оплаченных групповых уроков
 $queryString = Core::factory( 'Orm' )
@@ -91,12 +111,20 @@ $queryString = Core::factory( 'Orm' )
     ->where( 'u.group_id', '=', 5 )
     ->where( 'p.model_name', '=', 'User' )
     ->where( 'p.property_id', '=', 14 )
-    ->where( 'value', '>', 0 )
-    ->getQueryString();
+    ->where( 'value', '>', 0 );
 
+if ( $areaId !== 0 )
+{
+    $queryString->join(
+        'Schedule_Area_Assignment as saa',
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+    );
+}
+
+$queryString = $queryString->getQueryString();
 $Result = Core::factory( 'Orm' )->executeQuery( $queryString );
 $Result = $Result->fetch();
-$Result['sum'] > 0
+$Result['sum'] != null
     ?   $group_lessons_pos = $Result['sum']
     :   $group_lessons_pos = 0;
 
@@ -109,12 +137,20 @@ $queryString = Core::factory( 'Orm' )
     ->where( 'u.active', '=', 1 )
     ->where( 'u.subordinated', '=', $subordinated )
     ->where( 'property_id', '=', 14 )
-    ->where( 'value', '<', 0 )
-    ->getQueryString();
+    ->where( 'value', '<', 0 );
 
+if ( $areaId !== 0 )
+{
+    $queryString->join(
+        'Schedule_Area_Assignment as saa',
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+    );
+}
+
+$queryString = $queryString->getQueryString();
 $Result = Core::factory( 'Orm' )->executeQuery( $queryString );
 $Result = $Result->fetch();
-$Result['sum'] > 0
+$Result['sum'] != null
     ?   $group_lessons_neg = $Result['sum']
     :   $group_lessons_neg = 0;
 
@@ -154,6 +190,11 @@ else
     }
 }
 
+if ( $areaId !== 0 )
+{
+    $totalCount->where( 'area_id', '=', $areaId );
+}
+
 $totalCount = $totalCount->getCount();
 
 $Statuses = Core::factory( 'Lid_Status' )
@@ -187,6 +228,11 @@ $Statuses = Core::factory( 'Lid_Status' )
                 {
                     $queryString->where( 'control_date', '<=', $dateTo );
                 }
+            }
+
+            if ( $areaId !== 0 )
+            {
+                $queryString->where( 'area_id', '=', $areaId );
             }
 
             $queryString = $queryString->getQueryString();
@@ -228,7 +274,17 @@ $queryString = Core::factory( 'Orm' )
     ->select( 'sum(value)', 'sum' )
     ->from( 'Payment' )
     ->where( 'type', '=', 3 )
-    ->where( 'subordinated', '=', $subordinated );
+    ->where( 'Payment.subordinated', '=', $subordinated );
+
+if ( $areaId !== 0 )
+{
+    $queryString
+        ->join( 'User as u', 'Payment.user = u.id' )
+        ->join(
+            'Schedule_Area_Assignment as saa',
+            'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+        );
+}
 
 if ( $dateFrom === null && $dateTo === null )
 {
@@ -301,6 +357,20 @@ else
     }
 }
 
+if ( $areaId !== 0 )
+{
+    $lessonReportsCount
+        ->join(
+            'Schedule_Area_Assignment as saa',
+            'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+        );
+    $attendanceCount
+        ->join(
+            'Schedule_Area_Assignment as saa',
+            'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+        );
+}
+
 $lessonReportsCount = $lessonReportsCount->getCount();
 $attendanceCount = $attendanceCount->getCount();
 
@@ -323,16 +393,21 @@ if ( $dateFrom === null && $dateTo === null )
 }
 else
 {
-    $countDaysInterval = ( strtotime( $dateTo ) - strtotime( $dateFrom ) ) / ( 60*60*24 );
+    $dateFrom === null
+        ?   $from = date( 'Y-m-d' )
+        :   $from = $dateFrom;
+
+    $dateTo === null
+        ?   $to = date( 'Y-m-d' )
+        :   $to = $dateTo;
+
+    $countDaysInterval = ( strtotime( $to ) - strtotime( $from ) ) / ( 60*60*24 );
     $countDaysInterval = intval( $countDaysInterval ) + 1;
 }
-
 
 $countDaysInterval == 0
     ?   $lessonIndex = $attendanceCount
     :   $lessonIndex = round( $attendanceCount / $countDaysInterval, 1 );
-
-
 
 Core::factory( 'Core_Entity' )
     ->addSimpleEntity( 'day_index', $lessonIndex )
@@ -341,7 +416,6 @@ Core::factory( 'Core_Entity' )
     ->addSimpleEntity( 'attendance_percent', $attendancePercent )
     ->xsl( 'musadm/statistic/lessons.xsl' )
     ->show();
-
 
 /**
  * Статистика по доходам, расходам и прибыли
@@ -357,6 +431,16 @@ $hostExpenses = Core::factory( 'Payment' )
     ->select( 'sum(Payment.value)', 'value' )
     ->where( 'type', '=', 4 )
     ->where( 'subordinated', '=', $subordinated );
+
+if ( $areaId !== 0 )
+{
+    $finances
+        ->join(
+            'Schedule_Area_Assignment as saa',
+            'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+        );
+    $hostExpenses->where( 'area_id', '=', $areaId );
+}
 
 if ( $dateFrom === null && $dateTo === null )
 {
@@ -377,6 +461,7 @@ else
         $hostExpenses->where( 'datetime', '<=', $dateTo );
     }
 }
+
 
 $income =   clone $finances->select( 'sum(client_rate)', 'value' );
 $expenses = clone $finances->select( 'sum(teacher_rate)', 'value' );

@@ -1,19 +1,16 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 03.06.2018
- * Time: 12:46
+ *
+ *
+ * @author Bad Wolf
+ * @date 03.06.2018 12:46
+ * @version 20190221
  */
 
 
-/**
- * Блок проверки авторизации и прав доступа
- */
-$User = User::current();
-$accessRules = ['groups' => [1, 6]];
+$accessRules = ['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]];
 
-if ( !User::checkUserAccess( $accessRules, $User ) )
+if ( !User::checkUserAccess( $accessRules ) )
 {
     Core_Page_Show::instance()->error( 403 );
 }
@@ -28,7 +25,7 @@ Core_Page_Show::instance()->setParam( 'title-first', 'СТАТИСТИКА' );
 Core_Page_Show::instance()->setParam( 'title-second', '' );
 Core_Page_Show::instance()->setParam( 'breadcumbs', $breadcumbs );
 
-$action = Core_Array::Get( 'action', '' );
+$action = Core_Array::Get( 'action', '', PARAM_STRING );
 
 if ( $action === 'refresh' )
 {
