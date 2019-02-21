@@ -12,66 +12,60 @@
     <link href='https://fonts.googleapis.com/css?family=Bitter' rel='stylesheet'>
     <?
     Core_Page_Show::instance()
-        ->css( "/templates/template10/assets/plugins/bootstrap/css/bootstrap.min.css" )
-        ->css( "/templates/template10/assets/plugins/font-awesome/css/font-awesome.css" )
-        ->css( "/templates/template10/assets/plugins/elegant_font/css/style.css" )
-        ->css( "/templates/template10/assets/css/popup.css" )
-        ->css( "/templates/template10/assets/css/styles.css" )
-        ->css( "/templates/template10/assets/css/custom.css" )
-        ->css( "/templates/template10/assets/css/balance.css" )
-        ->css( "/templates/template10/assets/css/lids.css" )
-        ->css( "/templates/template10/assets/css/finances.css" )
-        ->css( "/templates/template10/assets/css/tasks.css" )
-        ->css( "/templates/template10/assets/css/checkbox.css" )
-        ->css( "/templates/template10/assets/css/tooltip.css" )
-        ->css( "/templates/template10/assets/css/scroll.css" )
-        ->css( "/templates/template10/assets/css/radiobutton.css" )
-        ->js( "/templates/template10/assets/plugins/jquery.min.js" );
+        ->css( '/templates/template10/assets/plugins/bootstrap/css/bootstrap.min.css' )
+        ->css( '/templates/template10/assets/plugins/font-awesome/css/font-awesome.css' )
+        ->css( '/templates/template10/assets/plugins/elegant_font/css/style.css' )
+        ->css( '/templates/template10/assets/css/popup.css' )
+        ->css( '/templates/template10/assets/css/styles.css' )
+        ->css( '/templates/template10/assets/css/custom.css' )
+        ->css( '/templates/template10/assets/css/balance.css' )
+        ->css( '/templates/template10/assets/css/lids.css' )
+        ->css( '/templates/template10/assets/css/finances.css' )
+        ->css( '/templates/template10/assets/css/tasks.css' )
+        ->css( '/templates/template10/assets/css/checkbox.css' )
+        ->css( '/templates/template10/assets/css/tooltip.css' )
+        ->css( '/templates/template10/assets/css/scroll.css' )
+        ->css( '/templates/template10/assets/css/radiobutton.css' )
+        ->js( '/templates/template10/assets/plugins/jquery.min.js' );
 
         global $CFG;
-
+        Core::factory( 'User_Controller' );
         $Director = User::current()->getDirector();
-        if( !$Director )    die( Core::getMessage("NOT_DIRECTOR") );
         $subordinated = $Director->getId();
-
-        $pageUserId = Core_Array::Get( "userid", null );
+        $pageUserId = Core_Array::Get( 'userid', null, PARAM_INT );
 
         is_null( $pageUserId )
             ?   $User = User::current()
-            :   $User = Core::factory( "User", $pageUserId );
+            :   $User = User_Controller::factory( $pageUserId );
 
-
-        if( is_null( $pageUserId ) )
+        if ( is_null( $pageUserId ) )
         {
-            $disauthorizeLink = "href='" . $CFG->rootdir . "/authorize?auth_revert=1" ."'";
+            $disauthorizeLink = 'href="' . $CFG->rootdir . '/authorize?auth_revert=1' . '"';
         }
         else
         {
-            //$disauthorizeLink = "href='#' onclick='history.back()'";
-            $UserGroup = Core::factory( "User_Group", $User->groupId() );
-            $disauthorizeLink = "href='" . $CFG->rootdir . "/user/" . $UserGroup->path() . "/'";
+            $UserGroup = Core::factory( 'User_Group', $User->groupId() );
+            $disauthorizeLink = 'href="' . $CFG->rootdir . '/user/' . $UserGroup->path() . '/"';
         }
 
-        $name = $User->name();
-        $surname = $User->surname();
-        $isAdmin = $User->groupId() <= 3;
+        $name =     $User->name();
+        $surname =  $User->surname();
+        $isAdmin =  $User->groupId() <= ROLE_MANAGER;
 
-
-        switch ( Core_Page_Show::instance()->getParam( "body-class", "" ) )
+        switch ( Core_Page_Show::instance()->getParam( 'body-class', '' ) )
         {
-            case "body-orange":     $hover = '#F88C30';     break;
-            case "body-primary":    $hover = '#40babd';     break;
-            case "body-blue":       $hover = '#58bbee';     break;
-            case "body-red":        $hover = '#f77b6b';     break;
-            case "body-pink":       $hover = '#EA5395';     break;
-            case "body-green":      $hover = '#75c181';     break;
+            case 'body-orange':     $hover = '#F88C30';     break;
+            case 'body-primary':    $hover = '#40babd';     break;
+            case 'body-blue':       $hover = '#58bbee';     break;
+            case 'body-red':        $hover = '#f77b6b';     break;
+            case 'body-pink':       $hover = '#EA5395';     break;
+            case 'body-green':      $hover = '#75c181';     break;
             default:                $hover = 'black';
         }
-
     ?>
 </head>
 
-<body class="<?=$this->getParam( "body-class", "" )?>">
+<body class="<?=$this->getParam( 'body-class', '' )?>">
 
     <style>
         :root {
@@ -94,17 +88,20 @@
                             <a class="navbar-brand" href="<?=$CFG->rootdir?>" >Musicmetod</a>
                         </div>
                         <ul class="nav navbar-nav">
-                            <? if( $User->groupId() == 2 ) { ?>
+                            <?php
+                            if ( User::checkUserAccess( ['groups' => [ROLE_MANAGER]] ) )
+                            {
+                            ?>
                             <li class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$CFG->rootdir?>/user">Расписание
                                     <span class="caret"></span></a>
                                 <ul class="dropdown-menu">
-                                    <?
-                                    $Areas = Core::factory( "Schedule_Area_Assignment" )->getAreas( $User, true );
+                                    <?php
+                                    $Areas = Core::factory( 'Schedule_Area_Assignment' )->getAreas( $User, true );
 
                                     foreach ( $Areas as $area )
                                     {
-                                        $href = $CFG->rootdir . "/schedule/" . $area->path();
+                                        $href = $CFG->rootdir . '/schedule/' . $area->path();
                                         echo "<li><a href='" . $href . "'>";
                                         echo $area->title();
                                         echo "</a></li>";
@@ -112,33 +109,38 @@
                                     ?>
                                 </ul>
                             </li>
-                            <? } elseif( $User->groupId() == 4 || $User->groupId() == 6 ) {?>
+                            <?php
+                            }
+                            elseif ( User::checkUserAccess( ['groups' => [ROLE_DIRECTOR, ROLE_TEACHER]] ) )
+                            {
+                            ?>
                                 <li><a href="<?=$CFG->rootdir?>/schedule">Расписание</a></li>
-                            <? }
+                            <?php
+                            }
 
                             //Пункты только для клиентов
-                            if( $User->groupId() == 5 )
+                            if ( User::checkUserAccess( ['groups' => [ROLE_CLIENT]] ) )
                             {
 
-                                $linkBalance = $CFG->rootdir . "/balance";
-                                $linkChangelogin = $CFG->rootdir . "/changelogin";
+                                $linkBalance = $CFG->rootdir . '/balance';
+                                $linkChangelogin = $CFG->rootdir . '/changelogin';
 
-                                if( $pageUserId !== null )
+                                if ( $pageUserId !== null )
                                 {
-                                    $linkBalance .= "?userid=" . $pageUserId;
-                                    $linkChangelogin .= "?userid=" . $pageUserId;
+                                    $linkBalance .= '?userid=' . $pageUserId;
+                                    $linkChangelogin .= '?userid=' . $pageUserId;
                                 }
 
-                                ?>
+                            ?>
                                 <li><a href="<?=$linkBalance?>" >Баланс</a></li>
                                 <li><a href="<?=$linkChangelogin?>" >Сменить логин или пароль</a></li>
-                                <?
+                            <?php
                             }
 
                             //Пункты только для администратора, директора или менеджера
-                            if( $User->groupId() == 2 || $User->groupId() == 6 )
+                            if ( User::checkUserAccess( ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]] ) )
                             {
-                                ?>
+                            ?>
                                 <li class="dropdown">
                                     <a class="dropdown-toggle" data-toggle="dropdown" href="<?=$CFG->rootdir?>/user">Пользователи
                                         <span class="caret"></span></a>
@@ -151,29 +153,26 @@
                                 <li><a href="<?=$CFG->rootdir?>/groups">Группы</a></li>
                                 <li><a href="<?=$CFG->rootdir?>/lids">Лиды</a></li>
                                 <li><a href="<?=$CFG->rootdir?>/certificates">Сертификаты</a></li>
-                                <?
-                                if( User::checkUserAccess(["groups" => [6]]) )
+                                <li><a href="<?=$CFG->rootdir?>/tasks">Задачи</a></li>
+                                <?php
+                                if ( User::checkUserAccess( ['groups' => [ROLE_DIRECTOR]] ) )
                                 {
                                     echo "<li><a href='" . $CFG->rootdir . "/finances'>Финансы</a></li>";
-                                }
-                                ?>
-                                <li><a href="<?=$CFG->rootdir?>/tasks">Задачи</a></li>
-                                <?
-                                if( User::checkUserAccess(["groups" => [6]]) )
-                                {
                                     echo "<li><a href='".$CFG->rootdir."/statistic'>Статистика</a></li>";
                                 }
+                                ?>
+                            <?php
                             }
                             ?>
                         </ul>
                         <ul class="nav navbar-nav navbar-right">
                             <?
-                            if( !is_null( $pageUserId ) )
+                            if ( !is_null( $pageUserId ) )
                             {
                                 echo "<li><a>". $User->phoneNumber()."</a></li>";
                             }
                             ?>
-                            <li><a><?echo $surname . " " . $name; ?></a></li>
+                            <li><a><?=$surname . ' ' . $name?></a></li>
                             <li><a><?=$User->getOrganizationName()?></a></li>
                             <li><a <?=$disauthorizeLink?>>Выйти</a></li>
                         </ul>
@@ -182,19 +181,21 @@
 
                 <div class="container">
                     <?php
-                        Core::factory( "Core_Entity" )
-                            ->addSimpleEntity( "rootdir", $CFG->rootdir )
-                            ->addSimpleEntity( "title-first", $this->getParam( "title-first" ) )
-                            ->addSimpleEntity( "title-second", $this->getParam( "title-second" ) )
-                            ->addEntities( $this->getParam( "breadcumbs" ), "breadcumb" )
-                            ->xsl( "musadm/header.xsl" )
+                        Core::factory( 'Core_Entity' )
+                            ->addSimpleEntity( 'rootdir', $CFG->rootdir )
+                            ->addSimpleEntity( 'title-first', Core_Page_Show::instance()->getParam( 'title-first' ) )
+                            ->addSimpleEntity( 'title-second', Core_Page_Show::instance()->getParam( 'title-second' ) )
+                            ->addEntities( Core_Page_Show::instance()->getParam( 'breadcumbs' ), 'breadcumb' )
+                            ->xsl( 'musadm/header.xsl' )
                             ->show();
                     ?>
                 </div><!--//container-->
             </header>
 
             <div class="container page">
-                <?php $this->execute();?>
+                <?php
+                Core_Page_Show::instance()->execute();
+                ?>
             </div>
 
             <div id="ekkoLightbox-640" class="ekko-lightbox modal fade in" tabindex="-1" style="padding-right: 17px;">
@@ -225,38 +226,38 @@
 
 <?php
 Core_Page_Show::instance()
-    ->js( "/templates/template10/assets/plugins/bootstrap/js/bootstrap.min.js" )
-    ->js( "/templates/template10/assets/js/jquery.validate.min.js" )
-    ->js( "/templates/template10/assets/js/jquery.maskedinput.min.js" )
-    ->js( "/templates/template4/lib/tablesorter/js/jquery.tablesorter.js" )
-    ->js( "/templates/template4/lib/tablesorter/js/jquery.tablesorter.widgets.js" )
-    ->js( "/templates/template4/lib/tablesorter/addons/pager/jquery.tablesorter.pager.js" )
-    ->js( "/templates/template4/lib/tablesorter/beta-testing/pager-custom-controls.js" )
-    ->js( "/templates/template10/assets/plugins/prism/prism.js" )
-    ->js( "/templates/template10/assets/plugins/jquery-scrollTo/jquery.scrollTo.min.js" )
-    ->js( "/templates/template10/assets/plugins/lightbox/dist/ekko-lightbox.min.js" )
-    ->js( "/templates/template10/assets/plugins/jquery-match-height/jquery.matchHeight-min.js" )
-    ->js( "/templates/template10/assets/js/main.js" )
-    ->js( "/templates/template4/js/bootstrap.min.js")
-    ->js( "/templates/template4/js/jquery.validate.min.js" )
-    ->js( "/templates/template4/js/bootstrap.min.js" )
-    ->js( "/templates/template4/lib/tablesorter/js/jquery.tablesorter.js" )
-    ->js( "/templates/template4/lib/tablesorter/js/jquery.tablesorter.widgets.js" )
-    ->js( "/templates/template4/lib/tablesorter/addons/pager/jquery.tablesorter.pager.js" )
-    ->js( "/templates/template4/lib/tablesorter/beta-testing/pager-custom-controls.js" )
-    ->js( "/templates/template4/js/main.js" )
-    ->js( "/templates/template4/js/users.js" )
-    ->js( "/templates/template4/js/payments.js" )
-    ->js( "/templates/template4/js/groups.js" )
-    ->js( "/templates/template4/js/lids.js" )
-    ->js( "/templates/template4/js/schedule.js" )
-    ->js( "/templates/template4/js/tasks.js" )
-    ->js( "/templates/template4/js/certificates.js" )
-    ->js( "/templates/template4/js/finances.js" )
-    ->js( "/templates/template4/js/statistic.js" )
-    ->js( "/templates/template4/js/areas_assignments.js" )
-    ->js( "/templates/template4/js/property_list.js" )
-    ->js( "/templates/template4/js/js.js" );
+    ->js( '/templates/template10/assets/plugins/bootstrap/js/bootstrap.min.js' )
+    ->js( '/templates/template10/assets/js/jquery.validate.min.js' )
+    ->js( '/templates/template10/assets/js/jquery.maskedinput.min.js' )
+    ->js( '/templates/template4/lib/tablesorter/js/jquery.tablesorter.js' )
+    ->js( '/templates/template4/lib/tablesorter/js/jquery.tablesorter.widgets.js' )
+    ->js( '/templates/template4/lib/tablesorter/addons/pager/jquery.tablesorter.pager.js' )
+    ->js( '/templates/template4/lib/tablesorter/beta-testing/pager-custom-controls.js' )
+    ->js( '/templates/template10/assets/plugins/prism/prism.js' )
+    ->js( '/templates/template10/assets/plugins/jquery-scrollTo/jquery.scrollTo.min.js' )
+    ->js( '/templates/template10/assets/plugins/lightbox/dist/ekko-lightbox.min.js' )
+    ->js( '/templates/template10/assets/plugins/jquery-match-height/jquery.matchHeight-min.js' )
+    ->js( '/templates/template10/assets/js/main.js' )
+    ->js( '/templates/template4/js/bootstrap.min.js' )
+    ->js( '/templates/template4/js/jquery.validate.min.js' )
+    ->js( '/templates/template4/js/bootstrap.min.js' )
+    ->js( '/templates/template4/lib/tablesorter/js/jquery.tablesorter.js' )
+    ->js( '/templates/template4/lib/tablesorter/js/jquery.tablesorter.widgets.js' )
+    ->js( '/templates/template4/lib/tablesorter/addons/pager/jquery.tablesorter.pager.js' )
+    ->js( '/templates/template4/lib/tablesorter/beta-testing/pager-custom-controls.js' )
+    ->js( '/templates/template4/js/main.js' )
+    ->js( '/templates/template4/js/users.js' )
+    ->js( '/templates/template4/js/payments.js' )
+    ->js( '/templates/template4/js/groups.js' )
+    ->js( '/templates/template4/js/lids.js' )
+    ->js( '/templates/template4/js/schedule.js' )
+    ->js( '/templates/template4/js/tasks.js' )
+    ->js( '/templates/template4/js/certificates.js' )
+    ->js( '/templates/template4/js/finances.js' )
+    ->js( '/templates/template4/js/statistic.js' )
+    ->js( '/templates/template4/js/areas_assignments.js' )
+    ->js( '/templates/template4/js/property_list.js' )
+    ->js( '/templates/template4/js/js.js' );
 ?>
 
 </body>
