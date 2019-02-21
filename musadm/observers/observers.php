@@ -285,7 +285,7 @@ Core::attachObserver( 'beforeStructureSave', function( $args ) {
         ->getCount();
 
     $countCoincidingItems = $CoincidingItems
-        ->where( 'parent_id', $ParentId )
+        ->whereIn( 'parent_id', $ParentId )
         ->getCount();
 
     if ( $countCoincidingItems > 0 || $countCoincidingStructures > 0 )
