@@ -20,12 +20,12 @@ Core::attachObserver( 'beforeUserInsert', function( $args ) {
     $Director = User::current()->getDirector();
     $subordinated = $Director->getId();
 
-    if ( $User->groupId() == 4 )
+    if ( $User->groupId() == ROLE_TEACHER )
     {
         $teacherFullName = $User->surname() . ' ' . $User->name();
 
         Core::factory( 'Property_List_Values' )
-            ->property_id( 21 )
+            ->propertyId( 21 )
             ->value( $teacherFullName )
             ->subordinated( $subordinated )
             ->save();
@@ -33,12 +33,31 @@ Core::attachObserver( 'beforeUserInsert', function( $args ) {
 
     //TODO: добавить обработчик ещё и для редактирования учетной записи преподавателя. Если измениться его имя или фамилия то элемент списка свойства 'преподаватели' не изменится
 
-    if ( $User->groupId() != 6 && $User->groupId() != 1 )
+    if ( $User->groupId() != ROLE_DIRECTOR && $User->groupId() != ROLE_ADMIN )
     {
         if ( $User->subordinated() == 0 )
         {
             $User->subordinated( $subordinated );
         }
+    }
+});
+
+
+Core::attachObserver( 'beforeUserActivate', function( $args ) {
+    $User = $args[0];
+
+    $Director = User::current()->getDirector();
+    $subordinated = $Director->getId();
+
+    if ( $User->groupId() == ROLE_TEACHER )
+    {
+        $teacherFullName = $User->surname() . ' ' . $User->name();
+
+        Core::factory( 'Property_List_Values' )
+            ->propertyId( 21 )
+            ->value( $teacherFullName )
+            ->subordinated( $subordinated )
+            ->save();
     }
 });
 
@@ -49,7 +68,7 @@ Core::attachObserver( 'beforeUserInsert', function( $args ) {
 Core::attachObserver( 'beforeUserDelete', function( $args ) {
     $User = $args[0];
 
-    if ( $User->groupId() == 4 )
+    if ( $User->groupId() == ROLE_TEACHER )
     {
         $Director = User::current()->getDirector();
         $subordinated = $Director->getId();
@@ -62,11 +81,39 @@ Core::attachObserver( 'beforeUserDelete', function( $args ) {
             ->where( 'value', 'like', '%' . $User->surname() . '%' )
             ->find();
 
-        if ( $listValue ) $listValue->delete();
+        if ( $listValue )
+        {
+            $listValue->delete();
+        }
     }
 
     Core::factory( 'Property' )->clearForObject( $User );
 });
+
+
+Core::attachObserver( 'beforeUserDeactivate', function( $args ) {
+    $User = $args[0];
+
+    if ( $User->groupId() == ROLE_TEACHER )
+    {
+        $Director = User::current()->getDirector();
+        $subordinated = $Director->getId();
+
+        $listValue = Core::factory( 'Property_List_Values' )
+            ->queryBuilder()
+            ->where( 'property_id', '=', 21 )
+            ->where( 'subordinated', '=', $subordinated )
+            ->where( 'value', 'like', '%' . $User->name() . '%' )
+            ->where( 'value', 'like', '%' . $User->surname() . '%' )
+            ->find();
+
+        if ( $listValue )
+        {
+            $listValue->delete();
+        }
+    }
+});
+
 
 
 /**
