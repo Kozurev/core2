@@ -225,7 +225,7 @@ foreach ( $UserReports as $rep )
     $rep->date( refactorDateFormat( $rep->date() ) );
 }
 
-User::checkUserAccess( ['groups' => [6]], User::parentAuth() )
+User::checkUserAccess( ['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]] )
     ?   $isDirector = 1
     :   $isDirector = 0;
 

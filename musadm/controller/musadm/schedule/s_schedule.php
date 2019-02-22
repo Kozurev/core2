@@ -6,6 +6,7 @@ $Director = $User->getDirector();
 $subordinated = $Director->getId();
 
 Core::factory( 'User_Controller' );
+Core::factory( 'Task_Controller' );
 Core::factory( 'Schedule_Area_Controller' );
 
 
@@ -427,8 +428,10 @@ if ( $action === 'teacherReport' )
         $teacherAbsentValue = 0;
     }
 
-    if ( $att )
-    $Report->teacherRate( $teacherAbsentValue );
+    if ( $attendance == 0 )
+    {
+        $Report->teacherRate( $teacherAbsentValue );
+    }
 
 
     /**
