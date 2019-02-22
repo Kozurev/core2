@@ -429,8 +429,9 @@ $finances = Core::factory( 'Schedule_Lesson_Report' )
 $hostExpenses = Core::factory( 'Payment' )
     ->queryBuilder()
     ->select( 'sum(Payment.value)', 'value' )
-    ->where( 'type', '=', 4 )
-    ->where( 'subordinated', '=', $subordinated );
+    ->join( 'Payment_Type as t', 'Payment.type = t.id' )
+    ->where( 't.subordinated', '=', $subordinated )
+    ->where( 'Payment.subordinated', '=', $subordinated );
 
 if ( $areaId !== 0 )
 {
