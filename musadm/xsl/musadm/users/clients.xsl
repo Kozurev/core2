@@ -28,7 +28,7 @@
         </xsl:if>
 
 
-        <section class="section-bordered">
+        <section>
             <div class="table-responsive">
                 <table id="sortingTable" class="table table-striped table-statused">
                     <thead>
