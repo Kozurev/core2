@@ -265,62 +265,8 @@ $LidsOutput
     ->show();
 
 
-/**
- * Статистика по выплатам преподавателям
- */
+
 echo "<div class=\"col-lg-4 col-md-6 col-sm-6 col-xs-12\">";
-
-$queryString = Core::factory( 'Orm' )
-    ->select( 'sum(value)', 'sum' )
-    ->from( 'Payment' )
-    ->where( 'type', '=', 3 )
-    ->where( 'Payment.subordinated', '=', $subordinated );
-
-if ( $areaId !== 0 )
-{
-    $queryString
-        ->join( 'User as u', 'Payment.user = u.id' )
-        ->join(
-            'Schedule_Area_Assignment as saa',
-            'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
-        );
-}
-
-if ( $dateFrom === null && $dateTo === null )
-{
-    $queryString->where( 'datetime', '=', $date );
-}
-else
-{
-    if ( $dateFrom !== null )
-    {
-        $queryString->where( 'datetime', '>=', $dateFrom );
-    }
-
-    if ( $dateTo !== null )
-    {
-        $queryString->where( 'datetime', '<=', $dateTo );
-    }
-}
-
-$queryString = $queryString->getQueryString();
-$Result = Core::factory( 'Orm' )->executeQuery( $queryString );
-$Result = $Result->fetch();
-
-if ( $Result['sum'] == null )
-{
-    $sum = 0;
-}
-else
-{
-    $sum = $Result['sum'];
-}
-
-Core::factory( 'Core_Entity' )
-    ->addSimpleEntity( 'total_sum', $sum )
-    ->xsl( 'musadm/statistic/teacher_payments.xsl' )
-    ->show();
-
 
 /**
  * Статистика по проведенным занятиям
@@ -415,6 +361,60 @@ Core::factory( 'Core_Entity' )
     ->addSimpleEntity( 'attendance_count', $attendanceCount )
     ->addSimpleEntity( 'attendance_percent', $attendancePercent )
     ->xsl( 'musadm/statistic/lessons.xsl' )
+    ->show();
+
+/**
+ * Статистика по выплатам преподавателям
+ */
+$queryString = Core::factory( 'Orm' )
+    ->select( 'sum(value)', 'sum' )
+    ->from( 'Payment' )
+    ->where( 'type', '=', 3 )
+    ->where( 'Payment.subordinated', '=', $subordinated );
+
+if ( $areaId !== 0 )
+{
+    $queryString
+        ->join( 'User as u', 'Payment.user = u.id' )
+        ->join(
+            'Schedule_Area_Assignment as saa',
+            'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+        );
+}
+
+if ( $dateFrom === null && $dateTo === null )
+{
+    $queryString->where( 'datetime', '=', $date );
+}
+else
+{
+    if ( $dateFrom !== null )
+    {
+        $queryString->where( 'datetime', '>=', $dateFrom );
+    }
+
+    if ( $dateTo !== null )
+    {
+        $queryString->where( 'datetime', '<=', $dateTo );
+    }
+}
+
+$queryString = $queryString->getQueryString();
+$Result = Core::factory( 'Orm' )->executeQuery( $queryString );
+$Result = $Result->fetch();
+
+if ( $Result['sum'] == null )
+{
+    $sum = 0;
+}
+else
+{
+    $sum = $Result['sum'];
+}
+
+Core::factory( 'Core_Entity' )
+    ->addSimpleEntity( 'total_sum', $sum )
+    ->xsl( 'musadm/statistic/teacher_payments.xsl' )
     ->show();
 
 /**
