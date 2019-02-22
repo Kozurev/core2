@@ -1,16 +1,15 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Egor
- * Date: 18.03.2018
- * Time: 21:21
+ *
+ *
+ * @author Bad Wolf
+ * @date 18.03.2018 21:21
+ * @version 20190222
  */
 
-/*
-*	Блок проверки авторизации
-*/
+
 $User = User::current();
-$access = ['groups' => [1, 2, 6]];
+$access = ['groups' => [ROLE_ADMIN, ROLE_MANAGER, ROLE_DIRECTOR]];
 
 if ( $User === null )
 {
@@ -20,20 +19,14 @@ if ( $User === null )
     exit;
 }
 
-
-/**
- * Настроки редиректа
- */
 $host  = Core_Array::Server( 'HTTP_HOST', '' );
 $uri   = rtrim( dirname( Core_Array::Server( 'PHP_SELF', '' ) ), '/\\' );
-
 
 Core_Page_Show::instance()->setParam( 'body-class', 'body-green' );
 Core_Page_Show::instance()->setParam( 'title-first', 'ГЛАВНАЯ' );
 Core_Page_Show::instance()->setParam( 'title-second', 'СТРАНИЦА' );
 
-
-if ( Core_Array::Get( 'ajax', null ) === null )
+if ( Core_Array::Get( 'ajax', null, PARAM_STRING ) === null )
 {
     if ( !User::checkUserAccess( $access, $User ) )
     {
@@ -57,19 +50,20 @@ if ( Core_Array::Get( 'ajax', null ) === null )
 }
 
 
-$action = Core_Array::Get(  'action', null );
+$action = Core_Array::Get(  'action', null, PARAM_STRING );
 
 
 $Director = $User->getDirector();
 $subordinated = $Director->getId();
 
-COre::factory( 'User_Controller' );
+Core::factory( 'User_Controller' );
 Core::factory( 'Lid_Controller' );
 Core::factory( 'Task_Controller' );
+Core::factory( 'Property_Controller' );
 
 
 /**
- *
+ * Обработчик для открытия всплывающего окна редактирования списка дополнительного свойства
  */
 if ( $action === 'getPropertyListPopup' )
 {
@@ -80,14 +74,12 @@ if ( $action === 'getPropertyListPopup' )
         Core_Page_Show::instance()->error( 404 );
     }
 
-
-    $Property = Core::factory( 'Property', $propId );
+    $Property = Property_Controller::factory( $propId );
 
     if ( $Property === null )
     {
         Core_Page_Show::instance()->error( 404 );
     }
-
 
     $Values = $Property->getList();
 
@@ -106,7 +98,7 @@ if ( $action === 'getPropertyListPopup' )
  */
 if ( $action === 'savePropertyListValue' )
 {
-    $id =     Core_Array::Get( 'id', 0, PARAM_INT );
+    $id =     Core_Array::Get( 'id', null, PARAM_INT );
     $propId = Core_Array::Get( 'prop_id', null, PARAM_INT );
     $value =  Core_Array::Get( 'value', null, PARAM_STRING );
 
@@ -115,11 +107,7 @@ if ( $action === 'savePropertyListValue' )
         Core_Page_Show::instance()->error( 404 );
     }
 
-    $NewValue = Core::factory( 'Property_List_Values' )
-        ->queryBuilder()
-        ->where( 'id', '=', $id )
-        ->where( 'subordinated', '=', $subordinated )
-        ->find();
+    $NewValue = Property_Controller::factoryListValue( $id );
 
     if ( $NewValue === null )
     {
@@ -127,7 +115,7 @@ if ( $action === 'savePropertyListValue' )
     }
 
     $NewValue
-        ->property_id( $propId )
+        ->propertyId( $propId )
         ->value( $value )
         ->sorting( 0 );
     $NewValue->save();
@@ -154,12 +142,7 @@ if ( $action === 'deletePropertyListValue' )
         Core_Page_Show::instance()->error( 404 );
     }
 
-
-    $PropertyListValue = Core::factory( 'Property_List_Values' )
-        ->queryBuilder()
-        ->where( 'id', '=', $id )
-        ->where( 'subordinated', '=', $subordinated )
-        ->find();
+    $PropertyListValue = Property_Controller::factoryListValue( $id );
 
     if ( $PropertyListValue === null )
     {
@@ -182,22 +165,27 @@ if ( $action === 'savePropertyValue' )
     $modelId =      Core_Array::Get( 'model_id', null, PARAM_INT );
     $modelName =    Core_Array::Get( 'model_name', null, PARAM_STRING );
 
+    $Object = Core::factory( $modelName );
     $Property = Core::factory( 'Property' )->getByTagName( $propertyName );
 
-    if ( $Property === null )
+    if ( is_null( $Property ) || is_null( $Object ) )
     {
-        exit ( 'Свойство с названием ' . $propertyName . ' не существует' );
+        Core_Page_Show::instance()->error( 404 );
     }
 
-    $Object = Core::factory( $modelName )
-        ->queryBuilder()
+    if ( method_exists( $Object, 'subordinated' ) )
+    {
+        $Object->queryBuilder()
+            ->where( 'subordinated', '=', $subordinated );
+    }
+
+    $Object = $Object->queryBuilder()
         ->where( 'id', '=', $modelId )
-        ->where( 'subordinated', '=', $subordinated )
         ->find();
 
-    if ( !is_object( $Object ) || $Object->getId() == 0 )
+    if ( is_null( $Object ) )
     {
-        exit ( "Объекта класса $modelName с id $modelId не существует" );
+        Core_Page_Show::instance()->error( 404 );
     }
 
     $Value = $Property->getPropertyValues( $Object )[0];
@@ -210,7 +198,7 @@ if ( $action === 'savePropertyValue' )
 /**
  * Обновление таблицы лидов
  */
-if ( $action == 'refreshLidTable' )
+if ( $action === 'refreshLidTable' )
 {
     $LidController = new Lid_Controller( $User );
     $LidController

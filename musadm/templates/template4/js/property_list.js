@@ -49,7 +49,7 @@ $(function(){
                         id =            saveBtn.data('id'),
                         editingOption = itemsList.find('option[value='+id+']');
 
-                    saveBtn.data('id', 0);
+                    saveBtn.data('id', '');
                     editingOption.text(response.value);
                 }
             });

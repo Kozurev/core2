@@ -8,7 +8,7 @@
 
                 <div class="row center">
                     <div class="col-lg-6 col-md-8 col-sm-12 col-xs-12">
-                        <a href="#" class="btn btn-green btn-large" data-id="0" id="property_list_save" data-prop-id="{property/id}">Сохранить</a>
+                        <a href="#" class="btn btn-green btn-large" data-id="" id="property_list_save" data-prop-id="{property/id}">Сохранить</a>
                     </div>
 
                     <div class="col-lg-6 col-md-8 col-sm-12 col-xs-12 btn-cancel-block">
