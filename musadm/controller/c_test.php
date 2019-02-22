@@ -18,17 +18,13 @@ $Orm->executeQuery( 'DELETE FROM Event WHERE type_id = 28 AND data = ""' );
 
 $Orm->executeQuery( 'alter table Schedule_Area change count_classess count_classes int not null;' );
 
-
 $Orm->executeQuery( 'ALTER TABLE Page_Template RENAME TO Core_Page_Template;' );
 $Orm->executeQuery( 'ALTER TABLE Page_Template_Dir RENAME TO Core_Page_Template_Dir;' );
 
-
+$Orm->executeQuery( 'DELETE FROM Property_List_Values WHERE id = 221 OR id = 229' );
 
 $Orm->executeQuery( 'ALTER TABLE Payment ADD area_id int DEFAULT 0 NULL;' );
-
 $Orm->executeQuery( 'ALTER TABLE Payment_Type ADD subordinated int DEFAULT 0 NULL;' );
-//$Orm->executeQuery( 'UPDATE Payment_Type SET subordinated = 516 WHERE id < 4' );
-
 $Orm->executeQuery( 'ALTER TABLE Payment_Type ADD is_deletable smallint(1) DEFAULT 1 NULL;' );
 $Orm->executeQuery( 'UPDATE Payment_Type SET is_deletable = 0 WHERE id < 4' );
 
