@@ -344,8 +344,14 @@ function buyTarif(userid, tarifid)
             tarifid: tarifid
         },
         success: function(responce) {
-            if(responce != "")  alert(responce);
-            refreshPaymentsTable(userid, loaderOff);
+            if(responce != "")
+            {
+                alert(responce);
+            }
+            else
+            {
+                refreshPaymentsTable(userid, loaderOff);
+            }
             closePopup();
         }
     });
