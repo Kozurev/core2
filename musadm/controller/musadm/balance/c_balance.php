@@ -13,7 +13,13 @@ $ParentUser = User::parentAuth();
 $subordinated = User::current()->getDirector()->getId();
 
 //Указатель на авторизацию "под именем" клиента
-User::isAuthAs() ? $isAdmin = 1 : $isAdmin = 0;
+User::checkUserAccess( ['groups' => [ROLE_MANAGER, ROLE_DIRECTOR]] )
+    ?   $isAdmin = 1
+    :   $isAdmin = 0;
+
+User::checkUserAccess( ['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]] )
+    ?   $isDirector = 1
+    :   $isDirector = 0;
 
 //id клиента под которым авторизован менеджер/директор
 $pageClientId = Core_Array::Get( 'userid', null, PARAM_INT );
@@ -45,7 +51,7 @@ $OutputXml = Core::factory( 'Core_Entity' );
 /**
  * Пользовательские примечания и дата последней авторизации
  */
-if ( !is_null( $pageClientId ) )
+if ( $isAdmin )
 {
     $ClientNote = Core::factory( 'Property', 19 );
     $clientNote = $ClientNote->getPropertyValues( $User )[0];
@@ -224,10 +230,6 @@ foreach ( $UserReports as $rep )
     $rep->time_to = refactorTimeFormat( $RepLesson->timeTo() );
     $rep->date( refactorDateFormat( $rep->date() ) );
 }
-
-User::checkUserAccess( ['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]] )
-    ?   $isDirector = 1
-    :   $isDirector = 0;
 
 Core::factory( 'Core_Entity' )
     ->addEntities( $UserReports )

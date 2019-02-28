@@ -39,63 +39,65 @@
                         </td>
                     </tr>
 
-                    <tr>
-                        <td>Сменный график</td>
-
-                        <td><!--dng--></td>
-
-                        <td>
-                            <input type="checkbox" id="per_lesson" class="checkbox-new" data-userid="{note/object_id}" >
-                                <xsl:if test="per_lesson/value = 1">
-                                    <xsl:attribute name="checked">checked</xsl:attribute>
-                                </xsl:if>
-                            </input>
-                            <label for="per_lesson" class="label-new" style="position: relative; top: 5px;">
-                                <div class="tick"><input type="hidden" name="kostul"/></div>
-                            </label>
-                        </td>
-                    </tr>
-
-                    <xsl:if test="absent/id != ''">
+                    <xsl:if test="is_admin = 1">
                         <tr>
-                            <td>Текущий период отсутствия</td>
+                            <td>Сменный график</td>
+
+                            <td><!--dng--></td>
 
                             <td>
-                                <span id="absent-from"><xsl:value-of select="absent/date_from" /></span>
-                                <span> - </span>
-                                <span id="absent-to"><xsl:value-of select="absent/date_to" /></span>
+                                <input type="checkbox" id="per_lesson" class="checkbox-new" data-userid="{note/object_id}" >
+                                    <xsl:if test="per_lesson/value = 1">
+                                        <xsl:attribute name="checked">checked</xsl:attribute>
+                                    </xsl:if>
+                                </input>
+                                <label for="per_lesson" class="label-new" style="position: relative; top: 5px;">
+                                    <div class="tick"><input type="hidden" name="kostul"/></div>
+                                </label>
                             </td>
+                        </tr>
 
-                            <td>
-                                <a class="action edit edit_client_absent" data-id="{absent/id}"><xsl:text>&#x0A;</xsl:text></a>
-                                <a class="action delete"><xsl:text>&#x0A;</xsl:text></a>
+                        <xsl:if test="absent/id != ''">
+                            <tr>
+                                <td>Текущий период отсутствия</td>
+
+                                <td>
+                                    <span id="absent-from"><xsl:value-of select="absent/date_from" /></span>
+                                    <span> - </span>
+                                    <span id="absent-to"><xsl:value-of select="absent/date_to" /></span>
+                                </td>
+
+                                <td>
+                                    <a class="action edit edit_client_absent" data-id="{absent/id}"><xsl:text>&#x0A;</xsl:text></a>
+                                    <a class="action delete"><xsl:text>&#x0A;</xsl:text></a>
+                                </td>
+                            </tr>
+                        </xsl:if>
+
+                        <xsl:if test="entry/value != ''">
+                            <tr>
+                                <td>Последяя авторизация</td>
+                                <td colspan="2"><xsl:value-of select="entry/value" /></td>
+                            </tr>
+                        </xsl:if>
+
+                        <tr>
+                            <td>Примечание</td>
+
+                            <td colspan="2">
+                                <textarea class="form-control" placeholder="Заметки" id="client_notes" data-userid="{note/object_id}" >
+                                    <xsl:choose>
+                                        <xsl:when test="note/value != ''">
+                                            <xsl:value-of select="note/value" />
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:text>&#x0A;</xsl:text>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </textarea>
                             </td>
                         </tr>
                     </xsl:if>
-
-                    <xsl:if test="entry/value != ''">
-                        <tr>
-                            <td>Последяя авторизация</td>
-                            <td colspan="2"><xsl:value-of select="entry/value" /></td>
-                        </tr>
-                    </xsl:if>
-
-                    <tr>
-                        <td>Примечание</td>
-
-                        <td colspan="2">
-                            <textarea class="form-control" placeholder="Заметки" id="client_notes" data-userid="{note/object_id}" >
-                                <xsl:choose>
-                                    <xsl:when test="note/value != ''">
-                                        <xsl:value-of select="note/value" />
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:text>&#x0A;</xsl:text>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </textarea>
-                        </td>
-                    </tr>
 
                 </table>
             </div>

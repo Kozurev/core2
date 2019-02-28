@@ -60,6 +60,11 @@ if ( $action == 'refreshTablePayments' )
  */
 if ( $action == 'getPaymentPopup' )
 {
+    if ( !User::checkUserAccess( ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]] ) )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
+
     $userId = Core_Array::Get('userid', null, PARAM_INT );
 
     $User = User_Controller::factory( $userId );
@@ -86,7 +91,7 @@ if ( $action == 'getTarifPopup' )
         ->queryBuilder()
         ->where( 'subordinated', '=', $Director->getId() );
 
-    if ( !User::isAuthAs() )
+    if ( User::current()->groupId() == ROLE_CLIENT )
     {
         $Tarifs->where( 'access', '=', '1' );
     }
@@ -109,6 +114,11 @@ if ( $action == 'getTarifPopup' )
  */
 if ( $action == 'updateNote' )
 {
+    if ( !User::checkUserAccess( ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]] ) )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
+
     $userId =   Core_Array::Get( 'userid', null, PARAM_INT );
     $note =     Core_Array::Get( 'note', '', PARAM_STRING );
 
@@ -125,6 +135,11 @@ if ( $action == 'updateNote' )
 
 if ( $action === 'updatePerLesson' )
 {
+    if ( !User::checkUserAccess( ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]] ) )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
+
     $userId =   Core_Array::Get( 'userid', null, PARAM_INT );
     $value =    Core_Array::Get( 'value', 0, PARAM_INT );
 
@@ -224,6 +239,11 @@ if ( $action == 'buyTarif' )
 
 if ( $action == 'savePayment' )
 {
+    if ( !User::checkUserAccess( ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]] ) )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
+
     $userId =       Core_Array::Get( 'userid', null, PARAM_INT );
     $value  =       Core_Array::Get( 'value', 0, PARAM_INT );
     $description =  Core_Array::Get( 'description', '', PARAM_STRING );
@@ -265,6 +285,11 @@ if ( $action == 'savePayment' )
  */
 if ( $action == 'add_note' )
 {
+    if ( !User::checkUserAccess( ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]] ) )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
+
     $modelId =  Core_Array::Get( 'model_id', 0, PARAM_INT );
     $Payment =  Core::factory( 'Payment', $modelId );
     $Notes =    Core::factory( 'Property', 26 )->getPropertyValues( $Payment );
@@ -284,6 +309,11 @@ if ( $action == 'add_note' )
  */
 if ( $action === 'payment_save' )
 {
+    if ( !User::checkUserAccess( ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]] ) )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
+
     $id =     Core_Array::Get( 'id', 0, PARAM_INT );
     $value =  Core_Array::Get( 'value', 0, PARAM_INT );
     $date =   Core_Array::Get( 'date', date( 'Y-m-d' ), PARAM_STRING );
@@ -322,6 +352,11 @@ if ( $action === 'payment_save' )
 
 if ( $action === 'payment_delete' )
 {
+    if ( !User::checkUserAccess( ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]] ) )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
+
     $id = Core_Array::Get( 'id', 0, PARAM_INT );
     $Payment = Core::factory( 'Payment', $id );
 
@@ -346,6 +381,11 @@ if ( $action === 'payment_delete' )
 
 if ( $action == 'refreshTasksTable' )
 {
+    if ( !User::checkUserAccess( ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]] ) )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
+
     $Tasks = Core::factory( 'Task' )
         ->queryBuilder()
         ->where( 'associate', '=', $oUser->getId() )
@@ -408,6 +448,11 @@ if ( $action == 'refreshTasksTable' )
 
 if ( $action === 'saveUserComment' )
 {
+    if ( !User::checkUserAccess( ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]] ) )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
+
     $userId =   Core_Array::Get( 'userid', 0, PARAM_INT );
     $text =     Core_Array::Get( 'text', '', PARAM_STRING );
 
@@ -426,6 +471,11 @@ if ( $action === 'saveUserComment' )
  */
 if ( $action === 'edit_report_popup' )
 {
+    if ( !User::checkUserAccess( ['groups' => [ROLE_DIRECTOR]] ) )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
+
     $id = Core_Array::Get( 'id', 0, PARAM_INT );
     $Report = Core::factory( 'Schedule_Lesson_Report', $id );
 
