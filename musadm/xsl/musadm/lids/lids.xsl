@@ -39,8 +39,49 @@
                     <div>
                         <a class="btn btn-purple create_lid">Создать лида</a>
                     </div>
+
+                    <xsl:if test="is-director = 1">
+                        <div>
+                            <a class="btn btn-purple show_lid_status" data-lidid="">Статусы</a>
+                        </div>
+
+                        <div>
+                            <a href="#" class="btn btn-purple edit_property_list" data-prop-id="50">Источник</a>
+                        </div>
+                    </xsl:if>
                 </div>
             </xsl:if>
+        </section>
+
+        <section class="section-bordered lid_statuses_table">
+            <h3 class="section-title">Настройки статусов лидов</h3>
+
+            <table class="table table-stripped">
+                <thead>
+                    <tr class="header">
+                        <th>Название</th>
+                        <th>Цвет</th>
+                        <th class="center">Статус после создания консультации</th>
+                        <th class="center">Статус после присутствия на консультации</th>
+                        <th class="center">Статус после отсутствия на консультации</th>
+                        <th width="95px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <xsl:apply-templates select="lid_status" />
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="row buttons-panel center">
+                <div>
+                    <a class="edit_lid_status btn btn-purple">Создать статус</a>
+                </div>
+            </div>
         </section>
 
         <section class="cards-section text-center">
@@ -55,6 +96,69 @@
                 </xsl:choose>
             </div>
         </section>
+    </xsl:template>
+
+
+    <xsl:template match="lid_status">
+        <xsl:variable name="itemClass" select="item_class" />
+        <xsl:variable name="id" select="id" />
+
+        <tr>
+            <td>
+                <xsl:value-of select="title" />
+            </td>
+
+            <td>
+                <xsl:value-of select="//color[class = $itemClass]/name" />
+            </td>
+
+            <td class="center">
+                <!--<input class="radio" id="lid_status_consult" type="checkbox" name="lid_status_consult" >-->
+                    <!--<xsl:if test="lid_status_consult = $id">-->
+                        <!--<xsl:attribute name="checked">checked</xsl:attribute>-->
+                    <!--</xsl:if>-->
+                <!--</input>-->
+                <!--<label for="lid_status_consult" class="checkbox-label">-->
+                    <!--<span class="off">Нет</span>-->
+                    <!--<span class="on">Да</span>-->
+                <!--</label>    -->
+                <input type="radio" name="lid_status_consult" id="lid_status_consult_{id}" value="{id}"/>
+                <label for="lid_status_consult_{id}"></label>
+            </td>
+
+            <td class="center">
+                <!--<input class="radio" id="lid_status_consult_attended" type="checkbox" name="lid_status_consult_attended" >-->
+                    <!--<xsl:if test="lid_status_consult_attended = $id">-->
+                        <!--<xsl:attribute name="checked">checked</xsl:attribute>-->
+                    <!--</xsl:if>-->
+                <!--</input>-->
+                <!--<label for="lid_status_consult_attended" class="checkbox-label">-->
+                    <!--<span class="off">Нет</span>-->
+                    <!--<span class="on">Да</span>-->
+                <!--</label>-->
+                <input type="radio" name="lid_status_consult_attended" id="lid_status_consult_attended_{id}" value="{id}"/>
+                <label for="lid_status_consult_attended_{id}"></label>
+            </td>
+
+            <td class="center">
+                <!--<input class="radio" id="lid_status_consult_absent" type="checkbox" name="lid_status_consult_absent" >-->
+                    <!--<xsl:if test="lid_status_consult_absent = $id">-->
+                        <!--<xsl:attribute name="checked">checked</xsl:attribute>-->
+                    <!--</xsl:if>-->
+                <!--</input>-->
+                <!--<label for="lid_status_consult_absent" class="checkbox-label">-->
+                    <!--<span class="off">Нет</span>-->
+                    <!--<span class="on">Да</span>-->
+                <!--</label>-->
+                <input type="radio" name="lid_status_consult_absent" id="lid_status_consult_absent_{id}" value="{id}"/>
+                <label for="lid_status_consult_absent_{id}"></label>
+            </td>
+
+            <td class="right">
+                <a class="action edit edit_lid_status" data-id="{id}"></a>
+                <a class="action delete delete_lid_status" data-id="{id}"></a>
+            </td>
+        </tr>
     </xsl:template>
 
 
@@ -82,9 +186,21 @@
                     </p>
                 </xsl:if>
 
-                <xsl:if test="source != ''">
+                <xsl:variable name="source">
+                    <xsl:choose>
+                        <xsl:when test="count(property_value[property_id = 50]) = 1">
+                            <xsl:variable name="sourceId" select="property_value[property_id = 50]/value_id" />
+                            <xsl:value-of select="//property_list_values[id=$sourceId]/value" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="source" />
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
+
+                <xsl:if test="$source != ''">
                     <p class="intro">
-                        <span>Источник: </span><xsl:value-of select="source" />
+                        <span>Источник: </span><xsl:value-of select="$source" />
                     </p>
                 </xsl:if>
 
@@ -98,6 +214,7 @@
                     <div class="col-ld-6 col-md-6 col-sm-12 col-xs-12">
                         <select name="status" class="form-control lid_status" data-lidid="{id}">
                             <!--<xsl:variable name="status_id" select="property_value/id" />-->
+                            <option value="0"> ... </option>
                             <xsl:for-each select="/root/lid_status">
                                 <xsl:variable name="id" select="id" />
                                 <option value="{$id}">

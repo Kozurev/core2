@@ -27,6 +27,14 @@ class Lid_Controller
 
 
     /**
+     * Кол-во найденных лидов
+     *
+     * @var int
+     */
+    private $count = 0;
+
+
+    /**
      * Указатель на наличие/отсутствие полей ввода для указания периода за который производится выборка
      *
      * @var bool
@@ -86,6 +94,14 @@ class Lid_Controller
 
 
     /**
+     * Поиск лидов производится со списком статусов или юез
+     *
+     * @var bool
+     */
+    private $isWithStatuses = true;
+
+
+    /**
      * В выборке учавствуют только лиды принадлежащие той же организации что и пользователь
      *
      * @var bool
@@ -109,6 +125,22 @@ class Lid_Controller
      * @var array
      */
     private $forAreas = [];
+
+
+    /**
+     * Указатель отвечающий за подгрузку доп. свойств
+     * При значении: true|false - подгружаются все свойства родительской группы или не подгружаются вообще
+     * При значении array - список идентификаторов доп. свойств которые будут подгружаться
+     *
+     * @var array|null
+     */
+    private $properties = null;
+
+
+    /**
+     * @var array
+     */
+    private $entities = [];
 
 
     /**
@@ -185,6 +217,15 @@ class Lid_Controller
     public function queryBuilder()
     {
         return $this->LidQuery;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function count()
+    {
+        return $this->count;
     }
 
 
@@ -288,6 +329,17 @@ class Lid_Controller
 
 
     /**
+     * @param bool $isWithStatuses
+     * @return Lid_Controller
+     */
+    public function isWithStatuses( bool $isWithStatuses )
+    {
+        $this->isWithStatuses = $isWithStatuses;
+        return $this;
+    }
+
+
+    /**
      * @param array $Areas
      * @return Lid_Controller
      */
@@ -306,6 +358,13 @@ class Lid_Controller
             }
         }
 
+        return $this;
+    }
+
+
+    public function addEntity( $Entity, $tag )
+    {
+        $this->entities[$tag][] = $Entity;
         return $this;
     }
 
@@ -334,6 +393,41 @@ class Lid_Controller
     public function xsl( string $xslPath )
     {
         $this->xsl = $xslPath;
+        return $this;
+    }
+
+
+    /**
+     * @param $properties
+     * @return Lid_Controller
+     */
+    public function properties( $properties )
+    {
+        if ( is_array( $properties ) && count( $properties ) > 0 )
+        {
+            if ( !is_array( $this->properties ) )
+            {
+                $this->properties = [];
+            }
+
+            foreach ( $properties as $propId )
+            {
+                $Property = Core::factory( 'Property', $propId );
+
+                if ( $Property !== null )
+                {
+                    $this->properties[] = $Property;
+                }
+            }
+        }
+        elseif ( is_bool( $properties ) && $properties === true )
+        {
+            $this->properties = Core::factory( 'Property' )
+                ->getPropertiesList(
+                    Core::factory( 'Lid' )
+                );
+        }
+
         return $this;
     }
 
@@ -411,20 +505,52 @@ class Lid_Controller
 
 
         $Lids = $this->LidQuery
-            ->leftJoin( 'Lid_Status', 'Lid_Status.id = Lid.status_id' )
             ->findAll();
 
+        $this->count = count( $Lids );
+        $lidsIds = [];
 
-        if ( $this->isWithComments === true )
+        foreach ( $Lids as $Lid )
         {
-            $lidsIds = [];
+            $lidsIds[] = $Lid->getId();
+        }
+
+
+        //Подгрузка значений доп. свойств
+        if ( $this->properties !== null )
+        {
+            $PropertyValues = [];
+
+            foreach ( $this->properties as $Property )
+            {
+                $propValueTable = 'Property_' . ucfirst( $Property->type() );
+                $Values = Core::factory( $propValueTable )
+                    ->queryBuilder()
+                    ->where( 'model_name', '=', 'Lid' )
+                    ->where( 'property_id', '=', $Property->getId() )
+                    ->whereIn( 'object_id', $lidsIds )
+                    ->orderBy( 'object_id', 'DESC' )
+                    ->findAll();
+
+                $PropertyValues = array_merge( $PropertyValues, $Values );
+            }
 
             foreach ( $Lids as $Lid )
             {
-                $lidsIds[] = $Lid->getId();
+                foreach ( $PropertyValues as $Value )
+                {
+                    if ( $Lid->getId() == $Value->objectId() )
+                    {
+                        $Lid->addEntity( $Value, 'property_value' );
+                    }
+                }
             }
+        }
 
 
+        //Поиск комментариев
+        if ( $this->isWithComments === true )
+        {
             $Comments = Core::factory( 'Lid_Comment' )
                 ->queryBuilder()
                 ->addSelect( ['surname', 'name'] )
@@ -476,7 +602,6 @@ class Lid_Controller
             ?   $OutputXml->addSimpleEntity( 'buttons-panel', '1' )
             :   $OutputXml->addSimpleEntity( 'buttons-panel', '0' );
 
-
         //Добавление кастомных тэгов
         foreach ( $this->simpleEntities as $Entity )
         {
@@ -494,10 +619,38 @@ class Lid_Controller
             $OutputXml->addSimpleEntity( 'date_to', $this->periodTo );
         }
 
-
         if ( $this->lidId !== null )
         {
             $OutputXml->addSimpleEntity( 'lid_id', $this->lidId );
+        }
+
+
+        if ( $this->properties !== null && count( $this->properties ) > 0 )
+        {
+            foreach ( $this->properties as $Property )
+            {
+                if ( $Property->type() == 'list' )
+                {
+                    $Property->addEntity(
+                        Core::factory( 'Core_Entity' )
+                            ->_entityName( 'values' )
+                            ->addEntities(
+                                $Property->getList()
+                            )
+                    );
+                }
+
+                $OutputXml->addEntity( $Property );
+            }
+        }
+
+
+        foreach ( $this->entities as $tag => $values )
+        {
+            foreach ( $values as $val )
+            {
+                $OutputXml->addEntity( $val, $tag );
+            }
         }
 
 
@@ -506,10 +659,15 @@ class Lid_Controller
                 $this->getLids()
             )
             ->addEntities(
-                Core::factory( 'Schedule_Area' )->getList( true )
+                Core::factory( 'Schedule_Area' )
+                    ->getList()
             )
             ->addEntities(
-                Core::factory( 'Lid_Status' )->getList( true )
+                Core::factory( 'Lid_Status' )
+                    ->getList()
+            )
+            ->addEntities(
+                Lid_Status::getColors(), 'color'
             )
             ->xsl( $this->xsl );
 

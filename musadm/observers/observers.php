@@ -510,3 +510,24 @@ Core::attachObserver( 'beforeTaskSave', function( $args ) {
         }
     }
 });
+
+
+/**
+ * При удалении статуса лида все лиды имеющие этот статус приобретали статус '0'
+ */
+Core::attachObserver( 'afterLidStatusDelete', function( $args ) {
+    $Status = $args[0];
+
+    $subordinated = User::current()->getDirector()->getId();
+
+    $Lids = Core::factory( 'Lid' )
+        ->queryBuilder()
+        ->where( 'subordinated', '=', $subordinated )
+        ->where( 'status_id', '=', $Status->getId() )
+        ->findAll();
+
+    foreach ( $Lids as $Lid )
+    {
+        $Lid->statusId( 0 )->save();
+    }
+});

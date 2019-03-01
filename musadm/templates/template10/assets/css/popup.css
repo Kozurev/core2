@@ -39,8 +39,8 @@
 }
 
 .popup hr {
-     margin-top: 0px;
-     margin-bottom: 0px;
+     margin-top: 5px;
+     margin-bottom: 5px;
 }
 
 .popup form {
@@ -54,6 +54,10 @@
     padding-left: 15px;
     display: inline-block;
     text-align: center;
+}
+
+.popup .column .checkbox-label {
+    margin-left: 12%;
 }
 
 .popup .column span {

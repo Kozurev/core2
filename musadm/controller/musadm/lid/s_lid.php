@@ -26,7 +26,7 @@ if ( !User::checkUserAccess( $accessRules, $User ) )
     Core_Page_Show::instance()->error( 403 );
 }
 
-
+$subordinated = $User->getDirector()->getId();
 
 $action = Core_Array::Get( 'action', '',PARAM_STRING );
 
@@ -40,6 +40,170 @@ if ( $action === 'refreshLidTable' )
 }
 
 
+/**
+ * Открытие всплывающего окна создание/редактирование статуса лида
+ */
+if ( $action === 'getLidStatusPopup' )
+{
+    if ( !User::checkUserAccess( ['groups' => [ROLE_DIRECTOR]] ) )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
+
+    $id = Core_Array::Get( 'id', 0, PARAM_INT );
+
+    if ( $id !== 0 )
+    {
+        $Status = Core::factory( 'Lid_Status' )
+            ->queryBuilder()
+            ->where( 'id', '=', $id )
+            ->where( 'subordinated', '=', $subordinated )
+            ->find();
+
+        if ( $Status === null )
+        {
+            Core_Page_Show::instance()->error( 404 );
+        }
+    }
+    else
+    {
+        $Status = Core::factory( 'Lid_Status' );
+    }
+
+//    $OnConsult =        Core::factory( 'Property' )->getByTagName( 'lid_status_consult' );
+//    $AttendedConsult =  Core::factory( 'Property' )->getByTagName( 'lid_status_consult_attended' );
+//    $AbsentConsult =    Core::factory( 'Property' )->getByTagName( 'lid_status_consult_absent' );
+//
+//    $OnConsult->addEntity(
+//        $OnConsult->getPropertyValues( User::current() )[0], 'value'
+//    );
+//
+//    $AttendedConsult->addEntity(
+//        $OnConsult->getPropertyValues( User::current() )[0], 'value'
+//    );
+//
+//    $AbsentConsult->addEntity(
+//        $OnConsult->getPropertyValues( User::current() )[0], 'value'
+//    );
+
+    Core::factory( 'Core_Entity' )
+        ->addEntity( User::current() )
+        ->addEntity( $Status )
+//        ->addEntity( $OnConsult )
+//        ->addEntity( $AttendedConsult )
+//        ->addEntity( $AbsentConsult )
+        ->addEntities(
+            Lid_Status::getColors(), 'color'
+        )
+        ->xsl( 'musadm/lids/edit_lid_status_popup.xsl' )
+        ->show();
+
+    exit;
+}
+
+
+/**
+ * Сохранение данных статуса лида
+ */
+if ( $action === 'saveLidStatus' )
+{
+    if ( !User::checkUserAccess( ['groups' => [ROLE_DIRECTOR]] ) )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
+
+    $id =    Core_Array::Get( 'id', null, PARAM_INT );
+    $title = Core_Array::Get( 'title', '', PARAM_STRING );
+    $class = Core_Array::Get( 'item_class', '', PARAM_STRING );
+
+
+    if ( !is_null( $id ) )
+    {
+        $Status = Core::factory( 'Lid_Status' )
+            ->queryBuilder()
+            ->where( 'id', '=', $id )
+            ->where( 'subordinated', '=', $subordinated )
+            ->find();
+
+        if ( is_null( $Status ) )
+        {
+            Core_Page_Show::instance()->error( 404 );
+        }
+    }
+    else
+    {
+        $Status = Core::factory( 'Lid_Status' );
+    }
+
+    $jsonData = new stdClass();
+    $jsonData->itemClass = $class;
+    $jsonData->title = $title;
+
+    if ( $Status->getId() > 0 )
+    {
+        $jsonData->oldItemClass = $Status->itemClass();
+    }
+
+    $Status
+        ->title( $title )
+        ->itemClass( $class )
+        ->save();
+
+    $jsonData->id = $Status->getId();
+    $jsonData->colorName = Lid_Status::getColor( $class );
+
+    echo json_encode( $jsonData );
+    exit;
+}
+
+
+/**
+ * Удаление статуса лида
+ */
+if ( $action === 'deleteLidStatus' )
+{
+    if ( !User::checkUserAccess( ['groups' => [ROLE_DIRECTOR]] ) )
+    {
+        Core_Page_Show::instance()->error( 403 );
+    }
+
+
+    $id = Core_Array::Get( 'id', null, PARAM_INT );
+
+    if ( is_null( $id ) )
+    {
+        Core_Page_Show::instance()->error( 404 );
+    }
+
+    $Status = Core::factory( 'Lid_Status' )
+        ->queryBuilder()
+        ->where( 'id', '=', $id )
+        ->where( 'subordinated', '=', $subordinated )
+        ->find();
+
+    if ( is_null( $Status ) )
+    {
+        Core_Page_Show::instance()->error( 404 );
+    }
+
+    $colorName = Lid_Status::getColor( $Status->itemClass() );
+
+    $jsonData = new stdClass();
+    $jsonData->id = $Status->getId();
+    $jsonData->title = $Status->title();
+    $jsonData->itemClass = $Status->itemClass();
+    $jsonData->colorName = $colorName;
+    echo json_encode( $jsonData );
+
+    $Status->delete();
+
+    exit;
+}
+
+
+/**
+ *
+ */
 if ( $action === 'add_note_popup' )
 {
     $modelId = Core_Array::Get( 'model_id', 0, PARAM_INT );
@@ -62,7 +226,8 @@ if ( $action === 'save_lid' )
 {
     $surname =  Core_Array::Get( 'surname', '', PARAM_STRING );
     $name =     Core_Array::Get( 'name', '', PARAM_STRING );
-    $source =   Core_Array::Get( 'source', '', PARAM_STRING );
+    $sourceSel= Core_Array::Get( 'source_select', 0, PARAM_INT );
+    $sourceInp= Core_Array::Get( 'source_input', '', PARAM_STRING );
     $number =   Core_Array::Get( 'number', '', PARAM_STRING );
     $vk =       Core_Array::Get( 'vk', '', PARAM_STRING );
     $date =     Core_Array::Get( 'control_date', date( 'Y-m-d' ), PARAM_STRING );
@@ -74,18 +239,29 @@ if ( $action === 'save_lid' )
     $Lid = Lid_Controller::factory()
         ->surname( $surname )
         ->name( $name )
-        ->source( $source )
         ->number( $number )
         ->vk( $vk )
         ->controlDate( $date )
         ->statusId( $statusId )
         ->areaId( $areaId );
-    $Lid->save();
 
+    if ( $sourceSel == 0 && $sourceInp != '' )
+    {
+        $Lid->source( $sourceInp );
+    }
+
+    $Lid->save();
 
     if ( $comment != '' )
     {
         $Lid->addComment( $comment, false );
+    }
+
+    if ( $sourceSel > 0 && $sourceInp == '' )
+    {
+        Core::factory( 'Property' )
+            ->getByTagName( 'lid_source' )
+            ->addNewValue( $Lid, $sourceSel );
     }
 
     exit;
@@ -103,7 +279,6 @@ if ( $action === 'changeStatus' )
         Core_Page_Show::instance()->error( 404 );
     }
 
-
     $Lid->changeStatus( $statusId );
 
     exit;
@@ -119,7 +294,6 @@ if ( $action === 'changeDate' )
     {
         Core_Page_Show::instance()->error( 404 );
     }
-
 
     $Lid = Lid_Controller::factory( $modelId );
 
@@ -145,7 +319,6 @@ if ( $action === 'updateLidArea' )
     {
         Core_Page_Show::instance()->error( 404 );
     }
-
 
     $Lid = Lid_Controller::factory( $lidId );
 
@@ -173,18 +346,15 @@ if ( $action === 'editLidPopup' )
         Core_Page_Show::instance()->error( 404 );
     }
 
-    if ( $Lid->getId() > 0 && !User::isSubordinate( $Lid ) )
-    {
-        Core_Page_Show::instance()->error( 403 );
-    }
-
     $Areas = Core::factory( 'Schedule_Area' )->getList();
     $Statuses = $Lid->getStatusList();
+    $Sources = Core::factory( 'Property' )->getByTagName( 'lid_source' )->getList();
 
     //TODO: пока что реализован лишь механизм создания лида но с заделом и под редактирование
     Core::factory( 'Core_Entity' )
         ->addEntities( $Areas )
         ->addEntities( $Statuses )
+        ->addEntities( $Sources, 'source' )
         ->addSimpleEntity( 'today', date( 'Y-m-d' ) )
         ->xsl( 'musadm/lids/edit_lid_popup.xsl' )
         ->show();

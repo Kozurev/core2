@@ -1,17 +1,17 @@
 <?php
-
 /**
  * Класс-модель статуса лида
  *
- * @author Kozurev Egor
+ * @author Bad Wolf
  * @date 30.01.2019 17:37
+ * @version 20190225
  * Class Lid_Status
  */
 class Lid_Status extends Core_Entity
 {
     protected $id;
     protected $title;
-    protected $item_class = "";
+    protected $item_class = '';
     protected $sorting = 0;
     protected $subordinated;
 
@@ -24,7 +24,10 @@ class Lid_Status extends Core_Entity
 
     public function title( $title = null )
     {
-        if ( is_null( $title ) )    return $this->title;
+        if ( is_null( $title ) )
+        {
+            return $this->title;
+        }
 
         $this->title = strval( $title );
 
@@ -34,7 +37,10 @@ class Lid_Status extends Core_Entity
 
     public function itemClass( $itemClass = null )
     {
-        if ( is_null( $itemClass ) )    return $this->item_class;
+        if ( is_null( $itemClass ) )
+        {
+            return $this->item_class;
+        }
 
         $this->item_class = strval( $itemClass );
 
@@ -44,7 +50,10 @@ class Lid_Status extends Core_Entity
 
     public function sorting( $sorting = null )
     {
-        if ( is_null( $sorting ) )  return intval( $this->sorting );
+        if ( is_null( $sorting ) )
+        {
+            return intval( $this->sorting );
+        }
 
         $this->sorting = intval( $sorting );
 
@@ -54,7 +63,10 @@ class Lid_Status extends Core_Entity
 
     public function subordinated( $subordinated = null )
     {
-        if ( is_null( $subordinated ) ) return intval( $this->subordinated );
+        if ( is_null( $subordinated ) )
+        {
+            return intval( $this->subordinated );
+        }
 
         $this->subordinated = intval( $subordinated );
 
@@ -88,7 +100,99 @@ class Lid_Status extends Core_Entity
 
         return $Statuses->queryBuilder()
             ->orderBy( 'sorting' )
+            ->orderBy( 'title' )
             ->findAll();
+    }
+
+
+    /**
+     * Список возможных цветов для карточек
+     *
+     * @return array
+     */
+    public static function getColors()
+    {
+        $colors = [];
+
+        $default = new stdClass();
+        $default->name = 'Стандартный';
+        $default->class = 'item-default';
+
+        $orange = new stdClass();
+        $orange->name = 'Ораньжевый';
+        $orange->class = 'item-orange';
+
+        $blue = new stdClass();
+        $blue->name = 'Синий';
+        $blue->class = 'item-blue';
+
+        $green = new stdClass();
+        $green->name = 'Зеленый';
+        $green->class = 'item-green';
+
+        $red = new stdClass();
+        $red->name = 'Красный';
+        $red->class = 'item-red';
+
+        $purple = new stdClass();
+        $purple->name = 'Фиолетовый';
+        $purple->class = 'item-purple';
+
+        $pink = new stdClass();
+        $pink->name = 'Розовый';
+        $pink->class = 'item-pink';
+
+        $colors[] = $default;
+        $colors[] = $orange;
+        $colors[] = $blue;
+        $colors[] = $green;
+        $colors[] = $red;
+        $colors[] = $purple;
+        $colors[] = $pink;
+
+        return $colors;
+    }
+
+
+    /**
+     * Поиск названия цвета по названию класса
+     *
+     * @param $className - название класса элемента
+     * @return string
+     */
+    public static function getColor( $className )
+    {
+        $colors = Lid_Status::getColors();
+        $colorName = '';
+
+        foreach ( $colors as $color )
+        {
+            if ( $color->class == $className )
+            {
+                $colorName = $color->name;
+                break;
+            }
+        }
+
+        return $colorName;
+    }
+
+
+    /**
+     * @return void
+     */
+    public function save()
+    {
+        Core::notify( [&$this], 'beforeLidStatusSave' );
+        parent::save();
+        Core::notify( [&$this], 'afterLidStatusSave' );
+    }
+
+    public function delete()
+    {
+        Core::notify( [&$this], 'beforeLidStatusDelete' );
+        parent::delete();
+        Core::notify( [&$this], 'afterLidStatusDelete' );
     }
 
 }

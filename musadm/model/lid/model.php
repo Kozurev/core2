@@ -10,15 +10,15 @@
 class Lid_Model extends Core_Entity
 {
     protected $id;
-    protected $name;
-    protected $surname;
-    protected $number;
-    protected $vk;
-    protected $source;
-    protected $control_date;
-    protected $subordinated;
-    protected $area_id;
-    protected $status_id;
+    protected $name = '';
+    protected $surname = '';
+    protected $number = '';
+    protected $vk = '';
+    protected $source = '';
+    protected $control_date = '';
+    protected $subordinated = 0;
+    protected $area_id = 0;
+    protected $status_id = 0;
 
 
     public function getId()

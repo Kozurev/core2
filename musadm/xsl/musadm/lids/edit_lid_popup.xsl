@@ -96,19 +96,29 @@
                 <span>Источник</span>
             </div>
             <div class="column">
-                <input class="form-control" type="text" value="{lid/source}" name="source"  />
+                <select class="form-control" name="source_select" id="source_select">
+                    <xsl:for-each select="//source">
+                        <option value="{id}"><xsl:value-of select="value" /></option>
+                    </xsl:for-each>
+
+                    <option value="0">Другое</option>
+                </select>
+
+                <input class="form-control" type="text" value="{lid/source}" id="source_input" name="source_input" placeholder="Источник">
+                    <xsl:if test="count(//source) > 0">
+                        <xsl:attribute name="style">
+                            display:none
+                        </xsl:attribute>
+                    </xsl:if>
+                </input>
             </div>
+            <hr/>
             <div class="column">
                 <span>Комментарий</span>
             </div>
             <div class="column">
                 <textarea class="form-control" name="comment" ></textarea>
             </div>
-
-
-            <!--<input type="hidden" name="id" value="{lid/id}" />-->
-            <!--<input type="hidden" name="modelName" value="Lid" />-->
-
 
             <button class="lid_submit btn btn-default">Сохранить</button>
         </form>

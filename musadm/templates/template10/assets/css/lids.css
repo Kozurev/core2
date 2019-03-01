@@ -28,6 +28,13 @@
     height: 40px;
 }
 
+.lids .lid_statuses_table {
+    display: none;
+}
+
+.lids td .checkbox-label {
+    margin-left: 25%;
+}
 
 @media(min-width: 1024px) {
 

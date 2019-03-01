@@ -6,6 +6,13 @@
  * Time: 14:23
  */
 
+$OnConsult =        Core::factory( 'Property' )->getByTagName( 'lid_status_consult' );
+$AttendedConsult =  Core::factory( 'Property' )->getByTagName( 'lid_status_consult_attended' );
+$AbsentConsult =    Core::factory( 'Property' )->getByTagName( 'lid_status_consult_absent' );
+
+$OnConsult =        $OnConsult->getPropertyValues( User::current() )[0]->value();
+$AttendedConsult =  $AttendedConsult->getPropertyValues( User::current() )[0]->value();
+$AbsentConsult =    $AbsentConsult->getPropertyValues( User::current() )[0]->value();
 
 Core::factory( 'Lid_Controller' );
 $LidController = new Lid_Controller( User::current() );
@@ -19,6 +26,13 @@ $LidController
     ->lidId(
         Core_Array::Get( 'lidid', null, PARAM_INT )
     )
+    ->properties( true )
+    ->addSimpleEntity(
+        'is-director', User::checkUserAccess( ['groups' => [ROLE_DIRECTOR]] ) ? 1 : 0
+    )
+    ->addSimpleEntity( 'lid_status_consult', $OnConsult )
+    ->addSimpleEntity( 'lid_status_consult_attended', $AttendedConsult )
+    ->addSimpleEntity( 'lid_status_consult_absent', $AbsentConsult )
     ->show();
 
 

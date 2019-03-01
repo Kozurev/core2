@@ -5,10 +5,9 @@
  * Date: 24.04.2018
  * Time: 22:10
  */
-
-
 class Lid extends Lid_Model
 {
+    //const STATUS_PROP_ID = 27;
 
     public function __construct()
     {
@@ -124,7 +123,7 @@ class Lid extends Lid_Model
     /**
      * Поиск списка доступных статусов лида
      *
-     * @return array Lid_Status
+     * @return array Property_List_Values
      */
     public function getStatusList()
     {
@@ -139,9 +138,17 @@ class Lid extends Lid_Model
             ->where( 'subordinated', '=', $subordinated )
             ->orderBy( 'sorting', 'DESC' )
             ->findAll();
+
+//        return Core::factory( 'Property' )
+//            ->getByTagName( 'lid_status' )
+//            ->getList();
     }
 
 
+    /**
+     * @param $statusId
+     * @return $this
+     */
     public function changeStatus( $statusId )
     {
         if ( $this->subordinated() == 0 )
@@ -160,12 +167,12 @@ class Lid extends Lid_Model
             Core_Page_Show::instance()->error( 404 );
         }
 
-
         $observerArgs = [
             'Lid' => &$this,
-            'old_status' => $this->statusId(),
-            'new_status' => intval( $statusId )
+            'old_status' => $this->getStatus(),
+            'new_status' => $Status
         ];
+
         Core::notify( $observerArgs, 'beforeChangeLidStatus' );
 
         $this->statusId( $statusId )->save();
@@ -174,6 +181,25 @@ class Lid extends Lid_Model
         Core::notify( $observerArgs, 'afterChangeLidStatus' );
 
         return $this;
+    }
+
+
+    /**
+     * Метод поиска объекта текущего статуса
+     *
+     * @return Property_List_Values
+     */
+    public function getStatus()
+    {
+//        $PropertyValue = Core::factory( 'Property' )
+//            ->getByTagName( 'lid_status' )
+//            ->getPropertyValues( $this )[0];
+
+        return Core::factory( 'Lid_Status' )
+            ->queryBuilder()
+            ->where( 'id', '=', $this->status_id )
+            ->where( 'subordinated', '=', $this->subordinated() )
+            ->find();
     }
 
 
