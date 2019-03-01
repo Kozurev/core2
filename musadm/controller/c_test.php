@@ -138,6 +138,7 @@ CREATE TABLE Lid_Status
 
 Core::factory( 'Lid_Status' )
     ->title( 'Не определен' )
+    ->itemClass( 'item-default' )
     ->save();
 
 Core::factory( 'Lid_Status' )
@@ -200,6 +201,66 @@ CREATE TABLE Comment
 );' );
 
 
+$LidSource = Core::factory( 'Property' )
+    ->title( 'Источник лида' )
+    ->type( 'list' )
+    ->tagName( 'lid_source' );
+$LidSource->save();
+
+$LidSource->addToPropertiesList(
+    Core::factory( 'Lid' ),
+    $LidSource->getId()
+);
+
+Core::factory( 'Property' )
+    ->getByTagName( 'instrument' )
+    ->addToPropertiesList(
+        Core::factory( 'User_Group', ROLE_CLIENT ), 20
+    );
+
+
+$LidStatus1 = Core::factory( 'Property' )
+    ->title( 'Статус: записан на консультацию' )
+    ->description( 'записи лида на консультацию' )
+    ->tagName( 'lid_status_consult' )
+    ->type( 'int' )
+    ->active( 1 )
+    ->sorting( 0 );
+
+$LidStatus2 = Core::factory( 'Property' )
+    ->title( 'Статус: присутствовал на консультации' )
+    ->description( 'присутствия лида на консультации' )
+    ->tagName( 'lid_status_consult_attended' )
+    ->type( 'int' )
+    ->active( 1 )
+    ->sorting( 0 );
+
+$LidStatus3 = Core::factory( 'Property' )
+    ->title( 'Статус: отсутствовал на консультации' )
+    ->description( 'отсутствия лида на консультации' )
+    ->tagName( 'lid_status_consult_absent' )
+    ->type( 'int' )
+    ->active( 1 )
+    ->sorting( 0 );
+
+$LidStatus1->save();
+$LidStatus2->save();
+$LidStatus3->save();
+
+$LidStatus1->addToPropertiesList(
+    Core::factory( 'User_Group', ROLE_DIRECTOR ),
+    $LidStatus1->getId()
+);
+
+$LidStatus2->addToPropertiesList(
+    Core::factory( 'User_Group', ROLE_DIRECTOR ),
+    $LidStatus2->getId()
+);
+
+$LidStatus3->addToPropertiesList(
+    Core::factory( 'User_Group', ROLE_DIRECTOR ),
+    $LidStatus3->getId()
+);
 
 //$arr = [
 //    0 => 23,
