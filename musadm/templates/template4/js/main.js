@@ -1,7 +1,6 @@
 "use strict";
-var loaderTime = 0;
-//var root = "/musadm";
-var root = $("#rootdir").val();
+
+var root = $('#rootdir').val();
 
 
 function getCurrentDate() {
@@ -10,25 +9,23 @@ function getCurrentDate() {
     var month = date.getMonth() + 1;
     var day = date.getDate();
 
-    if(month < 10)  month = "0" + month;
-    if(day < 10)    day = "0" + day;
+    if(month < 10)  month = '0' + month;
+    if(day < 10)    day = '0' + day;
 
-    var today = year + "-" + month + "-" + day;
+    var today = year + '-' + month + '-' + day;
     return today;
 }
 
 //Запуск лоадера
-function loaderOn(){
-    var bodyHeight = ($(window).height() - $(".loader").outerHeight()) / 2;
-    if(bodyHeight < window.innerHeight) bodyHeight = window.innerHeight;
-    $(".loader").css("height", bodyHeight);
-    $(".loader").show();
+function loaderOn() {
+    $('.loader').show();
 }
 
 //Отключение лоадера
 function loaderOff(){
-    $(".loader").hide();
-    $("#sortingTable").tablesorter();
+    $('.loader').hide();
+    $('#sortingTable').tablesorter();
+    $('.sortingTable').tablesorter();
 }
 
 
@@ -38,21 +35,29 @@ function loaderOff(){
  * @param data - html данные окна
  */
 function showPopup(data) {
-    $(".overlay").show();
-    $(".popup").empty();
-    $(".popup").append('<a href="#" class="popup_close"></a>');
-    $(".popup").append(data);
-    $(".popup").show("fast");
+    var
+        overlay = $('.overlay'),
+        popup = $('.popup');
+
+    overlay.show();
+    popup.empty();
+    popup.append('<a href="#" class="popup_close"></a>');
+    popup.append(data);
+    popup.show('fast');
 }
 
 function closePopup() {
-    $(".overlay").hide();
-    $(".popup").hide("fast");
-    $(".popup").empty();
+    var
+        overlay = $('.overlay'),
+        popup = $('.popup');
+
+    overlay.hide();
+    popup.hide('fast');
+    popup.empty();
 }
 
 
-$(".overlay").click(function(e){
+$('.overlay').click(function(e) {
     closePopup();
 });
 
@@ -64,29 +69,34 @@ $(".overlay").click(function(e){
  * @param func - выполняемая функция по получению ответа ajax-запроса
  */
 function saveData(tab, func) {
-    var form = $("#createData");
-    if(form.valid() == false)
-    {
+    var form = $('#createData');
+    if(form.valid() == false) {
         loaderOff();
-        return;
-    }
-    var data = form.serialize();
-    var aUnchecked = form.find("input[type=checkbox]:unchecked");
-    for (var i = 0; i < aUnchecked.length; i++) {
-        data += "&" + $(aUnchecked[i]).attr("name") + "=0";
+        return false;
     }
 
-    var link = root + "/admin?menuTab=" + tab + "&menuAction=updateAction&ajax=1";
+    var
+        data = form.serialize(),
+        unchecked = form.find('input[type=checkbox]:unchecked');
+
+    for (var i = 0; i < unchecked.length; i++) {
+        data += '&' + $(unchecked[i]).attr('name') + '=0';
+    }
+
+    var link = root + '/admin?menuTab=' + tab + '&menuAction=updateAction&ajax=1';
 
     $.ajax({
-        type: "GET",
+        type: 'GET',
         url: link,
         data: data,
         async: false,
         success: function(response) {
             closePopup();
-            if(response != "0" && response != "") alert(response);
-            //if($.isFunction(func)) func(response);
+
+            if(response != '0' && response != '') {
+                notificationError(response);
+            }
+
             func(response);
         }
     });
@@ -96,38 +106,41 @@ function saveData(tab, func) {
 /**
  *	Удаление объекта
  *
- * @param model_name - название класса объекта
- * @param model_id - id объекта
+ * @param modelName - название класса объекта
+ * @param modelId - id объекта
  * @param func - выполняемая функция после ответа ajax-запроса
+ * @return void
  */
-function deleteItem(model_name, model_id, func){
-
-    var url = root + '/admin?menuTab=Main&menuAction=deleteAction&ajax=1';
-    url += '&model_name=' + model_name;
-    url += '&model_id=' + model_id;
-
+function deleteItem(modelName, modelId, func) {
     var agree = confirm('Подтвердите действие');
-    if(agree != true)
-    {
+    if(agree != true) {
         loaderOff();
-        return;
+        return false;
     }
 
     $.ajax({
         type: 'GET',
-        url: url,
+        url: root + '/admin',
+        data: {
+            menuTab: 'Main',
+            menuAction: 'deleteAction',
+            ajax: 1,
+            model_name: modelName,
+            model_id: modelId
+        },
         success: function(response) {
-            if(typeof func === 'function')
-            {
+            if(typeof func === 'function') {
                 func(response);
             }
 
-            if(response != '0')
-            {
-                alert('Ошибка: ' + response);
+            if(response != '0') {
+                notificationError('Ошибка: ' + response);
             }
 
             loaderOff();
+        },
+        error: function(response) {
+            notificationError('Произошла ошибка при удалении элемента');
         }
     });
 }
@@ -136,27 +149,34 @@ function deleteItem(model_name, model_id, func){
 /**
  *	Изменение активности структуры или элемента
  *
- *	@param model_name - название объекта (Structure, Structure_Item и т.д.)
- *	@param model_id - id объекта
+ *	@param modelName - название объекта (Structure, Structure_Item и т.д.)
+ *	@param modelId - id объекта
  *	@param value - значение активности true/false
  *  @param func - выполняемая функция по получению результата ajax-запроса
  */
-function updateActive(model_name, model_id, value, func){
-    var link = root + "/admin?menuTab=Main&menuAction=updateActive&ajax=1";
-    link += "&model_name=" + model_name;
-    link += "&model_id=" + model_id;
-    link += "&value=" + value;
-    link += "&ajax=1";
-
+function updateActive(modelName, modelId, value, func) {
     $.ajax({
-        type: "GET",
-        url: link,
-        success: function(answer){
-            if(answer != "0")
-                alert("Ошибка: " + answer);
+        type: 'GET',
+        url: root + '/admin',
+        data: {
+            menuTab: 'Main',
+            menuAction: 'updateActive',
+            ajax: 1,
+            model_name: modelName,
+            model_id: modelId,
+            value: value
+        },
+        success: function(response) {
+            if(response != '0') {
+                notificationError('Ошибка: ' + response);
+            }
 
-            if(typeof func === "function") func();
-            setTimeout("loaderOff()", loaderTime);
+            if(typeof func === 'function') {
+                func(response);
+            }
+        },
+        error: function(response) {
+            notificationError('Произошла ошибка при изменении активности элемента');
         }
     });
 }
@@ -165,30 +185,38 @@ function updateActive(model_name, model_id, value, func){
 /**
  * Сохранение платежа
  *
- * @param userid - id пользователя, к которому привязан платеж
+ * @param userId - id пользователя, к которому привязан платеж
  * @param value - сумма платежа
  * @param description - описание платежа (примечание)
+ * @param adminNote - описание платежа (примечание)
  * @param type - тип платежа (зачисление, списание и т.д.)
  * @param url - адрес запроса после root + "/user/" (client || balance)
  * @param func - выполняемая функция по получению ответа от ajax-запроса
  */
-function savePayment(userid, value, description, description2, type, url, func) {
+function savePayment(userId, value, description, adminNote, type, url, func) {
     $.ajax({
-        type: "GET",
-        url: root + "/user/" + url,
+        type: 'GET',
+        url: root + '/user/' + url,
         async: false,
         data: {
-            action: "savePayment",
+            action: 'savePayment',
             userid: userid,
             value: value,
             type: type,
             description: description,
-            property_26: description2
+            property_26: adminNote
         },
-        success: function(responce){
-            if(responce != "0") alert("Ошибка: " + responce);
+        success: function(response) {
+            if(response != '0') {
+                notificationError('Ошибка: ' + responce);
+            }
             closePopup();
-            if(typeof func === "function") func();
+            if(typeof func === 'function') {
+                func(response);
+            }
+        },
+        error: function(response) {
+            notificationError('Произошла ошибка при сохранении платежа');
         }
     });
 }
