@@ -106,8 +106,33 @@ function showError(errorText) {
 function showMessage(title, text, status) {
     popupSmall.find(".modal-title").text(title);
     popupSmall.find(".content").html(text);
-    if(status == "")    status = "default";
+    if(status === undefined) {
+        status = "default";
+    }
     popupSmall.addClass(status);
     popupSmall.slideDown("slow");
     setTimeout('$("#ekkoLightbox-640").slideUp("slow");', messageTimeout);
+}
+
+
+function notificationSuccess(str) {
+    showNotification(str, 'success');
+}
+
+function notificationError(str) {
+    showNotification(str, 'error');
+}
+
+function showNotification(str, type) {
+    var
+        box = $("#message_box"),
+        text = $('#message_text')
+        status = 'notification-' + type;
+
+    box.removeClass('notification-success');
+    box.removeClass('notification-error');
+
+    text.html(str);
+    box.addClass(status);
+    box.fadeIn(500).delay(3000).fadeOut(500, function(){});
 }

@@ -77,6 +77,10 @@
     <div class="popup"></div>
     <div class="overlay"></div>
 
+    <div id='message_box'>
+        <p id='message_text'></p>
+    </div>
+
     <input type="hidden" id="rootdir" value="<?=$CFG->rootdir?>"/>
 
     <div id="fb-root"></div>
