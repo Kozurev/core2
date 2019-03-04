@@ -200,7 +200,7 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
             return null;
         }
 
-        if ( $object->getId() <= 0 || $object->getId() == null || $areaId <= 0 )
+        if ( $object->getId() <= 0 || $object->getId() == null || $areaId < 0 )
         {
             return null;
         }
