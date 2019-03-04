@@ -70,28 +70,10 @@ if ( $action === 'getLidStatusPopup' )
         $Status = Core::factory( 'Lid_Status' );
     }
 
-//    $OnConsult =        Core::factory( 'Property' )->getByTagName( 'lid_status_consult' );
-//    $AttendedConsult =  Core::factory( 'Property' )->getByTagName( 'lid_status_consult_attended' );
-//    $AbsentConsult =    Core::factory( 'Property' )->getByTagName( 'lid_status_consult_absent' );
-//
-//    $OnConsult->addEntity(
-//        $OnConsult->getPropertyValues( User::current() )[0], 'value'
-//    );
-//
-//    $AttendedConsult->addEntity(
-//        $OnConsult->getPropertyValues( User::current() )[0], 'value'
-//    );
-//
-//    $AbsentConsult->addEntity(
-//        $OnConsult->getPropertyValues( User::current() )[0], 'value'
-//    );
 
     Core::factory( 'Core_Entity' )
         ->addEntity( User::current() )
         ->addEntity( $Status )
-//        ->addEntity( $OnConsult )
-//        ->addEntity( $AttendedConsult )
-//        ->addEntity( $AbsentConsult )
         ->addEntities(
             Lid_Status::getColors(), 'color'
         )
@@ -315,7 +297,7 @@ if ( $action === 'updateLidArea' )
     $lidId =  Core_Array::Get( 'lid_id', 0, PARAM_INT );
     $areaId = Core_Array::Get( 'area_id', 0, PARAM_INT );
 
-    if ( $lidId == 0 || $areaId == 0 )
+    if ( $lidId == 0 )
     {
         Core_Page_Show::instance()->error( 404 );
     }

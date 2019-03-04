@@ -14,14 +14,16 @@ $OnConsult =        $OnConsult->getPropertyValues( User::current() )[0]->value()
 $AttendedConsult =  $AttendedConsult->getPropertyValues( User::current() )[0]->value();
 $AbsentConsult =    $AbsentConsult->getPropertyValues( User::current() )[0]->value();
 
+$today = date('Y-m-d');
+
 Core::factory( 'Lid_Controller' );
 $LidController = new Lid_Controller( User::current() );
 $LidController
     ->periodFrom(
-        Core_Array::Get( 'date_from', null, PARAM_STRING )
+        Core_Array::Get( 'date_from', $today, PARAM_STRING )
     )
     ->periodTo(
-        Core_Array::Get( 'date_to', null, PARAM_STRING )
+        Core_Array::Get( 'date_to', $today, PARAM_STRING )
     )
     ->lidId(
         Core_Array::Get( 'lidid', null, PARAM_INT )
@@ -29,6 +31,9 @@ $LidController
     ->properties( true )
     ->addSimpleEntity(
         'is-director', User::checkUserAccess( ['groups' => [ROLE_DIRECTOR]] ) ? 1 : 0
+    )
+    ->addSimpleEntity(
+        'directorid', User::current()->getDirector()->getId()
     )
     ->addSimpleEntity( 'lid_status_consult', $OnConsult )
     ->addSimpleEntity( 'lid_status_consult_attended', $AttendedConsult )
