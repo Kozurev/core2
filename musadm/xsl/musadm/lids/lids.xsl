@@ -54,24 +54,50 @@
         </section>
 
         <section class="section-bordered lid_statuses_table">
-            <h3 class="section-title">Настройки статусов лидов</h3>
-
-            <table class="table table-stripped">
+            <h4 class="section-title">Настройки статусов лидов</h4>
+            <input type="hidden" id="directorid" value="{directorid}"/>
+            <table class="table table-stripped" id="table-lid-statuses">
                 <thead>
                     <tr class="header">
-                        <th>Название</th>
-                        <th>Цвет</th>
+                        <th class="center">Название</th>
+                        <th class="center">Цвет</th>
                         <th class="center">Статус после создания консультации</th>
                         <th class="center">Статус после присутствия на консультации</th>
                         <th class="center">Статус после отсутствия на консультации</th>
                         <th width="95px"></th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="center">
                     <xsl:apply-templates select="lid_status" />
                     <tr>
-                        <td></td>
-                        <td></td>
+                        <td colspan="2">Отсутствует</td>
+                        <td class="center">
+                            <input type="radio" name="lid_status_consult" id="lid_status_consult_0" value="0">
+                                <xsl:if test="lid_status_consult = 0">
+                                    <xsl:attribute name="checked">checked</xsl:attribute>
+                                </xsl:if>
+                            </input>
+                            <label for="lid_status_consult_0"></label>
+                        </td>
+
+                        <td class="center">
+                            <input type="radio" name="lid_status_consult_attended" id="lid_status_consult_attended_0" value="0">
+                                <xsl:if test="lid_status_consult_attended = 0">
+                                    <xsl:attribute name="checked">checked</xsl:attribute>
+                                </xsl:if>
+                            </input>
+                            <label for="lid_status_consult_attended_0"></label>
+                        </td>
+
+                        <td class="center">
+                            <input type="radio" name="lid_status_consult_absent" id="lid_status_consult_absent_0" value="0">
+                                <xsl:if test="lid_status_consult_absent = 0">
+                                    <xsl:attribute name="checked">checked</xsl:attribute>
+                                </xsl:if>
+                            </input>
+                            <label for="lid_status_consult_absent_0"></label>
+                        </td>
+
                         <td></td>
                     </tr>
                 </tbody>
@@ -113,44 +139,29 @@
             </td>
 
             <td class="center">
-                <!--<input class="radio" id="lid_status_consult" type="checkbox" name="lid_status_consult" >-->
-                    <!--<xsl:if test="lid_status_consult = $id">-->
-                        <!--<xsl:attribute name="checked">checked</xsl:attribute>-->
-                    <!--</xsl:if>-->
-                <!--</input>-->
-                <!--<label for="lid_status_consult" class="checkbox-label">-->
-                    <!--<span class="off">Нет</span>-->
-                    <!--<span class="on">Да</span>-->
-                <!--</label>    -->
-                <input type="radio" name="lid_status_consult" id="lid_status_consult_{id}" value="{id}"/>
+                <input type="radio" name="lid_status_consult" id="lid_status_consult_{id}" value="{id}">
+                    <xsl:if test="/root/lid_status_consult = $id">
+                        <xsl:attribute name="checked">checked</xsl:attribute>
+                    </xsl:if>
+                </input>
                 <label for="lid_status_consult_{id}"></label>
             </td>
 
             <td class="center">
-                <!--<input class="radio" id="lid_status_consult_attended" type="checkbox" name="lid_status_consult_attended" >-->
-                    <!--<xsl:if test="lid_status_consult_attended = $id">-->
-                        <!--<xsl:attribute name="checked">checked</xsl:attribute>-->
-                    <!--</xsl:if>-->
-                <!--</input>-->
-                <!--<label for="lid_status_consult_attended" class="checkbox-label">-->
-                    <!--<span class="off">Нет</span>-->
-                    <!--<span class="on">Да</span>-->
-                <!--</label>-->
-                <input type="radio" name="lid_status_consult_attended" id="lid_status_consult_attended_{id}" value="{id}"/>
+                <input type="radio" name="lid_status_consult_attended" id="lid_status_consult_attended_{id}" value="{id}">
+                    <xsl:if test="/root/lid_status_consult_attended = $id">
+                        <xsl:attribute name="checked">checked</xsl:attribute>
+                    </xsl:if>
+                </input>
                 <label for="lid_status_consult_attended_{id}"></label>
             </td>
 
             <td class="center">
-                <!--<input class="radio" id="lid_status_consult_absent" type="checkbox" name="lid_status_consult_absent" >-->
-                    <!--<xsl:if test="lid_status_consult_absent = $id">-->
-                        <!--<xsl:attribute name="checked">checked</xsl:attribute>-->
-                    <!--</xsl:if>-->
-                <!--</input>-->
-                <!--<label for="lid_status_consult_absent" class="checkbox-label">-->
-                    <!--<span class="off">Нет</span>-->
-                    <!--<span class="on">Да</span>-->
-                <!--</label>-->
-                <input type="radio" name="lid_status_consult_absent" id="lid_status_consult_absent_{id}" value="{id}"/>
+                <input type="radio" name="lid_status_consult_absent" id="lid_status_consult_absent_{id}" value="{id}">
+                    <xsl:if test="/root/lid_status_consult_absent = $id">
+                        <xsl:attribute name="checked">checked</xsl:attribute>
+                    </xsl:if>
+                </input>
                 <label for="lid_status_consult_absent_{id}"></label>
             </td>
 

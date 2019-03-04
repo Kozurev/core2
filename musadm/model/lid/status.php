@@ -100,7 +100,7 @@ class Lid_Status extends Core_Entity
 
         return $Statuses->queryBuilder()
             ->orderBy( 'sorting' )
-            ->orderBy( 'title' )
+            ->orderBy( 'id' )
             ->findAll();
     }
 

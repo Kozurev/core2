@@ -429,7 +429,16 @@ Core::attachObserver( 'beforeScheduleLessonSave', function( $args ) {
     $commentText .= ', преп. ' . $Lesson->getTeacher()->surname();
 
     $Lid->addComment( $commentText );
-    $Lid->changeStatus( 2 );
+
+    $newStatusId = Core::factory( 'Property' )
+        ->getByTagName( 'lid_status_consult' )
+        ->getPropertyValues( User::current()->getDirector() )[0]
+        ->value();
+
+    if ( $newStatusId != 0 )
+    {
+        $Lid->changeStatus( $newStatusId );
+    }
 });
 
 
@@ -460,10 +469,21 @@ Core::attachObserver( 'afterScheduleReportSave', function( $args ) {
     $Lid->addComment( $commentText, false );
 
     //Изменение статуса лида
-    if ( $Report->attendance() == 1 )
+    $propName = 'lid_status_consult_';
+    $Report->attendance() == 1
+        ?   $propName .= 'attended'
+        :   $propName .= 'absent';
+
+    $newStatusId = Core::factory( 'Property' )
+        ->getByTagName( $propName )
+        ->getPropertyValues( User::current()->getDirector() )[0]
+        ->value();
+
+    if ( $newStatusId != 0 )
     {
-        $Lid->changeStatus( 3 );
+        $Lid->changeStatus( $newStatusId );
     }
+
 });
 
 
