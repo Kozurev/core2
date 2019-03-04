@@ -1,39 +1,32 @@
 $(function(){
-
     $('body')
 
-        /**
-         * Открытие всплывающего окна редактирования скписка доп. свйоства
-         */
+        //Открытие всплывающего окна редактирования скписка доп. свйоства
         .on('click', '.edit_property_list', function(e){
             e.preventDefault();
             var propertyId = $(this).data('prop-id');
             getPropertyListPopup(propertyId);
         })
 
-        /**
-         * Сохранение значения списка - создание / редактирование
-         */
+        //Сохранение значения списка - создание / редактирование
         .on('click', '#property_list_save', function(e){
             e.preventDefault();
 
             var
                 id =            $(this).data('id'),
                 propId =        $(this).data('prop-id'),
-                value =         $('#property_list_value').val(),
+                valueInput =    $('#property_list_value'),
+                value =         valueInput.val(),
                 saveBtn =       $('#property_list_save'),
                 canselBtn =     $('.btn-cancel-block'),
-                itemsList =     $('#property_list_select'),
-                valueInput =    $('#property_list_value');
+                itemsList =     $('#property_list_select');
 
             canselBtn.css('display', 'none');
 
             savePropertyListValue(id, propId, value, function(response) {
                 valueInput.val('');
 
-                //Создание нового элемента
-                if(saveBtn.data('id') == 0)
-                {
+                if(saveBtn.data('id') == 0) { //Создание нового элемента
                     var previousOptions = itemsList.html();
                     itemsList.html(
                         '<option value="' + response.id + '"' +
@@ -41,10 +34,7 @@ $(function(){
                         response.value + '</option>'
                     );
                     itemsList.append(previousOptions);
-                }
-                //Редаткирование предыдущего
-                else
-                {
+                } else { //Редаткирование существующего
                     var
                         id =            saveBtn.data('id'),
                         editingOption = itemsList.find('option[value='+id+']');
@@ -124,8 +114,7 @@ function deletePropertyListValue(id, callback)
             id: id
         },
         success: function(response) {
-            if(typeof callback === 'function')
-            {
+            if(typeof callback === 'function') {
                 callback(response);
             }
         }
@@ -155,8 +144,7 @@ function savePropertyListValue(id, propertyId, value, callback)
             value: value
         },
         success: function(response) {
-            if(typeof callback === 'function')
-            {
+            if(typeof callback === 'function') {
                 callback(response);
             }
         }
@@ -192,34 +180,32 @@ function getPropertyListPopup(propertyId)
 /**
  * Сохранение значения дополнительного свойства объекта
  *
- * @param prop_name  - tag_name дополнительного свойства
+ * @param propName   - tag_name дополнительного свойства
  * @param value      - значение
- * @param model_name - название объекта к которому задается значение
- * @param model_id   - id объекта к которому задается значение
+ * @param modelName  - название объекта к которому задается значение
+ * @param modelId    - id объекта к которому задается значение
  * @param func       - исполняемая функция после выполнения запроса
  */
-function savePropertyValue(prop_name, value, model_name, model_id, func)
+function savePropertyValue(propName, value, modelName, modelId, func)
 {
     $.ajax({
-        type: "GET",
-        url: root + "/",
+        type: 'GET',
+        url: root + '/',
         data: {
             ajax: 1,
-            action: "savePropertyValue",
-            prop_name: prop_name,
+            action: 'savePropertyValue',
+            prop_name: propName,
             value: value,
-            model_name: model_name,
-            model_id: model_id
+            model_name: modelName,
+            model_id: modelId
         },
-        success: function(responce) {
-            if(responce != '')
-            {
-                alert("Ошибка: " + responce);
+        success: function(response) {
+            if(response != '') {
+                notificationError('Ошибка: ' + responae);
             }
 
-            if(typeof func === 'function')
-            {
-                func();
+            if(typeof func === 'function') {
+                func(response);
             }
 
             loaderOff();
