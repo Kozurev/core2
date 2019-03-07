@@ -32,6 +32,8 @@ $Orm->executeQuery( 'UPDATE Payment_Type SET subordinated = 526 WHERE id = 4' );
 $Orm->executeQuery( 'ALTER TABLE Task ADD area_id int DEFAULT 0 NULL;' );
 $Orm->executeQuery( 'ALTER TABLE Lid ADD area_id int DEFAULT 0 NULL;' );
 
+$Orm->executeQuery('alter table Schedule_Group add note text null after duration;');
+
 $Orm->executeQuery( '
     CREATE TABLE Schedule_Area_Assignment(
         id int PRIMARY KEY AUTO_INCREMENT,

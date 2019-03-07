@@ -1,32 +1,36 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Egor
- * Date: 24.04.2018
- * Time: 20:00
+ * Класс-модель группы для расписания
+ *
+ * @author BadWolf
+ * @date 24.04.2018 20:00
+ * @version 20190304
+ * Class Schedule_Group_Model
  */
-
 class Schedule_Group_Model extends Core_Entity
 {
     protected $id;
-    protected $teacher_id;
+    protected $teacher_id = 0;
     protected $title;
     protected $duration;
+    protected $note = '';
     protected $subordinated = 0;
     protected $active = 1;
 
 
-    public function __construct(){}
-
     public function getId()
     {
-        return $this->id;
+        return intval( $this->id );
     }
 
 
     public function teacherId( $val = null )
     {
-        if( is_null( $val ) )   return $this->teacher_id;
+        if ( is_null( $val ) )
+        {
+            return intval( $this->teacher_id );
+        }
+
         $this->teacher_id = intval( $val );
         return $this;
     }
@@ -34,10 +38,15 @@ class Schedule_Group_Model extends Core_Entity
 
     public function title( $val = null )
     {
-        if( is_null( $val ) )   return $this->title;
+        if ( is_null( $val ) )
+        {
+            return $this->title;
+        }
 
-        if( strlen( $val ) > 255 )
-            die( Core::getMessage( "TOO_LARGE_VALUE", ["title", "Schedule_Group", 255]));
+        if ( strlen( $val ) > 255 )
+        {
+            die( Core::getMessage( 'TOO_LARGE_VALUE', ['title', 'Schedule_Group', 255]));
+        }
 
         $this->title = strval( $val );
         return $this;
@@ -46,16 +55,22 @@ class Schedule_Group_Model extends Core_Entity
 
     public function duration( $val = null )
     {
-        if( is_null( $val ) )   return $this->duration;
+        if ( is_null( $val ) )
+        {
+            return $this->duration;
+        }
 
-        $this->duration = $val;
+        $this->duration = strval( $val );
         return $this;
     }
 
 
     public function subordinated( $val = null )
     {
-        if( is_null( $val ) )   return $this->subordinated;
+        if ( is_null( $val ) )
+        {
+            return intval( $this->subordinated );
+        }
 
         $this->subordinated = intval( $val );
         return $this;
@@ -64,10 +79,25 @@ class Schedule_Group_Model extends Core_Entity
 
     public function active( $val = null )
     {
-        if( is_null( $val ) )   return intval( $this->active );
+        if ( is_null( $val ) )
+        {
+            return intval( $this->active );
+        }
 
-        if( $val == 1 ) $this->active = 1;
-        elseif( $val == 0 ) $this->active = 0;
+        if ( $val == 1 )        $this->active = 1;
+        elseif ( $val == 0 )    $this->active = 0;
+        return $this;
+    }
+
+
+    public function note( $note = null )
+    {
+        if ( is_null( $note ) )
+        {
+            return $this->note;
+        }
+
+        $this->note = strval( $note );
         return $this;
     }
 
