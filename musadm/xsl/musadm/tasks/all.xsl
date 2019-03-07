@@ -26,7 +26,10 @@
                     </div>
 
                     <div>
-                        <a class="btn btn-red tasks_show" >Показать</a>
+                        <a class="btn btn-red"
+                           onclick="refreshTasksTable($('input[name=date_from]').val(), $('input[name=date_to]').val())">
+                            Показать
+                        </a>
                     </div>
                 </div>
             </xsl:if>
@@ -36,12 +39,12 @@
                     <xsl:choose>
                         <xsl:when test="periods = 1">
                             <div>
-                                <a class="btn btn-red task_create">Добавить задачу</a>
+                                <a class="btn btn-red" onclick="newTaskPopup()">Добавить задачу</a>
                             </div>
                         </xsl:when>
                         <xsl:otherwise>
                             <div>
-                                <a class="btn btn-red task_create">Добавить задачу</a>
+                                <a class="btn btn-red" onclick="newTaskPopup()">Добавить задачу</a>
                             </div>
                         </xsl:otherwise>
                     </xsl:choose>

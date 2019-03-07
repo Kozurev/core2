@@ -23,7 +23,10 @@
                 </div>
 
                 <div class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-1 col-md-offset-1 col-xs-12">
-                    <a class="btn btn-red tasks_show" >Показать</a>
+                    <a class="btn btn-red"
+                       onclick="refreshTasksTable($('input[name=date_from]').val(), $('input[name=date_to]').val())">
+                        Показать
+                    </a>
                 </div>
             </div>
         </xsl:if>
@@ -32,12 +35,12 @@
             <xsl:choose>
                 <xsl:when test="periods = 1">
                     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                        <a class="btn btn-red task_create">Добавить задачу</a>
+                        <a class="btn btn-red" onclick="newTaskPopup()">Добавить задачу</a>
                     </div>
                 </xsl:when>
                 <xsl:otherwise>
                     <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
-                        <a class="btn btn-green task_create">Добавить задачу</a>
+                        <a class="btn btn-green" onclick="newTaskPopup()">Добавить задачу</a>
                     </div>
                 </xsl:otherwise>
             </xsl:choose>
@@ -74,7 +77,7 @@
 
                     <!--Филлиал-->
                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                        <select name="area" class="form-control task_area" data-taskid="{id}">
+                        <select name="area" class="form-control" onchange="updateTaskArea({id}, this.value)">
                             <xsl:variable name="areaId" select="area_id" />
                             <option value="0"> ... </option>
                             <xsl:for-each select="//schedule_area">

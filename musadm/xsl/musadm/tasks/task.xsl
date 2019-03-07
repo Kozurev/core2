@@ -32,12 +32,12 @@
                 <div class="row">
                     <!--Дата контроля-->
                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                        <input type="date" class="form-control task_date" data-taskid="{id}" value="{date}" />
+                        <input type="date" class="form-control" value="{date}" onchange="updateTaskDate({id},this.value)" />
                     </div>
 
                     <!--Филлиал-->
                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                        <select name="area" class="form-control task_area" data-taskid="{id}">
+                        <select name="area" class="form-control" onchange="updateTaskArea({id}, this.value)">
                             <xsl:variable name="areaId" select="area_id" />
                             <option value="0"> ... </option>
                             <xsl:for-each select="//schedule_area">
@@ -54,7 +54,8 @@
 
                 <div class="row center">
                     <xsl:for-each select="//task_priority">
-                        <input type="radio" name="priority_{$id}" data-type="task_priority" value="{id}" id="priority_{$id}_{id}" data-taskid="{$id}" data-card-size="{/root/card-size}" >
+                        <input type="radio" name="priority_{$id}" value="{id}" id="priority_{$id}_{id}" data-taskid="{$id}" data-card-size="{/root/card-size}"
+                            onchange="loaderOn(); changeTaskPriority({$id}, this.value, taskAfterAction)">
                             <xsl:if test="id = $priorityId">
                                 <xsl:attribute name="checked">checked</xsl:attribute>
                             </xsl:if>
@@ -69,14 +70,17 @@
                 <div class="row">
                     <xsl:if test="done = 0">
                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                            <a href="#" class="action append_done task_append_done" data-task_id="{id}" title="Закрыть задачу"><input type="hidden" /></a>
+                            <!--<a href="#" class="action append_done task_append_done" data-task_id="{id}" title="Закрыть задачу"><input type="hidden" /></a>-->
+                            <a class="action append_done" onclick="markAsDone({id}, taskAfterAction)" title="Закрыть задачу"><input type="hidden" /></a>
                         </div>
                     </xsl:if>
                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                        <a data-task_id="{$id}" class="action comment task_add_note" data-table_type="{/root/table_name}" title="Добавить комментарий"><input type="hidden" /></a>
+                        <!--<a data-task_id="{$id}" class="action comment task_add_note" data-table_type="{/root/table_name}" title="Добавить комментарий"><input type="hidden" /></a>-->
+                        <a class="action comment task_add_note" title="Добавить комментарий" onclick="addTaskNotePopup({id})"><input type="hidden" /></a>
                     </div>
                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                        <a href="#" class="action associate associate" title="Привязать к клиенту" data-task_id="{$id}"><input type="hidden" /></a>
+                        <!--<a href="#" class="action associate associate" title="Привязать к клиенту" data-task_id="{$id}"><input type="hidden" /></a>-->
+                        <a href="#" class="action associate" title="Привязать к клиенту" onclick="assignmentTaskPopup({id})"><input type="hidden" /></a>
                     </div>
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
                         <xsl:if test="associate != 0">

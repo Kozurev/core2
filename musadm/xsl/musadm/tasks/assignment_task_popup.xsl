@@ -25,7 +25,7 @@
             <input type="hidden" name="id" value="{task/id}" />
             <input type="hidden" name="modelName" value="Task" />
 
-            <button class="popop_task_assignment_submit btn btn-default">Сохранить</button>
+            <button class="btn btn-default" onclick="loaderOn(); saveData('Main', taskAfterAction)">Сохранить</button>
         </form>
     </xsl:template>
 
