@@ -47,6 +47,10 @@
     margin-top: 40px;
 }
 
+.popup #groupAssignments form {
+    margin-top: 0;
+}
+
 .popup .column {
     width: 50%;
     vertical-align: middle;
@@ -86,14 +90,18 @@
 }
 
 .popup .row {
-    margin-top: 0;
-    margin-bottom: 8px;
+    margin-top: 8px;
+    margin-bottom: 2px;
 }
 
 .popup .popup-row-block {
     display: block;
     margin-top: 40px;
     margin-bottom: 20px;
+}
+
+.popup .popup-row-block div {
+    padding-left: 0;
 }
 
 .popup .row .btn-large {

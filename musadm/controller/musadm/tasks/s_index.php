@@ -261,5 +261,10 @@ if ( $action === 'changeTaskPriority' )
 
     $Task->priorityId( $priorityId )->save();
 
+    $jsonData = new stdClass();
+    $jsonData->taskId = $taskId;
+    $jsonData->priorityId = $priorityId;
+    $jsonData->priorityTitle = $Priority->title();
+    echo json_encode($jsonData);
     exit;
 }

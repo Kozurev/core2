@@ -1,11 +1,11 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Egor
- * Date: 24.04.2018
- * Time: 19:59
+ * @author BadWolf
+ * @date 24.04.2018 19:59
+ * @version 20190304
+ * Class Schedule_Group
  */
-
 class Schedule_Group extends Schedule_Group_Model
 {
 
@@ -16,42 +16,38 @@ class Schedule_Group extends Schedule_Group_Model
      */
     public function getClientList()
     {
-        if( $this->id == null )   return [];
-
-        $Assignments = Core::factory( "Schedule_Group_Assignment" )
-            ->queryBuilder()
-            ->where( "group_id", "=", $this->id )
-            ->findAll();
-
-        $output = [];
-
-        foreach ( $Assignments as $Assignment )
-        {
-            $GroupUsers = Core::factory( "User" )
-                ->queryBuilder()
-                ->where( "id", "=", $Assignment->userId() )
-                ->findAll();
-
-            $output = array_merge( $output, $GroupUsers );
+        if ($this->id == null) {
+            return [];
         }
 
-        return $output;
+        return Core::factory('User')
+            ->queryBuilder()
+            ->join('Schedule_Group_Assignment AS ass', 'ass.user_id = User.id AND ass.group_id = ' . $this->id)
+            ->where('User.group_id', '=', ROLE_CLIENT)
+            ->orderBy('User.surname')
+            ->findAll();
     }
 
 
     /**
      * Очистка списка клиентов группы
+     *
+     * @return void
      */
     public function clearClientList()
     {
-        if( $this->id == null )   return;
+        if ($this->id == null) {
+            return;
+        }
 
-        $Assignments = Core::factory( "Schedule_Group_Assignment" )
+        $Assignments = Core::factory('Schedule_Group_Assignment')
             ->queryBuilder()
-            ->where( "group_id", "=", $this->id )
+            ->where('group_id', '=', $this->id)
             ->findAll();
 
-        foreach ( $Assignments as $Assignment )   $Assignment->delete();
+        foreach ($Assignments as $Assignment) {
+            $Assignment->delete();
+        }
     }
 
 
@@ -62,39 +58,79 @@ class Schedule_Group extends Schedule_Group_Model
      */
     public function getTeacher()
     {
-        return Core::factory( "User", $this->teacher_id );
+        return Core::factory('User', $this->teacher_id);
     }
 
 
     /**
      * Добавление пользователя в список клиентов
      *
-     * @param $userid
+     * @param $userId
+     * @return Schedule_Group_Assignment|null
      */
-    public function appendClient( $userid )
+    public function appendClient($userId)
     {
-        if( $this->id == null )   return;
+        if ($this->id == null) {
+            return null;
+        }
 
-        Core::factory( "Schedule_Group_Assignment" )
-            ->groupId($this->id)
-            ->userId($userid)
-            ->save();
+        $ExistingAssignment = Core::factory('Schedule_Group_Assignment')
+            ->queryBuilder()
+            ->where('group_id', '=', $this->id)
+            ->where('user_id', '=', $userId)
+            ->find();
+
+        if (is_null($ExistingAssignment)) {
+            $NewAssignment = Core::factory('Schedule_Group_Assignment')
+                ->groupId($this->id)
+                ->userId($userId);
+            $NewAssignment->save();
+            return $NewAssignment;
+        } else {
+            return $ExistingAssignment;
+        }
+    }
+
+
+    /**
+     * Удаление связи группы с клиентом
+     *
+     * @param $userId
+     * @return null|void
+     */
+    public function removeClient($userId)
+    {
+        if ($this->id == null) {
+            return null;
+        }
+
+        $ExistingAssignment = Core::factory( 'Schedule_Group_Assignment' )
+            ->queryBuilder()
+            ->where( 'group_id', '=', $this->id )
+            ->where( 'user_id', '=', $userId )
+            ->find();
+
+        if (!is_null($ExistingAssignment)) {
+            $ExistingAssignment->delete();
+        }
+
+        return;
     }
 
 
     public function delete($obj = null)
     {
-        Core::notify(array(&$this), "beforeScheduleGroupDelete");
+        Core::notify([&$this], 'beforeScheduleGroupDelete');
         parent::delete();
-        Core::notify(array(&$this), "ScheduleGroupDelete");
+        Core::notify([&$this], 'afterScheduleGroupDelete');
     }
 
 
     public function save($obj = null)
     {
-        Core::notify(array(&$this), "beforeScheduleGroupSave");
+        Core::notify([&$this], 'beforeScheduleGroupSave');
         parent::save();
-        Core::notify(array(&$this), "afterScheduleGroupSave");
+        Core::notify([&$this], 'afterScheduleGroupSave');
     }
 
 }

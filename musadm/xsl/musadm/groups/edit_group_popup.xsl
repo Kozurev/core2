@@ -1,9 +1,6 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <!--<xsl:variable name="modelid" select="object_id" />-->
-        <!--<xsl:variable name="modelname" select="model_name" />-->
-
         <script>
             $(function(){
                 $("#createData").validate({
@@ -32,7 +29,7 @@
                 <span>Учитель</span>
             </div>
             <div class="column">
-                <select name="teacher_id" class="form-control">
+                <select name="teacherId" class="form-control">
                     <xsl:for-each select="user[group_id = 4]">
                         <option value="{id}">
                             <xsl:if test="id = //schedule_group/teacher_id">
@@ -48,7 +45,7 @@
             <hr/>
 
             <div class="column">
-                <span>Длительность урока</span>
+                <span>Длит. урока</span>
             </div>
             <div class="column">
                 <input type="time" name="duration" class="form-control" value="{schedule_group/duration}" />
@@ -56,29 +53,17 @@
             <hr/>
 
             <div class="column">
-                <span>Состав группы</span>
+                <span>Примечание</span>
             </div>
             <div class="column">
-                <select name="clients[]" multiple="multiple" class="form-control" size="8">
-                    <xsl:for-each select="user[group_id = 5]">
-                        <xsl:variable name="id" select="id"/>
-                        <option value="{id}">
-                            <xsl:if test="count(//schedule_group/user[id = $id]) != 0">
-                                <xsl:attribute name="selected">selected</xsl:attribute>
-                            </xsl:if>
-                            <xsl:value-of select="surname" />
-                            <xsl:text> </xsl:text>
-                            <xsl:value-of select="name" />
-                        </option>
-                    </xsl:for-each>
-                </select>
+                <textarea name="note"><xsl:value-of select="schedule_group/note" /></textarea>
             </div>
-            <hr/>
 
             <input type="hidden" name="id" value="{schedule_group/id}" />
-            <input type="hidden" name="action" value="saveGroup" />
+            <input type="hidden" name="modelName" value="Schedule_Group" />
+            <!--<input type="hidden" name="action" value="saveGroup" />-->
 
-            <button class="popop_group_submit btn btn-default">Сохранить</button>
+            <button class="btn btn-default" onclick="saveData('Main', refreshGroupTable)">Сохранить</button>
         </form>
     </xsl:template>
 
