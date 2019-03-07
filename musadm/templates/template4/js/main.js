@@ -155,6 +155,7 @@ function deleteItem(modelName, modelId, func) {
  *  @param func - выполняемая функция по получению результата ajax-запроса
  */
 function updateActive(modelName, modelId, value, func) {
+    loaderOn();
     $.ajax({
         type: 'GET',
         url: root + '/admin',
@@ -174,9 +175,12 @@ function updateActive(modelName, modelId, value, func) {
             if(typeof func === 'function') {
                 func(response);
             }
+
+            loaderOff();
         },
         error: function(response) {
             notificationError('Произошла ошибка при изменении активности элемента');
+            loaderOff();
         }
     });
 }
