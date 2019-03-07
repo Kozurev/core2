@@ -366,6 +366,18 @@ class User_Controller
         return $this;
     }
 
+
+    /**
+     * @param bool $isWithAreaAssignments
+     * @return User_Controller
+     */
+    public function isWithAreaAssignments(bool $isWithAreaAssignments)
+    {
+        $this->isWithAreaAssignments = $isWithAreaAssignments;
+        return $this;
+    }
+
+
     /**
      * @param array $Areas
      * @return User_Controller
