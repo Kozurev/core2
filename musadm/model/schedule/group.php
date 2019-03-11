@@ -1,6 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
+ * Класс реализующий методы для работы с группами
+ *
  * @author BadWolf
  * @date 24.04.2018 19:59
  * @version 20190304
@@ -96,12 +97,12 @@ class Schedule_Group extends Schedule_Group_Model
      * Удаление связи группы с клиентом
      *
      * @param $userId
-     * @return null|void
+     * @return void
      */
     public function removeClient($userId)
     {
         if ($this->id == null) {
-            return null;
+            return;
         }
 
         $ExistingAssignment = Core::factory( 'Schedule_Group_Assignment' )
@@ -113,8 +114,6 @@ class Schedule_Group extends Schedule_Group_Model
         if (!is_null($ExistingAssignment)) {
             $ExistingAssignment->delete();
         }
-
-        return;
     }
 
 
