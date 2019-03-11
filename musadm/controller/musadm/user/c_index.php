@@ -7,6 +7,8 @@
  * @version 20190311
  */
 
+$isDirector = intval(User::current()->groupId() == ROLE_DIRECTOR);
+
 Core::factory('User_Controller');
 Core::factory('Schedule_Area_Controller');
 
@@ -41,6 +43,7 @@ $ClientController
     ->groupId($groupId)
     ->isShowCount(true)
     ->addSimpleEntity('page-theme-color', 'primary')
+    ->addSimpleEntity('is_director', $isDirector)
     ->xsl($xsl);
 
 $ScheduleAssignment = Core::factory('Schedule_Area_Assignment');

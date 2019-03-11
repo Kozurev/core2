@@ -14,9 +14,11 @@
                         <a class="btn btn-primary user_create" data-usergroup="4">Создать пользователя</a>
                     </div>
 
-                    <div>
-                        <a href="#" class="btn btn-primary edit_property_list" data-prop-id="20">Направление подготовки</a>
-                    </div>
+                    <xsl:if test="is_director = 1">
+                        <div>
+                            <a href="#" class="btn btn-primary edit_property_list" data-prop-id="20">Направление подготовки</a>
+                        </div>
+                    </xsl:if>
 
                     <xsl:if test="show-count-users = 1">
                         <div>
