@@ -15,7 +15,7 @@
                     </div>
 
                     <div>
-                        <a href="#" class="btn btn-primary edit_property_list" data-prop-id="20">Инструмент</a>
+                        <a href="#" class="btn btn-primary edit_property_list" data-prop-id="20">Направление подготовки</a>
                     </div>
 
                     <xsl:if test="show-count-users = 1">

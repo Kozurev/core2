@@ -264,6 +264,8 @@ $LidStatus3->addToPropertiesList(
     $LidStatus3->getId()
 );
 
+Core::factory('Property')->addToPropertiesList(Core::factory('User_Group', ROLE_CLIENT), 20);
+
 //$arr = [
 //    0 => 23,
 //    1 => '34',

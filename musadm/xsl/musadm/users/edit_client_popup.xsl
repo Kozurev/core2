@@ -1,9 +1,6 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <!--<xsl:variable name="modelid" select="object_id" />-->
-        <!--<xsl:variable name="modelname" select="model_name" />-->
-
         <script>
             $(function(){
                 $("#createData").validate({
@@ -120,7 +117,6 @@
                 <select class="form-control" name="areas[]" >
                     <option value="0">...</option>
                     <xsl:for-each select="areas">
-                        <!--<xsl:variable name="id" select="id" />-->
                         <option value="{id}">
                             <xsl:if test="$area_id = id">
                                 <xsl:attribute name="selected">selected</xsl:attribute>
@@ -143,16 +139,23 @@
                 </select>
             </div>
 
+            <div class="column">
+                <span>Направление подготовки</span>
+            </div>
+            <div class="column">
+                <select class="form-control" name="property_20[]">
+                    <option value="0">...</option>
+                    <xsl:call-template name="property_list" >
+                        <xsl:with-param name="property_id" select="20" />
+                    </xsl:call-template>
+                </select>
+            </div>
+
             <hr/>
             <div class="column">
                 <span>Соглашение подписано</span>
             </div>
             <div class="column">
-                <!--<input type="checkbox" name="property_18[]" >-->
-                    <!--<xsl:if test="property_value[property_id=18]/value = 1">-->
-                        <!--<xsl:attribute name="checked">checked</xsl:attribute>-->
-                    <!--</xsl:if>-->
-                <!--</input>-->
                 <input type="checkbox" id="property_18" name="property_18[]" class="checkbox-new" >
                     <xsl:if test="property_value[property_id=18]/value = 1">
                         <xsl:attribute name="checked">checked</xsl:attribute>
@@ -192,7 +195,7 @@
     <xsl:template name="property_list">
         <xsl:param name="property_id" />
 
-        <xsl:for-each select="property_list[property_id=$property_id]">
+        <xsl:for-each select="//property_list[property_id=$property_id]">
             <xsl:variable name="id" select="id" />
             <option value="{$id}">
                 <xsl:if test="//property_value[property_id = $property_id]/value_id = $id">

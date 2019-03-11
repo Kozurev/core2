@@ -33,63 +33,61 @@ $action = Core_Array::Get( 'action', null );
 /**
  * Форма редактирования клиента
  */
-if ( $action == 'updateFormClient' )
-{
-    $userId = Core_Array::Get( 'userid', 0, PARAM_INT );
-    $output = Core::factory( 'Core_Entity' );
+if ($action == 'updateFormClient') {
+    $userId = Core_Array::Get('userid', 0, PARAM_INT);
+    $output = Core::factory('Core_Entity');
 
-    if ( $userId )
-    {
-        $Client = User_Controller::factory( $userId );
+    if ($userId) {
+        $Client = User_Controller::factory($userId);
 
-        if ( $Client === null )
-        {
-            exit ( Core::getMessage( 'NOT_FOUND', ['Пользователь', $userId] ) );
+        if ($Client === null) {
+            exit(Core::getMessage('NOT_FOUND', ['Пользователь', $userId]));
         }
 
-        if ( !User::isSubordinate( $Client, $User ) )
-        {
-            exit ( Core::getMessage( 'NOT_SUBORDINATE', ['Пользователь', $userId] ) );
+        if (!User::isSubordinate($Client, $User)) {
+            exit(Core::getMessage('NOT_SUBORDINATE', ['Пользователь', $userId]));
         }
 
+        $AreaAssignments = Core::factory('Schedule_Area_Assignment')->getAssignments($Client);
 
-        $AreaAssignments = Core::factory( 'Schedule_Area_Assignment' )->getAssignments( $Client );
-
-        if ( count( $AreaAssignments ) > 0 )
-        {
-            $Client->addSimpleEntity( 'area_id', $AreaAssignments[0]->areaId() );
+        if (count($AreaAssignments) > 0) {
+            $Client->addSimpleEntity('area_id', $AreaAssignments[0]->areaId());
         }
 
-
-        $Properties[] = Core::factory( 'Property', 16 )->getPropertyValues( $Client )[0];    //Доп. телефон
-        $Properties[] = Core::factory( 'Property', 9  )->getPropertyValues( $Client )[0];    //Ссылка вк
-        $Properties[] = Core::factory( 'Property', 17 )->getPropertyValues( $Client )[0];    //Длительность урока
-        $Properties[] = Core::factory( 'Property', 18 )->getPropertyValues( $Client )[0];    //Соглашение подписано
-        $Properties[] = Core::factory( 'Property', 28 )->getPropertyValues( $Client )[0];    //Год рождения
-        $Properties =   array_merge( $Properties, Core::factory( 'Property', 21 )->getPropertyValues( $Client) );   //Учителя
-    }
-    else
-    {
+        $Properties[] = Core::factory('Property', 16)->getPropertyValues($Client)[0]; //Доп. телефон
+        $Properties[] = Core::factory('Property',  9)->getPropertyValues($Client)[0]; //Ссылка вк
+        $Properties[] = Core::factory('Property', 17)->getPropertyValues($Client)[0]; //Длительность урока
+        $Properties[] = Core::factory('Property', 18)->getPropertyValues($Client)[0]; //Соглашение подписано
+        $Properties[] = Core::factory('Property', 20)->getPropertyValues($Client)[0]; //Учителя
+        $Properties[] = Core::factory('Property', 28)->getPropertyValues($Client)[0]; //Год рождения
+        $Properties = array_merge($Properties, Core::factory('Property', 21)->getPropertyValues($Client)); //Учителя
+        $Properties = array_merge($Properties, Core::factory('Property', 20)->getPropertyValues($Client)); //Направление подготовки (инструмент)
+    } else {
         $Client = User_Controller::factory();
 
-        $Properties[] =   Core::factory( 'Property_Int' )
+        $Properties[] = Core::factory('Property_Int')
             ->value(
-                Core::factory( 'Property', 17 )->defaultValue()
+                Core::factory('Property', 17)->defaultValue()
             );
     }
 
-    $Areas = Core::factory( 'Schedule_Area' )->getList( true, false );
+    $Areas = Core::factory('Schedule_Area')->getList(true, false);
 
-    $PropertyLists = Core::factory( 'Property' )
-        ->getByTagName( 'teachers' )
+    $ListTeachers = Core::factory('Property')
+        ->getByTagName('teachers')
+        ->getList();
+
+    $ListInstruments = Core::factory('Property')
+        ->getByTagName('instrument')
         ->getList();
 
     $output
-        ->addEntity( $Client )
-        ->addEntities( $Areas, 'areas' )
-        ->addEntities( $Properties, 'property_value' )
-        ->addEntities( $PropertyLists, 'property_list' )
-        ->xsl( 'musadm/users/edit_client_popup.xsl' )
+        ->addEntity($Client)
+        ->addEntities($Areas, 'areas')
+        ->addEntities($Properties, 'property_value')
+        ->addEntities($ListTeachers, 'property_list')
+        ->addEntities($ListInstruments, 'property_list')
+        ->xsl( 'musadm/users/edit_client_popup.xsl')
         ->show();
 
     exit;
