@@ -60,7 +60,7 @@
 
             <td>
                 <xsl:choose>
-                    <xsl:when test="surname != '' and name != ''">
+                    <xsl:when test="surname != ''">
                         <xsl:value-of select="surname" />
                         <xsl:text> </xsl:text>
                         <xsl:value-of select="name" />

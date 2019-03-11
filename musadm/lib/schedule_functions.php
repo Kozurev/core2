@@ -1,51 +1,51 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 08.05.2018
- * Time: 14:37
+ *
+ * @author BadWolf
+ * @date 08.05.2018 14:37
  */
 
-function array_pop_lesson( $aoLessons, $time, $classId )
+function array_pop_lesson($Lessons, $time, $classId)
 {
-    if(!is_array($aoLessons))   return false;
+    if (!is_array($Lessons)) {
+        return false;
+    }
 
     $timeMax = addTime($time, SCHEDULE_DELIMITER);
         
-    foreach ( $aoLessons as $key => $lesson )
-    {
-        if( compareTime( $lesson->timeFrom(), ">=", $time ) && compareTime( $lesson->timeFrom(), "<", $timeMax ) && $lesson->classId() == $classId )
-        //if( compareTime( $lesson->timeFrom(), "==", $time ) && $lesson->classId() == $classId )
-        {
-            $temp = $aoLessons[$key];
-            unset($aoLessons[$key]);
+    foreach ($Lessons as $key => $lesson) {
+        if (compareTime( $lesson->timeFrom(), '>=', $time)
+            && compareTime( $lesson->timeFrom(), '<', $timeMax)
+            && $lesson->classId() == $classId
+        ) {
+            $temp = $Lessons[$key];
+            unset($Lessons[$key]);
             return $temp;
         }
     }
+
     return false;
 }
 
 
-function updateLastLessonTime( $oLesson, &$maxTime, $time, $period )
+function updateLastLessonTime($Lesson, &$maxTime, $time, $period)
 {
-    /**
-     * Поиск высоты ячейки (rowspan) исходя из времени урока и временного промежутка одной ячейки
-     */
-    $minutes = deductTime( $oLesson->timeTo(), $time );
-    $rowspan = divTime( $minutes, $period, "/" );
-    if( divTime( $minutes, $period, "%" ) ) $rowspan++;
+    //Поиск высоты ячейки (rowspan) исходя из времени урока и временного промежутка одной ячейки
+    $minutes = deductTime($Lesson->timeTo(), $time);
+    $rowspan = divTime($minutes, $period, '/');
 
+    if (divTime($minutes, $period, '%')) {
+        $rowspan++;
+    }
 
-    /**
-     * Увеличение верхней границы времени на приблизительное время длительности урока
-     */
+    //Увеличение верхней границы времени на приблизительное время длительности урока
     $tmpTime = $time;
-    for ($i = 0; $i < $rowspan; $i++)
-    {
+    for ($i = 0; $i < $rowspan; $i++) {
         $tmpTime = addTime($tmpTime, $period);
     }
-    $maxTime = $tmpTime;
 
+    $maxTime = $tmpTime;
     return $rowspan;
 }
 
@@ -55,79 +55,74 @@ function updateLastLessonTime( $oLesson, &$maxTime, $time, $period )
  * @param $oLesson
  * @return array
  */
-function getLessonData( $oLesson )
+function getLessonData($Lesson)
 {
-    $output = array(
-        "client"    =>  "",
-        "teacher"   =>  "",
-        "client_status" =>  "",
-    );
+    $output = [
+        'client'    =>  '',
+        'teacher'   =>  '',
+        'client_status' =>  '',
+    ];
 
+    if ($Lesson->typeId() == 2) {
+        $Group = $Lesson->getGroup();
 
-    if ($oLesson->typeId() == 2)
-    {
-        $oGroup = $oLesson->getGroup();
-
-        if($oLesson->teacherId() == 0)  $oTeacher = $oGroup->getTeacher();
-        else $oTeacher = $oLesson->getTeacher();
-
-        if( $oTeacher == false )
-        {
-            $output["teacher"] = "Неизвестен";
-        }
-        else
-        {
-            $output["teacher"] = $oTeacher->surname() . " " . $oTeacher->name();
+        if ($Lesson->teacherId() == 0) {
+            $Teacher = $Group->getTeacher();
+        } else {
+            $Teacher = $Lesson->getTeacher();
         }
 
-        if( $oGroup == false )
-        {
-            $output["client"] = "Неизвестен";
+        if ($Teacher == false) {
+            $output['teacher'] = 'Неизвестен';
+        } else {
+            $output['teacher'] = $Teacher->surname() . ' ' . $Teacher->name();
         }
-        else
-        {
-            $output["client"] = $oGroup->title();
-            $output["client_status"] = "group";
+
+        if ($Group == false) {
+            $output['client'] = 'Неизвестен';
+        } else {
+            $output['client'] = $Group->title();
+            $output['client_status'] = 'group';
         }
-    }
-    elseif ( $oLesson->typeId() == 1 )
-    {
-        $oTeacher = $oLesson->getTeacher();
-        $oClient = $oLesson->getClient();
+    } elseif ($Lesson->typeId() == 1) {
+        $Teacher = $Lesson->getTeacher();
+        $Client = $Lesson->getClient();
 
-        $output["teacher"] = $oTeacher->surname() . " " . $oTeacher->name();
-        $output["client"] = $oClient->surname() . " " . $oClient->name();
+        $output['teacher'] = $Teacher->surname() . ' ' . $Teacher->name();
+        $output["client"] = $Client->surname() . ' ' . $Client->name();
 
-        if( !$oClient->getId() )
-        {
-            $output["client_status"] = "neutral";
+        if (!$Client->getId()) {
+            $output['client_status'] = 'neutral';
+        } else {
+            $countPrivateLessons = Core::factory('Property', 13)
+                ->getPropertyValues($Client)[0]->value();
+            $countGroupLessons = Core::factory('Property', 14)
+                ->getPropertyValues($Client)[0]->value();
+
+            if ( $countGroupLessons < 0 || $countPrivateLessons < 0 ) {
+                $output['client_status'] = 'negative';
+            } elseif ( $countPrivateLessons > 1 || $countGroupLessons > 1 ) {
+                $output['client_status'] = 'positive';
+            } else {
+                $output['client_status'] = 'neutral';
+            }
+
+            $vk = Core::factory('Property', 9)
+                ->getPropertyValues($Client)[0]->value();
+            if ($vk != '') {
+                $output['client_status'] .= ' vk';
+            }
         }
-        else
-        {
-            $countPrivateLessons = Core::factory( "Property", 13 )->getPropertyValues( $oClient )[0]->value();
-            $countGroupLessons = Core::factory( "Property", 14 )->getPropertyValues( $oClient )[0]->value();
+    } elseif ( $Lesson->typeId() == 3 ) {
+        $Teacher = $Lesson->getTeacher();
+        $output['teacher'] = $Teacher->surname() . ' ' . $Teacher->name();
+        $output['client'] = 'Консультация';
+        $output['client_status'] = 'neutral';
 
-            if ( $countGroupLessons < 0 || $countPrivateLessons < 0 ) $output["client_status"] = "negative";
-            elseif ( $countPrivateLessons > 1 || $countGroupLessons > 1 ) $output["client_status"] = "positive";
-            else $output["client_status"] = "neutral";
-
-            $vk = Core::factory( "Property", 9 )->getPropertyValues( $oClient )[0]->value();
-            if ( $vk != "" ) $output["client_status"] .= " vk";
-        }
-    }
-    elseif ( $oLesson->typeId() == 3 )
-    {
-        $oTeacher = $oLesson->getTeacher();
-        $output["teacher"] = $oTeacher->surname() . " " . $oTeacher->name();
-        $output["client"] = "Консультация";
-        $output["client_status"] = "neutral";
-
-        if ( $oLesson->clientId() != 0 )
-        {
-            $output["client"] .= " " . $oLesson->clientId();
+        if ($Lesson->clientId() != 0) {
+            $output['client'] .= ' ' . $Lesson->clientId();
         }
     }
-
 
     return $output;
 }
@@ -139,14 +134,11 @@ function getLessonData( $oLesson )
  * @param $arr
  * @param $prop
  */
-function sortByTime( &$arr, $prop )
+function sortByTime(&$arr, $prop)
 {
-    for ( $i = 0; $i < count($arr) - 1; $i++ )
-    {
-        for ( $j = 0; $j < count($arr) - 1; $j++ )
-        {
-            if( compareTime( $arr[$j]->$prop(), ">", $arr[$j+1]->$prop() ) )
-            {
+    for ($i = 0; $i < count($arr) - 1; $i++) {
+        for ($j = 0; $j < count($arr) - 1; $j++) {
+            if (compareTime($arr[$j]->$prop(), '>', $arr[$j+1]->$prop())) {
                 $tmp = $arr[$j];
                 $arr[$j] = $arr[$j + 1];
                 $arr[$j + 1] = $tmp;
@@ -157,125 +149,114 @@ function sortByTime( &$arr, $prop )
 
 
 /**
- *  Получение списка занятий на определенную дату
+ * Получение списка занятий на определенную дату
+ *
+ * @param string $date
+ * @param int $userId
+ * @return array
  */
-function getLessons( $date, $userId = 0 )
+function getLessons($date, $userId = 0)
 {
-    $dayName =  new DateTime( $date );
-    $dayName =  $dayName->format( "l" );
+    $dayName =  new DateTime($date);
+    $dayName =  $dayName->format('l');
 
-    $aoMainLessons = Core::factory(  "Schedule_Lesson" )
+    $MainLessons = Core::factory('Schedule_Lesson')
+        ->queryBuilder()
         ->open()
-            ->where( "delete_date", ">", $date )
-            ->where( "delete_date", "IS", Core::unchanged( "NULL" ), "or" )
+            ->where('delete_date', '>', $date )
+            ->orWhere('delete_date', 'IS', Core::unchanged( 'NULL' ))
         ->close()
-        ->orderBy( "time_from" );
+        ->orderBy('time_from');
 
-    $aoCurrentLessons = clone $aoMainLessons;
-    $aoCurrentLessons
-        ->where( "lesson_type", "=", 2 )
-        ->where( "insert_date", "=", $date );
+    $CurrentLessons = clone $MainLessons;
+    $CurrentLessons
+        ->where('lesson_type', '=', 2)
+        ->where('insert_date', '=', $date);
 
-    $aoMainLessons
-        ->where( "lesson_type", "=", 1 )
-        ->where( "day_name", "=", $dayName )
-        ->where( "insert_date", "<=", $date );
+    $MainLessons
+        ->where('lesson_type', '=', 1)
+        ->where('day_name', '=', $dayName)
+        ->where('insert_date', '<=', $date );
 
-    if( $userId != 0 )
+    if ($userId != 0)
     {
-        $User = Core::factory( "User", $userId );
+        $User = Core::factory('User', $userId);
 
-        if ( $User === null )
-        {
-            exit ( Core::getMessage( "NOT_FOUND", ["Пользователь", $userId] ) );
+        if ($User === null) {
+            exit (Core::getMessage( 'NOT_FOUND', ['Пользователь', $userId]));
         }
 
-
-        /**
-         * Если страница клиента
-         */
-        if ( $User->groupId() == 5 )
-        {
-            $aoClientGroups = Core::factory("Schedule_Group_Assignment")->queryBuilder()
-                ->where( "user_id", "=", $userId )
+        //Если страница клиента
+        if ($User->groupId() == ROLE_CLIENT) {
+            $ClientGroups = Core::factory('Schedule_Group_Assignment')
+                ->queryBuilder()
+                ->where('user_id', '=', $userId)
                 ->findAll();
 
             $aUserGroups = [];
-
-            foreach ( $aoClientGroups as $group )
-            {
-                $aUserGroups[] = $group->groupId();
+            foreach ($ClientGroups as $group) {
+                $UserGroups[] = $group->groupId();
             }
 
-            $aoMainLessons->open()
-                ->where( "client_id", "=", $userId );
+            $MainLessons->open()
+                ->where('client_id', '=', $userId);
 
-            if ( count( $aUserGroups ) > 0 )
-            {
-                $aoMainLessons
+            if (count($UserGroups) > 0) {
+                $MainLessons
                     ->open()
-                        ->where( "client_id", "in", $aUserGroups, "or" )
-                        ->where( "type_id", "=", 2 )
+                        ->orWhereIn('client_id', $UserGroups)
+                        ->where('type_id', '=', 2)
                     ->close();
             }
 
-            $aoMainLessons->close();
+            $MainLessons->close();
+            $CurrentLessons->open()
+                ->where('client_id', '=', $userId);
 
-            $aoCurrentLessons->open()
-                ->where( "client_id", "=", $userId );
-
-            if ( count( $aUserGroups ) > 0 )
-            {
-                $aoCurrentLessons
+            if (count($UserGroups) > 0) {
+                $CurrentLessons
                     ->open()
-                        ->where("client_id", "in", $aUserGroups, "or")
-                        ->where("type_id", "=", 2)
+                        ->orWhereIn('client_id', $aUserGroups)
+                        ->where('type_id', '=', 2)
                     ->close();
             }
 
-            $aoCurrentLessons->close();
-        }
-        /**
-         * Если страница учителя
-         */
-        elseif ( $User->groupId() == 4 )
-        {
-            $aoMainLessons->where( "teacher_id", "=", $userId );
-            $aoCurrentLessons->where( "teacher_id", "=", $userId );
+            $CurrentLessons->close();
+        } elseif ($User->groupId() == ROLE_TEACHER) { //Если страница учителя
+            $MainLessons->where('teacher_id', '=', $userId );
+            $CurrentLessons->where('teacher_id', '=', $userId );
         }
     }
 
+    $MainLessons = $MainLessons->findAll();
+    $CurrentLessons = $CurrentLessons->findAll();
 
-    $aoMainLessons = $aoMainLessons->findAll();
-    $aoCurrentLessons = $aoCurrentLessons->findAll();
-
-    foreach ( $aoMainLessons as $oMainLesson )
-    {
-        if ( $oMainLesson->isAbsent( $date ) )   continue;
+    foreach ($MainLessons as $MainLesson) {
+        if ($MainLesson->isAbsent($date)) {
+            continue;
+        }
 
         /**
          * Если у занятия изменено время на текущую дату то необходимо добавить
          * его в список занятий текущего расписания
          */
-        if ( $oMainLesson->isTimeModified( $date ) )
-        {
-            $oModify = Core::factory("Schedule_Lesson_TimeModified")->queryBuilder()
-                ->where( "lesson_id", "=", $oMainLesson->getId() )
-                ->where( "date", "=", $date )
+        if ($MainLesson->isTimeModified($date)) {
+            $Modify = Core::factory('Schedule_Lesson_TimeModified')
+                ->queryBuilder()
+                ->where('lesson_id', '=', $MainLesson->getId())
+                ->where('date', '=', $date)
                 ->find();
 
-            $oMainLesson
-                ->timeFrom( $oModify->timeFrom() )
-                ->timeTo( $oModify->timeTo() );
+            $MainLesson
+                ->timeFrom($Modify->timeFrom())
+                ->timeTo($Modify->timeTo());
         }
 
-        $aoCurrentLessons[] = $oMainLesson;
+        $CurrentLessons[] = $MainLesson;
     }
 
-    sortByTime( $aoCurrentLessons, "timeFrom" );
-
-    return $aoCurrentLessons;
-
+    sortByTime($CurrentLessons, 'timeFrom');
+    return $CurrentLessons;
 }
 
 
