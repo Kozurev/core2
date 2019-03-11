@@ -31,12 +31,12 @@
             <div class="item-inner">
                 <div class="row">
                     <!--Дата контроля-->
-                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <!--<div class="col-md-3 col-sm-6 col-xs-12">-->
                         <input type="date" class="form-control" value="{date}" onchange="updateTaskDate({id},this.value)" />
-                    </div>
+                    <!--</div>-->
 
                     <!--Филлиал-->
-                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <!--<div class="col-md-3 col-sm-6 col-xs-12">-->
                         <select name="area" class="form-control" onchange="updateTaskArea({id}, this.value)">
                             <xsl:variable name="areaId" select="area_id" />
                             <option value="0"> ... </option>
@@ -49,7 +49,31 @@
                                 </option>
                             </xsl:for-each>
                         </select>
-                    </div>
+                    <!--</div>-->
+
+                    <xsl:if test="done = 0">
+                        <!--<div class="col-md-1 col-sm-3 col-xs-3">-->
+                            <a class="action append_done" onclick="markAsDone({id}, taskAfterAction)" title="Закрыть задачу"><input type="hidden" /></a>
+                        <!--</div>-->
+                    </xsl:if>
+                    <!--<div class="col-md-1 col-sm-3 col-xs-3">-->
+                        <a class="action comment task_add_note" title="Добавить комментарий" onclick="addTaskNotePopup({id})"><input type="hidden" /></a>
+                    <!--</div>-->
+                    <!--<div class="col-md-1 col-sm-3 col-xs-3">-->
+                        <a href="#" class="action associate" title="Привязать к клиенту" onclick="assignmentTaskPopup({id})"><input type="hidden" /></a>
+                    <!--</div>-->
+                    <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">-->
+                        <xsl:if test="associate != 0">
+                            <xsl:variable name="fio">
+                                <xsl:value-of select="user/surname" />
+                                <xsl:text> </xsl:text>
+                                <xsl:value-of select="user/name" />
+                            </xsl:variable>
+
+                            <a class="user-icon" title="{$fio}" href="{//wwwroot}/balance?userid={user/id}" target="_blank"><input type="hidden" /></a>
+                        </xsl:if>
+                        <!--<input type="hidden" />-->
+                    <!--</div>-->
                 </div>
 
                 <div class="row center">
@@ -67,34 +91,34 @@
                     </xsl:for-each>
                 </div>
 
-                <div class="row">
-                    <xsl:if test="done = 0">
-                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                            <!--<a href="#" class="action append_done task_append_done" data-task_id="{id}" title="Закрыть задачу"><input type="hidden" /></a>-->
-                            <a class="action append_done" onclick="markAsDone({id}, taskAfterAction)" title="Закрыть задачу"><input type="hidden" /></a>
-                        </div>
-                    </xsl:if>
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                        <!--<a data-task_id="{$id}" class="action comment task_add_note" data-table_type="{/root/table_name}" title="Добавить комментарий"><input type="hidden" /></a>-->
-                        <a class="action comment task_add_note" title="Добавить комментарий" onclick="addTaskNotePopup({id})"><input type="hidden" /></a>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                        <!--<a href="#" class="action associate associate" title="Привязать к клиенту" data-task_id="{$id}"><input type="hidden" /></a>-->
-                        <a href="#" class="action associate" title="Привязать к клиенту" onclick="assignmentTaskPopup({id})"><input type="hidden" /></a>
-                    </div>
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-                        <xsl:if test="associate != 0">
-                            <xsl:variable name="fio">
-                                <xsl:value-of select="user/surname" />
-                                <xsl:text> </xsl:text>
-                                <xsl:value-of select="user/name" />
-                            </xsl:variable>
+                <!--<div class="row">-->
+                    <!--<xsl:if test="done = 0">-->
+                        <!--<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">-->
+                            <!--&lt;!&ndash;<a href="#" class="action append_done task_append_done" data-task_id="{id}" title="Закрыть задачу"><input type="hidden" /></a>&ndash;&gt;-->
+                            <!--<a class="action append_done" onclick="markAsDone({id}, taskAfterAction)" title="Закрыть задачу"><input type="hidden" /></a>-->
+                        <!--</div>-->
+                    <!--</xsl:if>-->
+                    <!--<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">-->
+                        <!--&lt;!&ndash;<a data-task_id="{$id}" class="action comment task_add_note" data-table_type="{/root/table_name}" title="Добавить комментарий"><input type="hidden" /></a>&ndash;&gt;-->
+                        <!--<a class="action comment task_add_note" title="Добавить комментарий" onclick="addTaskNotePopup({id})"><input type="hidden" /></a>-->
+                    <!--</div>-->
+                    <!--<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">-->
+                        <!--&lt;!&ndash;<a href="#" class="action associate associate" title="Привязать к клиенту" data-task_id="{$id}"><input type="hidden" /></a>&ndash;&gt;-->
+                        <!--<a href="#" class="action associate" title="Привязать к клиенту" onclick="assignmentTaskPopup({id})"><input type="hidden" /></a>-->
+                    <!--</div>-->
+                    <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">-->
+                        <!--<xsl:if test="associate != 0">-->
+                            <!--<xsl:variable name="fio">-->
+                                <!--<xsl:value-of select="user/surname" />-->
+                                <!--<xsl:text> </xsl:text>-->
+                                <!--<xsl:value-of select="user/name" />-->
+                            <!--</xsl:variable>-->
 
-                            <a class="user-icon" title="{$fio}" href="{//wwwroot}/balance?userid={user/id}" target="_blank"><input type="hidden" /></a>
-                        </xsl:if>
-                        <input type="hidden" />
-                    </div>
-                </div>
+                            <!--<a class="user-icon" title="{$fio}" href="{//wwwroot}/balance?userid={user/id}" target="_blank"><input type="hidden" /></a>-->
+                        <!--</xsl:if>-->
+                        <!--<input type="hidden" />-->
+                    <!--</div>-->
+                <!--</div>-->
 
                 <div class="row comments">
                     <xsl:apply-templates select="comments/task_note" />

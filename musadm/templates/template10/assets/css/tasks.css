@@ -8,20 +8,35 @@
     margin-right: 10px;
 }
 
-.tasks .tasks-comments {
-    overflow-y: auto;
-    overflow-x: visible;
-    max-height: 250px;
-}
-
 /*.tasks .tasks-comments::-webkit-scrollbar { width: 0; }*/
 /*.tasks .tasks-comments { -ms-overflow-style: none; }*/
+
+.tasks .item {
+    width: 100%;
+}
+
+.tasks .item .form-control {
+    width: 200px;
+    display: inline-block;
+    margin-right: 30px;
+    margin-bottom: 10px;
+}
+
+.tasks .item .action {
+    margin: 0 10px;
+    vertical-align: bottom;
+}
 
 .tasks .item .item-inner .row {
     margin-bottom: 8px;
     text-align: center;
 }
 
+.tasks .tasks-comments {
+    overflow-y: auto;
+    overflow-x: visible;
+    max-height: 250px;
+}
 
 .tasks .item .item-inner .row div .user-icon {
     margin-top: 10px;
