@@ -31,6 +31,7 @@ if ($groupId == ROLE_CLIENT) {
 } elseif ($groupId == ROLE_TEACHER) {
     $propertiesIds = [
         20, //Инструмент
+        28, //Год(дата) рождения
         31  //Расписание занятий
     ];
     $xsl = 'musadm/users/teachers.xsl';

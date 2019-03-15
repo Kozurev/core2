@@ -7,22 +7,17 @@
  */
 
 
-$Director = User::current()->getDirector();
-$subordinated = $Director->getId();
-
 Core::factory( 'User_Controller' );
 Core::factory( 'Lid_Controller' );
 Core::factory( 'Schedule_Area_Controller' );
 
 
-/**
- *	Блок проверки авторизации
- */
 $User = User::current();
+$Director = $User->getDirector();
+$subordinated = $Director->getId();
 $accessRules = ['groups' => [ROLE_ADMIN, ROLE_DIRECTOR, ROLE_MANAGER]];
 
-if ( !User::checkUserAccess( $accessRules, $User ) )
-{
+if (!User::checkUserAccess($accessRules, $User)) {
     Core_Page_Show::instance()->error404();
 }
 
@@ -33,7 +28,7 @@ $action = Core_Array::Get( 'action', null );
 /**
  * Форма редактирования клиента
  */
-if ($action == 'updateFormClient') {
+if ($action === 'updateFormClient') {
     $userId = Core_Array::Get('userid', 0, PARAM_INT);
     $output = Core::factory('Core_Entity');
 
@@ -87,7 +82,7 @@ if ($action == 'updateFormClient') {
         ->addEntities($Properties, 'property_value')
         ->addEntities($ListTeachers, 'property_list')
         ->addEntities($ListInstruments, 'property_list')
-        ->xsl( 'musadm/users/edit_client_popup.xsl')
+        ->xsl('musadm/users/edit_client_popup.xsl')
         ->show();
 
     exit;
@@ -97,39 +92,32 @@ if ($action == 'updateFormClient') {
 /**
  * Форма редактирования учителя
  */
-if ( $action == 'updateFormTeacher' )
-{
-    $userId = Core_Array::Get( 'userid', 0, PARAM_INT );
-    $output = Core::factory( 'Core_Entity' );
+if ($action === 'updateFormTeacher') {
+    $userId = Core_Array::Get('userid', 0, PARAM_INT);
+    $output = Core::factory('Core_Entity');
 
-    if ( $userId != 0 )
-    {
-        $Teacher = User_Controller::factory( $userId );
+    if ($userId != 0) {
+        $Teacher = User_Controller::factory($userId);
 
-        if ( $Teacher === null )
-        {
-            exit ( Core::getMessage( 'NOT_FOUND', ['Преподаватель', $userId] ) );
+        if (is_null($Teacher)) {
+            exit (Core::getMessage('NOT_FOUND', ['Преподаватель', $userId]));
         }
 
-        $Properties[] = Core::factory( 'Property', 20 )->getPropertyValues( $Teacher )[0];    //Инструмент
-        $Properties[] = Core::factory( 'Property', 31 )->getPropertyValues( $Teacher )[0];    //Инструмент
-
-        $output->addEntities( $Properties, 'property_value' );
-    }
-    else
-    {
+        $Properties[] = Core::factory('Property', 20)->getPropertyValues($Teacher)[0];    //Инструмент
+        $Properties[] = Core::factory('Property', 31)->getPropertyValues($Teacher)[0];    //Инструмент
+        $output->addEntities($Properties, 'property_value');
+    } else {
         $Teacher = User_Controller::factory();
     }
 
-
-    $PropertyLists = Core::factory( 'Property' )
-        ->getByTagName( 'instrument' )
+    $PropertyLists = Core::factory('Property')
+        ->getByTagName('instrument')
         ->getList();
 
     $output
-        ->addEntity( $Teacher )
-        ->addEntities( $PropertyLists, 'property_list' )
-        ->xsl( 'musadm/users/edit_teacher_popup.xsl' )
+        ->addEntity($Teacher)
+        ->addEntities($PropertyLists, 'property_list')
+        ->xsl('musadm/users/edit_teacher_popup.xsl')
         ->show();
 
     exit;
@@ -139,36 +127,31 @@ if ( $action == 'updateFormTeacher' )
 /**
  * Форма редактирования директора
  */
-if ( $action == 'updateFormDirector' )
-{
-    $userId = Core_Array::Get( 'userid', 0, PARAM_INT );
-    $output = Core::factory( 'Core_Entity' );
+if ($action === 'updateFormDirector') {
+    $userId = Core_Array::Get('userid', 0, PARAM_INT);
+    $output = Core::factory('Core_Entity');
 
-    if ( $userId != 0 )
-    {
-        $Director = User_Controller::factory( $userId, false );
+    if ($userId != 0) {
+        $Director = User_Controller::factory($userId, false);
 
-        if ( $Director === null )
-        {
-            exit ( Core::getMessage( 'NOT_FOUND', ['Директор', $userId] ) );
+        if (is_null($Director)) {
+            exit (Core::getMessage('NOT_FOUND', ['Директор', $userId]));
         }
 
-        $City = Core::factory( 'Property', 29 )->getPropertyValues( $Director )[0]; //Город
-        $Link = Core::factory( 'Property', 33 )->getPropertyValues( $Director )[0]; //Город
-        $Organization = Core::factory( 'Property', 30 )->getPropertyValues( $Director )[0]; //Организация
+        $City = Core::factory('Property', 29)->getPropertyValues($Director)[0]; //Город
+        $Link = Core::factory('Property', 33)->getPropertyValues($Director)[0]; //Город
+        $Organization = Core::factory('Property', 30)->getPropertyValues($Director)[0]; //Организация
 
-        $output->addEntity( $City, 'property_value' );
-        $output->addEntity( $Link, 'property_value' );
-        $output->addEntity( $Organization, 'property_value' );
-    }
-    else
-    {
+        $output->addEntity($City, 'property_value');
+        $output->addEntity($Link, 'property_value');
+        $output->addEntity($Organization, 'property_value');
+    } else {
         $Director = User_Controller::factory();
     }
 
     $output
-        ->addEntity( $Director )
-        ->xsl( 'musadm/users/edit_director_popup.xsl' )
+        ->addEntity($Director)
+        ->xsl('musadm/users/edit_director_popup.xsl')
         ->show();
 
     exit;
@@ -178,28 +161,23 @@ if ( $action == 'updateFormDirector' )
 /**
  * Форма редактирования менеджера
  */
-if ( $action == 'updateFormManager' )
-{
-    $userId = Core_Array::Get( 'userid', 0, PARAM_INT );
-    $output = Core::factory( 'Core_Entity' );
+if ($action === 'updateFormManager') {
+    $userId = Core_Array::Get('userid', 0, PARAM_INT);
+    $output = Core::factory('Core_Entity');
 
-    if ( $userId != 0 )
-    {
-        $Manager = User_Controller::factory( $userId );
+    if ($userId != 0) {
+        $Manager = User_Controller::factory($userId);
 
-        if ( $Director === null )
-        {
-            exit ( Core::getMessage( 'NOT_FOUND', ['Директор', $userId] ) );
+        if (is_null($Director)) {
+            exit (Core::getMessage('NOT_FOUND', ['Директор', $userId]));
         }
-    }
-    else
-    {
+    } else {
         $Manager = User_Controller::factory();
     }
 
     $output
-        ->addEntity( $Manager )
-        ->xsl( 'musadm/users/edit_manager_popup.xsl' )
+        ->addEntity($Manager)
+        ->xsl('musadm/users/edit_manager_popup.xsl')
         ->show();
 
     exit;
@@ -209,8 +187,7 @@ if ( $action == 'updateFormManager' )
 /**
  * Обновление таблиц
  */
-if ( $action == 'refreshTableUsers' )
-{
+if ($action === 'refreshTableUsers') {
     $this->execute();
     exit;
 }
@@ -219,20 +196,18 @@ if ( $action == 'refreshTableUsers' )
 /**
  * Форма для создания платежа
  */
-if ( $action == 'getPaymentPopup' )
-{
-    $userId =   Core_Array::Get( 'userid', 0, PARAM_INT );
-    $User =     User_Controller::factory( $userId );
+if ($action === 'getPaymentPopup') {
+    $userId = Core_Array::Get('userid', 0, PARAM_INT);
+    $User = User_Controller::factory($userId);
 
-    if ( $User === null )
-    {
-        exit ( Core::getMessage( 'NOT_FOUND', ['Пользователь', $userId] ) );
+    if (is_null($User)) {
+        exit (Core::getMessage('NOT_FOUND', ['Пользователь', $userId]));
     }
 
-    Core::factory( 'Core_Entity' )
-        ->addEntity( $User )
-        ->addSimpleEntity( 'function', 'clients' )
-        ->xsl( 'musadm/users/balance/edit_payment_popup.xsl' )
+    Core::factory('Core_Entity')
+        ->addEntity($User)
+        ->addSimpleEntity('function', 'clients')
+        ->xsl('musadm/users/balance/edit_payment_popup.xsl')
         ->show();
 
     exit;
@@ -242,38 +217,35 @@ if ( $action == 'getPaymentPopup' )
 /**
  * Сохранение платежа
  */
-if ( $action == 'savePayment' )
-{
-    $userId =       Core_Array::Get( 'userid', 0, PARAM_INT );
-    $value  =       Core_Array::Get( 'value', 0, PARAM_FLOAT );
-    $description =  Core_Array::Get( 'description', '', PARAM_STRING );
-    $type =         Core_Array::Get( 'type', 0, PARAM_INT );
+if ($action == 'savePayment') {
+    $userId =       Core_Array::Get('userid', 0, PARAM_INT);
+    $value  =       Core_Array::Get('value', 0, PARAM_FLOAT);
+    $description =  Core_Array::Get('description', '', PARAM_STRING);
+    $type =         Core_Array::Get('type', 0, PARAM_INT);
 
-    $Payment = Core::factory( 'Payment' )
-        ->user( $userId )
-        ->type( $type )
-        ->value( $value )
-        ->description( $description );
+    $Payment = Core::factory('Payment')
+        ->user($userId)
+        ->type($type)
+        ->value($value)
+        ->description($description);
     $Payment->save();
 
     //Корректировка баланса ученика
-    $User = User_Controller::factory( $userId );
+    $User = User_Controller::factory($userId);
 
-    if ( $User === null )
-    {
-        exit ( Core::getMessage( 'NOT_FOUND', ['Пользователь', $userId] ) );
+    if (is_null($User)) {
+        exit (Core::getMessage('NOT_FOUND', ['Пользователь', $userId]));
     }
 
-
-    $UserBalance = Core::factory( 'Property', 12 );
-    $UserBalance = $UserBalance->getPropertyValues( $User )[0];
-    $balanceOld =  intval( $UserBalance->value() );
+    $UserBalance = Core::factory('Property', 12);
+    $UserBalance = $UserBalance->getPropertyValues($User)[0];
+    $balanceOld = intval($UserBalance->value());
 
     $type == 1
-        ?   $balanceNew =   $balanceOld + intval( $value )
-        :   $balanceNew =   $balanceOld - intval( $value );
+        ?   $balanceNew = $balanceOld + intval($value)
+        :   $balanceNew = $balanceOld - intval($value);
 
-    $UserBalance->value( $balanceNew );
+    $UserBalance->value($balanceNew);
     $UserBalance->save();
 
     exit ( '0' );
@@ -283,25 +255,22 @@ if ( $action == 'savePayment' )
 /**
  * При сохранении пользователя идет проверка на дублирования логина
  */
-if ( $action == 'checkLoginExists' )
-{
-    $userId =   Core_Array::Get( 'userid', 0, PARAM_INT );
-    $login =    Core_Array::Get( 'login', '', PARAM_STRING );
+if ($action === 'checkLoginExists') {
+    $userId = Core_Array::Get('userid', 0, PARAM_INT);
+    $login = Core_Array::Get('login', '', PARAM_STRING);
 
-    if ( $login == '' )
-    {
-        exit ( 'Логин не может быть пустым' );
+    if ($login == '') {
+        exit ('Логин не может быть пустым');
     }
 
-    $User = Core::factory(  'User' )
+    $User = Core::factory('User')
         ->queryBuilder()
-        ->where( 'id', '<>', $userId )
-        ->where( 'login', '=', $login )
+        ->where('id', '<>', $userId)
+        ->where('login', '=', $login)
         ->find();
 
-    if ( $User !== null )
-    {
-        exit ( 'Пользователь с таким логином уже существует' );
+    if (!is_null($User)) {
+        exit ('Пользователь с таким логином уже существует');
     }
 
     exit;
@@ -311,19 +280,19 @@ if ( $action == 'checkLoginExists' )
 /**
  * Экспорт пользователей в Excel
  */
-if ( $action === 'export' )
-{
-    User::checkUserAccess( ['groups' => [2, 6]] );
+if ($action === 'export') {
+    User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]]);
 
-    header( 'Content-type: application/vnd.ms-excel' );
-    header( 'Content-Disposition: attachment; filename=demo.xls' );
+    header('Content-type: application/vnd.ms-excel');
+    header('Content-Disposition: attachment; filename=demo.xls');
 
-    Core::factory( 'User_Controller' );
-    $ClientController = new User_Controller( User::current() );
+    Core::factory('User_Controller');
+    $ClientController = new User_Controller(User::current());
     $ClientController
-        ->properties( [16] )
-        ->groupId( 5 )
-        ->xsl( 'musadm/users/export.xsl' )
+        ->properties([16])
+        ->isSubordinate(true)
+        ->groupId(ROLE_CLIENT)
+        ->xsl('musadm/users/export.xsl')
         ->show();
 
     exit;
@@ -333,20 +302,17 @@ if ( $action === 'export' )
 /**
  * Получение данных лида для заполнения формы создания клиента
  */
-if ( $action === 'getLidData' )
-{
-    $lidId = Core_Array::Get( 'lidid', 0, PARAM_INT );
+if ($action === 'getLidData') {
+    $lidId = Core_Array::Get('lidid', 0, PARAM_INT);
 
-    if ( $lidId == 0 )
-    {
-        exit ( Core::getMessage( 'EMPTY_GET_PARAM', ['идентификатор лида'] ) );
+    if ($lidId == 0) {
+        exit (Core::getMessage('EMPTY_GET_PARAM', ['идентификатор лида']));
     }
 
-    $Lid = Lid_Controller::factory( $lidId );
+    $Lid = Lid_Controller::factory($lidId);
 
-    if ( $Lid === null )
-    {
-        exit ( Core::getMessage( 'NOT_FOUND', ['Лид', $lidId] ) );
+    if (is_null($Lid)) {
+        exit (Core::getMessage('NOT_FOUND', ['Лид', $lidId]));
     }
 
     $LidEncode = new stdClass();
@@ -355,7 +321,7 @@ if ( $action === 'getLidData' )
     $LidEncode->phone = $Lid->number();
     $LidEncode->vk = $Lid->vk();
 
-    echo json_encode( $LidEncode );
+    echo json_encode($LidEncode);
     exit;
 }
 
@@ -364,38 +330,33 @@ if ( $action === 'getLidData' )
  * Открытие всплывающего окна создания/удаления связей сущьности с филиалами
  * для типа связи многие ко многим
  */
-if ( $action === 'showAssignmentsPopup' )
-{
-    $modelId =   Core_Array::Get( 'model_id', 0, PARAM_INT );
-    $modelName = Core_Array::Get( 'model_name', '', PARAM_STRING );
+if ($action === 'showAssignmentsPopup') {
+    $modelId =   Core_Array::Get('model_id', 0, PARAM_INT);
+    $modelName = Core_Array::Get('model_name', '', PARAM_STRING);
 
-    if ( $modelId <= 0 || $modelName == '' )
-    {
-        Core_Page_Show::instance()->error( 404 );
+    if ($modelId <= 0 || $modelName == '') {
+        Core_Page_Show::instance()->error(404);
     }
 
-    $Object = Core::factory( $modelName, $modelId );
+    $Object = Core::factory($modelName, $modelId);
 
-    if ( $Object === null )
-    {
-        exit ( Core::getMessage( 'NOT_FOUND', [$modelName, $modelId] ) );
+    if (is_null($Object)) {
+        exit (Core::getMessage('NOT_FOUND', [$modelName, $modelId]));
     }
 
-    if ( method_exists( $Object, 'subordinated' ) && $Object->subordinated() != $subordinated )
-    {
-        exit ( Core::getMessage( 'NOT_SUBORDINATE', [$modelName, $modelId] ) );
+    if (method_exists($Object, 'subordinated') && $Object->subordinated() != $subordinated) {
+        exit (Core::getMessage('NOT_SUBORDINATE', [$modelName, $modelId]));
     }
 
+    $AreasList = Core::factory('Schedule_Area')->getList(true, false);
+    $AreaAssignments = Core::factory('Schedule_Area_Assignment')->getAssignments($Object);
 
-    $AreasList = Core::factory( 'Schedule_Area' )->getList( true, false );
-    $AreaAssignments = Core::factory( 'Schedule_Area_Assignment' )->getAssignments( $Object );
-
-    Core::factory( 'Core_Entity' )
-        ->addSimpleEntity( 'model-id', $modelId )
-        ->addSimpleEntity( 'model-name', $modelName )
-        ->addEntities( $AreasList, 'areas' )
-        ->addEntities( $AreaAssignments, 'assignments' )
-        ->xsl( 'musadm/schedule/assignments/areas_assignments_edit.xsl' )
+    Core::factory('Core_Entity')
+        ->addSimpleEntity('model-id', $modelId)
+        ->addSimpleEntity('model-name', $modelName)
+        ->addEntities($AreasList, 'areas')
+        ->addEntities($AreaAssignments, 'assignments')
+        ->xsl('musadm/schedule/assignments/areas_assignments_edit.xsl')
         ->show();
 
     exit;
@@ -405,45 +366,37 @@ if ( $action === 'showAssignmentsPopup' )
 /**
  * Обработчик для создания новой связи сущьности и филиала
  */
-if ( $action === 'appendAreaAssignment' )
-{
-    $modelId =   Core_Array::Get( 'model_id', 0, PARAM_INT );
-    $modelName = Core_Array::Get( 'model_name', '', PARAM_STRING );
-    $areaId =    Core_Array::Get( 'area_id', 0, PARAM_INT );
+if ($action === 'appendAreaAssignment') {
+    $modelId = Core_Array::Get('model_id', 0, PARAM_INT);
+    $modelName = Core_Array::Get('model_name', '', PARAM_STRING);
+    $areaId = Core_Array::Get('area_id', 0, PARAM_INT);
 
-    if ( $modelId <= 0 || $modelName == '' || $areaId <= 0 )
-    {
-        Core_Page_Show::instance()->error404();
+    if ($modelId <= 0 || $modelName == '' || $areaId <= 0) {
+        Core_Page_Show::instance()->error(404);
     }
 
+    $Object = Core::factory($modelName, $modelId);
 
-    $Object = Core::factory( $modelName, $modelId );
-
-    if ( $Object === null )
-    {
-        exit ( Core::getMessage( 'NOT_FOUND', [$modelName, $modelId] ) );
+    if (is_null($Object)) {
+        exit (Core::getMessage('NOT_FOUND', [$modelName, $modelId]));
     }
 
-    if ( method_exists( $Object, 'subordinated' ) && $Object->subordinated() != $subordinated )
-    {
-        exit ( Core::getMessage( 'NOT_SUBORDINATE', [$modelName, $modelId] ) );
+    if (method_exists($Object, 'subordinated') && $Object->subordinated() != $subordinated) {
+        exit (Core::getMessage('NOT_SUBORDINATE', [$modelName, $modelId]));
     }
 
+    $Area = Schedule_Area_Controller::factory($areaId);
 
-    $Area = Schedule_Area_Controller::factory( $areaId );
-
-    if ( $Area === null )
-    {
-        exit ( Core::getMessage( 'NOT_FOUND', ['Филиал', $areaId] ) );
+    if (is_null($Area)) {
+        exit (Core::getMessage('NOT_FOUND', ['Филиал', $areaId]));
     }
 
-
-    $Assignment = Core::factory( 'Schedule_Area_Assignment' )->createAssignment( $Object, $areaId );
+    $Assignment = Core::factory('Schedule_Area_Assignment')->createAssignment($Object, $areaId);
 
     $outputJson = new stdClass();
     $outputJson->id = $Assignment->getId();
     $outputJson->title = $Area->title();
-    echo json_encode( $outputJson );
+    echo json_encode($outputJson);
     exit;
 }
 
@@ -451,37 +404,31 @@ if ( $action === 'appendAreaAssignment' )
 /**
  * Обработчик удаления связи объекта с филмалом
  */
-if ( $action === 'deleteAreaAssignment' )
-{
-    $modelId =   Core_Array::Get( 'model_id', 0, PARAM_INT );
-    $modelName = Core_Array::Get( 'model_name', '', PARAM_STRING );
-    $areaId =    Core_Array::Get( 'area_id', 0, PARAM_INT );
+if ($action === 'deleteAreaAssignment') {
+    $modelId = Core_Array::Get('model_id', 0, PARAM_INT);
+    $modelName = Core_Array::Get('model_name', '', PARAM_STRING);
+    $areaId = Core_Array::Get('area_id', 0, PARAM_INT);
 
-    if ( $modelId <= 0 || $modelName == '' || $areaId <= 0 )
-    {
-        Core_Page_Show::instance()->error( 404 );
+    if ($modelId <= 0 || $modelName == '' || $areaId <= 0) {
+        Core_Page_Show::instance()->error(404);
     }
 
-    $Object = Core::factory( $modelName, $modelId );
+    $Object = Core::factory($modelName, $modelId);
 
-    if ( $Object === null )
-    {
-        exit ( Core::getMessage( 'NOT_FOUND', [$modelName, $modelId] ) );
+    if (is_null($Object)) {
+        exit (Core::getMessage('NOT_FOUND', [$modelName, $modelId]));
     }
 
-    if ( method_exists( $Object, 'subordinated' ) && $Object->subordinated() != $subordinated )
-    {
-        exit ( Core::getMessage( 'NOT_SUBORDINATE', [$modelName, $modelId] ) );
+    if (method_exists($Object, 'subordinated') && $Object->subordinated() != $subordinated) {
+        exit (Core::getMessage('NOT_SUBORDINATE', [$modelName, $modelId]));
     }
 
-
-    Core::factory( 'Schedule_Area_Assignment' )->deleteAssignment( $Object, $areaId );
+    Core::factory('Schedule_Area_Assignment')->deleteAssignment($Object, $areaId);
     exit;
 }
 
 
-if ( $action === 'applyUserFilter' )
-{
+if ($action === 'applyUserFilter') {
     Core_Page_Show::instance()->execute();
     exit;
 }
@@ -489,13 +436,10 @@ if ( $action === 'applyUserFilter' )
 
 
 
-if ( Core_Page_Show::instance()->StructureItem->getId() == 5 )
-{
+if (Core_Page_Show::instance()->StructureItem->getId() == ROLE_CLIENT) {
     $title2 = 'КЛИЕНТОВ';
     $breadcumb = 'клиентов';
-}
-else
-{
+} else {
     $title2 = 'СОТРУДНИКОВ';
     $breadcumb = 'сотрудников';
 }
@@ -504,18 +448,20 @@ $breadcumbs[0] = new stdClass();
 $breadcumbs[0]->title = Core_Page_Show::instance()->title;
 $breadcumbs[0]->active = 1;
 
-Core_Page_Show::instance()->setParam( 'body-class', 'body-primary' );
-Core_Page_Show::instance()->setParam( 'title-first', 'СПИСОК' );
-Core_Page_Show::instance()->setParam( 'title-second', $title2 );
-Core_Page_Show::instance()->setParam( 'breadcumbs', $breadcumbs );
+Core_Page_Show::instance()->setParam('body-class', 'body-primary');
+Core_Page_Show::instance()->setParam('title-first', 'СПИСОК');
+Core_Page_Show::instance()->setParam('title-second', $title2);
+Core_Page_Show::instance()->setParam('breadcumbs', $breadcumbs);
 
 
 $title[] = Core_Page_Show::instance()->Structure->title();
 
-if ( get_class( Core_Page_Show::instance()->StructureItem ) == 'User_Group' )
+if (get_class(Core_Page_Show::instance()->StructureItem) == 'User_Group') {
     $title[] = $this->StructureItem->title();
+}
 
-if ( get_class( Core_Page_Show::instance()->StructureItem) == 'User' )
+if (get_class(Core_Page_Show::instance()->StructureItem) == 'User') {
     $title[] = $this->StructureItem->surname() . ' ' . $this->StructureItem->name();
+}
 
-$this->title = array_pop( $title );
+$this->title = array_pop($title);

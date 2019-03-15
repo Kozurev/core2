@@ -91,6 +91,14 @@
                     </xsl:call-template>
                 </select>
             </div>
+            <hr/>
+            <div class="column">
+                <span>Дата рождения</span>
+            </div>
+            <div class="column">
+                <input class="form-control" type="text" value="{property_value[property_id = 28]/value}" name="property_28[]"  />
+            </div>
+            <hr/>
             <div class="column">
                 <span>График для занятий</span>
             </div>

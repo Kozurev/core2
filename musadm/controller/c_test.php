@@ -250,20 +250,21 @@ $LidStatus2->save();
 $LidStatus3->save();
 
 $LidStatus1->addToPropertiesList(
-    Core::factory( 'User_Group', ROLE_DIRECTOR ),
+    Core::factory('User_Group', ROLE_DIRECTOR),
     $LidStatus1->getId()
 );
 
 $LidStatus2->addToPropertiesList(
-    Core::factory( 'User_Group', ROLE_DIRECTOR ),
+    Core::factory('User_Group', ROLE_DIRECTOR),
     $LidStatus2->getId()
 );
 
 $LidStatus3->addToPropertiesList(
-    Core::factory( 'User_Group', ROLE_DIRECTOR ),
+    Core::factory('User_Group', ROLE_DIRECTOR),
     $LidStatus3->getId()
 );
 
+Core::factory('Property')->addToPropertiesList(Core::factory('User_Group', ROLE_TEACHER), 28);
 Core::factory('Property')->addToPropertiesList(Core::factory('User_Group', ROLE_CLIENT), 20);
 
 //$arr = [
