@@ -4,7 +4,7 @@
  *
  * @author Egor
  * @date 03.02.2019 20:13
- * @version 20190219
+ * @version 20190315 891 776
  * Class User_Controller
  */
 class User_Controller
@@ -190,18 +190,15 @@ class User_Controller
     private $filterType = self::FILTER_NOT_STRICT;
 
 
-
-
-    public function __construct( User $User = null )
+    public function __construct(User $User = null)
     {
         $this->User = $User;
-
-        $this->UserQuery = Core::factory( 'User' )->queryBuilder()
-            ->select( ['User.id', 'User.name', 'User.surname', 'phone_number', 'email', 'group_id'] )
-            ->from( Core::factory( 'User' )->getTableName() )
-            ->orderBy( 'User.id', 'DESC' );
+        $this->UserQuery = Core::factory('User')
+            ->queryBuilder()
+            ->select(['User.id', 'User.name', 'User.surname', 'phone_number', 'email', 'group_id', 'subordinated'])
+            ->from(Core::factory('User')->getTableName())
+            ->orderBy('User.id', 'DESC');
     }
-
 
     /**
      * Кастомная фабрика для пользователей
@@ -210,39 +207,34 @@ class User_Controller
      * @param bool $isSubordinate
      * @return User|null
      */
-    public static function factory( int $id = null, bool $isSubordinate = true )
+    public static function factory(int $id = null, bool $isSubordinate = true)
     {
-        if ( is_null( $id ) )
-        {
-            return Core::factory( 'User' );
+        if (is_null($id)) {
+            return Core::factory('User');
         }
 
-        $ResUser = Core::factory( 'User' )
+        $ResUser = Core::factory('User')
             ->queryBuilder()
-            ->where( 'id', '=', $id );
+            ->where('id', '=', $id);
 
-        if ( $isSubordinate === true )
-        {
+        if ($isSubordinate === true) {
             $AuthUser = User::current();
 
-            if ( is_null( $AuthUser ) )
-            {
+            if (is_null($AuthUser)) {
                 return null;
             }
 
             $Director = $AuthUser->getDirector();
 
-            if ( is_null( $Director ) )
-            {
+            if (is_null($Director)) {
                 return null;
             }
 
-            $ResUser->where( 'subordinated', '=', $Director->getId() );
+            $ResUser->where('subordinated', '=', $Director->getId());
         }
 
         return $ResUser->find();
     }
-
 
     /**
      * @return Orm
@@ -252,7 +244,6 @@ class User_Controller
         return $this->UserQuery;
     }
 
-
     /**
      * Метод добавления в окончательный XML различных простых тэгов
      *
@@ -260,26 +251,23 @@ class User_Controller
      * @param string $entityValue - значение тэга
      * @return User_Controller
      */
-    public function addSimpleEntity( string $entityName, string $entityValue )
+    public function addSimpleEntity(string $entityName, string $entityValue)
     {
-        $this->simpleEntities[] = Core::factory( 'Core_Entity' )
-            ->_entityName( $entityName )
-            ->_entityValue( $entityValue );
-
+        $this->simpleEntities[] = Core::factory('Core_Entity')
+            ->_entityName($entityName)
+            ->_entityValue($entityValue);
         return $this;
     }
-
 
     /**
      * @param string $tableType
      * @return User_Controller
      */
-    public function tableType( string $tableType )
+    public function tableType(string $tableType)
     {
         $requiredTypes = [self::TABLE_ACTIVE,self::TABLE_ARCHIVE];
 
-        if ( !in_array( $tableType, $requiredTypes ) )
-        {
+        if (!in_array($tableType, $requiredTypes)) {
             return $this;
         }
 
@@ -287,12 +275,11 @@ class User_Controller
         return $this;
     }
 
-
     /**
      * @param bool $isSubordinate
      * @return User_Controller
      */
-    public function isSubordinate( bool $isSubordinate )
+    public function isSubordinate(bool $isSubordinate)
     {
         $this->isSubordinate = $isSubordinate;
         return $this;
@@ -303,69 +290,56 @@ class User_Controller
      * @param bool $isActiveBtnPanel
      * @return User_Controller
      */
-    public function isActiveBtnPanel( bool $isActiveBtnPanel )
+    public function isActiveBtnPanel(bool $isActiveBtnPanel)
     {
-        if ( $isActiveBtnPanel === true )
-        {
+        if ($isActiveBtnPanel === true) {
             $this->isActiveBtnPanel = 1;
-        }
-        elseif ( $isActiveBtnPanel === false )
-        {
+        } elseif ($isActiveBtnPanel === false) {
             $this->isActiveBtnPanel = 0;
         }
 
         return $this;
     }
 
-
     /**
      * @param bool $isActiveExportBtn
      * @return User_Controller
      */
-    public function isActiveExportBtn( bool $isActiveExportBtn )
+    public function isActiveExportBtn(bool $isActiveExportBtn)
     {
-        if ( $isActiveExportBtn === true )
-        {
+        if ($isActiveExportBtn === true) {
             $this->isActiveExportBtn = 1;
-        }
-        elseif ( $isActiveExportBtn === false )
-        {
+        } elseif ($isActiveExportBtn === false) {
             $this->isActiveExportBtn = 0;
         }
 
         return $this;
     }
 
-
     /**
      * @param bool $isShowCount
      * @return User_Controller
      */
-    public function isShowCount( bool $isShowCount )
+    public function isShowCount(bool $isShowCount)
     {
-        if ( $isShowCount === true )
-        {
+        if ($isShowCount === true) {
             $this->isShowCount = 1;
-        }
-        elseif ( $isShowCount === false )
-        {
+        } elseif ($isShowCount === false) {
             $this->isShowCount = 0;
         }
 
         return $this;
     }
 
-
     /**
      * @param bool $isLimited
      * @return User_Controller
      */
-    public function isLimitedAreasAccess( bool $isLimited )
+    public function isLimitedAreasAccess(bool $isLimited)
     {
         $this->isLimitedAreasAccess = $isLimited;
         return $this;
     }
-
 
     /**
      * @param bool $isWithAreaAssignments
@@ -377,27 +351,22 @@ class User_Controller
         return $this;
     }
 
-
     /**
      * @param array $Areas
      * @return User_Controller
      */
-    public function forAreas( array $Areas )
+    public function forAreas(array $Areas)
     {
-        if ( $this->forAreas === null )
-        {
+        if (is_null($this->forAreas)) {
             $this->forAreas = [];
         }
 
-        foreach ( $Areas as $Area )
-        {
-            if ( !is_object( $Area ) )
-            {
+        foreach ($Areas as $Area) {
+            if (!is_object($Area)) {
                 continue;
             }
 
-            if ( get_class( $Area ) === 'Schedule_Area' && $Area->getId() > 0 )
-            {
+            if (get_class($Area) === 'Schedule_Area' && $Area->getId() > 0) {
                 $this->forAreas[] = $Area;
             }
         }
@@ -405,118 +374,98 @@ class User_Controller
         return $this;
     }
 
-
     /**
      * @param string $xslPath
      * @return User_Controller
      */
-    public function xsl( string $xslPath )
+    public function xsl(string $xslPath)
     {
         $this->xsl = $xslPath;
         return $this;
     }
 
-
     /**
      * @param bool $isActive
      * @return User_Controller
      */
-    public function active( bool $isActive )
+    public function active(bool $isActive)
     {
-        if ( is_null( $isActive ) )
-        {
+        if (is_null($isActive)) {
             $this->active = null;
         }
 
-        if ( $isActive === true )
-        {
+        if ($isActive === true) {
             $this->active = true;
-        }
-        elseif ( $isActive === false )
-        {
+        } elseif ($isActive === false) {
             $this->active = false;
         }
 
         return $this;
     }
 
-
     /**
      * @param $groupId
      * @return User_Controller
      */
-    public function groupId( $groupId )
+    public function groupId($groupId)
     {
-        if ( is_array( $groupId ) && count( $groupId ) > 0 )
-        {
+        if (is_array($groupId) && count($groupId) > 0) {
             $this->groupIds = $groupId;
-        }
-        elseif ( is_numeric( $groupId ) && $groupId > 0 )
-        {
+        } elseif (is_numeric($groupId) && $groupId > 0) {
             $this->groupIds[] = $groupId;
         }
 
         return $this;
     }
 
-
     /**
      * @param $properties
      * @return User_Controller
      */
-    public function properties( $properties )
+    public function properties($properties)
     {
-        if ( is_array( $properties ) && count( $properties ) > 0 )
-        {
-            if ( !is_array( $this->properties ) )
-            {
+        if (is_array($properties) && count($properties) > 0) {
+            if (!is_array($this->properties)) {
                 $this->properties = [];
             }
 
-            foreach ( $properties as $propId )
-            {
-                $Property = Core::factory( 'Property', $propId );
+            foreach ($properties as $propId) {
+                $Property = Core::factory('Property', $propId);
 
-                if ( $Property !== null )
-                {
+                if (!is_null($Property)) {
                     $this->properties[] = $Property;
                 }
             }
-        }
-        elseif ( is_bool( $properties ) )
-        {
+        } elseif (is_bool($properties)) {
             $this->properties = $properties;
         }
 
         return $this;
     }
 
-
     /**
      * @param string $paramName
      * @param $searchingValue
      * @return User_Controller
      */
-    public function appendFilter( string $paramName, $searchingValue )
+    public function appendFilter(string $paramName, $searchingValue)
     {
         $this->filter[$paramName][] = $searchingValue;
         return $this;
     }
 
-
     /**
      * @param string $filterType
      * @return User_Controller
      */
-    public function filterType( string $filterType )
+    public function filterType(string $filterType)
     {
         $existingTypes = [
             self::FILTER_STRICT,
             self::FILTER_NOT_STRICT
         ];
 
-        if ( !in_array( $filterType, $existingTypes ) )
-        {
+        if (!in_array($filterType, $existingTypes)) {
             $this->filterType = $filterType;
         }
 
@@ -532,7 +481,6 @@ class User_Controller
         return $this->countUsers;
     }
 
-
     /**
      * Поиск пользователей по указанным параметрам
      *
@@ -541,21 +489,17 @@ class User_Controller
     public function getUsers()
     {
         //Фильтр по принадлежности организации
-        if ( $this->User !== null && $this->isSubordinate === true )
-        {
+        if ($this->User !== null && $this->isSubordinate === true) {
             $subordinated = $this->User->getDirector()->getId();
-            $this->UserQuery->where( 'subordinated', '=', $subordinated );
+            $this->UserQuery->where('subordinated', '=', $subordinated);
         }
 
         //Поиск указанных групп и связанных с ними дополнительных свйоств
-        if ( count( $this->groupIds ) > 0 )
-        {
-            foreach ( $this->groupIds as $groupId )
-            {
-                $Group = Core::factory( 'User_Group', $groupId );
+        if (count($this->groupIds) > 0) {
+            foreach ($this->groupIds as $groupId) {
+                $Group = Core::factory('User_Group', $groupId);
 
-                if ( $Group !== null )
-                {
+                if (!is_null($Group)) {
                     $this->Groups[$groupId]['group'] = $Group;
                     $this->Groups[$groupId]['properties'] = [];
                     $this->Groups[$groupId]['groupUserIds'] = [];
@@ -570,25 +514,20 @@ class User_Controller
          */
         $areasIds = [];
 
-        if ( $this->forAreas !== null )
-        {
-            foreach ( $this->forAreas as $Area )
-            {
+        if (!is_null($this->forAreas)) {
+            foreach ($this->forAreas as $Area) {
                 $areasIds[] = $Area->getId();
             }
-        }
-        elseif ( $this->isLimitedAreasAccess === true && $this->User !== null && $this->User->groupId() != ROLE_DIRECTOR )
-        {
-            $UserAreaAssignments = Core::factory( 'Schedule_Area_Assignment' )->getAssignments( $this->User );
+        } elseif ($this->isLimitedAreasAccess === true && !is_null($this->User) && $this->User->groupId() != ROLE_DIRECTOR) {
+            $UserAreaAssignments = Core::factory('Schedule_Area_Assignment')
+                ->getAssignments($this->User);
 
-            foreach ( $UserAreaAssignments as $Assignment )
-            {
+            foreach ($UserAreaAssignments as $Assignment) {
                 $areasIds[] = $Assignment->areaId();
             }
         }
 
-        if ( isset( $areasIds ) && count( $areasIds ) > 0 )
-        {
+        if (isset($areasIds) && count($areasIds) > 0) {
             $this->forAreas === null
                 ?   $this->UserQuery
                         ->leftJoin(
@@ -604,31 +543,27 @@ class User_Controller
             $this->forAreas === null
                 ?   $this->UserQuery
                         ->open()
-                            ->whereIn( 'saa.area_id', $areasIds )
-                            ->orWhere( 'saa.area_id', 'is', NULL )
+                            ->whereIn('saa.area_id', $areasIds)
+                            ->orWhere('saa.area_id', 'IS', null)
                         ->close()
-                :   $this->UserQuery->whereIn( 'saa.area_id', $areasIds );
+                :   $this->UserQuery->whereIn('saa.area_id', $areasIds);
         }
 
         //Фильт по активности пользователей
-        if ( $this->active === true )
-        {
-            $this->UserQuery->where( 'active', '=', '1' );
+        if ($this->active === true) {
+            $this->UserQuery->where('active', '=', 1);
         }
-        elseif ( $this->active === false )
-        {
-            $this->UserQuery->where( 'active', '=', '0' );
+        elseif ($this->active === false) {
+            $this->UserQuery->where('active', '=', 0);
         }
 
         //Фильтрация по группам
-        if ( count( $this->groupIds ) > 0 )
-        {
-            $this->UserQuery->whereIn( 'group_id', $this->groupIds );
+        if (count($this->groupIds) > 0) {
+            $this->UserQuery->whereIn('group_id', $this->groupIds);
         }
 
         //Фильтры
-        if ( $this->filter !== null )
-        {
+        if (!is_null($this->filter)) {
             /**
              * Массив параметров присоеденяемых таблиц со значениями доп. свйоств где:
              *  ключ: название присоеденяемой таблицы
@@ -637,86 +572,65 @@ class User_Controller
              */
             $joins = [];
 
-            foreach ( $this->filter as $paramName => $values )
-            {
+            foreach ($this->filter as $paramName => $values) {
                 //По доп. свойствам
-                if ( strpos( $paramName, 'property_' ) !== false )
-                {
-                    $propertyId = explode( 'property_', $paramName )[1];
-                    $Property = Core::factory( 'Property', $propertyId );
+                if (strpos($paramName, 'property_') !== false) {
+                    $propertyId = explode('property_', $paramName)[1];
+                    $Property = Core::factory('Property', $propertyId);
 
-                    if ( $Property === null )
-                    {
+                    if (is_null($Property)) {
                         continue;
                     }
 
-                    $propTableName = 'Property_' . ucfirst( $Property->type() );
+                    $propTableName = 'Property_' . ucfirst($Property->type());
                     $propTableSynonym = 'prop_' . $Property->type();
                     $propColumn = $Property->type() == 'list'
                         ?   $propTableSynonym . '.value_id'
                         :   $propTableSynonym . '.value';
 
-
                     $joins[$propTableName]['as'] = $propTableSynonym;
                     $joins[$propTableName]['propid'][] = $Property->getId();
 
-
-                    if ( in_array( $Property->defaultValue(), $values ) )
-                    {
+                    if (in_array($Property->defaultValue(), $values)) {
                         $this->UserQuery
                             ->open()
-                            ->where( $propColumn, 'is', 'NULL' )
-                            ->orWhereIn( $propColumn, $values )
+                                ->where($propColumn, 'IS', 'NULL')
+                                ->orWhereIn($propColumn, $values)
                             ->close();
-                    }
-                    else
-                    {
-                        $this->UserQuery->whereIn( $propColumn, $values );
+                    } else {
+                        $this->UserQuery->whereIn($propColumn, $values);
                     }
 
                     continue;
                 }
 
                 //По свойствам пользователя
-                if ( count( $values ) == 1 )
-                {
-                    if ( $this->filterType === self::FILTER_STRICT )
-                    {
-                        $this->UserQuery->where( $paramName, '=', $values[0] );
-                    }
-                    elseif ( $this->filterType === self::FILTER_NOT_STRICT )
-                    {
+                if (count($values) == 1) {
+                    if ($this->filterType === self::FILTER_STRICT) {
+                        $this->UserQuery->where($paramName, '=', $values[0]);
+                    } elseif ($this->filterType === self::FILTER_NOT_STRICT) {
                         $this->UserQuery
                             ->open()
-                                ->where( $paramName, 'LIKE', "%$values[0]%" )
-                                ->orWhere( $paramName, 'LIKE', "$values[0]%" )
-                                ->orWhere( $paramName, 'LIKE', "%$values[0]" )
-                                ->orWhere( $paramName, '=', $values[0] )
+                                ->where($paramName, 'LIKE', "%$values[0]%")
+                                ->orWhere($paramName, 'LIKE', "$values[0]%")
+                                ->orWhere($paramName, 'LIKE', "%$values[0]")
+                                ->orWhere($paramName, '=', $values[0])
                             ->close();
                     }
-                }
-                elseif ( count( $values ) > 1 )
-                {
-                    if ( $this->filterType === self::FILTER_STRICT )
-                    {
+                } elseif (count($values) > 1) {
+                    if ($this->filterType === self::FILTER_STRICT) {
                         $this->UserQuery->whereIn( $paramName, $values );
-                    }
-                    elseif ( $this->filterType === self::FILTER_NOT_STRICT )
-                    {
-                        for ( $i = 0; $i < count( $values ); $i++ )
-                        {
-                            if ( $i === 0 )
-                            {
+                    } elseif ($this->filterType === self::FILTER_NOT_STRICT) {
+                        for ($i = 0; $i < count($values); $i++) {
+                            if ($i === 0) {
                                 $this->UserQuery
                                     ->open()
-                                    ->where( $paramName, '=', $values[$i] );
-                            }
-                            else
-                            {
+                                    ->where($paramName, '=', $values[$i]);
+                            } else {
                                 $this->UserQuery
-                                    ->orWhere( $paramName, 'LIKE', "%$values[$i]%" )
-                                    ->orWhere( $paramName, 'LIKE', "$values[$i]%" )
-                                    ->orWhere( $paramName, 'LIKE', "%$values[$i]" );
+                                    ->orWhere($paramName, 'LIKE', "%$values[$i]%")
+                                    ->orWhere($paramName, 'LIKE', "$values[$i]%")
+                                    ->orWhere($paramName, 'LIKE', "%$values[$i]");
                             }
                         }
 
@@ -726,50 +640,37 @@ class User_Controller
             }
 
             //Присоединение необходимых таблиц при фильтрации по доп. свойствам
-            foreach ( $joins as $tableName => $params )
-            {
+            foreach ($joins as $tableName => $params) {
                 $conditions = 'User.id = ' . $params['as'] . '.object_id AND ' . $params['as'] . '.model_name = \'User\' ';
-                $conditions .= ' AND ' . $params['as'] . '.property_id IN (' . implode( ', ', $params['propid'] ) . ')';
-
+                $conditions .= ' AND ' . $params['as'] . '.property_id IN (' . implode(', ', $params['propid']) . ')';
                 $this->UserQuery->leftJoin( $tableName . ' AS ' . $params['as'], $conditions );
             }
         }
 
-
         $Users = $this->UserQuery->findAll();
-
         $this->countUsers = count( $Users );
 
-
         //Поиск доп. свйоств для групп и значений доп. свойств для каждого из пользователей
-        if ( $this->properties !== false )
-        {
+        if ($this->properties !== false) {
             //Поиск списка доп. свойств для пользователей
-            if ( $this->properties === true )
-            {
-                foreach ( $this->Groups as $Group )
-                {
-                    $this->Groups[$Group['group']->getId()]['properties'] = Core::factory( 'Property' )
-                        ->getPropertiesList( $Group['group'] );
+            if ($this->properties === true) {
+                foreach ($this->Groups as $Group) {
+                    $this->Groups[$Group['group']->getId()]['properties'] = Core::factory('Property')
+                        ->getPropertiesList($Group['group']);
                 }
-            }
-            elseif ( is_array( $this->properties ) && count( $this->properties ) > 0 )
-            {
-                foreach ( $this->Groups as $groupId => $Group )
-                {
+            } elseif (is_array($this->properties) && count($this->properties) > 0) {
+                foreach ($this->Groups as $groupId => $Group) {
                     $this->Groups[$groupId]['properties'] = $this->properties;
                 }
             }
 
-            foreach ( $this->Groups as $Group )
-            {
-                foreach ( $Group['properties'] as $Property )
-                {
+            foreach ($this->Groups as $Group) {
+                foreach ($Group['properties'] as $Property) {
                     $ValuesList = $Property->getList();
                     $Property->addEntity(
-                        Core::factory( 'Core_Entity' )
-                            ->_entityName( 'values' )
-                            ->addEntities( $ValuesList, 'item' )
+                        Core::factory('Core_Entity')
+                            ->_entityName('values')
+                            ->addEntities($ValuesList, 'item')
                     );
                 }
             }
@@ -777,30 +678,25 @@ class User_Controller
             $userIds = [];
 
             //Сопоставление id пользователей с группами, которым они принадлежат
-            for ( $i = 0; $i < $this->countUsers; $i++ )
-            {
+            for ($i = 0; $i < $this->countUsers; $i++) {
                 $userIds[] = $Users[$i]->getId();
                 $this->Groups[$Users[$i]->groupId()]['groupUserIds'][] = $Users[$i]->getId();
             }
 
             //Поиск и сопоставлений пользователей со связями с филиалами
-            if ( $this->isWithAreaAssignments === true )
-            {
-                $AreaAssignments = Core::factory( 'Schedule_Area_Assignment' )
+            if ($this->isWithAreaAssignments === true) {
+                $AreaAssignments = Core::factory('Schedule_Area_Assignment')
                     ->queryBuilder()
-                    ->where( 'model_name', '=', 'User' )
-                    ->whereIn( 'model_id', $userIds )
-                    ->orderBy( 'model_id', 'DESC' )
+                    ->where('model_name', '=', 'User')
+                    ->whereIn('model_id', $userIds)
+                    ->orderBy('model_id', 'DESC')
                     ->findAll();
 
-                $countAssignments = count( $AreaAssignments );
+                $countAssignments = count($AreaAssignments);
 
-                for ( $assignmentIndex = 0; $assignmentIndex < $countAssignments; $assignmentIndex++ )
-                {
-                    for ( $userIndex = 0; $userIndex < $this->countUsers; $userIndex++ )
-                    {
-                        if ( $Users[$userIndex]->getId() == $AreaAssignments[$assignmentIndex]->modelId() )
-                        {
+                for ($assignmentIndex = 0; $assignmentIndex < $countAssignments; $assignmentIndex++) {
+                    for ($userIndex = 0; $userIndex < $this->countUsers; $userIndex++) {
+                        if ($Users[$userIndex]->getId() == $AreaAssignments[$assignmentIndex]->modelId()) {
                             $Users[$userIndex]->addEntity( $AreaAssignments[$assignmentIndex] );
                         }
                     }
@@ -808,34 +704,28 @@ class User_Controller
             }
 
             //Поиск значений доп. свойств пользователей
-            foreach ( $this->Groups as $Group )
-            {
-                foreach ( $Group['properties'] as $GroupProperty )
-                {
-                    $propValueTable = 'Property_' . ucfirst( $GroupProperty->type() );
-                    $PropertyValues = Core::factory( $propValueTable )
+            foreach ($this->Groups as $Group) {
+                foreach ($Group['properties'] as $GroupProperty) {
+                    $propValueTable = 'Property_' . ucfirst($GroupProperty->type());
+                    $PropertyValues = Core::factory($propValueTable)
                         ->queryBuilder()
-                        ->where( 'model_name', '=', 'User' )
-                        ->where( 'property_id', '=', $GroupProperty->getId() )
-                        ->whereIn( 'object_id', $Group['groupUserIds'] )
-                        ->orderBy( 'object_id', 'DESC' )
+                        ->where('model_name', '=', 'User')
+                        ->where('property_id', '=', $GroupProperty->getId())
+                        ->whereIn('object_id', $Group['groupUserIds'])
+                        ->orderBy('object_id', 'DESC')
                         ->findAll();
 
-                    $countValues = count( $PropertyValues );
-
+                    $countValues = count($PropertyValues);
 
                     /**
                      * Сопостовлений значений доп. свойств с пользователями, которым они принадлежат
                      * С точки зрения читабельности кода лучше было использовать за место for - foreach
                      * но с точки зрения производительности из-за больших объемов данных так лучше, хотя хз :)
                      */
-                    for ( $valueIndex = 0; $valueIndex < $countValues; $valueIndex++ )
-                    {
-                        for ( $userIndex = 0; $userIndex < $this->countUsers; $userIndex++ )
-                        {
-                            if ( $Users[$userIndex]->getId() == $PropertyValues[$valueIndex]->object_id() )
-                            {
-                                $Users[$userIndex]->addEntity( $PropertyValues[$valueIndex], 'property_value' );
+                    for ($valueIndex = 0; $valueIndex < $countValues; $valueIndex++) {
+                        for ($userIndex = 0; $userIndex < $this->countUsers; $userIndex++) {
+                            if ($Users[$userIndex]->getId() == $PropertyValues[$valueIndex]->object_id()) {
+                                $Users[$userIndex]->addEntity($PropertyValues[$valueIndex], 'property_value');
                             }
                         }
                     }
@@ -846,46 +736,41 @@ class User_Controller
         return $Users;
     }
 
-
     /**
      * Вывод сформированного HTML на основании указаных параметров и XSL шаблона
      *
      * @param bool $isEcho
      * @return mixed
      */
-    public function show( $isEcho = true )
+    public function show($isEcho = true)
     {
         global $CFG;
 
-        $OutputXml = Core::factory( 'Core_Entity' )
-            ->addSimpleEntity( 'wwwroot', $CFG->rootdir )
-            ->addSimpleEntity( 'table-type', $this->tableType )
-            ->addSimpleEntity( 'active-btn-panel', $this->isActiveBtnPanel )
-            ->addSImpleEntity( 'active-export-btn', $this->isActiveExportBtn )
-            ->addSimpleEntity( 'show-count-users', $this->isShowCount )
-            ->addEntities( $this->getUsers() )
+        $OutputXml = Core::factory('Core_Entity')
+            ->addSimpleEntity('wwwroot', $CFG->rootdir)
+            ->addSimpleEntity('table-type', $this->tableType)
+            ->addSimpleEntity('active-btn-panel', $this->isActiveBtnPanel)
+            ->addSImpleEntity('active-export-btn', $this->isActiveExportBtn)
+            ->addSimpleEntity('show-count-users', $this->isShowCount)
+            ->addEntities($this->getUsers())
             ->addEntities( 
-                Core::factory( 'Schedule_Area' )->getList( true, false )
+                Core::factory('Schedule_Area')->getList(true, false)
             )
-            ->xsl( $this->xsl );
+            ->xsl($this->xsl);
 
         //Добавление объектов доп. свойств
-        foreach ( $this->Groups as $Group )
-        {
-            foreach ( $Group['properties'] as $Property )
-            {
-                $Group['group']->addEntity( $Property );
+        foreach ($this->Groups as $Group) {
+            foreach ($Group['properties'] as $Property) {
+                $Group['group']->addEntity($Property);
             }
-
-            $OutputXml->addEntity( $Group['group'] );
+            $OutputXml->addEntity($Group['group']);
         }
 
         //Добавление кастомных тэгов
-        foreach ( $this->simpleEntities as $Entity )
-        {
-            $OutputXml->addEntity( $Entity );
+        foreach ($this->simpleEntities as $Entity) {
+            $OutputXml->addEntity($Entity);
         }
 
-        return $OutputXml->show( $isEcho );
+        return $OutputXml->show($isEcho);
     }
 }
