@@ -71,7 +71,7 @@ section {
 
 .cards-section .item-inner {
     padding: 15px 15px;
-    height: 340px !important;
+    height: 340px;
     overflow-y: auto;
 }
 

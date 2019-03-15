@@ -11,6 +11,11 @@
 /*.tasks .tasks-comments::-webkit-scrollbar { width: 0; }*/
 /*.tasks .tasks-comments { -ms-overflow-style: none; }*/
 
+.tasks .cards-section .item-inner {
+    height: auto;
+    max-height: 340px;
+}
+
 .tasks .item {
     width: 100%;
 }
@@ -38,7 +43,7 @@
     max-height: 250px;
 }
 
-.tasks .item .item-inner .row div .user-icon {
+.tasks .item .item-inner .row .user-icon {
     margin-top: 10px;
     display: inline-block;
     cursor: pointer;
@@ -48,6 +53,11 @@
     background-size: cover;
 }
 
+.tasks .item .item-inner .row select,
+.tasks .item .item-inner .row input,
+.tasks .item .item-inner .row a {
+    vertical-align: -webkit-baseline-middle;
+}
 
 
 

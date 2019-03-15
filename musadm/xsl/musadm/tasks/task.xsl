@@ -57,21 +57,22 @@
                         <!--</div>-->
                     </xsl:if>
                     <!--<div class="col-md-1 col-sm-3 col-xs-3">-->
-                        <a class="action comment task_add_note" title="Добавить комментарий" onclick="addTaskNotePopup({id})"><input type="hidden" /></a>
+                    <a class="action comment task_add_note" title="Добавить комментарий" onclick="addTaskNotePopup({id})"><input type="hidden" /></a>
                     <!--</div>-->
                     <!--<div class="col-md-1 col-sm-3 col-xs-3">-->
-                        <a href="#" class="action associate" title="Привязать к клиенту" onclick="assignmentTaskPopup({id})"><input type="hidden" /></a>
+                    <a class="action associate" title="Привязать к клиенту" onclick="assignmentTaskPopup({id})"><input type="hidden" /></a>
                     <!--</div>-->
                     <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">-->
-                        <xsl:if test="associate != 0">
-                            <xsl:variable name="fio">
-                                <xsl:value-of select="user/surname" />
-                                <xsl:text> </xsl:text>
-                                <xsl:value-of select="user/name" />
-                            </xsl:variable>
 
-                            <a class="user-icon" title="{$fio}" href="{//wwwroot}/balance?userid={user/id}" target="_blank"><input type="hidden" /></a>
-                        </xsl:if>
+                    <xsl:if test="associate != 0">
+                        <xsl:variable name="fio">
+                            <xsl:value-of select="user/surname" />
+                            <xsl:text> </xsl:text>
+                            <xsl:value-of select="user/name" />
+                        </xsl:variable>
+
+                        <a class="user-icon" title="{$fio}" href="{//wwwroot}/balance?userid={user/id}" target="_blank"><input type="hidden" /></a>
+                    </xsl:if>
                         <!--<input type="hidden" />-->
                     <!--</div>-->
                 </div>
