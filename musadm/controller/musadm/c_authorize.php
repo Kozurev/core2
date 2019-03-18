@@ -14,13 +14,13 @@ $back = Core_Array::Get( "back", $CFG->rootdir );
 
 <form action="<?=$CFG->rootdir?>/authorize?back=<?=$back?>" method="post">
     <label for="name">Логин:</label>
-    <input type="name" name="login"/>
+    <input type="name" id="name" name="login"/>
 
     <label for="password">Пароль:</label>
-    <input type="password" name="password"/>
+    <input type="password" id="password" name="password"/>
 
     <label for="remember">Запомнить меня</label>
-    <input type="checkbox" name="remember"/>
+    <input type="checkbox" id="remember" name="remember"/>
 
     <div id="lower">
         <input type="submit" value="Войти"/>
