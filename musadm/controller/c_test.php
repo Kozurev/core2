@@ -43,6 +43,17 @@ $Orm->executeQuery( '
     );'
 );
 
+$Orm->executeQuery('
+    create table Schedule_Room(
+        id int auto_increment,
+        title varchar(255) null,
+        area_id int null,
+        class_id int null,
+        constraint Schedule_Room_pk
+            primary key (id)
+    );'
+);
+
 
 $userAreaAssignments = $Orm->executeQuery( '
 SELECT User.id, pl.value_id
