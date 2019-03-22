@@ -9,25 +9,24 @@
 class Schedule_Area extends Schedule_Area_Model
 {
 
+    /**
+     * Генератор свойства path (url путь к филиалу) на основе названия и идентификатора
+     *
+     * @return $this
+     */
     public function renderPath()
     {
-        if ( $this->subordinated() > 0 )
-        {
+        if ($this->subordinated() > 0) {
             $subordinated = $this->subordinated();
-        }
-        else
-        {
+        } else {
             $AuthUser = User::current();
-
-            if ( is_null( $AuthUser ) )
-            {
-                exit ( 'Невозможно сформировать путь филиала так как не удается получить значение subordinated' );
+            if (is_null($AuthUser)) {
+                exit('Невозможно сформировать путь филиала так как не удается получить значение subordinated');
             }
-
             $subordinated = $AuthUser->getDirector()->getId();
         }
 
-        $this->path = translite( $this->title() ) . '-' . $subordinated;
+        $this->path = translite($this->title()) . '-' . $subordinated;
         return $this;
     }
 
@@ -43,33 +42,30 @@ class Schedule_Area extends Schedule_Area_Model
      *      false:  поиск филиалов вне зависимости от их активности
      * @return array
      */
-    public function getList( bool $isSubordinate = true, bool $isActive = true )
+    public function getList(bool $isSubordinate = true, bool $isActive = true) : array
     {
         Core::factory( 'Schedule_Area_Controller' );
         $Areas = Schedule_Area_Controller::factory();
 
-        if ( $isSubordinate === true )
-        {
+        if ($isSubordinate === true) {
             $User = User::current();
 
-            if ( $User === null )
-            {
+            if (is_null($User)) {
                 return [];
             }
 
             $Areas->queryBuilder()
-                ->where( 'subordinated', '=', $User->getDirector()->getId() );
+                ->where('subordinated', '=', $User->getDirector()->getId());
         }
 
-        if ( $isActive === true )
-        {
+        if ($isActive === true) {
             $Areas->queryBuilder()
-                ->where( 'active', '=', 1 );
+                ->where('active', '=', 1);
         }
 
         return $Areas->queryBuilder()
-            ->orderBy( 'sorting' )
-            ->orderBy( 'title' )
+            ->orderBy('sorting')
+            ->orderBy('title')
             ->findAll();
     }
 
@@ -82,47 +78,94 @@ class Schedule_Area extends Schedule_Area_Model
      * @param null $val
      * @return Schedule_Area
      */
-    public function title( $val = null )
+    public function title($val = null)
     {
-        if ( is_null( $val ) )
-        {
+        if (is_null($val)) {
             return $this->title;
         }
 
-        if ( strlen( $val ) > 255 )
-        {
-            die ( Core::getMessage( 'TOO_LARGE_VALUE', ['title', 'Schedule_Area', 255] ) );
+        if (strlen($val) > 255) {
+            exit(Core::getMessage('TOO_LARGE_VALUE', ['title', 'Schedule_Area', 255]));
         }
 
         $this->oldTitle = $this->title;
-        $this->title = strval( $val );
+        $this->title = strval($val);
         return $this;
     }
 
 
-
-    public function save( $obj = null )
+    /**
+     * @param int $classId
+     * @return Schedule_Room|null
+     */
+    private function getClass(int $classId)
     {
-        Core::notify( [&$this], 'beforeScheduleAreaSave' );
-
-        if ( isset( $this->oldTitle ) )
-        {
-            unset( $this->oldTitle );
+        if (!$this->id) {
+            return null;
         }
 
-        parent::save();
-
-        Core::notify( [&$this], 'afterScheduleAreaSave' );
+        return Core::factory('Schedule_Room')
+            ->queryBuilder()
+            ->clearQuery()
+            ->where('class_id', '=', $classId)
+            ->where('area_id', '=', $this->id)
+            ->find();
     }
 
 
-    public function delete( $obj = null )
+    /**
+     * @param int $classId
+     * @param string $default
+     * @return string
+     */
+    public function getClassName(int $classId, string $default) : string
     {
-        Core::notify( [&$this], 'beforeScheduleAreaDelete' );
+        $Room = $this->getClass($classId);
 
+        if (is_null($Room)) {
+            return $default;
+        } else {
+            return $Room->title();
+        }
+    }
+
+
+    /**
+     * @param int $classId
+     * @param string $name
+     * @return Schedule_Room
+     */
+    public function setClassName(int $classId, string $name)
+    {
+        $ExistingRoom = $this->getClass($classId);
+
+        !is_null($ExistingRoom)
+            ?   $Room = $ExistingRoom
+            :   $Room = Core::factory('Schedule_Room')
+                    ->areaId($this->id)
+                    ->classId($classId);
+
+        $Room->title($name)->save();
+        return $Room;
+    }
+
+
+    public function save($obj = null)
+    {
+        Core::notify([&$this], 'beforeScheduleAreaSave');
+        if (isset($this->oldTitle)) {
+            unset($this->oldTitle);
+        }
+        parent::save();
+        Core::notify([&$this], 'afterScheduleAreaSave');
+    }
+
+
+    public function delete($obj = null)
+    {
+        Core::notify([&$this], 'beforeScheduleAreaDelete');
         parent::delete();
-
-        Core::notify( [&$this], 'afterScheduleAreaDelete' );
+        Core::notify([&$this], 'afterScheduleAreaDelete');
     }
 
 }
