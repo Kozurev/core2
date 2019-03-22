@@ -413,4 +413,9 @@ class Core_Entity extends Core_Entity_Model
         return $this;
     }
 
+
+    public function getId() {
+	    return intval($this->id);
+    }
+
 }
