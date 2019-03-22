@@ -20,6 +20,10 @@
 	/*text-align: center;*/
 /*}*/
 
+.schedule table .schedule_class:hover {
+	cursor: pointer;
+}
+
 .schedule .date {
 	font-size: 11px;
 	color: #D1D1D1;
