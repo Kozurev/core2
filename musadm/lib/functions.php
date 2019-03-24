@@ -208,12 +208,11 @@ function toSeconds( string $time )
  * @param string $time - время
  * @return string
  */
-function refactorTimeFormat( $time )
+function refactorTimeFormat(string $time) : string
 {
-    $segments = explode( ':', $time );
+    $segments = explode(':', $time);
 
-    if ( count( $segments ) != 3 )
-    {
+    if (count($segments) != 3) {
         return $time;
     }
 
