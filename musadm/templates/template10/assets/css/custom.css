@@ -42,7 +42,7 @@ section {
 }
 
 .left {
-    text-align: left;
+    text-align: left !important;
 }
 
 .right {
@@ -385,6 +385,14 @@ section {
 .teacher_table th {
     vertical-align: middle;
     text-align: center;
+}
+
+.teacher_table h5 {
+    font-weight: bold;
+}
+
+.teacher_table label {
+    font-weight: normal;
 }
 
 .day_name {

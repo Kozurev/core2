@@ -7,8 +7,9 @@
                     <th>Дата</th>
                     <th>Время</th>
                     <th>Преподаватель</th>
-                    <th>Ученик / Группа</th>
-                    <th>Отметка <br/>о явке</th>
+                    <td>Результат</td>
+                    <!--<th>Ученик / Группа</th>-->
+                    <!--<th>Отметка <br/>о явке</th>-->
                     <th>Действия</th>
                 </tr>
                 <xsl:apply-templates select="lesson" />
@@ -33,13 +34,13 @@
                 <xsl:value-of select="../user/name" />
             </td>
 
-            <td>
+            <td class="left">
                 <xsl:choose>
                     <xsl:when test="type_id = 3">
                         Консультация
-                        <xsl:if test="client_id != 0">
-                            <xsl:value-of select="client_id" />
-                        </xsl:if>
+                            <xsl:if test="client_id != 0">
+                                <xsl:value-of select="client_id" />
+                            </xsl:if>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:apply-templates select="client" />
@@ -47,41 +48,36 @@
                 </xsl:choose>
             </td>
 
-            <td>
-                <input type="checkbox" name="attendance" >
-                    <xsl:if test="count(report/id) != 0">
-                        <xsl:attribute name="disabled">
-                            disabled
-                        </xsl:attribute>
-                    </xsl:if>
+            <!--<td>-->
+                <!--<xsl:choose>-->
+                    <!--<xsl:when test="type_id = 3">-->
+                        <!--Консультация-->
+                        <!--<xsl:if test="client_id != 0">-->
+                            <!--<xsl:value-of select="client_id" />-->
+                        <!--</xsl:if>-->
+                    <!--</xsl:when>-->
+                    <!--<xsl:otherwise>-->
+                        <!--<xsl:apply-templates select="client" />-->
+                    <!--</xsl:otherwise>-->
+                <!--</xsl:choose>-->
+            <!--</td>-->
 
-                    <xsl:if test="report/attendance = 1">
-                        <xsl:attribute name="checked" >
-                            checked
-                        </xsl:attribute>
-                    </xsl:if>
-                </input>
-                <!-- <input type="checkbox" id="attendance{position()}" name="attendance" class="checkbox-new" >
-                    <xsl:if test="count(report/id) != 0">
-                        <xsl:attribute name="disabled">
-                            disabled
-                        </xsl:attribute>
-                    </xsl:if>
+            <!--<td>-->
+                <!--<input type="checkbox" name="attendance" >-->
+                    <!--<xsl:if test="count(report/id) != 0">-->
+                        <!--<xsl:attribute name="disabled">-->
+                            <!--disabled-->
+                        <!--</xsl:attribute>-->
+                    <!--</xsl:if>-->
 
-                    <xsl:if test="report/attendance = 1">
-                        <xsl:attribute name="checked" >
-                            checked
-                        </xsl:attribute>
-                    </xsl:if>
-                </input>
-                <label for="attendance{position()}" class="label-new">
-                    <div class="tick"><input type="hidden" name="kostul"/></div>
-                </label> -->
-            </td>
+                    <!--<xsl:if test="report/attendance = 1">-->
+                        <!--<xsl:attribute name="checked" >-->
+                            <!--checked-->
+                        <!--</xsl:attribute>-->
+                    <!--</xsl:if>-->
+                <!--</input>-->
+            <!--</td>-->
 
-            <input type="hidden" name="teacherId" value="{../user/id}" />
-            <input type="hidden" name="typeId" value="{type_id}"/>
-            <input type="hidden" name="clientId" value="{client_id}"/>
             <input type="hidden" name="date" value="{//real_date}"/>
             
             <xsl:choose>
@@ -93,30 +89,13 @@
                 </xsl:otherwise>
             </xsl:choose>
 
-            <input type="hidden" name="reportId" value="{report/id}" />
-            <input type="hidden" name="lessonType" value="{lesson_type}" />
-
             <td>
-                <!--<button class="btn btn-green send_report" >-->
-                    <!--<xsl:if test="count(report/id) != 0">-->
-                        <!--<xsl:attribute name="disabled">-->
-                            <!--disabled-->
-                        <!--</xsl:attribute>-->
-                    <!--</xsl:if>-->
-                    <!--Сохранить-->
-                <!--</button>-->
-
                 <xsl:if test="count(report/id) = 0">
                     <a class="action save send_report" title="Сохранить отчет о проведении занятия"></a>
                 </xsl:if>
-
                 <xsl:if test="count(report/id) != 0 and /root/is_admin = 1">
-                    <!--<button class="btn btn-danger delete_report">-->
-                        <!--Отменить-->
-                    <!--</button>-->
                     <a class="action unarchive delete_report" title="Отменить отправку отчета"></a>
                 </xsl:if>
-
             </td>
         </tr>
     </xsl:template>
@@ -124,12 +103,18 @@
     <xsl:template match="client">
         <xsl:choose>
             <xsl:when test="title != ''">
-                <xsl:value-of select="title" />
+                <h5><xsl:value-of select="title" />:</h5>
+                <xsl:apply-templates select="client" />
             </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="surname" />
-                <xsl:text> </xsl:text>
-                <xsl:value-of select="name" />
+                <xsl:if test="position() > 1"><br/></xsl:if>
+                <input type="checkbox" name="attendance_{id}" id="attendance_{id}" />
+                <xsl:text>   </xsl:text>
+                <label for="attendance_{id}">
+                    <xsl:value-of select="surname" />
+                    <xsl:text> </xsl:text>
+                    <xsl:value-of select="name" />
+                </label>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

@@ -227,37 +227,34 @@ $(function(){
             loaderOn();
             var tr = $(this).parent().parent();
             var lessonId = tr.find('input[name=lessonId]').val();
-            var teacherId = tr.find('input[name=teacherId]').val();
-            var clientId = tr.find('input[name=clientId]').val();
-            var typeId = tr.find('input[name=typeId]').val();
             var date = tr.find('input[name=date]').val();
-            var lessonType = tr.find('input[name=lessonType]').val();
-            var attendance = tr.find('input[name=attendance]').is(':checked');
+            var attendance = tr.find('input[type=checkbox]');
 
-            if(attendance == true) {
-                attendance = 1;
-            } else {
-                attendance = 0;
-            }
+            var ajaxData = {
+                action: 'teacherReport',
+                date: date,
+                lessonId: lessonId
+            };
+
+            $.each(attendance, function(key, input) {
+                var name = $(input).attr('name');
+                var value = Number($(input).is(':checked'));
+                ajaxData[name] = value;
+            });
 
             $.ajax({
                 type: 'GET',
                 url: '',
-                data: {
-                    action: 'teacherReport',
-                    teacher_id: teacherId,
-                    client_id: clientId,
-                    type_id: typeId,
-                    date: date,
-                    lesson_id: lessonId,
-                    lesson_type: lessonType,
-                    attendance: attendance
-                },
+                data: ajaxData,
                 success: function(response) {
-                    if (response != '0') {
-                        alert(responce);
+                    if (response != '') {
+                        notificationError(response);
                     }
                     refreshSchedule();
+                },
+                error: function(response) {
+                    notificationError('Произошла ошибка: ' + response);
+                    loaderOff();
                 }
             });
         })

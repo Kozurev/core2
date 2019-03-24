@@ -19,7 +19,6 @@ $date = Core_Array::Get('date', $today, PARAM_STRING);
 
 /**
  * Формирование таблицы расписания для менеджеров
- * Начало >>
  */
 if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
     && is_object(Core_Page_Show::instance()->StructureItem)
@@ -47,12 +46,12 @@ if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
     $CurrentLessons = clone $Lessons;
     $CurrentLessons
         ->where('insert_date', '=', $date)
-        ->where('lesson_type', '=', '2');
+        ->where('lesson_type', '=', Schedule_Lesson::SCHEDULE_CURRENT);
 
     $Lessons
         ->where('insert_date', '<=', $date)
         ->where('day_name', '=', $dayName)
-        ->where('lesson_type', '=', '1');
+        ->where('lesson_type', '=', Schedule_Lesson::SCHEDULE_MAIN);
 
     $Lessons = $Lessons->findAll();
     $CurrentLessons = $CurrentLessons->findAll();
@@ -319,11 +318,9 @@ if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
  */
 if ($User->groupId() == ROLE_TEACHER) {
     $month = getMonth($date);
-
     if (intval($month) < 10) {
         $month = '0' . $month;
     }
-
     $year = getYear($date);
 
     echo '<section class="section-bordered">';
@@ -345,7 +342,12 @@ if ($User->groupId() == ROLE_TEACHER) {
     foreach ($TeacherLessons as $key => $Lesson) {
         $Lesson->timeFrom(refactorTimeFormat($Lesson->timeFrom()));
         $Lesson->timeTo(refactorTimeFormat($Lesson->timeTo()));
-        $Lesson->addEntity($Lesson->getClient(), 'client');
+        $LessonClient = $Lesson->getClient();
+        if ($LessonClient instanceof Schedule_Group) {
+            $Clients = $LessonClient->getClientList();
+            $LessonClient->addEntities($Clients, 'client');
+        }
+        $Lesson->addEntity($LessonClient, 'client');
         $Lesson->addSimpleEntity('lesson_type', $Lesson->lessonType());
         $Reported = $Lesson->isReported($date);
         if ($Reported !== false) {
