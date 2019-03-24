@@ -2,11 +2,11 @@
 /**
  * Модель занятия (урока)
  *
- * @author Kozurev Egor
+ * @author BadWolf
  * @date 24.04.2018 19:58
+ * @version 20190324
+ * Class Schedule_Lesson_Model
  */
-
-
 class Schedule_Lesson_Model extends Core_Entity
 {
     protected $id;
@@ -111,116 +111,167 @@ class Schedule_Lesson_Model extends Core_Entity
     protected $lesson_type;
 
 
-
-
-    public function getId()
+    /**
+     * @param string|null $insertDate
+     * @return $this|string
+     */
+    public function insertDate(string $insertDate = null)
     {
-        return intval( $this->id );
+        if (is_null($insertDate)) {
+            return $this->insert_date;
+        } else {
+            $this->insert_date = $insertDate;
+            return $this;
+        }
     }
 
 
-    public function insertDate( $val = null )
+    /**
+     * @param string|null $deleteDate
+     * @return $this|string
+     */
+    public function deleteDate(string $deleteDate = null )
     {
-        if( is_null( $val ) )   return $this->insert_date;
-
-        $this->insert_date = strval( $val );
-        return $this;
+        if (is_null($deleteDate)) {
+            return $this->delete_date;
+        } else {
+            $this->delete_date = $deleteDate;
+            return $this;
+        }
     }
 
 
-    public function deleteDate( $val = null )
+    /**
+     * @param int|null $lessonType
+     * @return $this|int
+     */
+    public function lessonType(int $lessonType = null)
     {
-        if( is_null( $val ) )   return $this->delete_date;
-
-        $this->delete_date = strval( $val );
-        return $this;
+        if (is_null($lessonType)) {
+            return intval($this->lesson_type);
+        } else {
+            $this->lesson_type = $lessonType;
+            return $this;
+        }
     }
 
 
-    public function lessonType( $val = null )
+    /**
+     * @param string|null $timeFrom
+     * @return $this|string
+     */
+    public function timeFrom(string $timeFrom = null)
     {
-        if( is_null( $val ) )   return $this->lesson_type;
-
-        $this->lesson_type = intval( $val );
-        return $this;
+        if (is_null($timeFrom)) {
+            return $this->time_from;
+        } else {
+            $this->time_from = $timeFrom;
+            return $this;
+        }
     }
 
 
-    public function timeFrom( $val = null )
+    /**
+     * @param string|null $timeTo
+     * @return $this|string
+     */
+    public function timeTo(string $timeTo = null)
     {
-        if ( is_null( $val ) )   return $this->time_from;
-
-        if ( strlen( $val ) == 5 ) $val .= ":00";
-
-        $this->time_from = $val;
-        return $this;
+        if (is_null($timeTo)) {
+            return $this->time_to;
+        } else {
+            $this->time_to = $timeTo;
+            return $this;
+        }
     }
 
 
-    public function timeTo( $val = null )
+    /**
+     * @param string|null $dayName
+     * @return $this|string
+     */
+    public function dayName(string $dayName = null)
     {
-        if( is_null( $val ) )   return $this->time_to;
-
-        if ( strlen( $val ) == 5 ) $val .= ":00";
-
-        $this->time_to = $val;
-        return $this;
+        if (is_null($dayName)) {
+            return $this->day_name;
+        } else {
+            $this->day_name = $dayName;
+            return $this;
+        }
     }
 
 
-    public function dayName( $val = null )
+    /**
+     * @param int|null $areaId
+     * @return $this|int
+     */
+    public function areaId(int $areaId = null)
     {
-        if( is_null( $val ) )   return $this->day_name;
-
-        if( strlen( $val ) > 255 )
-            die( Core::getMessage( "TOO_LARGE_VALUE", ["day_name", "Schedule_Lesson", 255] ) );
-
-        $this->day_name = strval( $val );
-        return $this;
+        if (is_null($areaId)) {
+            return intval($this->area_id);
+        } else {
+            $this->area_id = $areaId;
+            return $this;
+        }
     }
 
 
-    public function areaId( $val = null )
+    /**
+     * @param int|null $classId
+     * @return $this|int
+     */
+    public function classId(int $classId = null)
     {
-        if( is_null( $val ) )   return $this->area_id;
-
-        $this->area_id = intval( $val );
-        return $this;
+        if (is_null($classId)) {
+            return intval($this->class_id);
+        } else {
+            $this->class_id = $classId;
+            return $this;
+        }
     }
 
 
-    public function classId( $val = null )
+    /**
+     * @param int|null $teacherId
+     * @return $this|int
+     */
+    public function teacherId(int $teacherId = null)
     {
-        if( is_null( $val ) )   return $this->class_id;
-
-        $this->class_id = intval( $val );
-        return $this;
+        if (is_null($teacherId)) {
+            return intval($this->teacher_id);
+        } else {
+            $this->teacher_id = $teacherId;
+            return $this;
+        }
     }
 
 
-    public function teacherId( $val = null )
+    /**
+     * @param int|null $clientId
+     * @return $this|int
+     */
+    public function clientId(int $clientId = null)
     {
-        if( is_null( $val ) )   return $this->teacher_id;
-        $this->teacher_id = intval( $val );
-        return $this;
+        if (is_null($clientId)) {
+            return intval($this->client_id);
+        } else {
+            $this->client_id = $clientId;
+            return $this;
+        }
     }
 
 
-    public function clientId( $val = null )
+    /**
+     * @param int|null $typeId
+     * @return $this|int
+     */
+    public function typeId(int $typeId = null)
     {
-        if( is_null( $val ) )   return $this->client_id;
-
-        $this->client_id = intval( $val );
-        return $this;
+        if (is_null($typeId)) {
+            return intval($this->type_id);
+        } else {
+            $this->type_id = $typeId;
+            return $this;
+        }
     }
-
-
-    public function typeId( $val = null )
-    {
-        if( is_null( $val ) )   return $this->type_id;
-
-        $this->type_id = intval( $val );
-        return $this;
-    }
-
 }

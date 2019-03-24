@@ -10,6 +10,13 @@
 class Schedule_Lesson extends Schedule_Lesson_Model
 {
 
+    const TYPE_INDIV = 1;
+    const TYPE_GROUP = 2;
+    const TYPE_CONSULT = 3;
+
+    const SCHEDULE_MAIN = 1;
+    const SCHEDULE_CURRENT = 2;
+
     /**
      * В случае отсутствия искомого объекта либо отсутствия обязательных значений свойств
      * геттер будет возвращать объекты по умолчанию
@@ -51,7 +58,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
         $Group = Core::factory( 'Schedule_Group', $this->client_id);
 
-        if ($Group !== null) {
+        if (!is_null($Group)) {
             return $Group;
         } else {
             return $this->defaultGroup;
@@ -87,29 +94,25 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      */
     public function getClient()
     {
-        switch ( $this->type_id )
+        switch ($this->type_id)
         {
-            case 1:
+            case self::TYPE_INDIV:
                 if ($this->client_id == null || $this->client_id < 0) {
                     return $this->defaultUser;
                 }
-
                 $Client = Core::factory( 'User', $this->client_id);
-
-                if ($Client !== null) {
+                if (!is_null($Client)) {
                     return $Client;
                 } else {
                     return $this->defaultUser;
                 }
                 break;
-            case 2:
+            case self::TYPE_GROUP:
                 if ($this->client_id == null || $this->client_id < 0) {
                     return $this->defaultGroup;
                 }
-
                 $Group = Core::factory('Schedule_Group', $this->client_id);
-
-                if ($Group !== null) {
+                if (!is_null($Group)) {
                     return $Group;
                 } else {
                     return $this->defaultGroup;
@@ -119,10 +122,8 @@ class Schedule_Lesson extends Schedule_Lesson_Model
                 if ($this->client_id == null || $this->client_id < 0) {
                     return $this->defaultLid;
                 }
-
                 $Lid = Core::factory('Lid', $this->client_id);
-
-                if ($Lid !== null) {
+                if (!is_null($Lid)) {
                     return $Lid;
                 } else {
                     return $this->defaultLid;
@@ -130,7 +131,6 @@ class Schedule_Lesson extends Schedule_Lesson_Model
                 break;
             default:
                 exit('Тип занятия не указан либо неизвестен');
-
         }
     }
 
@@ -150,16 +150,15 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
         Core::notify($observerArgs, 'ScheduleLessonMarkDeleted');
 
-        if ($this->lesson_type == 1) { //Основной график
+        if ($this->lesson_type == self::SCHEDULE_MAIN) { //Основной график
             if($this->insert_date == $this->delete_date) {
                 $this->delete();
             } else {
                 $this->delete_date = $date;
                 parent::save();
             }
-
             return $this;
-        } elseif ( $this->lesson_type == 2 ) { //Актуальный график
+        } elseif ($this->lesson_type == self::SCHEDULE_CURRENT) { //Актуальный график
             parent::delete();
         } else {
             exit('У занятия отсутствует указатель на тип графика либо указан неверно');
@@ -177,7 +176,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      */
     public function setAbsent($date)
     {
-        if ($this->lesson_type == 2) {
+        if ($this->lesson_type == self::SCHEDULE_CURRENT) {
             $observerArgs = [
                 'Lesson' => &$this,
                 'date' => $date,
@@ -185,7 +184,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             Core::notify($observerArgs, 'ScheduleLessonMarkDeleted');
             $this->delete();
             return $this;
-        } elseif ($this->lesson_type == 1) {
+        } elseif ($this->lesson_type == self::SCHEDULE_MAIN) {
             Core::factory('Schedule_Lesson_Absent')
                 ->date($date)
                 ->lessonId($this->id)
@@ -201,10 +200,10 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     /**
      * Проверка на отсутствие урока в определенный день
      *
-     * @param $date
+     * @param string $date
      * @return bool
      */
-    public function isAbsent($date)
+    public function isAbsent(string $date) : bool
     {
         $Absent = Core::factory('Schedule_Lesson_Absent')
             ->queryBuilder()
@@ -220,7 +219,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->where('type_id', '=', $this->type_id )
             ->find();
 
-        if ($Absent === null && $ClientAbsent === null) {
+        if (is_null($Absent) && is_null($ClientAbsent)) {
             return false;
         } else {
             return true;
@@ -229,18 +228,123 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
 
     /**
+     * Создание отчета о проведенном занятии
+     *
+     * @param string $date
+     * @param array $attendance
+     * @return void
+     */
+    public function makeReport(string $date, array $attendance)
+    {
+        $Report = Core::factory('Schedule_Lesson_Report')
+            ->lessonId($this->id)
+            ->teacherId($this->teacher_id)
+            ->date($date)
+            ->attendance($attendance)
+            ->typeId($this->type_id)
+            ->lessonType($this->lesson_type);
+        //TODO: Убрать последнее свойство вообще из таблицы за ненадобностью
+
+        $Director = User::current()->getDirector();
+        Core::factory('User_Controller');
+
+        //Создание отчета
+        foreach ($attendance as $clientId => $presence) {
+            $Client = User_Controller::factory($clientId);
+            $Teacher = User_Controller::factory($this->teacherId());
+            if (is_null($Client) || is_null($Teacher)) {
+                continue;
+            }
+
+            $ClientReport = clone $Report;
+            $ClientReport->clientId($clientId)->attendance($presence);
+
+            if ($this->typeId() == self::TYPE_INDIV) {
+                $clientLessons = 'indiv_lessons';
+                $clientRate = 'client_rate_indiv';
+                $teacherRate = 'teacher_rate_indiv';
+                $isTeacherDefaultRate = 'is_teacher_rate_default_indiv';
+            } elseif ($this->typeId() == self::TYPE_GROUP) {
+                $clientLessons = 'group_lessons';
+                $clientRate = 'client_rate_group';
+                $teacherRate = 'teacher_rate_group';
+                $isTeacherDefaultRate = 'is_teacher_rate_default_group';
+            } elseif ($this->typeId() == self::TYPE_CONSULT) {
+                $clientLessons = null;
+                $teacherRate = 'teacher_rate_consult';
+                $isTeacherDefaultRate = 'is_teacher_rate_default_consult';
+            }
+
+            //$ClientLessons = Core::factory('Property')->getByTagName($clientLessons);
+            //$PropertyPerLesson = Core::factory('Property')->getByTagName('per_lesson');
+
+            //Вычисление значения ставки преподавателя за проведенное занятие
+            $IsTeacherDefaultRate = Core::factory('Property')->getByTagName($isTeacherDefaultRate);
+            $IsTeacherDefaultRate = $IsTeacherDefaultRate->getPropertyValues($Teacher)[0];
+            if ($IsTeacherDefaultRate->value()) {
+                $TeacherRate = Core::factory('Property')->getByTagName($teacherRate . '_default');
+                $teacherRateValue = $TeacherRate->getPropertyValues($Director)[0]->value();
+            } else {
+                $TeacherRate = Core::factory('Property')->getByTagName($teacherRate);
+                $teacherRateValue = $TeacherRate->getPropertyValues($Teacher)[0]->value();
+            }
+
+            if ($presence == 0 && $this->typeId() != self::TYPE_CONSULT) {
+                $IsTeacherDefaultAbsentRate = Core::factory('Property')->getByTagName('is_teacher_rate_default_absent');
+                $isTeacherDefaultAbsentRate = $IsTeacherDefaultAbsentRate->getPropertyValues($Teacher)[0]->value();
+
+                //Создание свойства тарифа по количеству списываемых занятий за пропуск
+                $AbsentRate = Core::factory('Property')->getByTagName('client_absent_rate');
+                $absentRateValue = $AbsentRate->getPropertyValues($Director)[0];
+                $absentRateValue = floatval($absentRateValue->value());
+
+                //Вычисление значения ставки преподавателя
+                if ($isTeacherDefaultAbsentRate == 0) { //Индивидуальная ставка
+                    $TeacherRateAbsent = Core::factory('Property')->getByTagName('teacher_rate_absent');
+                    $teacherAbsentValue = $TeacherRateAbsent->getPropertyValues($Teacher)[0]->value();
+                } else { //Общее значение
+                    $AbsentRateType = Core::factory('Property')->getByTagName('teacher_rate_type_absent_default');
+                    $absentRateType = $AbsentRateType->getPropertyValues($Director)[0]->value();
+
+                    if ($absentRateType == 0) { //По формуле "пропорционально"
+                        $teacherAbsentValue = $teacherRateValue * $absentRateValue;
+                    } else { //По общей ставке
+                        $TeacherRateAbsentDefault = Core::factory('Property')->getByTagName('teacher_rate_absent_default');
+                        $teacherAbsentValue = $TeacherRateAbsentDefault->getPropertyValues($Director)[0]->value();
+                    }
+                }
+            } elseif ($presence == 0 && $this->typeId() == self::TYPE_CONSULT) {
+                $teacherAbsentValue = 0;
+            }
+
+            if ($presence == 1) {
+                $ClientReport->teacherRate($teacherRateValue);
+            } elseif ($presence == 0 && $this->typeId() == self::TYPE_GROUP) {
+                $ClientReport->teacherRate($teacherRateValue);
+            } else {
+                $ClientReport->teacherRate($teacherAbsentValue);
+            }
+
+
+
+            debug($ClientReport);
+        } //end attendance foreach
+    }
+
+
+    /**
      * Проверка на наличие отчета о проведении занятия за определенное число
      *
-     * @param $date
+     * @param string $date
      * @return Schedule_Lesson_Report|null
      */
-    public function isReported($date)
+    public function isReported(string $date)
     {
         $Report = Core::factory('Schedule_Lesson_Report')
             ->queryBuilder()
             ->where('date', '=', $date );
 
-            if ($this->oldid !== null) {
+            if (!empty($this->oldid)) {
                 $Report->where('lesson_id', '=', $this->oldid);
             } else {
                 $Report->where('lesson_id', '=', $this->id);
@@ -269,20 +373,19 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         ];
         Core::notify($observerArgs, 'ScheduleLessonTimemodify');
 
-        if ($this->lesson_type == 2) {  //Актуальный график
+        if ($this->lesson_type == self::SCHEDULE_CURRENT) {  //Актуальный график
             $this->time_from = $timeFrom;
             $this->time_to = $timeTo;
             $this->save();
-        } elseif ($this->lesson_type == 1) { // Основной график
+        } elseif ($this->lesson_type == self::SCHEDULE_MAIN) { // Основной график
             $Modify = Core::factory('Schedule_Lesson_TimeModified')
                 ->queryBuilder()
                 ->where('date', '=', $date )
                 ->where('lesson_id', '=', $this->id)
                 ->find();
 
-            if ($Modify !== null) {
-                if ($this->time_from == $timeFrom && $this->time_to == $timeTo)
-                {
+            if (!is_null($Modify)) {
+                if ($this->time_from == $timeFrom && $this->time_to == $timeTo) {
                     $Modify->delete();
                     return $this;
                 } else {
@@ -310,12 +413,12 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     /**
      * Проверка на наличие моддификаций времени для данного урока
      *
-     * @param $date
+     * @param string $date
      * @return bool
      */
-    public function isTimeModified($date)
+    public function isTimeModified(string $date) : bool
     {
-        if ($this->lesson_type == 2) {
+        if ($this->lesson_type == self::SCHEDULE_CURRENT) {
             return false;
         }
 
@@ -340,7 +443,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      * @param $date
      * @return $this
      */
-    public function setRealTime($date)
+    public function setRealTime(string $date)
     {
         $Modify = Core::factory('Schedule_Lesson_TimeModified')
             ->queryBuilder()
@@ -348,7 +451,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->where('date', '=', $date )
             ->find();
 
-        if ($Modify !== null) {
+        if (!is_null($Modify)) {
             $this->time_from = $Modify->timeFrom();
             $this->time_to = $Modify->timeTo();
         }
@@ -375,11 +478,19 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             exit ('Невозможно сохранить занятие не указав преподавателя');
         }
 
+
+        if (strlen($this->time_from) == 5) {
+            $this->time_from .= ':00';
+        }
+        if (strlen($this->time_to) == 5) {
+            $this->time_to .= ':00';
+        }
+
         if (compareTime($this->time_from, '>=', $this->time_to)) {
             exit('Время начала занятия должно быть строго меньше времени окончания');
         }
 
-        if ($this->type_id == 3 && $this->client_id != 0) {
+        if ($this->type_id == self::TYPE_CONSULT && $this->client_id != 0) {
             $Director = User::current()->getDirector();
 
             $isLidIsset = Core::factory('Lid')
@@ -433,11 +544,11 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->open()
                 ->open()
                     ->where('insert_date', '<=', $this->insert_date)
-                    ->where('lesson_type', '=', 1)
+                    ->where('lesson_type', '=', self::SCHEDULE_MAIN)
                     ->where('day_name', '=', $this->day_name)
                 ->close()
                 ->open()
-                    ->orWhere('lesson_type', '=', 2)
+                    ->orWhere('lesson_type', '=', self::SCHEDULE_CURRENT)
                     ->where('insert_date', '=', $this->insert_date)
                 ->close()
             ->close()
@@ -452,17 +563,17 @@ class Schedule_Lesson extends Schedule_Lesson_Model
                 ->close()
                 ->open()
                     ->between('time_to', $this->time_from, $this->time_to, 'OR')
-                    ->where('time_to', '<>', $this->time_from )
+                    ->where('time_to', '<>', $this->time_from)
                 ->close()
             ->close()
             ->findAll();
 
         foreach ($Lessons as $Lesson) {
-            if ($this->lesson_type == 1 && $Lesson->lessonType() == 1) {
+            if ($this->lesson_type == self::SCHEDULE_MAIN && $Lesson->lessonType() == self::SCHEDULE_MAIN) {
                 exit('Добавление невозможно по причине пересечения с другим занятием 2');
             }
 
-            if ($Lesson->lessonType() == 1 && !$Lesson->isAbsent($this->insert_date)) {
+            if ($Lesson->lessonType() == self::SCHEDULE_MAIN && !$Lesson->isAbsent($this->insert_date)) {
                 if (!$Lesson->isTimeModified($this->insert_date)) {
                     exit('Добавление невозможно по причине пересечения с другим занятием 3');
                 }

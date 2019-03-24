@@ -1,134 +1,239 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 11.05.2018
- * Time: 15:24
+ * Класс-модель для отчета о проведенном занятия
+ *
+ * @author BadWolf
+ * @date 11.05.2018 15:24
+ * @version 20190324
  */
 
 class Schedule_Lesson_Report extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
+
+    /**
+     * @var int
+     */
     protected $teacher_id;
+
+    /**
+     * id пользователя (клиента)
+     *
+     * @var int
+     */
     protected $client_id;
+
+    /**
+     * Присутствие клиента на занятии
+     *
+     * @var int
+     */
     protected $attendance = 0;
+
+    /**
+     * id занятия по которому сформирован отчет
+     *
+     * @var int
+     */
     protected $lesson_id;
+
+    /**
+     * Тип занятия (индив./групп./конс.)
+     *
+     * @var int
+     */
     protected $type_id;
+
+    /**
+     * Дата проведенного занятия
+     *
+     * @var string
+     */
     protected $date;
+
+    /**
+     * Тип графика занятия (основной/актуальный)
+     * TODO: Убрать это значение за ненадобностью
+     * @var int
+     */
     protected $lesson_type;
-    protected $client_rate = 0;
-    protected $teacher_rate = 0;
-    protected $total_rate = 0;
+
+    /**
+     * Стоимость занятия для клиента
+     *
+     * @var float
+     */
+    protected $client_rate = 0.0;
+
+    /**
+     * Стоимость занятия для преподавателя (сумма, которая начисляется ему за проведение)
+     *
+     * @var float
+     */
+    protected $teacher_rate = 0.0;
+
+    /**
+     * Чистая прибыль занятия для студии (разница стоимости занятия для клиента и необходимой выплаты преподавателю)
+     *
+     * @var float
+     */
+    protected $total_rate = 0.0;
 
 
-    public function __construct(){}
-
-
-    public function getId()
+    /**
+     * @param int|null $teacherId
+     * @return $this|int
+     */
+    public function teacherId(int $teacherId = null)
     {
-        return $this->id;
+        if (is_null($teacherId)) {
+            return intval($this->teacher_id);
+        } else {
+            $this->teacher_id = $teacherId;
+            return $this;
+        }
     }
 
-
-    public function lessonType( $val = null )
+    /**
+     * @param int|null $clientId
+     * @return $this|int
+     */
+    public function clientId(int $clientId = null)
     {
-        if( is_null( $val ) )   return $this->lesson_type;
-        $this->lesson_type = intval( $val );
+        if (is_null($clientId)) {
+            return $this->client_id;
+        } else {
+            $this->client_id = $clientId;
+            return $this;
+        }
+    }
+
+    /**
+     * @param int|null $lessonId
+     * @return $this|int
+     */
+    public function lessonId(int $lessonId = null)
+    {
+        if (is_null($lessonId)) {
+            return $this->lesson_id;
+        } else {
+            $this->lesson_id = $lessonId;
+            return $this;
+        }
+    }
+
+    /**
+     * @param string|null $date
+     * @return $this|string
+     */
+    public function date(string $date = null)
+    {
+        if (is_null($date)) {
+            return $this->date;
+        } else {
+            $this->date = $date;
+            return $this;
+        }
+    }
+
+    /**
+     * @param int|null $attendance
+     * @return $this|int
+     */
+    public function attendance(int $attendance = null)
+    {
+        if (is_null($attendance)) {
+            return intval( $this->attendance );
+        } elseif($attendance == true) {
+            $this->attendance = 1;
+        } elseif($attendance == false) {
+            $this->attendance = 0;
+        }
         return $this;
     }
 
 
-    public function typeId($val = null)
+    /**
+     * @param int|null $lessonType
+     * @return $this|int
+     */
+    public function lessonType(int $lessonType = null)
     {
-        if(is_null($val))   return $this->type_id;
-        $this->type_id = intval($val);
-        return $this;
+        if (is_null($lessonType)) {
+            return intval($this->lesson_type);
+        } else {
+            $this->lesson_type = $lessonType ;
+            return $this;
+        }
+    }
+
+    /**
+     * @param int|null $typeId
+     * @return $this|int
+     */
+    public function typeId(int $typeId = null)
+    {
+        if (is_null($typeId)) {
+            return intval($this->type_id);
+        } else {
+            $this->type_id = $typeId;
+            return $this;
+        }
+    }
+
+    /**
+     * @param float|null $clientRate
+     * @return $this|float
+     */
+    public function clientRate(float $clientRate = null)
+    {
+        if (is_null($clientRate)) {
+            return floatval($this->client_rate);
+        } else {
+            $this->client_rate = $clientRate;
+            return $this;
+        }
+    }
+
+    /**
+     * @param float|null $teacherRate
+     * @return $this|float
+     */
+    public function teacherRate(float $teacherRate = null)
+    {
+        if (is_null($teacherRate)) {
+            return floatval($this->teacher_rate);
+        } else {
+            $this->teacher_rate = $teacherRate;
+            return $this;
+        }
+    }
+
+    /**
+     * @param float|null $totalRate
+     * @return $this|float
+     */
+    public function totalRate(float $totalRate = null)
+    {
+        if (is_null($totalRate)) {
+            return floatval($this->total_rate);
+        } else {
+            $this->total_rate = $totalRate;
+            return $this;
+        }
     }
 
 
-    public function teacherId($val = null)
-    {
-        if(is_null($val))   return $this->teacher_id;
-        $this->teacher_id = intval($val);
-        return $this;
-    }
-
-
-    public function clientId($val = null)
-    {
-        if(is_null($val))   return $this->client_id;
-        $this->client_id = intval($val);
-        return $this;
-    }
-
-
-//    public function groupId($val = null)
-//    {
-//        if(is_null($val))   return $this->group_id;
-//        $this->group_id = intval($val);
-//        return $this;
-//    }
-
-
-    public function lessonId($val = null)
-    {
-        if(is_null($val))   return $this->lesson_id;
-        $this->lesson_id = intval($val);
-        return $this;
-    }
-
-
-    public function date($val = null)
-    {
-        if(is_null($val))   return $this->date;
-        $this->date = $val;
-        return $this;
-    }
-
-
-    public function attendance($val = null)
-    {
-        if(is_null($val))   return intval( $this->attendance );
-        if($val == true)    $this->attendance = 1;
-        elseif($val == false)$this->attendance = 0;
-        return $this;
-    }
-
-
-    public function clientRate( $val = null )
-    {
-        if( is_null( $val ) )   return floatval( $this->client_rate );
-
-        $this->client_rate = floatval( $val );
-        return $this;
-    }
-
-
-    public function teacherRate( $val = null )
-    {
-        if( is_null( $val ) )   return floatval( $this->teacher_rate );
-
-        $this->teacher_rate = floatval( $val );
-        return $this;
-    }
-
-
-    public function totalRate( $val = null )
-    {
-        if( is_null( $val ) )   return floatval( $this->total_rate );
-
-        $this->total_rate = floatval( $val );
-        return $this;
-    }
-
-
-    public function save( $obj = null )
+    public function save($obj = null)
     {
         $this->total_rate = $this->clientRate() - $this->teacherRate();
 
-        Core::notify( array( &$this ), "beforeScheduleReportSave" );
+        Core::notify([&$this], 'beforeScheduleReportSave');
         parent::save();
-        Core::notify( array( &$this ), "afterScheduleReportSave" );
+        Core::notify([&$this], 'afterScheduleReportSave');
     }
 
 
