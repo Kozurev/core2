@@ -1,25 +1,25 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 05.05.2018
- * Time: 19:59
+ *
+ * @author BadWolf
+ * @date 05.05.2018 19:59
+ * @version 20190325
  */
 
 
-function debug( $val, bool $type = false )
+/**
+ * @param $val
+ * @param bool $type
+ */
+function debug($val, bool $type = false)
 {
     echo '<pre>';
-
-    if ( $type == false )
-    {
-        print_r( $val );
+    if ($type == false) {
+        print_r($val);
+    } elseif ($type == true) {
+        var_dump($val);
     }
-    elseif ( $type == true )
-    {
-        var_dump( $val );
-    }
-
     echo '</pre>';
 }
 
@@ -30,17 +30,14 @@ function debug( $val, bool $type = false )
  * @param string $convertingString
  * @return string
  */
-function toCamelCase( string $convertingString )
+function toCamelCase(string $convertingString) : string
 {
     $return = '';
-    $words = explode( '_', $convertingString );
-
-    foreach ( $words as $word )
-    {
-        $return .= ucfirst( $word );
+    $words = explode('_', $convertingString);
+    foreach ($words as $word) {
+        $return .= ucfirst($word);
     }
-
-    return lcfirst( $return );
+    return lcfirst($return);
 }
 
 
@@ -51,10 +48,10 @@ function toCamelCase( string $convertingString )
  * @param string $val - прибавляемое значение
  * @return string
  */
-function addTime( string $time, string $val )
+function addTime(string $time, string $val) : string
 {
-    $result = toSeconds( $time ) + toSeconds( $val );
-    return toTime( $result );
+    $result = toSeconds($time) + toSeconds($val);
+    return toTime($result);
 }
 
 
@@ -65,10 +62,10 @@ function addTime( string $time, string $val )
  * @param string $time2
  * @return string
  */
-function deductTime( string $time1, string $time2 )
+function deductTime(string $time1, string $time2) : string
 {
-    $totalCountSeconds1 = toSeconds( $time1 );
-    $totalCountSeconds2 = toSeconds( $time2 );
+    $totalCountSeconds1 = toSeconds($time1);
+    $totalCountSeconds2 = toSeconds($time2);
     return toTime($totalCountSeconds1 - $totalCountSeconds2);
 }
 
@@ -81,48 +78,54 @@ function deductTime( string $time1, string $time2 )
  * @param string $condition - условие сравнения
  * @return bool; true - если первое значение больше второго
  */
-function compareTime( string $time1, string $condition, string $time2 )
+function compareTime(string $time1, string $condition, string $time2) : bool
 {
-    $totalCountSeconds1 = toSeconds( $time1 );
-    $totalCountSeconds2 = toSeconds( $time2 );
+    $totalCountSeconds1 = toSeconds($time1);
+    $totalCountSeconds2 = toSeconds($time2);
 
-    switch ( $condition )
+    switch ($condition)
     {
         case '>':
-        {
-            if ( $totalCountSeconds1 > $totalCountSeconds2 )
+            if ($totalCountSeconds1 > $totalCountSeconds2) {
                 return true;
-            else
+            }
+            else {
                 return false;
-        }
+            }
+
         case '>=':
-        {
-            if ( $totalCountSeconds1 >= $totalCountSeconds2 )
+
+            if ($totalCountSeconds1 >= $totalCountSeconds2) {
                 return true;
-            else
+            }
+            else {
                 return false;
-        }
+            }
+
         case '<':
-        {
-            if ( $totalCountSeconds1 < $totalCountSeconds2 )
+            if ($totalCountSeconds1 < $totalCountSeconds2) {
                 return true;
-            else
+            }
+            else {
                 return false;
-        }
+            }
+
         case '<=':
-        {
-            if ( $totalCountSeconds1 <= $totalCountSeconds2 )
+            if ($totalCountSeconds1 <= $totalCountSeconds2) {
                 return true;
-            else
+            }
+            else {
                 return false;
-        }
+            }
+
         case '==':
-        {
-            if ( $totalCountSeconds1 == $totalCountSeconds2 )
+            if ($totalCountSeconds1 == $totalCountSeconds2) {
                 return true;
-            else
+            }
+            else {
                 return false;
-        }
+            }
+
         default: return false;
     }
 }
@@ -130,20 +133,25 @@ function compareTime( string $time1, string $condition, string $time2 )
 
 /**
  * Деление времени
+ * ХЗ почему функция возвращает целочисленное значение, но так надо, иначе не работает
  *
  * @param string $time1
  * @param string $time2
  * @param string $divType - тип деления ('/' или '%')
- * @return int | float
+ * @return int
  */
-function divTime( string $time1, string $time2, string $divType )
+function divTime(string $time1, string $time2, string $divType) : int
 {
-    $totalCountSeconds1 = toSeconds( $time1 );
-    $totalCountSeconds2 = toSeconds( $time2 );
+    $totalCountSeconds1 = toSeconds($time1);
+    $totalCountSeconds2 = toSeconds($time2);
 
-    if ( $divType == '/' )      return intval( $totalCountSeconds1 / $totalCountSeconds2 );
-    elseif ( $divType == '%' )  return intval( $totalCountSeconds1 % $totalCountSeconds2 );
-    else                        return 0;
+    if ( $divType == '/' ) {
+        return intval( $totalCountSeconds1 / $totalCountSeconds2 );
+    } elseif ( $divType == '%' ) {
+        return intval( $totalCountSeconds1 % $totalCountSeconds2 );
+    } else {
+        return 0;
+    }
 }
 
 
@@ -153,25 +161,27 @@ function divTime( string $time1, string $time2, string $divType )
  * @param $seconds - кол-во секунд
  * @return string
  */
-function toTime( $seconds )
+function toTime($seconds) : string
 {
-    $hours = intval( $seconds / (60 * 60) );
-    $seconds -= intval(  $hours * 60 * 60 );
+    $hours = intval($seconds / (60 * 60));
+    $seconds -= intval($hours * 60 * 60);
+    $minutes = intval($seconds / 60);
+    $seconds -= intval($minutes * 60);
 
-    $minutes = intval( $seconds / 60 );
-    $seconds -= intval( $minutes * 60 );
-
-    $segments = [];
-
-    if ( $hours < 10 )      $hours = '0' . $hours;
-    if ( $minutes < 10 )    $minutes = '0' . $minutes;
-    if ( $seconds < 10 )    $seconds = '0' . $seconds;
+    if ($hours < 10) {
+        $hours = '0' . $hours;
+    }
+    if ($minutes < 10) {
+        $minutes = '0' . $minutes;
+    }
+    if ($seconds < 10) {
+        $seconds = '0' . $seconds;
+    }
 
     $segments[] = $hours;
     $segments[] = $minutes;
     $segments[] = $seconds;
-
-    return implode( ":", $segments );
+    return implode(':', $segments);
 }
 
 
@@ -181,23 +191,21 @@ function toTime( $seconds )
  * @param string $time
  * @return int
  */
-function toSeconds( string $time )
+function toSeconds(string $time) : int
 {
     $segments = explode( ':', $time );
 
-    if ( !is_array( $segments ) || count( $segments) < 3 )
-    {
+    if (!is_array($segments) || count($segments) < 3) {
         return '';
     }
 
-    $hours =   intval( $segments[0] );
-    $minutes = intval( $segments[1] );
-    $seconds = intval( $segments[2] );
+    $hours =   intval($segments[0]);
+    $minutes = intval($segments[1]);
+    $seconds = intval($segments[2]);
 
     $totalCountSeconds =  $hours * 60 * 60;
     $totalCountSeconds += $minutes * 60;
     $totalCountSeconds += $seconds;
-
     return $totalCountSeconds;
 }
 
@@ -211,11 +219,9 @@ function toSeconds( string $time )
 function refactorTimeFormat(string $time) : string
 {
     $segments = explode(':', $time);
-
     if (count($segments) != 3) {
         return $time;
     }
-
     $result = $segments[0] . ':' . $segments[1];
     return $result;
 }
@@ -230,23 +236,13 @@ function refactorTimeFormat(string $time) : string
  * @param string $type - тип: full - с годом (d.m.Y); short - без года (d.m)
  * @return string
  */
-function refactorDateFormat ( $date, $glue = '.', $type = 'full' )
+function refactorDateFormat ($date, $glue = '.', $type = 'full')
 {
-//    $segments = explode( '-', $date );
-//
-//    if ( $type === 'short' )
-//    {
-//        unset ( $segments[0] );
-//    }
-//
-//    $segments = array_reverse( $segments );
-//    return implode( $glue, $segments );
-
     $type === 'short'
         ?   $format = 'd' . $glue . 'm'
         :   $format = 'd' . $glue . 'm' . $glue . 'y';
 
-    return date( $format, strtotime( $date ) );
+    return date($format, strtotime($date));
 }
 
 
@@ -256,11 +252,11 @@ function refactorDateFormat ( $date, $glue = '.', $type = 'full' )
  * @param string $date - дата формата Y-m-d
  * @return int
  */
-function getMonth( $date )
+function getMonth($date) : int
 {
-    $month = substr( $date, 5 );
-    $month = intval( substr( $month, 0, 3 ) );
-    return $month;
+    $month = substr($date, 5);
+    $month = substr($month, 0, 3 );
+    return intval($month);
 }
 
 
@@ -270,9 +266,9 @@ function getMonth( $date )
  * @param string $date - дата формата Y-m-d
  * @return int
  */
-function getYear( $date )
+function getYear($date) : int
 {
-    return intval( substr( $date, 0, 4 ) );
+    return intval(substr($date, 0, 4));
 }
 
 
@@ -282,10 +278,10 @@ function getYear( $date )
  * @param string $date - дата формата 'Y-m-d'
  * @return string - название месяца
  */
-function getMonthName( $date )
+function getMonthName($date)
 {
     $months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-    return $months[ getMonth( $date ) - 1 ];
+    return $months[getMonth($date) - 1];
 }
 
 
@@ -295,10 +291,10 @@ function getMonthName( $date )
  * @param string $str - исходная строка
  * @return string
  */
-function translite( $str )
+function translite($str)
 {
     $result = '';
-    $str = trim( $str );
+    $str = trim($str);
 
     $translite = [
         'а' => 'a', 'б' => 'b', 'в' => 'v',
@@ -314,33 +310,24 @@ function translite( $str )
         'ю' => 'ju', 'я' => 'ja'
     ];
 
-
-    while ( $str !== false && iconv_strlen( $str ) > 0 )
+    while ($str !== false && iconv_strlen($str) > 0)
     {
-        $temp = mb_substr( $str, 0, 1 );
-        $temp = mb_strtolower( $temp );
+        $temp = mb_substr($str, 0, 1);
+        $temp = mb_strtolower($temp);
 
-        if ( $temp == ' ' )
-        {
+        if ($temp == ' ') {
             $result .= '-';
-        }
-        elseif ( is_numeric( $temp ) )
-        {
+        } elseif (is_numeric($temp)) {
             $result .= $temp;
-        }
-        elseif ( in_array( $temp, array_keys( $translite ) ) )
-        {
-            if( Core_Array::getValue( $translite, $temp, false ) !== false )
-            {
+        } elseif (in_array($temp, array_keys($translite))) {
+            if(Core_Array::getValue($translite, $temp, false) !== false) {
                 $result .= $translite[$temp];
             }
-        }
-        else
-        {
+        } else {
             $result .= $temp;
         }
 
-        $str = mb_substr( $str, 1 );
+        $str = mb_substr($str, 1);
     }
 
     return $result;
