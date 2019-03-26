@@ -29,7 +29,7 @@ $action = Core_Array::Get( 'action', null );
  * Форма редактирования клиента
  */
 if ($action === 'updateFormClient') {
-    $userId = Core_Array::Get('userid', 0, PARAM_INT);
+    $userId = Core_Array::Get('userId', 0, PARAM_INT);
     $output = Core::factory('Core_Entity');
 
     if ($userId) {
@@ -93,7 +93,7 @@ if ($action === 'updateFormClient') {
  * Форма редактирования учителя
  */
 if ($action === 'updateFormTeacher') {
-    $userId = Core_Array::Get('userid', 0, PARAM_INT);
+    $userId = Core_Array::Get('userId', 0, PARAM_INT);
     $output = Core::factory('Core_Entity');
 
     if ($userId != 0) {
@@ -128,7 +128,7 @@ if ($action === 'updateFormTeacher') {
  * Форма редактирования директора
  */
 if ($action === 'updateFormDirector') {
-    $userId = Core_Array::Get('userid', 0, PARAM_INT);
+    $userId = Core_Array::Get('userId', 0, PARAM_INT);
     $output = Core::factory('Core_Entity');
 
     if ($userId != 0) {
@@ -197,10 +197,10 @@ if ($action === 'refreshTableUsers') {
  * Форма для создания платежа
  */
 if ($action === 'getPaymentPopup') {
-    $userId = Core_Array::Get('userid', 0, PARAM_INT);
+    $userId = Core_Array::Get('userId', null, PARAM_INT);
     $User = User_Controller::factory($userId);
 
-    if (is_null($User)) {
+    if (is_null($userId) || is_null($User)) {
         exit (Core::getMessage('NOT_FOUND', ['Пользователь', $userId]));
     }
 
@@ -256,7 +256,7 @@ if ($action == 'savePayment') {
  * При сохранении пользователя идет проверка на дублирования логина
  */
 if ($action === 'checkLoginExists') {
-    $userId = Core_Array::Get('userid', 0, PARAM_INT);
+    $userId = Core_Array::Get('userId', 0, PARAM_INT);
     $login = Core_Array::Get('login', '', PARAM_STRING);
 
     if ($login == '') {
@@ -303,16 +303,11 @@ if ($action === 'export') {
  * Получение данных лида для заполнения формы создания клиента
  */
 if ($action === 'getLidData') {
-    $lidId = Core_Array::Get('lidid', 0, PARAM_INT);
-
-    if ($lidId == 0) {
-        exit (Core::getMessage('EMPTY_GET_PARAM', ['идентификатор лида']));
-    }
-
+    $lidId = Core_Array::Get('lidId', null, PARAM_INT);
     $Lid = Lid_Controller::factory($lidId);
 
-    if (is_null($Lid)) {
-        exit (Core::getMessage('NOT_FOUND', ['Лид', $lidId]));
+    if (is_null($lidId) || is_null($Lid)) {
+        exit;
     }
 
     $LidEncode = new stdClass();
@@ -320,7 +315,6 @@ if ($action === 'getLidData') {
     $LidEncode->surname = $Lid->surname();
     $LidEncode->phone = $Lid->number();
     $LidEncode->vk = $Lid->vk();
-
     echo json_encode($LidEncode);
     exit;
 }
