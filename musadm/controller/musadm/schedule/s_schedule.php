@@ -453,6 +453,7 @@ if ($action === 'teacherReport') {
     exit;
 }
 
+
 if ($action === 'deleteReport') {
     $reportId =     Core_Array::Get('report_id', 0, PARAM_INT);
     $lessonId =     Core_Array::Get('lesson_id', 0, PARAM_INT);
@@ -496,8 +497,9 @@ if ($action === 'deleteReport') {
     }
 
     $Report->delete();
-    exit ('0');
+    exit;
 }
+
 
 /**
  * Обновление списка клиентов/групп при выборе элемента из списка типов занятия
@@ -532,6 +534,7 @@ if ($action === 'getclientList') {
     exit;
 }
 
+
 /**
  * Удаление занятия из расписания
  */
@@ -557,6 +560,7 @@ if ($action === 'markDeleted') {
     exit;
 }
 
+
 /**
  * Отсутствие занятия
  */
@@ -581,6 +585,7 @@ if ($action === 'markAbsent') {
     $Lesson->setAbsent($date);
     exit;
 }
+
 
 /**
  * Вывод формы изменения времени начала/конца проведения занятия
@@ -612,12 +617,13 @@ if ($action === 'getScheduleChangeTimePopup') {
     exit;
 }
 
+
 /**
  * Обработчик сохранения изменения времени проведения занятия
  */
 if ($action === 'saveScheduleChangeTimePopup') {
     $lessonId = Core_Array::Get('lesson_id', 0, PARAM_INT);
-    $date =     Core_Array::Get('date', date( 'Y-m-d' ), PARAM_STRING);
+    $date =     Core_Array::Get('date', date('Y-m-d'), PARAM_STRING);
     $timeFrom = Core_Array::Get('time_from', '', PARAM_STRING);
     $timeTo =   Core_Array::Get('time_to', '', PARAM_STRING);
 

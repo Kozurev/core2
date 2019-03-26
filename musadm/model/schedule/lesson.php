@@ -240,7 +240,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->lessonId($this->id)
             ->teacherId($this->teacher_id)
             ->date($date)
-            ->attendance($attendance)
+            //->attendance($attendance)
             ->typeId($this->type_id)
             ->lessonType($this->lesson_type);
         //TODO: Убрать последнее свойство вообще из таблицы за ненадобностью
@@ -248,7 +248,29 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         $Director = User::current()->getDirector();
         Core::factory('User_Controller');
 
-        //Создание отчета
+        if ($this->typeId() == self::TYPE_INDIV) {
+            $clientLessons = 'indiv_lessons';
+            $clientRate = 'client_rate_indiv';
+            $teacherRate = 'teacher_rate_indiv';
+            $isTeacherDefaultRate = 'is_teacher_rate_default_indiv';
+        } elseif ($this->typeId() == self::TYPE_GROUP) {
+            $clientLessons = 'group_lessons';
+            $clientRate = 'client_rate_group';
+            $teacherRate = 'teacher_rate_group';
+            $isTeacherDefaultRate = 'is_teacher_rate_default_group';
+        } elseif ($this->typeId() == self::TYPE_CONSULT) {
+            $clientLessons = null;
+            $teacherRate = 'teacher_rate_consult';
+            $isTeacherDefaultRate = 'is_teacher_rate_default_consult';
+        }
+
+        $ClientLessons = Core::factory('Property')->getByTagName($clientLessons);
+        //$PropertyPerLesson = Core::factory('Property')->getByTagName('per_lesson');
+
+        $Reports = []; //Отчеты по занятию
+        $clientRateValueSum = 0.0; //
+
+        //Создание отчета по каждому клиенту
         foreach ($attendance as $clientId => $presence) {
             $Client = User_Controller::factory($clientId);
             $Teacher = User_Controller::factory($this->teacherId());
@@ -258,25 +280,6 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
             $ClientReport = clone $Report;
             $ClientReport->clientId($clientId)->attendance($presence);
-
-            if ($this->typeId() == self::TYPE_INDIV) {
-                $clientLessons = 'indiv_lessons';
-                $clientRate = 'client_rate_indiv';
-                $teacherRate = 'teacher_rate_indiv';
-                $isTeacherDefaultRate = 'is_teacher_rate_default_indiv';
-            } elseif ($this->typeId() == self::TYPE_GROUP) {
-                $clientLessons = 'group_lessons';
-                $clientRate = 'client_rate_group';
-                $teacherRate = 'teacher_rate_group';
-                $isTeacherDefaultRate = 'is_teacher_rate_default_group';
-            } elseif ($this->typeId() == self::TYPE_CONSULT) {
-                $clientLessons = null;
-                $teacherRate = 'teacher_rate_consult';
-                $isTeacherDefaultRate = 'is_teacher_rate_default_consult';
-            }
-
-            //$ClientLessons = Core::factory('Property')->getByTagName($clientLessons);
-            //$PropertyPerLesson = Core::factory('Property')->getByTagName('per_lesson');
 
             //Вычисление значения ставки преподавателя за проведенное занятие
             $IsTeacherDefaultRate = Core::factory('Property')->getByTagName($isTeacherDefaultRate);
@@ -314,7 +317,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
                     }
                 }
             } elseif ($presence == 0 && $this->typeId() == self::TYPE_CONSULT) {
-                $teacherAbsentValue = 0;
+                $absentRateValue = 0;
             }
 
             if ($presence == 1) {
@@ -325,10 +328,33 @@ class Schedule_Lesson extends Schedule_Lesson_Model
                 $ClientReport->teacherRate($teacherAbsentValue);
             }
 
+            //Корректировка баланса количества занятий клиента
+            $ClientCountLessons = $ClientLessons->getPropertyValues($Client)[0];
+            $clientCountLessons = floatval($ClientCountLessons->value());
 
+            $presence == 1 || $this->typeId() == self::TYPE_GROUP
+                ?   $clientCountLessons--
+                :   $clientCountLessons -= $absentRateValue;
+            $ClientCountLessons->value($clientCountLessons)->save();
 
-            debug($ClientReport);
+            //Задание значения клиентской "медианы" для отчета
+            $ClientRate = Core::factory('Property')->getByTagName($clientRate);
+            $ClientRateValue = $ClientRate->getPropertyValues($Client)[0];
+            $clientRateValue = floatval($ClientRateValue->value());
+
+            if ($presence == 0 && $this->typeId() == self::TYPE_INDIV) {
+                $clientRateValue *= $absentRateValue;
+            }
+
+            $Reports[] = $ClientReport;
+            $clientRateValueSum += floatval($clientRateValue);
         } //end attendance foreach
+
+        foreach ($Reports as $Report) {
+            $Report->clientRate($clientRateValueSum);
+            $Report->totalRate($Report->clientRate() - $Report->teacherRate());
+            $Report->save();
+        }
     }
 
 
@@ -336,22 +362,48 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      * Проверка на наличие отчета о проведении занятия за определенное число
      *
      * @param string $date
-     * @return Schedule_Lesson_Report|null
+     * @return bool
      */
-    public function isReported(string $date)
+    public function isReported(string $date) : bool
     {
         $Report = Core::factory('Schedule_Lesson_Report')
             ->queryBuilder()
-            ->where('date', '=', $date );
+            ->where('date', '=', $date);
 
-            if (!empty($this->oldid)) {
+            if (isset($this->oldid) && !empty($this->oldid)) {
                 $Report->where('lesson_id', '=', $this->oldid);
             } else {
                 $Report->where('lesson_id', '=', $this->id);
             }
 
-        $Report = $Report->find();
-        return $Report;
+        $countReports = $Report->getCount();
+        if ($countReports > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Поиск отчетов о занятии за определнную дату
+     *
+     * @param string $date
+     * @return array
+     */
+    public function getReports(string $date) : array
+    {
+        $Reports = Core::factory('Schedule_Report')
+            ->queryBuilder()
+            ->where('date', '=', $date);
+
+        if (isset($this->oldid) && !empty($this->oldid)) {
+            $Reports->where('lesson_id', '=', $this->oldid);
+        } else {
+            $Reports->where('lesson_id', '=', $this->id);
+        }
+
+        return $Reports->findAll();
     }
 
 
