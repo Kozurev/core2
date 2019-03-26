@@ -1,40 +1,39 @@
 'use strict';
-var root = $("#rootdir").val();
+var root = $('#rootdir').val();
 
 $(function(){
     $("body")
         //Открытие всплывающего окна редактирования пользователя
-        .on("click", ".user_edit", function(e){
+        .on('click', '.user_edit', function(e) {
             e.preventDefault();
-
-            var userid = $(this).data("userid");
-            var usergroupid = $(this).data("usergroup");
+            var userId = $(this).data('userid');
+            var usergroupid = $(this).data('usergroup');
 
             switch(usergroupid)
             {
-                case 2: getManagerPopup(userid);    break;
-                case 4: getTeacherPopup(userid);    break;
-                case 5: getClientPopup(userid);     break;
-                case 6: getDirectorPopup(userid);   break;
+                case 2: getManagerPopup(userId);    break;
+                case 4: getTeacherPopup(userId);    break;
+                case 5: getClientPopup(userId);     break;
+                case 6: getDirectorPopup(userId);   break;
                 default:    break;
             }
         })
-        .on("click", ".user_create", function(e){
+        .on('click', '.user_create', function(e) {
             e.preventDefault();
-            var userid = 0;
-            var usergroupid = $(this).data("usergroup");
+            var userId = 0;
+            var usergroupid = $(this).data('usergroup');
 
             switch(usergroupid)
             {
-                case 2: getManagerPopup(userid);    break;
-                case 4: getTeacherPopup(userid);    break;
-                case 5: getClientPopup(userid);     break;
-                case 6: getDirectorPopup(userid);   break;
+                case 2: getManagerPopup(userId);    break;
+                case 4: getTeacherPopup(userId);    break;
+                case 5: getClientPopup(userId);     break;
+                case 6: getDirectorPopup(userId);   break;
                 default:    break;
             }
         })
         //Сохранение данных
-        .on("click", ".popop_user_submit", function(e){
+        .on('click', '.popop_user_submit', function(e) {
             e.preventDefault();
             loaderOn();
             userSave(function(response){
@@ -45,11 +44,11 @@ $(function(){
         .on('click', '.user_archive', function(e) {
             e.preventDefault();
             var agree = confirm('Перенести пользователя в архив?');
-            if(agree != true) return;
+            if (agree != true) return;
             loaderOn();
-            var userid = $(this).data('userid');
+            var userId = $(this).data('userid');
             var userTr = $(this).parent().parent();
-            updateActive('User', userid, 'false', function(response) {
+            updateActive('User', userId, 'false', function(response) {
                 var
                     totalCountSpan =    $('#total-clients-count'),
                     totalCount =        Number(totalCountSpan.text());
@@ -63,11 +62,11 @@ $(function(){
         .on('click', '.user_unarchive', function(e) {
             e.preventDefault();
             var agree = confirm('Убрать пользователя из архива?');
-            if(agree != true) return;
+            if (agree != true) return;
             loaderOn();
-            var userid = $(this).data('userid');
+            var userId = $(this).data('userid');
             var userTr = $(this).parent().parent();
-            updateActive('User', userid, 'true', function(response) {
+            updateActive('User', userId, 'true', function(response) {
                 var
                     totalCountSpan =    $('#total-clients-count'),
                     totalCount =        Number(totalCountSpan.text());
@@ -77,200 +76,194 @@ $(function(){
             });
         })
         //Удаление пользователя
-        .on("click", ".user_delete", function(e){
+        .on('click', '.user_delete', function(e) {
             e.preventDefault();
-            var userid = $(this).data("model_id");
-            deleteItem("User", userid, refreshArchiveTable);
+            var userId = $(this).data('model_id');
+            deleteItem('User', userId, refreshArchiveTable);
         })
         //Нажатие на кнопку закрытия высплывающего окна редактирования пользователя
-        .on("click", ".popup_close", function(e){
+        .on("click", ".popup_close", function(e) {
             e.preventDefault();
             closePopup();
         })
         //Начисление платежа пользователю (форма)
-        .on("click", ".user_add_payment", function(e){
+        .on('click', '.user_add_payment', function(e) {
             e.preventDefault();
-            var userid = $(this).data("userid");
-            getPaymentPopup(userid, root + "/user/client");
+            var userId = $(this).data('userid');
+            getPaymentPopup(userId, root + '/user/client');
         })
         //Сохранение заметок клиента
-        .on("blur", "#client_notes", function(){
+        .on('blur', '#client_notes', function() {
             loaderOn();
             var note = $(this).val();
-            var userid = $(this).data("userid");
-            updateUserNote(userid, note, loaderOff);
+            var userId = $(this).data('userid');
+            updateUserNote(userId, note, loaderOff);
         })
-        .on("click", "#per_lesson", function(){
+        .on('click', '#per_lesson', function() {
             loaderOn();
             var value = 0;
-            if($(this).is(":checked"))  value = 1;
-            var userid = $(this).data("userid");
-            updateUserPerLesson(userid, value, loaderOff);
+            if ($(this).is(':checked')) {
+                value = 1;
+            }
+            var userId = $(this).data('userid');
+            updateUserPerLesson(userId, value, loaderOff);
         })
         //Сохранение логина клиента в личном кабинете
         .on("click", ".change_login_submit", function(e){
             e.preventDefault();
             loaderOn();
-            //userSave(loaderOff);
-            saveData("User", function(response){ loaderOff(); });
-
-            $("input[name=pass1]").val('');
-            $("input[name=pass2]").val('');
+            saveData('User', function(response){ loaderOff(); });
+            $('input[name=pass1]').val('');
+            $('input[name=pass2]').val('');
         })
-        .on("click", ".balance_show", function(e){
+        .on('click', '.balance_show', function(e) {
             e.preventDefault();
             loaderOn();
-            var date_from = $("input[name=date_from]").val();
-            var date_to = $("input[name=date_to]").val();
+            var dateFrom = $('input[name=date_from]').val();
+            var dateTo = $('input[name=date_to]').val();
             $.ajax({
-                type: "GET",
-                url: "",
+                type: 'GET',
+                url: '',
                 data: {
-                    date_from: date_from,
-                    date_to: date_to
+                    date_from: dateFrom,
+                    date_to: dateTo
                 },
-                success: function(responce){
-                    $("body").empty();
-                    $("body").html(responce);
+                success: function(response) {
+                    $('body').html(response);
                     loaderOff();
                 }
             });
         })
-        .on("click", "#user_comment_save", function(e){
+        .on('click', '#user_comment_save', function(e) {
             e.preventDefault();
-            var text = $("#user_comment").val();
-            if( text != '' )
-            {
+            var text = $('#user_comment').val();
+            if (text != '') {
                 loaderOn();
-                var userid = $(this).data("userid");
-                saveUserComment(userid, text, refreshUserTable);
+                var userId = $(this).data('userid');
+                saveUserComment(userId, text, refreshUserTable);
             }
         })
-        .on("click", "#get_lid_data", function(e){
+        .on('click', '#get_lid_data', function(e) {
             e.preventDefault();
-            var lid_id = $("#lid_id").val();
-            if( lid_id == "" || lid_id == "0" )
-            {
-                $("#lid_id").addClass("error");
+            var lidId = $("#lid_id").val();
+            if (lidId == '' || lidId == '0') {
+                $('#lid_id').addClass('error');
                 return false;
             }
             loaderOn();
 
             $.ajax({
-                type: "GET",
-                url: root + "/user/client",
+                type: 'GET',
+                url: root + '/user/client',
                 dataType: 'json',
                 data: {
-                    action: "getLidData",
-                    lidid: lid_id
+                    action: 'getLidData',
+                    lidId: lidId
                 },
-                success: function(responce) {
-                    if( responce != "0" )
-                    {
-                        $("input[name=name]").val( responce.name );
-                        $("input[name=surname]").val( responce.surname );
-                        $("input[name=phoneNumber]").val( responce.phone );
-                        $("input[name='property_9[]']").val( responce.vk );
-                        $(".get_lid_data_row").remove();
+                success: function(response) {
+                    if (response != '') {
+                        $('input[name="name"]').val(response.name);
+                        $('input[name="surname"]').val(response.surname);
+                        $('input[name="phoneNumber"]').val(response.phone);
+                        $('input[name="property_9[]"]').val(response.vk);
+                        $('.get_lid_data_row').remove();
+                    } else {
+                        notificationError("Лида с номером " + lidId + " не существует");
                     }
-                    else
-                    {
-                        alert( "Лида с номером " + lid_id + " не существует" );
-                    }
+                    loaderOff();
+                },
+                error: function (response) {
+                    notificationError("Лида с номером " + lidId + " не существует");
                     loaderOff();
                 }
             });
-
-            loaderOff();
         })
         //Поиск клиента на странице менеджера
-        .on("submit", "#search_client", function(e){
+        .on('submit', '#search_client', function(e) {
             e.preventDefault();
             loaderOn();
-            var surname = $("#surname").val();
-            var name    = $("#name").val();
-            var phone   = $("#phone").val();
-            if(surname == "" && name == "" && phone == "")
-            {
+            var
+                surname = $('#surname').val(),
+                name    = $('#name').val(),
+                phone   = $('#phone').val();
+
+            if(surname == '' && name == '' && phone == '') {
                 loaderOff();
                 return false;
             }
-            searchClients( surname, name, phone );
+
+            searchClients(surname, name, phone);
         })
-        .on("click", "#user_search_clear", function(e){
+        .on('click', '#user_search_clear', function(e) {
             e.preventDefault();
-            $(".dynamic-fixed-row").find(".buttons-panel").remove();
-            $(".dynamic-fixed-row").find(".table-responsive").remove();
-            $("#surname").val("");
-            $("#name").val("");
-            $("#phone").val("");
+            $('.dynamic-fixed-row').find('.buttons-panel').remove();
+            $('.dynamic-fixed-row').find('.table-responsive').remove();
+            $('#surname').val('');
+            $('#name').val('');
+            $('#phone').val('');
         })
-        .on("click", ".info-by-id", function(e){
+        .on('click', '.info-by-id', function(e) {
             e.preventDefault();
-            var model = $(this).data("model");
-            var id = $(this).data("id");
-            getObjectPopupInfo( id, model );
+            var model = $(this).data('model');
+            var id = $(this).data('id');
+            getObjectPopupInfo(id, model);
         })
-        .on("click", ".events_show", function(e){
+        .on('click', '.events_show', function(e) {
             e.preventDefault();
-            var from = $("input[name='event_date_from']").val();
-            var to = $("input[name='event_date_to']").val();
+            var from = $('input[name="event_date_from"]').val();
+            var to = $('input[name="event_date_to"]').val();
             loaderOn();
-            $.ajax({type:"GET", url:"", data:{action:"refreshTableUsers",event_date_from:from,event_date_to:to}, success:function(response){
-                $(".page").html(response);
+            $.ajax({type:'GET', url:'', data:{action:'refreshTableUsers',event_date_from:from,event_date_to:to}, success:function(response){
+                $('.page').html(response);
                 loaderOff();
-                }});
+            }});
         })
-        .on("click", ".events_load_more", function(){
+        .on('click', '.events_load_more', function() {
             loaderOn();
-            var limit = $(this).data("limit");
-            $.ajax({url:"", type:"GET", data:{action:"refreshTableUsers", limit: limit}, success:function(responce){
-                $(".page").html(responce);
+            var limit = $(this).data('limit');
+            $.ajax({url:'', type:'GET', data:{action:'refreshTableUsers', limit: limit}, success:function(response){
+                $('.page').html(response);
                 loaderOff();
-                }});
+            }});
         })
-        .on("click", ".edit_teacher_report", function(e){
+        .on('click', '.edit_teacher_report', function(e) {
             e.preventDefault();
-            var report_id = $(this).data("reportid");
+            var reportId = $(this).data('reportid');
 
             $.ajax({
-                url: root + "/balance",
-                type: "GET",
+                url: root + '/balance',
+                type: 'GET',
                 data: {
-                    action: "edit_report_popup",
-                    id: report_id
+                    action: 'edit_report_popup',
+                    id: reportId
                 },
-                success: function(response){
+                success: function(response) {
                     showPopup(response);
                 }
             });
         })
-        .on("click", ".report_data_submit", function(e){
+        .on('click', '.report_data_submit', function(e) {
             e.preventDefault();
             loaderOn();
-            saveData("Main", function(response){ refreshUserTable(); });
+            saveData('Main', function(response){ refreshUserTable(); });
         })
         .on('click', '#show-client-filter', function() {
             var
                 form = $('#client-filter'),
                 i    = $(this).find('i');
 
-
-            if(form.css('display') == 'none')
-            {
+            if (form.css('display') == 'none') {
                 i.css('transform', 'rotate(180deg)');
                 form.show('fast');
-            }
-            else
-            {
+            } else {
                 i.css('transform', 'none');
                 form.hide('fast');
             }
         })
-        .on('submit', '#client-filter', function(e){
+        .on('submit', '#client-filter', function(e) {
             e.preventDefault();
             applyClientFilter($('#client-filter'), function(response) {
-                $(".users").html(response);
+                $('.users').html(response);
             });
         })
         .on('click', '.edit_client_absent', function(e) {
@@ -281,14 +274,17 @@ $(function(){
 });
 
 
+/**
+ * Применение фильтров для поиска клиентов
+ *
+ * @param form
+ * @param callback
+ */
 function applyClientFilter(form, callback) {
     loaderOn();
-
     var
         action =    form.attr('action'),
         data =      form.serialize();
-
-
     data += '&action=applyUserFilter';
 
     $.ajax({
@@ -296,29 +292,33 @@ function applyClientFilter(form, callback) {
         url: action,
         data: data,
         success: function(response) {
-            if(typeof callback === 'function')
-            {
+            if(typeof callback === 'function') {
                 callback(response);
             }
-
             loaderOff();
         }
     });
 }
 
 
+/**
+ * Информация об объекте: пользователь, задача или лид
+ *
+ * @param id
+ * @param model
+ */
 function getObjectPopupInfo(id, model) {
     loaderOn();
     $.ajax({
         url: root,
-        type: "GET",
+        type: 'GET',
         data: {
-            action: "getObjectInfoPopup",
+            action: 'getObjectInfoPopup',
             id: id,
             model: model
         },
-        success: function(responce) {
-            showPopup(responce);
+        success: function(response) {
+            showPopup(response);
             loaderOff();
         }
     });
@@ -327,232 +327,303 @@ function getObjectPopupInfo(id, model) {
 
 /**
  * Поиск списка клиентов по фамилии, имени и номеру телефона
+ *
+ * @param surname
+ * @param name
+ * @param phone
  */
-function searchClients( surname, name, phone ) {
+function searchClients(surname, name, phone) {
     $.ajax({
         url: root,
-        type: "GET",
+        type: 'GET',
         data: {
-            action: "search_client",
+            action: 'search_client',
             surname: surname,
             name: name,
             phone: phone
         },
         success: function(response) {
-            if( response == "" )    alert( "Пользователи с указаными параметрами не найдены" );
-
-            $(".users").remove();
-            $(".dynamic-fixed-row").find(".buttons-panel").remove();
-            $(".dynamic-fixed-row").find(".table-responsive").remove();
-            $(".dynamic-fixed-row").append( response );
+            if (response == '') {
+                notificationError('Пользователи с указаными параметрами не найдены');
+            }
+            var dynamicRow = $('.dynamic-fixed-row');
+            $('.users').remove();
+            dynamicRow.find('.buttons-panel').remove();
+            dynamicRow.find('.table-responsive').remove();
+            dynamicRow.append(response);
             loaderOff();
         }
     });
 }
 
 
-function userSave(func) {
-    var login = $("input[name=login]").val();
-    var userid = $("input[name=id]").val();
+/**
+ * Сохранение данных учетной записи клиента
+ *
+ * @param callback
+ */
+function userSave(callback) {
+    var login = $('input[name=login]').val();
+    var userId = $('input[name=id]').val();
 
     $.ajax({
-        type: "GET",
-        url: root + "/user/client",
+        type: 'GET',
+        url: root + '/user/client',
         data: {
-            action: "checkLoginExists",
+            action: 'checkLoginExists',
             login: login,
-            userid: userid
+            userId: userId
         },
-        success: function(responce){
-            if(responce != "")
-            {
-                alert(responce);
+        success: function(response) {
+            if (response != '') {
+                alert(response);
                 loaderOff();
-            }
-            else
-            {
-                if( $("#createData").valid() )
-                    saveData("User", function(response){
-                        func(response);
-                        //refreshUserTable();
+            } else {
+                if ($('#createData').valid())
+                    saveData('User', function(response) {
+                        callback(response);
                     });
-                else
+                else {
                     loaderOff();
+                }
             }
         }
     });
 }
 
 
-function updateUserNote(userid, note, func) {
+/**
+ * Сохранение значения доп. свойства пользователя - примечание
+ *
+ * @param userId
+ * @param note
+ * @param callback
+ */
+function updateUserNote(userId, note, callback) {
     $.ajax({
-        type: "GET",
-        url: root + "/user/balance",
+        type: 'GET',
+        url: root + '/user/balance',
         data: {
-            action: "updateNote",
-            userid: userid,
+            action: 'updateNote',
+            userId: userId,
             note: note
         },
-        success: function(responce){
-            func();
-            if(responce != "")  alert(responce);
+        success: function(response) {
+            callback();
+            if (response != '') {
+                notificationError(response);
+            }
         }
     });
 }
 
 
-function updateUserPerLesson(userid, value, func) {
+/**
+ * Изменение чекбокса клиента со значением свойства "поурочно"
+ *
+ * @param userId
+ * @param value
+ * @param callback
+ */
+function updateUserPerLesson(userId, value, callback) {
     $.ajax({
-        type: "GET",
-        url: root + "/user/balance",
+        type: 'GET',
+        url: root + '/user/balance',
         data: {
-            action: "updatePerLesson",
-            userid: userid,
+            action: 'updatePerLesson',
+            userId: userId,
             value: value
         },
-        success: function(responce) {
-            func();
-            if(responce != "")  alert(responce);
+        success: function(response) {
+            callback();
+            if (response != '') {
+                notificationError(response);
+            }
         }
     });
 }
 
-
-function getPaymentPopup(userid, url) {
+/**
+ * Открытие всплывающего окна для создания платежа
+ *
+ * @param userId
+ * @param url
+ */
+function getPaymentPopup(userId, url) {
     $.ajax({
-        type: "GET",
+        type: 'GET',
         url: url,
         data: {
-            action: "getPaymentPopup",
-            userid: userid
+            action: 'getPaymentPopup',
+            userId: userId
         },
-        success: function(responce) {
-            showPopup(responce);
+        success: function(response) {
+            showPopup(response);
+        },
+        error: function (response) {
+            notificationError(response);
         }
     });
 }
 
-
+/**
+ * Обновление контента страницы пользователей
+ *
+ * @returns {boolean}
+ */
 function refreshUserTable() {
-
-    if( $("#search_client").length != 0 )
-    {
-        $("#search_client").submit();
+    //Если это страница менеджера то просто происходит отправка данных формы поиска клиента
+    //а там уже свой обработчик обновляет контент
+    if ($('#search_client').length != 0) {
+        $('#search_client').submit();
         return;
     }
 
-    if( $(".users").length == 0 )
-    {
+    if ($('.users').length == 0) {
         loaderOff();
         return false;
     }
 
     $.ajax({
-        type: "GET",
-        url: "",
+        type: 'GET',
+        url: '',
         async: false,
         data: {
-            action: "refreshTableUsers",
+            action: 'refreshTableUsers'
         },
-        success: function(responce) {
-            $(".users").empty();
-            $(".users").append(responce);
-            $("#sortingTable").tablesorter();
+        success: function(response) {
+            $('.users').html(response);
+            $('#sortingTable').tablesorter();
             loaderOff();
         }
     });
 }
 
 
-function refreshArchiveTable(func) {
+/**
+ * Обновление контента страницы с архивом пользователей
+ *
+ * @param callback
+ */
+function refreshArchiveTable(callback) {
     $.ajax({
-        type: "GET",
-        url: root + "/user/archive",
+        type: 'GET',
+        url: root + '/user/archive',
         data: {
-            action: "refreshTableArchive"
+            action: 'refreshTableArchive'
         },
-        success: function(responce) {
-            $(".page").empty();
-            $(".page").append(responce);
-            $("#sortingTable").tablesorter();
-            if(func) func();
+        success: function(response) {
+            $('.page').html(response);
+            $('#sortingTable').tablesorter();
+            if (typeof callback == 'function') {
+                callback(response);
+            }
         }
     });
 }
 
 
-function getClientPopup(userid) {
+/**
+ * Открытие всплывающего окна редактирования данных клиента
+ *
+ * @param userId
+ */
+function getClientPopup(userId) {
     $.ajax({
-        type: "GET",
-        url: root + "/user/client",
+        type: 'GET',
+        url: root + '/user/client',
         data: {
-            action: "updateFormClient",
-            userid: userid,
+            action: 'updateFormClient',
+            userId: userId
         },
-        success: function(responce){
-            showPopup(responce);
+        success: function(response) {
+            showPopup(response);
         }
     });
 }
 
 
-function getTeacherPopup(userid) {
+/**
+ * Открытие всплывающего окна редактирования данных преподавателя
+ *
+ * @param userId
+ */
+function getTeacherPopup(userId) {
     $.ajax({
-        type: "GET",
-        url: root + "/user/teacher",
+        type: 'GET',
+        url: root + '/user/teacher',
         data: {
-            action: "updateFormTeacher",
-            userid: userid,
+            action: 'updateFormTeacher',
+            userId: userId
         },
-        success: function(responce){
-            showPopup(responce);
+        success: function(response) {
+            showPopup(response);
         }
     });
 }
 
 
-function getDirectorPopup(userid) {
+/**
+ * Открытие всплывающего окна редактирования данных директора
+ *
+ * @param userId
+ */
+function getDirectorPopup(userId) {
     $.ajax({
-        type: "GET",
-        url: root + "/user/client",
+        type: 'GET',
+        url: root + '/user/client',
         data: {
-            action: "updateFormDirector",
-            userid: userid
+            action: 'updateFormDirector',
+            userId: userId
         },
-        success: function(responce) {
-            showPopup(responce);
+        success: function(response) {
+            showPopup(response);
         }
     });
 }
 
 
-function getManagerPopup(userid) {
+/**
+ * Открытие всплывающего окна редактирования данных директора
+ *
+ * @param userId
+ */
+function getManagerPopup(userId) {
     $.ajax({
-        type: "GET",
-        url: root + "/user/client",
+        type: 'GET',
+        url: root + '/user/client',
         data: {
-            action: "updateFormManager",
-            userid: userid
+            action: 'updateFormManager',
+            userId: userId
         },
-        success: function(responce) {
-            showPopup(responce);
+        success: function(response) {
+            showPopup(response);
         }
     });
 }
 
 
-function saveUserComment( userid, text, func) {
+/**
+ * Создание комментария к клиенту
+ *
+ * @param userId
+ * @param text
+ * @param callback
+ */
+function saveUserComment(userId, text, callback) {
     $.ajax({
-        type: "GET",
-        url: root + "/balance",
+        type: 'GET',
+        url: root + '/balance',
         data: {
-            action: "saveUserComment",
-            userid: userid,
+            action: 'saveUserComment',
+            userId: userId,
             text: text
         },
-        success: function(responce){
-            //$(".page").empty();
-            $(".users").html(responce);
+        success: function(response) {
+            $('.users').html(response);
+            if (typeof callback == 'function') {
+                callback(response);
+            }
             loaderOff();
         }
     });
