@@ -33,34 +33,33 @@ $(function(){
             getPaymentPopup(userid, root + "/balance");
         })
         //Отправка формы пополнения баланса
-        .on("click", ".popop_balance_payment_submit", function(e){
+        .on('click', '.popop_balance_payment_submit', function(e){
             e.preventDefault();
             loaderOn();
-            var form = $("#createData");
-            if($(form).valid() == false)
-            {
+            var form = $('#createData');
+            if($(form).valid() == false) {
                 loaderOff();
                 return;
             }
-            var userid = $(this).data("userid");
-            var value = $(form).find("input[name=value]").val();
-            var description = $(form).find("textarea[name=description]").val();
-            var description2 = $(form).find("textarea[name=property_26]").val();
-            var type = $(form).find("input[name=type]:checked").val();
+            var userid = $(this).data('userid');
+            var value = $(form).find('input[name=value]').val();
+            var description = $(form).find('textarea[name=description]').val();
+            var description2 = $(form).find('textarea[name=property_26]').val();
+            var type = $(form).find('input[name=type]:checked').val();
             // savePayment(userid, value, description, description2, type, "balance", function(){});
             // refreshPaymentsTable(userid, loaderOff);
 
             //Если это страница со списком клиентов
-            if( $("#payment_from").val() == "clients" )
-            {
-                savePayment(userid, value, description, description2, type, "balance", refreshUserTable);
+            if ($('#payment_from').val() == 'clients') {
+                savePayment(userid, value, description, description2, type, 'balance', refreshUserTable);
             }
             else
             {
-                savePayment(userid, value, description, description2, type, "balance", function(){
+                savePayment(userid, value, description, description2, type, 'balance', function() {
                     refreshPaymentsTable(userid, loaderOff);
                 });
             }
+            loaderOff();
         })
         //Открытие формы покупки индивидуальных уроков
         .on("click", ".btn_private_lessons", function(e){
@@ -78,11 +77,11 @@ $(function(){
         /**
          * Покупка тарифа
          */
-        .on("click", ".popop_buy_tarif_submit", function(e){
+        .on('click', '.popop_buy_tarif_submit', function(e) {
             e.preventDefault();
             loaderOn();
-            var tarifid = $("select[name=tarif_id]").val();
-            var userid = $(this).data("userid");
+            var tarifid = $('select[name=tarif_id]').val();
+            var userid = $(this).data('userid');
             buyTarif(userid, tarifid);
         })
 
@@ -332,25 +331,21 @@ function getTarifPopup(id, type) {
 }
 
 
-function buyTarif(userid, tarifid)
-{
+function buyTarif(userId, tarifId) {
     $.ajax({
-        type: "GET",
-        url: root + "/balance",
+        type: 'GET',
+        url: root + '/balance',
         async: false,
         data: {
-            action: "buyTarif",
-            userid: userid,
-            tarifid: tarifid
+            action: 'buyTarif',
+            userId: userId,
+            tarifId: tarifId
         },
-        success: function(responce) {
-            if(responce != "")
-            {
-                alert(responce);
-            }
-            else
-            {
-                refreshPaymentsTable(userid, loaderOff);
+        success: function(response) {
+            if (response != '') {
+                notificationError(response);
+            } else {
+                refreshPaymentsTable(userId, loaderOff);
             }
             closePopup();
         }
