@@ -200,11 +200,10 @@ function updateActive(modelName, modelId, value, func) {
 function savePayment(userId, value, description, adminNote, type, url, func) {
     $.ajax({
         type: 'GET',
-        url: root + '/user/' + url,
-        async: false,
+        url: root + '/' + url,
         data: {
             action: 'savePayment',
-            userid: userid,
+            userid: userId,
             value: value,
             type: type,
             description: description,
