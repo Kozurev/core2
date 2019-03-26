@@ -264,9 +264,10 @@ $(function(){
             e.preventDefault();
             loaderOn();
             var tr = $(this).parent().parent();
-            var id = tr.find('input[name=reportId]').val();
+            //var id = tr.find('input[name=reportId]').val();
             var lessonId = tr.find('input[name=lessonId]').val();
-            var lessonType = tr.find('input[name=lessonType]').val();
+            var date = tr.find('input[name=date]').val();
+            //var lessonType = tr.find('input[name=lessonType]').val();
 
             $.ajax({
                 type: 'GET',
@@ -274,11 +275,10 @@ $(function(){
                 data: {
                     action: 'deleteReport',
                     lesson_id: lessonId,
-                    lesson_type: lessonType,
-                    report_id: id,
+                    date: date
                 },
                 success: function(response) {
-                    if (response != "0") {
+                    if (response != '') {
                         alert(response);
                     }
                     refreshSchedule();
