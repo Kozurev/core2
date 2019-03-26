@@ -349,10 +349,7 @@ if ($User->groupId() == ROLE_TEACHER) {
         }
         $Lesson->addEntity($LessonClient, 'client');
         $Lesson->addSimpleEntity('lesson_type', $Lesson->lessonType());
-        $Reported = $Lesson->isReported($date);
-        if ($Reported !== false) {
-            $Lesson->addEntity($Reported, 'report');
-        }
+        //TODO: Добавить подгрузку отчетов о проведенном занятии
     }
 
     $output = Core::factory('Core_Entity')
