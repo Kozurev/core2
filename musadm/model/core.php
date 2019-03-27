@@ -1,22 +1,27 @@
 <?php
+
 /**
-*
-*/ 
+ * @author BadWolf
+ * @version 20190327
+ * Class Core
+ */
 class Core //extends Orm
 {
-
-    //private $aStrings;
+    /**
+     * Массив установлденных наблюдателей
+     *
+     * @var array
+     */
     static private $observers = [];
-
 
 
     /**
      * Создание обработчика для наблюдателя
      *
-     * @param $action - название события
+     * @param string $action - название события
      * @param $function - обрабтчик для данного события
      */
-    static public function attachObserver( $action, $function )
+    static public function attachObserver(string $action, $function)
     {
         Core::$observers[$action][] = $function;
     }
@@ -25,15 +30,13 @@ class Core //extends Orm
     /**
      * Удаление последнего добавленного обработчика наблюдателя
      *
-     * @param $action - название действия
+     * @param string $action - название действия
      */
-    static public function detachObserver( $action )
+    static public function detachObserver(string $action)
     {
-        foreach ( Core::$observers as $name => $observers )
-        {
-            if ( $name == $action )
-            {
-                array_pop( Core::$observers[$name] );
+        foreach (Core::$observers as $name => $observers) {
+            if ($name == $action) {
+                array_pop(Core::$observers[$name]);
                 return;
             }
         }
@@ -46,15 +49,12 @@ class Core //extends Orm
      * @param $args - аргумент для функции обработчика наблюдателя
      * @param $action - название действия
      */
-    static public function notify( $args, $action )
+    static public function notify($args, $action)
     {
-        foreach ( Core::$observers as $name => $observers )
-        {
-            if ( $name == $action )
-            {
-                foreach ( $observers as $function )
-                {
-                    $function( $args );
+        foreach (Core::$observers as $name => $observers) {
+            if ($name == $action) {
+                foreach ($observers as $function) {
+                    $function($args);
                 }
             }
         }
@@ -62,10 +62,13 @@ class Core //extends Orm
 
 
 	/**
-	*	Подключает необходимый файл и создаёт объект класса
-	* 	@return mixed
-	*/
-	static public function factory( $className, $id = 0 )
+	 * Подключает необходимый файл и создаёт объект класса
+     *
+     * @param string $className - название класса создаваемого объекта
+     * @param int $id
+	 * @return mixed
+	 */
+	static public function factory(string $className, int $id = 0)
 	{
 		//Формирование пути к файлу класса
 		$segments = explode( "_", $className );
@@ -73,53 +76,41 @@ class Core //extends Orm
 		$filePath = ROOT . "/model";
 		$obj = null;
 
-		foreach ( $segments as $segment )
-        {
-            $filePath .= "/" . lcfirst( $segment );
+		foreach ($segments as $segment) {
+            $filePath .= '/' . lcfirst($segment);
         }
 
-
-		if ( TEST_MODE_FACTORY )
-		{
-			echo "<br>FilePath: " . $filePath . ".php";
-			echo "<br>FilePath: " . $filePath . "/model.php";
-			echo "<br>ClassName: " . $className;
-			echo "<br>ClassName: " . $className . "_Model";
+		if (TEST_MODE_FACTORY) {
+			echo '<br>FilePath: ' . $filePath . '.php';
+			echo '<br>FilePath: ' . $filePath . '/model.php';
+			echo '<br>ClassName: ' . $className;
+			echo '<br>ClassName: ' . $className . '_Model';
 		}
 
 		//Подключение модели
-		if ( file_exists( $filePath . "/model.php" ) && !class_exists( $className . "_Model") )
-		{
-			 include_once $filePath . "/model.php";
+		if ( file_exists($filePath . '/model.php') && !class_exists($model)) {
+			 include_once $filePath . '/model.php';
 		}
 
 		//Подключение файла с методами
-		if ( file_exists( $filePath . ".php" ) && !class_exists( $className ) )
-		{
-			 include_once $filePath . ".php";
+		if (file_exists($filePath . '.php') && !class_exists($className)) {
+			 include_once $filePath . '.php';
 		}
 		
 		//Создание объекта класса
-		if ( class_exists( $className ) )
-        {
+		if (class_exists($className)) {
             $obj = new $className;
-        }
-		else
-        {
+        } else {
             return null;
         }
 
-
 		//Если был передан id тогда формируем условия поиска конкретного объекта
 		//или возвращаем пустой объект 
-		if ( is_numeric( $id ) && intval( $id ) !== 0 )
-		{
+		if ($id !== 0) {
 			return $obj->queryBuilder()
-				->where( "id", "=", $id )
+				->where('id', '=', $id)
 				->find();
-		}
-		else 
-        {
+		} else {
             return $obj;
         }
 	}
@@ -127,38 +118,37 @@ class Core //extends Orm
 
     /**
      * Получение значения часто используемой строки
-     * @param $sMessageName - назавние строки
-     * @param $aMessageParams - параметры, передаваемые в строку
+     * @param string $sMessageName - назавние строки
+     * @param array $aMessageParams - параметры, передаваемые в строку
      * @return string
      */
-    public static function getMessage($sMessageName, $aMessageParams = [])
+    public static function getMessage(string $sMessageName, array $aMessageParams = [])
     {
         ini_set('display_errors','Off');
-        $aStrings = include ROOT . "/config/messages/ru/messages.php";
+        $aStrings = include ROOT . '/config/messages/ru/messages.php';
 
-        if(isset($aStrings[$sMessageName]))
-        {
-            echo $aStrings[$sMessageName];
-        }
-        else
-        {
-            echo $aStrings["UNDEFIND_STRING_NAME"];
+        if(isset($aStrings[$sMessageName])) {
+            $returnStr = $aStrings[$sMessageName];
+        } else {
+            $returnStr = $aStrings['UNDEFIND_STRING_NAME'];
         }
 
         ini_set('display_errors','On');
+        return$returnStr;
     }
 
 
+    /**
+     * Метод формирования объекта для передачи значения в конструктор запросов без его изменения и обрамления в кавычки
+     *
+     * @param $val
+     * @return stdClass
+     */
     public static function unchanged($val)
     {
         $result = new stdClass;
-        $result->type = "unchanged";
+        $result->type = 'unchanged';
         $result->val = $val;
         return $result;
     }
-
-
-
-
-
 }
