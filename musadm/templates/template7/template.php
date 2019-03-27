@@ -33,7 +33,7 @@ is_object(Core_Page_Show::instance()->StructureItem)
     <section>
         <div class="row calendar_small">
             <div>
-                <input type="date" class="form-control schedule_calendar" />
+                <input type="date" class="form-control schedule_calendar" value="<?=date('Y-m-d')?>" />
             </div>
             <div>
                 <span class="day_name"></span>
