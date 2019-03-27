@@ -240,7 +240,6 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->lessonId($this->id)
             ->teacherId($this->teacher_id)
             ->date($date)
-            //->attendance($attendance)
             ->typeId($this->type_id)
             ->lessonType($this->lesson_type);
         //TODO: Убрать последнее свойство вообще из таблицы за ненадобностью
@@ -263,12 +262,10 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             $teacherRate = 'teacher_rate_consult';
             $isTeacherDefaultRate = 'is_teacher_rate_default_consult';
         }
-
         $ClientLessons = Core::factory('Property')->getByTagName($clientLessons);
-        //$PropertyPerLesson = Core::factory('Property')->getByTagName('per_lesson');
 
         $Reports = []; //Отчеты по занятию
-        $clientRateValueSum = 0.0; //
+        $clientRateValueSum = 0.0; //Общая сумма медиан для всех клиентов занятия
 
         //Создание отчета по каждому клиенту
         foreach ($attendance as $clientId => $presence) {
@@ -276,6 +273,16 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             $Teacher = User_Controller::factory($this->teacherId());
             if (is_null($Client) || is_null($Teacher)) {
                 continue;
+            }
+
+            $ExistingReport = Core::factory('Schedule_Lesson_Report')
+                ->queryBuilder()
+                ->where('lesson_id', '=', $this->id)
+                ->where('date', '=', $date)
+                ->where('client_id', '=', $clientId)
+                ->find();
+            if (!is_null($ExistingReport)) {
+                $ExistingReport->delete();
             }
 
             $ClientReport = clone $Report;
@@ -386,6 +393,25 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
 
     /**
+     * Удаление отчетовв о проведенных занятиях
+     *
+     * @param string $date
+     */
+    public function clearReports(string $date)
+    {
+        $Reports = Core::factory('Schedule_Lesson_Report')
+            ->queryBuilder()
+            ->where('lesson_id', '=', $this->id)
+            ->where('date', '=', $date)
+            ->findAll();
+
+        foreach ($Reports as $Report) {
+            $Report->delete();
+        }
+    }
+
+
+    /**
      * Поиск отчетов о занятии за определнную дату
      *
      * @param string $date
@@ -393,7 +419,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      */
     public function getReports(string $date) : array
     {
-        $Reports = Core::factory('Schedule_Report')
+        $Reports = Core::factory('Schedule_Lesson_Report')
             ->queryBuilder()
             ->where('date', '=', $date);
 
