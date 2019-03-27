@@ -1,212 +1,334 @@
 <?php
-
-
 /**
-*	Модель структуры
-*/
+ * Класс модель структуры (раздела) сайта
+ *
+ * @author BadWolf
+ * @version 20190327
+ * Class Structure_Model
+ */
 class Structure_Model extends Core_Entity
 {
+    /**
+     * @var int
+     */
 	protected $id;
-	protected $title; 
-	protected $parent_id; 
-	protected $path; 
-	protected $action; 
-	protected $template_id; 
+
+
+    /**
+     * Название раздела
+     *
+     * @var string
+     */
+	protected $title;
+
+
+    /**
+     * id родительской структуры
+     *
+     * @var int
+     */
+	protected $parent_id;
+
+
+    /**
+     * URL путь к разделу
+     *
+     * @var string
+     */
+	protected $path;
+
+
+    /**
+     * Путь к файлу-обработчику для формирования содержимого страницы
+     *
+     * @var string
+     */
+	protected $action;
+
+
+    /**
+     * id макета который используется в разделе
+     *
+     * @var int
+     */
+	protected $template_id;
+
+
+    /**
+     * Описание раздела
+     *
+     * @var string
+     */
 	protected $description;
+
+
+    /**
+     * Название класса дочерней сущности
+     *
+     * @var string
+     */
 	protected $children_name;
-	//protected $properties_list;
+
+
+    /**
+     * Указатель активности раздела
+     *
+     * @var int
+     */
 	protected $active;
+
+
+    /**
+     * id меню для раздела
+     *
+     * @var int
+     */
 	protected $menu_id;
-	protected $meta_title; 
-	protected $meta_description; 
-	protected $meta_keywords; 
-	protected $sorting;
 
 
-	public function __construct()
+    /**
+     * Значение тэга meta=title
+     *
+     * @var string
+     */
+	protected $meta_title;
+
+
+    /**
+     * Значение тэга meta=description
+     *
+     * @var string
+     */
+	protected $meta_description;
+
+
+    /**
+     * Значение тэга meta=keywords
+     *
+     * @var string
+     */
+	protected $meta_keywords;
+
+
+    /**
+     * Порядок сортировки при выборке
+     *
+     * @var int
+     */
+	protected $sorting = 0;
+
+
+    /**
+     * @param string|null $title
+     * @return $this|string
+     */
+	public function title(string $title = null)
 	{
-		//$this->properties_list = unserialize($this->properties_list);
+		if (is_null($title)) {
+		    return $this->title;
+        } else {
+            if (mb_strlen($title) > 150) {
+                exit(Core::getMessage('TOO_LARGE_VALUE', ['title', 'Structure', 150]));
+            }
+            $this->title = $title;
+            return $this;
+        }
 	}
 
 
-	public function getId()
+    /**
+     * @param string|null $active
+     * @return $this|int
+     */
+	public function active(string $active = null)
+	{
+		if (is_null($active)) {
+		    return intval($this->active);
+        } elseif ($active == true) {
+		    $this->active = 1;
+        } elseif ($active == false) {
+		    $this->active = 0;
+        }
+		return $this;
+	}
+
+
+    /**
+     * @param int|null $parentId
+     * @return $this|int
+     */
+	public function parentId(int $parentId = null)
+	{
+		if (is_null($parentId)) {
+		    return intval($this->parent_id);
+        } else {
+            $this->parent_id = $parentId;
+            return $this;
+        }
+	}
+
+
+    /**
+     * @param int|null $menuId
+     * @return $this|int
+     */
+    public function menuId(int $menuId = null)
     {
-		return intval( $this->id );
+        if (is_null($menuId)) {
+            return intval($this->menu_id);
+        } else {
+            $this->menu_id = $menuId;
+            return $this;
+        }
     }
 
 
-    public function children_name( $val = null )
+    /**
+     * @param int|null $templateId
+     * @return $this|int
+     */
+    public function templateId(int $templateId = null)
     {
-        if ( is_null( $val ) )  return $this->children_name;
-
-        if ( strlen( $val ) > 255 )
-        {
-            exit ( Core::getMessage( "TOO_LARGE_VALUE", ["children_name", "Structure", 255] ) );
+        if (is_null($templateId)) {
+            return intval($this->template_id);
+        } else {
+            $this->template_id = $templateId;
+            return $this;
         }
-
-        $this->children_name = $val;
-
-        return $this;
     }
 
 
-	public function title( $val = null )
+    /**
+     * @param string|null $description
+     * @return $this|string
+     */
+	public function description(string $description = null)
 	{
-		if ( is_null( $val ) )  return $this->title;
-
-		if ( strlen( $val ) > 150 )
-        {
-            exit ( Core::getMessage( "TOO_LARGE_VALUE", ["title", "Structure", 150] ) );
+		if (is_null($description)) {
+		    return $this->description;
+        } else {
+            $this->description = $description;
+            return $this;
         }
-				
-		$this->title = $val;
-
-		return $this;
 	}
 
 
-	public function active( $val = null )
+    /**
+     * @param string|null $path
+     * @return $this|string
+     */
+	public function path(string $path = null)
 	{
-		if ( is_null( $val ) )  return intval( $this->active );
-		if ( $val == true )     $this->active = 1;
-		elseif ( $val == false )$this->active = 0;
-
-		return $this;
-	}
-
-
-	public function parentId( $val = null )
-	{
-		if ( is_null( $val ) ) 	return $this->parent_id;
-
-		if ( $val < 0 )
-        {
-            exit ( Core::getMessage( "UNSIGNED_VALUE", ["parent_id", "Structure"] ) );
+		if (is_null($path)) {
+		    return $this->path;
+        } else {
+            if (mb_strlen($path) > 100) {
+                exit(Core::getMessage('TOO_LARGE_VALUE', ['title', 'Structure', 100]));
+            }
+            $this->path = $path;
+            return $this;
         }
-		
-		$this->parent_id = intval( $val );
-
-		return $this;
 	}
 
 
-    public function menuId( $val = null )
+    /**
+     * @param int|null $action
+     * @return $this|string
+     */
+	public function action(int $action = null)
+	{
+		if (is_null($action)) {
+		    return $this->action;
+        } else {
+            if (strlen($action) > 100) {
+                exit(Core::getMessage('TOO_LARGE_VALUE', ['title', 'Structure', 100]));
+            }
+            $this->action = $action;
+            return $this;
+        }
+	}
+
+
+    /**
+     * @param string|null $metaTitle
+     * @return $this|string
+     */
+	public function meta_title(string $metaTitle = null)
+	{
+		if (is_null($metaTitle)) {
+		    return $this->meta_title;
+        } else {
+            if (mb_strlen($metaTitle) > 100) {
+                exit ( Core::getMessage('TOO_LARGE_VALUE', ['title', 'Structure', 100]));
+            }
+            $this->meta_title = $metaTitle;
+            return $this;
+        }
+	}
+
+
+    /**
+     * @param string|null $metaKeywords
+     * @return $this|string
+     */
+	public function meta_keywords(string $metaKeywords = null )
+	{
+		if (is_null($metaKeywords)) {
+		    return $this->meta_keywords;
+        } else {
+            if (mb_strlen($metaKeywords) > 100) {
+                exit(Core::getMessage('TOO_LARGE_VALUE', ['title', 'Structure', 100]));
+            }
+            $this->meta_keywords = $metaKeywords;
+            return $this;
+        }
+	}
+
+
+    /**
+     * @param string|null $metaDescription
+     * @return $this|string
+     */
+	public function meta_description(string $metaDescription = null)
+	{
+		if (is_null($metaDescription)) {
+		    return $this->meta_description;
+        } else {
+            $this->meta_description = $metaDescription;
+            return $this;
+        }
+	}
+
+
+    /**
+     * @param string|null $childrenName
+     * @return $this|string
+     */
+    public function children_name(string $childrenName = null)
     {
-        if ( is_null( $val ) ) 	return intval( $this->menu_id );
-
-        if ( $val < 0 )
-        {
-            exit ( Core::getMessage( "UNSIGNED_VALUE", ["menu_id", "Structure"] ) );
+        if (is_null($childrenName)) {
+            return $this->children_name;
+        } else {
+            if (mb_strlen($childrenName) > 255) {
+                exit(Core::getMessage('TOO_LARGE_VALUE', ['children_name', 'Structure', 255]));
+            }
+            $this->children_name = $childrenName;
+            return $this;
         }
-
-        $this->menu_id = intval( $val );
-
-        return $this;
     }
 
 
-	public function template_id( $val = null )
+    /**
+     * @param int|null $sorting
+     * @return $this|int
+     */
+	public function sorting(int $sorting = null)
 	{
-		if ( is_null( $val ) ) 	return intval( $this->template_id );
-
-		if ( $val < 0 )
-        {
-            exit ( Core::getMessage( "UNSIGNED_VALUE", ["template_id", "Structure"] ) );
+		if (is_null($sorting)) {
+		    return intval($this->sorting);
+        } else {
+            $this->sorting = $sorting;
+            return $this;
         }
-
-		$this->template_id = intval( $val );
-
-		return $this;
 	}
-
-
-	public function description( $val = null )
-	{
-		if ( is_null( $val ) ) 	return $this->description;
-
-		$this->description = $val;
-
-		return $this;
-	}
-
-
-	public function path( $val = null )
-	{
-		if ( is_null( $val ) )  return $this->path;
-
-		if ( strlen( $val ) > 100 )
-        {
-            exit ( Core::getMessage( "TOO_LARGE_VALUE", ["title", "Structure", 100] ) );
-        }
-		
-		$this->path = $val;
-
-		return $this;
-	}
-
-
-	public function action( $val = null )
-	{
-		if ( is_null( $val ) )  return $this->action;
-
-		if ( strlen( $val ) > 100 )
-        {
-            exit ( Core::getMessage( "TOO_LARGE_VALUE", ["title", "Structure", 100] ) );
-        }
-		
-		$this->action = $val;
-
-		return $this;
-	}
-
-
-	public function meta_title( $val = null )
-	{
-		if ( is_null( $val ) )  return $this->meta_title;
-
-		if ( strlen( $val ) > 100 )
-        {
-            exit ( Core::getMessage( "TOO_LARGE_VALUE", ["title", "Structure", 100] ) );
-        }
-				
-		$this->meta_title = $val;
-
-		return $this;
-	}
-
-
-	public function meta_keywords( $val = null )
-	{
-		if ( is_null( $val ) )  return $this->meta_keywords;
-
-		if ( strlen( $val ) > 100 )
-        {
-            exit ( Core::getMessage( "TOO_LARGE_VALUE", ["title", "Structure", 100] ) );
-        }
-				
-		$this->meta_keywords = $val;
-
-		return $this;
-	}
-
-
-	public function meta_description( $val = null )
-	{
-		if ( is_null( $val ) ) 	return $this->meta_description;
-
-		$this->meta_description = $val;
-
-		return $this;
-	}
-
-
-	public function sorting($val = null)
-	{
-		if ( is_null( $val ) )  return intval( $this->sorting );
-
-		$this->sorting = intval( $val );
-
-		return $this;
-	}
-
 }
