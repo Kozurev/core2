@@ -48,36 +48,6 @@
                 </xsl:choose>
             </td>
 
-            <!--<td>-->
-                <!--<xsl:choose>-->
-                    <!--<xsl:when test="type_id = 3">-->
-                        <!--Консультация-->
-                        <!--<xsl:if test="client_id != 0">-->
-                            <!--<xsl:value-of select="client_id" />-->
-                        <!--</xsl:if>-->
-                    <!--</xsl:when>-->
-                    <!--<xsl:otherwise>-->
-                        <!--<xsl:apply-templates select="client" />-->
-                    <!--</xsl:otherwise>-->
-                <!--</xsl:choose>-->
-            <!--</td>-->
-
-            <!--<td>-->
-                <!--<input type="checkbox" name="attendance" >-->
-                    <!--<xsl:if test="count(report/id) != 0">-->
-                        <!--<xsl:attribute name="disabled">-->
-                            <!--disabled-->
-                        <!--</xsl:attribute>-->
-                    <!--</xsl:if>-->
-
-                    <!--<xsl:if test="report/attendance = 1">-->
-                        <!--<xsl:attribute name="checked" >-->
-                            <!--checked-->
-                        <!--</xsl:attribute>-->
-                    <!--</xsl:if>-->
-                <!--</input>-->
-            <!--</td>-->
-
             <input type="hidden" name="date" value="{//real_date}"/>
             
             <xsl:choose>
@@ -90,10 +60,10 @@
             </xsl:choose>
 
             <td>
-                <xsl:if test="count(report/id) = 0">
+                <xsl:if test="is_reported = 0">
                     <a class="action save send_report" title="Сохранить отчет о проведении занятия"></a>
                 </xsl:if>
-                <xsl:if test="count(report/id) != 0 and /root/is_admin = 1">
+                <xsl:if test="is_reported = 1 and /root/is_admin = 1">
                     <a class="action unarchive delete_report" title="Отменить отправку отчета"></a>
                 </xsl:if>
             </td>
@@ -108,7 +78,14 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:if test="position() > 1"><br/></xsl:if>
-                <input type="checkbox" name="attendance_{id}" id="attendance_{id}" />
+                <input type="checkbox" name="attendance_{id}" id="attendance_{id}">
+                    <xsl:if test="report/id">
+                        <xsl:attribute name="disabled">disabled</xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test="report/attendance = 1">
+                        <xsl:attribute name="checked">checked</xsl:attribute>
+                    </xsl:if>
+                </input>
                 <xsl:text>   </xsl:text>
                 <label for="attendance_{id}">
                     <xsl:value-of select="surname" />

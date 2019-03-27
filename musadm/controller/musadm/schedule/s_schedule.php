@@ -3,14 +3,34 @@
  * @author BadWolf
  * @version 20190322
  */
+Core::factory('User_Controller');
+Core::factory('Task_Controller');
+Core::factory('Schedule_Area_Controller');
 
 $User = User::current();
 $Director = $User->getDirector();
 $subordinated = $Director->getId();
 
-Core::factory( 'User_Controller' );
-Core::factory( 'Task_Controller' );
-Core::factory( 'Schedule_Area_Controller' );
+//Формирование заголовка страницы
+$pageUserId = Core_Array::Get('userid', null);
+if (!is_null($pageUserId)) {
+    $Teacher = User_Controller::factory($pageUserId);
+} else {
+    $Teacher = $User;
+}
+$isTeacherPage = $Teacher->groupId() == ROLE_TEACHER && is_null(Core_Page_Show::instance()->StructureItem);
+
+//Личный кабинет преподавателя
+if ($isTeacherPage == true) {
+    if (is_null($Teacher)) {
+        Core_Page_Show::instance()->error(404);
+    }
+
+    $teacherFio = $Teacher->surname() . ' ' . $Teacher->name();
+    Core_Page_Show::instance()->title = $teacherFio . ' | Личный кабинет';
+} else {
+    Core_Page_Show::instance()->title = 'Расписание | ' . Core_Page_Show::instance()->StructureItem->title();
+}
 
 
 $action = Core_Array::Get('action', null, PARAM_STRING);
@@ -19,12 +39,12 @@ $action = Core_Array::Get('action', null, PARAM_STRING);
 if (!User::checkUserAccess(['groups' => [ROLE_MANAGER, ROLE_TEACHER, ROLE_DIRECTOR]])) {
     Core_Page_Show::instance()->error(403);
 }
-
 if (User::checkUserAccess(['groups' => [ROLE_MANAGER]]) && Core_Page_Show::instance()->StructureItem == null && $action == null) {
     Core_Page_Show::instance()->error(403);
 } elseif (User::checkUserAccess(['groups' => [ROLE_TEACHER]]) && Core_Page_Show::instance()->StructureItem != null) {
     Core_Page_Show::instance()->error(403);
 }
+
 
 
 $breadcumbs[0] = new stdClass();
@@ -222,281 +242,23 @@ if ($action === 'teacherReport') {
     }
 
     $Lesson->makeReport($date, $attendance);
-
-//    $lessonId =     Core_Array::Get('lesson_id',   0, PARAM_INT);
-//    $lessonType =   Core_Array::Get('lesson_type', 0, PARAM_INT);
-//    $attendance =   Core_Array::Get('attendance',  0, PARAM_INT);
-//    $teacherId =    Core_Array::Get('teacher_id',  0, PARAM_INT);
-//    $clientId =     Core_Array::Get('client_id',   0, PARAM_INT);
-//    $typeId =       Core_Array::Get('type_id',     0, PARAM_INT);
-//    $date =         Core_Array::Get('date',        '', PARAM_STRING);
-//
-//    if ($lessonId === 0)    exit(Core::getMessage('EMPTY_GET_PARAM', ['идентификатор занятия']));
-//    if ($lessonType === 0)  exit(Core::getMessage('EMPTY_GET_PARAM', ['тип графика']));
-//    if ($teacherId === 0)   exit(Core::getMessage('EMPTY_GET_PARAM', ['идентификатор преподавателя']));
-//    if ($typeId === 0)      exit(Core::getMessage('EMPTY_GET_PARAM', ['тип занятия']));
-//    if ($date === '')       exit(Core::getMessage('EMPTY_GET_PARAM', ['дата']));
-//
-//    //Проверка во избежание дублирование отчетов
-//    $Lesson = Core::factory( 'Schedule_Lesson', $lessonId );
-//
-//    if (is_null($Lesson)) {
-//        Core_Page_Show::instance()->error(404);
-//    }
-//
-//    if ($Lesson->isReported($date)) {
-//        exit('Отчет по данному занятию уже отправлен');
-//    }
-//
-//    if ($Lesson->clientId() != $clientId)     exit('Ошибка: переданный идентификатор клиента не совпадает с клиентов занятия');
-//    if ($Lesson->lessonType() != $lessonType) exit('Ошибка: переданный тип графика не совпадает с типом графика занятия');
-//    if ($Lesson->typeId() != $typeId)         exit('Ошибка: переданный тип занятия не совпадает с типом занятия');
-//
-//    //Проверка филлиала, клиента и преподавателя на принадлежность тому же директору что и авторизованный пользователь
-//    $Area = Schedule_Area_Controller::factory($Lesson->areaId());
-//
-//    if (is_null($Area)) {
-//        Core_Page_Show::instance()->error(404);
-//    }
-//
-//    $Teacher = User_Controller::factory($teacherId);
-//
-//    if (is_null($Teacher)) {
-//        Core_Page_Show::instance()->error(404);
-//    }
-//
-//    if ($clientId > 0) {
-//        $LessonClient = $Lesson->getClient();
-//    }
-//
-//    //Создание отчета
-//    $Report = Core::factory('Schedule_Lesson_Report')
-//        ->lessonId($lessonId)
-//        ->teacherId($teacherId)
-//        ->typeId($typeId)
-//        ->date($date)
-//        ->attendance($attendance)
-//        ->lessonType($lessonType)
-//        ->clientId($clientId);
-//
-//    $Clients = [];
-//
-//    if ($Lesson->typeId() != 2) {
-//        $Clients[] = $Lesson->getClient();
-//    } else {
-//        $Group = $Lesson->getGroup();
-//        $Clients = $Group->getClientList();
-//    }
-//
-//    if ($Lesson->typeId() == 1) { //Индивидуальное занятие
-//        $clientLessons = 'indiv_lessons';
-//        $clientRate = 'client_rate_indiv';
-//        $teacherRate = 'teacher_rate_indiv';
-//        $isTeacherDefaultRate = 'is_teacher_rate_default_indiv';
-//    } elseif ( $Lesson->typeId() == 2 ) { //Групповое занятие
-//        $clientLessons = 'group_lessons';
-//        $clientRate = 'client_rate_group';
-//        $teacherRate = 'teacher_rate_group';
-//        $isTeacherDefaultRate = 'is_teacher_rate_default_group';
-//    } elseif ( $Lesson->typeId() == 3 ) { //Консультация
-//        $clientLessons = null;
-//        $teacherRate = 'teacher_rate_consult';
-//        $isTeacherDefaultRate = 'is_teacher_rate_default_consult';
-//    }
-//
-//    //Создание свойства кол-ва групп/индив занятий у клиента для списания
-//    //и тариф по количеству списываемых занятий за пропуск
-//    if (!is_null($clientLessons)) {
-//        $ClientLessons = Core::factory('Property')->getByTagName($clientLessons);
-//        $PropertyPerLesson = Core::factory('Property')->getByTagName('per_lesson');
-//
-//        if ($attendance == 0) {
-//            $AbsentRate = Core::factory('Property')->getByTagName('client_absent_rate');
-//            $absentRateValue = $AbsentRate->getPropertyValues($Director)[0];
-//            $absentRateValue = floatval($absentRateValue->value());
-//        }
-//    } else {
-//        $absentRateValue = 0;
-//    }
-//
-//    //Задание ставки преподавателя за проведенное занятие
-//    $Teacher = User_Controller::factory($teacherId);
-//
-//    //Определение значения ставки преподавателя
-//    $IsTeacherDefaultRate = Core::factory('Property')->getByTagName($isTeacherDefaultRate);
-//    $IsTeacherDefaultRate = $IsTeacherDefaultRate->getPropertyValues($Teacher)[0];
-//
-//    if ($IsTeacherDefaultRate->value()) {
-//        $TeacherRate = Core::factory('Property')->getByTagName($teacherRate . '_default');
-//        $teacherRateValue = $TeacherRate->getPropertyValues($Director)[0]->value();
-//    } else {
-//        $TeacherRate = Core::factory('Property')->getByTagName($teacherRate);
-//        $teacherRateValue = $TeacherRate->getPropertyValues($Teacher)[0]->value();
-//    }
-//
-//    $Report->teacherRate($teacherRateValue);
-//
-//    //Обработчик для индивидуальных настроек тарифов с пропуском занятия для преподавателя
-//    if ($attendance == 0 && $Report->typeId() != 3) {
-//        $IsTeacherDefaultAbsentRate = Core::factory('Property')->getByTagName('is_teacher_rate_default_absent');
-//        $isTeacherDefaultAbsentRate = $IsTeacherDefaultAbsentRate->getPropertyValues($Teacher)[0]->value();
-//
-//        if ($isTeacherDefaultAbsentRate == 0) { //Индивидуальная ставка
-//            $TeacherRateAbsent = Core::factory('Property')->getByTagName('teacher_rate_absent');
-//            $teacherAbsentValue = $TeacherRateAbsent->getPropertyValues($Teacher)[0]->value();
-//        } else { //Общее значение
-//            $AbsentRateType = Core::factory('Property')->getByTagName('teacher_rate_type_absent_default');
-//            $absentRateType = $AbsentRateType->getPropertyValues($Director)[0]->value();
-//
-//            if ($absentRateType == 0) { //По формуле "пропорционально"
-//                $teacherAbsentValue = $teacherRateValue * $absentRateValue;
-//            } else { //По общей ставке
-//                $TeacherRateAbsentDefault = Core::factory( 'Property' )->getByTagName( 'teacher_rate_absent_default' );
-//                $teacherAbsentValue = $TeacherRateAbsentDefault->getPropertyValues( $Director )[0]->value();
-//            }
-//        }
-//    } elseif ($attendance == 0 && $Report->typeId() == 3) {
-//        $teacherAbsentValue = 0;
-//    }
-//
-//    if ($attendance == 0) {
-//        $Report->teacherRate($teacherAbsentValue);
-//    }
-//
-//    if ($Report->typeId() == 1 || $Report->typeId() == 2) {
-//        foreach ($Clients as $Client) {
-//            //Корректировка остатка количества занятий клиента
-//            $clientCountLessons = $ClientLessons->getPropertyValues($Client)[0];
-//            $count = floatval($clientCountLessons->value());
-//
-//            $attendance == 1
-//                ?   $count--
-//                :   $count -= $absentRateValue;
-//
-//            $clientCountLessons->value($count)->save();
-//
-//            //Задание значения клиентской "медианы" для отчета
-//            $ClientRate = Core::factory('Property')->getByTagName($clientRate);
-//            $ClientRateValue = $ClientRate->getPropertyValues($Client)[0];
-//            $ClientRateValue = floatval($ClientRateValue->value());
-//
-//            if ($attendance == 0) {
-//                $ClientRateValue *= $absentRateValue;
-//            }
-//
-//            $Report->clientRate($Report->clientRate() + $ClientRateValue);
-//
-//            /**
-//             * Проверка на кол-во оставшихся занятий
-//             * и создание задачи с напоминанием об оплате на завтра
-//             */
-//            $tomorrow = strtotime('+1 day');
-//            $tomorrow = date('Y-m-d', $tomorrow);
-//
-//            if ($count <= 0.5 && $PropertyPerLesson->getPropertyValues($Client)[0]->value() == 0) {
-//                $isIssetTask = Task_Controller::factory()
-//                    ->queryBuilder()
-//                    ->where('associate', '=', $Client->getId())
-//                    ->where('done', '=', 0)
-//                    ->where('type', '=', 1)
-//                    ->find();
-//
-//                //Если не существет подобной незакрытой задачи
-//                if (is_null($isIssetTask)) {
-//                    $Task = Core::factory('Task')
-//                        ->date($tomorrow)
-//                        ->type(1)
-//                        ->associate($Client->getId())
-//                        ->save();
-//
-//                    $taskNoteText = $Client->surname() . ' ' . $Client->name() . '. Проверить баланс. Напомнить клиенту про оплату.';
-//                    $Task->addNote($taskNoteText, 0, date('Y-m-d'));
-//                }
-//            }
-//
-//            /**
-//             * Проверка на отсутствие на занятии 2 раза подряд
-//             * и создание задачи с напоминание о звонке
-//             */
-//            if ($Report->attendance() == 0) {
-//                $LastClientReport = Core::factory('Schedule_Lesson_Report')
-//                    ->queryBuilder()
-//                    ->where('id', '<>', $Report->getId())
-//                    ->where('client_id', '=', $Client->getId())
-//                    ->orderBy('id', 'DESC')
-//                    ->find();
-//
-//                if (!is_null($LastClientReport) && $LastClientReport->attendance() === 0) {
-//                    $isIssetTask = Core::factory('Task')
-//                        ->queryBuilder()
-//                        ->where('associate', '=', $Client->getId())
-//                        ->where('done', '=', 0)
-//                        ->where('type', '=', 2)
-//                        ->find();
-//
-//                    if (is_null($isIssetTask)) {
-//                        $Task = Task_Controller::factory()
-//                            ->date($tomorrow)
-//                            ->type(2)
-//                            ->associate($Client->getId())
-//                            ->save();
-//
-//                        $taskNoteText = $Client->surname() . ' ' . $Client->name() . ' пропустил(а) два урока подряд. Необходимо связаться.';
-//                        $Task->addNote($taskNoteText, 0, date('Y-m-d'));
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    $Report->totalRate( $Report->clientRate() - $Report->teacherRate() )->save();
     exit;
 }
 
 
+/**
+ * Удаление отчета/отчетов о проведенном занятии
+ */
 if ($action === 'deleteReport') {
-    $reportId =     Core_Array::Get('report_id', 0, PARAM_INT);
-    $lessonId =     Core_Array::Get('lesson_id', 0, PARAM_INT);
-    $lessonType =   Core_Array::Get('lesson_type', 0, PARAM_INT);
-    $Report = Core::factory('Schedule_Lesson_Report', $reportId);
-
-    if (is_null($Report)) {
-        Core_Page_Show::instance()->error(404);
-    }
-
+    $date = Core_Array::Get('date', null, PARAM_STRING);
+    $lessonId = Core_Array::Get('lesson_id', null, PARAM_INT);
     $Lesson = Core::factory('Schedule_Lesson', $lessonId);
 
-    if (is_null($Lesson)) {
+    if (is_null($date) || is_null($lessonId) || is_null($Lesson)) {
         Core_Page_Show::instance()->error(404);
     }
 
-    $Clients = [];
-
-    if ($Lesson->typeId() != 2) {
-        $Clients[] = $Lesson->getClient();
-    } else {
-        $Group = $Lesson->getGroup();
-        $Clients = $Group->getClientList();
-    }
-
-    $Lesson->typeId() == 2
-        ?   $propertyId = 14
-        :   $propertyId = 13;
-
-    $Property = Core::factory('Property', $propertyId);
-
-    foreach ($Clients as $Client) {
-        $clientCountLessons = $Property->getPropertyValues($Client)[0];
-        $count = floatval($clientCountLessons->value());
-
-        $Report->attendance() == 1
-            ?   $count++
-            :   $count += 0.5;
-
-        $clientCountLessons->value($count)->save();
-    }
-
-    $Report->delete();
+    $Lesson->clearReports($date);
     exit;
 }
 

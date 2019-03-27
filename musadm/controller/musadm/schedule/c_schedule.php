@@ -1,7 +1,7 @@
 <?php
 /**
  * @author BadWolf
- * @version 20190322
+ * @version 20190327
  */
 
 $userId = Core_Array::Get('userid', null, PARAM_INT);
@@ -342,14 +342,34 @@ if ($User->groupId() == ROLE_TEACHER) {
     foreach ($TeacherLessons as $key => $Lesson) {
         $Lesson->timeFrom(refactorTimeFormat($Lesson->timeFrom()));
         $Lesson->timeTo(refactorTimeFormat($Lesson->timeTo()));
+        $LessonReports = $Lesson->getReports($date);
         $LessonClient = $Lesson->getClient();
         if ($LessonClient instanceof Schedule_Group) {
             $Clients = $LessonClient->getClientList();
+            $countClients = count($Clients);
+            foreach ($Clients as $Client) {
+                foreach ($LessonReports as $LessonReport) {
+                    if ($Client->getId() == $LessonReport->clientId()) {
+                        $Client->addEntity($LessonReport, 'report');
+                    }
+                }
+            }
+
             $LessonClient->addEntities($Clients, 'client');
+        } else {
+            $countClients = 1;
+            if (count($LessonReports) == 1 && $LessonClient->getId() == $LessonReports[0]->clientId()) {
+                $LessonClient->addEntity($LessonReports[0], 'report');
+            }
+        }
+
+        if (count($LessonReports) == $countClients) {
+            $Lesson->addSimpleEntity('is_reported', 1);
+        } else {
+            $Lesson->addSimpleEntity('is_reported', 0);
         }
         $Lesson->addEntity($LessonClient, 'client');
         $Lesson->addSimpleEntity('lesson_type', $Lesson->lessonType());
-        //TODO: Добавить подгрузку отчетов о проведенном занятии
     }
 
     $output = Core::factory('Core_Entity')
