@@ -4,7 +4,7 @@
  *
  * @author Kozurev Egor
  * @date 26.11.2018 14:59
- * @version 20190221
+ * @version 20190328
  * Class Event
  */
 class Event extends Event_Model
@@ -59,153 +59,122 @@ class Event extends Event_Model
      * @param string $type - принимает значение одной из констант с префиксом STRING_
      * @return string
      */
-    public function getTemplateString( string $type = self::STRING_FULL )
+    public function getTemplateString(string $type = self::STRING_FULL) : string
     {
-        if ( !in_array( $type, [self::STRING_SHORT, self::STRING_FULL] ) )
-        {
+        if (!in_array($type, [self::STRING_SHORT, self::STRING_FULL])) {
             return 'Неверно указан тип формирования шаблона строки - ' . $type;
         }
 
         //Пока что всего 2 типа формирования шаблона и обходится конструкцией if/elseif
         //но на будущее лучше использовать тут конструкцию switch
-        if      ( $type === self::STRING_FULL )     $str = $this->user_assignment_fio . '. ';
-        elseif  ( $type === self::STRING_SHORT )    $str = '';
+        if ($type === self::STRING_FULL ) {
+            $str = $this->user_assignment_fio . '. ';
+        } elseif ($type === self::STRING_SHORT ) {
+            $str = '';
+        }
 
-
-        switch ( $this->type_id )
+        switch ($this->type_id)
         {
             case self::SCHEDULE_APPEND_USER:
-                Core::factory( 'Schedule_Lesson' );
-
+                Core::factory('Schedule_Lesson');
                 $this->data()->Lesson->lessonType() == 1
                     ?   $str .= 'Основной график с '
                     :   $str .= 'Актуальный график на ' ;
-
-                $insertDate =   refactorDateFormat( $this->data()->Lesson->insertDate() );
-                $timeStart =    $this->data()->Lesson->timeFrom();
-
+                $insertDate = refactorDateFormat($this->data()->Lesson->insertDate());
+                $timeStart = $this->data()->Lesson->timeFrom();
                 return $str . $insertDate . ' в ' . $timeStart;
                 break;
 
-
             case self::SCHEDULE_REMOVE_USER:
-                Core::factory( 'Schedule_Lesson' );
-
-                $date = refactorDateFormat( $this->data()->date );
-
+                Core::factory('Schedule_Lesson');
+                $date = refactorDateFormat($this->data()->date);
                 $this->data()->Lesson->lessonType() == 1
                     ?   $str .= 'Удален(а) из основного графика с ' . $date
                     :   $str .= 'Отсутствует ' . $date;
-
                 return $str;
                 break;
 
-
             case self::SCHEDULE_CREATE_ABSENT_PERIOD:
-                Core::factory( 'Schedule_Absent' );
-
-                $dateFrom = refactorDateFormat( $this->data()->Period->dateFrom() );
-                $dateTo =   refactorDateFormat( $this->data()->Period->dateTo() );
-
+                Core::factory('Schedule_Absent');
+                $dateFrom = refactorDateFormat($this->data()->Period->dateFrom());
+                $dateTo =   refactorDateFormat($this->data()->Period->dateTo());
                 return $str . 'Отсутствует с ' . $dateFrom . ' по ' . $dateTo;
                 break;
 
-
             case self::SCHEDULE_CHANGE_TIME:
-                Core::factory( 'Schedule_Lesson' );
-
-                $date =         refactorDateFormat( $this->data()->date );
-                $oldTimeFrom =  refactorTimeFormat( $this->data()->Lesson->timeFrom() );
-                $newTimeFrom =  refactorTimeFormat( $this->data()->new_time_from );
-
+                Core::factory('Schedule_Lesson');
+                $date =         refactorDateFormat($this->data()->date);
+                $oldTimeFrom =  refactorTimeFormat($this->data()->Lesson->timeFrom());
+                $newTimeFrom =  refactorTimeFormat($this->data()->new_time_from);
                 return $str . ' Актуальный график изменился на ' . $date
                             . '; старое время ' . $oldTimeFrom
                             . ', новое время ' . $newTimeFrom . '.';
                 break;
 
-
             case self::SCHEDULE_EDIT_ABSENT_PERIOD:
-                Core::factory( 'Schedule_Absent' );
-
-                $oldDateFrom =  refactorDateFormat( $this->data()->old_Period->dateFrom() );
-                $oldDateTo =    refactorDateFormat( $this->data()->old_Period->dateTo() );
-                $newDateFrom =  refactorDateFormat( $this->data()->new_Period->dateFrom() );
-                $newDateTo =    refactorDateFormat( $this->data()->new_Period->dateTo() );
-
+                Core::factory('Schedule_Absent');
+                $oldDateFrom =  refactorDateFormat($this->data()->old_Period->dateFrom());
+                $oldDateTo =    refactorDateFormat($this->data()->old_Period->dateTo());
+                $newDateFrom =  refactorDateFormat($this->data()->new_Period->dateFrom());
+                $newDateTo =    refactorDateFormat($this->data()->new_Period->dateTo());
                 return $str . 'Период отсутствия изменен с: ' . $oldDateFrom . ' - ' . $oldDateTo
                                                     . ' на: ' . $newDateFrom . ' - ' . $newDateTo;
                 break;
 
-
             case self::SCHEDULE_APPEND_CONSULT:
-                Core::factory( 'Schedule_Lesson' );
-                Core::factory( 'Lid' );
-
+                Core::factory('Schedule_Lesson');
+                Core::factory('Lid');
                 $Lesson =   $this->data()->Lesson;
-                $timeFrom = refactorTimeFormat( $Lesson->timeFrom() );
-                $timeTo =   refactorTimeFormat( $Lesson->timeTo() );
-
+                $timeFrom = refactorTimeFormat($Lesson->timeFrom());
+                $timeTo =   refactorTimeFormat($Lesson->timeTo());
                 $str = 'Добавил(а) консультацию c ' . $timeFrom . ' по ' . $timeTo . '. ';
-
-                if ( $Lesson->clientId() )
-                {
+                if ($Lesson->clientId()) {
                     $lidId = $this->data()->Lid->getId();
                     $str .= "Лид <a href='#' class='info-by-id' data-model='Lid' data-id='".$lidId."'>№".$lidId."</a>";
                 }
                 return $str;
                 break;
 
-
             case self::CLIENT_ARCHIVE:
                 return $str . 'Добавлен(а) в архив';
                 break;
-
 
             case self::CLIENT_UNARCHIVE:
                 return $str . 'Восстановлен(а) из архива';
                 break;
 
-
             case self::CLIENT_APPEND_COMMENT:
-                Core::factory( 'User_Comment' );
+                Core::factory('User_Comment');
                 return $str . 'Добавлен комментарий с текстом: ' . $this->data()->Comment->text();
 
-
             case self::PAYMENT_CHANGE_BALANCE:
-                Core::factory( 'Payment' );
+                Core::factory('Payment');
                 return $str . 'Внесение оплаты пользователю на сумму ' . $this->data()->Payment->value() . ' руб.';
                 break;
 
-
             case self::PAYMENT_HOST_COSTS:
-                Core::factory( 'Payment' );
+                Core::factory('Payment');
                 return 'Внесение хозрасходов на сумму ' . $this->data()->Payment->value() . ' руб.';
                 break;
 
-
             case self::PAYMENT_TEACHER_PAYMENT:
-                Core::factory( 'Payment' );
+                Core::factory('Payment');
                 return 'преп. ' . $this->user_assignment_fio . '. Выплата на сумму ' . $this->data()->Payment->value() . ' руб.';
                 break;
 
-
             case self::PAYMENT_APPEND_COMMENT:
-                Core::factory( 'Property_String' );
+                Core::factory('Property_String');
                 return 'Добавил(а) комментарий к платежу с текстом: \''. $this->data()->Comment->value() .'\'';
                 break;
 
-
             case self::TASK_CREATE:
-                Core::factory( 'Task_Note' );
-
+                Core::factory('Task_Note');
                 $id =   $this->data()->Note->taskId();
                 $text = $this->data()->Note->text();
-
                 return "Добавил(а) задачу 
                         <a href='#' class='info-by-id' data-model='Task' data-id='" . $id . "'>№" . $id . "</a> 
                         с комментарием: '" . $text . "'";
                 break;
-
 
             case self::TASK_DONE:
                 $id = $this->data()->task_id->getId();
@@ -213,83 +182,63 @@ class Event extends Event_Model
                         <a href='#' class='info-by-id' data-model='Task' data-id='" . $id ."'>№" . $id . "</a>";
                 break;
 
-
             case self::TASK_APPEND_COMMENT:
-                Core::factory( 'Task_Note' );
-
+                Core::factory('Task_Note');
                 $id =   $this->data()->Note->taskId();
                 $text = $this->data()->Note->text();
-
                 return "Добавил(а) комментарий к задаче 
                         <a href='#' class='info-by-id' data-model='Task' data-id='" . $id . "'>№" . $id . "</a> 
                         с текстом: '" . $text . "'";
                 break;
 
-
             case self::TASK_CHANGE_DATE:
                 $id =       $this->data()->task_id;
-                $newDate =  refactorDateFormat( $this->data()->new_date );
-                $oldDate =  refactorDateFormat( $this->data()->old_date );
-
+                $newDate =  refactorDateFormat($this->data()->new_date);
+                $oldDate =  refactorDateFormat($this->data()->old_date);
                 return "Задача 
                         <a href='#' class='info-by-id' data-model='Task' data-id='" . $id . "'>№" . $id . "</a>. 
                         Изменение даты с " . $oldDate . " на " . $newDate;
                 break;
 
-
             case self::LID_CREATE:
-                Core::factory( 'Lid' );
-
+                Core::factory('Lid');
                 $id =           $this->data()->Lid->getId();
                 $lidSurname =   $this->data()->Lid->surname();
                 $lidName =      $this->data()->Lid->name();
-
                 return "Добавил(а) лида 
                         <a href='#' class='info-by-id' data-model='Lid' data-id='" . $id . "'>№$id</a> $lidSurname $lidName";
                 break;
 
-
             case self::LID_APPEND_COMMENT:
-                Core::factory( 'Lid_Comment' );
-
+                Core::factory('Lid_Comment');
                 $id = $this->data()->Comment->lidId();
-
                 return "Добавил(а) комментарий к лиду 
                 <a href='#' class='info-by-id' data-model='Lid' data-id='" . $id . "'>№$id</a> 
                 с текстом '" . $this->data()->Comment->text() . "'";
                 break; 
 
-
             case self::LID_CHANGE_DATE:
-                Core::factory( 'Lid' );
-
+                Core::factory('Lid');
                 $id =       $this->data()->Lid->getId();
-                $oldDate =  refactorDateFormat( $this->data()->old_date );
-                $newDate =  refactorDateFormat( $this->data()->new_date );
-
+                $oldDate =  refactorDateFormat($this->data()->old_date);
+                $newDate =  refactorDateFormat($this->data()->new_date);
                 return "Лид 
                         <a href='#' class='info-by-id' data-model='Lid' data-id='" . $id . "'>№$id</a>. 
                         Изменение даты с " . $oldDate . " на " . $newDate;
                 break;
 
-
             case self::CERTIFICATE_CREATE:
-                Core::factory( 'Certificate' );
-
+                Core::factory('Certificate');
                 $id =   $this->data()->Certificate->getId();
                 $num =  $this->data()->Certificate->number();
-
                 return "Добавил(а) сертификат 
                         <a href='#' class='info-by-id' data-model='Certificate' data-id='" . $id . "'>№" . $num . "</a>";
                 break;
 
-
             case self::CERTIFICATE_APPEND_COMMENT:
-                Core::factory( 'Certificate_Note' );
-
+                Core::factory('Certificate_Note');
                 $id =   $this->data()->Note->certificateId();
                 $num =  Core::factory( 'Certificate', $id )->number();
-
                 return "Сертификат 
                         <a href='#' class='info-by-id' data-model='Certificate' data-id='" . $id . "'>№$num</a>. "
                         . $this->data()->Note->text();
@@ -299,41 +248,37 @@ class Event extends Event_Model
         }
     }
 
-
-
-    public function save( $obj = null )
+    /**
+     * @param null $obj
+     * @return void
+     */
+    public function save($obj = null)
     {
-        Core::notify( [&$this], 'beforeEventSave' );
+        Core::notify([&$this], 'beforeEventSave');
 
         //Задание значение времени события
-        if ( $this->time === 0 ) $this->time = time();
+        if ($this->time === 0) {
+            $this->time = time();
+        }
 
         //Задание значений связанных с автором события - author_id & author_fio
-        if ( $this->author_id === 0 )
-        {
+        if ($this->authorId() === 0) {
             $CurrentUser = User::parentAuth();
 
-            if( $CurrentUser !== null )
-            {
-                $this->author_id = $CurrentUser->getId();
+            if (!is_null($CurrentUser)) {
+                $this->author_id =  $CurrentUser->getId();
                 $this->author_fio = $CurrentUser->surname() . ' ' . $CurrentUser->name();
-
-                if( $CurrentUser->patronimyc() != '' )
-                {
+                if($CurrentUser->patronimyc() != '') {
                     $this->author_fio .= ' ' . $CurrentUser->patronimyc();
                 }
             }
         }
 
         //Конвертация дополнительных данных события в строку
-        if ( is_array( $this->data ) || is_object( $this->data ) )
-        {
-            try
-            {
-                $this->data = serialize( $this->data );
-            }
-            catch( Exception $e )
-            {
+        if (is_array($this->data) || is_object($this->data)) {
+            try {
+                $this->data = serialize($this->data);
+            } catch (Exception $e) {
                 echo "<h2>" . $e->getMessage() . "</h2>";
                 return;
             }
@@ -341,18 +286,21 @@ class Event extends Event_Model
 
         parent::save();
 
-        Core::notify( [&$this], 'afterEventSave' );
+        Core::notify([&$this], 'afterEventSave');
     }
 
 
-    public function delete( $obj = null )
+    /**
+     * @param null $obj
+     * @return void
+     */
+    public function delete($obj = null)
     {
-        Core::notify( [&$this], 'beforeEventDelete' );
+        Core::notify([&$this], 'beforeEventDelete');
 
         parent::delete();
 
-        Core::notify( [&$this], 'afterEventDelete' );
+        Core::notify([&$this], 'afterEventDelete');
     }
-
 
 }

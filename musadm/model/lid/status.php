@@ -4,73 +4,137 @@
  *
  * @author Bad Wolf
  * @date 30.01.2019 17:37
- * @version 20190225
+ * @version 20190328
  * Class Lid_Status
  */
 class Lid_Status extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
+
+
+    /**
+     * Название статуса
+     *
+     * @var string
+     */
     protected $title;
+
+
+    /**
+     * Название класса для карточек лидов
+     *
+     * @var string
+     */
     protected $item_class = '';
+
+
+    /**
+     * Порядок сортировки
+     *
+     * @var int
+     */
     protected $sorting = 0;
-    protected $subordinated;
 
 
-    public function getId()
+    /**
+     * id организации (директора) которой рпинадлежит статус
+     *
+     * @var int
+     */
+    protected $subordinated = 0;
+
+
+    /**
+     * @param string|null $title
+     * @return $this|string
+     */
+    public function title(string $title = null)
     {
-        return intval( $this->id );
-    }
-
-
-    public function title( $title = null )
-    {
-        if ( is_null( $title ) )
-        {
+        if (is_null( $title)) {
             return $this->title;
+        } else {
+            $this->title = $title;
+            return $this;
         }
-
-        $this->title = strval( $title );
-
-        return $this;
     }
 
 
-    public function itemClass( $itemClass = null )
+    /**
+     * @param string|null $itemClass
+     * @return $this|string
+     */
+    public function itemClass(string $itemClass = null)
     {
-        if ( is_null( $itemClass ) )
-        {
+        if (is_null($itemClass)) {
             return $this->item_class;
+        } else {
+            $this->item_class = $itemClass;
+            return $this;
         }
-
-        $this->item_class = strval( $itemClass );
-
-        return $this;
     }
 
 
-    public function sorting( $sorting = null )
+    /**
+     * @param int|null $sorting
+     * @return $this|int
+     */
+    public function sorting(int $sorting = null)
     {
-        if ( is_null( $sorting ) )
-        {
-            return intval( $this->sorting );
+        if (is_null($sorting)) {
+            return intval($this->sorting);
+        } else {
+            $this->sorting = $sorting;
+            return $this;
         }
-
-        $this->sorting = intval( $sorting );
-
-        return $this;
     }
 
 
-    public function subordinated( $subordinated = null )
+    /**
+     * @param int|null $subordinated
+     * @return $this|int
+     */
+    public function subordinated(int $subordinated = null)
     {
-        if ( is_null( $subordinated ) )
-        {
-            return intval( $this->subordinated );
+        if (is_null($subordinated)) {
+            return intval($this->subordinated);
+        } else {
+            $this->subordinated = $subordinated;
+            return $this;
         }
+    }
 
-        $this->subordinated = intval( $subordinated );
 
-        return $this;
+    //Параметры валидации при сохранении таблицы
+    public function schema()
+    {
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'title' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'sorting' => [
+                'required' => true,
+                'type' => PARAM_INT
+            ],
+            'item_class' => [
+                'required' => false,
+                'type' => PARAM_INT,
+                'maxlength' => 50
+            ],
+            'subordinated' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ]
+        ];
     }
 
 
@@ -80,27 +144,24 @@ class Lid_Status extends Core_Entity
      * @param bool $isSubordinate
      * @return array
      */
-    public function getList( bool $isSubordinate = true )
+    public function getList(bool $isSubordinate = true)
     {
-        $Statuses = Core::factory( 'Lid_Status' );
+        $Statuses = Core::factory('Lid_Status');
 
-        if ( $isSubordinate === true )
-        {
+        if ($isSubordinate === true) {
             $User = User::current();
-
-            if ( $User === null )
-            {
+            if (is_null($User)) {
                 return [];
             }
 
             $subordinated = $User->getDirector()->getId();
             $Statuses->queryBuilder()
-                ->where( 'subordinated', '=', $subordinated );
+                ->where('subordinated', '=', $subordinated);
         }
 
         return $Statuses->queryBuilder()
-            ->orderBy( 'sorting' )
-            ->orderBy( 'id' )
+            ->orderBy('sorting')
+            ->orderBy('id')
             ->findAll();
     }
 
@@ -157,18 +218,16 @@ class Lid_Status extends Core_Entity
     /**
      * Поиск названия цвета по названию класса
      *
-     * @param $className - название класса элемента
+     * @param string $className - название класса элемента
      * @return string
      */
-    public static function getColor( $className )
+    public static function getColor(string $className)
     {
         $colors = Lid_Status::getColors();
         $colorName = '';
 
-        foreach ( $colors as $color )
-        {
-            if ( $color->class == $className )
-            {
+        foreach ($colors as $color) {
+            if ($color->class == $className) {
                 $colorName = $color->name;
                 break;
             }
@@ -179,20 +238,26 @@ class Lid_Status extends Core_Entity
 
 
     /**
-     * @return void
+     * @param null $obj
+     * @return $this|void
      */
-    public function save()
+    public function save($obj = null)
     {
-        Core::notify( [&$this], 'beforeLidStatusSave' );
+        Core::notify([&$this], 'beforeLidStatusSave');
         parent::save();
-        Core::notify( [&$this], 'afterLidStatusSave' );
+        Core::notify([&$this], 'afterLidStatusSave');
     }
 
-    public function delete()
+
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
+    public function delete($obj = null)
     {
-        Core::notify( [&$this], 'beforeLidStatusDelete' );
+        Core::notify([&$this], 'beforeLidStatusDelete');
         parent::delete();
-        Core::notify( [&$this], 'afterLidStatusDelete' );
+        Core::notify([&$this], 'afterLidStatusDelete');
     }
 
 }

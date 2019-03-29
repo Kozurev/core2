@@ -1,29 +1,34 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: User
- * Date: 28.04.2018
- * Time: 16:07
+ * Класс реализующий методы для работы с тарифом
+ *
+ * @author BadWolf
+ * @date 28.04.2018 16:07
+ * @version 20190328
+ * Class Payment_Tarif
  */
-
 class Payment_Tarif extends Payment_Tarif_Model
 {
-
-
-    public function save()
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
+    public function save($obj = null)
     {
-        Core::notify( array( &$this ), "beforePaymentTarifSave" );
+        Core::notify([&$this], 'beforePaymentTarifSave');
         parent::save();
-        Core::notify( array( &$this ), "afterPaymentTarifSave" );
+        Core::notify([&$this], 'afterPaymentTarifSave');
     }
 
 
-    public function delete( $obj = null )
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
+    public function delete($obj = null)
     {
-        Core::notify( array( &$this ), "beforePaymentTarifDelete" );
+        Core::notify([&$this], 'beforePaymentTarifDelete');
         parent::delete();
-        Core::notify( array( &$this ), "afterPaymentTarifDelete" );
+        Core::notify([&$this], 'afterPaymentTarifDelete');
     }
-
-
 }

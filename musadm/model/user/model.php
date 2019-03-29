@@ -1,191 +1,351 @@
 <?php
 /**
  * Класс-модель пользователя
+ *
+ * @author BadWolf
+ * @version 20190328
+ * Class User_Model
  */
 class User_Model extends Core_Entity
 {
-	protected $id = 0;
-	protected $name; //
-	protected $surname; //
-	protected $patronimyc = ""; //
-	protected $phone_number = ""; //
-	protected $email = ""; //
-	protected $login; //
-	protected $password; //
-	protected $group_id; //
-	protected $register_date; //
-	protected $active = 1; //
+    /**
+     * @var int
+     */
+	protected $id;
+
+
+    /**
+     * @var string
+     */
+	protected $name;
+
+
+    /**
+     * @var string
+     */
+	protected $surname;
+
+
+    /**
+     * @var string
+     */
+	protected $patronimyc = '';
+
+
+    /**
+     * @var string
+     */
+	protected $phone_number = '';
+
+
+    /**
+     * @var string
+     */
+	protected $email = '';
+
+
+    /**
+     * @var string
+     */
+	protected $login;
+
+
+    /**
+     * @var string
+     */
+	protected $password;
+
+
+    /**
+     * @var int
+     */
+	protected $group_id;
+
+
+    /**
+     * @var string
+     */
+	protected $register_date;
+
+
+    /**
+     * @var int
+     */
+	protected $active = 1;
+
+
+    /**
+     * @var int
+     */
 	protected $superuser = 0;
+
+
+    /**
+     * @var int
+     */
 	protected $subordinated = 0;
 
 
-	function __construct()
+    /**
+     * @param int|null $groupId
+     * @return $this|int
+     */
+	public function groupId(int $groupId = null)
 	{
-		if ( !$this->register_date )
-        {
-            $this->register_date = date(  'Y-m-d' );
+		if (is_null($groupId)) {
+		    return intval($this->group_id);
+        } else {
+            $this->group_id = $groupId;
+            return $this;
         }
 	}
 
 
-	public function getId()
+    /**
+     * @param int|null $active
+     * @return $this|int
+     */
+	public function active(int $active = null)
 	{
-		return intval( $this->id );
-	}
-
-
-	public function groupId( $val = null )
-	{
-		if ( is_null( $val ) )  return intval( $this->group_id );
-
-		if ( $val < 0 )
-        {
-            exit ( Core::getMessage( 'UNSIGNED_VALUE', ['group_id', 'User'] ) );
+		if (is_null($active)) {
+		    return intval($this->active);
+        } elseif ($active == true )	{
+		    $this->active = 1;
+        } elseif ($active == false ) {
+		    $this->active = 0;
         }
-
-		$this->group_id = intval( $val );
 		return $this;
 	}
 
 
-	public function active( $val = null )
+    /**
+     * @param string|null $pass
+     * @param bool $type
+     * @return $this|string
+     */
+	public function password(string $pass = null, bool $type = false)
 	{
-		if ( is_null( $val ) )  return intval( $this->active );
-
-		if ( $val == true )		$this->active = 1;
-		elseif ( $val == false )$this->active = 0;
-
-		return $this;
-	}
-
-
-	public function password( $val = null, $type = false )
-	{
-		if ( is_null( $val ) ) 		return $this->password;
-
-		if ( strlen( $val ) > 255 )
-        {
-            exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['password', 'User', 255] ) );
+		if (is_null($pass)) {
+		    return $this->password;
         }
 
-		$val = trim( $val );
-
-		$type == false
-		    ?   $this->password = md5( $val )
-		    :   $this->password = strval( $val );
+		$pass = trim($pass);
+		if ($type === false) {
+            $this->password = md5($pass);
+        } elseif ($type == true) {
+            $this->password = $pass;
+        }
 
 		return $this;
 	}
 
 
-	public function phoneNumber( $val = null )
+    /**
+     * @param string|null $phoneNumber
+     * @return $this|string
+     */
+	public function phoneNumber(string $phoneNumber = null)
 	{
-		if ( is_null( $val ) )		return $this->phone_number;
-
-		if ( strlen( $val ) > 255 )
-        {
-            exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['phone_number', 'User', 255] ) );
+		if (is_null($phoneNumber)) {
+		    return $this->phone_number;
+        } else {
+            $this->phone_number = $phoneNumber;
+            return $this;
         }
-
-		$this->phone_number = strval( $val );
-		return $this;
 	}
 
 
-	public function name( $val = null )
+    /**
+     * @param string|null $name
+     * @return $this|string
+     */
+	public function name(string $name = null)
 	{
-		if ( is_null( $val ) )	return $this->name;
-
-		if( strlen( $val ) > 255 )
-        {
-            exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['name', 'User', 255] ) );
+		if (is_null($name))	{
+		    return $this->name;
+        } else {
+            $this->name = trim($name);
+            return $this;
         }
-
-		$this->name = trim( $val );
-		return $this;
 	}
 
 
-	public function surname( $val = null )
+    /**
+     * @param string|null $surname
+     * @return $this|string
+     */
+	public function surname(string $surname = null)
 	{
-		if ( is_null( $val ) )	return $this->surname;
-
-		if ( strlen( $val ) > 255 )
-        {
-            exit (Core::getMessage( 'TOO_LARGE_VALUE', ['surname', 'User', 255] ) );
+		if (is_null($surname)) {
+		    return $this->surname;
+        } else {
+            $this->surname = trim($surname);
+            return $this;
         }
-
-		$this->surname = trim( $val );
-		return $this;
 	}
 
 
-	public function patronimyc( $val = null )
+    /**
+     * TODO: изменить ошибку названия свойства на - patronymic
+     * @param string|null $patronymic
+     * @return $this|string
+     */
+	public function patronimyc(string $patronymic = null)
 	{
-		if ( is_null( $val ) )		return $this->patronimyc;
-
-		if ( strlen( $val ) > 255 )
-        {
-            exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['patronimyc', 'User', 255] ) );
+		if (is_null($patronymic)) {
+		    return $this->patronimyc;
+        } else {
+            $this->patronimyc = trim($patronymic);
+            return $this;
         }
-
-		$this->patronimyc = trim( $val );
-		return $this;
 	}
 
 
-	public function email( $val = null )
+    /**
+     * @param string|null $email
+     * @return $this|string
+     */
+	public function email(string $email = null)
 	{
-		if ( is_null( $val ) )	return $this->email;
-
-		if ( strlen( $val ) > 255 )
-        {
-            exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['email', 'User', 255] ) );
+		if (is_null($email)) {
+		    return $this->email;
+        } else {
+            $this->email = $email;
+            return $this;
         }
-
-		$this->email = $val;
-		return $this;
 	}
 
 
-	public function login( $val = null )
+    /**
+     * @param string|null $login
+     * @return $this|string
+     */
+	public function login(string $login = null)
 	{
-		if ( is_null( $val) ) 	return $this->login;
-
-		if ( strlen( $val ) > 255 )
-        {
-            exit ( Core::getMessage('TOO_LARGE_VALUE', ['login', 'User', 255] ) );
+		if (is_null($login)) {
+		    return $this->login;
+        } else {
+            $this->login = trim($login);
+            return $this;
         }
-
-		$this->login = trim( $val );
-		return $this;
 	}
 
 
+    /**
+     * @return string
+     */
 	public function registerDate()
 	{
 		return $this->register_date;
 	}
 
 
-	public function superuser( $val = null )
+    /**
+     * @param int|null $superuser
+     * @return $this|int
+     */
+	public function superuser(int $superuser = null)
 	{
-		if ( is_null( $val ) ) 	return intval( $this->superuser );
-
-		if ( $val == true )		$this->superuser = 1;
-		elseif ($val == false)	$this->superuser = 0;
-
+		if (is_null($superuser)) {
+		    return intval($this->superuser);
+        } elseif ($superuser == true ) {
+            $this->superuser = 1;
+        } elseif ($superuser == false) {
+		    $this->superuser = 0;
+        }
 		return $this;
 	}
 
 
-	public function subordinated( $val = null )
+    /**
+     * @param int|null $subordinated
+     * @return $this|int
+     */
+	public function subordinated(int $subordinated = null)
     {
-        if ( is_null( $val ) )   return intval( $this->subordinated );
-
-        $this->subordinated = intval( $val );
-        return $this;
+        if (is_null($subordinated)) {
+            return intval($this->subordinated);
+        } else {
+            $this->subordinated = $subordinated;
+            return $this;
+        }
     }
 
+
+    /**
+     * @return array
+     */
+    public function schema() : array
+    {
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'name' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'surname' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'patronimyc' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'phone_number' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'email' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'login' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'password' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'group_id' => [
+                'required' => false,
+                'type' => PARAM_INT,
+                'minval' => 1
+            ],
+            'register_date' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'minlength' => 10,
+                'maxlength' => 10
+            ],
+            'active' => [
+                'required' => false,
+                'type' => PARAM_INT,
+                'minval' => 0,
+                'maxval' => 1
+            ],
+            'superuser' => [
+                'required' => false,
+                'type' => PARAM_INT,
+                'minval' => 0,
+                'maxval' => 1
+            ],
+            'subordinated' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 1
+            ]
+        ];
+    }
 
 }

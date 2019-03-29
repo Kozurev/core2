@@ -1,132 +1,280 @@
 <?php
 /**
- * Модель лида
+ * Класс-модель лида
  *
  * @author Kozurev Egor
  * @date 24.04.2018 22:11
+ * @version 20190328
+ * Class Lid_Model
  */
-
-
 class Lid_Model extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
+
+
+    /**
+     * Имя
+     *
+     * @var string
+     */
     protected $name = '';
+
+
+    /**
+     * Фамилия
+     *
+     * @var string
+     */
     protected $surname = '';
+
+
+    /**
+     * Номер телефона
+     *
+     * @var string
+     */
     protected $number = '';
+
+
+    /**
+     * Ссылка Вконтакте
+     *
+     * @var string
+     */
     protected $vk = '';
+
+
+    /**
+     * id или текстовое значение источника лида
+     *
+     * @var string
+     */
     protected $source = '';
+
+
+    /**
+     * Дата контроля лида
+     *
+     * @var string
+     */
     protected $control_date = '';
+
+
+    /**
+     * id организации которой принадлежит лид
+     *
+     * @var int
+     */
     protected $subordinated = 0;
+
+
+    /**
+     * id филиала которому принадлежит лид
+     *
+     * @var int
+     */
     protected $area_id = 0;
+
+
+    /**
+     * id статуса лида
+     *
+     * @var int
+     */
     protected $status_id = 0;
 
 
-    public function getId()
+    /**
+     * @param string|null $name
+     * @return $this|string
+     */
+    public function name(string $name = null)
     {
-        return intval( $this->id );
+        if (is_null($name)) {
+            return $this->name;
+        } else {
+            $this->name = trim($name);
+            return $this;
+        }
     }
 
 
-    public function name( $val = null )
+    /**
+     * @param string|null $surname
+     * @return $this|string
+     */
+    public function surname(string $surname = null)
     {
-        if ( is_null( $val ) )   return $this->name;
-
-        if ( strlen( $val ) > 255 ) exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['name', 'Lid', 255] ) );
-
-        $this->name = trim( $val );
-
-        return $this;
+        if (is_null($surname)) {
+            return $this->surname;
+        } else {
+            $this->surname = trim($surname);
+            return $this;
+        }
     }
 
 
-    public function surname( $val = null )
+    /**
+     * @param string|null $number
+     * @return $this|string
+     */
+    public function number(string $number = null)
     {
-        if ( is_null( $val ) )   return $this->surname;
-
-        if ( strlen( $val ) > 255 ) exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['surname', 'Lid', 255] ) );
-
-        $this->surname = trim( $val );
-
-        return $this;
+        if (is_null($number)) {
+            return $this->number;
+        } else {
+            $this->number = trim($number);
+            return $this;
+        }
     }
 
 
-    public function number( $val = null )
+    /**
+     * @param string|null $vk
+     * @return $this|string
+     */
+    public function vk(string $vk = null)
     {
-        if ( is_null( $val ) )   return $this->number;
-
-        if ( strlen( $val ) > 255 ) exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['number', 'Lid', 255] ) );
-
-        $this->number = trim( $val );
-
-        return $this;
+        if (is_null($vk)) {
+            return $this->vk;
+        } else {
+            $this->vk = trim($vk);
+            return $this;
+        }
     }
 
 
-    public function vk( $val = null )
+    /**
+     * @param string|null $source
+     * @return $this|int|string
+     */
+    public function source(string $source = null)
     {
-        if ( is_null( $val ) )   return $this->vk;
-
-        if ( strlen( $val ) > 255 ) exit( Core::getMessage( 'TOO_LARGE_VALUE', ['vk', 'Lid', 255] ) );
-
-        $this->vk = strval( $val );
-
-        return $this;
+        if (is_null($source)) {
+            if (is_numeric($this->source)) {
+                return intval($this->source);
+            } else {
+                return $this->source;
+            }
+        } else {
+            $this->source = trim($source);
+            return $this;
+        }
     }
 
 
-    public function source( $val = null )
+    /**
+     * @param string|null $controlDate
+     * @return $this|string
+     */
+    public function controlDate(string $controlDate = null )
     {
-        if ( is_null( $val ) )   return $this->source;
-
-        if ( strlen( $val ) > 255 ) exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['source', 'Lid', 255] ) );
-
-        $this->source = trim( $val );
-
-        return $this;
+        if (is_null($controlDate)) {
+            return $this->control_date;
+        } else {
+            $this->control_date = $controlDate;
+            return $this;
+        }
     }
 
 
-    public function controlDate( $val = null )
+    /**
+     * @param int|null $subordinated
+     * @return $this|int
+     */
+    public function subordinated(int $subordinated = null)
     {
-        if ( is_null( $val ) )   return $this->control_date;
-
-        $this->control_date = trim( $val );
-
-        return $this;
+        if (is_null($subordinated)) {
+            return intval($this->subordinated);
+        } else {
+            $this->subordinated = $subordinated;
+            return $this;
+        }
     }
 
 
-    public function subordinated( $val = null )
+    /**
+     * @param int|null $areaId
+     * @return $this|int
+     */
+    public function areaId(int $areaId = null)
     {
-        if( is_null( $val ) )   return intval( $this->subordinated );
-
-        $this->subordinated = intval( $val );
-
-        return $this;
+        if (is_null($areaId)) {
+            return intval($this->area_id);
+        } else {
+            $this->area_id = $areaId;
+            return $this;
+        }
     }
 
 
-    public function areaId( $val = null )
+    /**
+     * @param int|null $statusId
+     * @return $this|int
+     */
+    public function statusId(int $statusId = null )
     {
-        if ( is_null( $val ) )  return intval( $this->area_id );
-
-        $this->area_id = intval( $val );
-
-        return $this;
+        if (is_null($statusId)) {
+            return intval($this->status_id);
+        } else {
+            $this->status_id = $statusId;
+            return $this;
+        }
     }
 
 
-    public function statusId( $statusId = null )
+    //Параметры валидации при сохранении таблицы
+    public function schema()
     {
-        if ( is_null( $statusId ) ) return intval( $this->status_id );
-
-
-        $this->status_id = intval( $statusId );
-
-        return $this;
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'name' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'surname' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'number' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'vk' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'source' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'subordinated' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'area_id' => [
+                'required' => false,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'status_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+        ];
     }
-
-
 
 }

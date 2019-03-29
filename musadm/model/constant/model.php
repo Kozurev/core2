@@ -1,92 +1,223 @@
 <?php
-
+/**
+ * Класс-модель объекта константы
+ *
+ * @author BadWolf
+ * @version 20190328
+ * Class Constant_Model
+ */
 class Constant_Model extends Core_Entity
 {
+    /**
+     * @var int
+     */
 	protected $id;
+
+
+    /**
+     * Название константы (для админ раздела)
+     *
+     * @var string
+     */
 	protected $title;
+
+
+    /**
+     * Название константы для использования в коде
+     *
+     * @var string
+     */
 	protected $name;
+
+
+    /**
+     * Описание
+     *
+     * @var string
+     */
 	protected $description;
+
+
+    /**
+     * Значение константы
+     *
+     * @var string
+     */
 	protected $value;
+
+
+    /**
+     * Тип значения
+     *
+     * @var int
+     */
     protected $value_type;
+
+
+    /**
+     * Указатель активности константы
+     *
+     * @var int
+     */
     protected $active;
+
+
+    /**
+     * id родительской директории
+     *
+     * @var int
+     */
     protected $dir;
 
-	public function __construct()
+
+    /**
+     * @param string|null $title
+     * @return $this|string
+     */
+	public function title(string $title = null)
 	{
-		//$this->setConnect();
+		if (is_null($title)) {
+		    return $this->title;
+        } else {
+            $this->title = $val;
+            return $this;
+        }
 	}
 
 
-	public function getId(){return $this->id;}
-
-
-	public function title($val = null)
-	{
-		if(is_null($val))   return $this->title;
-		if(strlen($val) > 150) die(Core::getMessage("TOO_LARGE_VALUE", array("title", "Constant", 150)));
-		$this->title = $val;
-		return $this;
-	}
-
-
-	public function name($val = null)
+    /**
+     * @param string|null $name
+     * @return $this|string
+     */
+	public function name(string $name = null)
     {
-        if(is_null($val))   return $this->name;
-        if(strlen($val) > 150)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("name", "Constant", 150)));
-        $this->name = $val;
+        if (is_null($name)) {
+            return $this->name;
+        } else {
+            $this->name = $name;
+            return $this;
+        }
+    }
+
+
+    /**
+     * @param string|null $description
+     * @return $this|string
+     */
+	public function description(string $description = null)
+	{
+		if (is_null($description)) {
+		    return $this->description;
+        } else {
+            $this->description = $description;
+            return $this;
+        }
+	}
+
+
+	public function value(string $value = null)
+	{
+        if (is_null($value)) {
+            return $this->value;
+        } else {
+            $this->value = $value;
+            return $this;
+        }
+	}
+
+
+    /**
+     * @param int|null $typeId
+     * @return $this|int
+     */
+	public function valueType(int $typeId = null)
+    {
+        if (is_null($typeId)) {
+            return intval($this->value_type);
+        } else {
+            $this->value_type = $typeId;
+            return $this;
+        }
+    }
+
+
+    /**
+     * @param int|null $active
+     * @return $this|int
+     */
+    public function active(int $active = null)
+    {
+        if (is_null($active)) {
+            return intval($this->active);
+        } elseif ($active == true) {
+            $this->active = 1;
+        }
+        elseif ($active == false) {
+            $this->active = 0;
+        }
+
         return $this;
     }
 
 
-	public function description($val = null)
-	{
-		if(is_null($val))   return $this->description;
-		$this->description = $val;
-		return $this;
-	}
-
-
-	public function value($val = null)
-	{
-        if(is_null($val))   return $this->value;
-        if(is_array($val) || is_object($val))
-            die(Core::getMessage("INVALID_TYPE", array("value", "Constant", "string")));
-        if(strlen($val) > 150)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("value", "Constant", 150)));
-        $this->value = $val;
-        return $this;
-	}
-
-
-	public function valueType($val = null)
+    /**
+     * @param int|null $dir
+     * @return $this|int
+     */
+    public function dir(int $dir = null)
     {
-        if(is_null($val))   return $this->value_type;
-        if(strlen($val) > 10)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("value_type", "Constant", 10)));
-        $this->value_type = $val;
-        return $this;
+        if (is_null($dir)) {
+            return intval($this->dir);
+        } else {
+            $this->dir = $dir;
+            return $this;
+        }
     }
 
 
-    public function active($val = null)
+    //Параметры валидации при сохранении таблицы
+    public function schema()
     {
-        if(is_null($val)) 		return $this->active;
-        if($val == true) 		$this->active = 1;
-        elseif($val == false)	$this->active = 0;
-
-        return $this;
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'title' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 150
+            ],
+            'name' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 150
+            ],
+            'description' => [
+                'required' => true,
+                'type' => PARAM_STRING
+            ],
+            'value' => [
+                'required' => true,
+                'type' => PARAM_STRING
+            ],
+            'value_type' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 1
+            ],
+            'active' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0,
+                'maxval' => 1
+            ],
+            'dir' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 1
+            ]
+        ];
     }
-
-
-    public function dir($val = null)
-    {
-        if(is_null($val))   return $this->dir;
-        if($val < 0) die(Core::getMessage("UNSIGNED_VALUE", array("dir", "Constant")));
-        $this->dir = $val;
-        return $this;
-    }
-
-
 
 }

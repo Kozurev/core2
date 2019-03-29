@@ -1,126 +1,178 @@
 <?php
-
+/**
+ * @author BadWolf
+ * @version 20190328
+ * Class Property_List_Model
+ */
 class Property_List_Model extends Core_Entity
 {
-	protected $id;
-	protected $property_id;
-	protected $model_name;
-	protected $object_id;
-	protected $value_id;
+    /**
+     * @var int
+     */
+    protected $id;
 
 
-	public function getId()
+    /**
+     * id объекта с которым связано свойство
+     *
+     * @var int
+     */
+    protected $object_id;
+
+
+    /**
+     * Название класса объекта
+     *
+     * @var string
+     */
+    protected $model_name;
+
+
+    /**
+     * id доп. свойства
+     *
+     * @var int
+     */
+    protected $property_id;
+
+
+    /**
+     * @var int
+     */
+    protected $value_id;
+
+
+    /**
+     * @param int|null $objectId
+     * @return $this|int
+     */
+    public function objectId(int $objectId = null)
     {
-		return intval( $this->id );
+        if (is_null($objectId)) {
+            return intval($this->object_id);
+        } else {
+            $this->object_id = $objectId;
+            return $this;
+        }
     }
 
 
-	public function property_id( $val = null )
-	{
-		if ( is_null( $val ) )
-        {
-            return intval( $this->property_id );
-        }
-
-		$this->property_id = intval( $val );
-
-		return $this;
-	}
+    /**
+     * @param int|null $objectId
+     * @return int|Property_Assigment_Model
+     */
+    public function object_id(int $objectId = null)
+    {
+        return $this->objectId($objectId);
+    }
 
 
-	public function model_name( $val = null )
-	{
-		if ( is_null( $val ) )
-        {
+    /**
+     * @param string|null $modelName
+     * @return $this|string
+     */
+    public function modelName(string $modelName = null)
+    {
+        if (is_null($modelName)) {
             return $this->model_name;
+        } else {
+            $this->model_name = $modelName;
+            return $this;
         }
-
-		if ( strlen( $val ) > 100 )
-        {
-            exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['model_name', 'Property_List', 100] ) );
-        }
-
-		$this->model_name = $val;
-
-		return $this;
-	}
-
-
-	public function object_id( $val = null )
-	{
-		if ( is_null( $val ) )
-        {
-            return intval( $this->object_id );
-        }
-
-		$this->object_id = intval( $val );
-
-		return $this;
-	}
-
-
-    public function value_id( $val = null )
-    {
-        if ( is_null( $val ) )	return intval( $this->value_id );
-
-        $this->value_id = intval( $val );
-
-        return $this;
     }
 
 
-    public function propertyId( $val = null )
+    /**
+     * @param string|null $modelName
+     * @return Property_Assigment_Model|string
+     */
+    public function model_name(string $modelName = null)
     {
-        if ( is_null( $val ) )
-        {
-            return intval( $this->property_id );
-        }
-
-        $this->property_id = intval( $val );
-
-        return $this;
+        return $this->modelName($modelName);
     }
 
 
-    public function modelName( $val = null )
+    /**
+     * @param int|null $propertyId
+     * @return $this|int
+     */
+    public function propertyId(int $propertyId = null)
     {
-        if ( is_null( $val ) )
-        {
-            return $this->model_name;
+        if (is_null($propertyId)) {
+            return intval($this->property_id);
+        } else {
+            $this->property_id = $propertyId;
+            return $this;
         }
-
-        if ( strlen( $val ) > 100 )
-        {
-            exit ( Core::getMessage( 'TOO_LARGE_VALUE', ['model_name', 'Property_List', 100] ) );
-        }
-
-        $this->model_name = $val;
-
-        return $this;
     }
 
 
-    public function objectId( $val = null )
+    /**
+     * @param int|null $propertyId
+     * @return int|Property_Assigment_Model
+     */
+    public function property_id(int $propertyId = null)
     {
-        if ( is_null( $val ) )
-        {
-            return intval( $this->object_id );
-        }
-
-        $this->object_id = intval( $val );
-
-        return $this;
+        return $this->propertyId($propertyId);
     }
 
 
-	public function value( $val = null )
-	{
-		if ( is_null( $val ) )	return intval( $this->value_id );
+    /**
+     * @param int|null $value
+     * @return $this|int
+     */
+    public function value(int $value = null)
+    {
+        if (is_null($value)) {
+            return intval($this->value_id);
+        } else {
+            $this->value_id = $value;
+            return $this;
+        }
+    }
 
-		$this->value_id = intval( $val );
 
-		return $this;
-	}
+    /**
+     * @param int|null $value
+     * @return int|Property_List_Model
+     */
+    public function value_id(int $value = null)
+    {
+        return $this->value($value = null);
+    }
 
+
+    /**
+     * Параметры валидации при сохранении таблицы
+     */
+    public function schema()
+    {
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'object_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'model_name' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'property_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'value_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ]
+        ];
+    }
 
 }

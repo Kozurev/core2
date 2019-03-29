@@ -1,15 +1,17 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Egor
- * Date: 26.11.2018
- * Time: 15:26
+ * Класс-модель "события"
+ *
+ * @author BadWolf
+ * @date 26.11.2018 15:26
+ * @version 20190328
+ * Class Event_Model
  */
-
-
 class Event_Model extends Core_Entity
 {
-
+    /**
+     * @var int
+     */
     protected $id;
 
 
@@ -34,7 +36,7 @@ class Event_Model extends Core_Entity
      *
      * @var string
      */
-    protected $author_fio = "";
+    protected $author_fio = '';
 
 
     /**
@@ -50,7 +52,7 @@ class Event_Model extends Core_Entity
      *
      * @var string
      */
-    protected $user_assignment_fio = "";
+    protected $user_assignment_fio = '';
 
 
     /**
@@ -67,88 +69,159 @@ class Event_Model extends Core_Entity
      *
      * @var string
      */
-    protected $data = "";
+    protected $data = '';
 
 
-
-
-    public function getId()
+    /**
+     * @param int|null $time
+     * @return $this|int
+     */
+    public function time(int $time = null)
     {
-        return intval( $this->id );
+        if (is_null($time)) {
+            return $this->time;
+        } else {
+            $this->time = $time;
+            return $this;
+        }
     }
 
 
-    public function time( $val = null )
+    /**
+     * @param int|null $authorId
+     * @return $this|int
+     */
+    public function authorId(int $authorId = null)
     {
-        if( is_null( $val ) )   return intval( $this->time );
-
-        $this->time = intval( $val );
-        return $this;
+        if (is_null($authorId)) {
+            return intval($this->author_id);
+        } else {
+            $this->author_id = $authorId;
+            return $this;
+        }
     }
 
 
-    public function authorId( $val = null )
+    /**
+     * @param string|null $authorFio
+     * @return $this|string
+     */
+    public function authorFio(string $authorFio = null)
     {
-        if( is_null( $val ) )   return intval( $this->author_id );
-
-        $this->author_id = intval( $val );
-        return $this;
+        if (is_null($authorFio) ) {
+            return $this->author_fio;
+        } else {
+            $this->author_fio = $authorFio;
+            return $this;
+        }
     }
 
 
-    public function authorFio( $val = null )
+    /**
+     * @param int|null $userAssignment
+     * @return $this|int
+     */
+    public function userAssignmentId(int $userAssignment = null)
     {
-        if( is_null( $val ) )   return strval( $this->author_fio );
-
-        $this->author_fio = strval( $val );
-        return $this;
+        if (is_null($userAssignment)) {
+            return intval($this->user_assignment_id);
+        } else {
+            $this->user_assignment_id = $userAssignment;
+            return $this;
+        }
     }
 
 
-    public function userAssignmentId( $val = null )
+    /**
+     * @param string|null $userAssignmentFio
+     * @return $this|string
+     */
+    public function userAssignmentFio(string $userAssignmentFio = null)
     {
-        if( is_null( $val ) )   return intval( $this->user_assignment_id );
-
-        $this->user_assignment_id = intval( $val );
-        return $this;
+        if (is_null($userAssignmentFio)) {
+            return $this->user_assignment_fio;
+        } else {
+            $this->user_assignment_fio = $userAssignmentFio;
+            return $this;
+        }
     }
 
 
-    public function userAssignmentFio( $val = null )
+    /**
+     * @param int|null $typeId
+     * @return $this|int
+     */
+    public function typeId(int $typeId = null)
     {
-        if( is_null( $val ) )   return strval( $val );
-
-        $this->user_assignment_fio = strval( $val );
-        return $this;
+        if (is_null($typeId)) {
+            return intval($this->type_id);
+        } else {
+            $this->type_id = $typeId;
+            return $this;
+        }
     }
 
 
-    public function typeId( $val = null )
+    /**
+     * @param stdClass|array|null $data
+     * @return $this|mixed|string
+     */
+    public function data($data = null)
     {
-        if( is_null( $val ) )   return intval( $this->type_id );
-
-        $this->type_id = intval( $val );
-        return $this;
-    }
-
-
-    public function data( $val = null )
-    {
-        if( is_null( $val ) )
-        {
-            if( is_string( $this->data ) )
-            {
-                return unserialize( $this->data );
-            }
-            else
-            {
+        if (is_null($data)) {
+            if (is_string($this->data)) {
+                return unserialize($this->data);
+            } else {
                 return $this->data;
             }
         }
 
-        $this->data = $val;
+        $this->data = $data;
         return $this;
     }
 
 
+    //Параметры валидации при сохранении таблицы
+    public function schema()
+    {
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'time' => [
+                'required' => true,
+                'type' => PARAM_INT
+            ],
+            'author_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'author_fio' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'user_assignment_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'user_assignment_fio' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'type_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'data' => [
+                'required' => true,
+                'type' => PARAM_STRING
+            ]
+        ];
+    }
 }

@@ -1,79 +1,87 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Egor
- * Date: 24.04.2018
- * Time: 22:10
+ * Класс реализующий методы для работы с лидами
+ *
+ * @author BadWolf
+ * @date 24.04.2018 22:10
+ * @version 20190328
+ * Class Lid
  */
 class Lid extends Lid_Model
 {
-    //const STATUS_PROP_ID = 27;
-
-    public function __construct()
+    /**
+     * @param string $date
+     */
+    public function changeDate(string $date)
     {
-        if ( $this->control_date == null ) $this->control_date = date( 'Y-m-d' );
-    }
-
-
-    public function changeDate( $date )
-    {
-        $oldDate = $this->controlDate();
-
-        $ObserverArgs = array(
+        $ObserverArgs = [
             'Lid' => &$this,
             'new_date' => $date,
-            'old_date' => $oldDate
-        );
+            'old_date' => $this->controlDate()
+        ];
 
-        Core::notify( $ObserverArgs, 'beforeLidChangeDate' );
-
-        $this->controlDate( $date )->save();
-
-        Core::notify( $ObserverArgs, 'afterLidChangeDate' );
+        Core::notify($ObserverArgs, 'beforeLidChangeDate');
+        $this->controlDate($date)->save();
+        Core::notify($ObserverArgs, 'afterLidChangeDate');
     }
 
 
-    public function save( $obj = null )
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
+    public function save($obj = null)
     {
-        Core::notify( [&$this], 'beforeLidSave' );
+        if (empty($this->control_date)) {
+            $this->control_date = date('Y-m-d');
+        }
+
+        Core::notify([&$this], 'beforeLidSave');
         parent::save();
-        Core::notify( [&$this], 'afterLidSave' );
+        Core::notify([&$this], 'afterLidSave');
     }
 
 
-    public function delete( $obj = null )
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
+    public function delete($obj = null)
     {
-        Core::notify( [&$this], 'beforeLidDelete' );
+        Core::notify([&$this], 'beforeLidDelete');
 
-        if ( $this->id != null )
-        {
-            $Comments = Core::factory( 'Lid_Comment' )
+        if (!is_null($this->id)) {
+            $Comments = Core::factory('Lid_Comment')
                 ->queryBuilder()
-                ->where( 'lid_id', '=', $this->id )
+                ->where('lid_id', '=', $this->id)
                 ->findAll();
 
-            foreach ( $Comments as $Comment )   $Comment->delete();
+            foreach ($Comments as $Comment) {
+                $Comment->delete();
+            }
 
-            Core::factory( 'Property' )->clearForObject( $this );
+            Core::factory('Property')->clearForObject($this);
         }
 
         parent::delete();
         
-        Core::notify( [&$this], 'afterLidDelete' );
+        Core::notify([&$this], 'afterLidDelete');
     }
 
 
+    /**
+     * @return array
+     */
     public function getComments()
     {
-        if ( $this->id == null )
-        {
+        if (empty($this->id)) {
             return [];
         }
 
-        return Core::factory( 'Lid_Comment' )
+        return Core::factory('Lid_Comment')
             ->queryBuilder()
-            ->where( 'lid_id', '=', $this->id )
-            ->orderBy( 'datetime', 'DESC' )
+            ->where('lid_id', '=', $this->id)
+            ->orderBy('datetime', 'DESC')
             ->findAll();
     }
 
@@ -81,38 +89,34 @@ class Lid extends Lid_Model
     /**
      * Добавление комментария к лиду
      *
-     * @param $text
+     * @param string $text
      * @param bool $triggerObserver
      * @return $this
      */
-    public function addComment( $text, $triggerObserver = true )
+    public function addComment(string $text, $triggerObserver = true)
     {
-        if ( !$this->id )
-        {
-            exit ( 'Не указан id лида при сохранении комментария' );
+        if (empty($this->id)) {
+            exit('Не указан id лида при сохранении комментария');
         }
 
         $User = User::current();
-
-        $User == false
+        is_null($User)
             ?   $authorId = 0
             :   $authorId = $User->getId();
 
-        $Comment = Core::factory( 'Lid_Comment' )
-            ->datetime( date( 'Y-m-d H:i:s' ) )
-            ->authorId( $authorId )
-            ->lidId( $this->id )
-            ->text( $text );
+        $Comment = Core::factory('Lid_Comment')
+            ->datetime(date('Y-m-d H:i:s'))
+            ->authorId($authorId)
+            ->lidId($this->id)
+            ->text($text);
 
-        if ( $triggerObserver == true )
-        {
-            Core::notify( [&$Comment], 'beforeLidAddComment' );
+        if ($triggerObserver === true) {
+            Core::notify([&$Comment], 'beforeLidAddComment');
         }
 
         $Comment->save();
 
-        if ( $triggerObserver == true )
-        {
+        if ($triggerObserver === true) {
             Core::notify( [&$Comment], 'afterLidAddComment' );
         }
 
@@ -128,43 +132,36 @@ class Lid extends Lid_Model
     public function getStatusList()
     {
         $User = User::current();
-
-        $User !== null
+        !is_null($User)
             ?   $subordinated = $User->getDirector()->getId()
             :   $subordinated = 0;
 
-        return Core::factory( 'Lid_Status' )
+        return Core::factory('Lid_Status')
             ->queryBuilder()
-            ->where( 'subordinated', '=', $subordinated )
-            ->orderBy( 'sorting', 'DESC' )
+            ->where('subordinated', '=', $subordinated)
+            ->orderBy('sorting', 'DESC')
             ->findAll();
-
-//        return Core::factory( 'Property' )
-//            ->getByTagName( 'lid_status' )
-//            ->getList();
     }
 
 
     /**
-     * @param $statusId
+     * @param int $statusId
      * @return $this
      */
-    public function changeStatus( $statusId )
+    public function changeStatus(int $statusId)
     {
-        if ( $this->subordinated() == 0 )
-        {
+        if ($this->subordinated() == 0) {
             return $this;
         }
 
-        $Status = Core::factory( 'Lid_Status' )
+        $Status = Core::factory('Lid_Status')
             ->queryBuilder()
-            ->where( 'id', '=', $statusId )
-            ->where( 'subordinated', '=', $this->subordinated() )
+            ->where('id', '=', $statusId)
+            ->where('subordinated', '=', $this->subordinated())
             ->find();
 
-        if ( $Status === null )
-        {
-            Core_Page_Show::instance()->error( 404 );
+        if (is_null($Status)) {
+            Core_Page_Show::instance()->error(404);
         }
 
         $observerArgs = [
@@ -173,12 +170,10 @@ class Lid extends Lid_Model
             'new_status' => $Status
         ];
 
-        Core::notify( $observerArgs, 'beforeChangeLidStatus' );
-
-        $this->statusId( $statusId )->save();
-
+        Core::notify($observerArgs, 'beforeChangeLidStatus');
+        $this->statusId($statusId)->save();
         $observerArgs['Lid'] = &$this;
-        Core::notify( $observerArgs, 'afterChangeLidStatus' );
+        Core::notify($observerArgs, 'afterChangeLidStatus');
 
         return $this;
     }
@@ -191,16 +186,11 @@ class Lid extends Lid_Model
      */
     public function getStatus()
     {
-//        $PropertyValue = Core::factory( 'Property' )
-//            ->getByTagName( 'lid_status' )
-//            ->getPropertyValues( $this )[0];
-
-        return Core::factory( 'Lid_Status' )
+        return Core::factory('Lid_Status')
             ->queryBuilder()
-            ->where( 'id', '=', $this->status_id )
-            ->where( 'subordinated', '=', $this->subordinated() )
+            ->where('id', '=', $this->statusId())
+            ->where('subordinated', '=', $this->subordinated())
             ->find();
     }
-
 
 }

@@ -1,20 +1,19 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 16.05.2018
- * Time: 16:47
+ * Класс реализующий методы для работы с задачами
+ *
+ * @author BadWolf
+ * @date 16.05.2018 16:47
+ * @version 20190329
+ * Class Task
  */
-
 class Task extends Task_Model
 {
-    /**
-     * Статически заданный текст комментария при закрытии задачи
-     */
-    const TASK_DONE_COMMENT = "Задача закрыта";
+    //Текст комментария при закрытии задачи
+    const TASK_DONE_COMMENT = 'Задача закрыта';
 
-
-    public function __construct(){}
+    //Текст задачи при возвращения к работе
+    const TASK_DONE_REVERT_COMMENT = 'Задача восстановлена на доработку';
 
 
     /**
@@ -22,13 +21,16 @@ class Task extends Task_Model
      *
      * @return array
      */
-    public function getNotes()
+    public function getNotes() : array
     {
-        if ( $this->id === null || $this->id < 0 )   return [];
+        if (empty($this->id)) {
+            return [];
+        }
 
-        return Core::factory( "Task_Note" )->queryBuilder()
-            ->where( "task_id", "=", $this->id )
-            ->orderBy( "date", "DESC" )
+        return Core::factory('Task_Note')
+            ->queryBuilder()
+            ->where('task_id', '=', $this->getId())
+            ->orderBy('date', 'DESC')
             ->findAll();
     }
 
@@ -38,50 +40,54 @@ class Task extends Task_Model
      *
      * @return string
      */
-    public function doneComment()
+    public function doneComment() : string
     {
         return self::TASK_DONE_COMMENT;
     }
 
 
     /**
+     * Геттер для текста комментария при восстановлении задачи для доработки
+     *
+     * @return string
+     */
+    public function doneRevertComment() : string
+    {
+        return self::TASK_DONE_REVERT_COMMENT;
+    }
+
+
+    /**
      * Добавление комментария к задаче
      *
-     * @param $text - текст комментария
-     * @param null $author_id - id автора, по умолчанию береться id авторизованного пользователя
-     * @param null $date - дата комментария, по умолчанию берется текущая
+     * @param string $text - текст комментария
+     * @param int|null $authorId - id автора, по умолчанию береться id авторизованного пользователя
+     * @param string|null $date - дата комментария, по умолчанию берется текущая
      * @return $this
      */
-    public function addNote( $text, $author_id = null, $date = null )
+    public function addNote(string $text, int $authorId = null, string $date = null)
     {
-        $Note = Core::factory( "Task_Note" );
+        $Note = Core::factory('Task_Note');
 
-        if ( $author_id === null )
-        {
-            $Author = User::current();
-
-            $Author === false
-                ?   $Note->authorId( 0 )
-                :   $Note->authorId( $Author->getId() );
-        }
-        else
-        {
-            $Note->authorId( $author_id );
+        if (is_null($authorId)) {
+            if (is_null(User::current())) {
+                $Note->authorId(0);
+            } else {
+                $Note->authorId(User::current()->getId());
+            }
+        } else {
+            $Note->authorId($authorId);
         }
 
-        if ( $date === null )
-        {
-            $Note->date( date( "Y-m-d H:i:s" ) );
+        if (is_null($date)) {
+            $Note->date(date('Y-m-d H:i:s'));
+        } else {
+            $Note->date($date);
         }
-        else
-        {
-            $Note->date( $date );
-        }
-
 
         $Note
-            ->taskId( $this->id )
-            ->text( $text )
+            ->taskId($this->id)
+            ->text($text)
             ->save();
 
         return $this;
@@ -89,17 +95,44 @@ class Task extends Task_Model
 
 
     /**
-     * Закрытие задачи + событие
+     * Пометка завершения задачи
+     *
+     * @return $this
      */
     public function markAsDone()
     {
-        Core::notify( [&$this], "TaskMarkAsDone" );
+        if (empty($this->id)) {
+            return $this;
+        }
+
+        Core::notify([&$this], 'TaskMarkAsDone');
 
         $this
-            ->done( 1 )
+            ->doneDate(date('Y-m-d'))
+            ->done(1)
             ->save();
 
-        $this->addNote( self::TASK_DONE_COMMENT );
+        $this->addNote($this->doneComment());
+        return $this;
+    }
+
+
+    /**
+     * Возвращение задачи на выполнение
+     *
+     * @return $this
+     */
+    public function doneRevert()
+    {
+        if (empty($this->id)) {
+            return $this;
+        }
+
+        Core::notify([&$this], 'TaskDoneRevert');
+
+        $this->done_date = null;
+        $this->done(0)->save();
+        return $this;
     }
 
 

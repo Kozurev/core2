@@ -1,80 +1,141 @@
 <?php
-
+/**
+ * @author BadWolf
+ * @version 20190328
+ * Class Property_List_Values_Model
+ */
 class Property_List_Values_Model extends Core_Entity
 {
-
+    /**
+     * @var int
+     */
 	protected $id;
+
+
+    /**
+     * @var int
+     */
 	protected $property_id;
+
+
+    /**
+     * @var string
+     */
 	protected $value;
+
+
+    /**
+     * @var int
+     */
     protected $sorting = 0;
+
+
+    /**
+     * @var int
+     */
     protected $subordinated = 0;
 
-	public function getId()
+
+    /**
+     * @param int|null $propertyId
+     * @return $this|int
+     */
+    public function propertyId(int $propertyId = null)
     {
-		return intval( $this->id );
+        if (is_null($propertyId)) {
+            return intval($this->property_id);
+        } else {
+            $this->property_id = $propertyId;
+            return $this;
+        }
     }
 
 
-	public function property_id( $val = null )
-	{
-		if ( is_null( $val ) )
-        {
-            return intval( $this->property_id );
-        }
-
-		$this->property_id = intval( $val );
-		return $this;
-	}
-
-	public function propertyId( $val = null )
+    /**
+     * @param int|null $propertyId
+     * @return int|Property_List_Values_Model
+     */
+    public function property_id(int $propertyId = null)
     {
-        if ( is_null( $val ) )
-        {
-            return intval( $this->property_id );
-        }
-
-        $this->property_id = intval( $val );
-        return $this;
+        return $this->propertyId($propertyId);
     }
 
-	public function value( $val = null )
-	{
-		if ( is_null( $val ) )
-        {
+
+    /**
+     * @param string|null $value
+     * @return $this|string
+     */
+    public function value(string $value = null)
+    {
+        if (is_null($value)) {
             return $this->value;
+        } else {
+            $this->value = $value;
+            return $this;
         }
-
-		if ( strlen( $val ) > 100 )
-        {
-            die( Core::getMessage( 'TOO_LARGE_VALUE', ['value', 'Property_List_Values', 100] ) );
-        }
-
-		$this->value = $val;
-		return $this;
-	}
-
-
-    public function sorting( $val = null )
-    {
-        if ( is_null( $val ) )
-        {
-            return intval( $this->sorting );
-        }
-
-        $this->sorting = intval( $val );
-        return $this;
     }
 
 
-    public function subordinated( $val = null )
+    /**
+     * @param int|null $sorting
+     * @return $this|int
+     */
+    public function sorting(int $sorting = null)
     {
-        if ( is_null( $val ) )
-        {
-            return $this->subordinated;
+        if (is_null($sorting)) {
+            return intval($this->sorting);
+        } else {
+            $this->sorting = $sorting;
+            return $this;
         }
+    }
 
-        $this->subordinated = intval( $val );
-        return $this;
+
+    /**
+     * @param int|null $subordinated
+     * @return $this|int
+     */
+    public function subordinated(int $subordinated = null)
+    {
+        if (is_null($subordinated)) {
+            return intval($this->subordinated);
+        } else {
+            $this->subordinated = $subordinated;
+            return $this;
+        }
+    }
+
+
+    /**
+     * Параметры валидации при сохранении таблицы
+     */
+    public function schema()
+    {
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'sorting' => [
+                'required' => true,
+                'type' => PARAM_INT
+            ],
+            'property_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'value' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 100
+            ],
+            'subordinated' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ]
+        ];
     }
 
 }

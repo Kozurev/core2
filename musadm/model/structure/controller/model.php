@@ -1,6 +1,6 @@
 <?php 
 
-class Structure_Controller_Model extends Core_Entity_Controller
+class Structure_Controller_Model extends Core_Entity
 {
 	protected $aStructureControllerVars = array(
 		"items" => false,

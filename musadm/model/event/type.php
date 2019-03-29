@@ -1,14 +1,17 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Egor
- * Date: 26.11.2018
- * Time: 16:07
+ * Класс-модель типа события
+ *
+ * @author BadWolf
+ * @date 26.11.2018 16:07
+ * @version 20190328
+ * Class Event_Type
  */
-
 class Event_Type extends Core_Entity
 {
-
+    /**
+     * @var int
+     */
     protected $id;
 
 
@@ -30,7 +33,7 @@ class Event_Type extends Core_Entity
      *
      * @var string
      */
-    protected $name = "";
+    protected $name;
 
 
     /**
@@ -38,63 +41,108 @@ class Event_Type extends Core_Entity
      *
      * @var string
      */
-    protected $title = "";
+    protected $title;
 
 
-    public function getId()
+    /**
+     * @param int|null $parentId
+     * @return $this|int
+     */
+    public function parentId(int $parentId = null)
     {
-        return intval( $this->id );
+        if (is_null($parentId)) {
+            return intval($this->parent_id);
+        } else {
+            $this->parent_id = $parentId;
+            return $this;
+        }
     }
 
 
-    public function parentId( $val = null )
+    /**
+     * @param string|null $name
+     * @return $this|string
+     */
+    public function name(string $name = null)
     {
-        if( is_null( $val ) )   return intval( $this->parent_id );
-
-        $this->parent_id = intval( $val );
-        return $this;
+        if (is_null($name)) {
+            return $this->name;
+        } else {
+            $this->name = $name;
+            return $this;
+        }
     }
 
 
-    public function name( $val = null )
+    /**
+     * @param string|null $title
+     * @return $this|string
+     */
+    public function title(string $title = null)
     {
-        if( is_null( $val ) )   return strval( $this->name );
-
-        $this->name = strval( $val );
-        return $this;
+        if (is_null($title)) {
+            return $this->title;
+        } else {
+            $this->title = $title;
+            return $this;
+        }
     }
 
 
-    public function title( $val = null )
+    //Параметры валидации при сохранении таблицы
+    public function schema()
     {
-        if( is_null( $val ) )   return strval( $this->title );
-
-        $this->title = strval( $val );
-        return $this;
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'title' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'name' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'parent_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ]
+        ];
     }
 
 
-    public function save( $obj = null )
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
+    public function save($obj = null)
     {
-        Core::notify( array( &$this ), "beforeEventTypeSave" );
+        Core::notify([&$this], 'beforeEventTypeSave');
 
-        if( $this->name != "" )
-        {
-            $Type = Core::factory( "Event_Type" )
-                ->where( "name", "=", $this->name );
+        if ($this->name != '') {
+            $Type = Core::factory('Event_Type')
+                ->queryBuilder()
+                ->where('name', '=', $this->name);
 
-            if( $this->id != null )
-                $Type->where( "id", "<>", $this->id );
+            if (!empty($this->id)) {
+                $Type->where('id', '<>', $this->id);
+            }
 
             $Type = $Type->find();
 
-            if( $Type !== false )
-                die( "Тип события с названием <b>'". $this->name ."'</b> уже существует" );
+            if(!is_null($Type)) {
+                die("Тип события с названием <b>'". $this->name ."'</b> уже существует" );
+            }
         }
 
         parent::save();
 
-        Core::notify( array( &$this ), "afterEventTypeSave" );
+        Core::notify([&$this], 'afterEventTypeSave');
     }
 
 
@@ -102,21 +150,21 @@ class Event_Type extends Core_Entity
      * Добавление дочернего типа события
      * Возвращает созданный дочерний тип
      *
-     * @param $child_name
+     * @param string $child_title
+     * @param string $child_name
      * @return Event_Type
      */
-    public function appendChild( $child_title, $child_name = "" )
+    public function appendChild(string $child_title, string $child_name = '')
     {
-        if( $this->id == null )
-            die( "Невозможно добавить дочерний элемент '". strval( $child_name ) ."' к несохраненному (не имеющему id) типу события" );
+        if(empty($this->id)) {
+            die("Невозможно добавить дочерний элемент '". strval($child_name) . "' к несохраненному (не имеющему id) типу события");
+        }
 
-        $ChildType = Core::factory( "Event_Type" )
-            ->parentId( $this->id )
-            ->name( $child_name )
-            ->title( strval( $child_title ) );
-        //Orm::debug(true);
+        $ChildType = Core::factory('Event_Type')
+            ->parentId($this->id)
+            ->name($child_name)
+            ->title(strval($child_title));
         $ChildType->save();
-        //Orm::debug(false);
         return $ChildType;
     }
 
@@ -124,19 +172,15 @@ class Event_Type extends Core_Entity
     /**
      * Получение типа события по уникальному названию
      *
-     * @param $name
-     * @return mixed
+     * @param string $name
+     * @return Event_Type|null
      */
-    public function getByName( $name )
+    public function getByName(string $name)
     {
-        $Type = Core::factory( "Event_Type" )
-            ->where( "name", "=", strval( $name ) )
+        return Core::factory('Event_Type')
+            ->queryBuilder()
+            ->where('name', '=', $name)
             ->find();
-
-        if( $Type === false )
-            die( "Типа события с именем <b>'". strval( $name ) ."'</b> не найдено" );
-        else
-            return $Type;
     }
 
 

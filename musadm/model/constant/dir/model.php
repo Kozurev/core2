@@ -1,48 +1,107 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Egor
- * Date: 04.03.2018
- * Time: 17:24
+ * Класс-модель директории констант
+ *
+ * @author Egor
+ * @date 04.03.2018 17:24
+ * Class Constant_Dir_Model
  */
-
 class Constant_Dir_Model extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
+
+
+    /**
+     * Название директории
+     *
+     * @var string
+     */
     protected $title;
+
+
+    /**
+     * Описание директории
+     *
+     * @var string
+     */
     protected $description;
-    protected $parent_id;
 
-    public function getId()
+
+    /**
+     * id родительской директории
+     *
+     * @var int
+     */
+    protected $parent_id = 0;
+
+
+    /**
+     * @param string|null $title
+     * @return $this|string
+     */
+    public function title(string $title = null)
     {
-        return $this->id;
+        if (is_null($title)) {
+            return $this->title;
+        } else {
+            $this->title = $title;
+            return $this;
+        }
     }
 
 
-    public function title($val = null)
+    /**
+     * @param string|null $description
+     * @return $this|string
+     */
+    public function description(string $description = null)
     {
-        if(is_null($val))   return $this->title;
-        if(strlen($val) > 150)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("title", "Constant_Dir", )));
-        $this->title = $val;
-        return $this;
+        if (is_null($description)) {
+            return $this->description;
+        } else {
+            $this->description = $description;
+            return $this;
+        }
     }
 
-    public function description($val = null)
+
+    public function parentId(int $parentId = null)
     {
-        if(is_null($val))   return $this->description;
-        $this->description = $val;
-        return $this;
+        if (is_null($parentId)) {
+            return intval($this->parent_id);
+        } else {
+            $this->parent_id = $parentId;
+            return $this;
+        }
     }
 
 
-    public function parentId($val = null)
+    //Параметры валидации при сохранении таблицы
+    public function schema()
     {
-        if(is_null($val))   return $this->parent_id;
-        if($val < 0)
-            die(Core::getMessage("UNSIGNED_VALUE", array("parent_id", "Constant_Dir")));
-        $this->parent_id = $val;
-        return $this;
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'title' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 150
+            ],
+            'description' => [
+                'required' => true,
+                'type' => PARAM_STRING
+            ],
+            'author_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 1
+            ]
+        ];
     }
 
 }

@@ -1,92 +1,232 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: User
- * Date: 20.04.2018
- * Time: 15:06
+ * Класс-модель платежа
+ *
+ * @author BadWolf
+ * @date 20.04.2018 15:06
+ * @version 20190328
+ * Class Payment_Model
  */
-
-
 class Payment_Model extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
+
+
+    /**
+     * id пользователя с которым был связан платеж
+     *
+     * @var int
+     */
     protected $user = 0;
-    protected $type = 0;
+
+
+    /**
+     * id типа платежа
+     *
+     * @var int
+     */
+    protected $type;
+
+
+    /**
+     * Дата совершения платежа
+     *
+     * @var string
+     */
     protected $datetime;
+
+
+    /**
+     * Сумма платежа
+     *
+     * @var int
+     */
     protected $value;
+
+
+    /**
+     * Примечание к платежу
+     *
+     * @var string
+     */
     protected $description;
+
+
+    /**
+     * id организации (директора) которой принадлежит платеж
+     *
+     * @var int
+     */
     protected $subordinated = 0;
+
+
+    /**
+     * id филиала с которым связан платеж
+     *
+     * @var int
+     */
     protected $area_id = 0;
 
-    public function __construct(){}
 
-
-    public function getId()
+    /**
+     * @param int|null $user
+     * @return $this|int
+     */
+    public function user(int $user = null)
     {
-        return intval( $this->id );
+        if (is_null($user)) {
+            return intval($this->user);
+        } else {
+            $this->user = $user;
+            return $this;
+        }
     }
 
 
-    public function user ( $val = null )
+    /**
+     * @param int|null $typeId
+     * @return $this|int
+     */
+    public function type(int $typeId = null)
     {
-        if ( is_null( $val ) )   return intval( $this->user );
-
-        $this->user = intval( $val );
-        return $this;
+        if (is_null($typeId)) {
+            return intval($this->type);
+        } else {
+            $this->type = $typeId;
+            return $this;
+        }
     }
 
 
-    public function type( $val = null )
+    /**
+     * @param string|null $date
+     * @return $this|string
+     */
+    public function datetime(string $date = null)
     {
-        if ( is_null( $val ) )   return intval( $this->type );
-
-        $this->type = intval( $val );
-        return $this;
+        if (is_null($date)) {
+            return $this->datetime;
+        } else {
+            $this->datetime = $date;
+            return $this;
+        }
     }
 
 
-    public function datetime( $val = null )
+    /**
+     * @param int|null $value
+     * @return $this|int
+     */
+    public function value(int $value = null)
     {
-        if ( is_null( $val ) )   return $this->datetime;
-
-        $this->datetime = strval( $val );
-        return $this;
+        if (is_null($value)) {
+            return intval($this->value);
+        } else {
+            $this->value = $value;
+            return $this;
+        }
     }
 
 
-    public function value( $val = null )
+    /**
+     * @param string|null $description
+     * @return $this|string
+     */
+    public function description(string $description = null)
     {
-        if ( is_null( $val ) )   return intval( $this->value );
-
-        $this->value = intval( $val );
-        return $this;
+        if (is_null($description)) {
+            return $this->description;
+        } else {
+            $this->description = $description;
+            return $this;
+        }
     }
 
 
-    public function description( $val = null )
+    /**
+     * @param int|null $subordinated
+     * @return $this|int
+     */
+    public function subordinated(int $subordinated = null)
     {
-        if ( is_null( $val ) )   return $this->description;
-
-        $this->description = strval( $val );
-        return $this;
+        if (is_null($subordinated)) {
+            return intval($this->subordinated);
+        } else {
+            $this->subordinated = $subordinated;
+            return $this;
+        }
     }
 
 
-    public function subordinated( $val = null )
+    /**
+     * @param int|null $areaId
+     * @return $this|int
+     */
+    public function areaId(int $areaId = null)
     {
-        if ( is_null( $val ) )   return intval( $this->subordinated );
-
-        $this->subordinated = intval( $val );
-        return $this;
+        if (is_null($areaId)) {
+            return intval($this->area_id);
+        } else {
+            $this->area_id = $areaId;
+            return $this;
+        }
     }
 
 
-    public function areaId( $val = null )
+    /**
+     * Параметры валидации при сохранении таблицы
+     */
+    public function schema()
     {
-        if ( is_null( $val ) )  return intval( $this->area_id );
-
-        $this->area_id = intval( $val );
-        return $this;
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'title' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'user' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'type' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'datetime' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minlength' => 10,
+                'maxlength' => 10
+            ],
+            'description' => [
+                'required' => true,
+                'type' => PARAM_STRING
+            ],
+            'value' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'area_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'subordinated' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ]
+        ];
     }
 
 }

@@ -1,38 +1,61 @@
 <?php
 /**
-*	Модель шаблона
-*/
+ * Класс-модель макета страницы
+ *
+ * @author BadWolf
+ * @version 20190328
+ */
 class Core_Page_Template extends Core_Page_Template_Model
 {
-
+    /**
+     * @return Core_Page_Template|null
+     */
     public function getParent()
     {
-        if($this->parent_id == "")  return false;
-        return Core::factory("Page_Template", $this->parent_id);
+        if ($this->parentId() == 0)  {
+            return null;
+        } else {
+            return Core::factory('Core_Page_Template', $this->parentId());
+        }
     }
 
 
+    /**
+     * @return array
+     */
     public function getChildren()
     {
-        if($this->id == "") return false;
-        return Core::factory("Page_Template")
-            ->where("parent_id", "=", $this->id)
+        if (empty($this->id)) {
+            return [];
+        }
+
+        return Core::factory('Core_Page_Template')
+            ->queryBuilder()
+            ->where('parent_id', '=', $this->id)
             ->findAll();
     }
 
 
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
     public function delete($obj = null)
     {
-        Core::notify(array(&$this), "beforeTemplateDelete");
+        Core::notify([&$this], 'beforeTemplateDelete');
         parent::delete();
-        Core::notify(array(&$this), "afterTemplateDelete");
+        Core::notify([&$this], 'afterTemplateDelete');
     }
 
 
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
     public function save($obj = null)
     {
-        Core::notify(array(&$this), "beforeTemplateSave");
+        Core::notify([&$this], 'beforeTemplateSave');
         parent::save();
-        Core::notify(array(&$this), "afterTemplateSave");
+        Core::notify([&$this], 'afterTemplateSave');
     }
 }

@@ -1,108 +1,206 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 16.05.2018
- * Time: 16:41
+ * Класс-модель задачи (тикета)
+ *
+ * @author BadWolf
+ * @date 16.05.2018 16:41
+ * @version 20190329
+ * Class Task_Model
  */
-
 class Task_Model extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
+
+
+    /**
+     * Дата, начиная с которой задача станет видна сотрудникам
+     *
+     * @var string
+     */
     protected $date;
+
+
+    /**
+     * Указатель завершенности задачи
+     *
+     * @var int
+     */
     protected $done = 0;
+
+
+    /**
+     * Дата выполнения задачи
+     *
+     * @var string
+     */
     protected $done_date;
+
+
+    /**
+     * id типа задачи
+     * 0 - обычный тикет
+     * все значения больше 0 - типы задач из таблицы Task_Type
+     *
+     * @var int
+     */
     protected $type = 0;
+
+
+    /**
+     * id клиента с которым связана задача
+     *
+     * @var int
+     */
     protected $associate = 0;
+
+
+    /**
+     * id организации (директора), которому принадлежит задача
+     *
+     * @var int
+     */
     protected $subordinated = 0;
+
+
+    /**
+     * id филиала, с которым связана задача
+     *
+     * @var int
+     */
     protected $area_id = 0;
+
+
+    /**
+     * id приоритета задачи
+     * По умолчанию приоритет - обычный
+     *
+     * @var int
+     */
     protected $priority_id = 1;
 
 
-
-    public function getId()
+    /**
+     * @param string|null $date
+     * @return $this|string
+     */
+    public function date(string $date = null)
     {
-        return intval( $this->id );
-    }
-
-
-    public function date( $val = null )
-    {
-        if ( is_null( $val ) )   return strval( $this->date );
-
-        $this->date = strval( $val );
-
-        return $this;
-    }
-
-
-    public function done( $val = null )
-    {
-        if ( is_null( $val ) )   return intval( $this->done );
-
-        if ( $val == true )
-        {
-            $this->done = 1;
-            $this->done_date = date( "Y-m-d" );
+        if (is_null($date)) {
+            return $this->date;
+        } else {
+            $this->date = $date;
+            return $this;
         }
-        elseif ( $val == false )
-        {
+    }
+
+
+    /**
+     * @param int|null $done
+     * @return $this|int
+     */
+    public function done(int $done = null)
+    {
+        if (is_null($done)) {
+            return intval($this->done);
+        } elseif ($done == true) {
+            $this->done = 1;
+        } elseif ($done == false) {
             $this->done = 0;
         }
-
         return $this;
     }
 
 
-    public function type( $val = null )
+    /**
+     * @param string|null $doneDate
+     * @return $this|string
+     */
+    public function doneDate(string $doneDate = null)
     {
-        if ( is_null( $val ) )   return intval( $this->type );
-
-        $this->type = intval( $val );
-
-        return $this;
+        if (is_null($doneDate)) {
+            return $this->done_date;
+        } else {
+            $this->done_date = $doneDate;
+            return $this;
+        }
     }
 
 
-    public function associate( $val = null )
+    /**
+     * @param int|null $typeId
+     * @return $this|int
+     */
+    public function type(int $typeId = null)
     {
-        if ( is_null( $val ) )   return intval( $this->associate );
-
-        $this->associate = intval( $val );
-
-        return $this;
+        if (is_null($typeId)) {
+            return intval($this->type);
+        } else {
+            $this->type = $typeId;
+            return $this;
+        }
     }
 
 
-    public function subordinated( $val = null )
+    /**
+     * @param int|null $associate
+     * @return $this|int
+     */
+    public function associate(int $associate = null)
     {
-        if ( is_null( $val ) )   return intval( $this->subordinated );
-
-        $this->subordinated = intval( $val );
-
-        return $this;
+        if (is_null($associate)) {
+            return intval($this->associate);
+        } else {
+            $this->associate = $associate;
+            return $this;
+        }
     }
 
 
-    public function areaId( $val = null )
+    /**
+     * @param int|null $subordinated
+     * @return $this|int
+     */
+    public function subordinated(int $subordinated = null)
     {
-        if ( is_null( $val ) )  return intval( $this->area_id );
-
-        $this->area_id = intval( $val );
-
-        return $this;
+        if (is_null($subordinated)) {
+            return intval($this->subordinated);
+        } else {
+            $this->subordinated = $subordinated;
+            return $this;
+        }
     }
 
 
-    public function priorityId( $priority_id = null )
+    /**
+     * @param int|null $areaId
+     * @return $this|int
+     */
+    public function areaId(int $areaId = null)
     {
-        if ( is_null( $priority_id ) )  return intval( $this->priority_id );
-
-        $this->priority_id = intval( $priority_id );
-
-        return $this;
+        if (is_null($areaId)) {
+            return intval($this->area_id);
+        } else {
+            $this->area_id = $areaId;
+            return $this;
+        }
     }
 
 
+    /**
+     * @param int|null $priorityId
+     * @return $this|int
+     */
+    public function priorityId(int $priorityId = null)
+    {
+        if (is_null($priorityId)) {
+            return intval($this->priority_id);
+        } else {
+            $this->priority_id = $priorityId;
+            return $this;
+        }
+    }
 
 }

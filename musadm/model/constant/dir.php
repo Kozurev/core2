@@ -1,30 +1,41 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Egor
- * Date: 04.03.2018
- * Time: 16:55
+ *
+ * @author BadWolf
+ * @date 04.03.2018 16:55
+ * @version 20190328
+ * Class Constant_Dir
  */
-
 class Constant_Dir extends Constant_Dir_Model
 {
-
-    public function __construct()
-    {
-    }
-
-
+    /**
+     * @return Constant_Dir|null
+     */
     public function getParent()
     {
-        return Core::factory("Constant_Dir", $this->parent_id);
+        return Core::factory('Constant_Dir', $this->parent_id);
     }
 
 
-    public function isChild($oDir)
+    /**
+     * @param $Dir
+     * @return bool
+     */
+    public function isChild(Constant_Dir $Dir) : bool
     {
-        if($oDir->parentId() == $this->id) return true;
-        if($oDir->parentId() == 0) return false;
-        return $this->isChild($oDir->getParent());
+        if ($Dir->parentId() == $this->id) {
+            return true;
+        } elseif ($Dir->parentId() == 0) {
+            return false;
+        }
+
+        $ParentDir = $this->getParent();
+        if (!is_null($ParentDir)) {
+            return $this->isChild($ParentDir);
+        } else {
+            return false;
+        }
     }
 
 }

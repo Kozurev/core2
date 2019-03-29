@@ -1,52 +1,112 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 19.04.2018
- * Time: 16:31
+ * Класс-модель директории макета
+ *
+ * @author BadWolf
+ * @date 19.04.2018 16:31
+ * @version 20190328
+ * Class Core_Page_Template_Dir_Model
  */
-
 class Core_Page_Template_Dir_Model extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
+
+
+    /**
+     * Название
+     *
+     * @var string
+     */
     protected $title;
+
+
+    /**
+     * Описание
+     *
+     * @var string
+     */
     protected $description;
-    protected $dir;
 
-    public function __construct()
+
+    /**
+     * id родительской директории
+     *
+     * @var int
+     */
+    protected $dir = 0;
+
+
+    /**
+     * @param string|null $title
+     * @return $this|string
+     */
+    public function title(string $title = null)
     {
+        if (is_null($title)) {
+            return $this->title;
+        } else {
+            $this->title = trim($title);
+            return $this;
+        }
     }
 
 
-    public function getId()
+    /**
+     * @param string|null $description
+     * @return $this|string
+     */
+    public function description(string $description = null)
     {
-        return $this->id;
+        if (is_null($description)) {
+            return $this->description;
+        } else {
+            $this->description = $description;
+            return $this;
+        }
     }
 
 
-    public function title($val = null)
+    /**
+     * @param int|null $dir
+     * @return $this|int
+     */
+    public function dir(int $dir = null)
     {
-        if(is_null($val))   return $this->title;
-        if(strlen($val) > 255)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("title", "Page_Template_Dir", 255)));
-        $this->title = $val;
-        return $this;
+        if (is_null($dir)) {
+            return $this->dir;
+        } else {
+            $this->dir = $dir;
+            return $this;
+        }
     }
 
 
-    public function description($val = null)
+    //Параметры валидации при сохранении таблицы
+    public function schema()
     {
-        if(is_null($val))   return $this->description;
-        $this->description = $val;
-        return $this;
-    }
-
-
-    public function dir($val = null)
-    {
-        if(is_null($val))   return $this->dir;
-        $this->dir = intval($val);
-        return $this;
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'title' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'description' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+            ],
+            'dir' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ]
+        ];
     }
 
 }

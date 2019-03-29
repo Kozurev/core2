@@ -1,56 +1,161 @@
 <?php
+/**
+ * @author BadWolf
+ * @version 20190328
+ * Class Property_Int
+ */
 class Property_Int extends Core_Entity
 {
-	protected $id;
-	protected $property_id;
-	protected $value;
-	protected $model_name;
-	protected $object_id;
-	//protected $forbiddenTags = array("_xslPath");
-
-	public function __construct()
-	{
-	}
+    /**
+     * @var int
+     */
+    protected $id;
 
 
-	public function getId(){
-		return $this->id;}
+    /**
+     * @var int
+     */
+    protected $property_id;
 
 
-	public function property_id($val = null)
-	{
-		if(is_null($val))	return $this->property_id;
-
-		$this->property_id = intval($val);
-		return $this;
-	}
+    /**
+     * @var int
+     */
+    protected $value;
 
 
-	public function value($val = null)
-	{
-		if(is_null($val))	return $this->value;
-		$this->value = floatval($val);
-		return $this;
-	}
+    /**
+     * @var string
+     */
+    protected $model_name;
 
 
-	public function model_name($val = null)
-	{
-		if(is_null($val)) 	return $this->model_name;
-		if(strlen($val) > 100)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("model_name", "Property_Int", 100)));
-
-		$this->model_name = $val;
-		return $this;
-	}
+    /**
+     * @var int
+     */
+    protected $object_id;
 
 
-	public function object_id($val = null)
-	{
-		if(is_null($val))	return $this->object_id;
+    /**
+     * @param float|null $value
+     * @return $this|float
+     */
+    public function value(float $value = null)
+    {
+        if (is_null($value))	{
+            return floatval($this->value);
+        } else {
+            $this->value = $value;
+            return $this;
+        }
+    }
 
-		$this->object_id = intval($val);
-		return $this;
-	}
+
+    /**
+     * @param string|null $modelName
+     * @return $this|string
+     */
+    public function modelName(string $modelName = null)
+    {
+        if (is_null($modelName)) {
+            return $this->model_name;
+        } else {
+            $this->model_name = $modelName;
+            return $this;
+        }
+    }
+
+
+    /**
+     * @param string|null $modelName
+     * @return Property_Int|string
+     */
+    public function model_name(string $modelName = null)
+    {
+        return $this->modelName($modelName);
+    }
+
+
+    /**
+     * @param int|null $objectId
+     * @return $this|int
+     */
+    public function objectId(int $objectId = null)
+    {
+        if (is_null($objectId)) {
+            return intval($this->object_id);
+        } else {
+            $this->object_id = $objectId;
+            return $this;
+        }
+    }
+
+
+    /**
+     * @param int|null $objectId
+     * @return int|Property_Int
+     */
+    public function object_id(int $objectId = null)
+    {
+        return $this->objectId($objectId);
+    }
+
+
+    /**
+     * @param int|null $propertyId
+     * @return $this|int
+     */
+    public function propertyId(int $propertyId = null)
+    {
+        if (is_null($propertyId)) {
+            return intval($this->property_id);
+        } else {
+            $this->property_id = $propertyId;
+            return $this;
+        }
+    }
+
+
+    /**
+     * @param int|null $propertyId
+     * @return int|Property_Int
+     */
+    public function property_id(int $propertyId = null)
+    {
+        return $this->propertyId($propertyId);
+    }
+
+
+    /**
+     * Параметры валидации при сохранении таблицы
+     */
+    public function schema()
+    {
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'object_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'model_name' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 100
+            ],
+            'property_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'value' => [
+                'required' => true,
+                'type' => PARAM_FLOAT
+            ]
+        ];
+    }
 
 }

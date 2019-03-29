@@ -1,192 +1,303 @@
 <?php
 /**
-*	Модель свойства структуры или её элемента
-*/
+ * Модель свойства структуры или её элемента
+ *
+ * @author BadWolf
+ * @version 20190328
+ */
 class Property_Model extends Core_Entity
 {
+    /**
+     * @var int
+     */
 	protected $id;
+
+
+    /**
+     * Уникальное название свойства
+     *
+     * @var string
+     */
 	protected $tag_name;
+
+
+    /**
+     * Заголовок доп. свойства
+     *
+     * @var string
+     */
 	protected $title;
+
+
+    /**
+     * Описание
+     *
+     * @var string
+     */
 	protected $description = ' ';
+
+
+    /**
+     * Тип хранимого значения
+     *
+     * @var int
+     */
 	protected $type = 0;
+
+
+    /**
+     * Указатель на возможность создания множественного свойства
+     *
+     * @var int
+     */
     protected $multiple = 0;
+
+
+    /**
+     * Активность доп. свойства
+     *
+     * @var int
+     */
 	protected $active = 1;
+
+
+    /**
+     * Порядок сортировки
+     *
+     * @var int
+     */
     protected $sorting = 0;
+
+
+    /**
+     * id родительской директории
+     *
+     * @var int
+     */
     protected $dir = 0;
+
+
+    /**
+     * Значение по умолчанию
+     *
+     * @var int
+     */
     protected $default_value = 0;
 
 
-
-	public function getId()
+    /**
+     * @param string|null $defaultValue
+     * @return $this|int
+     */
+    public function defaultValue(string $defaultValue = null)
     {
-		return intval( $this->id );
-    }
-
-
-    public function defaultValue($val = null)
-    {
-        if ( is_null( $val ) )
-        {
+        if (is_null($defaultValue)) {
             return $this->default_value;
+        } else {
+            $this->default_value = $defaultValue;
+            return $this;
         }
-
-        $this->default_value = $val;
-        return $this;
     }
 
 
-	public function active( $val = null )
+    /**
+     * @param int|null $active
+     * @return $this|int
+     */
+	public function active(int $active = null)
 	{
-		if ( is_null( $val ) )
-        {
-            return $this->active;
+		if (is_null($active)) {
+            return intval($this->active);
+        } elseif ($active == true) {
+		    $this->active = 1;
+        } elseif ($active == false) {
+		    $this->active = 0;
         }
-
-		$val == true
-            ?   $this->active = 1
-            :   $this->active = 0;
-
 		return $this;
 	}
 
 
-	public function multiple( $val = null )
+    /**
+     * @param int|null $multiple
+     * @return $this|int
+     */
+	public function multiple(int $multiple = null)
     {
-        if ( is_null( $val ) )
-        {
-            return $this->multiple;
-        }
-
-        if ( $val == true )
-        {
-            $this->multiple = 1;
-        }
-        else
-        {
+        if (is_null($multiple)) {
+            return intval($this->multiple);
+        } elseif ($multiple == true) {
+            $this->multiple = 0;
+        } elseif ($multiple == false) {
             $this->multiple = 0;
         }
-
         return $this;
     }
 
 
-	public function dir( $val = null )
+    /**
+     * @param int|null $dir
+     * @return $this|int
+     */
+	public function dir(int $dir = null)
     {
-        if ( is_null( $val ) )
-        {
-            return $this->dir;
+        if (is_null($dir)) {
+            return intval($this->dir);
+        } else {
+            $this->dir = $dir;
+            return $this;
         }
-
-        if ( intval( $val ) < 0 )
-        {
-            die ( Core::getMessage( 'UNSIGNED_VALUE', ['dir', 'Property'] ) );
-        }
-
-        $this->dir = intval( $val );
-        return $this;
     }
 
 
-	public function title( $val = null )
+    /**
+     * @param string|null $title
+     * @return $this|string
+     */
+	public function title(string $title = null)
 	{
-		if ( is_null( $val ) )
-        {
+		if (is_null($title)) {
             return $this->title;
+        } else {
+            $this->title = $title;
+            return $this;
         }
-
-		if ( strlen( $val ) > 150 )
-        {
-            die ( Core::getMessage( 'TOO_LARGE_VALUE', ['title', 'Property', 150] ) );
-        }
-
-		$this->title = $val;
-		return $this;
 	}
 
 
-	public function tag_name( $val = null )
-	{
-		if ( is_null( $val ) )
-        {
-            return $this->tag_name;
-        }
-
-		if ( strlen( $val ) > 50 )
-        {
-            die ( Core::getMessage( 'TOO_LARGE_VALUE', ['tag_name', 'Property', 50] ) );
-        }
-
-		$this->tag_name = $val;
-		return $this;
-	}
-
-
-    public function tagName( $val = null )
+    /**
+     * @param string|null $tagName
+     * @return $this|string
+     */
+    public function tagName(string $tagName = null)
     {
-        if ( is_null( $val ) )
-        {
+        if (is_null($tagName)) {
             return $this->tag_name;
+        } else {
+            $this->tag_name = $tagName;
+            return $this;
         }
-
-        if ( strlen( $val ) > 50 )
-        {
-            die ( Core::getMessage( 'TOO_LARGE_VALUE', ['tag_name', 'Property', 50] ) );
-        }
-
-        $this->tag_name = $val;
-        return $this;
     }
 
 
-	public function description( $val = null )
+    /**
+     * @param string|null $tagName
+     * @return Property_Model|string
+     */
+    public function tag_name(string $tagName = null)
+    {
+        return $this->tagName($tagName);
+    }
+
+
+    /**
+     * @param string|null $description
+     * @return $this|string
+     */
+	public function description(string $description = null)
 	{
-		if ( is_null( $val ) )
-        {
+		if (is_null($description)) {
             return $this->description;
+        } else {
+            $this->description = $description;
+            return $this;
         }
-
-		$this->description = $val;
-		return $this;
 	}
 
 
-	public function type( $val = null )
+    /**
+     * @param string|null $type
+     * @return $this|int
+     */
+	public function type(string $type = null)
 	{
-		if ( is_null( $val ) )
-        {
+		if (is_null($type)) {
             return $this->type;
+        } else {
+            $this->type = $type;
+            return $this;
         }
-
-		if ( strlen( $val ) > 50 )
-        {
-            die ( Core::getMessage( 'TOO_LARGE_VALUE', ['type', 'Property', 50] ) );
-        }
-
-		$this->type = $val;
-		return $this;
 	}
 
 
-    public function sorting( $val = null )
+    /**
+     * @param int|null $sorting
+     * @return $this|int
+     */
+    public function sorting(int $sorting = null)
     {
-        if ( is_null( $val ) )
-        {
-            return $this->sorting;
+        if (is_null($sorting)) {
+            return intval($this->sorting);
+        } else {
+            $this->sorting = $sorting;
+            return $this;
         }
-
-        if ( intval( $val ) < 0 )
-        {
-            die ( Core::getMessage( 'UNSIGNED_VALUE', ['sorting', 'Property'] ) );
-        }
-
-        $this->sorting = intval( $val );
-        return $this;
     }
 
 
-    public function getPropertyTypes()
+    /**
+     * @return array
+     */
+    public function getPropertyTypes() : array
     {
         return ['Int', 'String', 'Text', 'List', 'Bool'];
+    }
+
+
+    /**
+     * @return array
+     */
+    public function schema()
+    {
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT,
+            ],
+            'title' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 150
+            ],
+            'description' => [
+                'required' => true,
+                'type' => PARAM_STRING
+            ],
+            'tag_name' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 50
+            ],
+            'type' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 50
+            ],
+            'sorting' => [
+                'required' => true,
+                'type' => PARAM_INT
+            ],
+            'dir' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'active' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0,
+                'maxval' => 1
+            ],
+            'multiple' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0,
+                'maxval' => 1
+            ],
+            'default_value' => [
+                'required' => true,
+                'type' => PARAM_STRING
+            ]
+        ];
     }
 
 }

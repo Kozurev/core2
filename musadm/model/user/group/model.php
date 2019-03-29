@@ -1,64 +1,119 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: User
- * Date: 21.03.2018
- * Time: 13:16
+ * Класс-модель группы пользователей
+ *
+ * @author BadWolf
+ * @date 21.03.2018 13:16
+ * @version 20190329
+ * Class User_Group_Model
  */
-
 class User_Group_Model extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
+
+
+    /**
+     * Название группы
+     *
+     * @var string
+     */
     protected $title;
+
+
+    /**
+     * Порядок сортировки
+     *
+     * @var int
+     */
     protected $sorting = 0;
+
+
+    /**
+     * URL путь для страницы группы
+     *
+     * @var string
+     */
     protected $path;
+
+
+    /**
+     * Название дочерней сущности
+     *
+     * @var string
+     */
     protected $children_name;
 
-    public function __construct(){}
 
-
-    public function getId()
+    /**
+     * @param string|null $title
+     * @return $this|string
+     */
+    public function title(string $title = null)
     {
-        return $this->id;
+        if (is_null($title)) {
+            return $this->title;
+        } else {
+            $this->title = $title;
+            return $this;
+        }
     }
 
 
-    public function title($val = null)
+    /**
+     * @param int|null $sorting
+     * @return $this|int
+     */
+    public function sorting(int $sorting = null)
     {
-        if(is_null($val))   return $this->title;
-        if(strlen($val) > 50)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("title", "User_Group", 50)));
-
-        $this->title = $val;
-        return $this;
+        if (is_null($sorting)) {
+            return $this->sorting;
+        } else {
+            $this->sorting = $sorting;
+            return $this;
+        }
     }
 
 
-    public function sorting($val = null)
+    /**
+     * @param string|null $childrenName
+     * @return $this|string
+     */
+    public function childrenName(string $childrenName = null)
     {
-        if(is_null($val))   return $this->sorting;
-        $this->sorting = $val;
-        return $this;
+        if (is_null($childrenName)) {
+            return $this->children_name;
+        } else {
+            $this->children_name = $childrenName;
+            return $this;
+        }
     }
 
 
-    public function children_name($val = null)
+    /**
+     * @param string|null $childrenName
+     * @return string|User_Group_Model
+     */
+    public function children_name(string $childrenName = null)
     {
-        if(is_null($val))   return $this->children_name;
-        if(strlen($val) > 255)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("children_name", "Structure", 255)));
-        $this->children_name = $val;
+        return $this->childrenName($childrenName);
     }
 
 
-    public function path($val = null)
+    /**
+     * @param string|null $path
+     * @return $this|string
+     */
+    public function path(string $path = null)
     {
-        if(is_null($val))   return $this->path;
-        if(strlen($val) > 255)
-            die(Core::getMessage("TOO_LARGE_VALUE", array("path", "User_Group", 255)));
-
-        $this->path = $val;
-        return $this;
+        if (is_null($path)) {
+            return $this->path;
+        } else {
+            $this->path = $path;
+            return $this;
+        }
     }
 
 

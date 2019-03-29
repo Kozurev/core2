@@ -1,80 +1,181 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 09.07.2018
- * Time: 10:52
+ * Класс-модель для примечания к сертификату (надо удалить и объединить все комментарии в одну таблицу)
+ *
+ * @author BadWolf
+ * @date 09.07.2018 10:52
+ * @version 20190328
+ * Class Certificate_Note
  */
-
 class Certificate_Note extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
+
+
+    /**
+     * Дата создания примечания формата: date('Y-m-d H:i:s')
+     *
+     * @var string
+     */
     protected $date;
-    protected $certificate_id;
-    protected $author_id;
+
+
+    /**
+     * id сертификата, которому принадлежит примечание
+     *
+     * @var int
+     */
+    protected $certificate_id = 0;
+
+
+    /**
+     * id пользователя (автора) комментария
+     *
+     * @var int
+     */
+    protected $author_id = 0;
+
+
+    /**
+     * Текст примечания
+     *
+     * @var string
+     */
     protected $text;
 
-    public function __construct(){}
 
-
-    public function getId()
+    /**
+     * @param string|null $date
+     * @return $this|string
+     */
+    public function date(string $date = null)
     {
-        return $this->id;
+        if (is_null($date)) {
+            return $this->date;
+        } else {
+            $this->date = $date;
+            return $this;
+        }
     }
 
 
-    public function date( $val = null )
+    /**
+     * @param int|null $authorId
+     * @return $this|int
+     */
+    public function authorId(int $authorId = null)
     {
-        if( is_null( $val ) )   return $this->date;
-        $this->date = strval( $val );
-        return $this;
+        if (is_null($authorId)) {
+            return $this->author_id;
+        } else {
+            $this->author_id = $authorId;
+            return $this;
+        }
     }
 
 
-    public function authorId( $val = null )
+    /**
+     * @param int|null $certificateId
+     * @return $this|int
+     */
+    public function certificateId(int $certificateId = null)
     {
-        if( is_null( $val ) )   return $this->author_id;
-        $this->author_id = intval( $val );
-        return $this;
+        if (is_null($certificateId)) {
+            return $this->certificate_id;
+        } else {
+            $this->certificate_id = $certificateId;
+            return $this;
+        }
     }
 
 
-    public function certificateId( $val = null )
+    /**
+     * @param string|null $text
+     * @return $this|string
+     */
+    public function text(string $text = null)
     {
-        if( is_null( $val ) )   return $this->certificate_id;
-        $this->certificate_id = intval( $val );
-        return $this;
+        if (is_null($text)) {
+            return $this->text;
+        } else {
+            $this->text = $text;
+            return $this;
+        }
     }
 
 
-    public function text( $val = null )
+    //Параметры валидации при сохранении таблицы
+    public function schema()
     {
-        if( is_null( $val ) )   return $this->text;
-        $this->text = strval( $val );
-        return $this;
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'date' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'certificate_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+            ],
+            'author_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+            ],
+            'text' => [
+                'required' => true,
+                'type' => PARAM_STRING
+            ]
+        ];
     }
 
 
+    /**
+     * @return User|null
+     */
     public function getAuthor()
     {
-        return Core::factory( "User", $this->author_id );
+        return Core::factory('User', $this->author_id);
     }
 
 
-    public function save( $obj = null )
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
+    public function save($obj = null)
     {
-        Core::notify( array( &$this ), "beforeCertificateNoteSave" );
-        $this->date = date( "Y-m-d H:i:s" );
-        if( $this->author_id == "" )  $this->author_id = Core::factory("User")->getCurrent()->getId();
+        Core::notify([&$this], 'beforeCertificateNoteSave');
+
+        if (is_null($this->date)) {
+            $this->date = date('Y-m-d H:i:s');
+        }
+        if ($this->author_id == 0) {
+            $AuthUser = User::current()->getId();
+            if (!is_null($AuthUser)) {
+                $this->author_id = $AuthUser->getId();
+            }
+        }
+
         parent::save();
-        Core::notify( array( &$this ), "afterCertificateNoteSave" );
+        Core::notify([&$this], 'afterCertificateNoteSave');
     }
 
 
-    public function delete( $obj = null )
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
+    public function delete($obj = null)
     {
-        Core::notify( array( &$this ), "beforeCertificateNoteDelete" );
+        Core::notify([&$this], 'beforeCertificateNoteDelete');
         parent::delete();
-        Core::notify( array( &$this ), "afterCertificateNoteDelete" );
+        Core::notify([&$this], 'afterCertificateNoteDelete');
     }
 }

@@ -8,5 +8,5 @@
 
 class Property_Dir extends Property_Dir_Model
 {
-    public function __construct(){}
+
 }

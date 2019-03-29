@@ -2,6 +2,8 @@
 /**
  * Класс-модель для шаблона страницы
  *
+ * @author BadWolf
+ * @version 20190328
  * Class Core_Page_Template_Model
  */
 class Core_Page_Template_Model extends Core_Entity
@@ -43,9 +45,6 @@ class Core_Page_Template_Model extends Core_Entity
         if (is_null($title)) {
             return $this->title;
         } else {
-            if (strlen($title) > 255) {
-                die(Core::getMessage('TOO_LARGE_VALUE', ['title', 'Page_Template', 255]));
-            }
             $this->title = $title;
             return $this;
         }
@@ -79,6 +78,33 @@ class Core_Page_Template_Model extends Core_Entity
             $this->dir = $dir;
             return $this;
         }
+    }
+
+
+    //Параметры валидации при сохранении таблицы
+    public function schema()
+    {
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'title' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'parent_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'dir' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ]
+        ];
     }
 
 }
