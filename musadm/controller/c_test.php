@@ -34,6 +34,8 @@ $Orm->executeQuery( 'ALTER TABLE Lid ADD area_id int DEFAULT 0 NULL;' );
 
 $Orm->executeQuery('alter table Schedule_Group add note text null after duration;');
 
+$Orm->executeQuery('alter table Payment_Tarif modify count_group float not null');
+
 $Orm->executeQuery( '
     CREATE TABLE Schedule_Area_Assignment(
         id int PRIMARY KEY AUTO_INCREMENT,
