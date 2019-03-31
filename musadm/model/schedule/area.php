@@ -71,26 +71,21 @@ class Schedule_Area extends Schedule_Area_Model
 
 
     /**
-     * Переопределенный сеттер для названия филиала
      * Это реально ебаное волшебство. Я не помню зачем я добавлял кастомное свойство oldTitle
      * но без него филиал не сохраняется почему-то. Я хз что делать, просто оставлю так. Не трогать!
      *
-     * @param null $val
-     * @return Schedule_Area
+     * @param string|null $title
+     * @return $this|string
      */
-    public function title($val = null)
+    public function title(string $title = null)
     {
-        if (is_null($val)) {
+        if (is_null($title)) {
             return $this->title;
+        } else {
+            $this->oldTitle = $this->title;
+            $this->title = $title;
+            return $this;
         }
-
-        if (strlen($val) > 255) {
-            exit(Core::getMessage('TOO_LARGE_VALUE', ['title', 'Schedule_Area', 255]));
-        }
-
-        $this->oldTitle = $this->title;
-        $this->title = strval($val);
-        return $this;
     }
 
 

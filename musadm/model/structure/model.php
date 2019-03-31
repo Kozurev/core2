@@ -127,9 +127,6 @@ class Structure_Model extends Core_Entity
 		if (is_null($title)) {
 		    return $this->title;
         } else {
-            if (mb_strlen($title) > 150) {
-                exit(Core::getMessage('TOO_LARGE_VALUE', ['title', 'Structure', 150]));
-            }
             $this->title = $title;
             return $this;
         }
@@ -137,10 +134,10 @@ class Structure_Model extends Core_Entity
 
 
     /**
-     * @param string|null $active
+     * @param int|null $active
      * @return $this|int
      */
-	public function active(string $active = null)
+	public function active(int $active = null)
 	{
 		if (is_null($active)) {
 		    return intval($this->active);
@@ -222,9 +219,6 @@ class Structure_Model extends Core_Entity
 		if (is_null($path)) {
 		    return $this->path;
         } else {
-            if (mb_strlen($path) > 100) {
-                exit(Core::getMessage('TOO_LARGE_VALUE', ['title', 'Structure', 100]));
-            }
             $this->path = $path;
             return $this;
         }
@@ -235,14 +229,11 @@ class Structure_Model extends Core_Entity
      * @param int|null $action
      * @return $this|string
      */
-	public function action(int $action = null)
+	public function action(string $action = null)
 	{
 		if (is_null($action)) {
 		    return $this->action;
         } else {
-            if (strlen($action) > 100) {
-                exit(Core::getMessage('TOO_LARGE_VALUE', ['title', 'Structure', 100]));
-            }
             $this->action = $action;
             return $this;
         }
@@ -258,9 +249,6 @@ class Structure_Model extends Core_Entity
 		if (is_null($metaTitle)) {
 		    return $this->meta_title;
         } else {
-            if (mb_strlen($metaTitle) > 100) {
-                exit ( Core::getMessage('TOO_LARGE_VALUE', ['title', 'Structure', 100]));
-            }
             $this->meta_title = $metaTitle;
             return $this;
         }
@@ -276,9 +264,6 @@ class Structure_Model extends Core_Entity
 		if (is_null($metaKeywords)) {
 		    return $this->meta_keywords;
         } else {
-            if (mb_strlen($metaKeywords) > 100) {
-                exit(Core::getMessage('TOO_LARGE_VALUE', ['title', 'Structure', 100]));
-            }
             $this->meta_keywords = $metaKeywords;
             return $this;
         }
@@ -309,9 +294,6 @@ class Structure_Model extends Core_Entity
         if (is_null($childrenName)) {
             return $this->children_name;
         } else {
-            if (mb_strlen($childrenName) > 255) {
-                exit(Core::getMessage('TOO_LARGE_VALUE', ['children_name', 'Structure', 255]));
-            }
             $this->children_name = $childrenName;
             return $this;
         }
@@ -331,4 +313,83 @@ class Structure_Model extends Core_Entity
             return $this;
         }
 	}
+
+
+    /**
+     * @return array
+     */
+	public function schema() : array
+    {
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'title' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 150
+            ],
+            'parent_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'path' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 100
+            ],
+            'action' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 100
+            ],
+            'template_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'description' => [
+                'required' => true,
+                'type' => PARAM_STRING
+            ],
+            'children_name' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'active' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0,
+                'maxval' => 0
+            ],
+            'menu_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'sorting' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'meta_title' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 100
+            ],
+            'meta_description' => [
+                'required' => true,
+                'type' => PARAM_STRING
+            ],
+            'meta_keywords' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 100
+            ],
+        ];
+    }
+
+
 }

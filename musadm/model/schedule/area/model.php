@@ -1,74 +1,110 @@
 <?php
 /**
- * Created by PhpStorm.
+ * Класс-модель филиала
  *
- * User: Kozurev Egor
- * Date: 18.01.2019
- * Time: 14:26
+ * @author BadWolf
+ * @date 18.01.2019 14:26
+ * @version 20190331
  */
 class Schedule_Area_Model extends Core_Entity
 {
-
+    /**
+     * @var int
+     */
     protected $id;
+
+
+    /**
+     * Название филиала
+     *
+     * @var string
+     */
     protected $title;
+
+
+    /**
+     * Количество классов в филиале
+     *
+     * @var int
+     */
     protected $count_classes;
+
+
+    /**
+     * URL путь к филиалу
+     *
+     * @var string
+     */
     protected $path;
+
+
+    /**
+     * Активность филиала
+     *
+     * @var int
+     */
     protected $active = 1;
+
+
+    /**
+     * Порядок сортировки
+     *
+     *
+     * @var int
+     */
     protected $sorting = 0;
+
+
+    /**
+     * id организации (директора) которой принадлежит филиал
+     *
+     * @var int
+     */
     protected $subordinated;
 
 
-    public function __construct(){}
-
-
-    public function getId()
+    /**
+     * @param string|null $title
+     * @return $this|string
+     */
+    public function title(string $title = null)
     {
-        return intval( $this->id );
-    }
-
-
-    public function title( $val = null )
-    {
-        if ( is_null( $val ) )
-        {
+        if (is_null($title)) {
             return $this->title;
+        } else {
+            $this->title = $title;
+            return $this;
         }
-
-        if ( strlen( $val ) > 255 )
-        {
-            die ( Core::getMessage( 'TOO_LARGE_VALUE', ['title', 'Schedule_Area', 255] ) );
-        }
-
-        return $this;
     }
 
 
-    public function countClasses( $val = null )
+    /**
+     * @param int|null $countClasses
+     * @return $this|int
+     */
+    public function countClasses(int $countClasses = null)
     {
-        if ( is_null( $val ) )
-        {
-            return $this->count_classes;
+        if (is_null($countClasses)) {
+            return intval($this->count_classes);
+        } else {
+            $this->count_classes = $countClasses;
+            return $this;
         }
-
-        $this->count_classes = intval( $val );
-        return $this;
     }
 
 
-    public function path( $val = null )
+    /**
+     * @param string|null $path
+     * @return $this|string
+     */
+    public function path(string $path = null)
     {
-        if ( is_null( $val ) )
-        {
+        if (is_null($path)) {
             return $this->path;
+        } else {
+            $this->path = $path;
+            return $this;
         }
-
-        if ( strlen( $val ) > 255 )
-        {
-            die ( Core::getMessage( 'TOO_LARGE_VALUE', ['path', 'Schedule_Area', 255] ) );
-        }
-
-        $this->path = strval( $val );
-        return $this;
     }
 
 
@@ -84,30 +120,79 @@ class Schedule_Area_Model extends Core_Entity
     }
 
 
-    public function active( $val = null )
+    /**
+     * @param int|null $active
+     * @return $this|int
+     */
+    public function active(int $active = null)
     {
-        if ( is_null( $val ) )
-        {
+        if (is_null($active)) {
             return $this->active;
+        } elseif ($active == true) {
+            $this->active = 1;
+        } elseif ($active == false) {
+            $this->active = 0;
         }
-
-        $val == true
-            ?   $this->active = 1
-            :   $this->active = 0;
-
         return $this;
     }
 
 
-    public function subordinated( $val = null )
+    /**
+     * @param int|null $subordinated
+     * @return $this|int
+     */
+    public function subordinated(int $subordinated = null)
     {
-        if ( is_null( $val ) )
-        {
-            return $this->subordinated;
+        if (is_null($subordinated)) {
+            return intval($this->subordinated);
+        } else {
+            $this->subordinated = $subordinated;
+            return $this;
         }
+    }
 
-        $this->subordinated = intval( $val );
-        return $this;
+
+    /**
+     * @return array
+     */
+    public function schema() : array
+    {
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'title' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'count_classes' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'path' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'sorting' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'subordinated' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'active' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0,
+                'maxval' => 1
+            ]
+        ];
     }
 
 }
