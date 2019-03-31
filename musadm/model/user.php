@@ -96,8 +96,7 @@ class User extends User_Model
 
             $_SESSION['core']['user'] = $ExistingUser->getId();
 		    $_SESSION['core']['user_backup'] = [];
-		    $_SESSION['core']['user_object'] = $ExistingUser;
-		    //unset($_SESSION['core']['user_object']);
+		    $_SESSION['core']['user_object'] = serialize($ExistingUser);
 		}
 
         Core::notify([&$ExistingUser], 'afterUserAuthorize');
