@@ -28,8 +28,10 @@ if ($isTeacherPage == true) {
 
     $teacherFio = $Teacher->surname() . ' ' . $Teacher->name();
     Core_Page_Show::instance()->title = $teacherFio . ' | Личный кабинет';
-} else {
+} elseif (!is_null(Core_Page_Show::instance()->StructureItem)) {
     Core_Page_Show::instance()->title = 'Расписание | ' . Core_Page_Show::instance()->StructureItem->title();
+} else {
+    Core_Page_Show::instance()->title = 'Расписание';
 }
 
 
