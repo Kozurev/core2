@@ -432,7 +432,7 @@ class Core_Page_Show extends Core
                         $this->StructureItem->queryBuilder()->where($parentField, '=', $parentId);
                     }
 
-                    if (!is_null(Core_Array::getValue($CFG->items_mapping, $childrenName . '/active', null, PARAM_BOOL))) {
+                    if (Core_Array::getValue($CFG->items_mapping, $childrenName . '/active', null, PARAM_BOOL) !== false) {
                         $this->StructureItem->queryBuilder()->where('active', '=', 1);
                     }
 
