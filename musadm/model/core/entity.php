@@ -397,9 +397,9 @@ class Core_Entity extends Core_Entity_Model
     {
         $xml = $xmlObj;
 
-        if ($obj instanceof Core_Entity) {
+        if (get_class($obj) == 'Core_Entity') {
             //Формирование простого тэга
-            if (is_null($obj->_entityValue())) {
+            if (!is_null($obj->_entityValue())) {
                 return $xml->createElement($obj->_entityName(), $obj->_entityValue());
             } else {
                 $tagName = $obj->_entityName();
@@ -420,7 +420,7 @@ class Core_Entity extends Core_Entity_Model
 
         //Преобразование объекта в XML сущьность
         foreach ($objData as $key => $val) {
-            if (is_array($val) || $key != 'childrenObjects') {
+            if (is_array($val) && $key != 'childrenObjects') {
                 continue;
             }
 
