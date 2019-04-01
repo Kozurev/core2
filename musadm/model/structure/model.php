@@ -363,7 +363,7 @@ class Structure_Model extends Core_Entity
                 'required' => true,
                 'type' => PARAM_INT,
                 'minval' => 0,
-                'maxval' => 0
+                'maxval' => 1
             ],
             'menu_id' => [
                 'required' => true,
@@ -375,16 +375,16 @@ class Structure_Model extends Core_Entity
                 'type' => PARAM_INT
             ],
             'meta_title' => [
-                'required' => true,
+                'required' => false,
                 'type' => PARAM_STRING,
                 'maxlength' => 100
             ],
             'meta_description' => [
-                'required' => true,
+                'required' => false,
                 'type' => PARAM_STRING
             ],
             'meta_keywords' => [
-                'required' => true,
+                'required' => false,
                 'type' => PARAM_STRING,
                 'maxlength' => 100
             ],

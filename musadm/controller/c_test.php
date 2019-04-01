@@ -84,22 +84,22 @@ $Orm->executeQuery( 'DELETE FROM Property_List_Values WHERE property_id = 15' );
 
 Core::factory( "Core_Page_Template" )
     ->title( 'Макет для раздела "Задачи"' )
-    ->parent_id( 10 )
+    ->parentId( 10 )
     ->dir( 0 )
     ->save();
 
 Core::factory( "Core_Page_Template" )
     ->title( 'Макет для раздела "Лиды"' )
-    ->parent_id( 10 )
+    ->parentId( 10 )
     ->dir( 0 )
     ->save();
 
 Core::factory( "Structure", 30 )
-    ->template_id( 11 )
+    ->templateId( 11 )
     ->save();
 
 Core::factory( "Structure", 28 )
-    ->template_id( 12 )
+    ->templateId( 12 )
     ->save();
 
 

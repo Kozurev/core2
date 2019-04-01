@@ -1,61 +1,109 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 16.05.2018
- * Time: 16:50
+ * Класс-модель примечания к задаче
+ *
+ * @author BadWolf
+ * @date 16.05.2018 16:50
+ * @version 20190401
+ * Class Task_Note
  */
-
 class Task_Note extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
+
+
+    /**
+     * Дата и время создания примечания формата 'Y-m-d H:i:s'
+     *
+     * @var string
+     */
     protected $date;
+
+
+    /**
+     * id задачи, которой принадлежит примечание
+     *
+     * @var int
+     */
     protected $task_id = 0;
+
+
+    /**
+     * id пользователя-автора примечания
+     *
+     * @var int
+     */
     protected $author_id = 0;
+
+
+    /**
+     * Текст примечания
+     *
+     * @var string
+     */
     protected $text;
 
-    public function __construct(){}
 
-
-    public function getId()
+    /**
+     * @param string|null $date
+     * @return $this|string
+     */
+    public function date(string $date = null)
     {
-        return intval( $this->id );
+        if (is_null($date)) {
+            return $this->date;
+        } else {
+            $this->date = $date;
+            return $this;
+        }
     }
 
 
-    public function date( $val = null )
+    /**
+     * @param int|null $authorId
+     * @return $this|int
+     */
+    public function authorId(int $authorId = null)
     {
-        if ( is_null( $val ) )  return strval( $this->date );
-
-        $this->date = strval( $val );
-        return $this;
+        if (is_null($authorId)) {
+            return intval($this->author_id);
+        } else {
+            $this->author_id = $authorId;
+            return $this;
+        }
     }
 
 
-    public function authorId( $val = null )
+    /**
+     * @param int|null $taskId
+     * @return $this|int
+     */
+    public function taskId(int $taskId = null)
     {
-        if ( is_null( $val ) )  return intval( $this->author_id );
-
-        $this->author_id = intval( $val );
-        return $this;
+        if (is_null($taskId)) {
+            return intval($this->task_id);
+        } else {
+            $this->task_id = $taskId;
+            return $this;
+        }
     }
 
 
-    public function taskId( $val = null )
+    /**
+     * @param string|null $text
+     * @return $this|string
+     */
+    public function text(string $text = null)
     {
-        if ( is_null( $val ) )  return intval( $this->task_id );
-
-        $this->task_id = intval( $val );
-        return $this;
-    }
-
-
-    public function text( $val = null )
-    {
-        if ( is_null( $val ) )  return strval( $this->text );
-
-        $this->text = strval( $val );
-        return $this;
+        if (is_null($text)) {
+            return $this->text;
+        } else {
+            $this->text = $text;
+            return $this;
+        }
     }
 
 
@@ -66,34 +114,39 @@ class Task_Note extends Core_Entity
      */
     public function getAuthor()
     {
-        if ( $this->authorId() === 0 )
-        {
+        if ($this->authorId() === 0) {
             return null;
         }
 
-        $Author = Core::factory( "User", $this->author_id );
-
+        $Author = Core::factory('User', $this->author_id);
         return $Author;
     }
 
 
-    public function save( $obj = null )
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
+    public function save($obj = null)
     {
-        Core::notify( [&$this], "beforeTaskNoteSave" );
+        Core::notify([&$this], 'beforeTaskNoteSave');
 
-        if( $this->date == null )       $this->date = date( "Y-m-d H:i:s" );
-
-        if( $this->author_id === null )
-        {
+        if (is_null($this->date)) {
+            $this->date = date('Y-m-d H:i:s');
+        }
+        if (is_null($this->author_id)) {
             $this->author_id = User::parentAuth()->getId();
         }
 
         parent::save();
-
-        Core::notify( [&$this], "afterTaskNoteSave" );
+        Core::notify([&$this], 'afterTaskNoteSave');
     }
 
 
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
     public function delete( $obj = null )
     {
         Core::notify( [&$this], "beforeTaskNoteDelete" );

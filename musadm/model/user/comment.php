@@ -4,10 +4,14 @@
  *
  * @author Kozurev Egor
  * @date 30.11.2018 13:43
+ * @version 20190401
  * @Class User_Comment
  */
 class User_Comment extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
 
     /**
@@ -40,70 +44,120 @@ class User_Comment extends Core_Entity
      *
      * @var string
      */
-    protected $text = "";
+    protected $text = '';
 
 
-
-    public function getId()
+    /**
+     * @param int|null $time
+     * @return $this|int
+     */
+    public function time(int $time = null)
     {
-        return intval( $this->id );
+        if (is_null($time)) {
+            return intval($this->time);
+        } else {
+            $this->time = $time;
+            return $this;
+        }
     }
 
 
-    public function time( $val = null )
+    /**
+     * @param int|null $authorId
+     * @return $this|int
+     */
+    public function authorId(int $authorId = null)
     {
-        if( is_null( $val ) )   return intval( $this->time );
-
-        $this->time = intval( $val );
-        return $this;
+        if (is_null($authorId)) {
+            return intval($this->author_id);
+        } else {
+            $this->author_id = $authorId;
+            return $this;
+        }
     }
 
 
-    public function authorId( $val = null )
+    /**
+     * @param int|null $userId
+     * @return $this|int
+     */
+    public function userId(int $userId = null)
     {
-        if( is_null($val ) )    return intval( $this->author_id );
-
-        $this->author_id = intval( $val );
-        return $this;
+        if (is_null($userId)) {
+            return intval($this->user_id);
+        } else {
+            $this->user_id = $userId;
+            return $this;
+        }
     }
 
 
-    public function userId( $val = null )
+    /**
+     * @param string|null $text
+     * @return $this|string
+     */
+    public function text(string $text = null)
     {
-        if( is_null($val ) )    return intval( $this->user_id );
-
-        $this->user_id = intval( $val );
-        return $this;
+        if (is_null($text)) {
+            return $this->text;
+        } else {
+            $this->text = $text;
+            return $this;
+        }
     }
 
 
-    public function text( $val = null )
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
+    public function save($obj = null)
     {
-        if( is_null( $val ) )   return strval( $this->text );
-
-        $this->text = strval( $val );
-        return $this;
-    }
-
-
-
-    public function save( $obj = null )
-    {
-        if( $this->authorId() === 0 )
-        {
-            $this->authorId( User::parentAuth()->getId() );
+        if ($this->authorId() === 0) {
+            $this->authorId(User::parentAuth()->getId());
         }
 
-        if( $this->time() === 0 )
-        {
+        if ($this->time() === 0) {
             $this->time = time();
         }
 
-        Core::notify( array( &$this ), "beforeUserCommentSave" );
-
+        Core::notify([&$this], 'beforeUserCommentSave');
         parent::save();
-
-        Core::notify( array( &$this ), "afterUserCommentSave" );
+        Core::notify([&$this], 'afterUserCommentSave');
     }
+
+
+    /**
+     * @return array
+     */
+    public function schema() : array
+    {
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'time' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'author_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 1
+            ],
+            'user_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 1
+            ],
+            'text' => [
+                'required' => true,
+                'type' => PARAM_STRING
+            ]
+        ];
+    }
+
 
 }
