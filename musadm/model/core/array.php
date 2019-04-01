@@ -4,7 +4,7 @@
  *
  * @author Bad Wolf
  * @date 20.03.2018 16:03
- * @version 20190328
+ * @version 20190401
  */
 class Core_Array
 {
@@ -64,13 +64,13 @@ class Core_Array
             switch ($type)
             {
                 case PARAM_INT:
-                    is_numeric($value)
+                    is_numeric($value) && ($value == intval($value))
                         ?   $value = intval($value)
                         :   $value = $default;
                     break;
 
                 case PARAM_FLOAT:
-                    is_numeric($value)
+                    is_numeric($value) && ($value == floatval($value))
                         ?   $value = floatval($value)
                         :   $value = $default;
                     break;
@@ -94,7 +94,11 @@ class Core_Array
                         $value = false;
                         break;
                     }
-                    $value = boolval($value);
+                    if (is_bool($value) || is_numeric($value)) {
+                        $value = boolval($value);
+                    } else {
+                        $value = $default;
+                    }
                     break;
 
                 case PARAM_ARRAY:
