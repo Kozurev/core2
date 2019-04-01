@@ -108,15 +108,18 @@ class Schedule_Area_Model extends Core_Entity
     }
 
 
-    public function sorting( $val = null )
+    /**
+     * @param int|null $sorting
+     * @return $this|int
+     */
+    public function sorting(int $sorting = null)
     {
-        if ( is_null( $val ) )
-        {
-            return $this->sorting;
+        if (is_null($sorting)) {
+            return intval($this->sorting);
+        } else {
+            $this->sorting = $sorting;
+            return $this;
         }
-
-        $this->sorting = intval( $val );
-        return $this;
     }
 
 

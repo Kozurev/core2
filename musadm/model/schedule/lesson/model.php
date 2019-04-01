@@ -4,11 +4,14 @@
  *
  * @author BadWolf
  * @date 24.04.2018 19:58
- * @version 20190324
+ * @version 20190401
  * Class Schedule_Lesson_Model
  */
 class Schedule_Lesson_Model extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
 
 
@@ -28,7 +31,7 @@ class Schedule_Lesson_Model extends Core_Entity
      *
      * @var string
      */
-    protected $delete_date = "NULL";
+    protected $delete_date;
 
 
     /**
@@ -274,4 +277,78 @@ class Schedule_Lesson_Model extends Core_Entity
             return $this;
         }
     }
+
+
+    /**
+     * @return array
+     */
+    public function schema() : array
+    {
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'insert_date' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'minlength' => 10,
+                'maxlength' => 10
+            ],
+            'delete_date' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'minlength' => 10,
+                'maxlength' => 10
+            ],
+            'time_from' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'minlength' => 8,
+                'maxlength' => 8
+            ],
+            'time_to' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'minlength' => 8,
+                'maxlength' => 8
+            ],
+            'day_name' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'area_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 1
+            ],
+            'class_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 1
+            ],
+            'teacher_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 1
+            ],
+            'client_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 1
+            ],
+            'type_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 1
+            ],
+            'lesson_type' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 1
+            ]
+        ];
+    }
+
 }

@@ -1,57 +1,146 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 07.05.2018
- * Time: 11:29
+ * Класс-модель периода отсутствия
+ *
+ * @author BadWolf
+ * @date 07.05.2018 11:29
+ * @version 20190401
+ * Class Schedule_Absent_Model
  */
-
 class Schedule_Absent_Model extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
+
+
+    /**
+     * id клиента с которым связан период отсутствия
+     *
+     * @var int
+     */
     protected $client_id;
+
+
+    /**
+     * Дата начала периода отсутствия
+     *
+     * @var string
+     */
     protected $date_from;
+
+
+    /**
+     * Дата завершения периода отсутствия
+     *
+     * @var string
+     */
     protected $date_to;
+
+
+    /**
+     * id типа периода отсутствия (1 - клиент; 2 - группа)
+     *
+     * @var int
+     */
     protected $type_id;
 
-    public function __construct(){}
 
-
-    public function getId()
+    /**
+     * @param int|null $clientId
+     * @return $this|int
+     */
+    public function clientId(int $clientId = null)
     {
-        return $this->id;
+        if (is_null($clientId)) {
+            return intval($this->client_id);
+        } else {
+            $this->client_id = $clientId;
+            return $this;
+        }
     }
 
 
-    public function clientId($val = null)
+    /**
+     * @param string|null $dateFrom
+     * @return $this|string
+     */
+    public function dateFrom(string $dateFrom = null)
     {
-        if(is_null($val))   return $this->client_id;
-        $this->client_id = intval($val);
-        return $this;
+        if (is_null($dateFrom)) {
+            return $this->date_from;
+        } else {
+            $this->date_from = $dateFrom;
+            return $this;
+        }
     }
 
 
-    public function dateFrom($val = null)
+    /**
+     * @param string|null $dateTo
+     * @return $this|string
+     */
+    public function dateTo(string $dateTo = null)
     {
-        if(is_null($val))   return $this->date_from;
-        $this->date_from = strval($val);
-        return $this;
+        if (is_null($dateTo)) {
+            return $this->date_to;
+        } else {
+            $this->date_to = $dateTo;
+            return $this;
+        }
     }
 
 
-    public function dateTo($val = null)
+    /**
+     * @param int|null $typeId
+     * @return $this|int
+     */
+    public function typeId(int $typeId = null)
     {
-        if(is_null($val))   return $this->date_to;
-        $this->date_to = strval($val);
-        return $this;
+        if (is_null($typeId)) {
+            return intval($this->type_id);
+        } else {
+            $this->type_id = $typeId;
+            return $this;
+        }
     }
 
 
-    public function typeId($val = null)
+    /**
+     * @return array
+     */
+    public function schema() : array
     {
-        if(is_null($val))   return $this->type_id;
-        $this->type_id = intval($val);
-        return $this;
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'date_from' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'minlength' => 10,
+                'maxlength' => 10
+            ],
+            'date_to' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'minlength' => 10,
+                'maxlength' => 10
+            ],
+            'client_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 1
+            ],
+            'type_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 1
+            ]
+        ];
     }
+
 
 }

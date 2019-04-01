@@ -4,101 +4,199 @@
  *
  * @author BadWolf
  * @date 24.04.2018 20:00
- * @version 20190304
+ * @version 20190401
  * Class Schedule_Group_Model
  */
 class Schedule_Group_Model extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
+
+
+    /**
+     * id пользователя (преподавателя)группы
+     *
+     * @var int
+     */
     protected $teacher_id = 0;
+
+
+    /**
+     * Название группы
+     *
+     * @var string
+     */
     protected $title;
+
+
+    /**
+     * Продолжительность занятия формата (00:00:00)
+     *
+     * @var string
+     */
     protected $duration;
+
+
+    /**
+     * Примечание к группе
+     *
+     * @var string
+     */
     protected $note = '';
+
+
+    /**
+     * id организации (директора), которой принадлежит группа
+     *
+     * @var int
+     */
     protected $subordinated = 0;
+
+
+    /**
+     * Указатель активности группы
+     *
+     * @var int
+     */
     protected $active = 1;
 
 
-    public function getId()
+    /**
+     * @param int|null $teacherId
+     * @return $this|int
+     */
+    public function teacherId(int $teacherId = null)
     {
-        return intval( $this->id );
-    }
-
-
-    public function teacherId( $val = null )
-    {
-        if ( is_null( $val ) )
-        {
-            return intval( $this->teacher_id );
+        if (is_null($teacherId)) {
+            return intval($this->teacher_id);
+        } else {
+            $this->teacher_id = $teacherId;
+            return $this;
         }
-
-        $this->teacher_id = intval( $val );
-        return $this;
     }
 
 
-    public function title( $val = null )
+    /**
+     * @param string|null $title
+     * @return $this|string
+     */
+    public function title(string $title = null)
     {
-        if ( is_null( $val ) )
-        {
+        if (is_null($title)) {
             return $this->title;
+        } else {
+            $this->title = $title;
+            return $this;
         }
-
-        if ( strlen( $val ) > 255 )
-        {
-            die( Core::getMessage( 'TOO_LARGE_VALUE', ['title', 'Schedule_Group', 255]));
-        }
-
-        $this->title = strval( $val );
-        return $this;
     }
 
 
-    public function duration( $val = null )
+    /**
+     * @param string|null $duration
+     * @return $this|string
+     */
+    public function duration(string $duration = null)
     {
-        if ( is_null( $val ) )
-        {
+        if (is_null($duration)) {
             return $this->duration;
+        } else {
+            $this->duration = $duration;
+            return $this;
         }
+    }
 
-        $this->duration = strval( $val );
+
+    /**
+     * @param int|null $subordinated
+     * @return $this|int
+     */
+    public function subordinated(int $subordinated = null)
+    {
+        if (is_null($subordinated)) {
+            return intval($this->subordinated);
+        } else {
+            $this->subordinated = $subordinated;
+            return $this;
+        }
+    }
+
+
+    /**
+     * @param int|null $active
+     * @return $this|int
+     */
+    public function active(int $active = null)
+    {
+        if (is_null($active)) {
+            return intval($this->active);
+        } elseif ($active == true) {
+            $this->active = 1;
+        } elseif ($active == false) {
+            $this->active = 0;
+        }
         return $this;
     }
 
 
-    public function subordinated( $val = null )
+    /**
+     * @param string|null $note
+     * @return $this|string
+     */
+    public function note(string $note = null)
     {
-        if ( is_null( $val ) )
-        {
-            return intval( $this->subordinated );
-        }
-
-        $this->subordinated = intval( $val );
-        return $this;
-    }
-
-
-    public function active( $val = null )
-    {
-        if ( is_null( $val ) )
-        {
-            return intval( $this->active );
-        }
-
-        if ( $val == 1 )        $this->active = 1;
-        elseif ( $val == 0 )    $this->active = 0;
-        return $this;
-    }
-
-
-    public function note( $note = null )
-    {
-        if ( is_null( $note ) )
-        {
+        if (is_null($note)) {
             return $this->note;
+        } else {
+            $this->note = $note;
+            return $this;
         }
+    }
 
-        $this->note = strval( $note );
-        return $this;
+
+    /**
+     * @return array
+     */
+    public function schema() : array
+    {
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'title' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'note' => [
+                'required' => true,
+                'type' => PARAM_STRING
+            ],
+            'teacher_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'duration' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'minlength' => 8,
+                'maxlength' => 8
+            ],
+            'active' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0,
+                'maxval' => 1
+            ],
+            'subordinated' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0,
+            ]
+        ];
     }
 
 }

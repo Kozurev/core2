@@ -1,38 +1,90 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 14.05.2018
- * Time: 12:45
+ * Класс-модель типа занятия
+ *
+ * @author BadWolf
+ * @date 14.05.2018 12:45
+ * @version 20190401
+ * Class Schedule_Lesson_Type
  */
-
-
 class Schedule_Lesson_Type extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
+
+
+    /**
+     * Название типа занятия
+     *
+     * @var string
+     */
     protected $title;
+
+
+    /**
+     * Указатель на участие занятия с данным типом в статистике
+     *
+     * @var int
+     */
     protected $statistic = 0;
 
-    public function getId()
+
+    /**
+     * @param string|null $title
+     * @return $this|string
+     */
+    public function title(string $title = null)
     {
-        return $this->id;
+        if (is_null($title)) {
+            return $this->title;
+        } else {
+            $this->title = $title;
+            return $this;
+        }
     }
 
 
-    public function title($val = null)
+    /**
+     * @param int|null $statistic
+     * @return $this|int
+     */
+    public function statistic(int $statistic = null)
     {
-        if(is_null($val))   return $this->title;
-        $this->title = strval($val);
+        if (is_null($statistic)) {
+            return intval($this->statistic);
+        } elseif ($statistic == true) {
+            $this->statistic = 1;
+        } elseif ($statistic == false) {
+            $this->statistic = 0;
+        }
         return $this;
     }
 
 
-    public function statistic($val = null)
+    /**
+     * @return array
+     */
+    public function schema() : array
     {
-        if(is_null($val))   return $this->statistic;
-        if($val == true)    $this->statistic = 1;
-        else $this->statistic = 0;
-        return $this;
+        return [
+            'id' => [
+                'required' => false,
+                'type' => PARAM_INT
+            ],
+            'title' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
+            ],
+            'statistic' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0,
+                'maxval' => 1
+            ]
+        ];
     }
 
 }
