@@ -82,8 +82,12 @@ class Core_Entity extends Core_Entity_Model
             }
         }
 
-        if ($this->validate() === true) {
-            $this->queryBuilder()->save($this);
+        try {
+            if ($this->validate() === true) {
+                $this->queryBuilder()->save($this);
+            }
+        } catch (Exception $e) {
+            die($e->getMessage());
         }
 
         return $this;
@@ -124,10 +128,12 @@ class Core_Entity extends Core_Entity_Model
         return $this->queryBuilder()->getCount();
     }
 
+
     /**
      * Валидация значнеий сохраняемого объекта
      *
      * @return bool
+     * @throws Exception
      */
     public function validate() : bool
     {
@@ -141,13 +147,14 @@ class Core_Entity extends Core_Entity_Model
             $minLength = Core_Array::getValue($rules, 'minlength', null, PARAM_INT);
             $maxLength = Core_Array::getValue($rules, 'maxlength', null, PARAM_INT);
             $minVal = Core_Array::getValue($rules, 'minval', null, PARAM_FLOAT);
-            $maxVal = Core_Array::getValue($rules, 'maxval', null. PARAM_FLOAT);
+            $maxVal = Core_Array::getValue($rules, 'maxval', null, PARAM_FLOAT);
 
 
             //check required
             if ($isRequired === true) {
                 if (is_null($this->$propName)) {
-                    return false;
+                    die ('<br/>Param ' . $propName . ' of ' . get_class($this) . ' is required');
+                    //return false;
                 }
             } elseif ($isRequired === false && is_null($this->$propName)) {
                 return true;
@@ -159,6 +166,8 @@ class Core_Entity extends Core_Entity_Model
             //check maxlength
             if (!is_null($maxLength) && $type === PARAM_STRING) {
                 if (mb_strlen($this->$propName) > $maxLength) {
+                    throw new Exception('<br/>Param ' . $propName . ' of ' . get_class($this)
+                        . ' has to be not longer the ' . $maxLength . '. Current length: ' . mb_strlen($this->$propName));
                     return false;
                 }
             }
@@ -166,20 +175,26 @@ class Core_Entity extends Core_Entity_Model
             //check minlength
             if (!is_null($minLength) && $type === PARAM_STRING) {
                 if (mb_strlen($this->$propName) < $minLength) {
+                    throw new Exception('<br/>Param ' . $propName . ' of ' . get_class($this)
+                        . ' has to be longer the ' . $maxLength . '. Current length: ' . mb_strlen($this->$propName));
                     return false;
                 }
             }
 
             //check max val
-            if (!is_null($maxLength) || in_array($type, [PARAM_INT, PARAM_FLOAT])) {
-                if ($this->$propName > $maxLength) {
+            if (!is_null($maxVal) && in_array($type, [PARAM_INT, PARAM_FLOAT])) {
+                if ($this->$propName > $maxVal) {
+                    throw new Exception('<br/>Param ' . $propName . ' of ' . get_class($this)
+                        . ' has to be not more than ' . $maxVal . ' Current value: ' . $this->$propName);
                     return false;
                 }
             }
 
             //check min val
-            if (!is_null($minVal) || in_array($type, [PARAM_INT, PARAM_FLOAT])) {
-                if ($this->$propName < $maxVal) {
+            if (!is_null($minVal) && in_array($type, [PARAM_INT, PARAM_FLOAT])) {
+                if ($this->$propName < $minVal) {
+                    throw new Exception('<br/>Param ' . $propName . ' of ' . get_class($this)
+                        . ' has to be more than ' . $minVal . ' Current value: ' . $this->$propName);
                     return false;
                 }
             }
@@ -202,10 +217,6 @@ class Core_Entity extends Core_Entity_Model
         if (method_exists($this, 'databaseTableName')) {
             return $this->databaseTableName();
         } else {
-//            $table = mb_strtolower(get_class($this)) . 's';
-//            if ($isWithPrefix === true) {
-//                $table = $CFG->prefix . $table;
-//            }
             return get_class($this);
         }
     }
