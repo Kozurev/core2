@@ -23,6 +23,12 @@ $(function(){
             e.preventDefault();
             loaderOn();
             var userid = $(this).data("userid");
+            var note = $('#property_26').val();
+            if (note == '') {
+                closePopup();
+                loaderOff();
+                return;
+            }
             saveData("Main", function(response){loaderOff();});
             refreshPaymentsTable(userid, loaderOff);
         })
@@ -229,10 +235,10 @@ $(function(){
  */
 function deletePayment(paymentId, func) {
     $.ajax({
-        type: "GET",
-        url: root + "/balance",
+        type: 'GET',
+        url: root + '/balance',
         data: {
-            action: "payment_delete",
+            action: 'payment_delete',
             id: paymentId
         },
         success: function(response) {
@@ -244,15 +250,15 @@ function deletePayment(paymentId, func) {
 
 function editPaymentPopup(id, afterSaveAction) {
     $.ajax({
-        type: "GET",
-        url: root + "/finances",
+        type: 'GET',
+        url: root + '/finances',
         data: {
-            action: "edit_payment",
+            action: 'edit_payment',
             id: id,
             afterSaveAction: afterSaveAction
         },
-        success: function(responce){
-            showPopup(responce);
+        success: function(response){
+            showPopup(response);
         }
     });
 }
@@ -261,15 +267,15 @@ function editPaymentPopup(id, afterSaveAction) {
 /**
  * Открытие всплывающего окна создания / редактирования тарифа
  *
- * @param tarifid
+ * @param tarifId
  */
-function editTarifPopup(tarifid) {
+function editTarifPopup(tarifId) {
     $.ajax({
-        type: "GET",
-        url: "finances",
+        type: 'GET',
+        url: 'finances',
         data: {
-            action: "edit_tarif_popup",
-            tarifid: tarifid
+            action: 'edit_tarif_popup',
+            tarifid: tarifId
         },
         success: function(responce) {
             showPopup(responce);
@@ -285,9 +291,9 @@ function refreshPayments() {
         data: {
             action: "show",
         },
-        success: function( responce ) {
+        success: function(response) {
             var isTarifsTableDisplay = $('.tarifs').css('display');
-            $(".finances").html(responce);
+            $('.finances').html(response);
             $('.tarifs').css('display', isTarifsTableDisplay);
             loaderOff();
         }
@@ -295,20 +301,19 @@ function refreshPayments() {
 }
 
 
-function refreshPaymentsTable(userid, func) {
+function refreshPaymentsTable(userId, func) {
     $.ajax({
-        type: "GET",
-        url: root + "/balance",
+        type: 'GET',
+        url: root + '/balance',
         async: false,
         data: {
-            action: "refreshTablePayments",
-            user_id: userid,
-            userid: userid
+            action: 'refreshTablePayments',
+            user_id: userId,
+            userid: userId
         },
-        success: function(responce) {
-            $(".users").empty();
-            $(".users").append(responce);
-            $("#sortingTable").tablesorter();
+        success: function(response) {
+            $('.users').html(response);
+            $('#sortingTable').tablesorter();
             func();
         }
     });
@@ -317,10 +322,10 @@ function refreshPaymentsTable(userid, func) {
 
 function getTarifPopup(id, type) {
     $.ajax({
-        type: "GET",
-        url: root + "/balance",
+        type: 'GET',
+        url: root + '/balance',
         data: {
-            action: "getTarifPopup",
+            action: 'getTarifPopup',
             type: type,
             userid: id
         },
