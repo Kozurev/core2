@@ -12,7 +12,14 @@
       <paths name="musicmetod">
         <serverdata>
           <mappings>
-            <mapping deploy="/" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/musadmnew" local="$PROJECT_DIR$/musadm" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="portfolio">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
