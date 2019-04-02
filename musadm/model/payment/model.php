@@ -186,11 +186,6 @@ class Payment_Model extends Core_Entity
                 'required' => false,
                 'type' => PARAM_INT
             ],
-            'title' => [
-                'required' => true,
-                'type' => PARAM_STRING,
-                'maxlength' => 255
-            ],
             'user' => [
                 'required' => true,
                 'type' => PARAM_INT,
