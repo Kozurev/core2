@@ -7,6 +7,7 @@
  * @author Bad Wolf
  * @date 18.02.2019 9:42
  * @version 20190220
+ * @version 20190402
  */
 
 
@@ -17,11 +18,12 @@
  *
  * @date 18.02.2019 9:43
  */
-define( 'PARAM_INT',    'int' );
-define( 'PARAM_FLOAT',  'float' );
-define( 'PARAM_STRING', 'string' );
-define( 'PARAM_BOOL',   'bool' );
-define( 'PARAM_ARRAY',  'array' );
+define('PARAM_INT',    'int');
+define('PARAM_FLOAT',  'float');
+define('PARAM_STRING', 'string');
+define('PARAM_BOOL',   'bool');
+define('PARAM_ARRAY',  'array');
+define('PARAM_DATE',   'date');
 
 
 /**
@@ -32,8 +34,8 @@ define( 'PARAM_ARRAY',  'array' );
  *
  * @date 20.02.2019 10:22
  */
-define( 'ROLE_ADMIN',       1 );
-define( 'ROLE_MANAGER',     2 );
-define( 'ROLE_TEACHER',     4 );
-define( 'ROLE_CLIENT',      5 );
-define( 'ROLE_DIRECTOR',    6 );
+define('ROLE_ADMIN',       1);
+define('ROLE_DIRECTOR',    6);
+define('ROLE_MANAGER',     2);
+define('ROLE_TEACHER',     4);
+define('ROLE_CLIENT',      5);
