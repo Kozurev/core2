@@ -66,13 +66,13 @@ if ($action === 'getPaymentPopup') {
     }
 
     $userId = Core_Array::Get('userId', null, PARAM_INT);
-    $Client = User_Controller::factory($clientId);
+    $Client = User_Controller::factory($userId);
     if (is_null($userId) || is_null($Client)) {
         Core_Page_Show::instance()->error(404);
     }
 
     Core::factory('Core_Entity')
-        ->addEntity($User)
+        ->addEntity($Client)
         ->addSimpleEntity('function', 'balance')
         ->xsl('musadm/users/balance/edit_payment_popup.xsl')
         ->show();
@@ -120,11 +120,15 @@ if ($action === 'updateNote') {
     $userId =   Core_Array::Get('userId', null, PARAM_INT);
     $note =     Core_Array::Get('note', '', PARAM_STRING);
 
-    $User = User_Controller::factory( $userId );
+    $User = User_Controller::factory($userId);
+    if (is_null($User)) {
+        Core_Page_Show::instance()->error(404);
+    }
 
-    Core::factory( 'Property', 19 )
-        ->getPropertyValues( $User )[0]
-        ->value( $note )
+    Core::factory('Property')
+        ->getByTagName('notes')
+        ->getPropertyValues($User)[0]
+        ->value($note)
         ->save();
 
     exit;
@@ -170,6 +174,8 @@ if ($action == 'buyTarif') {
         Core_Page_Show::instance()->error(404);
     }
 
+
+
     $UserBalance = Core::factory('Property')->getByTagName('balance');
     $UserBalance = $UserBalance->getPropertyValues($Client)[0];
     if ($UserBalance->value() < $Tarif->price()) {
@@ -207,7 +213,6 @@ if ($action == 'buyTarif') {
         $clientRate['client_rate_group'] = $Tarif->countGroup();
     }
 
-    Orm::Debug(true);
     foreach ($clientRate as $rateType => $countLessons) {
         $ClientRateProperty = Core::factory('Property')->getByTagName($rateType);
         $newClientRateValue = $Tarif->price() / $countLessons;
@@ -251,20 +256,17 @@ if ($action === 'savePayment') {
         ->addNewValue($Payment, $description2);
 
     //Корректировка баланса ученика
-    //$Client =      Core::factory('User', $userId);
+    $Client =      Core::factory('User', $userId);
     $UserBalance = Core::factory('Property')->getByTagName('balance');
     $UserBalance = $UserBalance->getPropertyValues($Client)[0];
-    $balanceOld =  intval($UserBalance->value());
+    $balanceOld =  floatval($UserBalance->value());
 
     $type == 1
-        ?   $balanceNew = $balanceOld + intval( $value )
-        :   $balanceNew = $balanceOld - intval( $value );
+        ?   $balanceNew = $balanceOld + floatval($value)
+        :   $balanceNew = $balanceOld - floatval($value);
 
-    $UserBalance
-        ->value( $balanceNew )
-        ->save();
-
-    exit ('0');
+    $UserBalance->value($balanceNew)->save();
+    exit('0');
 }
 
 
