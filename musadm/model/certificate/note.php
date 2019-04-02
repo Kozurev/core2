@@ -157,7 +157,7 @@ class Certificate_Note extends Core_Entity
             $this->date = date('Y-m-d H:i:s');
         }
         if ($this->author_id == 0) {
-            $AuthUser = User::current()->getId();
+            $AuthUser = User::current();
             if (!is_null($AuthUser)) {
                 $this->author_id = $AuthUser->getId();
             }

@@ -3,9 +3,7 @@
     <xsl:template match="root">
         <section class="certificate">
             <div class="row buttons-panel">
-                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                    <a class="btn btn-pink certificate_edit" data-id="">Добавить сертификат</a>
-                </div>
+                <a class="btn btn-pink" onclick="editCertificatePopup(0)">Добавить сертификат</a>
             </div>
 
             <style>
@@ -18,12 +16,12 @@
                 <table id="sortingTable" class="table table-striped certificate center">
                     <thead>
                         <tr class="header">
-                            <th>№</th>
-                            <th>Дата продажи</th>
-                            <th>Действителен до</th>
-                            <th>Номер</th>
-                            <th>Комментарии</th>
-                            <th>Действия</th>
+                            <th class="center">№</th>
+                            <th class="center">Дата продажи</th>
+                            <th class="center">Действителен до</th>
+                            <th class="center">Номер</th>
+                            <th class="center">Комментарии</th>
+                            <th class="center">Действия</th>
                         </tr>
                     </thead>
 
@@ -50,16 +48,11 @@
             </td>
             <td>
                 <div class="row">
-                    <div class="col-lg-2">
-                        <a class="btn btn-pink add_comment" data-cert-id="{id}">+</a>
-                    </div>
+                    <a class="action comment" onclick="addNewCertificateNotePopup({id})"></a>
+
                     <xsl:if test="/root/is_director = 1">
-                        <div class="col-lg-5">
-                            <a class="btn btn-orange certificate_edit" data-id="{id}">Изменить</a>
-                        </div>
-                        <div class="col-lg-5">
-                            <a class="btn btn-red certificate_delete" data-id="{id}">Удалить</a>
-                        </div>
+                        <a class="action edit" onclick="editCertificatePopup({id})"></a>
+                        <a class="action delete" onclick="deleteItem('Certificate', {id}, refreshCertificatesTable)"></a>
                     </xsl:if>
                 </div>
             </td>

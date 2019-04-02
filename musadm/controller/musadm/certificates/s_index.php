@@ -1,38 +1,30 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 21.05.2018
- * Time: 10:01
+ * Страница настроек раздела сертификатов
+ *
+ * @author BadWolf
+ * @date 21.05.2018 10:01
+ * @version 20190402
  */
 
-
-/**
- * Блок проверки авторизации и прав доступа
- */
 $User = User::current();
-$accessRules = [ 'groups' => [1, 2, 6] ];
-
-if( !User::checkUserAccess( $accessRules, $User ) )
-{
-    Core_Page_Show::instance()->error404();
+$accessRules = ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]];
+if (!User::checkUserAccess($accessRules, $User)) {
+    Core_Page_Show::instance()->error(404);
 }
-
 
 $breadcumbs[0] = new stdClass();
 $breadcumbs[0]->title = Core_Page_Show::instance()->Structure->title();
 $breadcumbs[0]->active = 1;
 
-Core_Page_Show::instance()->setParam( 'body-class', 'body-pink' );
-Core_Page_Show::instance()->setParam( 'title-first', 'СПИСОК' );
-Core_Page_Show::instance()->setParam( 'title-second', 'СЕРТИФИКАТОВ' );
-Core_Page_Show::instance()->setParam( 'breadcumbs', $breadcumbs );
+Core_Page_Show::instance()->setParam('body-class', 'body-pink');
+Core_Page_Show::instance()->setParam('title-first', 'СПИСОК');
+Core_Page_Show::instance()->setParam('title-second', 'СЕРТИФИКАТОВ');
+Core_Page_Show::instance()->setParam('breadcumbs', $breadcumbs);
 
+$action = Core_Array::Get('action', '', PARAM_STRING);
 
-$action = Core_Array::Get( 'action', '' );
-
-if ( $action === 'refreshCertificatesTable' )
-{
+if ($action === 'refreshCertificatesTable') {
     Core_Page_Show::instance()->execute();
     exit;
 }
@@ -41,20 +33,17 @@ if ( $action === 'refreshCertificatesTable' )
 /**
  * Содержание всплывающего окна создания / редактирования сертификата
  */
-if ( $action === 'edit_popup' )
-{
-    $id = Core_Array::Get( 'id', 0, PARAM_INT );
+if ($action === 'edit_popup') {
+    $id = Core_Array::Get('id', 0, PARAM_INT);
 
     $id == 0
         ?   $isNew = 1
         :   $isNew = 0;
 
-    Core::factory( 'Core_Entity' )
-        ->addSimpleEntity( 'is_new', $isNew )
-        ->addEntity(
-            Core::factory( 'Certificate', $id )
-        )
-        ->xsl( 'musadm/certificates/new_certificate_popup.xsl' )
+    Core::factory('Core_Entity')
+        ->addSimpleEntity('is_new', $isNew)
+        ->addEntity(Core::factory('Certificate', $id))
+        ->xsl('musadm/certificates/new_certificate_popup.xsl')
         ->show();
 
     exit;

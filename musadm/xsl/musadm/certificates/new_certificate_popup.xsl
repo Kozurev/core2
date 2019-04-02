@@ -1,5 +1,4 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-
     <xsl:template match="certificate">
         <form name="createData" id="createData" action="." >
             <div class="column"><span>Дата продажи</span><span style="color:red">*</span></div>
@@ -14,8 +13,7 @@
             </xsl:if>
 
             <input type="hidden" name="id" value="{id}" />
-            <button class="popop_certificate_submit btn btn-default">Сохранить</button>"
+            <button class="popop_certificate_submit btn btn-default">Сохранить</button>
         </form>
     </xsl:template>
-
 </xsl:stylesheet>

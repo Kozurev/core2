@@ -1,74 +1,109 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: User
- * Date: 21.05.2018
- * Time: 10:07
+ * Класс-модель сертификата
+ *
+ * @author BadWolf
+ * @date 21.05.2018 10:07
+ * @version 20190402
+ * Class Certificate
  */
-
 class Certificate extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
+
+
+    /**
+     * Дата продажи сертификата
+     *
+     * @var string
+     */
     protected $sell_date;
+
+
+    /**
+     * Номер сертификата
+     *
+     * @var string
+     */
     protected $number;
+
+
+    /**
+     * Дата до которой действителен сертификат
+     *
+     * @var string
+     */
     protected $active_to;
+
+
+    /**
+     * id организации (директора), которому принадлежит сертификат
+     *
+     * @var int
+     */
     protected $subordinated = 0;
 
-    public function __construct(){}
 
-
-    public function getId()
+    /**
+     * @param string|null $sellDate
+     * @return $this|string
+     */
+    public function sellDate(string $sellDate = null)
     {
-        return $this->id;
+        if (is_null($sellDate)) {
+            return $this->sell_date;
+        } else {
+            $this->sell_date = $sellDate;
+            return $this;
+        }
     }
 
 
-    public function sellDate($val = null)
+    /**
+     * @param string|null $number
+     * @return $this|string
+     */
+    public function number(string $number =  null)
     {
-        if(is_null($val))   return $this->sell_date;
-        $this->sell_date = strval($val);
-        return $this;
+        if (is_null($number)) {
+            return $this->number;
+        } else {
+            $this->number = $number;
+            return $this;
+        }
     }
 
 
-    public function number($val =  null)
+    /**
+     * @param string|null $activeTo
+     * @return $this|string
+     */
+    public function activeTo(string $activeTo = null)
     {
-        if(is_null($val))   return $this->number;
-        $this->number = strval($val);
-        return $this;
+        if (is_null($activeTo)) {
+            return $this->active_to;
+        } else {
+            $this->active_to = $activeTo;
+            return $this;
+        }
     }
 
 
-    public function activeTo($val = null)
+    /**
+     * @param int|null $subordinated
+     * @return $this|int
+     */
+    public function subordinated(int $subordinated = null)
     {
-        if(is_null($val))   return $this->active_to;
-        $this->active_to = strval($val);
-        return $this;
-    }
-
-
-    public function subordinated( $val = null )
-    {
-        if( is_null( $val ) )   return $this->subordinated;
-        $this->subordinated = intval( $val );
-        return $this;
-    }
-
-
-
-    public function save($obj = null)
-    {
-        Core::notify(array(&$this), "beforeCertificateSave");
-        if($this->sell_date == "")  $this->sell_date = date("Y-m-d");
-        parent::save();
-        Core::notify(array(&$this), "afterCertificateSave");
-    }
-
-    public function delete($obj = null)
-    {
-        Core::notify(array(&$this), "beforeCertificateDelete");
-        parent::delete();
-        Core::notify(array(&$this), "afterCertificateDelete");
+        if (is_null($subordinated)) {
+            return $this->subordinated;
+        } else {
+            $this->subordinated = $subordinated;
+            return $this;
+        }
     }
 
 
@@ -79,27 +114,71 @@ class Certificate extends Core_Entity
      */
     public function getNotes()
     {
-        return Core::factory( "Certificate_Note" )
-            ->select( array( "Certificate_Note.id", "date", "certificate_id", "author_id", "text", "usr.surname", "usr.name" ) )
-            ->join( "User as usr", "author_id = usr.id" )
-            ->where( "certificate_id", "=", $this->id )
-            ->findAll();
+        $Notes = Core::factory('Certificate_Note')
+            ->queryBuilder()
+            ->select(['Certificate_Note.id', 'date', 'certificate_id', 'author_id', 'text'])
+            ->addSelect('usr.surname')
+            ->addSelect('usr.name')
+            ->join('User as usr', 'author_id = usr.id')
+            ->orderBy('date', 'DESC')
+            ->orderBy('Certificate_Note.id', 'DESC');
+        if (!empty($this->id)) {
+            $Notes->where('certificate_id', '=', $this->id);
+        }
+        return $Notes->findAll();
     }
 
 
-    public function addNote( $text, $triggerObserver = true )
+    /**
+     * Метод добавления комментария
+     *
+     * @param string $text
+     * @param bool $triggerObserver
+     */
+    public function addNote(string $text, bool $triggerObserver = true)
     {
-        $oCertificateNote = Core::factory( "Certificate_Note" )
-            ->text( $text )
-            ->certificateId( $this->id );
+        $Note = Core::factory('Certificate_Note')
+            ->text($text)
+            ->certificateId($this->id);
 
-        if( $triggerObserver == true )
-            Core::notify( array( &$oCertificateNote ), "beforeCertificateAddComment" );
+        if ($triggerObserver == true) {
+            Core::notify([&$Note], 'beforeCertificateAddComment');
+        }
 
-        $oCertificateNote->save();
+        $Note->save();
 
-        if( $triggerObserver == true )
-            Core::notify( array( &$oCertificateNote ), "afterCertificateAddComment" );
+        if ($triggerObserver == true) {
+            Core::notify([&$Note], 'afterCertificateAddComment');
+        }
+    }
+
+
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
+    public function save($obj = null)
+    {
+        Core::notify([&$this], 'beforeCertificateSave');
+
+        if ($this->sell_date == '') {
+            $this->sell_date = date('Y-m-d');
+        }
+
+        parent::save();
+        Core::notify([&$this], "afterCertificateSave");
+    }
+
+
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
+    public function delete($obj = null)
+    {
+        Core::notify([&$this], 'beforeCertificateDelete');
+        parent::delete();
+        Core::notify([&$this], 'afterCertificateDelete');
     }
 
 }
