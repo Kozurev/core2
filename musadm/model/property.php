@@ -39,7 +39,7 @@ class Property extends Property_Model
         $EmptyValue = Core::factory( $tableName )
             ->property_id( $this->id )
             ->model_name( $modelName )
-            ->value( strval( $this->default_value ) );
+            ->value($this->defaultValue());
 
 		if ( $obj->getId() == 0 )
         {

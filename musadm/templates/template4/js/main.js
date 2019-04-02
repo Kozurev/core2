@@ -211,7 +211,7 @@ function savePayment(userId, value, description, adminNote, type, url, func) {
         },
         success: function(response) {
             if(response != '0') {
-                notificationError('Ошибка: ' + responce);
+                notificationError('Ошибка: ' + response);
             }
             closePopup();
             if(typeof func === 'function') {
