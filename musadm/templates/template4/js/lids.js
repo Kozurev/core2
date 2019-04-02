@@ -28,6 +28,11 @@ $(function () {
         .on('click', '.popop_lid_comment_submit', function (e) {
             e.preventDefault();
             loaderOn();
+            if ($('#createData').find('textarea').val() == '') {
+                closePopup();
+                loaderOff();
+                return;
+            }
             saveData('Main', function (response) {
                 refreshLidTable();
             });
