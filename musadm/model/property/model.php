@@ -92,7 +92,13 @@ class Property_Model extends Core_Entity
     public function defaultValue(string $defaultValue = null)
     {
         if (is_null($defaultValue)) {
-            return $this->default_value;
+            if ($this->type() == 'int' || $this->type() == 'bool' || $this->type() == 'list') {
+                return intval($this->default_value);
+            } elseif ($this->type() == 'float') {
+                return floatval($this->default_value);
+            } else {
+                return $this->default_value;
+            }
         } else {
             $this->default_value = $defaultValue;
             return $this;
