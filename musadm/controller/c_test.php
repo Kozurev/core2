@@ -36,6 +36,8 @@ $Orm->executeQuery('alter table Schedule_Group add note text null after duration
 
 $Orm->executeQuery('alter table Payment_Tarif modify count_group float not null');
 
+$Orm->executeQuery( 'alter table Schedule_Lesson_Report add lessons_written_off float null after lesson_type;' );
+
 $Orm->executeQuery( '
     CREATE TABLE Schedule_Area_Assignment(
         id int PRIMARY KEY AUTO_INCREMENT,

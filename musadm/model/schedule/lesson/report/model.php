@@ -60,6 +60,13 @@ class Schedule_Lesson_Report_Model extends Core_Entity
      */
     protected $lesson_type;
 
+
+    /**
+     * @var float
+     */
+    protected $lessons_written_off = 0.0;
+
+
     /**
      * Стоимость занятия для клиента
      *
@@ -169,6 +176,7 @@ class Schedule_Lesson_Report_Model extends Core_Entity
         }
     }
 
+
     /**
      * @param int|null $typeId
      * @return $this|int
@@ -182,6 +190,22 @@ class Schedule_Lesson_Report_Model extends Core_Entity
             return $this;
         }
     }
+
+
+    /**
+     * @param float|null $lessonsWrittenOff
+     * @return $this|float
+     */
+    public function lessonsWrittenOff(float $lessonsWrittenOff = null)
+    {
+        if (is_null($lessonsWrittenOff)) {
+            return floatval($this->lessons_written_off);
+        } else {
+            $this->lessons_written_off = $lessonsWrittenOff;
+            return $this;
+        }
+    }
+
 
     /**
      * @param float|null $clientRate
