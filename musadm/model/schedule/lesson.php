@@ -324,7 +324,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
                     }
                 }
             } elseif ($presence == 0 && $this->typeId() == self::TYPE_CONSULT) {
-                $absentRateValue = 0;
+                $absentRateValue = 0.0;
             }
 
             if ($presence == 1) {
@@ -339,10 +339,16 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             $ClientCountLessons = $ClientLessons->getPropertyValues($Client)[0];
             $clientCountLessons = floatval($ClientCountLessons->value());
 
-            $presence == 1 || $this->typeId() == self::TYPE_GROUP
-                ?   $clientCountLessons--
-                :   $clientCountLessons -= $absentRateValue;
+            if ($presence == 1 || $this->typeId() == self::TYPE_GROUP) {
+                $clientCountLessons--;
+                $ClientReport->lessonsWrittenOff(1);
+            } else {
+                $clientCountLessons -= $absentRateValue;
+                $ClientReport->lessonsWrittenOff($absentRateValue);
+            }
+
             $ClientCountLessons->value($clientCountLessons)->save();
+
 
             //Задание значения клиентской "медианы" для отчета
             $ClientRate = Core::factory('Property')->getByTagName($clientRate);
@@ -361,6 +367,34 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             $Report->clientRate($clientRateValueSum);
             $Report->totalRate($Report->clientRate() - $Report->teacherRate());
             $Report->save();
+        }
+    }
+
+
+    /**
+     * Удаление отчетовв о проведенных занятиях
+     *
+     * @param string $date
+     */
+    public function clearReports(string $date)
+    {
+        $Reports = Core::factory('Schedule_Lesson_Report')
+            ->queryBuilder()
+            ->where('lesson_id', '=', $this->id)
+            ->where('date', '=', $date)
+            ->findAll();
+
+        foreach ($Reports as $Report) {
+            $Client = $Report->getClient();
+            if ($Report->typeId() == self::TYPE_INDIV) {
+                $ClientLessons = Core::factory('Property')->getByTagName('indiv_lessons');
+            } else {
+                $ClientLessons = Core::factory('Property')->getByTagName('group_lessons');
+            }
+
+            $CurrentLessons = $ClientLessons->getPropertyValues($Client)[0];
+            $CurrentLessons->value($CurrentLessons->value() + $Report->lessonsWrittenOff())->save();
+            $Report->delete();
         }
     }
 
@@ -388,25 +422,6 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             return true;
         } else {
             return false;
-        }
-    }
-
-
-    /**
-     * Удаление отчетовв о проведенных занятиях
-     *
-     * @param string $date
-     */
-    public function clearReports(string $date)
-    {
-        $Reports = Core::factory('Schedule_Lesson_Report')
-            ->queryBuilder()
-            ->where('lesson_id', '=', $this->id)
-            ->where('date', '=', $date)
-            ->findAll();
-
-        foreach ($Reports as $Report) {
-            $Report->delete();
         }
     }
 
