@@ -126,7 +126,8 @@
                     </xsl:for-each>
                 </select>
             </div>
-                <hr/>
+            <hr/>
+
             <div class="column">
                 <span>Учителя</span>
             </div>
@@ -138,6 +139,7 @@
                     </xsl:call-template>
                 </select>
             </div>
+            <hr/>
 
             <div class="column">
                 <span>Направление подготовки</span>
