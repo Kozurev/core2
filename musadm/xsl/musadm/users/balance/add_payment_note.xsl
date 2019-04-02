@@ -7,7 +7,7 @@
                 <span>Примечание</span>
             </div>
             <div class="column">
-                <textarea name="property_26[]"></textarea>
+                <textarea name="property_26[]" id="property_26"></textarea>
             </div>
 
             <xsl:if test="count(notes/value) != 0">

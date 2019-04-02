@@ -51,7 +51,7 @@
 
                 <xsl:if test="//is_admin = 1">
                     <xsl:for-each select="notes">
-                        <br/><xsl:value-of select="value" />
+                        <xsl:if test="value != ''"><br/><xsl:value-of select="value" /></xsl:if>
                     </xsl:for-each>
                 </xsl:if>
             </td>
