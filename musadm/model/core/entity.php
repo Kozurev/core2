@@ -124,6 +124,8 @@ class Core_Entity extends Core_Entity_Model
                     );
                     return false;
                 }
+
+                //TODO: add check types: PARAM_DATE, PARAM_TIME, PARAM_DATETIME
             }
 
             //check maxlength
@@ -603,6 +605,8 @@ class Core_Entity extends Core_Entity_Model
         foreach ($this->childrenObjects as $obj) {
             $rootTag->appendChild($this->createEntity($obj, $xml));
         }
+
+        //$xml->save('xml.xml');
 
         // Объект стиля
         $xsl = new DOMDocument();
