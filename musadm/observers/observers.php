@@ -353,8 +353,7 @@ Core::attachObserver('beforeScheduleLessonSave', function($args) {
 
     Core::factory('Lid_Controller');
     $Lid = Lid_Controller::factory($clientId);
-
-    if (!is_null($Lid)) {
+    if (is_null($Lid)) {
         die('Лида с номером ' . $clientId . ' не существует');
     }
 
