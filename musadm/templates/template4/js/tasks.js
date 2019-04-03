@@ -1,80 +1,20 @@
-"use strict";
-var root = $("#rootdir").val();
-var taskAfterActionValue = $("#taskAfterAction").val();
+'use strict';
+var root = $('#rootdir').val();
+var taskAfterActionValue = $('#taskAfterAction').val();
 
-
-$(function(){
-    $("body")
-        // .on("click", ".task_create", function(e){
-        //     e.preventDefault();
-        //     newTaskPopup();
-        // })
-        .on("click", ".popop_task_submit", function(e){
+$(function() {
+    $('body')
+        .on('click', '.popop_task_submit', function(e) {
             e.preventDefault();
             loaderOn();
-            var form = $("#createData");
-
+            var form = $('#createData');
             if (form.valid()) {
                 var formData = form.serialize();
                 saveTask(formData, refreshTasksTable);
             } else {
                 loaderOff();
             }
-        })
-        // .on("change", ".task_date", function (e) {
-        //     e.preventDefault();
-        //     var taskId = $(this).data("taskid");
-        //     var date = $(this).val();
-        //     updateTaskDate(taskId, date);
-        // })
-        // .on("change", ".task_area", function(e){
-        //     var taskId = $(this).data("taskid");
-        //     var areaId = $(this).val();
-        //     updateTaskArea(taskId, areaId);
-        // })
-        // .on("click", ".task_append_done", function(e){
-        //     e.preventDefault();
-        //     loaderOn();
-        //     var task_id = $(this).data("task_id");
-        //     markAsDone(task_id, function(response){
-        //         taskAfterAction();
-        //     });
-        // })
-        // .on("click", ".task_add_note", function(e){
-        //     e.preventDefault();
-        //     var task_id = $(this).data("task_id");
-        //     addTaskNotePopup(task_id);
-        // })
-        // .on("click", ".popop_task_note_submit", function(e){
-        //     e.preventDefault();
-        //     loaderOn();
-        //     saveData("Main", function(response){taskAfterAction();});
-        // })
-        // .on("click", ".tasks_show", function(){
-        //     loaderOn();
-        //     var dateFrom = $("input[name=date_from]").val();
-        //     var dateTo = $("input[name=date_to]").val();
-        //     refreshTasksTable(dateFrom, dateTo);
-        // })
-        // .on("click", ".associate", function(e){
-        //     e.preventDefault();
-        //     assignmentTaskPopup( $(this).data("task_id") );
-        // })
-        // .on("click", ".popop_task_assignment_submit", function(e){
-        //     e.preventDefault();
-        //     loaderOn();
-        //     saveData("Main", function(response){taskAfterAction();});
-        // })
-        // .on("change", "input[data-type=task_priority]", function(e){
-        //     var priorityId = $(this).val();
-        //     var taskId = $(this).data("taskid");
-        //
-        //     loaderOn();
-        //     changeTaskPriority(taskId, priorityId, function(response){
-        //         taskAfterAction();
-        //     });
-        // });
-
+        });
 });
 
 
@@ -112,13 +52,13 @@ function taskAfterAction() {
 
 function changeTaskPriority(taskId, priorityId, func) {
     $.ajax({
-        type: "GET",
-        url: root + "/tasks",
+        type: 'GET',
+        url: root + '/tasks',
         dataType: 'json',
         data: {
-            action: "changeTaskPriority",
-            task_id: taskId,
-            priority_id: priorityId
+            action: 'changeTaskPriority',
+            taskId: taskId,
+            priorityId: priorityId
         },
         success: function (response) {
             func(response);
@@ -134,11 +74,11 @@ function changeTaskPriority(taskId, priorityId, func) {
 
 function assignmentTaskPopup(taskId) {
     $.ajax({
-        url: root + "/tasks",
-        type: "GET",
+        url: root + '/tasks',
+        type: 'GET',
         data: {
-            action: "task_assignment_popup",
-            taskid: taskId
+            action: 'task_assignment_popup',
+            taskId: taskId
         },
         success: function(response){
             showPopup(response);
@@ -147,22 +87,21 @@ function assignmentTaskPopup(taskId) {
 }
 
 
-function markAsDone(taskId, func) {
+function markAsDone(taskId, callBack) {
     loaderOn();
     $.ajax({
-        type: "GET",
-        url: root + "/tasks",
+        type: 'GET',
+        url: root + '/tasks',
         data: {
-            action: "markAsDone",
-            task_id: taskId
+            action: 'markAsDone',
+            taskId: taskId
         },
-        success: function(responce){
-            if(responce != '0') {
-                notificationError('Ошибка: ' + responce);
+        success: function(response) {
+            if (response != '0') {
+                notificationError('Ошибка: ' + response);
                 return;
             }
-
-            func(responce);
+            callBack(response);
             loaderOff();
         }
     });
@@ -171,43 +110,47 @@ function markAsDone(taskId, func) {
 
 function updateTaskDate(taskId, taskDate) {
     $.ajax({
-        type: "GET",
-        url: root + "/tasks",
+        type: 'GET',
+        url: root + '/tasks',
         data: {
-            action: "update_date",
-            task_id: taskId,
+            action: 'update_date',
+            taskId: taskId,
             date: taskDate
         },
-        success: function(response){}
+        success: function(response) {
+
+        }
     });
 }
 
 
 function updateTaskArea(taskId, areaId) {
     $.ajax({
-        type: "GET",
-        url: root + "/tasks",
+        type: 'GET',
+        url: root + '/tasks',
         data: {
-            action: "update_area",
-            task_id: taskId,
-            area_id: areaId
+            action: 'update_area',
+            taskId: taskId,
+            areaId: areaId
         },
-        success: function(response){}
+        success: function(response) {
+
+        }
     });
 }
 
 
 function refreshTasksTable(from, to) {
     $.ajax({
-        type: "GET",
-        url: "",
+        type: 'GET',
+        url: '',
         data: {
-            action: "refreshTasksTable",
+            action: 'refreshTasksTable',
             date_from: from,
             date_to: to
         },
         success: function(response) {
-            $(".tasks").html(response);
+            $('.tasks').html(response);
             loaderOff();
         }
     });
@@ -216,29 +159,31 @@ function refreshTasksTable(from, to) {
 
 function newTaskPopup() {
     $.ajax({
-        type: "GET",
-        url: root + "/tasks",
+        type: 'GET',
+        url: root + '/tasks',
         data: {
-            action: "new_task_popup",
+            action: 'new_task_popup',
         },
-        success: function(responce){
-            showPopup(responce);
+        success: function(response) {
+            showPopup(response);
         }
     });
 }
 
 
-function saveTask(formData, func) {
-    formData += "&action=save_task";
+function saveTask(formData, callBack) {
+    formData += '&action=save_task';
 
     $.ajax({
-        type: "GET",
-        url: root + "/tasks",
+        type: 'GET',
+        url: root + '/tasks',
         data: formData,
-        success: function(responce){
-            if(responce != "0") alert(responce);
+        success: function(response) {
+            if (response != '0') {
+                notificationError(response);
+            }
             closePopup();
-            func();
+            callBack();
             loaderOff();
         }
     });
