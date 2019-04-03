@@ -438,7 +438,7 @@ function getScheduleAreaPopup(areaId) {
             areaId: areaId
         },
         success: function(response){
-            showPopup(responce);
+            showPopup(response);
         }
     });
 }

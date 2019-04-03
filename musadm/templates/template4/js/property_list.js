@@ -201,13 +201,11 @@ function savePropertyValue(propName, value, modelName, modelId, func)
         },
         success: function(response) {
             if(response != '') {
-                notificationError('Ошибка: ' + responae);
+                notificationError('Ошибка: ' + response);
             }
-
             if(typeof func === 'function') {
                 func(response);
             }
-
             loaderOff();
         }
     });
