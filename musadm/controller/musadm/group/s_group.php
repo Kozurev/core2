@@ -44,7 +44,7 @@ if ($action === 'getGroupComposition') {
 
     $Group->addEntities($Group->getClientList());
 
-    $UserController = new User_Controller();
+    $UserController = new User_Controller(User::current());
     $Users = $UserController
         ->groupId(ROLE_CLIENT)
         ->isWithAreaAssignments(false)
@@ -104,7 +104,7 @@ if($action == 'updateForm')
 
 //Обработчик для фильтрации (поиска) клиентов по фио
 if ($action === 'groupSearchClient') {
-    $Users = new User_Controller();
+    $Users = new User_Controller(User::current());
     $Users
         ->groupId(ROLE_CLIENT)
         ->filterType(User_Controller::FILTER_NOT_STRICT)
@@ -149,7 +149,6 @@ if ($action === 'groupCreateAssignments') {
     }
 
     $outputJson = [];
-
     foreach ($userIds as $id) {
         $User = User_Controller::factory($id);
         if (!is_null($User)) {
