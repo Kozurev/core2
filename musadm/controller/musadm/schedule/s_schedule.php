@@ -12,13 +12,14 @@ $Director = $User->getDirector();
 $subordinated = $Director->getId();
 
 //Формирование заголовка страницы
-$pageUserId = Core_Array::Get('userid', null);
+$pageUserId = Core_Array::Get('userid', null, PARAM_INT);
 if (!is_null($pageUserId)) {
     $Teacher = User_Controller::factory($pageUserId);
 } else {
     $Teacher = $User;
 }
-$isTeacherPage = $Teacher->groupId() == ROLE_TEACHER && is_null(Core_Page_Show::instance()->StructureItem);
+
+$isTeacherPage = !is_null($Teacher) && $Teacher->groupId() == ROLE_TEACHER && is_null(Core_Page_Show::instance()->StructureItem);
 
 //Личный кабинет преподавателя
 if ($isTeacherPage == true) {
