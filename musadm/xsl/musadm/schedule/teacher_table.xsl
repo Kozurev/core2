@@ -37,10 +37,23 @@
             <td class="left">
                 <xsl:choose>
                     <xsl:when test="type_id = 3">
-                        Консультация
+                        <xsl:variable name="lidId" select="client_id" />
+
+                        <input type="checkbox" name="attendance_{$lidId}" id="attendance_{$lidId}">
+                            <xsl:if test="client/report/id">
+                                <xsl:attribute name="disabled">disabled</xsl:attribute>
+                            </xsl:if>
+                            <xsl:if test="client/report/attendance = 1">
+                                <xsl:attribute name="checked">checked</xsl:attribute>
+                            </xsl:if>
+                        </input>
+                        <xsl:text>   </xsl:text>
+                        <label for="attendance_{$lidId}">
+                            Консультация
                             <xsl:if test="client_id != 0">
                                 <xsl:value-of select="client_id" />
                             </xsl:if>
+                        </label>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:apply-templates select="client" />

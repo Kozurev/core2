@@ -4,12 +4,10 @@
  *
  * @author: Kozurev Egor
  * @date 24.04.2018 19:57
+ * @version 20190403
  */
-
-
 class Schedule_Lesson extends Schedule_Lesson_Model
 {
-
     const TYPE_INDIV = 1;
     const TYPE_GROUP = 2;
     const TYPE_CONSULT = 3;
@@ -118,7 +116,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
                     return $this->defaultGroup;
                 }
                 break;
-            case 3:
+            case self::TYPE_CONSULT:
                 if ($this->client_id == null || $this->client_id < 0) {
                     return $this->defaultLid;
                 }
@@ -271,7 +269,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         foreach ($attendance as $clientId => $presence) {
             $Client = User_Controller::factory($clientId);
             $Teacher = User_Controller::factory($this->teacherId());
-            if (is_null($Client) || is_null($Teacher)) {
+            if (is_null($Teacher)) {
                 continue;
             }
 
@@ -325,6 +323,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
                 }
             } elseif ($presence == 0 && $this->typeId() == self::TYPE_CONSULT) {
                 $absentRateValue = 0.0;
+                $teacherAbsentValue = 0.0;
             }
 
             if ($presence == 1) {
@@ -335,28 +334,31 @@ class Schedule_Lesson extends Schedule_Lesson_Model
                 $ClientReport->teacherRate($teacherAbsentValue);
             }
 
-            //Корректировка баланса количества занятий клиента
-            $ClientCountLessons = $ClientLessons->getPropertyValues($Client)[0];
-            $clientCountLessons = floatval($ClientCountLessons->value());
+            if ($this->typeId() != self::TYPE_CONSULT) {
+                //Корректировка баланса количества занятий клиента
+                $ClientCountLessons = $ClientLessons->getPropertyValues($Client)[0];
+                $clientCountLessons = floatval($ClientCountLessons->value());
 
-            if ($presence == 1 || $this->typeId() == self::TYPE_GROUP) {
-                $clientCountLessons--;
-                $ClientReport->lessonsWrittenOff(1);
+                if ($presence == 1 || $this->typeId() == self::TYPE_GROUP) {
+                    $clientCountLessons--;
+                    $ClientReport->lessonsWrittenOff(1);
+                } else {
+                    $clientCountLessons -= $absentRateValue;
+                    $ClientReport->lessonsWrittenOff($absentRateValue);
+                }
+
+                $ClientCountLessons->value($clientCountLessons)->save();
+
+                //Задание значения клиентской "медианы" для отчета
+                $ClientRate = Core::factory('Property')->getByTagName($clientRate);
+                $ClientRateValue = $ClientRate->getPropertyValues($Client)[0];
+                $clientRateValue = floatval($ClientRateValue->value());
+
+                if ($presence == 0 && $this->typeId() == self::TYPE_INDIV) {
+                    $clientRateValue *= $absentRateValue;
+                }
             } else {
-                $clientCountLessons -= $absentRateValue;
-                $ClientReport->lessonsWrittenOff($absentRateValue);
-            }
-
-            $ClientCountLessons->value($clientCountLessons)->save();
-
-
-            //Задание значения клиентской "медианы" для отчета
-            $ClientRate = Core::factory('Property')->getByTagName($clientRate);
-            $ClientRateValue = $ClientRate->getPropertyValues($Client)[0];
-            $clientRateValue = floatval($ClientRateValue->value());
-
-            if ($presence == 0 && $this->typeId() == self::TYPE_INDIV) {
-                $clientRateValue *= $absentRateValue;
+                $clientRateValue = 0.0;
             }
 
             $Reports[] = $ClientReport;
@@ -385,15 +387,17 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->findAll();
 
         foreach ($Reports as $Report) {
-            $Client = $Report->getClient();
-            if ($Report->typeId() == self::TYPE_INDIV) {
-                $ClientLessons = Core::factory('Property')->getByTagName('indiv_lessons');
-            } else {
-                $ClientLessons = Core::factory('Property')->getByTagName('group_lessons');
-            }
+            if ($Report->typeId() != self::TYPE_CONSULT) {
+                $Client = $Report->getClient();
+                if ($Report->typeId() == self::TYPE_INDIV) {
+                    $ClientLessons = Core::factory('Property')->getByTagName('indiv_lessons');
+                } else {
+                    $ClientLessons = Core::factory('Property')->getByTagName('group_lessons');
+                }
 
-            $CurrentLessons = $ClientLessons->getPropertyValues($Client)[0];
-            $CurrentLessons->value($CurrentLessons->value() + $Report->lessonsWrittenOff())->save();
+                $CurrentLessons = $ClientLessons->getPropertyValues($Client)[0];
+                $CurrentLessons->value($CurrentLessons->value() + $Report->lessonsWrittenOff())->save();
+            }
             $Report->delete();
         }
     }
