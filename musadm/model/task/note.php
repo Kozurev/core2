@@ -134,7 +134,7 @@ class Task_Note extends Core_Entity
         if (is_null($this->date)) {
             $this->date = date('Y-m-d H:i:s');
         }
-        if (is_null($this->author_id)) {
+        if ($this->author_id === 0) {
             $this->author_id = User::parentAuth()->getId();
         }
 
