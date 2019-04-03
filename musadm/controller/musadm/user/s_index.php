@@ -162,7 +162,7 @@ if ($action === 'updateFormDirector') {
  * Форма редактирования менеджера
  */
 if ($action === 'updateFormManager') {
-    $userId = Core_Array::Get('userid', 0, PARAM_INT);
+    $userId = Core_Array::Get('userId', 0, PARAM_INT);
     $output = Core::factory('Core_Entity');
 
     if ($userId != 0) {
