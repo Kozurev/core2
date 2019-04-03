@@ -8,6 +8,7 @@
  * @date 18.02.2019 9:42
  * @version 20190220
  * @version 20190402
+ * @version 20190403
  */
 
 
@@ -17,13 +18,16 @@
  * для, хотя бы частичной, защиты от SQL инъекций.
  *
  * @date 18.02.2019 9:43
+ * @version 20190403
  */
-define('PARAM_INT',    'int');
-define('PARAM_FLOAT',  'float');
-define('PARAM_STRING', 'string');
-define('PARAM_BOOL',   'bool');
-define('PARAM_ARRAY',  'array');
-define('PARAM_DATE',   'date');
+define('PARAM_INT',         'int');
+define('PARAM_FLOAT',       'float');
+define('PARAM_STRING',      'string');
+define('PARAM_BOOL',        'bool');
+define('PARAM_ARRAY',       'array');
+define('PARAM_DATE',        'date');
+define('PARAM_TIME',        'time');
+define('PARAM_DATETIME',    'datetime');
 
 
 /**

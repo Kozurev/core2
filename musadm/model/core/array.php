@@ -5,6 +5,7 @@
  * @author Bad Wolf
  * @date 20.03.2018 16:03
  * @version 20190401
+ * @version 20190403
  */
 class Core_Array
 {
@@ -19,7 +20,10 @@ class Core_Array
         'PARAM_FLOAT'   => 'float',
         'PARAM_STRING'  => 'string',
         'PARAM_BOOL'    => 'bool',
-        'PARAM_ARRAY'   => 'array'
+        'PARAM_ARRAY'   => 'array',
+        'PARAM_DATE'    => 'date',
+        'PARAM_TIME'    => 'time',
+        'PARAM_DATETIME'=> 'datetime'
     ];
 
 
@@ -45,7 +49,6 @@ class Core_Array
 
         foreach ($nesting as $arrKey) {
             $array = self::getValue($array, $arrKey, $default, PARAM_ARRAY);
-
             if (!is_array($array)) {
                 return $default;
             }
@@ -57,9 +60,7 @@ class Core_Array
             $value = $default;
         }
 
-        /**
-         * Контроль возвращаемого типа данных
-         */
+        //Контроль возвращаемого типа данных
         if (!is_null($type) && in_array($type, self::$types)) {
             switch ($type)
             {
@@ -105,6 +106,24 @@ class Core_Array
                     !is_array($value)
                         ?   $value = $default
                         :   $value = (array)$value;
+                    break;
+
+                case PARAM_DATE:
+                    if (!(is_string($value) && preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/', $value))) {
+                        $value = $default;
+                    }
+                    break;
+
+                case PARAM_TIME:
+                    if (!(is_string($value) && preg_match('/^(00|[0-9]|1[0-9]|2[0-3]):([0-9]|[0-5][0-9]):([0-9]|[0-5][0-9])$/', $value))) {
+                        $value = $default;
+                    }
+                    break;
+
+                case PARAM_DATETIME:
+                    if (!(is_string($value) && preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (00|[0-9]|1[0-9]|2[0-3]):([0-9]|[0-5][0-9]):([0-9]|[0-5][0-9])$/', $value))) {
+                        $value = $default;
+                    }
                     break;
             }
         }
@@ -208,5 +227,4 @@ class Core_Array
     {
         return self::getValue($_COOKIE, $key, $default, $type);
     }
-
 }
