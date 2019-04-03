@@ -12,7 +12,7 @@
                 <table id="sortingTable" class="table table-striped">
                     <thead>
                         <tr class="header">
-                            <th>id</th>
+                            <!--<th>id</th>-->
                             <th>Название</th>
                             <th>Учитель</th>
                             <th>Длит. занятия</th>
@@ -34,7 +34,7 @@
     <xsl:template match="schedule_group">
         <xsl:variable name="teacher" select="teacher_id"/>
         <tr>
-            <td><xsl:value-of select="id" /></td>
+            <!--<td><xsl:value-of select="id" /></td>-->
             <td><xsl:value-of select="title" /></td>
             <td>
                 <a href="{/root/wwwroot}/schedule/?userid={$teacher}">
