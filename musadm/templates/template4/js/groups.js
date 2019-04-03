@@ -10,12 +10,12 @@ $(function(){
             loaderOn();
             var userQuery = $('#groupUserQuery');
             var surname = userQuery.val();
-            if (surname === '') {
-                userQuery.addClass('error');
-                loaderOff();
-                return false;
-            } else {
-                userQuery.removeClass('error');
+            // if (surname === '') {
+            //     userQuery.addClass('error');
+            //     loaderOff();
+            //     return false;
+            // } else {
+                // userQuery.removeClass('error');
                 groupSearchClient(surname, function(response) {
                     var clientsList = $('#groupUserList');
                     clientsList.empty();
@@ -24,7 +24,7 @@ $(function(){
                     });
                     loaderOff();
                 });
-            }
+            // }
         })
         .on('click', '#groupAppendClient', function(e) {
             e.preventDefault();
