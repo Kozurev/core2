@@ -28,7 +28,7 @@ class Payment_Model extends Core_Entity
      *
      * @var int
      */
-    protected $type;
+    protected $type = 0;
 
 
     /**
@@ -44,7 +44,7 @@ class Payment_Model extends Core_Entity
      *
      * @var int
      */
-    protected $value;
+    protected $value = 0.0;
 
 
     /**
