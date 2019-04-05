@@ -26,6 +26,13 @@ class Schedule_Lesson_Report_Model extends Core_Entity
     protected $client_id;
 
     /**
+     * id группы, если это отчет по групповому занятию
+     *
+     * @var int
+     */
+    protected $group_id = 0;
+
+    /**
      * Присутствие клиента на занятии
      *
      * @var int
@@ -113,6 +120,20 @@ class Schedule_Lesson_Report_Model extends Core_Entity
             return $this->client_id;
         } else {
             $this->client_id = $clientId;
+            return $this;
+        }
+    }
+
+    /**
+     * @param int|null $groupId
+     * @return $this|int
+     */
+    public function groupId(int $groupId = null)
+    {
+        if (is_null($groupId)) {
+            return $this->group_id;
+        } else {
+            $this->group_id = $groupId;
             return $this;
         }
     }

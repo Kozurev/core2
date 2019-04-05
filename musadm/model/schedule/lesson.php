@@ -242,6 +242,11 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->lessonType($this->lesson_type);
         //TODO: Убрать последнее свойство вообще из таблицы за ненадобностью
 
+        if ($value = Core_Array::getValue($attendance, 'group', 0, PARAM_INT)) {
+            $Report->groupId($value);
+            unset($attendance['group']);
+        }
+
         $Director = User::current()->getDirector();
         Core::factory('User_Controller');
 
@@ -267,6 +272,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
         //Создание отчета по каждому клиенту
         foreach ($attendance as $clientId => $presence) {
+            $clientId = intval($clientId);
             $Client = User_Controller::factory($clientId);
             $Teacher = User_Controller::factory($this->teacherId());
             if (is_null($Teacher)) {

@@ -240,6 +240,8 @@ $(function(){
                 var name = $(input).attr('name');
                 if (name != 'group') {
                     ajaxData[name] = Number($(input).is(':checked'));
+                } else {
+                    ajaxData[name] = $(input).val();
                 }
             });
 

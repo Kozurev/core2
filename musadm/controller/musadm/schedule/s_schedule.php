@@ -241,6 +241,8 @@ if ($action === 'teacherReport') {
         if (stristr($param, 'attendance') !== false) {
             $clientId = explode('attendance_', $param)[1];
             $attendance[$clientId] = $value;
+        } elseif ($param == 'group') {
+            $attendance['group'] = $value;
         }
     }
 

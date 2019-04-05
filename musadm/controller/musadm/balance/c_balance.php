@@ -155,40 +155,14 @@ $UserReports
     ->select(['Schedule_Lesson_Report.id', 'attendance', 'date', 'lesson_id', 'lesson_type', 'client_id',
         'surname', 'name', 'client_rate', 'teacher_rate', 'total_rate', 'type_id'])
     ->leftJoin('User AS usr', 'usr.id = teacher_id')
+    ->where('client_id', '=', $User->getId())
+    ->where('type_id', 'in', [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_GROUP])
     ->orderBy('date', 'DESC');
-
-$ClientGroups = Core::factory('Schedule_Group_Assignment')
-    ->queryBuilder()
-    ->where('user_id', '=', $User->getId())
-    ->findAll();
-
-$UserGroups = [];
-foreach ($ClientGroups as $group) {
-    $UserGroups[] = $group->groupId();
-}
-
-if (count($UserGroups) > 0) {
-    $UserReports
-        ->queryBuilder()
-        ->open()
-            ->where('client_id', '=', $User->getId())
-            ->where('type_id', '=', 1)
-        ->close()
-        ->open()
-            ->orWhereIn('client_id', $UserGroups)
-            ->where('type_id', '=', 2)
-        ->close();
-} else {
-    $UserReports->queryBuilder()
-        ->where('client_id', '=', $User->getId())
-        ->where('type_id', '=', 1);
-}
 
 $UserReports = $UserReports->findAll();
 foreach ($UserReports as $rep) {
     $RepLesson = Core::factory('Schedule_Lesson', $rep->lessonId());
-
-    if ($RepLesson === null) {
+    if (is_null($RepLesson)) {
         continue;
     }
 
@@ -197,9 +171,12 @@ foreach ($UserReports as $rep) {
     $rep->time_to = refactorTimeFormat($RepLesson->timeTo());
     $rep->date(refactorDateFormat($rep->date()));
 
-    if ($rep->typeId() == 2) {
-        $rep->surname = Core::factory('Schedule_Group', $rep->clientId())->title();
-        $rep->name = '';
+    if ($rep->typeId() == Schedule_Lesson::TYPE_GROUP && $rep->groupId() > 0) {
+        $Group = Core::factory('Schedule_Group', $rep->groupId());
+        if (!is_null($Group)) {
+            $rep->surname = $Group->title();
+            $rep->name = '';
+        }
     }
 }
 

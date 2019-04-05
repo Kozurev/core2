@@ -89,7 +89,7 @@
         <xsl:choose>
             <xsl:when test="title != ''">
                 <li>
-                    <input type="checkbox" id="group_{id}" name="group" class="group-checkbox">
+                    <input type="checkbox" id="group_{id}" name="group" value="{id}" class="group-checkbox">
                         <xsl:if test="../is_reported = 1">
                             <xsl:attribute name="checked">checked</xsl:attribute>
                             <xsl:attribute name="disabled">disabled</xsl:attribute>
