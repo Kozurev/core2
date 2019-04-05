@@ -35,30 +35,32 @@
             </td>
 
             <td class="left">
-                <xsl:choose>
-                    <xsl:when test="type_id = 3">
-                        <xsl:variable name="lidId" select="client_id" />
+                <ul>
+                    <xsl:choose>
+                        <xsl:when test="type_id = 3">
+                            <xsl:variable name="lidId" select="client_id" />
 
-                        <input type="checkbox" name="attendance_{$lidId}" id="attendance_{$lidId}">
-                            <xsl:if test="client/report/id">
-                                <xsl:attribute name="disabled">disabled</xsl:attribute>
-                            </xsl:if>
-                            <xsl:if test="client/report/attendance = 1">
-                                <xsl:attribute name="checked">checked</xsl:attribute>
-                            </xsl:if>
-                        </input>
-                        <xsl:text>   </xsl:text>
-                        <label for="attendance_{$lidId}">
-                            Консультация
-                            <xsl:if test="client_id != 0">
-                                <xsl:value-of select="client_id" />
-                            </xsl:if>
-                        </label>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:apply-templates select="client" />
-                    </xsl:otherwise>
-                </xsl:choose>
+                            <input type="checkbox" name="attendance_{$lidId}" id="attendance_{$lidId}">
+                                <xsl:if test="client/report/id">
+                                    <xsl:attribute name="disabled">disabled</xsl:attribute>
+                                </xsl:if>
+                                <xsl:if test="client/report/attendance = 1">
+                                    <xsl:attribute name="checked">checked</xsl:attribute>
+                                </xsl:if>
+                            </input>
+                            <xsl:text>   </xsl:text>
+                            <label for="attendance_{$lidId}">
+                                Консультация
+                                <xsl:if test="client_id != 0">
+                                    <xsl:value-of select="client_id" />
+                                </xsl:if>
+                            </label>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:apply-templates select="client" />
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </ul>
             </td>
 
             <input type="hidden" name="date" value="{//real_date}"/>
@@ -86,25 +88,39 @@
     <xsl:template match="client">
         <xsl:choose>
             <xsl:when test="title != ''">
-                <h5><xsl:value-of select="title" />:</h5>
-                <xsl:apply-templates select="client" />
+                <li>
+                    <input type="checkbox" id="group_{id}" name="group" class="group-checkbox">
+                        <xsl:if test="../is_reported = 1">
+                            <xsl:attribute name="checked">checked</xsl:attribute>
+                            <xsl:attribute name="disabled">disabled</xsl:attribute>
+                        </xsl:if>
+                    </input>
+                    <label for="group_{id}" class="group-label">
+                        <xsl:value-of select="title" />
+                    </label>
+                    <a href="#" class="show-group-users">(состав)</a>
+                    <ul class="group-list">
+                        <xsl:apply-templates select="client" />
+                    </ul>
+                </li>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:if test="position() > 1"><br/></xsl:if>
-                <input type="checkbox" name="attendance_{id}" id="attendance_{id}">
-                    <xsl:if test="report/id">
-                        <xsl:attribute name="disabled">disabled</xsl:attribute>
-                    </xsl:if>
-                    <xsl:if test="report/attendance = 1">
-                        <xsl:attribute name="checked">checked</xsl:attribute>
-                    </xsl:if>
-                </input>
-                <xsl:text>   </xsl:text>
-                <label for="attendance_{id}">
-                    <xsl:value-of select="surname" />
-                    <xsl:text> </xsl:text>
-                    <xsl:value-of select="name" />
-                </label>
+                <li>
+                    <input type="checkbox" name="attendance_{id}" id="attendance_{id}">
+                        <xsl:if test="report/id">
+                            <xsl:attribute name="disabled">disabled</xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test="report/attendance = 1">
+                            <xsl:attribute name="checked">checked</xsl:attribute>
+                        </xsl:if>
+                    </input>
+                    <xsl:text>   </xsl:text>
+                    <label for="attendance_{id}">
+                        <xsl:value-of select="surname" />
+                        <xsl:text> </xsl:text>
+                        <xsl:value-of select="name" />
+                    </label>
+                </li>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

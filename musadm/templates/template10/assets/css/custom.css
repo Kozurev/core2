@@ -381,18 +381,33 @@ section {
     display: inline-block;
 }
 
-.teacher_table td,
-.teacher_table th {
+.teacher_table tr td,
+.teacher_table tr th {
     vertical-align: middle;
     text-align: center;
 }
 
-.teacher_table h5 {
-    font-weight: bold;
+.teacher_table tr td ul {
+    margin: 0;
+    padding: 0 0 0 15px;
 }
 
-.teacher_table label {
+.teacher_table tr td ul li .show-group-users {
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.teacher_table tr td ul li .group-list {
+    display: none;
+}
+
+.teacher_table tr td ul li {
+    list-style-type: none;
+}
+
+.teacher_table tr td ul li label {
     font-weight: normal;
+    padding-left: 5px;
 }
 
 .day_name {

@@ -238,8 +238,9 @@ $(function(){
 
             $.each(attendance, function(key, input) {
                 var name = $(input).attr('name');
-                var value = Number($(input).is(':checked'));
-                ajaxData[name] = value;
+                if (name != 'group') {
+                    ajaxData[name] = Number($(input).is(':checked'));
+                }
             });
 
             $.ajax({

@@ -10,12 +10,6 @@ $(function(){
             loaderOn();
             var userQuery = $('#groupUserQuery');
             var surname = userQuery.val();
-            // if (surname === '') {
-            //     userQuery.addClass('error');
-            //     loaderOff();
-            //     return false;
-            // } else {
-                // userQuery.removeClass('error');
                 groupSearchClient(surname, function(response) {
                     var clientsList = $('#groupUserList');
                     clientsList.empty();
@@ -77,6 +71,30 @@ $(function(){
                 });
                 refreshGroupTable();
             });
+        })
+        .on('change', '.group-checkbox', function(e) {
+            var groupClients = $(this).parent().find('.group-list').find('input[type=checkbox]');
+            var isGroupChecked;
+
+            if ($(this).is(':checked')) {
+                isGroupChecked = true;
+            } else {
+                isGroupChecked = false;
+            }
+
+            $.each(groupClients, function(key, input) {
+                $(input).prop('checked', isGroupChecked);
+            });
+        })
+        .on('click', '.show-group-users', function(e) {
+            e.preventDefault();
+            var clientsList = $(this).parent().find('.group-list');
+
+            if (clientsList.css('display') == 'none') {
+                clientsList.show();
+            } else {
+                clientsList.hide();
+            }
         });
 });
 
