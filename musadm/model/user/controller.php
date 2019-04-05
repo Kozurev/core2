@@ -196,8 +196,8 @@ class User_Controller
         $this->UserQuery = Core::factory('User')
             ->queryBuilder()
             ->select(['User.id', 'User.name', 'User.surname', 'phone_number', 'email', 'group_id', 'subordinated'])
-            ->from(Core::factory('User')->getTableName())
-            ->orderBy('User.id', 'DESC');
+            ->from(Core::factory('User')->getTableName());
+            //->orderBy('User.id', 'DESC');
     }
 
     /**
