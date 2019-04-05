@@ -5,16 +5,16 @@
  * @author Bad Wolf
  * @date 11.04.2018 22:17
  * @version 20190311
+ * @version 20190405
  */
-
-$isDirector = intval(User::current()->groupId() == ROLE_DIRECTOR);
 
 Core::factory('User_Controller');
 Core::factory('Schedule_Area_Controller');
-
+$isDirector = intval(User::current()->groupId() == ROLE_DIRECTOR);
 $groupId = Core_Page_Show::instance()->StructureItem->getId();
 
 if ($groupId == ROLE_CLIENT) {
+    $xsl = 'musadm/users/clients.xsl';
     $propertiesIds = [
         4,  //Примечание пользователя
         9,  //Ссылка вконтакте
@@ -27,14 +27,13 @@ if ($groupId == ROLE_CLIENT) {
         20, //Направление подготовки (инструмент)
         28  //Год рождения
     ];
-    $xsl = 'musadm/users/clients.xsl';
 } elseif ($groupId == ROLE_TEACHER) {
+    $xsl = 'musadm/users/teachers.xsl';
     $propertiesIds = [
         20, //Инструмент
         28, //Год(дата) рождения
         31  //Расписание занятий
     ];
-    $xsl = 'musadm/users/teachers.xsl';
 }
 
 $ClientController = new User_Controller(User::current());
@@ -46,7 +45,7 @@ $ClientController
     ->addSimpleEntity('page-theme-color', 'primary')
     ->addSimpleEntity('is_director', $isDirector)
     ->xsl($xsl);
-
+$ClientController->queryBuilder()->orderBy('id', 'DESC');
 $ScheduleAssignment = Core::factory('Schedule_Area_Assignment');
 
 foreach ($_GET as $paramName => $values) {

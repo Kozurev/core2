@@ -3,18 +3,15 @@
  * @author: BadWolf
  * @date: 24.04.2018 19:46
  * @version 20190603
+ * @version 20190405
  */
 
-Core::factory( 'User_Controller' );
+Core::factory('User_Controller');
 
-/**
- * Блок проверки авторизации и проверки прав доступа
- */
 $User = User::current();
-$accessRules = ['groups' => [1, 2, 6]];
-
-if (!User::checkUserAccess( $accessRules, $User )) {
-    Core_Page_Show::instance()->error(404);
+$accessRules = ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]];
+if (!User::checkUserAccess($accessRules, $User)) {
+    Core_Page_Show::instance()->error(403);
 }
 
 $Director = $User->getDirector();
@@ -23,12 +20,12 @@ $subordinated = $Director->getId();
 $breadcumbs[0] = new stdClass();
 $breadcumbs[0]->title = Core_Page_Show::instance()->Structure->title();
 $breadcumbs[0]->active = 1;
-Core_Page_Show::instance()->setParam( 'body-class', 'body-blue' );
-Core_Page_Show::instance()->setParam( 'title-first', 'СПИСОК' );
-Core_Page_Show::instance()->setParam( 'title-second', 'ГРУПП' );
-Core_Page_Show::instance()->setParam( 'breadcumbs', $breadcumbs );
+Core_Page_Show::instance()->setParam('body-class', 'body-blue');
+Core_Page_Show::instance()->setParam('title-first', 'СПИСОК');
+Core_Page_Show::instance()->setParam('title-second', 'ГРУПП');
+Core_Page_Show::instance()->setParam('breadcumbs', $breadcumbs);
 
-$action = Core_Array::Get( 'action', null, PARAM_STRING );
+$action = Core_Array::Get('action', null, PARAM_STRING);
 
 //Формирование содержания всплывающего окна состава группы
 if ($action === 'getGroupComposition') {
@@ -47,12 +44,14 @@ if ($action === 'getGroupComposition') {
     $UserController = new User_Controller(User::current());
     $Users = $UserController
         ->groupId(ROLE_CLIENT)
-        ->isWithAreaAssignments(false)
-        ->getUsers();
+        ->isWithAreaAssignments(false);
+    $Users->queryBuilder()
+        ->orderBy('surname', 'ASC')
+        ->orderBy('name', 'ASC');
 
     Core::factory('Core_Entity')
         ->addEntity($Group, 'group')
-        ->addEntities($Users)
+        ->addEntities($Users->getUsers())
         ->xsl('musadm/groups/group_assignment.xsl')
         ->show();
 
@@ -66,14 +65,13 @@ if ($action == 'refreshGroupTable') {
 }
 
 //Формирование всплывающего окна создания/редактирования
-if($action == 'updateForm')
-{
+if ($action == 'updateForm') {
     $popupData = Core::factory('Core_Entity');
     $modelId = Core_Array::Get('group_id', 0, PARAM_INT);
 
     if ($modelId !== 0) {
         $Group = Core::factory('Schedule_Group', $modelId);
-        if ($Group === null) {
+        if (is_null($Group)) {
             Core_Page_Show::instance()->error(404);
         }
         $Group->addEntity($Group->getTeacher());
@@ -85,8 +83,8 @@ if($action == 'updateForm')
     $Users = User_Controller::factory()
         ->queryBuilder()
         ->open()
-            ->where('group_id', '=', 4)
-            ->orWhere('group_id', '=', 5)
+            ->where('group_id', '=', ROLE_TEACHER)
+            ->orWhere('group_id', '=', ROLE_CLIENT)
         ->close()
         ->where('subordinated', '=', $subordinated)
         ->where('active', '=', 1)
@@ -109,6 +107,9 @@ if ($action === 'groupSearchClient') {
         ->groupId(ROLE_CLIENT)
         ->filterType(User_Controller::FILTER_NOT_STRICT)
         ->isWithAreaAssignments(false);
+    $Users->queryBuilder()
+        ->orderBy('surname', 'ASC')
+        ->orderBy('name', 'ASC');
 
     $searchingQuery = Core_Array::Get('surname', '', PARAM_STRING);
     if (!empty($searchingQuery)) {
