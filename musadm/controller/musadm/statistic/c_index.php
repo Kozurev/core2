@@ -379,7 +379,7 @@ if ($areaId !== 0) {
     $finances
         ->join(
             'Schedule_Area_Assignment as saa',
-            'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+            'client_id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
         );
     $hostExpenses->where('area_id', '=', $areaId);
 }
