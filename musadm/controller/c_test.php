@@ -27,7 +27,7 @@ $Orm->executeQuery( 'ALTER TABLE Payment ADD area_id int DEFAULT 0 NULL;' );
 $Orm->executeQuery( 'ALTER TABLE Payment_Type ADD subordinated int DEFAULT 0 NULL;' );
 $Orm->executeQuery( 'ALTER TABLE Payment_Type ADD is_deletable smallint(1) DEFAULT 1 NULL;' );
 $Orm->executeQuery( 'UPDATE Payment_Type SET is_deletable = 0 WHERE id < 4' );
-$Orm->executeQuery( 'UPDATE Payment_Type SET subordinated = 526 WHERE id = 4' );
+$Orm->executeQuery( 'UPDATE Payment_Type SET subordinated = 516 WHERE id = 4' );
 
 $Orm->executeQuery( 'ALTER TABLE Task ADD area_id int DEFAULT 0 NULL;' );
 $Orm->executeQuery( 'ALTER TABLE Lid ADD area_id int DEFAULT 0 NULL;' );
@@ -282,27 +282,3 @@ $LidStatus3->addToPropertiesList(
 
 Core::factory('Property')->addToPropertiesList(Core::factory('User_Group', ROLE_TEACHER), 28);
 Core::factory('Property')->addToPropertiesList(Core::factory('User_Group', ROLE_CLIENT), 20);
-
-//$arr = [
-//    0 => 23,
-//    1 => '34',
-//    2 => 'UNION(idfgnboid)',
-//    3 => '1',
-//    4 => 'false',
-//    5 => true,
-//    6 => '0',
-//];
-//
-//debug( Core_Array::getValue( $arr, 0, null, PARAM_INT ), true );
-//debug( Core_Array::getValue( $arr, 1, null, PARAM_INT ), true );
-//debug( Core_Array::getValue( $arr, 2, null, PARAM_INT ), true );
-//
-//debug( Core_Array::getValue( $arr, 3, null, PARAM_BOOL ), true );
-//debug( Core_Array::getValue( $arr, 4, null, PARAM_BOOL ), true );
-//debug( Core_Array::getValue( $arr, 5, null, PARAM_BOOL ), true );
-//debug( Core_Array::getValue( $arr, 6, null, PARAM_BOOL ), true );
-//
-////debug( boolval( '1' ), true );
-//
-//$arr = [];
-//debug( array_pop( $arr ), true );
