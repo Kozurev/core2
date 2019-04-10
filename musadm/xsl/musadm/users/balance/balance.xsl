@@ -82,7 +82,7 @@
                         </xsl:if>
 
                         <tr>
-                            <td>Примечание</td>
+                            <td>Статус</td>
 
                             <td colspan="2">
                                 <textarea class="form-control" placeholder="Заметки" id="client_notes" data-userid="{note/object_id}" >
