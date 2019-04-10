@@ -285,11 +285,16 @@ function editTarifPopup(tarifId) {
 
 
 function refreshPayments() {
+    var dateFrom = $('input[name=date_from]').val();
+    var dateTo = $('input[name=date_to]').val();
+
     $.ajax({
-        type: "GET",
-        url: root + "/finances",
+        type: 'GET',
+        url: root + '/finances',
         data: {
-            action: "show",
+            action: 'show',
+            date_from: dateFrom,
+            date_to: dateTo
         },
         success: function(response) {
             var isTarifsTableDisplay = $('.tarifs').css('display');
