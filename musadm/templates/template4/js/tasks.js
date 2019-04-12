@@ -4,13 +4,21 @@ var taskAfterActionValue = $('#taskAfterAction').val();
 
 $(function() {
     $('body')
-        .on('click', '.popop_task_submit', function(e) {
+        .on('click', '.popup_task_submit', function(e) {
             e.preventDefault();
             loaderOn();
             var form = $('#createData');
+            var callBack = $(this).data('callback');
             if (form.valid()) {
                 var formData = form.serialize();
-                saveTask(formData, refreshTasksTable);
+                //saveTask(formData, callBack);
+                if (callBack == 'refreshUserTable') {
+                    saveTask(formData, refreshUserTable);
+                } else if (callBack == 'refreshTasksTable') {
+                    saveTask(formData, refreshTasksTable);
+                } else {
+                    loaderOff();
+                }
             } else {
                 loaderOff();
             }
@@ -157,12 +165,14 @@ function refreshTasksTable(from, to) {
 }
 
 
-function newTaskPopup() {
+function newTaskPopup(associate, callback) {
     $.ajax({
         type: 'GET',
         url: root + '/tasks',
         data: {
             action: 'new_task_popup',
+            associate: associate,
+            callback: callback
         },
         success: function(response) {
             showPopup(response);
@@ -182,8 +192,8 @@ function saveTask(formData, callBack) {
             if (response != '0') {
                 notificationError(response);
             }
-            closePopup();
             callBack();
+            closePopup();
             loaderOff();
         }
     });

@@ -39,12 +39,12 @@
                     <xsl:choose>
                         <xsl:when test="periods = 1">
                             <div>
-                                <a class="btn btn-red" onclick="newTaskPopup()">Добавить задачу</a>
+                                <a class="btn btn-red" onclick="newTaskPopup(0, 'refreshTasksTable')">Добавить задачу</a>
                             </div>
                         </xsl:when>
                         <xsl:otherwise>
                             <div>
-                                <a class="btn btn-red" onclick="newTaskPopup()">Добавить задачу</a>
+                                <a class="btn btn-red" onclick="newTaskPopup(0, 'refreshTasksTable')">Добавить задачу</a>
                             </div>
                         </xsl:otherwise>
                     </xsl:choose>

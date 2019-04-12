@@ -97,27 +97,47 @@ if ($action === 'update_area') {
     exit;
 }
 
-
+//Открытие всплывающего окна создания новой задачи
 if ($action === 'new_task_popup') {
-    $Director = User::current()->getDirector();
-    $subordinated = $Director->getId();
+    $associate = Core_Array::Get('associate', 0, PARAM_INT);
+    $callback = Core_Array::Get('callback', '', PARAM_STRING);
+    Core::factory('User_Controller');
+
+    if ($associate !== 0) {
+        $Client = User_Controller::factory($associate);
+        if (is_null($Client)) {
+            Core_Page_Show::instance()->error(404);
+        }
+        $ClientAreas = Core::factory('Schedule_Area_Assignment')->getAreas($Client);
+        if (count($ClientAreas) > 0) {
+            $clientAreaId = $ClientAreas[0]->getId();
+        } else {
+            $clientAreaId = 0;
+        }
+    } else {
+        $clientAreaId = 0;
+    }
 
     $Areas = Core::factory('Schedule_Area')->getList();
     $Priorities = Core::factory('Task_Priority')->findAll();
 
-    $Clients = Core::factory('User')
-        ->queryBuilder()
-        ->where('active', '=', 1)
-        ->where('group_id', '=', ROLE_CLIENT)
-        ->where('subordinated', '=', $subordinated)
-        ->orderBy('surname')
-        ->findAll();
+    $UserController = new User_Controller(User::current());
+    $UserController
+        ->groupId(ROLE_CLIENT)
+        ->isLimitedAreasAccess(false)
+        ->isSubordinate(true)
+        ->properties(false);
+    $UserController->queryBuilder()->orderBy('surname', 'ASC');
+    $Clients = $UserController->getUsers();
 
     Core::factory('Core_Entity')
         ->addEntities($Areas)
         ->addEntities($Clients)
         ->addEntities($Priorities)
         ->addSimpleEntity('date', date('Y-m-d'))
+        ->addSimpleEntity('associate', $associate)
+        ->addSimpleEntity('client_area_id', $clientAreaId)
+        ->addSimpleEntity('callback', $callback)
         ->xsl('musadm/tasks/new_task_popup.xsl')
         ->show();
 
@@ -131,9 +151,6 @@ if ($action === 'save_task') {
     $areaId =       Core_Array::Get('areaId', 0, PARAM_INT);
     $associate =    Core_Array::Get('associate', 0, PARAM_INT);
     $priorityId =   Core_Array::Get('priority_id', 1, PARAM_INT);
-
-    $authorId = $User->getId();
-    $noteDate = date('Y-m-d H:i:s');
 
     $Task = Core::factory('Task')
         ->associate($associate)
@@ -150,14 +167,7 @@ if ($action === 'save_task') {
     }
 
     $Task->save();
-
-    Core::factory('Task_Note')
-        ->authorId($authorId)
-        ->date($noteDate)
-        ->text($note)
-        ->taskId($Task->getId())
-        ->save();
-
+    $Task->addNote($note);
     exit('0');
 }
 

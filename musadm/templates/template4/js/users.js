@@ -265,11 +265,6 @@ $(function(){
             applyClientFilter($('#client-filter'), function(response) {
                 $('.users').html(response);
             });
-        })
-        .on('click', '.edit_client_absent', function(e) {
-            e.preventDefault();
-            var id = $(this).data('id');
-            getScheduleAbsentPopup('', '', '', id);
         });
 });
 

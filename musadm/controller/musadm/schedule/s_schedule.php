@@ -113,7 +113,7 @@ if ($action == 'getScheduleAreaPopup') {
 if ($action === 'getScheduleAbsentPopup') {
     $clientId = Core_Array::Get('client_id', null, PARAM_INT);
     $typeId =   Core_Array::Get('type_id', null, PARAM_INT);
-    $date =     Core_Array::Get('date', date('Y-m-d'), PARAM_INT);
+    $date =     Core_Array::Get('date', date('Y-m-d'), PARAM_DATE);
     $id =       Core_Array::Get('id', null, PARAM_INT);
 
 
@@ -129,15 +129,21 @@ if ($action === 'getScheduleAbsentPopup') {
         }
     }
 
-    if (is_null($id)) {
-        $AbsentPeriod = Core::factory('Schedule_Absent')
-            ->queryBuilder()
-            ->where('client_id', '=', $clientId)
-            ->where('date_from', '<=', $date)
-            ->where('date_to', '>=', $date)
-            ->find();
-    } else {
+//    if (is_null($id)) {
+//        $AbsentPeriod = Core::factory('Schedule_Absent')
+//            ->queryBuilder()
+//            ->where('client_id', '=', $clientId)
+//            ->where('date_from', '<=', $date)
+//            ->where('date_to', '>=', $date)
+//            ->find();
+//    } else {
+//        $AbsentPeriod = Core::factory('Schedule_Absent', $id);
+//    }
+
+    if (!is_null($id)) {
         $AbsentPeriod = Core::factory('Schedule_Absent', $id);
+    } else {
+        $AbsentPeriod = Core::factory('Schedule_Absent');
     }
 
     Core::factory('Core_Entity')
@@ -149,6 +155,29 @@ if ($action === 'getScheduleAbsentPopup') {
         ->show();
 
     exit;
+}
+
+//Удаление периода отсутствия
+if ($action === 'deleteScheduleAbsent') {
+    $absentId = Core_Array::Get('id', null, PARAM_INT);
+
+    if (is_null($absentId)) {
+        Core_Page_Show::instance()->error(404);
+    }
+
+    $Absent = Core::factory('Schedule_Absent', $absentId);
+    if (is_null($Absent)) {
+        Core_Page_Show::instance()->error(404);
+    }
+
+    Core::factory('Schedule_Absent');
+    $Client = User_Controller::factory($Absent->clientId());
+    $outputJson = new stdClass();
+    $outputJson->fio = $Client->surname() . ' ' . $Client->name();
+    $outputJson->dateFrom = refactorDateFormat($Absent->dateFrom());
+    $outputJson->dateTo = refactorDateFormat($Absent->dateTo());
+    $Absent->delete();
+    exit(json_encode($outputJson));
 }
 
 /**

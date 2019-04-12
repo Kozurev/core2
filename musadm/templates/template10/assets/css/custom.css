@@ -53,20 +53,16 @@ section {
     text-align: center;
 }
 
+.green {
+    color: green;
+}
+
 .center-blocks,
 .left-blocks,
 .right-blocks div {
     display: inline-block;
     float: none;
 }
-
-/*.center,*/
-/*.left,*/
-/*.right div {*/
-    /*float: none;*/
-/*}*/
-
-
 
 
 .cards-section .item-inner {
@@ -79,13 +75,6 @@ section {
     max-width: 100%;
 }
 
-
-
-/*.table>tbody>tr>td, .table>tbody>tr>th,*/
-/*.table>tfoot>tr>td, .table>tfoot>tr>th,*/
-/*.table>thead>tr>td, .table>thead>tr>th {*/
-    /*padding: 4px;*/
-/*}*/
 
 .table-statused tr {
     border-left: 5px solid;
@@ -109,12 +98,6 @@ section {
     background-color: #494d55 !important;
     border-color: #494d55 !important;
 }
-
-/*.table {*/
-    /*font-family: serif;*/
-    /*font-size: 17px;*/
-/*}*/
-
 
 /**
  *  Верстка комментариев
@@ -281,8 +264,6 @@ section {
 }
 
 
-
-
 .schedule .group {
     background-color: lightblue !important;
 }
@@ -295,9 +276,6 @@ section {
 .schedule .neutral {
     background-color: rgba(240, 237, 234, 0.7) !important;
 }
-
-
-
 /**
  *  <<Конец 
  *  Подсветка пользователей

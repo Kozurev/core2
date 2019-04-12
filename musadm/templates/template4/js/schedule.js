@@ -44,7 +44,7 @@ $(function(){
                 dateFrom = $('input[name=dateFrom]').val(),
                 clientId = $("input[name=clientId]").val();
 
-            if( $('#absent_add_task').is(':checked')) {
+            if ($('#absent_add_task').is(':checked')) {
                 addAbsentTask(dateTo, clientId);
             }
 
@@ -53,6 +53,12 @@ $(function(){
                     refreshSchedule();
                 } else {
                     refreshUserTable();
+                }
+
+                if (response == '0') {
+                    notificationSuccess('Период отсутствия с ' + dateFrom + ' по ' + dateTo + ' успешно сохранен');
+                } else {
+                    notificationError('При сохранении периода отсутствия произошла ошибка: ' + response);
                 }
             });
         })
@@ -267,10 +273,8 @@ $(function(){
             e.preventDefault();
             loaderOn();
             var tr = $(this).parent().parent();
-            //var id = tr.find('input[name=reportId]').val();
             var lessonId = tr.find('input[name=lessonId]').val();
             var date = tr.find('input[name=date]').val();
-            //var lessonType = tr.find('input[name=lessonType]').val();
 
             $.ajax({
                 type: 'GET',
@@ -288,12 +292,6 @@ $(function(){
                 }
             });
         })
-
-        //Открытие всплывающего окна о создании задачи из раздела расписания
-        // .on("click", ".schedule_task_create", function(){
-        //     newScheduleTaskPopup();
-        // })
-
         /**
          * Сохранение данных задачи из раздела расписания
          */
@@ -504,6 +502,14 @@ function getSchedule(userId, date, func) {
 }
 
 
+/**
+ * Открытие всплывающего окна создания/редактирования периода отсутствия
+ *
+ * @param clientId
+ * @param typeId
+ * @param date
+ * @param id
+ */
 function getScheduleAbsentPopup(clientId, typeId, date, id) {
     $.ajax({
         type: 'GET',
@@ -518,6 +524,35 @@ function getScheduleAbsentPopup(clientId, typeId, date, id) {
         },
         success: function(response) {
             showPopup(response);
+        }
+    });
+}
+
+
+/**
+ * Удаление периода отсутствия клиента
+ *
+ * @param id
+ */
+function deleteScheduleAbsent(id) {
+    loaderOn();
+    $.ajax({
+        type: 'GET',
+        url: root + '/schedule',
+        dataType: 'json',
+        data: {
+            action: 'deleteScheduleAbsent',
+            id: id
+        },
+        success: function(response) {
+            notificationSuccess('Период отсутствия для клиента ' + response.fio + ' с ' + response.dateFrom + ' по '
+                + response.dateTo + ' успешно удален');
+            $('.row[data-period-id='+id+']').remove();
+            loaderOff();
+        },
+        error: function() {
+            notificationError('При удалении периода отсутсвия произошла ошибка');
+            loaderOff();
         }
     });
 }

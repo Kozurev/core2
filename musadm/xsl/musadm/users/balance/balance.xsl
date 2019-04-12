@@ -57,20 +57,42 @@
                             </td>
                         </tr>
 
-                        <xsl:if test="absent/id != ''">
-                            <tr>
-                                <td>Текущий период отсутствия</td>
+                        <xsl:if test="count(absent) > 0">
+                            <tr id="absent-row">
+                                <td>Периоды отсутствия</td>
 
-                                <td>
-                                    <span id="absent-from"><xsl:value-of select="absent/date_from" /></span>
-                                    <span> - </span>
-                                    <span id="absent-to"><xsl:value-of select="absent/date_to" /></span>
+                                <td colspan="2">
+                                    <xsl:for-each select="absent">
+                                        <div class="row" data-period-id="{id}">
+                                            <div class="col-md-6">
+                                                <xsl:variable name="periodClass">
+                                                    <xsl:choose>
+                                                        <xsl:when test="current = 1">
+                                                            green
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            default
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
+                                                </xsl:variable>
+
+                                                <span id="absent-from" class="{$periodClass}"><xsl:value-of select="date_from" /></span>
+                                                <span class="{$periodClass}"> - </span>
+                                                <span id="absent-to" class="{$periodClass}"><xsl:value-of select="date_to" /></span>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <a class="action edit" onclick="getScheduleAbsentPopup('', '', '', {id})"><xsl:text>&#x0A;</xsl:text></a>
+                                                <a class="action delete" onclick="deleteScheduleAbsent({id})"><xsl:text>&#x0A;</xsl:text></a>
+                                            </div>
+                                        </div>
+                                    </xsl:for-each>
                                 </td>
 
-                                <td>
-                                    <a class="action edit edit_client_absent" data-id="{absent/id}"><xsl:text>&#x0A;</xsl:text></a>
-                                    <a class="action delete"><xsl:text>&#x0A;</xsl:text></a>
-                                </td>
+                                <!--<td>-->
+                                    <!--<a class="action edit" onclick="getScheduleAbsentPopup('', '', '', {absent/id})"><xsl:text>&#x0A;</xsl:text></a>-->
+                                    <!--<a class="action delete" onclick="deleteScheduleAbsent({absent/id})"><xsl:text>&#x0A;</xsl:text></a>-->
+                                <!--</td>-->
                             </tr>
                         </xsl:if>
 
@@ -95,6 +117,23 @@
                                         </xsl:otherwise>
                                     </xsl:choose>
                                 </textarea>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="3">
+                                <div class="row buttons-panel center">
+                                    <div>
+                                        <a class="btn btn-blue" onclick="newTaskPopup({user/id}, 'refreshUserTable')">
+                                            Добавить задачу
+                                        </a>
+                                    </div>
+                                    <div>
+                                        <a class="btn btn-orange" onclick="getScheduleAbsentPopup({user/id}, 1, getCurrentDate(), '')">
+                                            Добавить период отстствия
+                                        </a>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     </xsl:if>

@@ -1,9 +1,10 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 19.04.2018
- * Time: 23:18
+ *
+ * @author BadWolf
+ * @date 19.04.2018 23:18
+ * @version 20190412
  */
 
 //Пользователь под которым происходила изначальная авторизация
@@ -39,40 +40,46 @@ if (is_null($pageClientId)) {
  * тому же директору, которому принадлежит и менеджер
  */
 if (is_null($User)) {
-    Core_Page_Show::instance()->error( 403 );
+    Core_Page_Show::instance()->error(403);
 }
-
 
 $OutputXml = Core::factory( 'Core_Entity' );
 
 //Пользовательские примечания и дата последней авторизации
 if ($isAdmin) {
-    $today = date( 'Y-m-d' );
+    $today = date('Y-m-d');
+    $todayTime = strtotime($today);
 
-    $ClientNote = Core::factory('Property', 19);
+    $ClientNote = Core::factory('Property')->getByTagName('notes');
     $clientNote = $ClientNote->getPropertyValues($User)[0];
-    $PerLesson = Core::factory('Property', 32);
+    $PerLesson = Core::factory('Property')->getByTagName('per_lesson');
     $perLesson = $PerLesson->getPropertyValues($User)[0];
-    $LastEntry = Core::factory('Property', 22);
+    $LastEntry = Core::factory('Property')->getByTagName('last_entry');
     $lastEntry = $LastEntry->getPropertyValues($User)[0];
 
-    $AbsentPeriod = Core::factory('Schedule_Absent')
+    $AbsentPeriods = Core::factory('Schedule_Absent')
         ->queryBuilder()
         ->where('client_id', '=', $User->getId())
-        ->where('date_from', '<=', $today)
         ->where('date_to', '>=', $today)
-        ->find();
+        ->orderBy('date_from', 'ASC')
+        ->findAll();
 
-    if (!is_null($AbsentPeriod)) {
-        $AbsentPeriod->dateFrom( refactorDateFormat($AbsentPeriod->dateFrom()));
-        $AbsentPeriod->dateTo( refactorDateFormat($AbsentPeriod->dateTo()));
+    if (count($AbsentPeriods) > 0) {
+        foreach ($AbsentPeriods as $AbsentPeriod) {
+            if (strtotime($AbsentPeriod->dateFrom()) <= $todayTime && strtotime($AbsentPeriod->dateTo()) >= $todayTime) {
+                $AbsentPeriod->current = 1;
+            }
+
+            $AbsentPeriod->dateFrom(refactorDateFormat($AbsentPeriod->dateFrom()));
+            $AbsentPeriod->dateTo(refactorDateFormat($AbsentPeriod->dateTo()));
+        }
     }
 
     $OutputXml
         ->addEntity($clientNote, 'note')
         ->addEntity($lastEntry, 'entry')
         ->addEntity($perLesson, 'per_lesson')
-        ->addEntity($AbsentPeriod, 'absent');
+        ->addEntities($AbsentPeriods, 'absent');
 }
 
 //Баланс, кол-во индивидуальных занятий, кол-во групповых занятий

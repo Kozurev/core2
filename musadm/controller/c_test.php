@@ -196,7 +196,10 @@ foreach ( $Lids as $Lid )
 
 Core::factory( 'Orm' )->executeQuery( 'UPDATE Lid SET status_id = 1 WHERE status_id IS NULL' );
 
-Core::factory( 'Property', 27 )->delete();
+$TMP_Prop = Core::factory( 'Property', 27 );
+if (!is_null($TMP_Prop)) {
+    $TMP_Prop->delete();
+}
 $Orm->executeQuery( 'DELETE FROM Property_List_Assigment WHERE model_name = \'Lid\' AND property_id = 27' );
 $Orm->executeQuery( 'DELETE FROM Property_List WHERE model_name = \'Lid\' AND property_id = 27' );
 $Orm->executeQuery( 'DELETE FROM Property_List_Values WHERE property_id = 27' );
