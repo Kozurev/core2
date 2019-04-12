@@ -66,7 +66,7 @@ $Payments = $Payments->findAll();
 
 //Поступления за период
 $summ = $summ->find();
-$summ === null
+$summ->value == null
     ?   $summ = 0
     :   $summ = $summ->value;
 
