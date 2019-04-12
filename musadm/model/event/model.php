@@ -5,6 +5,7 @@
  * @author BadWolf
  * @date 26.11.2018 15:26
  * @version 20190328
+ * @version 20190412
  * Class Event_Model
  */
 class Event_Model extends Core_Entity
@@ -170,7 +171,14 @@ class Event_Model extends Core_Entity
     {
         if (is_null($data)) {
             if (is_string($this->data)) {
-                return unserialize($this->data);
+                error_reporting(0);
+                if (unserialize($this->data) === false) {
+                    error_reporting(E_ALL);
+                    return null;
+                } else {
+                    error_reporting(E_ALL);
+                    return unserialize($this->data);
+                }
             } else {
                 return $this->data;
             }

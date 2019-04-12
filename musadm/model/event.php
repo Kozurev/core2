@@ -5,6 +5,7 @@
  * @author Kozurev Egor
  * @date 26.11.2018 14:59
  * @version 20190328
+ * @version 20190412
  * Class Event
  */
 class Event extends Event_Model
@@ -12,7 +13,6 @@ class Event extends Event_Model
 
     /**
      * Список констант идентификаторов типов событий
-     *
      * Примечание: при создании нового типа в таблице Event_Type необходимо создать аналогичную новой записи константу
      */
     const SCHEDULE_APPEND_USER =            2;
@@ -51,6 +51,20 @@ class Event extends Event_Model
     const STRING_SHORT =    'short';    //Строка НЕ начинается с фамилии и имени клиента/преподавателя
 
 
+    public function getTypeName() : string
+    {
+        if ($this->typeId() > 0) {
+            $EventType = Core::factory('Event_Type', $this->typeId());
+            if (is_null($EventType)) {
+                return 'неизвестно';
+            } else {
+                return lcfirst($EventType->title());
+            }
+        } else {
+            return 'неизвестно';
+        }
+    }
+
 
     /**
      * Формирование строки текста события
@@ -67,10 +81,14 @@ class Event extends Event_Model
 
         //Пока что всего 2 типа формирования шаблона и обходится конструкцией if/elseif
         //но на будущее лучше использовать тут конструкцию switch
-        if ($type === self::STRING_FULL ) {
+        if ($type === self::STRING_FULL) {
             $str = $this->user_assignment_fio . '. ';
-        } elseif ($type === self::STRING_SHORT ) {
+        } elseif ($type === self::STRING_SHORT) {
             $str = '';
+        }
+
+        if (is_null($this->data())) {
+            return 'При сохранении события типа \'' . $this->getTypeName() . '\' произошла неизвестная ошибка';
         }
 
         switch ($this->type_id)
@@ -277,7 +295,8 @@ class Event extends Event_Model
         //Конвертация дополнительных данных события в строку
         if (is_array($this->data) || is_object($this->data)) {
             try {
-                $this->data = serialize($this->data);
+                //$this->data = serialize($this->data);
+                $this->data = json_encode($this->data);
             } catch (Exception $e) {
                 echo "<h2>" . $e->getMessage() . "</h2>";
                 return;
@@ -285,7 +304,6 @@ class Event extends Event_Model
         }
 
         parent::save();
-
         Core::notify([&$this], 'afterEventSave');
     }
 
@@ -297,9 +315,7 @@ class Event extends Event_Model
     public function delete($obj = null)
     {
         Core::notify([&$this], 'beforeEventDelete');
-
         parent::delete();
-
         Core::notify([&$this], 'afterEventDelete');
     }
 
