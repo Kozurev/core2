@@ -285,3 +285,39 @@ $LidStatus3->addToPropertiesList(
 
 Core::factory('Property')->addToPropertiesList(Core::factory('User_Group', ROLE_TEACHER), 28);
 Core::factory('Property')->addToPropertiesList(Core::factory('User_Group', ROLE_CLIENT), 20);
+
+//global $CFG;
+//Orm::Debug(false);
+//if (Core_Array::Get('events', null, PARAM_INT) === null) {
+//    header('Location: ' . $CFG->rootdir . '/test?events=1');
+//} else {
+//    $limit = 100;
+//    $offset = Core_Array::Get('offset', 0, PARAM_INT);
+//    $count = Core::factory('Event')->getCount();
+//
+//    $Events = Core::factory('Event')
+//        ->queryBuilder()
+//        ->limit($limit)
+//        ->offset($offset)
+//        ->findAll();
+//
+//    foreach ($Events as $Event) {
+//        if ($Event->data() === false) {
+//            $Event->delete();
+//        } else {
+//            $Event->data = json_encode($Event->data());
+//            $Event->save();
+//        }
+//    }
+//
+//    $newLink = $CFG->rootdir . '/test?events=1&offset=' . $offset += $limit;
+//    echo '<h2>Обработано '.$limit + $offset.' событий из '.$count.'</h2>';
+//    ?>
+<!--        <script>-->
+<!--            setTimeout(function(){-->
+<!--                window.location.href = '--><?//=$newLink?>//';
+//            }, 3000);
+//        </script>
+//    <?php
+    //header('Location: ' . $CFG->rootdir . '/test?events=1&offset=' . $offset += $limit);
+//}
