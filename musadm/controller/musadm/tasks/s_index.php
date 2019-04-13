@@ -124,7 +124,7 @@ if ($action === 'new_task_popup') {
     $UserController = new User_Controller(User::current());
     $UserController
         ->groupId(ROLE_CLIENT)
-        ->isLimitedAreasAccess(false)
+        ->isLimitedAreasAccess(true)
         ->isSubordinate(true)
         ->properties(false);
     $UserController->queryBuilder()->orderBy('surname', 'ASC');
