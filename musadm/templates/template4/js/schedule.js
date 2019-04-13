@@ -614,7 +614,7 @@ function getScheduleChangeTimePopup(lessonId, date) {
         url: '',
         data: {
             action: 'getScheduleChangeTimePopup',
-            id: lessonid,
+            id: lessonId,
             date: date
         },
         success: function(response) {
