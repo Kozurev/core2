@@ -295,8 +295,7 @@ class Event extends Event_Model
         //Конвертация дополнительных данных события в строку
         if (is_array($this->data) || is_object($this->data)) {
             try {
-                //$this->data = serialize($this->data);
-                $this->data = json_encode($this->data);
+                $this->data = serialize($this->data);
             } catch (Exception $e) {
                 echo "<h2>" . $e->getMessage() . "</h2>";
                 return;
