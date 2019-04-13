@@ -42,7 +42,7 @@ $action = Core_Array::Get('action', null, PARAM_STRING);
 if (!User::checkUserAccess(['groups' => [ROLE_MANAGER, ROLE_TEACHER, ROLE_DIRECTOR]])) {
     Core_Page_Show::instance()->error(403);
 }
-if (User::checkUserAccess(['groups' => [ROLE_MANAGER]]) && Core_Page_Show::instance()->StructureItem == null && $action == null) {
+if (User::checkUserAccess(['groups' => [ROLE_MANAGER]]) && Core_Page_Show::instance()->StructureItem == null && !$isTeacherPage) {
     Core_Page_Show::instance()->error(403);
 } elseif (User::checkUserAccess(['groups' => [ROLE_TEACHER]]) && Core_Page_Show::instance()->StructureItem != null) {
     Core_Page_Show::instance()->error(403);
