@@ -4,12 +4,13 @@
  *
  * @author Kozurev Egor
  * @date 11.04.2018 22:16
+ * @version 20190414
  */
 
 
-Core::factory( 'User_Controller' );
-Core::factory( 'Lid_Controller' );
-Core::factory( 'Schedule_Area_Controller' );
+Core::factory('User_Controller');
+Core::factory('Lid_Controller');
+Core::factory('Schedule_Area_Controller');
 
 
 $User = User::current();
@@ -18,33 +19,27 @@ $subordinated = $Director->getId();
 $accessRules = ['groups' => [ROLE_ADMIN, ROLE_DIRECTOR, ROLE_MANAGER]];
 
 if (!User::checkUserAccess($accessRules, $User)) {
-    Core_Page_Show::instance()->error404();
+    Core_Page_Show::instance()->error(404);
 }
 
+$action = Core_Array::Get('action', null, PARAM_STRING);
 
-$action = Core_Array::Get( 'action', null );
 
-
-/**
- * Форма редактирования клиента
- */
+//Форма редактирования клиента
 if ($action === 'updateFormClient') {
     $userId = Core_Array::Get('userId', 0, PARAM_INT);
     $output = Core::factory('Core_Entity');
 
     if ($userId) {
         $Client = User_Controller::factory($userId);
-
-        if ($Client === null) {
+        if (is_null($Client)) {
             exit(Core::getMessage('NOT_FOUND', ['Пользователь', $userId]));
         }
-
         if (!User::isSubordinate($Client, $User)) {
             exit(Core::getMessage('NOT_SUBORDINATE', ['Пользователь', $userId]));
         }
 
         $AreaAssignments = Core::factory('Schedule_Area_Assignment')->getAssignments($Client);
-
         if (count($AreaAssignments) > 0) {
             $Client->addSimpleEntity('area_id', $AreaAssignments[0]->areaId());
         }
@@ -59,7 +54,6 @@ if ($action === 'updateFormClient') {
         $Properties = array_merge($Properties, Core::factory('Property', 20)->getPropertyValues($Client)); //Направление подготовки (инструмент)
     } else {
         $Client = User_Controller::factory();
-
         $Properties[] = Core::factory('Property_Int')
             ->value(
                 Core::factory('Property', 17)->defaultValue()
@@ -71,7 +65,6 @@ if ($action === 'updateFormClient') {
     $ListTeachers = Core::factory('Property')
         ->getByTagName('teachers')
         ->getList();
-
     $ListInstruments = Core::factory('Property')
         ->getByTagName('instrument')
         ->getList();
@@ -89,9 +82,7 @@ if ($action === 'updateFormClient') {
 }
 
 
-/**
- * Форма редактирования учителя
- */
+//Форма редактирования учителя
 if ($action === 'updateFormTeacher') {
     $userId = Core_Array::Get('userId', 0, PARAM_INT);
     $output = Core::factory('Core_Entity');
@@ -119,14 +110,11 @@ if ($action === 'updateFormTeacher') {
         ->addEntities($PropertyLists, 'property_list')
         ->xsl('musadm/users/edit_teacher_popup.xsl')
         ->show();
-
     exit;
 }
 
 
-/**
- * Форма редактирования директора
- */
+//Форма редактирования директора
 if ($action === 'updateFormDirector') {
     $userId = Core_Array::Get('userId', 0, PARAM_INT);
     $output = Core::factory('Core_Entity');
@@ -153,14 +141,11 @@ if ($action === 'updateFormDirector') {
         ->addEntity($Director)
         ->xsl('musadm/users/edit_director_popup.xsl')
         ->show();
-
     exit;
 }
 
 
-/**
- * Форма редактирования менеджера
- */
+//Форма редактирования менеджера
 if ($action === 'updateFormManager') {
     $userId = Core_Array::Get('userId', 0, PARAM_INT);
     $output = Core::factory('Core_Entity');
@@ -184,22 +169,17 @@ if ($action === 'updateFormManager') {
 }
 
 
-/**
- * Обновление таблиц
- */
+//Обновление таблиц
 if ($action === 'refreshTableUsers') {
     $this->execute();
     exit;
 }
 
 
-/**
- * Форма для создания платежа
- */
+//Форма для создания платежа
 if ($action === 'getPaymentPopup') {
     $userId = Core_Array::Get('userId', null, PARAM_INT);
     $User = User_Controller::factory($userId);
-
     if (is_null($userId) || is_null($User)) {
         exit (Core::getMessage('NOT_FOUND', ['Пользователь', $userId]));
     }
@@ -209,14 +189,11 @@ if ($action === 'getPaymentPopup') {
         ->addSimpleEntity('function', 'clients')
         ->xsl('musadm/users/balance/edit_payment_popup.xsl')
         ->show();
-
     exit;
 }
 
 
-/**
- * Сохранение платежа
- */
+//Сохранение платежа
 if ($action == 'savePayment') {
     $userId =       Core_Array::Get('userid', 0, PARAM_INT);
     $value  =       Core_Array::Get('value', 0, PARAM_FLOAT);
@@ -232,7 +209,6 @@ if ($action == 'savePayment') {
 
     //Корректировка баланса ученика
     $User = User_Controller::factory($userId);
-
     if (is_null($User)) {
         exit (Core::getMessage('NOT_FOUND', ['Пользователь', $userId]));
     }
@@ -244,17 +220,13 @@ if ($action == 'savePayment') {
     $type == 1
         ?   $balanceNew = $balanceOld + intval($value)
         :   $balanceNew = $balanceOld - intval($value);
-
     $UserBalance->value($balanceNew);
     $UserBalance->save();
-
-    exit ( '0' );
+    exit ('0');
 }
 
 
-/**
- * При сохранении пользователя идет проверка на дублирования логина
- */
+//При сохранении пользователя идет проверка на дублирования логина
 if ($action === 'checkLoginExists') {
     $userId = Core_Array::Get('userId', 0, PARAM_INT);
     $login = Core_Array::Get('login', '', PARAM_STRING);
@@ -268,24 +240,18 @@ if ($action === 'checkLoginExists') {
         ->where('id', '<>', $userId)
         ->where('login', '=', $login)
         ->find();
-
     if (!is_null($User)) {
         exit ('Пользователь с таким логином уже существует');
     }
-
     exit;
 }
 
 
-/**
- * Экспорт пользователей в Excel
- */
+//Экспорт пользователей в Excel
 if ($action === 'export') {
     User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]]);
-
     header('Content-type: application/vnd.ms-excel');
     header('Content-Disposition: attachment; filename=demo.xls');
-
     Core::factory('User_Controller');
     $ClientController = new User_Controller(User::current());
     $ClientController
@@ -294,18 +260,14 @@ if ($action === 'export') {
         ->groupId(ROLE_CLIENT)
         ->xsl('musadm/users/export.xsl')
         ->show();
-
     exit;
 }
 
 
-/**
- * Получение данных лида для заполнения формы создания клиента
- */
+//Получение данных лида для заполнения формы создания клиента
 if ($action === 'getLidData') {
     $lidId = Core_Array::Get('lidId', null, PARAM_INT);
     $Lid = Lid_Controller::factory($lidId);
-
     if (is_null($lidId) || is_null($Lid)) {
         exit;
     }
@@ -320,28 +282,21 @@ if ($action === 'getLidData') {
 }
 
 
-/**
- * Открытие всплывающего окна создания/удаления связей сущьности с филиалами
- * для типа связи многие ко многим
- */
+//Открытие всплывающего окна создания/удаления связей сущьности с филиалами для типа связи многие ко многим
 if ($action === 'showAssignmentsPopup') {
     $modelId =   Core_Array::Get('model_id', 0, PARAM_INT);
     $modelName = Core_Array::Get('model_name', '', PARAM_STRING);
-
     if ($modelId <= 0 || $modelName == '') {
         Core_Page_Show::instance()->error(404);
     }
 
     $Object = Core::factory($modelName, $modelId);
-
     if (is_null($Object)) {
         exit (Core::getMessage('NOT_FOUND', [$modelName, $modelId]));
     }
-
     if (method_exists($Object, 'subordinated') && $Object->subordinated() != $subordinated) {
         exit (Core::getMessage('NOT_SUBORDINATE', [$modelName, $modelId]));
     }
-
     $AreasList = Core::factory('Schedule_Area')->getList(true, false);
     $AreaAssignments = Core::factory('Schedule_Area_Assignment')->getAssignments($Object);
 
@@ -352,14 +307,11 @@ if ($action === 'showAssignmentsPopup') {
         ->addEntities($AreaAssignments, 'assignments')
         ->xsl('musadm/schedule/assignments/areas_assignments_edit.xsl')
         ->show();
-
     exit;
 }
 
 
-/**
- * Обработчик для создания новой связи сущьности и филиала
- */
+//Обработчик для создания новой связи сущьности и филиала
 if ($action === 'appendAreaAssignment') {
     $modelId = Core_Array::Get('model_id', 0, PARAM_INT);
     $modelName = Core_Array::Get('model_name', '', PARAM_STRING);
@@ -370,21 +322,16 @@ if ($action === 'appendAreaAssignment') {
     }
 
     $Object = Core::factory($modelName, $modelId);
-
     if (is_null($Object)) {
         exit (Core::getMessage('NOT_FOUND', [$modelName, $modelId]));
     }
-
     if (method_exists($Object, 'subordinated') && $Object->subordinated() != $subordinated) {
         exit (Core::getMessage('NOT_SUBORDINATE', [$modelName, $modelId]));
     }
-
     $Area = Schedule_Area_Controller::factory($areaId);
-
     if (is_null($Area)) {
         exit (Core::getMessage('NOT_FOUND', ['Филиал', $areaId]));
     }
-
     $Assignment = Core::factory('Schedule_Area_Assignment')->createAssignment($Object, $areaId);
 
     $outputJson = new stdClass();
@@ -395,9 +342,7 @@ if ($action === 'appendAreaAssignment') {
 }
 
 
-/**
- * Обработчик удаления связи объекта с филмалом
- */
+//Обработчик удаления связи объекта с филмалом
 if ($action === 'deleteAreaAssignment') {
     $modelId = Core_Array::Get('model_id', 0, PARAM_INT);
     $modelName = Core_Array::Get('model_name', '', PARAM_STRING);
@@ -406,17 +351,13 @@ if ($action === 'deleteAreaAssignment') {
     if ($modelId <= 0 || $modelName == '' || $areaId <= 0) {
         Core_Page_Show::instance()->error(404);
     }
-
     $Object = Core::factory($modelName, $modelId);
-
     if (is_null($Object)) {
         exit (Core::getMessage('NOT_FOUND', [$modelName, $modelId]));
     }
-
     if (method_exists($Object, 'subordinated') && $Object->subordinated() != $subordinated) {
         exit (Core::getMessage('NOT_SUBORDINATE', [$modelName, $modelId]));
     }
-
     Core::factory('Schedule_Area_Assignment')->deleteAssignment($Object, $areaId);
     exit;
 }
@@ -426,8 +367,6 @@ if ($action === 'applyUserFilter') {
     Core_Page_Show::instance()->execute();
     exit;
 }
-
-
 
 
 if (Core_Page_Show::instance()->StructureItem->getId() == ROLE_CLIENT) {
@@ -447,15 +386,11 @@ Core_Page_Show::instance()->setParam('title-first', 'СПИСОК');
 Core_Page_Show::instance()->setParam('title-second', $title2);
 Core_Page_Show::instance()->setParam('breadcumbs', $breadcumbs);
 
-
 $title[] = Core_Page_Show::instance()->Structure->title();
-
 if (get_class(Core_Page_Show::instance()->StructureItem) == 'User_Group') {
     $title[] = $this->StructureItem->title();
 }
-
 if (get_class(Core_Page_Show::instance()->StructureItem) == 'User') {
     $title[] = $this->StructureItem->surname() . ' ' . $this->StructureItem->name();
 }
-
 $this->title = array_pop($title);
