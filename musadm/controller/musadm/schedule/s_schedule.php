@@ -42,7 +42,10 @@ $action = Core_Array::Get('action', null, PARAM_STRING);
 if (!User::checkUserAccess(['groups' => [ROLE_MANAGER, ROLE_TEACHER, ROLE_DIRECTOR]])) {
     Core_Page_Show::instance()->error(403);
 }
-if (User::checkUserAccess(['groups' => [ROLE_MANAGER]]) && Core_Page_Show::instance()->StructureItem == null && !$isTeacherPage) {
+if (User::checkUserAccess(['groups' => [ROLE_MANAGER]])
+    && is_null(Core_Page_Show::instance()->StructureItem)
+    && is_null($action)
+    && !$isTeacherPage) {
     Core_Page_Show::instance()->error(403);
 } elseif (User::checkUserAccess(['groups' => [ROLE_TEACHER]]) && Core_Page_Show::instance()->StructureItem != null) {
     Core_Page_Show::instance()->error(403);
@@ -120,25 +123,12 @@ if ($action === 'getScheduleAbsentPopup') {
     if ((is_null($clientId) || is_null($typeId)) && is_null($id)) {
         Core_Page_Show::instance()->error(404);
     }
-
     if (!is_null($clientId)) {
         $Client = User_Controller::factory($clientId);
-
         if (is_null($Client)) {
             Core_Page_Show::instance()->error(404);
         }
     }
-
-//    if (is_null($id)) {
-//        $AbsentPeriod = Core::factory('Schedule_Absent')
-//            ->queryBuilder()
-//            ->where('client_id', '=', $clientId)
-//            ->where('date_from', '<=', $date)
-//            ->where('date_to', '>=', $date)
-//            ->find();
-//    } else {
-//        $AbsentPeriod = Core::factory('Schedule_Absent', $id);
-//    }
 
     if (!is_null($id)) {
         $AbsentPeriod = Core::factory('Schedule_Absent', $id);
