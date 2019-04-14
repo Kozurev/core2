@@ -6,12 +6,13 @@
  * @date 03.06.2018 12:46
  * @version 20190221
  * @version 20190405
+ * @version 20190414
  */
 
 $dateFormat = 'Y-m-d';
 $date = date($dateFormat);
-$dateFrom = Core_Array::Get('date_from', null, PARAM_DATE);
-$dateTo =   Core_Array::Get('date_to', null, PARAM_DATE);
+$dateFrom = Core_Array::Get('date_from', $date, PARAM_DATE);
+$dateTo =   Core_Array::Get('date_to', $date, PARAM_DATE);
 $areaId =   Core_Array::Get('area_id', 0, PARAM_INT);
 
 $Director = User::current()->getDirector();
@@ -164,16 +165,19 @@ $totalCount = Core::factory('Lid')
     ->queryBuilder()
     ->where('subordinated', '=', $subordinated);
 
-if (is_null($dateFrom) && is_null($dateTo)) {
+if ($dateFrom == $dateTo) {
     $totalCount->where('control_date', '=', $date);
 } else {
-    if (!is_null($dateFrom)) {
-        $totalCount->where('control_date', '>=', $dateFrom);
-    }
-    if (!is_null($dateTo)) {
-        $totalCount->where('control_date', '<=', $dateTo);
-    }
+    $totalCount->where('control_date', '>=', $dateFrom);
+    $totalCount->where('control_date', '<=', $dateTo);
+//    if (!is_null($dateFrom)) {
+//        $totalCount->where('control_date', '>=', $dateFrom);
+//    }
+//    if (!is_null($dateTo)) {
+//        $totalCount->where('control_date', '<=', $dateTo);
+//    }
 }
+
 if ($areaId !== 0) {
     $totalCount->where('area_id', '=', $areaId);
 }
@@ -193,16 +197,19 @@ $Statuses = Core::factory('Lid_Status')
                 ->where('subordinated', '=', $subordinated)
 				->where('status_id', '=', $status->getId());
 
-            if (is_null($dateFrom) && is_null($dateTo)) {
+            if ($dateFrom == $dateTo) {
                 $queryString->where('control_date', '=', $date);
             } else {
-                if (!is_null($dateFrom)) {
-                    $queryString->where('control_date', '>=', $dateFrom);
-                }
-                if (!is_null($dateTo)) {
-                    $queryString->where( 'control_date', '<=', $dateTo );
-                }
+                $queryString->where('control_date', '>=', $dateFrom);
+                $queryString->where( 'control_date', '<=', $dateTo );
+//                if (!is_null($dateFrom)) {
+//                    $queryString->where('control_date', '>=', $dateFrom);
+//                }
+//                if (!is_null($dateTo)) {
+//                    $queryString->where( 'control_date', '<=', $dateTo );
+//                }
             }
+
             if ($areaId !== 0) {
                 $queryString->where('area_id', '=', $areaId);
             }
@@ -252,28 +259,30 @@ $attendanceCount = Core::factory('Schedule_Lesson_Report')
     ->join('User as u', 'u.id = teacher_id')
     ->where('u.subordinated', '=', $subordinated);
 
-if (is_null($dateFrom) && is_null($dateTo)) {
+if ($dateFrom == $dateTo) {
     $lessonReportsCount->where('date', '=', $date);
     $attendanceCount->where('date', '=', $date);
 } else {
-    if (!is_null($dateFrom)) {
-        $lessonReportsCount->where('date', '>=', $dateFrom);
-        $attendanceCount->where('date', '>=', $dateFrom);
-    }
-    if (!is_null($dateTo)) {
-        $lessonReportsCount->where('date', '<=', $dateTo);
-        $attendanceCount->where('date', '<=', $dateTo);
-    }
+    $lessonReportsCount->where('date', '>=', $dateFrom);
+    $lessonReportsCount->where('date', '<=', $dateTo);
+    $attendanceCount->where('date', '>=', $dateFrom);
+    $attendanceCount->where('date', '<=', $dateTo);
+//    if (!is_null($dateFrom)) {
+//        $lessonReportsCount->where('date', '>=', $dateFrom);
+//        $attendanceCount->where('date', '>=', $dateFrom);
+//    }
+//    if (!is_null($dateTo)) {
+//        $lessonReportsCount->where('date', '<=', $dateTo);
+//        $attendanceCount->where('date', '<=', $dateTo);
+//    }
 }
 
 if ($areaId !== 0) {
-    $lessonReportsCount
-        ->join(
+    $lessonReportsCount->join(
             'Schedule_Area_Assignment as saa',
             'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
         );
-    $attendanceCount
-        ->join(
+    $attendanceCount->join(
             'Schedule_Area_Assignment as saa',
             'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
         );
@@ -289,17 +298,18 @@ if ($lessonReportsCount != 0) {
 }
 
 //Кол-во дней за указанный промежуток
-if (is_null($dateFrom) && is_null($dateTo)) {
+if ($dateFrom == $dateTo) {
     $countDaysInterval = 0;
 } else {
-    $dateFrom === null
-        ?   $from = date('Y-m-d')
-        :   $from = $dateFrom;
-    $dateTo === null
-        ?   $to = date('Y-m-d')
-        :   $to = $dateTo;
+//    $dateFrom === null
+//        ?   $from = date('Y-m-d')
+//        :   $from = $dateFrom;
+//    $dateTo === null
+//        ?   $to = date('Y-m-d')
+//        :   $to = $dateTo;
 
-    $countDaysInterval = (strtotime($to) - strtotime($from)) / (60*60*24);
+//    $countDaysInterval = (strtotime($to) - strtotime($from)) / (60*60*24);
+    $countDaysInterval = (strtotime($dateTo) - strtotime($dateFrom)) / (60*60*24);
     $countDaysInterval = intval($countDaysInterval) + 1;
 }
 
@@ -333,21 +343,22 @@ if ($areaId !== 0) {
         );
 }
 
-if (is_null($dateFrom) && is_null($dateTo)) {
+if ($dateFrom == $dateTo) {
     $queryString->where('datetime', '=', $date);
 } else {
-    if (!is_null($dateFrom)) {
-        $queryString->where('datetime', '>=', $dateFrom);
-    }
-    if (!is_null($dateTo)) {
-        $queryString->where('datetime', '<=', $dateTo);
-    }
+    $queryString->where('datetime', '>=', $dateFrom);
+    $queryString->where('datetime', '<=', $dateTo);
+//    if (!is_null($dateFrom)) {
+//        $queryString->where('datetime', '>=', $dateFrom);
+//    }
+//    if (!is_null($dateTo)) {
+//        $queryString->where('datetime', '<=', $dateTo);
+//    }
 }
 
 $queryString = $queryString->getQueryString();
 $Result = Core::factory('Orm')->executeQuery($queryString);
 $Result = $Result->fetch();
-
 if ($Result['sum'] == null) {
     $sum = 0;
 } else {
@@ -358,6 +369,7 @@ Core::factory('Core_Entity')
     ->addSimpleEntity('total_sum', $sum)
     ->xsl('musadm/statistic/teacher_payments.xsl')
     ->show();
+
 
 /**
  * Статистика по доходам, расходам и прибыли
@@ -376,26 +388,29 @@ $hostExpenses = Core::factory('Payment')
     ->where('Payment.subordinated', '=', $subordinated);
 
 if ($areaId !== 0) {
-    $finances
-        ->join(
+    $finances->join(
             'Schedule_Area_Assignment as saa',
             'client_id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
         );
     $hostExpenses->where('area_id', '=', $areaId);
 }
 
-if (is_null($dateFrom) && is_null($dateTo)) {
+if ($dateFrom == $dateTo) {
     $finances->where('date', '=', $date);
     $hostExpenses->where('datetime', '=', $date);
 } else {
-    if (!is_null($dateFrom)) {
-        $finances->where('date', '>=', $dateFrom);
-        $hostExpenses->where('datetime', '>=', $dateFrom);
-    }
-    if (!is_null($dateTo)) {
-        $finances->where('date', '<=', $dateTo);
-        $hostExpenses->where('datetime', '<=', $dateTo);
-    }
+    $finances->where('date', '>=', $dateFrom);
+    $finances->where('date', '<=', $dateTo);
+    $hostExpenses->where('datetime', '>=', $dateFrom);
+    $hostExpenses->where('datetime', '<=', $dateTo);
+//    if (!is_null($dateFrom)) {
+//        $finances->where('date', '>=', $dateFrom);
+//        $hostExpenses->where('datetime', '>=', $dateFrom);
+//    }
+//    if (!is_null($dateTo)) {
+//        $finances->where('date', '<=', $dateTo);
+//        $hostExpenses->where('datetime', '<=', $dateTo);
+//    }
 }
 
 $income =   clone $finances->select('sum(client_rate)', 'value');
@@ -419,17 +434,12 @@ if (is_null($hostExpenses)) {
     $hostExpenses = 0;
 }
 
-
-Core::factory( 'Core_Entity' )
-    ->addSimpleEntity( 'income', $income )
-    ->addSimpleEntity( 'expenses', $expenses )
-    ->addSimpleEntity( 'profit', $profit )
-    ->addSimpleEntity( 'host_expenses', $hostExpenses )
-    ->xsl( 'musadm/statistic/lessons_income.xsl' )
+Core::factory('Core_Entity')
+    ->addSimpleEntity('income', $income)
+    ->addSimpleEntity('expenses', $expenses)
+    ->addSimpleEntity('profit', $profit)
+    ->addSimpleEntity('host_expenses', $hostExpenses)
+    ->xsl('musadm/statistic/lessons_income.xsl')
     ->show();
 
-echo "</div>";
-echo "</div>";
-
-
-
+echo "</div></div>";
