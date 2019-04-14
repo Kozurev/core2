@@ -300,18 +300,17 @@ function translite($str)
         'а' => 'a', 'б' => 'b', 'в' => 'v',
         'г' => 'g', 'д' => 'd', 'е' => 'e',
         'ё' => 'y', 'ж' => 'j', 'з' => 'z',
-        'и' => 'i', 'к' => 'k', 'л' => 'l',
-        'м' => 'm', 'н' => 'n', 'о' => 'o',
-        'п' => 'p', 'р' => 'r', 'с' => 's',
-        'т' => 't', 'у' => 'u', 'ф' => 'f',
-        'х' => 'h', 'ц' => 'c', 'ч' => 'ch',
-        'ш' => 'sh','щ' => 'sh','ъ' => '',
-        'ы' => 'u', 'ь' => '',  'э' => 'e',
-        'ю' => 'ju', 'я' => 'ja'
+        'и' => 'i', 'й' => 'j', 'к' => 'k',
+        'л' => 'l', 'м' => 'm', 'н' => 'n',
+        'о' => 'o', 'п' => 'p', 'р' => 'r',
+        'с' => 's', 'т' => 't', 'у' => 'u',
+        'ф' => 'f', 'х' => 'h', 'ц' => 'c',
+        'ч' => 'ch', 'ш' => 'sh','щ' => 'sh',
+        'ъ' => '', 'ы' => 'u', 'ь' => '',
+        'э' => 'e', 'ю' => 'ju', 'я' => 'ja'
     ];
 
-    while ($str !== false && iconv_strlen($str) > 0)
-    {
+    while ($str !== false && iconv_strlen($str) > 0) {
         $temp = mb_substr($str, 0, 1);
         $temp = mb_strtolower($temp);
 
@@ -320,7 +319,7 @@ function translite($str)
         } elseif (is_numeric($temp)) {
             $result .= $temp;
         } elseif (in_array($temp, array_keys($translite))) {
-            if(Core_Array::getValue($translite, $temp, false) !== false) {
+            if (Core_Array::getValue($translite, $temp, false) !== false) {
                 $result .= $translite[$temp];
             }
         } else {
