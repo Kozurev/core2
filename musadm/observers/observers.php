@@ -5,6 +5,7 @@
  * @author: Kozurev Egor
  * @date: 13.04.2018 13:52
  * @version 20190326
+ * @version 20190414
  */
 
 require_once 'subordinated.php';
@@ -423,6 +424,29 @@ Core::attachObserver('afterScheduleReportSave', function($args) {
 Core::attachObserver('beforePaymentSave', function($args) {
     $Payment = $args[0];
 
+    //Корректировка баланса клиента
+    if ($Payment->type() == 1 || $Payment->type() == 2) {
+        if ($Payment->getId() > 0) {
+            $OldPayment = Core::factory('Payment', $Payment->getId());
+            $difference = $Payment->value() - $OldPayment->value();
+        } else {
+            $difference = $Payment->value();
+        }
+
+        Core::factory('User_Controller');
+        $Client = $Payment->getUser();
+        if (!is_null($Client)) {
+            $UserBalance = Core::factory('Property')->getByTagName('balance');
+            $UserBalance = $UserBalance->getPropertyValues($Client)[0];
+            $balanceOld =  floatval($UserBalance->value());
+            $Payment->type() == 1
+                ?   $balanceNew = $balanceOld + floatval($difference)
+                :   $balanceNew = $balanceOld - floatval($difference);
+            $UserBalance->value($balanceNew)->save();
+        }
+    }
+
+    //Автоматическое создание связи платежа с филиалом
     if ($Payment->areaId() == 0) {
         $PaymentUser = $Payment->getUser();
         if (!is_null($PaymentUser)) {

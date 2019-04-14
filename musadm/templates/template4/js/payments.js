@@ -52,15 +52,11 @@ $(function(){
             var description = $(form).find('textarea[name=description]').val();
             var description2 = $(form).find('textarea[name=property_26]').val();
             var type = $(form).find('input[name=type]:checked').val();
-            // savePayment(userid, value, description, description2, type, "balance", function(){});
-            // refreshPaymentsTable(userid, loaderOff);
 
             //Если это страница со списком клиентов
             if ($('#payment_from').val() == 'clients') {
                 savePayment(userid, value, description, description2, type, 'balance', refreshUserTable);
-            }
-            else
-            {
+            } else {
                 savePayment(userid, value, description, description2, type, 'balance', function() {
                     refreshPaymentsTable(userid, loaderOff);
                 });
@@ -154,22 +150,29 @@ $(function(){
         /**
          * Открытие всплывающего окна создания/редактирования платежа
          */
-        .on("click", ".payment_edit", function(e){
+        .on('click', '.payment_edit', function(e) {
             e.preventDefault();
-            var id = $(this).data("id");
-            var afterSaveAction = $(this).data("after_save_action");
+            var id = $(this).data('id');
+            var afterSaveAction = $(this).data('after_save_action');
 
-            if(afterSaveAction == "payment" && $(this).data("type") < 3)
-            {
-                if(confirm("Редактирование суммы данного платежа не повлияет на баланс клиента. Вы хотите продолжить?"))
-                {
-                    editPaymentPopup(id, afterSaveAction);
-                }
-            }
-            else
-            {
+            if (afterSaveAction == 'payment' && $(this).data('type') < 3) {
+                editPaymentPopup(id, afterSaveAction);
+            } else {
                 editPaymentPopup(id, afterSaveAction);
             }
+        })
+
+        .on('click', '.payment_delete', function(e){
+            e.preventDefault();
+            loaderOn();
+            var id = $(this).data('id');
+            var afterSaveAction = $(this).data('after_save_action');
+            deletePayment(id, function(response) {
+                if (afterSaveAction == 'client') {
+                    refreshUserTable();
+                }
+                loaderOff();
+            });
         })
 
         /**

@@ -256,16 +256,16 @@ if ($action === 'savePayment') {
         ->addNewValue($Payment, $description2);
 
     //Корректировка баланса ученика
-    $Client =      Core::factory('User', $userId);
-    $UserBalance = Core::factory('Property')->getByTagName('balance');
-    $UserBalance = $UserBalance->getPropertyValues($Client)[0];
-    $balanceOld =  floatval($UserBalance->value());
-
-    $type == 1
-        ?   $balanceNew = $balanceOld + floatval($value)
-        :   $balanceNew = $balanceOld - floatval($value);
-
-    $UserBalance->value($balanceNew)->save();
+//    $Client =      Core::factory('User', $userId);
+//    $UserBalance = Core::factory('Property')->getByTagName('balance');
+//    $UserBalance = $UserBalance->getPropertyValues($Client)[0];
+//    $balanceOld =  floatval($UserBalance->value());
+//
+//    $type == 1
+//        ?   $balanceNew = $balanceOld + floatval($value)
+//        :   $balanceNew = $balanceOld - floatval($value);
+//
+//    $UserBalance->value($balanceNew)->save();
     exit('0');
 }
 
@@ -302,24 +302,27 @@ if ($action === 'payment_save') {
 
     $id =     Core_Array::Get('id', 0, PARAM_INT);
     $value =  Core_Array::Get('value', 0, PARAM_INT);
-    $date =   Core_Array::Get('date', date('Y-m-d'), PARAM_STRING);
+    $date =   Core_Array::Get('date', date('Y-m-d'), PARAM_DATE);
     $description = Core_Array::Get('description', '', PARAM_STRING);
-
     $Payment = Core::factory('Payment', $id);
-    $difference = intval($Payment->value()) - intval($value);
-
-    if ($difference !== 0) {
-        $User =        User_Controller::factory($Payment->user());
-        $UserBalance = Core::factory( 'Property')->getByTagName('balance');
-        $UserBalance = $UserBalance->getPropertyValues($User)[0];
-        $balanceOld =  $UserBalance->value();
-
-        $Payment->type() == 1
-            ?   $balanceNew = $balanceOld - $difference
-            :   $balanceNew = $balanceOld + $difference;
-
-        $UserBalance->value($balanceNew)->save();
+    if (is_null($Payment)) {
+        Core_Page_Show::instance()->error(404);
     }
+
+//    $User = User_Controller::factory($Payment->user());
+//    $difference = intval($Payment->value()) - intval($value);
+//
+//    if ($difference !== 0 && $User->groupId() == ROLE_CLIENT) {
+//        $UserBalance = Core::factory( 'Property')->getByTagName('balance');
+//        $UserBalance = $UserBalance->getPropertyValues($User)[0];
+//        $balanceOld =  $UserBalance->value();
+//
+//        $Payment->type() == 1
+//            ?   $balanceNew = $balanceOld - $difference
+//            :   $balanceNew = $balanceOld + $difference;
+//
+//        $UserBalance->value($balanceNew)->save();
+//    }
 
     $Payment
         ->value($value)
@@ -342,23 +345,23 @@ if ($action === 'payment_delete') {
 
     $id = Core_Array::Get('id', 0, PARAM_INT);
     $Payment = Core::factory('Payment', $id);
-
     if (is_null($Payment)) {
         Core_Page_Show::instance()->error(404);
     }
 
-    $User =         User_Controller::factory($Payment->user());
-    $UserBalance =  Core::factory('Property')->getByTagName('balance');
-    $UserBalance =  $UserBalance->getPropertyValues( $User )[0];
-    $balanceOld =   $UserBalance->value();
+    $User = User_Controller::factory($Payment->user());
+    if ($User->groupId() == ROLE_CLIENT) {
+        $UserBalance =  Core::factory('Property')->getByTagName('balance');
+        $UserBalance =  $UserBalance->getPropertyValues($User)[0];
+        $balanceOld =   $UserBalance->value();
 
-    $Payment->type() == 1
-        ?   $newBalance = $balanceOld - $Payment->value()
-        :   $newBalance = $balanceOld + $Payment->value();
-
-    $UserBalance
-        ->value($newBalance)
-        ->save();
+        $Payment->type() == 1
+            ?   $newBalance = $balanceOld - $Payment->value()
+            :   $newBalance = $balanceOld + $Payment->value();
+        $UserBalance
+            ->value($newBalance)
+            ->save();
+    }
 
     $Payment->delete();
     exit;
