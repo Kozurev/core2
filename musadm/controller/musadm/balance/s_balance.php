@@ -174,8 +174,6 @@ if ($action == 'buyTarif') {
         Core_Page_Show::instance()->error(404);
     }
 
-
-
     $UserBalance = Core::factory('Property')->getByTagName('balance');
     $UserBalance = $UserBalance->getPropertyValues($Client)[0];
     if ($UserBalance->value() < $Tarif->price()) {
@@ -188,9 +186,9 @@ if ($action == 'buyTarif') {
     $CountGroupLessons = $CountGroupLessons->getPropertyValues($Client)[0];
 
     //Корректировка баланса
-    $oldBalance = intval($UserBalance->value());
-    $newBalance = $oldBalance - intval($Tarif->price());
-    $UserBalance->value($newBalance)->save();
+//    $oldBalance = intval($UserBalance->value());
+//    $newBalance = $oldBalance - intval($Tarif->price());
+//    $UserBalance->value($newBalance)->save();
 
     //Корректировка кол-ва занятий
     if ($Tarif->countIndiv() != 0) {
