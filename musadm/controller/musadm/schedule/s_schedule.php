@@ -429,8 +429,6 @@ if ($action === 'saveScheduleChangeTimePopup') {
 
     $timeFrom .= ':00';
     $timeTo .= ':00';
-
-    $Lesson = Core::factory('Schedule_Lesson', $lessonId);
     $Lesson->modifyTime($date, $timeFrom, $timeTo);
 
     exit;

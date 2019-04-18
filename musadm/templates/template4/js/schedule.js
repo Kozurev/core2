@@ -467,8 +467,10 @@ function saveScheduleTask(formData, func) {
         url: '',
         data: formData,
         success: function(response) {
-            if(responce != '0') {
+            if(response != '0') {
                 alert(response);
+            } else {
+                notificationSuccess('Ваше обращение доставлено менеджерам');
             }
             closePopup();
             func();
@@ -637,7 +639,7 @@ function saveScheduleChangeTimePopup(lessonId, date, timeFrom, timeTo, func) {
         },
         success: function(response){
             if (response != '') {
-                alert(responce);
+                alert(response);
             }
             closePopup();
             func();

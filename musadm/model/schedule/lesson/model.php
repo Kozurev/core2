@@ -295,12 +295,12 @@ class Schedule_Lesson_Model extends Core_Entity
                 'minlength' => 10,
                 'maxlength' => 10
             ],
-            'delete_date' => [
-                'required' => false,
-                'type' => PARAM_STRING,
-                'minlength' => 10,
-                'maxlength' => 10
-            ],
+//            'delete_date' => [
+//                'required' => false,
+//                'type' => PARAM_STRING,
+//                'minlength' => 10,
+//                'maxlength' => 10
+//            ],
             'time_from' => [
                 'required' => true,
                 'type' => PARAM_STRING,
