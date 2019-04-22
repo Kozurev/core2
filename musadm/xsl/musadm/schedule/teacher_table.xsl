@@ -41,10 +41,10 @@
                             <xsl:variable name="lidId" select="client_id" />
 
                             <input type="checkbox" name="attendance_{$lidId}" id="attendance_{$lidId}">
-                                <xsl:if test="client/report/id">
+                                <xsl:if test="report/id">
                                     <xsl:attribute name="disabled">disabled</xsl:attribute>
                                 </xsl:if>
-                                <xsl:if test="client/report/attendance = 1">
+                                <xsl:if test="report/attendance = 1">
                                     <xsl:attribute name="checked">checked</xsl:attribute>
                                 </xsl:if>
                             </input>
@@ -64,7 +64,7 @@
             </td>
 
             <input type="hidden" name="date" value="{//real_date}"/>
-            
+            <input type="hidden" name="typeId" value="{type_id}" />
             <xsl:choose>
                 <xsl:when test="oldid != ''">
                     <input type="hidden" name="lessonId" value="{oldid}"/>
@@ -90,9 +90,11 @@
             <xsl:when test="title != ''">
                 <li>
                     <input type="checkbox" id="group_{id}" name="group" value="{id}" class="group-checkbox">
-                        <xsl:if test="../is_reported = 1">
-                            <xsl:attribute name="checked">checked</xsl:attribute>
+                        <xsl:if test="../report/id">
                             <xsl:attribute name="disabled">disabled</xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test="../report/attendance = 1">
+                            <xsl:attribute name="checked">checked</xsl:attribute>
                         </xsl:if>
                     </input>
                     <label for="group_{id}" class="group-label">
@@ -107,10 +109,10 @@
             <xsl:otherwise>
                 <li>
                     <input type="checkbox" name="attendance_{id}" id="attendance_{id}">
-                        <xsl:if test="report/id">
+                        <xsl:if test="report/id or attendance/id">
                             <xsl:attribute name="disabled">disabled</xsl:attribute>
                         </xsl:if>
-                        <xsl:if test="report/attendance = 1">
+                        <xsl:if test="attendance/attendance = 1">
                             <xsl:attribute name="checked">checked</xsl:attribute>
                         </xsl:if>
                     </input>

@@ -159,12 +159,35 @@ if ($User->groupId() == ROLE_CLIENT) {
 $UserReports = Core::factory('Schedule_Lesson_Report');
 $UserReports
     ->queryBuilder()
-    ->select(['Schedule_Lesson_Report.id', 'attendance', 'date', 'lesson_id', 'lesson_type', 'client_id',
+    ->select(['Schedule_Lesson_Report.id', 'attendance', 'date', 'lesson_id', 'client_id',
         'surname', 'name', 'client_rate', 'teacher_rate', 'total_rate', 'type_id'])
     ->leftJoin('User AS usr', 'usr.id = teacher_id')
-    ->where('client_id', '=', $User->getId())
-    ->where('type_id', 'in', [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_GROUP])
     ->orderBy('date', 'DESC');
+
+$ClientGroups = Core::factory('Schedule_Group_Assignment')
+    ->queryBuilder()
+    ->where('user_id', '=', $User->getId())
+    ->findAll();
+$UserGroups = [];
+foreach ($ClientGroups as $group) {
+    $UserGroups[] = $group->groupId();
+}
+if (count($UserGroups) > 0) {
+    $UserReports
+        ->queryBuilder()
+            ->open()
+                ->where('client_id', '=', $User->getId())
+                ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
+            ->close()
+            ->open()
+                ->orWhereIn('client_id', $UserGroups)
+                ->where('type_id', '=', Schedule_Lesson::TYPE_GROUP)
+            ->close();
+} else {
+    $UserReports->queryBuilder()
+        ->where('client_id', '=', $User->getId())
+        ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV);
+}
 
 $UserReports = $UserReports->findAll();
 foreach ($UserReports as $rep) {

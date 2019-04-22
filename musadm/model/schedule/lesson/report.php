@@ -37,6 +37,19 @@ class Schedule_Lesson_Report extends Schedule_Lesson_Report_Model
 
 
     /**
+     * @return mixed|null
+     */
+    public function getGroup()
+    {
+        if (empty($this->groupId())) {
+            $this->groupId($this->clientId());
+        }
+
+        return Core::factory('Schedule_Group', $this->groupId());
+    }
+
+
+    /**
      * @return Schedule_Lesson|null
      */
     public function getLesson()
@@ -48,6 +61,23 @@ class Schedule_Lesson_Report extends Schedule_Lesson_Report_Model
         }
     }
 
+
+    /**
+     * Поиск информации о посещаемости
+     *
+     * @return array
+     */
+    public function getAttendances() : array
+    {
+        if (empty($this->id)) {
+            return [];
+        }
+
+        return Core::factory('Schedule_Lesson_Report_Attendance')
+            ->queryBuilder()
+            ->where('report_id', '=', $this->getId())
+            ->findAll();
+    }
 
 
     public function save($obj = null)

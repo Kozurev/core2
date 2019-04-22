@@ -30,7 +30,7 @@ class Schedule_Lesson_Report_Model extends Core_Entity
      *
      * @var int
      */
-    protected $group_id = 0;
+    //protected $group_id = 0;
 
     /**
      * Присутствие клиента на занятии
@@ -65,13 +65,13 @@ class Schedule_Lesson_Report_Model extends Core_Entity
      * TODO: Убрать это значение за ненадобностью
      * @var int
      */
-    protected $lesson_type;
+    //protected $lesson_type;
 
 
     /**
      * @var float
      */
-    protected $lessons_written_off = 0.0;
+    //protected $lessons_written_off = 0.0;
 
 
     /**
@@ -128,15 +128,15 @@ class Schedule_Lesson_Report_Model extends Core_Entity
      * @param int|null $groupId
      * @return $this|int
      */
-    public function groupId(int $groupId = null)
-    {
-        if (is_null($groupId)) {
-            return $this->group_id;
-        } else {
-            $this->group_id = $groupId;
-            return $this;
-        }
-    }
+//    public function groupId(int $groupId = null)
+//    {
+//        if (is_null($groupId)) {
+//            return $this->group_id;
+//        } else {
+//            $this->group_id = $groupId;
+//            return $this;
+//        }
+//    }
 
     /**
      * @param int|null $lessonId
@@ -187,15 +187,15 @@ class Schedule_Lesson_Report_Model extends Core_Entity
      * @param int|null $lessonType
      * @return $this|int
      */
-    public function lessonType(int $lessonType = null)
-    {
-        if (is_null($lessonType)) {
-            return intval($this->lesson_type);
-        } else {
-            $this->lesson_type = $lessonType ;
-            return $this;
-        }
-    }
+//    public function lessonType(int $lessonType = null)
+//    {
+//        if (is_null($lessonType)) {
+//            return intval($this->lesson_type);
+//        } else {
+//            $this->lesson_type = $lessonType ;
+//            return $this;
+//        }
+//    }
 
 
     /**
@@ -217,15 +217,15 @@ class Schedule_Lesson_Report_Model extends Core_Entity
      * @param float|null $lessonsWrittenOff
      * @return $this|float
      */
-    public function lessonsWrittenOff(float $lessonsWrittenOff = null)
-    {
-        if (is_null($lessonsWrittenOff)) {
-            return floatval($this->lessons_written_off);
-        } else {
-            $this->lessons_written_off = $lessonsWrittenOff;
-            return $this;
-        }
-    }
+//    public function lessonsWrittenOff(float $lessonsWrittenOff = null)
+//    {
+//        if (is_null($lessonsWrittenOff)) {
+//            return floatval($this->lessons_written_off);
+//        } else {
+//            $this->lessons_written_off = $lessonsWrittenOff;
+//            return $this;
+//        }
+//    }
 
 
     /**

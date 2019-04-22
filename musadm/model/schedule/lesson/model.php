@@ -253,12 +253,12 @@ class Schedule_Lesson_Model extends Core_Entity
      * @param int|null $clientId
      * @return $this|int
      */
-    public function clientId(int $clientId = null)
+    public function clientId($clientId = null)
     {
         if (is_null($clientId)) {
             return intval($this->client_id);
         } else {
-            $this->client_id = $clientId;
+            $this->client_id = intval($clientId);
             return $this;
         }
     }

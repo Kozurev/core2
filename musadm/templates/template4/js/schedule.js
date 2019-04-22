@@ -234,6 +234,7 @@ $(function(){
             var tr = $(this).parent().parent();
             var lessonId = tr.find('input[name=lessonId]').val();
             var date = tr.find('input[name=date]').val();
+            var typeId = tr.find('input[name=typeId]').val();
             var attendance = tr.find('input[type=checkbox]');
 
             var ajaxData = {
@@ -242,14 +243,18 @@ $(function(){
                 lessonId: lessonId
             };
 
-            $.each(attendance, function(key, input) {
-                var name = $(input).attr('name');
-                if (name != 'group') {
-                    ajaxData[name] = Number($(input).is(':checked'));
-                } else {
-                    ajaxData[name] = $(input).val();
-                }
-            });
+            if (typeId == 2) {
+                $.each(attendance, function(key, input) {
+                    var name = $(input).attr('name');
+                    if (name != 'group') {
+                        ajaxData[name] = Number($(input).is(':checked'));
+                    } else {
+                        ajaxData['attendance'] = Number($(input).is(':checked'));
+                    }
+                });
+            } else {
+                ajaxData['attendance'] = Number($(attendance[0]).is(':checked'));
+            }
 
             $.ajax({
                 type: 'GET',
@@ -470,7 +475,7 @@ function saveScheduleTask(formData, func) {
             if(response != '0') {
                 alert(response);
             } else {
-                notificationSuccess('Ваше обращение доставлено менеджерам');
+                notifySccess('Ваше обращение доставлено менеджерам');
             }
             closePopup();
             func();

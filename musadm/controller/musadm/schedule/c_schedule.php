@@ -2,6 +2,7 @@
 /**
  * @author BadWolf
  * @version 20190327
+ * @version 20190418
  */
 
 $userId = Core_Array::Get('userid', null, PARAM_INT);
@@ -342,32 +343,36 @@ if ($User->groupId() == ROLE_TEACHER) {
     foreach ($TeacherLessons as $key => $Lesson) {
         $Lesson->timeFrom(refactorTimeFormat($Lesson->timeFrom()));
         $Lesson->timeTo(refactorTimeFormat($Lesson->timeTo()));
-        $LessonReports = $Lesson->getReports($date);
+        $LessonReport = $Lesson->getReport($date);
         $LessonClient = $Lesson->getClient();
+
         if ($LessonClient instanceof Schedule_Group) {
             $Clients = $LessonClient->getClientList();
-            $countClients = count($Clients);
-            foreach ($Clients as $Client) {
-                foreach ($LessonReports as $LessonReport) {
-                    if ($Client->getId() == $LessonReport->clientId()) {
-                        $Client->addEntity($LessonReport, 'report');
+
+            if (!is_null($LessonReport)) {
+                $LessonAttendances = $LessonReport->getAttendances();
+
+                foreach ($LessonAttendances as $Attendance) {
+                    foreach ($Clients as $Client) {
+                        if ($Attendance->clientId() == $Client->getId()) {
+                            $Client->addEntity($Attendance, 'attendance');
+                        }
                     }
                 }
             }
 
             $LessonClient->addEntities($Clients, 'client');
         } else {
-            $countClients = 1;
-            if (count($LessonReports) == 1 && $LessonClient->getId() == $LessonReports[0]->clientId()) {
-                $LessonClient->addEntity($LessonReports[0], 'report');
+            if (!is_null($LessonReport)) {
+                $LessonAttendances = $LessonReport->getAttendances();
+                if (count($LessonAttendances) > 0) {
+                    $LessonClient->addEntity($LessonAttendances[0], 'attendance');
+                }
             }
         }
 
-        if (count($LessonReports) == $countClients) {
-            $Lesson->addSimpleEntity('is_reported', 1);
-        } else {
-            $Lesson->addSimpleEntity('is_reported', 0);
-        }
+        $Lesson->addSimpleEntity('is_reported', (int)$Lesson->isReported($date));
+        $Lesson->addEntity($LessonReport, 'report');
         $Lesson->addEntity($LessonClient, 'client');
         $Lesson->addSimpleEntity('lesson_type', $Lesson->lessonType());
     }
@@ -469,7 +474,6 @@ if ($User->groupId() == ROLE_TEACHER) {
         ->where('date', '>=', $dateFrom)
         ->where('date', '<=', $dateTo)
         ->getQueryString();
-
     $totalPayed = Core::factory('Orm')
         ->executeQuery($totalPayedSql)
         ->fetch();

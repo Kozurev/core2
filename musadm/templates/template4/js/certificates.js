@@ -85,7 +85,7 @@ function saveCertificateComment(formData, func) {
         url: '?action=saveCertificateNote',
         data: formData,
         success: function(response){
-            if (responce != '') {
+            if (response != '') {
                 notificationError('Ошибка: ' + response);
             }
             func();

@@ -248,24 +248,25 @@ if ($action === 'getScheduleLessonPopup') {
 if ($action === 'teacherReport') {
     $lessonId = Core_Array::Get('lessonId', null, PARAM_INT);
     $date = Core_Array::Get('date', null, PARAM_STRING);
-    $Lesson = Core::factory('Schedule_Lesson', $lessonId);
+    $attendance = Core_Array::Get('attendance', null, PARAM_INT);
 
+    $Lesson = Core::factory('Schedule_Lesson', $lessonId);
     if (is_null($lessonId) || is_null($date) || is_null($Lesson)) {
         Core_Page_Show::instance()->error(404);
     }
 
     //Формирование массива с информацией о присутствии клиента/клиентов
-    $attendance = [];
+    $attendanceClients = [];
     foreach ($_GET as $param => $value) {
-        if (stristr($param, 'attendance') !== false) {
+        if (stristr($param, 'attendance') !== false && $param != 'attendance') {
             $clientId = explode('attendance_', $param)[1];
-            $attendance[$clientId] = $value;
-        } elseif ($param == 'group') {
-            $attendance['group'] = $value;
+            $attendanceClients[$clientId] = $value;
         }
     }
 
-    $Lesson->makeReport($date, $attendance);
+    //if ($Lesson->typeId() == )
+
+    $Lesson->makeReport($date, $attendance, $attendanceClients);
     exit;
 }
 
