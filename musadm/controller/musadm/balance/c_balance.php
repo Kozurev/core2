@@ -201,8 +201,8 @@ foreach ($UserReports as $rep) {
     $rep->time_to = refactorTimeFormat($RepLesson->timeTo());
     $rep->date(refactorDateFormat($rep->date()));
 
-    if ($rep->typeId() == Schedule_Lesson::TYPE_GROUP && $rep->groupId() > 0) {
-        $Group = Core::factory('Schedule_Group', $rep->groupId());
+    if ($rep->typeId() == Schedule_Lesson::TYPE_GROUP) {
+        $Group = Core::factory('Schedule_Group', $rep->clientId());
         if (!is_null($Group)) {
             $rep->surname = $Group->title();
             $rep->name = '';
