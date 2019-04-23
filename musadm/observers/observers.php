@@ -504,7 +504,7 @@ Core::attachObserver('afterLidStatusDelete', function($args) {
 /**
  * Создание задачи с напоминанием о низком уровне баланса занятий клиента
  */
-Core::attachObserver('afterScheduleReportSave', function($args) {
+Core::attachObserver('afterScheduleLessonReportInsert', function($args) {
     Core::factory('Schedule_Lesson');
 
     $Report = $args[0];
@@ -522,6 +522,7 @@ Core::attachObserver('afterScheduleReportSave', function($args) {
         return;
     }
 
+    Core::factory('Task_Controller');
     $ClientLessons = Core::factory('Property')->getByTagName($clientLessons);
     $countLessons = $ClientLessons->getPropertyValues($Client)[0]->value();
     $PerLesson = Core::factory('Property')->getByTagName('per_lesson');
