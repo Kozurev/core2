@@ -122,6 +122,7 @@ $(function(){
             if ($('input[name=is_create_task]').is(':checked')) {
                 var clientId = Form.find('select[name=clientId]').val();
                 var date = Form.find('input[name=insertDate]').val();
+                var areaId = Form.find('input[name=areaId]').val();
 
                 $.ajax({
                     type: 'GET',
@@ -129,7 +130,8 @@ $(function(){
                     data: {
                         action: 'create_schedule_task',
                         date: date,
-                        client_id: clientId
+                        clientId: clientId,
+                        areaId: areaId
                     }
                 });
             }
