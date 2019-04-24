@@ -174,26 +174,24 @@ if ($action === 'deleteScheduleAbsent') {
  * Вывод формы для всплывающего окна создания занятия
  */
 if ($action === 'getScheduleLessonPopup') {
-    $classId =      Core_Array::Get('class_id', null, PARAM_INT);
-    $lessonType =   Core_Array::Get('model_name', '', PARAM_STRING);
+    $classId =      Core_Array::Get('classId', null, PARAM_INT);
+    $lessonType =   Core_Array::Get('lessonType', '', PARAM_STRING);
     $date =         Core_Array::Get('date', '', PARAM_STRING);
-    $areaId =       Core_Array::Get('area_id', null, PARAM_INT);
+    $areaId =       Core_Array::Get('areaId', null, PARAM_INT);
 
-    if ($classId === null)     exit(Core::getMessage('EMPTY_GET_PARAM', ['идентификатор класса']));
+    if (is_null($classId))     exit(Core::getMessage('EMPTY_GET_PARAM', ['идентификатор класса']));
     if ($lessonType === '')    exit(Core::getMessage('EMPTY_GET_PARAM', ['тип графика']));
     if ($date === '')          exit(Core::getMessage('EMPTY_GET_PARAM', ['дата']));
-    if ($areaId === null)      exit(Core::getMessage('EMPTY_GET_PARAM', ['идентификатор']));
+    if (is_null($areaId))      exit(Core::getMessage('EMPTY_GET_PARAM', ['идентификатор']));
 
     //Проверка на принадлежность филиала и авторизованного пользователя одному и тому же директору
     $Area = Schedule_Area_Controller::factory($areaId);
-
     if (is_null($Area)) {
         Core_Page_Show::instance()->error(404);
     }
 
     $Date = new DateTime($date);
     $dayName = $Date->format('l');
-
     //Временной промежуток (временное значение одной ячейки)
     defined('SCHEDULE_DELIMITER')
         ?   $period = SCHEDULE_DELIMITER
@@ -207,13 +205,12 @@ if ($action === 'getScheduleLessonPopup') {
         ->addSimpleEntity('period', $period)
         ->addSimpleEntity('lesson_type', $lessonType);
 
-    $Users = Core::factory('User')
-        ->queryBuilder()
-        ->where('active', '=', 1)
-        ->where('group_id', '>', 3)
-        ->where('subordinated', '=', $subordinated)
-        ->orderBy('surname', 'ASC')
-        ->findAll();
+    Core::factory('User_Controller');
+    $UserController = new User_Controller(User::current());
+    $Users = $UserController
+        ->isLimitedAreasAccess(true)
+        ->isWithAreaAssignments(false)
+        ->getUsers();
 
     $Groups = Core::factory('Schedule_Group')
         ->queryBuilder()
@@ -227,9 +224,10 @@ if ($action === 'getScheduleLessonPopup') {
         ->addEntities($Groups)
         ->addEntities($LessonTypes);
 
-    if ($lessonType == '2') {
+    Core::factory('Schedule_Lesson');
+    if ($lessonType == Schedule_Lesson::SCHEDULE_CURRENT) {
         $output->addSimpleEntity('schedule_type', 'актуальное');
-    } elseif ($lessonType == '') {
+    } elseif ($lessonType == Schedule_Lesson::SCHEDULE_MAIN) {
         $output->addSimpleEntity('schedule_type', 'основное');
     }
 

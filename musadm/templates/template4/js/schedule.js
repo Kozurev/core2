@@ -74,9 +74,9 @@ $(function(){
             }
 
             var type = $(this).data('schedule_type');
-            var class_id = $(this).data('class_id');
-            var area_id = $(this).data('area_id');
-            getScheduleLessonPopup(class_id, date, area_id, type);
+            var classId = $(this).data('class_id');
+            var areaId = $(this).data('area_id');
+            getScheduleLessonPopup(classId, date, areaId, type);
         })
 
         //Сохранение данных данятия
@@ -567,16 +567,16 @@ function deleteScheduleAbsent(id) {
 }
 
 
-function getScheduleLessonPopup(classId, date, areaId, type) {
+function getScheduleLessonPopup(classId, date, areaId, lessonType) {
     $.ajax({
         type: 'GET',
         url: '',
         data: {
             action: 'getScheduleLessonPopup',
-            class_id: classId,
+            classId: classId,
             date: date,
-            model_name: type,
-            area_id: areaId
+            lessonType: lessonType,
+            areaId: areaId
         },
         success: function(response) {
             showPopup(response);
