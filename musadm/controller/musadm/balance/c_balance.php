@@ -206,6 +206,12 @@ foreach ($UserReports as $rep) {
         if (!is_null($Group)) {
             $rep->surname = $Group->title();
             $rep->name = '';
+            $ClientAttendance = $rep->getClientAttendance($User->getId());
+            if (is_null($ClientAttendance)) {
+                $rep->attendance(0);
+            } else {
+                $rep->attendance($ClientAttendance->attendance());
+            }
         }
     }
 }

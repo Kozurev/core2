@@ -80,6 +80,24 @@ class Schedule_Lesson_Report extends Schedule_Lesson_Report_Model
     }
 
 
+    /**
+     * @param int $clientId
+     * @return Schedule_Lesson_Report_Attendance|null
+     */
+    public function getClientAttendance(int $clientId)
+    {
+        if (empty($this->id)) {
+            return null;
+        }
+
+        return Core::factory('Schedule_Lesson_Report_Attendance')
+            ->queryBuilder()
+            ->where('report_id', '=', $this->getId())
+            ->where('client_id', '=', $clientId)
+            ->find();
+    }
+
+
     public function save($obj = null)
     {
         $this->total_rate = $this->clientRate() - $this->teacherRate();
