@@ -168,7 +168,7 @@
                 </label>
             </div>
 
-            <xsl:if test="user/id = '0'">
+            <xsl:if test="user/id = ''">
                 <hr style="margin: 10px 0px" />
                 <div class="column get_lid_data_row">
                     <span>Данные из лида:</span>
@@ -189,7 +189,7 @@
         </form>
 
         <script>
-            $(".masked-phone").mask("+7(999) 999-99-99");
+            $(".masked-phone").mask("+7(999) 999-9999");
         </script>
     </xsl:template>
 
