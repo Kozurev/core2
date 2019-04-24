@@ -584,3 +584,17 @@ Core::attachObserver('afterScheduleLessonReportInsert', function($args) {
         }
     }
 });
+
+
+Core::attachObserver('beforeTaskInsert', function($args) {
+    $Task = $args[0];
+
+    if ($Task->associate() > 0 && $Task->areaId() == 0) {
+        $Client = Core::factory('User', $Task->associate());
+        $ClientAreas = Core::factory('Schedule_Area_Assignment')->getAreas($Client);
+        if (count($ClientAreas) == 1) {
+            $Area = $ClientAreas[0];
+            $Task->areaId($Area->getId());
+        }
+    }
+});
