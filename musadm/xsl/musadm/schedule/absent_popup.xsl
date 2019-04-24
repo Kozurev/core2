@@ -66,14 +66,14 @@
                 <input class="form-control" type="date" name="dateTo" value="{absent/date_to}" />
             </div>
 
-            <xsl:if test="count(absent) = 0">
+            <!--<xsl:if test="absent/id = ''">-->
                 <div class="column">
                     <span>Напомнить администратору о выходе ученика</span>
                 </div>
                 <div class="column">
                     <input type="checkbox" id="absent_add_task" />
                 </div>
-            </xsl:if>
+            <!--</xsl:if>-->
 
             <input type="hidden" name="id" value="{absent/id}" />
             <input type="hidden" value="{$clientId}" name="clientId" />
