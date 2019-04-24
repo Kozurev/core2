@@ -588,7 +588,7 @@ Core::attachObserver('afterScheduleLessonReportInsert', function($args) {
 
 Core::attachObserver('beforeTaskInsert', function($args) {
     $Task = $args[0];
-debug($Task);
+
     if ($Task->associate() > 0 && $Task->areaId() == 0) {
         $Client = Core::factory('User', $Task->associate());
         $ClientAreas = Core::factory('Schedule_Area_Assignment')->getAreas($Client, false);
