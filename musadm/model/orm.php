@@ -3,6 +3,7 @@
 /**
  * Класс-конструктор SQL-запросов
  *
+ * @version 20190422
  * Class Orm
  */
 class Orm 
@@ -113,12 +114,11 @@ class Orm
 
 
 
-    public function __construct( $obj = null )
+    public function __construct($obj = null)
     {
-        if( $obj !== null )
-        {
+        if (!is_null($obj)) {
             $this->table = $obj->getTableName();
-            $this->class = get_class( $obj );
+            $this->class = get_class($obj);
             $this->object = $obj;
         }
     }
@@ -129,7 +129,7 @@ class Orm
      *
      * @param bool $switch - указатель
      */
-    public static function Debug( $switch )
+    public static function Debug($switch)
     {
         $_SESSION['core']['SQL_DEBUG'] = $switch;
     }
@@ -142,7 +142,7 @@ class Orm
      */
     private static function isDebugSql()
     {
-        return Core_Array::getValue( $_SESSION['core'], 'SQL_DEBUG', false ) === true;
+        return Core_Array::getValue($_SESSION['core'], 'SQL_DEBUG', false) === true;
     }
 
 
@@ -154,7 +154,6 @@ class Orm
 	public function open()
     {
         $this->open++;
-
         return $this;
     }
 
@@ -166,11 +165,9 @@ class Orm
      */
     public function close()
     {
-        if ( $this->open == 0 )
-        {
+        if ($this->open == 0) {
             $this->where .= ') ';
         }
-
         return $this;
     }
 
@@ -185,27 +182,22 @@ class Orm
 	{
 	    $beforeSelect = $this->select;
 
-		$this->select( 'count(' . $this->table . '.id)', 'count' );
+		$this->select('count(' . $this->table . '.id)', 'count');
 		$this->setQueryString();
 		$result = DB::instance()->query( $this->queryString );
 
-        if( self::isDebugSql() )
-        {
+        if (self::isDebugSql()) {
             echo "<br>Строка запроса метода <b>getCount()</b>: " . $this->queryString;
         }
 
-		if ( $result == false )
-        {
+		if ($result == false) {
             return 0;
         }
 
-
         $this->queryString = '';
         $this->select = $beforeSelect;
-
 		$result = $result->fetch();
-
-		return intval( $result['count'] );
+		return intval($result['count']);
 	}
 
 
@@ -214,96 +206,66 @@ class Orm
      *
 	 * @return $this
 	 */
-	public function save( $obj )
+	public function save($obj)
 	{
 		//Генерация названия объекта для наблюдателя
 		$eventObjectName = $obj->getTableName();
-		$eventObjectName = explode( '_', $eventObjectName );
-		$eventObjectName = implode( '', $eventObjectName );
+		$eventObjectName = explode('_', $eventObjectName);
+		$eventObjectName = implode('', $eventObjectName);
 
-		if ( $obj->getId() )
-        {
+		if ($obj->getId() > 0) {
             $eventType = 'Update';
-        }
-        else
-        {
+        } else {
             $eventType = 'Insert';
         }
 
-        Core::notify( [&$obj], 'before' . $eventObjectName . $eventType );
+        Core::notify([&$obj], 'before' . $eventObjectName . $eventType);
 
         $objData = $obj->getObjectProperties();
-        unset( $objData['id'] );
+        unset($objData['id']);
 
-        $aRows = array_keys( $objData ); //Название свйоств (столбцов таблицы)
-        $aValues = array_values( $objData ); //Значения свйоств
-
+        $aRows = array_keys($objData); //Название свйоств (столбцов таблицы)
+        $aValues = array_values($objData); //Значения свйоств
 
         //Если этот элемент уже существует в базе данных
-		if ( $this->object->getId() )
-		{
+		if ($this->object->getId()) {
 			$queryStr = 'UPDATE ' . $this->table . ' SET ';
-
-			for ( $i = 0; $i < count( $objData ); $i++ )
-			{
-                $queryStr .= '`' . $aRows[$i] . '` = ' . $this->parseValue( $aValues[$i] );
-
-			    if ( $i + 1 < count( $objData ) )
-                {
+			for ($i = 0; $i < count($objData); $i++) {
+                $queryStr .= '`' . $aRows[$i] . '` = ' . $this->parseValue($aValues[$i]);
+			    if ($i + 1 < count($objData)) {
                     $queryStr .= ',';
                 }
-
                 $queryStr .= ' ';
 			}
-
 			$queryStr .= 'WHERE `id` = ' . $obj->getId() . ' ';
-		}
-		//Если это новый элемент
-		else 
-		{
+		} else { //Если это новый элемент
 			$queryStr = 'INSERT INTO ' . $this->table . '(';
-
-			for ( $i = 0; $i < count( $objData ); $i++ )
-			{
+			for ($i = 0; $i < count($objData); $i++) {
 			    $queryStr .= $aRows[$i];
-
-			    if ( $i + 1 < count( $objData ) )
-                {
+			    if ($i + 1 < count($objData)) {
                     $queryStr .= ',';
                 }
-
                 $queryStr .= ' ';
 			}
-
-
 			$queryStr .= ') VALUES(';
-
-			for ( $i = 0; $i < count( $objData ); $i++ )
-			{
-			    $queryStr .= $this->parseValue( $aValues[$i] );
-
-			    if ( $i + 1 < count( $objData ) )
-                {
+			for ($i = 0; $i < count($objData); $i++) {
+			    $queryStr .= $this->parseValue($aValues[$i]);
+			    if ($i + 1 < count($objData)) {
                     $queryStr .= ',';
                 }
-
                 $queryStr .= ' ';
 			}
-
 			$queryStr .= ') ';
 		}
 
-		if( self::isDebugSql() )
-		{
+		if (self::isDebugSql()) {
 			echo "<br>Строка запроса метода <b>save()</b>: ".$queryStr;
 		}
 
-		try
-		{
-			DB::instance()->query( $queryStr );
+		try {
+			DB::instance()->query($queryStr);
 		}
-		catch( PDOException $Exception )
-		{
+		catch (PDOException $Exception) {
 			echo $Exception->getMessage();
 		}
 
@@ -311,14 +273,11 @@ class Orm
          * Если объект только что был сохранен в таблицу то устанавливается значение
          * присвоенного уникального идентификатора для дальнейшей работы с объектом
          */
-		if( !$obj->getId() )
-		{
-            $obj->setId( intval( DB::instance()->lastInsertId() ) );
+		if (!$obj->getId()) {
+            $obj->setId(intval(DB::instance()->lastInsertId()));
 		}
 
-
-        Core::notify( [&$obj], 'after' . $eventObjectName . $eventType );
-
+        Core::notify([&$obj], 'after' . $eventObjectName . $eventType);
 		return $obj;
 	}
 
@@ -336,166 +295,114 @@ class Orm
          */
         $this->queryString = 'SELECT ';
 
-        //Выборка происходит только по колонкам таблицы объекта
-        if ( count( $this->select ) == 0 )
-        {
-            $tableRows = array_keys( $this->object->getObjectProperties() );
-
-            for ( $i = 0; $i < count( $tableRows ); $i++ )
-            {
+        if (count($this->select) == 0) { //Выборка происходит только по колонкам таблицы объекта
+            $tableRows = array_keys($this->object->getObjectProperties());
+            for ($i = 0; $i < count($tableRows); $i++) {
                 $row = $this->table . '.' . $tableRows[$i];
 
-                if ( in_array( $tableRows[$i], $this->forbiddenTags ) || in_array( $row, $this->forbiddenTags ) )
-                {
+                if (in_array($tableRows[$i], $this->forbiddenTags) || in_array($row, $this->forbiddenTags)) {
                     continue;
                 }
 
                 $this->queryString .= $row;
-
-                if ( $i + 1 < count( $tableRows ) )
-                {
+                if ($i + 1 < count($tableRows)) {
                     $this->queryString .= ',';
                 }
-
                 $this->queryString .= ' ';
             }
-        }
-        //Выбираемые колонки таблицы (таблиц) были заданы
-        else
-        {
-            for ( $i = 0; $i < count( $this->select ); $i++ )
-            {
-                if ( in_array( $this->select[$i], $this->forbiddenTags ) )
-                {
+        } else { //Выбираемые колонки таблицы (таблиц) были заданы
+            for ($i = 0; $i < count($this->select); $i++) {
+                if (in_array($this->select[$i], $this->forbiddenTags)) {
                     continue;
                 }
 
                 $this->queryString .= $this->select[$i];
-
-                if ( $i + 1 < count( $this->select ) )
-                {
+                if ($i + 1 < count($this->select)) {
                     $this->queryString .= ',';
                 }
-
                 $this->queryString .= ' ';
             }
         }
 
         //Дополнительные колонки таблицы для выборки
-        if ( count( $this->addSelecting ) > 0 )
-        {
-            for ( $i = 0; $i < count( $this->addSelecting ); $i++ )
-            {
+        if (count($this->addSelecting) > 0) {
+            for ($i = 0; $i < count($this->addSelecting); $i++) {
                 $this->queryString .= ', ' . $this->addSelecting[$i] . ' ';
             }
         }
-
 
         /**
          * Формирование списка таблиз из которых происходит выборка данных
          * Формирование значений для FROM
          */
         $this->queryString .= 'FROM ';
-
-        if ( count( $this->from ) == 0 )
-        {
+        if (count($this->from) == 0) {
             $this->queryString .= $this->table;
-        }
-        else
-        {
-            for ( $i = 0; $i < count( $this->from ); $i++ )
-            {
+        } else {
+            for ($i = 0; $i < count($this->from); $i++) {
                 $this->queryString .= $this->from[$i];
-
-                if ( $i + 1 < count( $this->from ) )
-                {
+                if ($i + 1 < count($this->from)) {
                     $this->queryString .= ',';
                 }
-
                 $this->queryString .= ' ';
             }
         }
 
-
         /**
          * Формирование всех JOIN-ов
          */
-        if ( count( $this->join ) > 0 )
-        {
-            foreach ( $this->join as $joining )
-            {
+        if (count($this->join) > 0) {
+            foreach ($this->join as $joining) {
                 $this->queryString .= ' ' . $joining->type . ' JOIN ';
                 $this->queryString .= $joining->table;
                 $this->queryString .= ' ON ' . $joining->conditions;
             }
         }
 
-
-        if ( $this->where != '' )
-        {
+        if ($this->where != '') {
             $this->queryString .= ' WHERE ' . $this->where;
         }
-
 
         /**
          * Формирование условий сортировки
          */
-        if ( count( $this->order ) > 0 )
-        {
+        if (count($this->order) > 0) {
             $this->queryString .= ' ORDER BY ';
-
-            $orderRows = array_keys( $this->order );
-            $orderSortings = array_values( $this->order );
-
-            for ( $i = 0; $i < count( $this->order ); $i++ )
-            {
+            $orderRows = array_keys($this->order);
+            $orderSortings = array_values($this->order);
+            for ($i = 0; $i < count($this->order); $i++) {
                 $this->queryString .= $orderRows[$i] . ' ' . $orderSortings[$i];
-
-                if ( $i + 1 < count( $this->order ) )
-                {
+                if ($i + 1 < count($this->order)) {
                     $this->queryString .= ',';
                 }
-
                 $this->queryString .= ' ';
             }
         }
 
-
-        if ( $this->limit != '' )
-        {
+        if ($this->limit != '') {
             $this->queryString .= ' LIMIT ' . $this->limit;
         }
 
-
-        if ( $this->offset != '' )
-        {
+        if ($this->offset != '') {
             $this->queryString .= ' OFFSET ' . $this->offset;
         }
-
 
         /**
          * Задание условий группировки
          */
-        if ( count( $this->groupBy ) > 0 )
-        {
+        if (count($this->groupBy) > 0) {
             $this->queryString .= ' GROUP BY ';
 
-            for ( $i = 0; $i < count( $this->groupBy ); $i++ )
-            {
+            for ($i = 0; $i < count($this->groupBy); $i++) {
                 $this->queryString .= $this->groupBy[$i];
-
-                if ( $i + 1 < count( $this->groupBy ) )
-                {
+                if ($i + 1 < count($this->groupBy)) {
                     $this->queryString .= ',';
                 }
-
                 $this->queryString .= ' ';
             }
         }
 
-
-        if ( $this->having != '' )
-        {
+        if ($this->having != '') {
             $this->queryString .= ' HAVING ' . $this->having;
         }
     }
@@ -507,15 +414,12 @@ class Orm
      * @param string $sql - стока SQL-запроса
      * @return mixed
      */
-    public function executeQuery( $sql )
+    public function executeQuery($sql)
     {
-        if ( self::isDebugSql() )
-        {
+        if (self::isDebugSql()) {
             echo "<br>Строка из метода <b>executeQuery()</b>: " . $sql;
         }
-
-        $result = DB::instance()->query( $sql );
-
+        $result = DB::instance()->query($sql);
         return $result;
     }
 
@@ -539,10 +443,8 @@ class Orm
         $this->join = [];
         $this->having = '';
         $this->offset = '';
-        //$this->leftJoin = "";
         $this->open = 0;
         $this->close = 0;
-
         return $this;
     }
 
@@ -555,7 +457,6 @@ class Orm
     public function getQueryString()
     {
         $this->setQueryString();
-
         return $this->queryString;
     }
 
@@ -570,21 +471,15 @@ class Orm
      * @param $value
      * @return string
      */
-    public function parseValue( $value )
+    public function parseValue($value)
     {
-        if ( is_object( $value ) && $value->type == 'unchanged' )
-        {
+        if (is_object($value) && $value->type == 'unchanged') {
             $val = $value->val;
-        }
-        elseif ( $value === 'NULL' || $value === null )
-        {
+        } elseif ($value === 'NULL' || $value === null) {
             $val = 'NULL';
-        }
-        else
-        {
+        } else {
             $val = '\'' . $value . '\'';
         }
-
         return $val;
     }
 
@@ -592,13 +487,11 @@ class Orm
     /**
      * Удаление Объекта из базы данных
      */
-    public function delete( $obj )
+    public function delete($obj)
     {
         $query = 'DELETE FROM ' . $this->table . ' WHERE id = ' . $obj->getId();
-        $this->executeQuery( $query );
-
-        if ( self::isDebugSql() )
-        {
+        DB::instance()->query( $query );
+        if (self::isDebugSql()) {
             echo "<br>Строка из метода <b>delete()</b>: " . $query;
         }
     }
@@ -620,27 +513,19 @@ class Orm
      * @param null $as - наименование результирующего столбца
 	 * @return self
 	 */
-	public function select( $aParams, $as = null )
+	public function select($aParams, $as = null)
 	{
-        if ( is_array( $aParams ) && count( $aParams ) > 0 )
-        {
-            foreach ( $aParams as $row )
-            {
+        if (is_array($aParams) && count($aParams) > 0) {
+            foreach ($aParams as $row) {
                 $this->select[] = $row;
             }
-        }
-        elseif ( is_string( $aParams ) )
-        {
+        } elseif (is_string($aParams)) {
             $select = $aParams;
-
-            if ( !is_null( $as ) && is_string( $as ) )
-            {
+            if (!is_null($as) && is_string($as)) {
                 $select .= ' AS ' . $as;
             }
-
             $this->select[] = $select;
         }
-
 		return $this;
 	}
 
@@ -651,17 +536,13 @@ class Orm
      * @param $tags
      * @return self
      */
-    public function forbiddenTags( $tags )
+    public function forbiddenTags($tags)
     {
-        if ( is_array( $tags ) )
-        {
-            $this->forbiddenTags = array_merge( $this->forbiddenTags, $tags );
-        }
-        elseif ( is_string( $tags ) )
-        {
+        if (is_array($tags)) {
+            $this->forbiddenTags = array_merge($this->forbiddenTags, $tags);
+        } elseif (is_string($tags)) {
             $this->forbiddenTags[] = $tags;
         }
-
         return $this;
     }
 
@@ -675,27 +556,19 @@ class Orm
      * @param null $as
      * @return self
      */
-	public function addSelect( $field, $as = null )
+	public function addSelect($field, $as = null)
     {
-        if ( is_array( $field ) && count( $field ) > 0 )
-        {
-            foreach ( $field as $row )
-            {
+        if (is_array($field) && count($field) > 0) {
+            foreach ($field as $row) {
                 $this->addSelecting[] = $row;
             }
-        }
-        elseif ( is_string( $field ) )
-        {
+        } elseif (is_string($field)) {
             $addSelect = $field;
-
-            if ( !is_null( $as ) && is_string( $as ) )
-            {
+            if (!is_null($as) && is_string($as)) {
                 $addSelect .= ' AS ' . $as;
             }
-
             $this->addSelecting[] = $addSelect;
         }
-
         return $this;
     }
 
@@ -707,27 +580,19 @@ class Orm
      * @param null $as
 	 * @return self
 	 */
-	public function from( $aTables, $as = null )
+	public function from($aTables, $as = null)
 	{
-		if ( is_array( $aTables ) )
-		{
-		    foreach ( $aTables as $table )
-            {
+		if (is_array($aTables)) {
+		    foreach ($aTables as $table) {
                 $this->from[] = $table;
             }
-		}
-		elseif ( is_string( $aTables ) )
-		{
+		} elseif (is_string($aTables)) {
 		    $from = $aTables;
-
-		    if ( !is_null( $as ) && is_string( $as ) )
-            {
+		    if (!is_null($as) && is_string($as)) {
                 $from .= ' AS ' . $as;
             }
-
             $this->from[] = $from;
 		}
-
 		return $this;
 	}
 
@@ -744,52 +609,35 @@ class Orm
      * @param $or
 	 * @return self
 	 */
-	public function where( $row, $operation, $value, $or = null )
+	public function where($row, $operation, $value, $or = null)
 	{
-        /**
-         * В случае операции IN
-         */
-        if ( ( $operation == 'in' || $operation == 'IN' ) && is_array( $value ) )
-        {
-            if ( is_null( $or ) || $or == 'and' || $or == 'AND' )
-            {
-                return $this->whereIn( $row, $value );
-            }
-            elseif ( $or == 'or' || $or == 'OR' )
-            {
-                return $this->orWhereIn( $row, $value );
+        //В случае операции IN
+        if (($operation == 'in' || $operation == 'IN') && is_array($value)) {
+            if (is_null($or) || $or == 'and' || $or == 'AND') {
+                return $this->whereIn($row, $value);
+            } elseif ($or == 'or' || $or == 'OR') {
+                return $this->orWhereIn($row, $value);
             }
         }
 
-
-        /**
-         * В случае операции OR
-         */
-        if ( $or == 'or' || $or == 'OR' )
-        {
-            $this->orWhere( $row, $operation, $value );
+        //В случае операции OR
+        if ($or == 'or' || $or == 'OR') {
+            $this->orWhere($row, $operation, $value);
         }
 
-        if ( $this->where != '' )
-        {
+        if ($this->where != '') {
             $this->where .= ' AND ';
         }
 
-
-        if ( $this->open != 0 )
-        {
-            for ( $i = 0; $i < $this->open; $i++ )
-            {
+        if ($this->open != 0) {
+            for ($i = 0; $i < $this->open; $i++) {
                 $this->where .= ' (';
             }
-
             $this->open = 0;
         }
 
-
         $this->where .= $row . ' ' . $operation . ' ';
-        $this->where .= $this->parseValue( $value ) . ' ';
-
+        $this->where .= $this->parseValue($value) . ' ';
         return $this;
 	}
 
@@ -802,28 +650,21 @@ class Orm
      * @param $value
      * @return self
      */
-    public function orWhere( $row, $condition, $value )
+    public function orWhere($row, $condition, $value)
     {
-        if ( $this->where != '' )
-        {
+        if ($this->where != '') {
             $this->where .= ' OR ';
         }
 
-
-        if ( $this->open != 0 )
-        {
-            for ( $i = 0; $i < $this->open; $i++ )
-            {
+        if ($this->open != 0) {
+            for ($i = 0; $i < $this->open; $i++) {
                 $this->where .= ' (';
             }
-
             $this->open = 0;
         }
 
-
         $this->where .= $row . ' ' . $condition . ' ';
-        $this->where .= $this->parseValue( $value ) . ' ';
-
+        $this->where .= $this->parseValue($value) . ' ';
         return $this;
     }
 
@@ -835,40 +676,29 @@ class Orm
      * @param $values
      * @return self
      */
-    public function whereIn( $row, $values )
+    public function whereIn($row, $values)
     {
-        if ( !is_array( $values ) )     return $this;
-        if ( count( $values ) == 0 )    return $this;
+        if (!is_array($values))     return $this;
+        if (count($values) == 0)    return $this;
 
-
-        if ( $this->where != '' )
-        {
+        if ($this->where != '') {
             $this->where .= ' AND ';
         }
 
-
-        if ( $this->open != 0 )
-        {
-            for ( $i = 0; $i < $this->open; $i++ )
-            {
+        if ($this->open != 0) {
+            for ($i = 0; $i < $this->open; $i++) {
                 $this->where .= ' (';
             }
-
             $this->open = 0;
         }
 
-
         $this->where .= $row . ' in(';
-
-        for ( $i = 0; $i < count( $values ); $i++ )
-        {
+        for ($i = 0; $i < count($values); $i++) {
             $i == 0
-                ?   $this->where .= $this->parseValue( $values[$i] )
-                :   $this->where .= ', ' . $this->parseValue( $values[$i] );
+                ?   $this->where .= $this->parseValue($values[$i])
+                :   $this->where .= ', ' . $this->parseValue($values[$i]);
         }
-
         $this->where .= ') ';
-
         return $this;
     }
 
@@ -880,29 +710,22 @@ class Orm
      * @param $values
      * @return self
      */
-    public function orWhereIn( $row, $values )
+    public function orWhereIn($row, $values)
     {
-        if ( !is_array( $values ) )     return $this;
-        if ( count( $values ) == 0 )    return $this;
+        if (!is_array($values))     return $this;
+        if (count($values) == 0)    return $this;
 
-
-        if ( $this->where != '' )
-        {
+        if ($this->where != '') {
             $this->where .= ' OR ';
         }
 
-
         $this->where .= $row . ' in(';
-
-        for ( $i = 0; $i < count( $values ); $i++ )
-        {
+        for ($i = 0; $i < count($values); $i++) {
             $i == 0
-                ?   $this->where .= $this->parseValue( $values[$i] )
-                :   $this->where .= ', ' . $this->parseValue( $values[$i] );
+                ?   $this->where .= $this->parseValue($values[$i])
+                :   $this->where .= ', ' . $this->parseValue($values[$i]);
         }
-
         $this->where .= ') ';
-
         return $this;
     }
 
@@ -916,32 +739,22 @@ class Orm
      * @param string $condition - условие (AND или OR)
      * @return self
      */
-    public function between( $param, $val1, $val2, $condition = 'AND' )
+    public function between($param, $val1, $val2, $condition = 'AND')
     {
-        if ( $this->where != '' )
-        {
+        if ($this->where != '') {
             $this->where .= $condition . ' ';
-
-            for ( $i = 0; $i < $this->open; $i++ )
-            {
+            for ($i = 0; $i < $this->open; $i++) {
                 $this->where .= ' (';
             }
-
             $this->open = 0;
-        }
-        else
-        {
-            for( $i = 0; $i < $this->open; $i++ )
-            {
+        } else {
+            for($i = 0; $i < $this->open; $i++) {
                 $this->where .= ' (';
             }
-
             $this->open = 0;
         }
-
 
         $this->where .= $param . ' BETWEEN \'' . $val1 . '\' AND \'' . $val2 . '\' ';
-
         return $this;
     }
 
@@ -954,20 +767,15 @@ class Orm
      * @param $order - порядок сортировки
 	 * @return self
 	 */
-	public function orderBy( $row, $order = 'ASC' )
+	public function orderBy($row, $order = 'ASC')
 	{
-		if ( is_array( $row ) )
-		{
-		    foreach ( $row as $column => $sorting )
-            {
+		if (is_array($row)) {
+		    foreach ($row as $column => $sorting) {
                 $this->order[$column] = $sorting;
             }
-		}
-		elseif ( is_string( $row ) && is_string( $order ) )
-		{
+		} elseif (is_string($row) && is_string($order)) {
 		    $this->order[$row] = $order;
 		}
-
 		return $this;
 	}
 
@@ -978,15 +786,12 @@ class Orm
      * @param $count - максимальное кол-во выбираемых строк
 	 * @return self
 	 */
-	public function limit( $count )
+	public function limit($count)
 	{
-		if ( !is_numeric( $count ) )
-        {
+		if (!is_numeric($count)) {
             return $this;
         }
-
 		$this->limit = $count;
-
 		return $this;
 	}
 
@@ -997,13 +802,11 @@ class Orm
      * @param $val - численное значение отступа
      * @return self
      */
-	public function offset( $val )
+	public function offset($val)
     {
-        if ( $this->offset == '' )
-        {
-            $this->offset = intval( $val );
+        if ($this->offset == '') {
+            $this->offset = intval($val);
         }
-
         return $this;
     }
 
@@ -1015,15 +818,13 @@ class Orm
      * @param $conditions - условия присоединения
 	 * @return self
 	 */
-	public function join( $table, $conditions )
+	public function join($table, $conditions)
 	{
 	    $joining = new stdClass();
 	    $joining->table = $table;
 	    $joining->type = 'INNER';
 	    $joining->conditions = $conditions;
-
 	    $this->join[] = $joining;
-
 		return $this;
 	}
 
@@ -1035,28 +836,24 @@ class Orm
      * @param $conditions - условия присоединения
      * @return self
      */
-	public function leftJoin( $table, $conditions )
+	public function leftJoin($table, $conditions)
     {
         $joining = new stdClass();
         $joining->table = $table;
         $joining->type = 'LEFT';
         $joining->conditions = $conditions;
-
         $this->join[] = $joining;
-
         return $this;
     }
 
 
-    public function rightJoin( $table, $conditions )
+    public function rightJoin($table, $conditions)
     {
         $joining = new stdClass();
         $joining->table = $table;
         $joining->type = 'RIGHT';
         $joining->conditions = $conditions;
-
         $this->join[] = $joining;
-
         return $this;
     }
 
@@ -1069,17 +866,13 @@ class Orm
      * @param $value - сравниваемое значение
      * @return self
      */
-    public function having( $row, $operation, $value )
+    public function having($row, $operation, $value)
     {
-        if ( $this->having != '' )
-        {
-            $this->having .= ' and ' . $row . ' ' . $operation . ' ' . $this->parseValue( $value );
+        if ($this->having != '') {
+            $this->having .= ' and ' . $row . ' ' . $operation . ' ' . $this->parseValue($value);
+        } else {
+            $this->having = $row . ' ' . $operation . ' ' . $this->parseValue($value);
         }
-        else
-        {
-            $this->having = $row . ' ' . $operation . ' ' . $this->parseValue( $value );
-        }
-
         return $this;
     }
 
@@ -1090,10 +883,9 @@ class Orm
      * @param $row - название колонки по которой производится группирповка
      * @return self
      */
-    public function groupBy( $row )
+    public function groupBy($row)
     {
         $this->groupBy[] = $row;
-
         return $this;
     }
 
@@ -1107,26 +899,23 @@ class Orm
 	{
 		$this->setQueryString();
 
-		if( self::isDebugSql() )
-		{
+		if (self::isDebugSql()) {
 			echo "<br>Строка запроса из метода <b>findAll()</b>: ".$this->queryString;
 		}
 
-		try
-		{
+		try {
 			$result = DB::instance()->query($this->queryString);
+			if (!$result) {
+			    return [];
+            }
 
-			if( !$result )    return [];
-
-            $this->class !== null
+            !is_null($this->class)
                 ?   $fetchClass = $this->class
                 :   $fetchClass = 'stdClass';
 
-			$result->setFetchMode( PDO::FETCH_CLASS, $fetchClass );
+			$result->setFetchMode(PDO::FETCH_CLASS, $fetchClass);
 			return $result->fetchAll();
-		}
-		catch( PDOException $Exception )
-		{
+		} catch(PDOException $Exception) {
 			echo $Exception->getMessage();
 			return [];
 		}
@@ -1142,41 +931,32 @@ class Orm
 	{
 		$this->setQueryString();
 
-		if( self::isDebugSql() )
-		{
+		if (self::isDebugSql()) {
 			echo "<br>Строка запроса из метода <b>find()</b>: ".$this->queryString;
 		}
 
-		try
-		{
-			$result = DB::instance()->query( $this->queryString );
-
-			if( $result == false )
-            {
+		try {
+			$result = DB::instance()->query($this->queryString);
+			if ($result == false) {
                 return null;
             }
 
-            $this->class !== null
+            !is_null($this->class)
                 ?   $fetchClass = $this->class
                 :   $fetchClass = 'stdClass';
 
-			$result->setFetchMode( PDO::FETCH_CLASS, $fetchClass );
+			$result->setFetchMode(PDO::FETCH_CLASS, $fetchClass);
 			$result = $result->fetch();
 
-			 if ( $result == false )
-             {
+			 if ($result == false) {
                  return null;
              }
-
              return $result;
-		}
-		catch( PDOException $Exception )
-		{
+		} catch(PDOException $Exception) {
 			echo $Exception->getMessage();
 			return null;
 		}
 	}
-
 
 
 /**
