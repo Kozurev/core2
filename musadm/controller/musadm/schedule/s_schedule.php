@@ -207,7 +207,9 @@ if ($action === 'getScheduleLessonPopup') {
 
     Core::factory('User_Controller');
     $UserController = new User_Controller(User::current());
+    $UserController->queryBuilder()->orderBy('surname', 'ASC');
     $Users = $UserController
+        ->groupId([ROLE_TEACHER, ROLE_CLIENT])
         ->isLimitedAreasAccess(true)
         ->isWithAreaAssignments(false)
         ->getUsers();
@@ -262,8 +264,6 @@ if ($action === 'teacherReport') {
         }
     }
 
-    //if ($Lesson->typeId() == )
-
     $Lesson->makeReport($date, $attendance, $attendanceClients);
     exit;
 }
@@ -303,13 +303,14 @@ if ($action === 'getclientList') {
             echo "<option value='" . $Group->getId() . "'>" . $Group->title() . "</option>";
         }
     } elseif ($type == 1 || $type == 3) {
-        $Users = User_Controller::factory()
-            ->queryBuilder()
-            ->where('active', '=', 1)
-            ->where('group_id', '=', 5)
-            ->where('subordinated', '=', $subordinated)
-            ->orderBy( 'surname', 'ASC')
-            ->findAll();
+        Core::factory('User_Controller');
+        $UserController = new User_Controller(User::current());
+        $UserController->queryBuilder()->orderBy('surname', 'ASC');
+        $Users = $UserController
+            ->groupId(ROLE_CLIENT)
+            ->isLimitedAreasAccess(true)
+            ->isWithAreaAssignments(false)
+            ->getUsers();
 
         foreach ($Users as $User) {
             echo "<option value='" . $User->getId() . "'>". $User->surname() . " " . $User->name() ."</option>";
