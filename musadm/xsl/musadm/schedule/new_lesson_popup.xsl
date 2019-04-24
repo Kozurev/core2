@@ -23,10 +23,8 @@
             });
         </script>
 
-
-
         <form name="createData" id="createData" action=".">
-            <div class="center"><h2>Добавление урока в <xsl:value-of select="schedule_type" /> расписание</h2></div>
+            <div class="center"><h3>Добавление урока в <xsl:value-of select="schedule_type" /> расписание</h3></div>
 
             <input type="hidden" value="{//timestep}" id="timestep" />
 
