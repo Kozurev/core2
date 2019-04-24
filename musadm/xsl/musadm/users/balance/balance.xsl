@@ -123,11 +123,11 @@
                         <tr>
                             <td colspan="3">
                                 <div class="row buttons-panel center">
-                                    <div>
-                                        <a class="btn btn-blue" onclick="newTaskPopup({user/id}, 'refreshUserTable')">
-                                            Добавить задачу
-                                        </a>
-                                    </div>
+                                    <!--<div>-->
+                                        <!--<a class="btn btn-blue" onclick="newTaskPopup({user/id}, 'refreshUserTable')">-->
+                                            <!--Добавить задачу-->
+                                        <!--</a>-->
+                                    <!--</div>-->
                                     <div>
                                         <a class="btn btn-orange" onclick="getScheduleAbsentPopup({user/id}, 1, getCurrentDate(), '')">
                                             Добавить период отстствия
