@@ -509,6 +509,8 @@ Core::attachObserver('afterScheduleLessonReportInsert', function($args) {
 
     $Report = $args[0];
     $Client = $Report->getClient();
+    $Lesson = Core::factory('Schedule_Lesson', $Report->lessonId());
+    //$LessonArea = Core::factory('Schedule_Area_Assignment')->getArea($Lesson);
 
     /**
      * Проверка остатка занятий у клиента
@@ -542,6 +544,7 @@ Core::attachObserver('afterScheduleLessonReportInsert', function($args) {
         if (is_null($isIssetTask)) {
             $Task = Task_Controller::factory()
                 ->date($tomorrow)
+                ->areaId($Lesson->areaId())
                 ->type(1)
                 ->associate($Client->getId())
                 ->save();
@@ -575,6 +578,7 @@ Core::attachObserver('afterScheduleLessonReportInsert', function($args) {
                 $Task = Task_Controller::factory()
                     ->date($tomorrow)
                     ->type(2)
+                    ->areaId($Lesson->areaId())
                     ->associate($Client->getId())
                     ->save();
 
