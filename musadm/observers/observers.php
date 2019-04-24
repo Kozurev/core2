@@ -591,7 +591,7 @@ Core::attachObserver('beforeTaskInsert', function($args) {
 
     if ($Task->associate() > 0 && $Task->areaId() == 0) {
         $Client = Core::factory('User', $Task->associate());
-        $ClientAreas = Core::factory('Schedule_Area_Assignment')->getAreas($Client);
+        $ClientAreas = Core::factory('Schedule_Area_Assignment')->getAreas($Client, false);
         if (count($ClientAreas) == 1) {
             $Area = $ClientAreas[0];
             $Task->areaId($Area->getId());
