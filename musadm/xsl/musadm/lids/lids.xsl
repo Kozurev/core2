@@ -1,5 +1,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+    <xsl:include href="areas_select.xsl"/>
+
     <xsl:template match="root">
         <section class="section-bordered">
             <xsl:if test="periods = 1">
@@ -28,8 +30,14 @@
 
             <xsl:if test="buttons-panel = 1">
                 <div class="row buttons-panel center">
+                    <xsl:call-template name="areas_row" />
+
                     <div>
                         <input class="form-control" type="number" id="search_id" placeholder="Номер лида" value="{lid_id}" />
+                    </div>
+
+                    <div>
+                        <input class="form-control" type="text" id="search_number" placeholder="Телефон" value="{number}" />
                     </div>
 
                     <div>

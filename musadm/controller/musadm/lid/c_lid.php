@@ -18,16 +18,31 @@ $today = date('Y-m-d');
 
 Core::factory('Lid_Controller');
 $LidController = new Lid_Controller(User::current());
+
+$areaId = Core_Array::Get('area_id', 0, PARAM_INT);
+if ($areaId !== 0) {
+    $forArea = Core::factory('Schedule_Area', $areaId);
+    $LidController->forAreas([$forArea]);
+    $LidController->isEnableCommonLids(false);
+}
+
+$phone = Core_Array::Get('phone', null, PARAM_STRING);
+if (!is_null($phone)) {
+    $LidController->appendFilter('number', $phone);
+    $LidController->addSimpleEntity('number', $phone);
+}
+
 $LidController
     ->periodFrom(
-        Core_Array::Get('date_from', $today, PARAM_STRING)
+        Core_Array::Get('date_from', $today, PARAM_DATE)
     )
     ->periodTo(
-        Core_Array::Get('date_to', $today, PARAM_STRING)
+        Core_Array::Get('date_to', $today, PARAM_DATE)
     )
     ->lidId(
         Core_Array::Get('lidid', null, PARAM_INT)
     )
+    ->isWithAreasAssignments(true)
     ->properties(true)
     ->addSimpleEntity(
         'is-director', User::checkUserAccess(['groups' => [ROLE_DIRECTOR]]) ? 1 : 0

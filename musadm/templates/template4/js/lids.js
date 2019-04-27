@@ -56,14 +56,18 @@ $(function () {
         .on('click', '.search', function(e) {
             e.preventDefault();
             loaderOn();
-            var lidId = $('#search_id').val();
-            if (lidId == '') {
-                $('#search_id').addClass('error');
+            var idInp = $('#search_id');
+            var numberInp = $('#search_number');
+            var lidId = idInp.val();
+            var number = numberInp.val();
+            if (lidId == '' && number == '') {
+                idInp.addClass('error');
+                numberInp.addClass('error');
                 alert('Введите номер лида в соответствующее поле');
                 loaderOff();
                 return false;
             }
-            findLid(lidId);
+            findLid(lidId, number);
         })
         .on('change', '.lid-area', function () {
             var areaId = $(this).val();
@@ -228,6 +232,7 @@ $(function () {
 function refreshLidTable() {
     var dateFrom = $("input[name=date_from]").val();
     var dateTo = $("input[name=date_to]").val();
+    var areaId = $('select[name=area_id]').val();
 
     $.ajax({
         type: 'GET',
@@ -236,7 +241,8 @@ function refreshLidTable() {
         data: {
             action: 'refreshLidTable',
             date_from: dateFrom,
-            date_to: dateTo
+            date_to: dateTo,
+            area_id: areaId
         },
         success: function (response) {
             $('.lids').html(response);
@@ -299,18 +305,21 @@ function editLidPopup(lidId) {
 
 
 /**
- * Поиск лида по id
+ * Поиск лида по id или номеру телефона
  *
  * @param id - id лида
+ * @param phone - номер телефона лида
  */
-function findLid(id) {
+function findLid(id, phone) {
+    loaderOn();
     $.ajax({
         type: 'GET',
         url: '',
         async: false,
         data: {
             action: 'refreshLidTable',
-            lidid: id
+            lidid: id,
+            phone: phone
         },
         success: function (responce) {
             $('.lids').html(responce);
