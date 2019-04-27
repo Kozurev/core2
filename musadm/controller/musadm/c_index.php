@@ -6,6 +6,7 @@
  * @date 18.03.2018 21:21
  * @version 20190221
  * @version 20190412
+ * @version 20190427
  */
 
 global $CFG;
@@ -40,11 +41,14 @@ if (User::checkUserAccess(['groups' => [ROLE_MANAGER]], $User)) {
     Core::factory('Lid_Controller');
     $LidController = new Lid_Controller($User);
     $LidController->isShowPeriods(false);
+    $LidController->isEnableCommonLids(false);
+    $LidController->isWithAreasAssignments(true);
 
     //Формирование столбца Задач
     Core::factory('Task_Controller');
     $TaskController = new Task_Controller(User::current());
     $TaskController
+        ->isWithAreasAssignments(true)
         ->isShowPeriods(false)
         ->isSubordinate(true)
         ->isLimitedAreasAccess(true)

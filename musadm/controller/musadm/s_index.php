@@ -5,6 +5,7 @@
  * @author Bad Wolf
  * @date 18.03.2018 21:21
  * @version 20190222
+ * @version 20190427
  */
 
 
@@ -170,8 +171,24 @@ if ($action === 'savePropertyValue') {
  */
 if ($action === 'refreshLidTable') {
     $LidController = new Lid_Controller($User);
+
+    $areaId = Core_Array::Get('area_id', 0, PARAM_INT);
+    if ($areaId !== 0) {
+        $forArea = Core::factory('Schedule_Area', $areaId);
+        $LidController->forAreas([$forArea]);
+        $LidController->isEnableCommonLids(false);
+    }
+
+    $phone = Core_Array::Get('phone', null, PARAM_STRING);
+    if (!is_null($phone)) {
+        $LidController->appendFilter('number', $phone);
+        $LidController->addSimpleEntity('number', $phone);
+    }
+
     $LidController
         ->lidId(Core_Array::Get('lidid', null, PARAM_INT))
+        ->isEnableCommonLids(false)
+        ->isWithAreasAssignments(true)
         ->isShowPeriods(false)
         ->show();
     exit;
@@ -183,7 +200,16 @@ if ($action === 'refreshLidTable') {
  */
 if ($action === 'refreshTasksTable') {
     $TaskController = new Task_Controller(User::current());
+
+    $areaId = Core_Array::Get('areaId', 0, PARAM_INT);
+    if ($areaId !== 0) {
+        $forArea = Core::factory('Schedule_Area', $areaId);
+        $TaskController->forAreas([$forArea]);
+        $TaskController->isEnableCommonTasks(false);
+    }
+
     $TaskController
+        ->isWithAreasAssignments(true)
         ->isShowPeriods(false)
         ->isSubordinate(true)
         ->isLimitedAreasAccess(true)
