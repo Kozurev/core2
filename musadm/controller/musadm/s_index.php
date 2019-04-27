@@ -183,6 +183,7 @@ if ($action === 'refreshLidTable') {
     if (!is_null($phone)) {
         $LidController->appendFilter('number', $phone);
         $LidController->addSimpleEntity('number', $phone);
+        $LidController->isPeriodControl(false);
     }
 
     $LidController

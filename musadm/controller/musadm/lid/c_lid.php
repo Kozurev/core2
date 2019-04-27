@@ -30,6 +30,7 @@ $phone = Core_Array::Get('phone', null, PARAM_STRING);
 if (!is_null($phone)) {
     $LidController->appendFilter('number', $phone);
     $LidController->addSimpleEntity('number', $phone);
+    $LidController->isPeriodControl(false);
 }
 
 $LidController
