@@ -1,6 +1,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:include href="task.xsl" />
+    <xsl:include href="areas_select.xsl" />
 
     <xsl:template match="root">
 
@@ -27,7 +28,11 @@
 
                     <div>
                         <a class="btn btn-red"
-                           onclick="refreshTasksTable($('input[name=date_from]').val(), $('input[name=date_to]').val())">
+                           onclick="refreshTasksTable(
+                                $('input[name=date_from]').val(),
+                                $('input[name=date_to]').val(),
+                                $('select[name=area_id]').val()
+                            )">
                             Показать
                         </a>
                     </div>
@@ -36,6 +41,8 @@
 
             <xsl:if test="buttons-panel = 1">
                 <div class="row buttons-panel">
+                    <xsl:call-template name="areas_row" />
+
                     <xsl:choose>
                         <xsl:when test="periods = 1">
                             <div>

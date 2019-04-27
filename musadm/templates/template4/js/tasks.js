@@ -148,14 +148,15 @@ function updateTaskArea(taskId, areaId) {
 }
 
 
-function refreshTasksTable(from, to) {
+function refreshTasksTable(from, to, areaId) {
     $.ajax({
         type: 'GET',
         url: '',
         data: {
             action: 'refreshTasksTable',
             date_from: from,
-            date_to: to
+            date_to: to,
+            areaId: areaId
         },
         success: function(response) {
             $('.tasks').html(response);

@@ -6,6 +6,7 @@
  * @author Kozurev Egor
  * @date 25.01.2019 17:00
  * @version 20190219
+ * @version 20190427
  * Class Task_Controller
  */
 class Task_Controller
@@ -98,6 +99,12 @@ class Task_Controller
 
 
     /**
+     * @var bool
+     */
+    private $isWithAreasAssignments = false;
+
+
+    /**
      * Филиалы для которых производится выборка
      *
      * @var array
@@ -130,16 +137,13 @@ class Task_Controller
     private $isEnableCommonTasks = true;
 
 
-
-
-
-    public function __construct( User $CurrentUser = null )
+    public function __construct(User $CurrentUser = null)
     {
         $this->User = $CurrentUser;
-
-        $this->TaskQuery = Core::factory( 'Task' )->queryBuilder()
-            ->orderBy( 'Task_Priority.priority', 'DESC' )
-            ->orderBy( 'associate' );
+        $this->TaskQuery = Core::factory('Task')
+            ->queryBuilder()
+            ->orderBy('Task_Priority.priority', 'DESC')
+            ->orderBy('associate');
     }
 
 
@@ -150,34 +154,28 @@ class Task_Controller
      * @param bool $isSubordinate
      * @return Task|null
      */
-    public static function factory( int $id = null, bool $isSubordinate = true )
+    public static function factory(int $id = null, bool $isSubordinate = true)
     {
-        if ( is_null( $id ) )
-        {
-            return Core::factory( 'Task' );
+        if (is_null($id)) {
+            return Core::factory('Task');
         }
 
-        $ResTask = Core::factory( 'Task' )
+        $ResTask = Core::factory('Task')
             ->queryBuilder()
-            ->where( 'id', '=', $id );
+            ->where('id', '=', $id);
 
-        if ( $isSubordinate === true )
-        {
+        if ($isSubordinate === true) {
             $AuthUser = User::current();
-
-            if ( is_null( $AuthUser ) )
-            {
+            if (is_null($AuthUser)) {
                 return null;
             }
 
             $Director = $AuthUser->getDirector();
-
-            if ( is_null( $Director ) )
-            {
+            if (is_null($Director)) {
                 return null;
             }
 
-            $ResTask->where( 'subordinated', '=', $Director->getId() );
+            $ResTask->where('subordinated', '=', $Director->getId());
         }
 
         return $ResTask->find();
@@ -197,7 +195,7 @@ class Task_Controller
      * @param bool $isEnable
      * @return Task_Controller
      */
-    public function isShowPeriods( bool $isEnable )
+    public function isShowPeriods(bool $isEnable)
     {
         $this->isShowPeriods = $isEnable;
         return $this;
@@ -208,7 +206,7 @@ class Task_Controller
      * @param bool $isEnable
      * @return Task_Controller
      */
-    public function isShowButtons( bool $isEnable )
+    public function isShowButtons(bool $isEnable)
     {
         $this->isShowButtons = $isEnable;
         return $this;
@@ -219,7 +217,7 @@ class Task_Controller
      * @param bool $isSubordinate
      * @return Task_Controller
      */
-    public function isSubordinate( bool $isSubordinate )
+    public function isSubordinate(bool $isSubordinate)
     {
         $this->isSubordinate = $isSubordinate;
         return $this;
@@ -230,7 +228,7 @@ class Task_Controller
      * @param string $from
      * @return Task_Controller
      */
-    public function periodFrom( $from )
+    public function periodFrom($from)
     {
         $this->periodFrom = $from;
         return $this;
@@ -241,7 +239,7 @@ class Task_Controller
      * @param string $to
      * @return Task_Controller
      */
-    public function periodTo( $to )
+    public function periodTo($to)
     {
         $this->periodTo = $to;
         return $this;
@@ -252,7 +250,7 @@ class Task_Controller
      * @param bool $isEnable
      * @return Task_Controller
      */
-    public function isPeriodControl( bool $isEnable )
+    public function isPeriodControl(bool $isEnable)
     {
         $this->isPeriodControl = $isEnable;
         return $this;
@@ -263,9 +261,9 @@ class Task_Controller
      * @param null $taskId
      * @return Task_Controller
      */
-    public function taskId( $taskId = null )
+    public function taskId($taskId = null)
     {
-        $this->taskId = intval( $taskId );
+        $this->taskId = intval($taskId);
         return $this;
     }
 
@@ -274,9 +272,17 @@ class Task_Controller
      * @param bool $isLimited
      * @return Task_Controller
      */
-    public function isLimitedAreasAccess( bool $isLimited )
+    public function isLimitedAreasAccess(bool $isLimited)
     {
         $this->isLimitedAreasAccess = $isLimited;
+        return $this;
+    }
+
+
+
+    public function isWithAreasAssignments(bool $isWithAreasAssignments)
+    {
+        $this->isWithAreasAssignments = $isWithAreasAssignments;
         return $this;
     }
 
@@ -285,17 +291,14 @@ class Task_Controller
      * @param array $Areas
      * @return Task_Controller
      */
-    public function forAreas( array $Areas )
+    public function forAreas(array $Areas)
     {
-        foreach ( $Areas as $Area )
-        {
-            if ( !is_object( $Area ) )
-            {
+        foreach ($Areas as $Area) {
+            if (!is_object($Area)) {
                 continue;
             }
 
-            if ( get_class( $Area ) === 'Schedule_Area' && $Area->getId() > 0 )
-            {
+            if (get_class($Area) === 'Schedule_Area' && $Area->getId() > 0) {
                 $this->forAreas[] = $Area;
             }
         }
@@ -308,7 +311,7 @@ class Task_Controller
      * @param bool $isEnableCommonTasks
      * @return Task_Controller
      */
-    public function isEnableCommonTasks( bool $isEnableCommonTasks )
+    public function isEnableCommonTasks(bool $isEnableCommonTasks)
     {
         $this->isEnableCommonTasks = $isEnableCommonTasks;
         return $this;
@@ -322,12 +325,11 @@ class Task_Controller
      * @param string $entityValue - значение тэга
      * @return Task_Controller
      */
-    public function addSimpleEntity( string $entityName, string $entityValue )
+    public function addSimpleEntity(string $entityName, string $entityValue)
     {
-        $this->simpleEntities[] = Core::factory( 'Core_Entity' )
-            ->_entityName( $entityName )
-            ->_entityValue( $entityValue );
-
+        $this->simpleEntities[] = Core::factory('Core_Entity')
+            ->_entityName($entityName)
+            ->_entityValue($entityValue);
         return $this;
     }
 
@@ -336,7 +338,7 @@ class Task_Controller
      * @param string $xslPath
      * @return Task_Controller
      */
-    public function xsl( string $xslPath )
+    public function xsl(string $xslPath)
     {
         $this->xsl = $xslPath;
         return $this;
@@ -353,83 +355,65 @@ class Task_Controller
     public function getTasks()
     {
         //Поиск конкретной задачи
-        if ( $this->taskId !== null )
-        {
-            $this->TaskQuery->where( 'Task.id', '=', $this->taskId );
+        if (!is_null($this->taskId)) {
+            $this->TaskQuery->where('Task.id', '=', $this->taskId);
         }
 
         //Задание условия принадлежности той же организации что и пользователь
-        if ( $this->isSubordinate === true && $this->User !== null )
-        {
+        if ($this->isSubordinate === true && !is_null($this->User)) {
             $subordinated = $this->User->getDirector()->getId();
-            $this->TaskQuery->where( 'subordinated', '=', $subordinated );
+            $this->TaskQuery->where('subordinated', '=', $subordinated);
         }
 
         //Задание условий принадлежности филлиалам
         $areasIds = [];
-
-        if ( count( $this->forAreas ) > 0 )
-        {
-            foreach ( $this->forAreas as $Area )
-            {
+        if (count($this->forAreas) > 0) {
+            foreach ($this->forAreas as $Area) {
                 $areasIds[] = $Area->getId();
             }
-        }
-        elseif( $this->isLimitedAreasAccess === true && $this->User !== null && $this->User->groupId() !== 6 )
-        {
-            $UserAreas = Core::factory( 'Schedule_Area_Assignment' )->getAreas( $this->User, true );
-
-            foreach ( $UserAreas as $Area )
-            {
+        } elseif ($this->isLimitedAreasAccess === true && !is_null($this->User) && $this->User->groupId() !== ROLE_DIRECTOR) {
+            $UserAreas = Core::factory('Schedule_Area_Assignment')->getAreas($this->User, true);
+            foreach ($UserAreas as $Area) {
                 $areasIds[] = $Area->getId();
             }
         }
 
-        if ( $this->isEnableCommonTasks === true )
-        {
+        if ($this->isEnableCommonTasks === true) {
             $areasIds[] = 0;
         }
 
-        if ( ( $this->isLimitedAreasAccess === true || count( $this->forAreas ) > 0 ) && $this->User->groupId() !== 6 )
-        {
-            $this->TaskQuery->whereIn( 'area_id', $areasIds );
+        if ((($this->isLimitedAreasAccess === true && $this->User->groupId() !== ROLE_DIRECTOR) || count($this->forAreas) > 0)) {
+            $this->TaskQuery->whereIn('area_id', $areasIds);
         }
 
         //Задание условий временного промежутка
-        if ( $this->isPeriodControl === true && $this->taskId === null )
-        {
-            if ( $this->periodFrom !== null )
-            {
-                $this->TaskQuery->where( 'date', '>=', $this->periodFrom );
-            }
-
-            if( $this->periodTo !== null )
-            {
-                $this->TaskQuery->where( 'date', '<=', $this->periodTo );
-            }
+        if ($this->isPeriodControl === true && is_null($this->taskId)) {
             //задачи на сегодняшний день
-            if ( $this->periodFrom === null && $this->periodTo === null )
-            {
-                $today = date( 'Y-m-d' );
+            if (is_null($this->periodFrom)&& is_null($this->periodTo)) {
+                $today = date('Y-m-d');
                 $this->TaskQuery
-                    ->where( 'date', '<=', $today )
+                    ->where('date', '<=', $today)
                     ->open()
-                    ->where( 'done', '=', 0 )
-                    ->orWhere( 'done_date', '=', $today )
+                    ->where('done', '=', 0)
+                    ->orWhere('done_date', '=', $today)
                     ->close();
+            } else {
+                if (!is_null($this->periodFrom)) {
+                    $this->TaskQuery->where('date', '>=', $this->periodFrom);
+                }
+                if (!is_null($this->periodTo)) {
+                    $this->TaskQuery->where('date', '<=', $this->periodTo);
+                }
             }
         }
 
-        if ( $this->User !== null && $this->User->groupId() === 5 )
-        {
-            $this->TaskQuery->where( 'associate', '=', $this->User->getId() );
+        if (!is_null($this->User) && $this->User->groupId() === ROLE_CLIENT) {
+            $this->TaskQuery->where('associate', '=', $this->User->getId());
         }
-
 
         $Tasks = $this->TaskQuery
-            ->leftJoin( 'Task_Priority', 'Task_Priority.id = Task.priority_id' )
+            ->leftJoin('Task_Priority', 'Task_Priority.id = Task.priority_id')
             ->findAll();
-
 
         //массив идентификаторов всех наденных задач
         $tasksIds = [];
@@ -437,95 +421,65 @@ class Task_Controller
         //массв идентификаторов пользователей (клиентов) с которыми связаны задачи
         $associateIds = [];
 
-        foreach ( $Tasks as $Task )
-        {
+        foreach ($Tasks as $Task) {
             $tasksIds[] = $Task->getId();
-
-            if ( !in_array( $Task->associate(), $associateIds ) )
-            {
+            if (!in_array($Task->associate(), $associateIds)) {
                 $associateIds[] = $Task->associate();
             }
         }
 
-
-        /**
-         * Поиск комментариев для всех найденных задач
-         */
-        $Notes = Core::factory( 'Task_Note' )
+        //Поиск комментариев для всех найденных задач
+        $Notes = Core::factory('Task_Note')
             ->queryBuilder()
-            ->addSelect( ['usr.name AS name', 'usr.surname AS surname'] )
-            ->whereIn( 'task_id', $tasksIds )
-            ->leftJoin( 'User AS usr', 'author_id = usr.id' )
-            ->orderBy( 'date', 'DESC' )
+            ->addSelect(['usr.name AS name', 'usr.surname AS surname'])
+            ->whereIn('task_id', $tasksIds)
+            ->leftJoin('User AS usr', 'author_id = usr.id')
+            ->orderBy('date', 'DESC')
             ->findAll();
 
-        foreach ( $Notes as $Note )
-        {
-            $createNoteTime = strtotime( $Note->date() );
-
-            date( 'H:i', $createNoteTime ) == '00:00'
+        foreach ($Notes as $Note) {
+            $createNoteTime = strtotime($Note->date());
+            date('H:i', $createNoteTime) == '00:00'
                 ?   $dateFormat = 'd.m.y'
                 :   $dateFormat = 'd.m.y H:i';
-
-            $Note->date( date( $dateFormat, $createNoteTime ) );
+            $Note->date(date($dateFormat, $createNoteTime));
         }
 
-
-        /**
-         * Поиск пользователей (клиентов) с которыми связана задача
-         */
-        $AssociateUsers = Core::factory( 'User' )
+        //Поиск пользователей (клиентов) с которыми связана задача
+        $AssociateUsers = Core::factory('User')
             ->queryBuilder()
-            ->whereIn( 'id', $associateIds )
-            ->orderBy( 'surname', 'ASC' );
-
-        if ( $this->isSubordinate === true && $this->User !== null )
-        {
-            $AssociateUsers->where( 'subordinated', '=', $subordinated );
+            ->whereIn('id', $associateIds)
+            ->orderBy('surname', 'ASC');
+        if ($this->isSubordinate === true && !is_null($this->User)) {
+            $AssociateUsers->where('subordinated', '=', $subordinated);
         }
-
         $AssociateUsers = $AssociateUsers->findAll();
-
 
         /**
          * Добавление к задачам найденные связанные с ними сущьности:
          * комментарии и прикрепленные пользователи
          */
-        foreach ( $Tasks as $Task )
-        {
-            /**
-             * Добавление к задаче всех её комментариев
-             */
-            $TaskComments = Core::factory( 'Core_Entity' )->_entityName( 'comments' );
-
-            foreach ( $Notes as $key => $Note )
-            {
-                if ( $Task->getId() === $Note->taskId() )
-                {
-                    $TaskComments->addEntity( $Note );
-                    unset ( $Notes[$key] );
+        foreach ($Tasks as $Task) {
+            //Добавление к задаче всех её комментариев
+            $TaskComments = Core::factory('Core_Entity')->_entityName('comments');
+            foreach ($Notes as $key => $Note) {
+                if ($Task->getId() === $Note->taskId()) {
+                    $TaskComments->addEntity($Note);
+                    unset ($Notes[$key]);
                 }
             }
+            $Task->addEntity($TaskComments);
 
-            $Task->addEntity( $TaskComments );
-
-
-            /**
-             * Добавление к задаче связанного с ней пользователя
-             */
-            if ( $Task->associate() !== 0 )
-            {
-                foreach ( $AssociateUsers as $User )
-                {
-                    if ( $Task->associate() === $User->getId() )
-                    {
-                        $Task->addEntity( $User );
+            //Добавление к задаче связанного с ней пользователя
+            if ($Task->associate() !== 0) {
+                foreach ($AssociateUsers as $User) {
+                    if ($Task->associate() === $User->getId()) {
+                        $Task->addEntity($User);
                         break;
                     }
                 }
             }
         }
-
 
         return $Tasks;
     }
@@ -538,57 +492,55 @@ class Task_Controller
      * @param bool $isEcho
      * @return string;
      */
-    public function show( bool $isEcho = true )
+    public function show(bool $isEcho = true)
     {
         global $CFG;
-
-        $OutputXml = Core::factory( 'Core_Entity' )
-            ->addSimpleEntity( 'wwwroot', $CFG->rootdir )
+        $OutputXml = Core::factory('Core_Entity')
+            ->addSimpleEntity('wwwroot', $CFG->rootdir)
+            ->addEntities($this->getTasks())
             ->addEntities(
-                $this->getTasks()
+                Core::factory('Schedule_Area')
+                    ->getList($this->isSubordinate)
             )
             ->addEntities(
-                Core::factory( 'Schedule_Area' )->getList( $this->isSubordinate )
-            )
-            ->addEntities(
-                Core::factory( 'Task_Priority' )
+                Core::factory('Task_Priority')
                     ->queryBuilder()
-                    ->orderBy( 'priority', 'DESC' )
+                    ->orderBy('priority', 'DESC')
                     ->findAll()
             )
-            ->xsl( $this->xsl );
-
+            ->xsl($this->xsl);
 
         //Условие вывода панели с указанием периода
         $this->isShowPeriods === true
-            ?   $OutputXml->addSimpleEntity( 'periods', '1' )
-            :   $OutputXml->addSimpleEntity( 'periods', '0' );
+            ?   $OutputXml->addSimpleEntity('periods', '1')
+            :   $OutputXml->addSimpleEntity('periods', '0');
 
         //Условие вывода панели с кнопками
         $this->isShowButtons === true
-            ?   $OutputXml->addSimpleEntity( 'buttons-panel', '1' )
-            :   $OutputXml->addSimpleEntity( 'buttons-panel', '0' );
+            ?   $OutputXml->addSimpleEntity('buttons-panel', '1')
+            :   $OutputXml->addSimpleEntity('buttons-panel', '0');
 
         //Добавление кастомных тэгов
-        foreach ( $this->simpleEntities as $Entity )
-        {
-            $OutputXml->addEntity( $Entity );
+        foreach ($this->simpleEntities as $Entity) {
+            $OutputXml->addEntity($Entity);
         }
 
-
-        if ( $this->periodFrom !== null )
-        {
-            $OutputXml->addSimpleEntity( 'date_from', $this->periodFrom );
+        if ($this->isWithAreasAssignments == true && !is_null($this->User)) {
+            $UserAreas = Core::factory('Schedule_Area_Assignment')->getAreas($this->User);
+            $OutputXml->addEntities($UserAreas ,'assignment_areas');
         }
 
-        if ( $this->periodTo !== null )
-        {
-            $OutputXml->addSimpleEntity( 'date_to', $this->periodTo );
+        if (!is_null($this->periodFrom)) {
+            $OutputXml->addSimpleEntity('date_from', $this->periodFrom);
+        }
+        if (!is_null($this->periodTo)) {
+            $OutputXml->addSimpleEntity('date_to', $this->periodTo);
         }
 
+        if (!is_null($this->forAreas) && count($this->forAreas) == 1) {
+            $OutputXml->addSimpleEntity('current_area', $this->forAreas[0]->getId());
+        }
 
-        return $OutputXml->show( $isEcho );
+        return $OutputXml->show($isEcho);
     }
-
-
 }

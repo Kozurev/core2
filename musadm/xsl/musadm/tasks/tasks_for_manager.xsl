@@ -24,7 +24,11 @@
 
                 <div class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-1 col-md-offset-1 col-xs-12">
                     <a class="btn btn-red"
-                       onclick="refreshTasksTable($('input[name=date_from]').val(), $('input[name=date_to]').val())">
+                       onclick="refreshTasksTable(
+                            $('input[name=date_from]').val(),
+                            $('input[name=date_to]').val(),
+                            $('select[name=area_id]').val()
+                        )">
                         Показать
                     </a>
                 </div>
