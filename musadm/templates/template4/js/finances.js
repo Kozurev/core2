@@ -2,9 +2,10 @@ $(function(){
     $("body")
         .on("click", ".finances_show", function(e){
             loaderOn();
-            var dateFrom = $("input[name=date_from]").val();
-            var dateTo = $("input[name=date_to]").val();
-            showFinancesHistory(dateFrom, dateTo);
+            var dateFrom = $('input[name=date_from]').val();
+            var dateTo = $('input[name=date_to]').val();
+            var areaId = $('select[name=area_id]').val();
+            showFinancesHistory(dateFrom, dateTo, areaId);
         })
         .on("click", ".finances_payment", function(){
             editPaymentPopup(0, "payment");
@@ -151,36 +152,23 @@ $(function(){
 });
 
 
-// function saveCustomPayment(summ, note) {
-//     closePopup();
-//
-//     $.ajax({
-//         type: "GET",
-//         url: "",
-//         data: {
-//             action: "saveCustomPayment",
-//             summ: summ,
-//             note: note
-//         },
-//         success: function(responce){
-//             $(".finances_show").click();
-//         }
-//     });
-// }
-
-
-function showFinancesHistory(periodFrom, periodTo) {
+/**
+ * @param periodFrom
+ * @param periodTo
+ * @param areaId
+ */
+function showFinancesHistory(periodFrom, periodTo, areaId) {
     $.ajax({
-        type: "GET",
-        url: "",
+        type: 'GET',
+        url: '',
         data: {
-            action: "show",
+            action: 'show',
             date_from: periodFrom,
-            date_to: periodTo
+            date_to: periodTo,
+            area_id: areaId
         },
-        success: function(responce){
-            $(".finances").empty();
-            $(".finances").append(responce);
+        success: function(response) {
+            $('.finances').html(response);
             loaderOff();
         }
     });
@@ -192,14 +180,14 @@ function showFinancesHistory(periodFrom, periodTo) {
  */
 function showFinancesTypes() {
     $.ajax({
-        type: "GET",
-        url: root + "/finances",
+        type: 'GET',
+        url: root + '/finances',
         data: {
-            action: "getPaymentTypesPopup"
+            action: 'getPaymentTypesPopup'
         },
         success: function(response) {
             loaderOff();
-            showPopup( response );
+            showPopup(response);
         }
     });
 }

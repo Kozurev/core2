@@ -1,31 +1,33 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:include href="rate_config.xsl" />
-
+    <xsl:include href="areas_select.xsl" />
 
     <xsl:template match="root">
 
         <section>
             <div class="row finances-calendar">
-                <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                <div>
                     <h4>Период с:</h4>
                 </div>
 
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                <div>
                     <input type="date" class="form-control" name="date_from" value="{date_from}"/>
                 </div>
 
-                <div class="right col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                <div>
                     <h4>по:</h4>
                 </div>
 
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                <div>
                     <input type="date" class="form-control" name="date_to" value="{date_to}"/>
                 </div>
 
-                <div class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-1 col-md-offset-1 col-xs-12">
-                    <a class="btn btn-green finances_show" >Показать</a>
+                <div>
+                    <a class="btn btn-green finances_show">Показать</a>
                 </div>
+
+                <xsl:call-template name="areas_row" />
             </div>
         </section>
 

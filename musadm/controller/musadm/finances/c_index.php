@@ -5,6 +5,7 @@
  * @author BadWolf
  * @date 21.05.2018 12:06
  * @version 20190410
+ * @version 20190427
  */
 
 $dateFormat = 'Y-m-d';
@@ -12,6 +13,7 @@ $date = date($dateFormat);
 
 $dateFrom = Core_Array::Get('date_from', $date, PARAM_DATE);
 $dateTo =   Core_Array::Get('date_to', $date, PARAM_DATE);
+$areaId =   Core_Array::Get('area_id', 0, PARAM_INT);
 $Director = User::current()->getDirector();
 $subordinated = $Director->getId();
 
@@ -62,6 +64,11 @@ if ($dateFrom == $dateTo) {
         ->where('datetime', '<=', $dateTo);
 }
 
+if ($areaId !== 0) {
+    $Payments->queryBuilder()
+        ->where('area_id', '=', $areaId);
+}
+
 $Payments = $Payments->findAll();
 
 //Поступления за период
@@ -101,6 +108,7 @@ Core::factory('Core_Entity')
     ->addEntities($LessonTypes)
     ->addEntities($PaymentTypes)
     ->addEntities($PaymentAreas)
+    ->addSimpleEntity('current_area', $areaId)
     ->addSimpleEntity('date_from', $dateFrom)
     ->addSimpleEntity('date_to', $dateTo)
     ->addSimpleEntity('total_summ', $summ)
