@@ -36,7 +36,7 @@ class Task_Note extends Core_Entity
      *
      * @var int
      */
-    protected $author_id = 0;
+    protected $author_id;
 
 
     /**
