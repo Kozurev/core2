@@ -5,10 +5,16 @@
  * @author BadWolf
  * @date 30.01.2019 13:36
  * @version 20190323
+ * @version 20190427
  * Class Lid_Controller
  */
 class Lid_Controller
 {
+
+    //Тип фильтров
+    const FILTER_STRICT = 'strict';
+    const FILTER_NOT_STRICT = 'not-strict';
+
 
     /**
      * Объект пользователя для которого происходит выборка лидов
@@ -120,6 +126,18 @@ class Lid_Controller
 
 
     /**
+     * @var bool
+     */
+    private $isEnableCommonLids = true;
+
+
+    /**
+     * @var bool
+     */
+    private $isWithAreasAssignments = false;
+
+
+    /**
      * Филиалы для которых производится выборка
      *
      * @var array
@@ -135,6 +153,27 @@ class Lid_Controller
      * @var array|null
      */
     private $properties = null;
+
+
+    /**
+     * Список фильтров по типу ключ - название свойства => значение - искомое згначение
+     *
+     * @var array|null
+     */
+    private $filter;
+
+
+    /**
+     * Тип фильтрации: мягкий или строгий
+     * Мягкая фильтрация - частичное совпадение существующего и искомого значения
+     * Строгая фильтрация - полное совпадение существующего и искомого значения
+     * Свойство принимает только значение одной из констант с префиксом 'FILTER_'
+     *
+     * TODO: для значений доп. свойств пока что применяется только строгая фильтрация. Надо бы потом поправить
+     *
+     * @var string
+     */
+    private $filterType = self::FILTER_NOT_STRICT;
 
 
     /**
@@ -288,6 +327,26 @@ class Lid_Controller
     }
 
     /**
+     * @param bool $isEnableCommonLids
+     * @return Lid_Controller
+     */
+    public function isEnableCommonLids(bool $isEnableCommonLids)
+    {
+        $this->isEnableCommonLids = $isEnableCommonLids;
+        return $this;
+    }
+
+    /**
+     * @param bool $isWithAreasAssignments
+     * @return Lid_Controller
+     */
+    public function isWithAreasAssignments(bool $isWithAreasAssignments)
+    {
+        $this->isWithAreasAssignments = $isWithAreasAssignments;
+        return $this;
+    }
+
+    /**
      * @param int $lidId
      * @return Lid_Controller
      */
@@ -395,6 +454,35 @@ class Lid_Controller
     }
 
     /**
+     * @param string $paramName
+     * @param $searchingValue
+     * @return Lid_Controller
+     */
+    public function appendFilter(string $paramName, $searchingValue)
+    {
+        $this->filter[$paramName][] = $searchingValue;
+        return $this;
+    }
+
+    /**
+     * @param string $filterType
+     * @return Lid_Controller
+     */
+    public function filterType(string $filterType)
+    {
+        $existingTypes = [
+            self::FILTER_STRICT,
+            self::FILTER_NOT_STRICT
+        ];
+
+        if (!in_array($filterType, $existingTypes)) {
+            $this->filterType = $filterType;
+        }
+
+        return $this;
+    }
+
+    /**
      * Поиск лидов по заданным параметрам
      *
      * @return array
@@ -416,11 +504,9 @@ class Lid_Controller
             if (!is_null($this->periodFrom)) {
                 $this->LidQuery->where('control_date', '>=', $this->periodFrom);
             }
-
             if (!is_null($this->periodTo)) {
                 $this->LidQuery->where('control_date', '<=', $this->periodTo);
             }
-
             if (is_null($this->periodFrom) && is_null($this->periodTo)) {
                 $this->LidQuery->where('control_date', '=', date('Y-m-d'));
             }
@@ -429,20 +515,111 @@ class Lid_Controller
         //Формирование условий выборки лидов по филиалам
         if (count($this->forAreas) > 0) {
             $ForAreas = $this->forAreas;
-        } elseif ($this->isLimitedAreasAccess === true && !is_null($this->User) && $this->User->groupId() !== 6) {
+        } elseif ($this->isLimitedAreasAccess === true && !is_null($this->User) && $this->User->groupId() !== ROLE_DIRECTOR) {
             $ForAreas = Core::factory('Schedule_Area_Assignment')
                 ->getAreas($this->User, true);
+        } else {
+            $ForAreas = [];
         }
 
-        if ($this->isLimitedAreasAccess === true && $this->User->groupId() !== ROLE_DIRECTOR) {
-            $this->LidQuery->open()
-                ->where('area_id', '=', 0);
-
-            foreach ($ForAreas as $Area) {
-                $this->LidQuery->orWhere('area_id', '=', $Area->getId());
+        if (count($ForAreas) > 0) {
+            $areasIds = [];
+            foreach($ForAreas as $Area) {
+                $areasIds[] = $Area->getId();
             }
 
-            $this->LidQuery->close();
+            if ($this->isEnableCommonLids == true) {
+                $this->LidQuery->open()
+                    ->where('area_id', '=', 0)
+                    ->orWhereIn('area_id', $areasIds)
+                    ->close();
+            } else {
+                $this->LidQuery->whereIn('area_id', $areasIds);
+            }
+        }
+
+        //Фильтры
+        if (!is_null($this->filter)) {
+            /**
+             * Массив параметров присоеденяемых таблиц со значениями доп. свйоств где:
+             *  ключ: название присоеденяемой таблицы
+             *  ['as']: синоним таблицы (Property_Bool => prop_bool)
+             *  ['propid']: массив идентификаторов свойств
+             */
+            $joins = [];
+
+            foreach ($this->filter as $paramName => $values) {
+                //По доп. свойствам
+                if (strpos($paramName, 'property_') !== false) {
+                    $propertyId = explode('property_', $paramName)[1];
+                    $Property = Core::factory('Property', $propertyId);
+                    if (is_null($Property)) {
+                        continue;
+                    }
+
+                    $propTableName = 'Property_' . ucfirst($Property->type());
+                    $propTableSynonym = 'prop_' . $Property->type();
+                    $propColumn = $Property->type() == 'list'
+                        ?   $propTableSynonym . '.value_id'
+                        :   $propTableSynonym . '.value';
+
+                    $joins[$propTableName]['as'] = $propTableSynonym;
+                    $joins[$propTableName]['propid'][] = $Property->getId();
+
+                    if (in_array($Property->defaultValue(), $values)) {
+                        $this->LidQuery
+                            ->open()
+                            ->where($propColumn, 'IS', 'NULL')
+                            ->orWhereIn($propColumn, $values)
+                            ->close();
+                    } else {
+                        $this->LidQuery->whereIn($propColumn, $values);
+                    }
+
+                    continue;
+                }
+
+                //По свойствам пользователя
+                if (count($values) == 1) {
+                    if ($this->filterType === self::FILTER_STRICT) {
+                        $this->LidQuery->where($paramName, '=', $values[0]);
+                    } elseif ($this->filterType === self::FILTER_NOT_STRICT) {
+                        $this->LidQuery
+                            ->open()
+                            ->where($paramName, 'LIKE', "%$values[0]%")
+                            ->orWhere($paramName, 'LIKE', "$values[0]%")
+                            ->orWhere($paramName, 'LIKE', "%$values[0]")
+                            ->orWhere($paramName, '=', $values[0])
+                            ->close();
+                    }
+                } elseif (count($values) > 1) {
+                    if ($this->filterType === self::FILTER_STRICT) {
+                        $this->LidQuery->whereIn($paramName, $values);
+                    } elseif ($this->filterType === self::FILTER_NOT_STRICT) {
+                        for ($i = 0; $i < count($values); $i++) {
+                            if ($i === 0) {
+                                $this->LidQuery
+                                    ->open()
+                                    ->where($paramName, '=', $values[$i]);
+                            } else {
+                                $this->LidQuery
+                                    ->orWhere($paramName, 'LIKE', "%$values[$i]%")
+                                    ->orWhere($paramName, 'LIKE', "$values[$i]%")
+                                    ->orWhere($paramName, 'LIKE', "%$values[$i]");
+                            }
+                        }
+
+                        $this->LidQuery->close();
+                    }
+                }
+            }
+
+            //Присоединение необходимых таблиц при фильтрации по доп. свойствам
+            foreach ($joins as $tableName => $params) {
+                $conditions = 'User.id = ' . $params['as'] . '.object_id AND ' . $params['as'] . '.model_name = \'User\' ';
+                $conditions .= ' AND ' . $params['as'] . '.property_id IN (' . implode(', ', $params['propid']) . ')';
+                $this->LidQuery->leftJoin( $tableName . ' AS ' . $params['as'], $conditions );
+            }
         }
 
         $Lids = $this->LidQuery->findAll();
@@ -563,6 +740,15 @@ class Lid_Controller
             foreach ($values as $val) {
                 $OutputXml->addEntity($val, $tag);
             }
+        }
+
+        if ($this->isWithAreasAssignments == true && !is_null($this->User)) {
+            $UserAreas = Core::factory('Schedule_Area_Assignment')->getAreas($this->User);
+            $OutputXml->addEntities($UserAreas ,'assignment_areas');
+        }
+
+        if (!is_null($this->forAreas) && count($this->forAreas) == 1) {
+            $OutputXml->addSimpleEntity('current_area', $this->forAreas[0]->getId());
         }
 
         $OutputXml
