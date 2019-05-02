@@ -117,6 +117,25 @@ class Schedule_Group extends Schedule_Group_Model
     }
 
 
+    /**
+     * Поиск всех групп, в которых состоит клиент
+     *
+     * @param User $Client
+     * @return array
+     */
+    public function getClientGroups(User $Client) : array
+    {
+        if (empty($Client->getId())) {
+            return [];
+        }
+
+        return Core::factory('Schedule_Group')
+            ->queryBuilder()
+            ->join('Schedule_Group_Assignment AS sga', 'sga.user_id = ' . $Client->getId() . ' AND Schedule_Group.id = sga.group_id')
+            ->findAll();
+    }
+
+
     public function delete($obj = null)
     {
         Core::notify([&$this], 'beforeScheduleGroupDelete');
