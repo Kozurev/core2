@@ -30,6 +30,7 @@
 
             <div class="item-inner">
                 <div class="row">
+                    <span class="form-control form-control-auto">№<xsl:value-of select="id" /></span>
                     <!--Дата контроля-->
                     <!--<div class="col-md-3 col-sm-6 col-xs-12">-->
                         <input type="date" class="form-control" value="{date}" onchange="updateTaskDate({id},this.value)" />

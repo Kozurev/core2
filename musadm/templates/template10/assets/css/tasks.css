@@ -27,6 +27,11 @@
     margin-bottom: 10px;
 }
 
+.tasks .item .form-control-auto {
+    width: auto;
+    line-height: 1.8;
+}
+
 .tasks .item .action {
     margin: 0 10px;
     vertical-align: bottom;
@@ -55,10 +60,10 @@
 
 .tasks .item .item-inner .row select,
 .tasks .item .item-inner .row input,
+.tasks .item .item-inner .row span,
 .tasks .item .item-inner .row a {
     vertical-align: -webkit-baseline-middle;
 }
-
 
 
 input[type=radio] {
