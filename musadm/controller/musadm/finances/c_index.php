@@ -67,6 +67,7 @@ if ($dateFrom == $dateTo) {
 if ($areaId !== 0) {
     $Payments->queryBuilder()
         ->where('area_id', '=', $areaId);
+    $summ->where('area_id', '=', $areaId);
 }
 
 $Payments = $Payments->findAll();
