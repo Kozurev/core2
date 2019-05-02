@@ -51,7 +51,11 @@ function taskAfterAction() {
             refreshPaymentsTable(userId, loaderOff);
             break;
         case 'tasks':
-            refreshTasksTable();
+            refreshTasksTable(
+                $('input[name=date_from]').val(),
+                $('input[name=date_to]').val(),
+                $('select[name=area_id]').val()
+            );
             break;
         default: loaderOff();
     }
