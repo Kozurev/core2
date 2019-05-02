@@ -29,12 +29,6 @@
 	color: #D1D1D1;
 }
 
-.schedule .teacher_payments_block {
-	overflow-y: auto;
-	max-height: 470px;
-}
-
-
 .schedule .table-responsive {
 	overflow-x: inherit;
 }

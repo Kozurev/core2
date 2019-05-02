@@ -359,6 +359,11 @@ section {
     display: inline-block;
 }
 
+.schedule .teacher_payments_block {
+    overflow-y: scroll;
+    max-height: 470px;
+}
+
 .teacher_table tr td,
 .teacher_table tr th {
     vertical-align: middle;
