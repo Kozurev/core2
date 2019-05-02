@@ -24,28 +24,24 @@ class Schedule_Lesson_Report extends Schedule_Lesson_Report_Model
 
 
     /**
-     * @return User|null
+     * @return User|Schedule_Group|Lid|null
      */
     public function getClient()
     {
         if (empty($this->clientId())) {
             return null;
         } else {
-            return Core::factory('User', $this->clientId());
+            Core::factory('Schedule_Lesson');
+            if ($this->typeId() == Schedule_Lesson::TYPE_INDIV) {
+                return Core::factory('User', $this->clientId());
+            } elseif ($this->typeId() == Schedule_Lesson::TYPE_GROUP) {
+                return Core::factory('Schedule_Group', $this->clientId());
+            } elseif ($this->typeId() == Schedule_Lesson::TYPE_CONSULT) {
+                return Core::factory('Lid', $this->clientId());
+            } else {
+                return null;
+            }
         }
-    }
-
-
-    /**
-     * @return mixed|null
-     */
-    public function getGroup()
-    {
-        if (empty($this->groupId())) {
-            $this->groupId($this->clientId());
-        }
-
-        return Core::factory('Schedule_Group', $this->groupId());
     }
 
 
