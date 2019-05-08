@@ -166,7 +166,7 @@ $totalCount = Core::factory('Lid')
     ->where('subordinated', '=', $subordinated);
 
 if ($dateFrom == $dateTo) {
-    $totalCount->where('control_date', '=', $date);
+    $totalCount->where('control_date', '=', $dateFrom);
 } else {
     $totalCount->where('control_date', '>=', $dateFrom);
     $totalCount->where('control_date', '<=', $dateTo);
@@ -192,12 +192,11 @@ $Statuses = Core::factory('Lid_Status')
 				->where('status_id', '=', $status->getId());
 
             if ($dateFrom == $dateTo) {
-                $queryString->where('control_date', '=', $date);
+                $queryString->where('control_date', '=', $dateFrom);
             } else {
                 $queryString->where('control_date', '>=', $dateFrom);
                 $queryString->where( 'control_date', '<=', $dateTo );
             }
-
             if ($areaId !== 0) {
                 $queryString->where('area_id', '=', $areaId);
             }
@@ -248,8 +247,8 @@ $attendanceCount = Core::factory('Schedule_Lesson_Report')
     ->where('u.subordinated', '=', $subordinated);
 
 if ($dateFrom == $dateTo) {
-    $lessonReportsCount->where('date', '=', $date);
-    $attendanceCount->where('date', '=', $date);
+    $lessonReportsCount->where('date', '=', $dateFrom);
+    $attendanceCount->where('date', '=', $dateFrom);
 } else {
     $lessonReportsCount->where('date', '>=', $dateFrom);
     $lessonReportsCount->where('date', '<=', $dateTo);
@@ -316,7 +315,7 @@ if ($areaId !== 0) {
 }
 
 if ($dateFrom == $dateTo) {
-    $queryString->where('datetime', '=', $date);
+    $queryString->where('datetime', '=', $dateFrom);
 } else {
     $queryString->where('datetime', '>=', $dateFrom);
     $queryString->where('datetime', '<=', $dateTo);
@@ -361,8 +360,8 @@ if ($areaId !== 0) {
 }
 
 if ($dateFrom == $dateTo) {
-    $finances->where('date', '=', $date);
-    $hostExpenses->where('datetime', '=', $date);
+    $finances->where('date', '=', $dateFrom);
+    $hostExpenses->where('datetime', '=', $dateFrom);
 } else {
     $finances->where('date', '>=', $dateFrom);
     $finances->where('date', '<=', $dateTo);
