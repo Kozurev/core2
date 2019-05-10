@@ -145,14 +145,14 @@ class Schedule_Lesson_TimeModified extends Core_Entity
             'time_from' => [
                 'required' => true,
                 'type' => PARAM_STRING,
-                'minlength' => 10,
-                'maxlength' => 10
+                'minlength' => 8,
+                'maxlength' => 8
             ],
             'time_to' => [
                 'required' => true,
                 'type' => PARAM_STRING,
-                'minlength' => 10,
-                'maxlength' => 10
+                'minlength' => 8,
+                'maxlength' => 8
             ]
         ];
     }
