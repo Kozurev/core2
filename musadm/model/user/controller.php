@@ -219,20 +219,15 @@ class User_Controller
 
         if ($isSubordinate === true) {
             $AuthUser = User::current();
-
             if (is_null($AuthUser)) {
                 return null;
             }
-
             $Director = $AuthUser->getDirector();
-
             if (is_null($Director)) {
                 return null;
             }
-
             $ResUser->where('subordinated', '=', $Director->getId());
         }
-
         return $ResUser->find();
     }
 
@@ -365,7 +360,6 @@ class User_Controller
             if (!is_object($Area)) {
                 continue;
             }
-
             if (get_class($Area) === 'Schedule_Area' && $Area->getId() > 0) {
                 $this->forAreas[] = $Area;
             }
@@ -393,13 +387,11 @@ class User_Controller
         if (is_null($isActive)) {
             $this->active = null;
         }
-
         if ($isActive === true) {
             $this->active = true;
         } elseif ($isActive === false) {
             $this->active = false;
         }
-
         return $this;
     }
 
@@ -414,7 +406,6 @@ class User_Controller
         } elseif (is_numeric($groupId) && $groupId > 0) {
             $this->groupIds[] = $groupId;
         }
-
         return $this;
     }
 
@@ -428,7 +419,6 @@ class User_Controller
             if (!is_array($this->properties)) {
                 $this->properties = [];
             }
-
             foreach ($properties as $propId) {
                 $Property = Core::factory('Property', $propId);
 
@@ -439,7 +429,6 @@ class User_Controller
         } elseif (is_bool($properties)) {
             $this->properties = $properties;
         }
-
         return $this;
     }
 
@@ -464,11 +453,9 @@ class User_Controller
             self::FILTER_STRICT,
             self::FILTER_NOT_STRICT
         ];
-
         if (!in_array($filterType, $existingTypes)) {
             $this->filterType = $filterType;
         }
-
         return $this;
     }
 
@@ -746,13 +733,19 @@ class User_Controller
     {
         global $CFG;
 
+        $observerArgs = [];
+        $observerArgs['queryBuilder'] = &$this->UserQuery;
+        $Users = $this->getUsers();
+        $observerArgs['users'] = &$Users;
+        Core::notify($observerArgs, 'beforeUserControllerShow');
+
         $OutputXml = Core::factory('Core_Entity')
             ->addSimpleEntity('wwwroot', $CFG->rootdir)
             ->addSimpleEntity('table-type', $this->tableType)
             ->addSimpleEntity('active-btn-panel', $this->isActiveBtnPanel)
             ->addSImpleEntity('active-export-btn', $this->isActiveExportBtn)
             ->addSimpleEntity('show-count-users', $this->isShowCount)
-            ->addEntities($this->getUsers())
+            ->addEntities($Users)
             ->addEntities( 
                 Core::factory('Schedule_Area')->getList(true, false)
             )
