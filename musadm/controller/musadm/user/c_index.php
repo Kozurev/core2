@@ -50,6 +50,7 @@ $ClientController
 $ClientController->queryBuilder()->orderBy('id', 'DESC');
 $ScheduleAssignment = Core::factory('Schedule_Area_Assignment');
 
+//Фильтры
 foreach ($_GET as $paramName => $values) {
     if ($paramName === 'areas') {
         foreach ($_GET['areas'] as $areaId) {

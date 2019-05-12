@@ -24,7 +24,7 @@
                             <ul class="list">
                                 <xsl:apply-templates select="property_value[property_id = 20]" />
                             </ul>
-                            <input type="hidden" name="kostul"/>
+                            <span style="display:none">1</span>
                         </div>
                     </div>
 
@@ -34,7 +34,7 @@
                             <ul class="list">
                                 <xsl:apply-templates select="property_value[property_id = 21]" />
                             </ul>
-                            <input type="hidden" name="kostul"/>
+                            <span style="display:none">1</span>
                         </div>
                     </div>
 
@@ -45,14 +45,14 @@
                                 <li>
                                     <input class="checkbox-new" type="checkbox" name="property_32[]" id="property_32_1" value="1" />
                                     <label class="label-new" for="property_32_1">
-                                        <div class="tick"><input type="hidden" name="kostul"/></div>
+                                        <div class="tick"><span style="display:none">1</span></div>
                                     </label>
                                     <span>Да</span>
                                 </li>
                                 <li>
                                     <input class="checkbox-new" type="checkbox" name="property_32[]" id="property_32_2" value="0" />
                                     <label class="label-new" for="property_32_2">
-                                        <div class="tick"><input type="hidden" name="kostul"/></div>
+                                        <div class="tick"><span style="display:none">1</span></div>
                                     </label>
                                     <span>Нет</span>
                                 </li>
@@ -73,9 +73,8 @@
         <li>
             <input class="checkbox-new" type="checkbox" name="areas[]" id="area_{id}" value="{id}" />
             <label class="label-new" for="area_{id}">
-                <div class="tick"><input type="hidden" name="kostul"/></div>
+                <div class="tick"><span style="display:none">1</span></div>
             </label>
-
             <span><xsl:value-of select="title" /></span>
         </li>
     </xsl:template>
@@ -85,9 +84,8 @@
         <li>
             <input class="checkbox-new" type="checkbox" name="property_{property_id}[]" id="property_{id}" value="{id}" />
             <label class="label-new" for="property_{id}">
-                <div class="tick"><input type="hidden" name="kostul"/></div>
+                <div class="tick"><span style="display:none">1</span></div>
             </label>
-
             <span><xsl:value-of select="value" /></span>
         </li>
     </xsl:template>

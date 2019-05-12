@@ -281,7 +281,6 @@ function applyClientFilter(form, callback) {
         action =    form.attr('action'),
         data =      form.serialize();
     data += '&action=applyUserFilter';
-
     $.ajax({
         type: 'GET',
         url: action,
@@ -622,4 +621,15 @@ function saveUserComment(userId, text, callback) {
             loaderOff();
         }
     });
+}
+
+
+function usersExport(href, form) {
+    var link = href + '?action=export';
+
+    if (form === undefined) {
+        location = link;
+    } else if (form.serialize() != '') {
+        location = link + '&' + form.serialize();
+    }
 }

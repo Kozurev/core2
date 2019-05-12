@@ -254,12 +254,40 @@ if ($action === 'export') {
     header('Content-Disposition: attachment; filename=demo.xls');
     Core::factory('User_Controller');
     $ClientController = new User_Controller(User::current());
-    $ClientController
-        ->properties([16])
-        ->isSubordinate(true)
-        ->groupId(ROLE_CLIENT)
-        ->xsl('musadm/users/export.xsl')
-        ->show();
+    $ClientController->properties([16]);
+    $ClientController->isSubordinate(true);
+    $ClientController->isWithAreaAssignments(true);
+    $ClientController->groupId(ROLE_CLIENT);
+    $ClientController->xsl('musadm/users/export.xsl');
+    $ClientController->queryBuilder()->orderBy('surname', 'ASC');
+
+    //Фильтры
+    $ScheduleAssignment = Core::factory('Schedule_Area_Assignment');
+    foreach ($_GET as $paramName => $values) {
+        if ($paramName === 'areas') {
+            foreach ($_GET['areas'] as $areaId) {
+                if ($areaId > 0
+                    && ($ScheduleAssignment->issetAssignment(User::current(), intval($areaId)) !== null)
+                    || User::checkUserAccess(['groups' => [ROLE_DIRECTOR]])
+                ) {
+                    $Area = Schedule_Area_Controller::factory(intval($areaId));
+                    if ($Area !== null) {
+                        $ClientController->forAreas([$Area]);
+                    }
+                }
+            }
+            continue;
+        }
+
+        if (strpos($paramName, 'property_') !== false) {
+            foreach ($_GET[$paramName] as $value) {
+                $propId = explode('property_', $value)[0];
+                $ClientController->appendFilter($paramName, $value);
+            }
+        }
+    }
+
+    $ClientController->show();
     exit;
 }
 
