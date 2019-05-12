@@ -287,6 +287,26 @@ if ($action === 'export') {
         }
     }
 
+    Core::attachObserver('beforeUserControllerShow', function($args) {
+        $pattern = '/[^0-9]/';
+        $replacement = '';
+
+        foreach ($args['users'] as $User) {
+            $filteredNumber = preg_replace($pattern, $replacement, $User->phoneNumber());
+            $User->phoneNumber($filteredNumber);
+            foreach ($User->_childrenObjects() as $add) {
+                if ($add instanceof Property_String) {
+                    $addPhone = $add->value();
+                    if ($addPhone == '') {
+                        continue;
+                    }
+                    $addPhone = preg_replace($pattern, $replacement, $addPhone);
+                    $add->value($addPhone);
+                }
+            }
+        }
+    });
+
     $ClientController->show();
     exit;
 }
