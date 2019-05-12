@@ -127,12 +127,18 @@ class Core_Entity_Model
      */
     public function _customTag(string $tag = null)
     {
-        if (is_null($tag) ) {
+        if (is_null($tag)) {
             return $this->aEntityVars['custom_tag'];
         } else {
             $this->aEntityVars['custom_tag'] = $tag;
             return $this;
         }
+    }
+
+
+    public function _childrenObjects()
+    {
+        return $this->childrenObjects;
     }
 
 }
