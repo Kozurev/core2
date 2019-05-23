@@ -655,10 +655,10 @@ function saveScheduleChangeTimePopup(lessonId, date, timeFrom, timeTo, func) {
 }
 
 
-function addAbsentTask(dateTo, clientId, prevName) {
+function addAbsentTask(dateTo, clientId) {
     $.ajax({
         type: 'GET',
-        url: '',
+        url: root + '/schedule',
         data: {
             action: 'addAbsentTask',
             date_to: dateTo,
