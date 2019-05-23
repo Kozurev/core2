@@ -61,62 +61,64 @@
             </xsl:if>
         </section>
 
-        <section class="section-bordered lid_statuses_table">
-            <h4 class="section-title">Настройки статусов лидов</h4>
-            <input type="hidden" id="directorid" value="{directorid}"/>
-            <table class="table table-stripped" id="table-lid-statuses">
-                <thead>
-                    <tr class="header">
-                        <th class="center">Название</th>
-                        <th class="center">Цвет</th>
-                        <th class="center">Статус после создания консультации</th>
-                        <th class="center">Статус после присутствия на консультации</th>
-                        <th class="center">Статус после отсутствия на консультации</th>
-                        <th width="95px"></th>
-                    </tr>
-                </thead>
-                <tbody class="center">
-                    <xsl:apply-templates select="lid_status" />
-                    <tr>
-                        <td colspan="2">Отсутствует</td>
-                        <td class="center">
-                            <input type="radio" name="lid_status_consult" id="lid_status_consult_0" value="0">
-                                <xsl:if test="lid_status_consult = 0">
-                                    <xsl:attribute name="checked">checked</xsl:attribute>
-                                </xsl:if>
-                            </input>
-                            <label for="lid_status_consult_0"></label>
-                        </td>
+        <xsl:if test="is-director = 1">
+            <section class="section-bordered lid_statuses_table">
+                <h4 class="section-title">Настройки статусов лидов</h4>
+                <input type="hidden" id="directorid" value="{directorid}"/>
+                <table class="table table-stripped" id="table-lid-statuses">
+                    <thead>
+                        <tr class="header">
+                            <th class="center">Название</th>
+                            <th class="center">Цвет</th>
+                            <th class="center">Статус после создания консультации</th>
+                            <th class="center">Статус после присутствия на консультации</th>
+                            <th class="center">Статус после отсутствия на консультации</th>
+                            <th width="95px"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="center">
+                        <xsl:apply-templates select="lid_status" />
+                        <tr>
+                            <td colspan="2">Отсутствует</td>
+                            <td class="center">
+                                <input type="radio" name="lid_status_consult" id="lid_status_consult_0" value="0">
+                                    <xsl:if test="lid_status_consult = 0">
+                                        <xsl:attribute name="checked">checked</xsl:attribute>
+                                    </xsl:if>
+                                </input>
+                                <label for="lid_status_consult_0"></label>
+                            </td>
 
-                        <td class="center">
-                            <input type="radio" name="lid_status_consult_attended" id="lid_status_consult_attended_0" value="0">
-                                <xsl:if test="lid_status_consult_attended = 0">
-                                    <xsl:attribute name="checked">checked</xsl:attribute>
-                                </xsl:if>
-                            </input>
-                            <label for="lid_status_consult_attended_0"></label>
-                        </td>
+                            <td class="center">
+                                <input type="radio" name="lid_status_consult_attended" id="lid_status_consult_attended_0" value="0">
+                                    <xsl:if test="lid_status_consult_attended = 0">
+                                        <xsl:attribute name="checked">checked</xsl:attribute>
+                                    </xsl:if>
+                                </input>
+                                <label for="lid_status_consult_attended_0"></label>
+                            </td>
 
-                        <td class="center">
-                            <input type="radio" name="lid_status_consult_absent" id="lid_status_consult_absent_0" value="0">
-                                <xsl:if test="lid_status_consult_absent = 0">
-                                    <xsl:attribute name="checked">checked</xsl:attribute>
-                                </xsl:if>
-                            </input>
-                            <label for="lid_status_consult_absent_0"></label>
-                        </td>
+                            <td class="center">
+                                <input type="radio" name="lid_status_consult_absent" id="lid_status_consult_absent_0" value="0">
+                                    <xsl:if test="lid_status_consult_absent = 0">
+                                        <xsl:attribute name="checked">checked</xsl:attribute>
+                                    </xsl:if>
+                                </input>
+                                <label for="lid_status_consult_absent_0"></label>
+                            </td>
 
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
 
-            <div class="row buttons-panel center">
-                <div>
-                    <a class="edit_lid_status btn btn-purple">Создать статус</a>
+                <div class="row buttons-panel center">
+                    <div>
+                        <a class="edit_lid_status btn btn-purple">Создать статус</a>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </xsl:if>
 
         <section class="cards-section text-center">
             <div id="cards-wrapper" class="cards-wrapper row">
