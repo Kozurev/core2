@@ -602,7 +602,7 @@ Core::attachObserver('afterScheduleLessonReportInsert', function($args) {
 
             $LastClientReport = $LastClientReport->queryBuilder()
                 ->close()
-                ->orderBy('id', 'DESC')
+                ->orderBy('date', 'DESC')
                 ->find();
 
             if (is_null($LastClientReport)) {
