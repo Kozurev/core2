@@ -8,8 +8,7 @@
 
 
 global $CFG;
-//$rootdir = $CFG->rootdir;
-$back = Core_Array::Get( "back", $CFG->rootdir );
+$back = Core_Array::Get('back', $CFG->rootdir);
 ?>
 
 <form action="<?=$CFG->rootdir?>/authorize?back=<?=$back?>" method="post">
@@ -23,6 +22,6 @@ $back = Core_Array::Get( "back", $CFG->rootdir );
     <input type="checkbox" id="remember" name="remember"/>
 
     <div id="lower">
-        <input type="submit" value="Войти"/>
+        <input type="submit" name="do_auth" value="Войти"/>
     </div>
 </form>

@@ -115,14 +115,13 @@ class User extends User_Model
             $_SESSION['core']['user'] = Core_Array::Cookie('userdata', 0, PARAM_INT);
         }
 
-        if (Core_Array::Session( 'core/user_object', null) !== null) {
+        if (Core_Array::Session('core/user_object', null) !== null) {
             $User = Core_Array::Session('core/user_object', null);
             return unserialize($User);
         }
 
         if (Core_Array::Session('core/user', 0, PARAM_INT) != 0) {
             $CurrentUser = Core::factory('User', Core_Array::Session('core/user', 0, PARAM_INT));
-
             if (!is_null($CurrentUser) && $CurrentUser->active() == 1) {
                 $_SESSION['core']['user_object'] = serialize($CurrentUser);
                 return $CurrentUser;
