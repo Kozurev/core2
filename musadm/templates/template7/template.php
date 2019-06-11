@@ -21,15 +21,12 @@ is_object(Core_Page_Show::instance()->StructureItem)
     :   $areaId = 0;
 
     if (User::checkUserAccess(['groups' => [ROLE_MANAGER]], $User)
-        || (User::checkUserAccess(['groups' => [ROLE_DIRECTOR]], $User) && is_object(Core_Page_Show::instance()->StructureItem))
-    )
-    {
+        || (User::checkUserAccess(['groups' => [ROLE_DIRECTOR]], $User) && $areaId > 0)
+    ) {
         Core_Page_Show::instance()->css('/templates/template7/css/style.css');
     }
 
-    if (User::checkUserAccess(['groups' => [ROLE_MANAGER, ROLE_TEACHER]], $User)
-        || (User::checkUserAccess(['groups' => [ROLE_DIRECTOR]], $User) && is_object(Core_Page_Show::instance()->StructureItem))
-    ) { ?>
+    if ($areaId > 0 || $pageUserId > 0) { ?>
     <section>
         <div class="row calendar_small">
             <div>
@@ -49,9 +46,7 @@ is_object(Core_Page_Show::instance()->StructureItem)
             var date = new Date();
             var year = date.getFullYear();
             var month = date.getMonth() + 1;
-
-            if( month < 10 ) month = '0' + month;
-
+            if(month < 10) month = '0' + month;
             $('#year').val(year);
             $('#month').val(month);
         });

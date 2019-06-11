@@ -11,15 +11,19 @@
 
             <xsl:if test="active-btn-panel = 1">
                 <div class="row buttons-panel">
-                    <div>
-                        <a href="#" class="btn btn-primary user_create" data-usergroup="2">Добавить менеджера</a>
-                    </div>
+                    <xsl:if test="//access_user_create_manager = 1">
+                        <div>
+                            <a href="#" class="btn btn-primary user_create" data-usergroup="2">Добавить менеджера</a>
+                        </div>
+                    </xsl:if>
 
                     <xsl:if test="show-count-users = 1">
                         <div>
                             <span>Всего:</span><span><xsl:value-of select="count(user)" /></span>
                         </div>
                     </xsl:if>
+
+                    <input type="hidden" />
                 </div>
             </xsl:if>
 

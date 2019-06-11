@@ -6,11 +6,11 @@
  * @date 03.06.2018 12:46
  * @version 20190221
  * @version 20190414
+ * @version 20190526
  */
 
-
-$accessRules = ['groups' => [ROLE_DIRECTOR]];
-if (!User::checkUserAccess($accessRules)) {
+//Проверка прав доступа
+if (!Core_Access::instance()->hasCapability(Core_Access::STATISTIC_READ)) {
     Core_Page_Show::instance()->error(403);
 }
 

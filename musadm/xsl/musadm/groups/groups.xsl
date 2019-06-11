@@ -3,16 +3,18 @@
     <xsl:template match="root">
         <section>
             <div class="row buttons-panel">
-                <div>
-                    <a class="btn btn-blue" onclick="getGroupPopup(0)">Создать группу</a>
-                </div>
+                <input type="hidden" />
+                <xsl:if test="access_group_create = 1">
+                    <div>
+                        <a class="btn btn-blue" onclick="getGroupPopup(0)">Создать группу</a>
+                    </div>
+                </xsl:if>
             </div>
 
             <div class="table-responsive">
                 <table id="sortingTable" class="table table-striped">
                     <thead>
                         <tr class="header">
-                            <!--<th>id</th>-->
                             <th>Название</th>
                             <th>Учитель</th>
                             <th>Длит. занятия</th>
@@ -21,7 +23,6 @@
                             <th>Действия</th>
                         </tr>
                     </thead>
-
                     <tbody>
                         <xsl:apply-templates select="schedule_group" />
                     </tbody>
@@ -34,7 +35,6 @@
     <xsl:template match="schedule_group">
         <xsl:variable name="teacher" select="teacher_id"/>
         <tr>
-            <!--<td><xsl:value-of select="id" /></td>-->
             <td><xsl:value-of select="title" /></td>
             <td>
                 <a href="{/root/wwwroot}/schedule/?userid={$teacher}">
@@ -58,11 +58,14 @@
             <td><xsl:value-of select="note" /></td>
 
             <td width="140px">
-                <!--<a href="#" class="action edit group_edit" data-groupid="{id}"></a>-->
-                <a class="action edit group_edit" onclick="getGroupPopup({id})"></a>
-                <a class="action associate" onclick="getGroupComposition({id})"></a>
-                <!--<a href="#" class="action archive group_archive" data-groupid="{id}"></a>-->
-                <a class="action archive group_archive" onclick="updateActive('Schedule_Group', {id}, 0, refreshGroupTable);"></a>
+                <xsl:if test="/root/access_group_edit = 1">
+                    <a class="action edit group_edit" onclick="getGroupPopup({id})"></a>
+                    <a class="action associate" onclick="getGroupComposition({id})"></a>
+                </xsl:if>
+
+                <xsl:if test="/root/access_group_delete = 1">
+                    <a class="action archive group_archive" onclick="updateActive('Schedule_Group', {id}, 0, refreshGroupTable);"></a>
+                </xsl:if>
             </td>
         </tr>
     </xsl:template>

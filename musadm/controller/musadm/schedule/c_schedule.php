@@ -3,6 +3,7 @@
  * @author BadWolf
  * @version 20190327
  * @version 20190418
+ * @version 20190526
  */
 
 $userId = Core_Array::Get('userid', null, PARAM_INT);
@@ -18,13 +19,16 @@ $today = date('Y-m-d');
 $date = Core_Array::Get('date', $today, PARAM_STRING);
 
 
-/**
- * Формирование таблицы расписания для менеджеров
- */
+//Формирование таблицы расписания для менеджеров
 if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
     && is_object(Core_Page_Show::instance()->StructureItem)
-)
-{
+) {
+    //права доступа
+    $accessCreate = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_CREATE);
+    $accessEdit =   Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT);
+    $accessDelete = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_DELETE);
+    $accessAbsent = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT);
+
     $Area = Core_Page_Show::instance()->StructureItem;
     $areaId = $Area->getId();
 
@@ -100,7 +104,10 @@ if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
     echo "<tr>";
     for ($i = 1; $i <= $Area->countClasses(); $i++) {
         echo "<th>Время</th>";
-        echo "<th class='add_lesson' 
+
+        $thClass = $accessCreate ? 'add_lesson' : '';
+
+        echo "<th class='".$thClass."' 
             title='Добавить занятие в основной график'
             data-schedule_type='1'
             data-class_id='" . $i . "'
@@ -108,7 +115,7 @@ if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
             data-area_id='" . $areaId . "'
             data-dayName='" . $dayName . "'
             >Основной график</th>";
-        echo "<th class='add_lesson' 
+        echo "<th class='".$thClass."' 
             title='Добавить занятие в актуальный график'
             data-schedule_type='2'
             data-class_id='" . $i . "'
@@ -143,17 +150,14 @@ if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
         }
     }
 
-    /**
-     * Формирование таблицы расписания
-     */
+    //Формирование таблицы расписания
     while (!compareTime($time, '>=', addTime($timeEnd, $period))) {
         echo '<tr>';
 
         for ($class = 1; $class <= $Area->countClasses(); $class++) {
             if (!compareTime($time, '>=', $maxLessonTime[0][$class])
                 && !compareTime($time, '>=', $maxLessonTime[1][$class])
-            )
-            {
+            ) {
                 echo '<th>' . refactorTimeFormat($time) . '</th>';
                 continue;
             }
@@ -210,20 +214,24 @@ if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
 
                     echo "<span class='client'>" . $MainLessonData['client'] . "</span><hr><span class='teacher'>преп. " . $MainLessonData['teacher'] . "</span>";
 
-                    if ($lessonTime >= $currentTime) {
+                    if ($lessonTime >= $currentTime && !(!$accessDelete && !$accessAbsent)) {
                         echo "<ul class=\"submenu\">
                         <li>
                             <a href=\"#\"></a>
                             <ul class=\"dropdown\"";
                         echo "data-clientid='" . $MainLesson->clientId() . "' data-typeid='" . $MainLesson->typeId() . "'";
                         echo " data-lessonid='" . $MainLesson->getId() . "'>";
-                        echo "<li><a href=\"#\" class='schedule_absent'>Временно отсутствует</a></li>";
+                        if ($accessAbsent) {
+                            echo "<li><a href=\"#\" class='schedule_absent'>Временно отсутствует</a></li>";
+                        }
+                        if ($accessDelete) {
+                            echo "<li>
+                                <a href=\"#\" class='schedule_delete_main' data-date='" . $date . "' data-id='" . $MainLesson->getId() . "'>
+                                    Удалить из основного графика
+                                </a>
+                            </li>";
+                        }
                         echo "
-                                <li>
-                                    <a href=\"#\" class='schedule_delete_main' data-date='" . $date . "' data-id='" . $MainLesson->getId() . "'>
-                                        Удалить из основного графика
-                                    </a>
-                                </li>
                             </ul>
                         </li>
                     </ul>";
@@ -248,7 +256,7 @@ if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
                     if (isset($CurrentLesson->oldid)) echo "<span><b>Временно</b></span><hr>";
                     echo "<span class='client'>" . $CurrentLessonData['client'] . "</span><hr><span class='teacher'>преп. " . $CurrentLessonData['teacher'] . "</span>";
 
-                    if (!$CurrentLesson->isReported($date)) {
+                    if (!$CurrentLesson->isReported($date) && $accessEdit) {
                         echo "<ul class=\"submenu\">
                         <li>
                             <a href=\"#\"></a>
@@ -283,10 +291,10 @@ if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
         $time = addTime( $time, $period );
     }
 
-    echo '<tr>';
+    echo "<tr>";
     for ($i = 1; $i <= $Area->countClasses(); $i++) {
-        echo '<th>Время</th>';
-        echo "<th class='add_lesson' 
+        echo "<th>Время</th>";
+        echo "<th class='".$thClass."' 
             title='Добавить занятие в основной график'
             data-schedule_type='1'
             data-class_id='" . $i . "'
@@ -294,22 +302,24 @@ if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
             data-area_id='" . $areaId . "'
             data-dayName='" . $dayName . "'
             >Основной график</th>";
-        echo "<th class='add_lesson' 
+        echo "<th class='".$thClass."' 
             title='Добавить занятие в актуальный график'
             data-schedule_type='2'
             data-class_id='" . $i . "'
             data-date='" . $date . "'
             data-area_id='" . $areaId . "'
             data-dayName='" . $dayName . "'
-        >Актуальный график</th>";
+            >Актуальный график</th>";
     }
-    echo '</tr>';
+    echo "</tr>";
 
-    echo '<tr>';
+    echo "<tr>";
     for ($i = 1; $i <= $Area->countClasses(); $i++) {
-        echo "<th colspan='3'>КЛАСС $i</th>";
+        $className = $Area->getClassName($i, 'Класс ' . $i);
+        echo "<th colspan='3' class='schedule_class' 
+            onclick='scheduleEditClassName(" . $Area->getId() . ", " . $i . ", this)'>$className</th>";
     }
-    echo '</tr>';
+    echo "</tr>";
     echo '</table></div>';
 }
 
@@ -318,80 +328,94 @@ if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
  * Формирование таблицы расписания для преподавателей
  */
 if ($User->groupId() == ROLE_TEACHER) {
+    $accessScheduleRead = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ);
+    $accessReportRead =   Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ);
+    $accessReportCreate = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_CREATE);
+    $accessReportDelete = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_DELETE);
+    $accessPaymentRead =  Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_TEACHER);
+    $accessPaymentCreate= Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_TEACHER);
+    $accessPaymentEdit =  Core_Access::instance()->hasCapability(Core_Access::PAYMENT_EDIT_TEACHER);
+    $accessPaymentDelete= Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_TEACHER);
+    $accessPaymentConfig= Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CONFIG);
+
     $month = getMonth($date);
     if (intval($month) < 10) {
         $month = '0' . $month;
     }
     $year = getYear($date);
 
+    if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ)) {
+        echo '<section class="section-bordered">';
+        Core::factory('Schedule_Controller')
+            ->userId($userId)
+            ->setCalendarPeriod($month, $year)
+            ->printCalendar();
+        echo '</section>';
+    }
+
     echo '<section class="section-bordered">';
-    Core::factory('Schedule_Controller')
-        ->userId($userId)
-        ->setCalendarPeriod($month, $year)
-        ->printCalendar();
-    echo '</section>';
 
-    $TeacherLessons = Core::factory('Schedule_Controller')
-        ->userId($userId)
-        ->unsetPeriod()
-        ->setDate($date)
-        ->getLessons();
+    if ($accessReportRead) {
+        $TeacherLessons = Core::factory('Schedule_Controller')
+            ->userId($userId)
+            ->unsetPeriod()
+            ->setDate($date)
+            ->getLessons();
 
-    //Формирование таблицы с отметками о явке/неявке>>
-    sortByTime($TeacherLessons, 'timeFrom');
+        //Формирование таблицы с отметками о явке/неявке>>
+        sortByTime($TeacherLessons, 'timeFrom');
 
-    foreach ($TeacherLessons as $key => $Lesson) {
-        $Lesson->timeFrom(refactorTimeFormat($Lesson->timeFrom()));
-        $Lesson->timeTo(refactorTimeFormat($Lesson->timeTo()));
-        $LessonReport = $Lesson->getReport($date);
-        $LessonClient = $Lesson->getClient();
+        foreach ($TeacherLessons as $key => $Lesson) {
+            $Lesson->timeFrom(refactorTimeFormat($Lesson->timeFrom()));
+            $Lesson->timeTo(refactorTimeFormat($Lesson->timeTo()));
+            $LessonReport = $Lesson->getReport($date);
+            $LessonClient = $Lesson->getClient();
 
-        if ($LessonClient instanceof Schedule_Group) {
-            $Clients = $LessonClient->getClientList();
-
-            if (!is_null($LessonReport)) {
-                $LessonAttendances = $LessonReport->getAttendances();
-
-                foreach ($LessonAttendances as $Attendance) {
-                    foreach ($Clients as $Client) {
-                        if ($Attendance->clientId() == $Client->getId()) {
-                            $Client->addEntity($Attendance, 'attendance');
+            if ($LessonClient instanceof Schedule_Group) {
+                $Clients = $LessonClient->getClientList();
+                if (!is_null($LessonReport)) {
+                    $LessonAttendances = $LessonReport->getAttendances();
+                    foreach ($LessonAttendances as $Attendance) {
+                        foreach ($Clients as $Client) {
+                            if ($Attendance->clientId() == $Client->getId()) {
+                                $Client->addEntity($Attendance, 'attendance');
+                            }
                         }
+                    }
+                }
+                $LessonClient->addEntities($Clients, 'client');
+            } else {
+                if (!is_null($LessonReport)) {
+                    $LessonAttendances = $LessonReport->getAttendances();
+                    if (count($LessonAttendances) > 0) {
+                        $LessonClient->addEntity($LessonAttendances[0], 'attendance');
                     }
                 }
             }
 
-            $LessonClient->addEntities($Clients, 'client');
-        } else {
-            if (!is_null($LessonReport)) {
-                $LessonAttendances = $LessonReport->getAttendances();
-                if (count($LessonAttendances) > 0) {
-                    $LessonClient->addEntity($LessonAttendances[0], 'attendance');
-                }
-            }
+            $Lesson->addSimpleEntity('is_reported', (int)$Lesson->isReported($date));
+            $Lesson->addEntity($LessonReport, 'report');
+            $Lesson->addEntity($LessonClient, 'client');
+            $Lesson->addSimpleEntity('lesson_type', $Lesson->lessonType());
         }
 
-        $Lesson->addSimpleEntity('is_reported', (int)$Lesson->isReported($date));
-        $Lesson->addEntity($LessonReport, 'report');
-        $Lesson->addEntity($LessonClient, 'client');
-        $Lesson->addSimpleEntity('lesson_type', $Lesson->lessonType());
+        $output = Core::factory('Core_Entity')
+            ->addSimpleEntity('date', refactorDateFormat($date))
+            ->addSimpleEntity('real_date', $date)
+            ->addEntity($User)
+            ->addEntities($TeacherLessons, 'lesson');
+
+        User::checkUserAccess(['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]], User::parentAuth())
+            ?   $isAdmin = 1
+            :   $isAdmin = 0;
+
+        $output
+            ->addSimpleEntity('is_admin', $isAdmin)
+            ->addSimpleEntity('access_report_create', (int)$accessReportCreate)
+            ->addSimpleEntity('access_report_delete', (int)$accessReportDelete)
+            ->xsl('musadm/schedule/teacher_table.xsl')
+            ->show();
     }
-
-    $output = Core::factory('Core_Entity')
-        ->addSimpleEntity('date', refactorDateFormat($date))
-        ->addSimpleEntity('real_date', $date)
-        ->addEntity($User)
-        ->addEntities($TeacherLessons, 'lesson');
-
-    User::checkUserAccess(['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]], User::parentAuth())
-        ?   $isAdmin = 1
-        :   $isAdmin = 0;
-
-    echo '<section class="section-bordered">';
-    $output
-        ->addSimpleEntity('is_admin', $isAdmin)
-        ->xsl('musadm/schedule/teacher_table.xsl')
-        ->show();
 
     $dateFrom = substr($date, 0, 8) . '01';
     $currentMonth = intval(substr($date, 5, 2));
@@ -458,85 +482,89 @@ if ($User->groupId() == ROLE_TEACHER) {
      * Подсчет сумм необходимых выплат преподавателю и того что уже выплачено
      * за текущий период (месяц)
      */
-    $totalPayedSql = Core::factory('Orm')
-        ->select('sum(value) AS payed')
-        ->from('Payment')
-        ->where('user', '=', $User->getId())
-        ->where('type', '=', 3)
-        ->where('datetime', '>=', $dateFrom)
-        ->where('datetime', '<=', $dateTo)
-        ->getQueryString();
+    if ($accessPaymentRead) {
+        $totalPayedSql = Core::factory('Orm')
+            ->select('sum(value) AS payed')
+            ->from('Payment')
+            ->where('user', '=', $User->getId())
+            ->where('type', '=', 3)
+            ->where('datetime', '>=', $dateFrom)
+            ->where('datetime', '<=', $dateTo)
+            ->getQueryString();
 
-    $totalHaveToPaySql = Core::factory('Orm')
-        ->select('sum(teacher_rate) AS total')
-        ->from('Schedule_Lesson_Report')
-        ->where('teacher_id', '=', $User->getId())
-        ->where('date', '>=', $dateFrom)
-        ->where('date', '<=', $dateTo)
-        ->getQueryString();
-    $totalPayed = Core::factory('Orm')
-        ->executeQuery($totalPayedSql)
-        ->fetch();
+        $totalHaveToPaySql = Core::factory('Orm')
+            ->select('sum(teacher_rate) AS total')
+            ->from('Schedule_Lesson_Report')
+            ->where('teacher_id', '=', $User->getId())
+            ->where('date', '>=', $dateFrom)
+            ->where('date', '<=', $dateTo)
+            ->getQueryString();
+        $totalPayed = Core::factory('Orm')
+            ->executeQuery($totalPayedSql)
+            ->fetch();
 
-    $totalHaveToPay = Core::factory('Orm')
-        ->executeQuery($totalHaveToPaySql)
-        ->fetch();
+        $totalHaveToPay = Core::factory('Orm')
+            ->executeQuery($totalHaveToPaySql)
+            ->fetch();
 
-    $totalPayed = Core_Array::getValue($totalPayed, 'payed', 0, PARAM_INT);
-    $totalHaveToPay = Core_Array::getValue($totalHaveToPay, "total", 0, PARAM_INT);
-    $debt = $totalHaveToPay - $totalPayed;
+        $totalPayed = Core_Array::getValue($totalPayed, 'payed', 0, PARAM_INT);
+        $totalHaveToPay = Core_Array::getValue($totalHaveToPay, "total", 0, PARAM_INT);
+        $debt = $totalHaveToPay - $totalPayed;
 
-    //echo "<h4>К выплате: <span id='teacher-debt'>$debt</span>руб; Уже выплачено: <span id='teacher-payed'>$totalPayed</span> руб.</h4>";
+        //Формирование таблицы с выплатами>>
+        $Payments = Core::factory('Payment')
+            ->queryBuilder()
+            ->where('type', '=', 3)
+            ->where('user', '=', $User->getId())
+            ->orderBy('datetime', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->findAll();
 
-    //Формирование таблицы с выплатами>>
-    $Payments = Core::factory('Payment')
-        ->queryBuilder()
-        ->where('type', '=', 3)
-        ->where('user', '=', $User->getId())
-        ->orderBy('datetime', 'DESC')
-        ->orderBy('id', 'DESC')
-        ->findAll();
+        $MonthesPayments = [];
+        $prevMonth = 0;
+        $index = 0;
 
-    $MonthesPayments = [];
-    $prevMonth = 0;
-    $index = 0;
+        foreach ($Payments as $Payment) {
+            if (getMonth($Payment->datetime()) != $prevMonth) {
+                $monthName = getMonthName($Payment->datetime() ) . ' ' . getYear($Payment->datetime());
+                $index++;
+                $prevMonth = getMonth($Payment->datetime());
+                $MonthesPayments[$index] = Core::factory('Core_Entity')->_entityName('month');
+                $MonthesPayments[$index]->addSimpleEntity('month_name', $monthName);
+            }
 
-    foreach ($Payments as $Payment) {
-        if (getMonth($Payment->datetime()) != $prevMonth) {
-            $monthName = getMonthName($Payment->datetime() ) . ' ' . getYear($Payment->datetime());
-            $index++;
-            $prevMonth = getMonth($Payment->datetime());
-            $MonthesPayments[$index] = Core::factory('Core_Entity')->_entityName('month');
-            $MonthesPayments[$index]->addSimpleEntity('month_name', $monthName);
+            $Payment->datetime(date('d.m.Y', strtotime($Payment->datetime())));
+            $MonthesPayments[$index]->addEntity($Payment);
         }
 
-        $Payment->datetime(date('d.m.Y', strtotime($Payment->datetime())));
-        $MonthesPayments[$index]->addEntity($Payment);
+        //Проверка на авторизованность под видом текущего пользователя
+        User::isAuthAs()
+            ?   $isAdmin = 1
+            :   $isAdmin = 0;
+
+        //Проверка на авторизованность директора ? администратора под видом преподавателя
+        User::parentAuth()->groupId() === ROLE_DIRECTOR || User::parentAuth()->superuser() == 1
+            ?   $isDirector = 1
+            :   $isDirector = 0;
+
+        Core::factory('Core_Entity')
+            ->addEntities($MonthesPayments)
+            ->addSimpleEntity('userid', $User->getId())
+            ->addSimpleEntity('is_admin', $isAdmin)
+            ->addSimpleEntity('is_director', $isDirector)
+            ->addSimpleEntity('access_payment_create', (int)$accessPaymentCreate)
+            ->addSimpleEntity('access_payment_edit', (int)$accessPaymentEdit)
+            ->addSimpleEntity('access_payment_delete', (int)$accessPaymentDelete)
+            ->addSimpleEntity('date', date('Y-m-d'))
+            ->addSimpleEntity('debt', $debt)
+            ->addSimpleEntity('total-payed', $totalPayed)
+            ->xsl( 'musadm/finances/teacher_payments.xsl')
+            ->show();
     }
 
-    //Проверка на авторизованность под видом текущего пользователя
-    User::isAuthAs()
-        ?   $isAdmin = 1
-        :   $isAdmin = 0;
-
-    //Проверка на авторизованность директора ? администратора под видом преподавателя
-    User::parentAuth()->groupId() === ROLE_DIRECTOR || User::parentAuth()->superuser() == 1
-        ?   $isDirector = 1
-        :   $isDirector = 0;
-
-    Core::factory('Core_Entity')
-        ->addEntities($MonthesPayments)
-        ->addSimpleEntity('userid', $User->getId())
-        ->addSimpleEntity('is_admin', $isAdmin)
-        ->addSimpleEntity('is_director', $isDirector)
-        ->addSimpleEntity('date', date('Y-m-d'))
-        ->addSimpleEntity('debt', $debt)
-        ->addSimpleEntity('total-payed', $totalPayed)
-        ->xsl( 'musadm/finances/teacher_payments.xsl')
-        ->show();
-
     //Таблица с настройками тарифов преподавателя
-    if (User::checkUserAccess(['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]], User::parentAuth())) {
+    //if (User::checkUserAccess(['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]], User::parentAuth())) {
+    if ($accessPaymentConfig) {
         //Общие значения
         $Director = User::current()->getDirector();
 
@@ -598,14 +626,15 @@ if ($User->groupId() == ROLE_TEACHER) {
 /**
  * Формирование списка филлиалов
  */
-if ($User->groupId() == ROLE_DIRECTOR && !Core_Page_Show::instance()->StructureItem) {
+if (Core_Access::instance()->hasCapability(Core_Access::AREA_READ) && !Core_Page_Show::instance()->StructureItem) {
     global $CFG;
-
     $Areas = Schedule_Area_Controller::factory()->getList(true, false);
-
     Core::factory('Core_Entity')
         ->addEntities($Areas)
         ->addSimpleEntity('wwwroot', $CFG->rootdir)
+        ->addSimpleEntity('access_area_create', (int)Core_Access::instance()->hasCapability(Core_Access::AREA_CREATE))
+        ->addSimpleEntity('access_area_edit', (int)Core_Access::instance()->hasCapability(Core_Access::AREA_EDIT))
+        ->addSimpleEntity('access_area_delete', (int)Core_Access::instance()->hasCapability(Core_Access::AREA_DELETE))
         ->xsl('musadm/schedule/areas.xsl')
         ->show();
 }

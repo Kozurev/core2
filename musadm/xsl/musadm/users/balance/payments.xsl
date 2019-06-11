@@ -61,6 +61,8 @@
                     <a class="action comment payment_add_note" data-modelid="{./id}" title="Добавить комментарий"></a>
                     <xsl:if test="//parent_user/group_id = 1 or //parent_user/group_id = 6">
                         <a class="action edit payment_edit" href="#" data-id="{id}" data-after_save_action="client" title="Редактирование платежа"></a>
+                    </xsl:if>
+                    <xsl:if test="//access_payment_delete_client = 1">
                         <a class="action delete payment_delete" href="#" data-id="{id}" data-after_save_action="client" title="Удаление платежа"></a>
                     </xsl:if>
                 </td>

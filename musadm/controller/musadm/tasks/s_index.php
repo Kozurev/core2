@@ -29,13 +29,19 @@ Core::factory('Task_Controller');
 Core::factory('Schedule_Area_Controller');
 
 
-if ($action === 'refreshTasksTable') {
-    Core_Page_Show::instance()->execute();
-    exit;
-}
+//Права доступа
+$accessRead =     Core_Access::instance()->hasCapability(Core_Access::TASK_READ);
+$accessCreate =   Core_Access::instance()->hasCapability(Core_Access::TASK_CREATE);
+$accessEdit =     Core_Access::instance()->hasCapability(Core_Access::TASK_EDIT);
+//$accessDelete = Core_Access::instance()->hasCapability(Core_Access::TASK_DELETE);
+$accessComment =  Core_Access::instance()->hasCapability(Core_Access::TASK_APPEND_COMMENT);
 
 
 if ($action === 'markAsDone') {
+    if (!$accessEdit) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $taskId = Core_Array::Get('taskId', 0, PARAM_INT);
     if ($taskId == 0) {
         Core_Page_Show::instance()->error(404);
@@ -52,6 +58,10 @@ if ($action === 'markAsDone') {
 
 
 if ($action === 'update_date') {
+    if (!$accessEdit) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $taskId = Core_Array::Get('taskId', 0, PARAM_INT);
     $date =   Core_Array::Get('date', '', PARAM_DATE);
 
@@ -76,6 +86,10 @@ if ($action === 'update_date') {
 
 
 if ($action === 'update_area') {
+    if (!$accessEdit) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $taskId = Core_Array::Get('taskId', 0, PARAM_INT);
     $areaId = Core_Array::Get('areaId', 0, PARAM_INT);
 
@@ -99,6 +113,10 @@ if ($action === 'update_area') {
 
 //Открытие всплывающего окна создания новой задачи
 if ($action === 'new_task_popup') {
+    if (!$accessCreate) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $associate = Core_Array::Get('associate', 0, PARAM_INT);
     $callback = Core_Array::Get('callback', '', PARAM_STRING);
     Core::factory('User_Controller');
@@ -146,6 +164,10 @@ if ($action === 'new_task_popup') {
 
 
 if ($action === 'save_task') {
+    if (!$accessCreate) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $date =         Core_Array::Get('date', date('Y-m-d'), PARAM_DATE);
     $note =         Core_Array::Get('text', '', PARAM_STRING);
     $areaId =       Core_Array::Get('areaId', 0, PARAM_INT);
@@ -173,6 +195,10 @@ if ($action === 'save_task') {
 
 
 if ($action === 'task_assignment_popup') {
+    if (!$accessEdit) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $taskId = Core_Array::Get('taskId', 0, PARAM_INT);
 
     if ($taskId == 0) {
@@ -209,6 +235,10 @@ if ($action === 'task_assignment_popup') {
  * Обработчик изменения приоритета задачи
  */
 if ($action === 'changeTaskPriority') {
+    if (!$accessEdit) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $taskId =       Core_Array::Get('taskId', null, PARAM_INT);
     $priorityId =   Core_Array::Get('priorityId', null, PARAM_INT);
 
@@ -230,5 +260,16 @@ if ($action === 'changeTaskPriority') {
     $jsonData->priorityId = $priorityId;
     $jsonData->priorityTitle = $Priority->title();
     echo json_encode($jsonData);
+    exit;
+}
+
+
+//проверка прав доступа
+if (!$accessRead) {
+    Core_Page_Show::instance()->error(403);
+}
+
+if ($action === 'refreshTasksTable') {
+    Core_Page_Show::instance()->execute();
     exit;
 }

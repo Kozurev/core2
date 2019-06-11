@@ -9,9 +9,11 @@
 
         <xsl:if test="active-btn-panel = 1">
             <div class="row buttons-panel">
-                <div>
-                    <a href="#" class="btn btn-{page-theme-color} user_create" data-usergroup="5">Создать пользователя</a>
-                </div>
+                <xsl:if test="access_user_create_client = 1">
+                    <div>
+                        <a href="#" class="btn btn-{page-theme-color}" onclick="getClientPopup(0)">Создать пользователя</a>
+                    </div>
+                </xsl:if>
 
                 <xsl:if test="active-export-btn = 1">
                     <div>
@@ -30,27 +32,29 @@
         </xsl:if>
 
 
-        <section>
-            <div class="table-responsive">
-                <table id="sortingTable" class="table table-striped table-statused">
-                    <thead>
-                        <tr class="header">
-                            <th>Фамилия имя</th>
-                            <th>Телефон</th>
-                            <th>Баланс</th>
-                            <th>Кол-во занятий<br/> индив/групп</th>
-                            <th>Длит.<br/>занятия</th>
-                            <th>Студия</th>
-                            <th>Действия</th>
-                        </tr>
-                    </thead>
+        <xsl:if test="access_user_read_clients = 1">
+            <section>
+                <div class="table-responsive">
+                    <table id="sortingTable" class="table table-striped table-statused">
+                        <thead>
+                            <tr class="header">
+                                <th>Фамилия имя</th>
+                                <th>Телефон</th>
+                                <th>Баланс</th>
+                                <th>Кол-во занятий<br/> индив/групп</th>
+                                <th>Длит.<br/>занятия</th>
+                                <th>Студия</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
 
-                    <tbody>
-                        <xsl:apply-templates select="user" />
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                        <tbody>
+                            <xsl:apply-templates select="user" />
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </xsl:if>
     </xsl:template>
 
 

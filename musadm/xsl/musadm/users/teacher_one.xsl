@@ -40,9 +40,15 @@
             </td>
 
             <td width="140px">
-                <a class="action edit user_edit" href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
+                <xsl:if test="//access_user_edit_teacher = 1">
+                    <a class="action edit user_edit" href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
+                </xsl:if>
+
                 <a class="action associate areas_assignments" href="#" data-model-id="{id}" data-model-name="User"></a>
-                <a class="action archive user_archive" href="#" data-userid="{id}"></a>
+
+                <xsl:if test="//access_user_archive_teacher = 1">
+                    <a class="action archive user_archive" href="#" data-userid="{id}"></a>
+                </xsl:if>
             </td>
         </tr>
     </xsl:template>

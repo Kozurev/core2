@@ -5,6 +5,7 @@
  * @author Egor
  * @date 03.02.2019 20:13
  * @version 20190315 891 776
+ * @version 20190525
  * Class User_Controller
  */
 class User_Controller
@@ -197,7 +198,7 @@ class User_Controller
             ->queryBuilder()
             ->select(['User.id', 'User.name', 'User.surname', 'phone_number', 'email', 'group_id', 'subordinated'])
             ->from(Core::factory('User')->getTableName());
-            //->orderBy('User.id', 'DESC');
+        //$this->UserQuery->limit(10);
     }
 
     /**
@@ -382,7 +383,7 @@ class User_Controller
      * @param bool $isActive
      * @return User_Controller
      */
-    public function active(bool $isActive)
+    public function active($isActive)
     {
         if (is_null($isActive)) {
             $this->active = null;
@@ -748,6 +749,58 @@ class User_Controller
             ->addEntities($Users)
             ->addEntities( 
                 Core::factory('Schedule_Area')->getList(true, false)
+            )
+            ->addSimpleEntity(
+                'access_user_read_clients',
+                (int)Core_Access::instance()->hasCapability(Core_Access::USER_READ_CLIENTS)
+            )
+            ->addSimpleEntity(
+                'access_user_create_client',
+                (int)Core_Access::instance()->hasCapability(Core_Access::USER_CREATE_CLIENT)
+            )
+            ->addSimpleEntity(
+                'access_user_edit_client',
+                (int)Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_CLIENT)
+            )
+            ->addSimpleEntity(
+                'access_user_archive_client',
+                (int)Core_Access::instance()->hasCapability(Core_Access::USER_ARCHIVE_CLIENT)
+            )
+            ->addSimpleEntity(
+                'access_payment_create_client',
+                (int)Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT)
+            )
+            ->addSimpleEntity(
+                'access_user_read_teachers',
+                (int)Core_Access::instance()->hasCapability(Core_Access::USER_READ_TEACHERS)
+            )
+            ->addSimpleEntity(
+                'access_user_create_teacher',
+                (int)Core_Access::instance()->hasCapability(Core_Access::USER_CREATE_TEACHER)
+            )
+            ->addSimpleEntity(
+                'access_user_edit_teacher',
+                (int)Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_TEACHER)
+            )
+            ->addSimpleEntity(
+                'access_user_archive_teacher',
+                (int)Core_Access::instance()->hasCapability(Core_Access::USER_ARCHIVE_TEACHER)
+            )
+            ->addSimpleEntity(
+                'access_user_read_managers',
+                (int)Core_Access::instance()->hasCapability(Core_Access::USER_READ_MANAGERS)
+            )
+            ->addSimpleEntity(
+                'access_user_create_manager',
+                (int)Core_Access::instance()->hasCapability(Core_Access::USER_CREATE_MANAGER)
+            )
+            ->addSimpleEntity(
+                'access_user_edit_manager',
+                (int)Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_MANAGER)
+            )
+            ->addSimpleEntity(
+                'access_user_archive_manager',
+                (int)Core_Access::instance()->hasCapability(Core_Access::USER_ARCHIVE_MANAGER)
             )
             ->xsl($this->xsl);
 

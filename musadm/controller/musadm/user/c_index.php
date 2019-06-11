@@ -78,7 +78,7 @@ foreach ($_GET as $paramName => $values) {
 $ClientController->show();
 
 //Список менеджеров для директора
-if ($groupId == ROLE_TEACHER && User::checkUserAccess(['groups' => [ROLE_DIRECTOR]])) {
+if ($groupId == ROLE_TEACHER && Core_Access::instance()->hasCapability(Core_Access::USER_READ_MANAGERS)) {
     $TeacherController = new User_Controller(User::current());
     $TeacherController
         ->properties(true)

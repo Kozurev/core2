@@ -1,13 +1,20 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 21.05.2018
- * Time: 10:01
+ * @author BadWolf
+ * @date 21.05.2018 10:01
+ * @version 20190526
  */
 
 $User = User::current();
 $subordinated = $User->getDirector()->getId();
+
+
+//права доступа
+$accessCreate = Core_Access::instance()->hasCapability(Core_Access::CERTIFICATE_CREATE);
+$accessEdit = Core_Access::instance()->hasCapability(Core_Access::CERTIFICATE_EDIT);
+$accessDelete = Core_Access::instance()->hasCapability(Core_Access::CERTIFICATE_DELETE);
+$accessComment = Core_Access::instance()->hasCapability(Core_Access::CERTIFICATE_APPEND_COMMENT);
+
 
 $Certificates = Core::factory('Certificate')
     ->queryBuilder()
@@ -35,5 +42,9 @@ Core::factory('Core_Entity')
     ->addSimpleEntity('is_director', $isDirector)
     ->addEntities($Certificates)
     ->addEntities($Notes)
+    ->addSimpleENtity('access_create', (int)$accessCreate)
+    ->addSimpleENtity('access_edit', (int)$accessEdit)
+    ->addSimpleENtity('access_delete', (int)$accessDelete)
+    ->addSimpleENtity('access_comment', (int)$accessComment)
     ->xsl('musadm/certificates/certificates.xsl')
     ->show();

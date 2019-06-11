@@ -11,7 +11,7 @@
 
             <div class="teacher_payments_block table-responsive">
                 <table class="table table-striped teacher_payments">
-                    <xsl:if test="is_admin = 1">
+                    <xsl:if test="access_payment_create = 1">
                         <tr>
                             <td><input name="date" class="form-control" type="date" value="{date}"/></td>
                             <td><input name="summ" class="form-control" type="number" placeholder="Сумма" /></td>
@@ -57,20 +57,18 @@
                 <td><xsl:value-of select="datetime" /></td>
                 <td class="value"><xsl:value-of select="value" /></td>
                 <td>
-                    <xsl:if test="/root/is_director = 0"><xsl:attribute name="colspan">2</xsl:attribute></xsl:if>
+                    <xsl:if test="/root/access_payment_edit = 0 and /root/access_payment_delete = 0"><xsl:attribute name="colspan">2</xsl:attribute></xsl:if>
                     <xsl:value-of select="description" />
                 </td>
-                <xsl:if test="/root/is_director = 1">
+                <xsl:if test="/root/access_payment_edit != 0 or /root/access_payment_delete != 0">
                     <td class="right">
                         <div class="row">
-                            <!--<div class="col-lg-6 col-sm-6 col-xs-12">-->
-                                <!--<a class="btn btn-orange payment_edit" href="#" data-id="{id}" data-after_save_action="teacher">Редактировать</a>-->
+                            <xsl:if test="/root/access_payment_edit = 1">
                                 <a class="action edit payment_edit" href="#" data-id="{id}" data-after_save_action="teacher" title="Редактировать платеж"></a>
-                            <!--</div>-->
-                            <!--<div class="col-lg-6 col-sm-6 col-xs-12">-->
-                                <!--<a class="btn btn-red payment_delete" href="#" data-id="{id}" data-after_save_action="teacher">Удалить</a>-->
+                            </xsl:if>
+                            <xsl:if test="/root/access_payment_delete = 1">
                                 <a class="action delete teacher_payment_delete" href="#" data-id="{id}" data-after_save_action="teacher" title="Удалить платеж"></a>
-                            <!--</div>-->
+                            </xsl:if>
                         </div>
                     </td>
                 </xsl:if>

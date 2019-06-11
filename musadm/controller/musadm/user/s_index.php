@@ -18,9 +18,9 @@ $Director = $User->getDirector();
 $subordinated = $Director->getId();
 $accessRules = ['groups' => [ROLE_ADMIN, ROLE_DIRECTOR, ROLE_MANAGER]];
 
-if (!User::checkUserAccess($accessRules, $User)) {
-    Core_Page_Show::instance()->error(404);
-}
+//if (!User::checkUserAccess($accessRules, $User)) {
+//    Core_Page_Show::instance()->error(404);
+//}
 
 $action = Core_Array::Get('action', null, PARAM_STRING);
 
@@ -29,6 +29,13 @@ $action = Core_Array::Get('action', null, PARAM_STRING);
 if ($action === 'updateFormClient') {
     $userId = Core_Array::Get('userId', 0, PARAM_INT);
     $output = Core::factory('Core_Entity');
+
+    //Проверка прав доступа
+    if ($userId == 0 && !Core_Access::instance()->hasCapability(Core_Access::USER_CREATE_CLIENT)) {
+        Core_Page_Show::instance()->error(403);
+    } elseif ($userId != 0 && !Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_CLIENT)) {
+        Core_Page_Show::instance()->error(403);
+    }
 
     if ($userId) {
         $Client = User_Controller::factory($userId);
@@ -87,6 +94,13 @@ if ($action === 'updateFormTeacher') {
     $userId = Core_Array::Get('userId', 0, PARAM_INT);
     $output = Core::factory('Core_Entity');
 
+    //Проверка прав доступа
+    if ($userId == 0 && !Core_Access::instance()->hasCapability(Core_Access::USER_CREATE_TEACHER)) {
+        Core_Page_Show::instance()->error(403);
+    } elseif ($userId != 0 && !Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_TEACHER)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     if ($userId != 0) {
         $Teacher = User_Controller::factory($userId);
 
@@ -116,6 +130,10 @@ if ($action === 'updateFormTeacher') {
 
 //Форма редактирования директора
 if ($action === 'updateFormDirector') {
+    if (!User::checkUserAccess(['groups' => [ROLE_ADMIN]])) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $userId = Core_Array::Get('userId', 0, PARAM_INT);
     $output = Core::factory('Core_Entity');
 
@@ -150,6 +168,13 @@ if ($action === 'updateFormManager') {
     $userId = Core_Array::Get('userId', 0, PARAM_INT);
     $output = Core::factory('Core_Entity');
 
+    //Проверка прав доступа
+    if ($userId == 0 && !Core_Access::instance()->hasCapability(Core_Access::USER_CREATE_MANAGER)) {
+        Core_Page_Show::instance()->error(403);
+    } elseif ($userId != 0 && !Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_MANAGER)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     if ($userId != 0) {
         $Manager = User_Controller::factory($userId);
 
@@ -169,15 +194,13 @@ if ($action === 'updateFormManager') {
 }
 
 
-//Обновление таблиц
-if ($action === 'refreshTableUsers') {
-    $this->execute();
-    exit;
-}
-
-
 //Форма для создания платежа
 if ($action === 'getPaymentPopup') {
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT)) {
+        Core_Page_Show::instance()->error(404);
+    }
+
     $userId = Core_Array::Get('userId', null, PARAM_INT);
     $User = User_Controller::factory($userId);
     if (is_null($userId) || is_null($User)) {
@@ -195,6 +218,11 @@ if ($action === 'getPaymentPopup') {
 
 //Сохранение платежа
 if ($action == 'savePayment') {
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT)) {
+        Core_Page_Show::instance()->error(404);
+    }
+
     $userId =       Core_Array::Get('userid', 0, PARAM_INT);
     $value  =       Core_Array::Get('value', 0, PARAM_FLOAT);
     $description =  Core_Array::Get('description', '', PARAM_STRING);
@@ -411,10 +439,18 @@ if ($action === 'deleteAreaAssignment') {
 }
 
 
+//Обновление таблиц
+if ($action === 'refreshTableUsers') {
+    $this->execute();
+    exit;
+}
+
+
 if ($action === 'applyUserFilter') {
     Core_Page_Show::instance()->execute();
     exit;
 }
+
 
 
 if (Core_Page_Show::instance()->StructureItem->getId() == ROLE_CLIENT) {

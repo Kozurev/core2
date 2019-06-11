@@ -57,6 +57,10 @@ section {
     color: green;
 }
 
+.red {
+    color: red;
+}
+
 .center-blocks,
 .left-blocks,
 .right-blocks div {
@@ -220,6 +224,11 @@ section {
 
 .plus {
     background: url("../images/plus.png");
+    background-size: cover;
+}
+
+.settings {
+    background: url("../images/settings.svg");
     background-size: cover;
 }
 

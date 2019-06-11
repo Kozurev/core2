@@ -6,7 +6,26 @@
  * @date 21.05.2018 12:06
  * @version 20190410
  * @version 20190427
+ * @version 20190526
  */
+
+
+//основные права доступа
+$accessPaymentsRead = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_ALL);
+$accessPaymentConfig = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CONFIG);
+$accessPaymentCreateA = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_ALL);
+$accessPaymentEditA = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_EDIT_ALL);
+$accessPaymentEditC = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_EDIT_CLIENT);
+$accessPaymentEditT = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_EDIT_TEACHER);
+$accessPaymentDeleteA = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_ALL);
+$accessPaymentDeleteC = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_CLIENT);
+$accessPaymentDeleteT = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_TEACHER);
+
+$accessTarifRead = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_READ);
+$accessTarifCreate = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_CREATE);
+$accessTarifEdit = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_EDIT);
+$accessTarifDelete = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_DELETE);
+
 
 $dateFormat = 'Y-m-d';
 $date = date($dateFormat);
@@ -121,5 +140,19 @@ Core::factory('Core_Entity')
     ->addSimpleEntity('absent_rate', $defAbsentRate)
     ->addSimpleEntity('absent_rate_type', $defAbsentRateType)
     ->addSimpleEntity('absent_rate_val', $defAbsentRateVal)
+    //права доступа
+    ->addSimpleEntity('access_payment_read', (int)$accessPaymentsRead)
+    ->addSimpleEntity('access_payment_config', (int)$accessPaymentConfig)
+    ->addSimpleEntity('access_payment_create_all', (int)$accessPaymentCreateA)
+    ->addSimpleEntity('access_payment_edit_all', (int)$accessPaymentEditA)
+    ->addSimpleEntity('access_payment_edit_client', (int)$accessPaymentEditC)
+    ->addSimpleEntity('access_payment_edit_teacher', (int)$accessPaymentEditT)
+    ->addSimpleEntity('access_payment_delete_all', (int)$accessPaymentEditA)
+    ->addSimpleEntity('access_payment_delete_client', (int)$accessPaymentEditC)
+    ->addSimpleEntity('access_payment_delete_teacher', (int)$accessPaymentEditT)
+    ->addSimpleEntity('access_payment_tarif_read', (int)$accessTarifRead)
+    ->addSimpleEntity('access_payment_tarif_create', (int)$accessTarifCreate)
+    ->addSimpleEntity('access_payment_tarif_edit', (int)$accessTarifEdit)
+    ->addSimpleEntity('access_payment_tarif_delete', (int)$accessTarifDelete)
     ->xsl('musadm/finances/client_payments.xsl')
     ->show();

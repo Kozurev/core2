@@ -2,6 +2,7 @@
 /**
  * @author BadWolf
  * @version 20190322
+ * @version 20190526
  */
 Core::factory('User_Controller');
 Core::factory('Task_Controller');
@@ -39,19 +40,11 @@ if ($isTeacherPage == true) {
 $action = Core_Array::Get('action', null, PARAM_STRING);
 
 
-if (!User::checkUserAccess(['groups' => [ROLE_MANAGER, ROLE_TEACHER, ROLE_DIRECTOR]])) {
+
+if (!$isTeacherPage && is_null(Core_Page_Show::instance()->StructureItem)
+    && !Core_Access::instance()->hasCapability(Core_Access::AREA_READ)) {
     Core_Page_Show::instance()->error(403);
 }
-if (User::checkUserAccess(['groups' => [ROLE_MANAGER]])
-    && is_null(Core_Page_Show::instance()->StructureItem)
-    && is_null($action)
-    && !$isTeacherPage) {
-    Core_Page_Show::instance()->error(403);
-} elseif (User::checkUserAccess(['groups' => [ROLE_TEACHER]]) && Core_Page_Show::instance()->StructureItem != null) {
-    Core_Page_Show::instance()->error(403);
-}
-
-
 
 $breadcumbs[0] = new stdClass();
 $breadcumbs[0]->title = Core_Page_Show::instance()->Structure->title();
@@ -96,8 +89,15 @@ if (Core_Page_Show::instance()->StructureItem != null) {
  */
 if ($action == 'getScheduleAreaPopup') {
     $areaId = Core_Array::Get('areaId', null, PARAM_INT);
-    $Area = Schedule_Area_Controller::factory($areaId);
 
+    //проверка прав доступа
+    if (is_null($areaId) && !Core_Access::instance()->hasCapability(Core_Access::AREA_CREATE)) {
+        Core_Page_Show::instance()->error(403);
+    } elseif (!is_null($areaId) && !Core_Access::instance()->hasCapability(Core_Access::AREA_EDIT)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
+    $Area = Schedule_Area_Controller::factory($areaId);
     if (is_null($Area)) {
         Core_Page_Show::instance()->error(404);
     }
@@ -106,7 +106,6 @@ if ($action == 'getScheduleAreaPopup') {
         ->addEntity($Area)
         ->xsl('musadm/schedule/new_area_popup.xsl')
         ->show();
-
     exit;
 }
 
@@ -114,11 +113,15 @@ if ($action == 'getScheduleAreaPopup') {
  * Вывод формы для всплывающего окна создания периода отсутствия
  */
 if ($action === 'getScheduleAbsentPopup') {
+    //Проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $clientId = Core_Array::Get('client_id', null, PARAM_INT);
     $typeId =   Core_Array::Get('type_id', null, PARAM_INT);
     $date =     Core_Array::Get('date', date('Y-m-d'), PARAM_DATE);
     $id =       Core_Array::Get('id', null, PARAM_INT);
-
 
     if ((is_null($clientId) || is_null($typeId)) && is_null($id)) {
         Core_Page_Show::instance()->error(404);
@@ -143,7 +146,6 @@ if ($action === 'getScheduleAbsentPopup') {
         ->addEntity($AbsentPeriod, 'absent')
         ->xsl('musadm/schedule/absent_popup.xsl')
         ->show();
-
     exit;
 }
 
@@ -174,6 +176,11 @@ if ($action === 'deleteScheduleAbsent') {
  * Вывод формы для всплывающего окна создания занятия
  */
 if ($action === 'getScheduleLessonPopup') {
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_CREATE)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $classId =      Core_Array::Get('classId', null, PARAM_INT);
     $lessonType =   Core_Array::Get('lessonType', '', PARAM_STRING);
     $date =         Core_Array::Get('date', '', PARAM_STRING);
@@ -237,7 +244,6 @@ if ($action === 'getScheduleLessonPopup') {
         ->addSimpleEntity('timestep', $period)
         ->xsl('musadm/schedule/new_lesson_popup.xsl')
         ->show();
-
     exit;
 }
 
@@ -246,6 +252,11 @@ if ($action === 'getScheduleLessonPopup') {
  * Формирование отчета по проведенному занятию
  */
 if ($action === 'teacherReport') {
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_CREATE)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $lessonId = Core_Array::Get('lessonId', null, PARAM_INT);
     $date = Core_Array::Get('date', null, PARAM_STRING);
     $attendance = Core_Array::Get('attendance', null, PARAM_INT);
@@ -273,6 +284,11 @@ if ($action === 'teacherReport') {
  * Удаление отчета/отчетов о проведенном занятии
  */
 if ($action === 'deleteReport') {
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_DELETE)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $date = Core_Array::Get('date', null, PARAM_STRING);
     $lessonId = Core_Array::Get('lesson_id', null, PARAM_INT);
     $Lesson = Core::factory('Schedule_Lesson', $lessonId);
@@ -298,7 +314,6 @@ if ($action === 'getclientList') {
             ->where('subordinated', '=', $subordinated)
             ->orderBy('title')
             ->findAll();
-
         foreach ($Groups as $Group) {
             echo "<option value='" . $Group->getId() . "'>" . $Group->title() . "</option>";
         }
@@ -311,7 +326,6 @@ if ($action === 'getclientList') {
             ->isLimitedAreasAccess(true)
             ->isWithAreaAssignments(false)
             ->getUsers();
-
         foreach ($Users as $User) {
             echo "<option value='" . $User->getId() . "'>". $User->surname() . " " . $User->name() ."</option>";
         }
@@ -325,6 +339,11 @@ if ($action === 'getclientList') {
  * Удаление занятия из расписания
  */
 if ($action === 'markDeleted') {
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_DELETE)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $lessonId =     Core_Array::Get('lessonid', 0, PARAM_INT);
     $deleteDate =   Core_Array::Get('deletedate', '', PARAM_STRING);
 
@@ -351,6 +370,11 @@ if ($action === 'markDeleted') {
  * Отсутствие занятия
  */
 if ($action === 'markAbsent') {
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $lessonId = Core_Array::Get('lessonid', 0, PARAM_INT);
     $date =     Core_Array::Get('date', '', PARAM_STRING);
 
@@ -377,6 +401,11 @@ if ($action === 'markAbsent') {
  * Вывод формы изменения времени начала/конца проведения занятия
  */
 if ($action === 'getScheduleChangeTimePopup') {
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $id =   Core_Array::Get('id', 0, PARAM_INT);
     $date = Core_Array::Get('date', '', PARAM_STRING);
 
@@ -408,6 +437,11 @@ if ($action === 'getScheduleChangeTimePopup') {
  * Обработчик сохранения изменения времени проведения занятия
  */
 if ($action === 'saveScheduleChangeTimePopup') {
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $lessonId = Core_Array::Get('lesson_id', 0, PARAM_INT);
     $date =     Core_Array::Get('date', date('Y-m-d'), PARAM_STRING);
     $timeFrom = Core_Array::Get('time_from', '', PARAM_STRING);
@@ -435,7 +469,7 @@ if ($action === 'saveScheduleChangeTimePopup') {
 }
 
 /**
- *
+ * Создание обращения к менеджерам
  */
 if ($action === 'new_task_popup') {
     $TaskTypes = Core::factory('Task_Type')->findAll();
@@ -454,7 +488,7 @@ if ($action === 'new_task_popup') {
 if ($action === 'save_task') {
     $authorId = $User->getId();
     $noteDate = date('Y-m-d');
-    $note = Core_Array::Get('text', '');
+    $note = Core_Array::Get('text', '', PARAM_STRING);
 
     $Task = Task_Controller::factory()->date($noteDate);
     $Task->save();
@@ -533,10 +567,6 @@ if ($action === 'payment_save') {
     exit;
 }
 
-if ($action === 'getSchedule') {
-    $this->execute();
-    exit;
-}
 
 if ($action === 'saveClassName') {
     $areaId = Core_Array::Get('areaId', 0, PARAM_INT);
@@ -549,11 +579,22 @@ if ($action === 'saveClassName') {
     }
 
     $Room = $Area->setClassName($classId, $newName);
-
     $outputJson = new stdClass();
     $outputJson->id = $Room->getId();
     $outputJson->title = $Room->title();
     $outputJson->classId = $Room->classId();
     $outputJson->areaId = $Room->areaId();
     exit(json_encode($Room));
+}
+
+
+//проверка прав доступа
+if (!$isTeacherPage && !Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ)) {
+    Core_Page_Show::instance()->error(403);
+}
+
+
+if ($action === 'getSchedule') {
+    $this->execute();
+    exit;
 }

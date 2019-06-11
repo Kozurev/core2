@@ -202,6 +202,21 @@ class User_Model extends Core_Entity
 
 
     /**
+     * @param string|null $patronymic
+     * @return $this|string
+     */
+    public function patronymic(string $patronymic = null)
+    {
+        if (is_null($patronymic)) {
+            return $this->patronimyc;
+        } else {
+            $this->patronimyc = trim($patronymic);
+            return $this;
+        }
+    }
+
+
+    /**
      * @param string|null $email
      * @return $this|string
      */
@@ -210,7 +225,7 @@ class User_Model extends Core_Entity
 		if (is_null($email)) {
 		    return $this->email;
         } else {
-            $this->email = $email;
+            $this->email = trim($email);
             return $this;
         }
 	}

@@ -2,9 +2,11 @@
 
     <xsl:template match="root">
         <section class="certificate">
-            <div class="row buttons-panel">
-                <a class="btn btn-pink" onclick="editCertificatePopup(0)">Добавить сертификат</a>
-            </div>
+            <xsl:if test="access_create = 1">
+                <div class="row buttons-panel">
+                    <a class="btn btn-pink" onclick="editCertificatePopup(0)">Добавить сертификат</a>
+                </div>
+            </xsl:if>
 
             <style>
                 .certificate .block {
@@ -48,15 +50,19 @@
             </td>
             <td>
                 <div class="row">
-                    <a class="action comment" onclick="addNewCertificateNotePopup({id})"></a>
+                    <xsl:if test="//access_comment = 1">
+                        <a class="action comment" onclick="addNewCertificateNotePopup({id})"></a>
+                    </xsl:if>
 
-                    <xsl:if test="/root/is_director = 1">
+                    <xsl:if test="//access_edit = 1">
                         <a class="action edit" onclick="editCertificatePopup({id})"></a>
+                    </xsl:if>
+
+                    <xsl:if test="//access_delete = 1">
                         <a class="action delete" onclick="deleteItem('Certificate', {id}, refreshCertificatesTable)"></a>
                     </xsl:if>
                 </div>
             </td>
-            <!--<td><a class="btn btn-pink certificate_delete" data-id="{id}">Удалить</a></td>-->
         </tr>
     </xsl:template>
 

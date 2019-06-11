@@ -6,6 +6,7 @@
  * @date 30.01.2019 13:36
  * @version 20190323
  * @version 20190427
+ * @version 20190526
  * Class Lid_Controller
  */
 class Lid_Controller
@@ -756,6 +757,9 @@ class Lid_Controller
             ->addEntities(Core::factory('Schedule_Area')->getList())
             ->addEntities(Core::factory('Lid_Status')->getList())
             ->addEntities(Lid_Status::getColors(), 'color')
+            ->addSimpleEntity('access_lid_create', (int)Core_Access::instance()->hasCapability(Core_Access::LID_CREATE))
+            ->addSimpleEntity('access_lid_edit', (int)Core_Access::instance()->hasCapability(Core_Access::LID_EDIT))
+            ->addSimpleEntity('access_lid_comment', (int)Core_Access::instance()->hasCapability(Core_Access::LID_APPEND_COMMENT))
             ->xsl($this->xsl);
 
         return $OutputXml->show($isEcho);

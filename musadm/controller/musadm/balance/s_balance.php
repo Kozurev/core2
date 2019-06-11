@@ -48,10 +48,16 @@ if (is_null($User)) {
 $Director = $User->getDirector();
 $action = Core_Array::Get('action', '');
 
+
 /**
  * Обновление сожержимого страницы
  */
 if ($action === 'refreshTablePayments') {
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::USER_READ_CLIENTS)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     Core_Page_Show::instance()->execute();
     exit;
 }
@@ -61,7 +67,8 @@ if ($action === 'refreshTablePayments') {
  * Открытие всплывающего окна для начисления оплаты (создания платежа клиента с 2 полями для примечания)
  */
 if ($action === 'getPaymentPopup') {
-    if (!User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]])) {
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT)) {
         Core_Page_Show::instance()->error(403);
     }
 
@@ -85,6 +92,11 @@ if ($action === 'getPaymentPopup') {
  * Открытие всплывающего окна для покупки тарифа
  */
 if ($action === 'getTarifPopup') {
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_BUY)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $userId =   Core_Array::Get('userid', null, PARAM_INT);
     $Client = User_Controller::factory($userId);
     if (is_null($Client)) {
@@ -164,6 +176,11 @@ if ($action === 'updatePerLesson') {
  * Покупка тарифа
  */
 if ($action == 'buyTarif') {
+    //Проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_BUY)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $clientId = Core_Array::Get('userId', null, PARAM_INT);
     $tarifId =  Core_Array::Get( 'tarifId', null, PARAM_INT);
 
@@ -184,11 +201,6 @@ if ($action == 'buyTarif') {
     $CountGroupLessons = Core::factory('Property')->getByTagName('group_lessons');
     $CountIndivLessons = $CountIndivLessons->getPropertyValues($Client)[0];
     $CountGroupLessons = $CountGroupLessons->getPropertyValues($Client)[0];
-
-    //Корректировка баланса
-//    $oldBalance = intval($UserBalance->value());
-//    $newBalance = $oldBalance - intval($Tarif->price());
-//    $UserBalance->value($newBalance)->save();
 
     //Корректировка кол-ва занятий
     if ($Tarif->countIndiv() != 0) {
@@ -232,7 +244,8 @@ if ($action == 'buyTarif') {
 
 
 if ($action === 'savePayment') {
-    if (!User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]])) {
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT)) {
         Core_Page_Show::instance()->error(403);
     }
 
@@ -253,17 +266,6 @@ if ($action === 'savePayment') {
         ->getByTagName('payment_comment')
         ->addNewValue($Payment, $description2);
 
-    //Корректировка баланса ученика
-//    $Client =      Core::factory('User', $userId);
-//    $UserBalance = Core::factory('Property')->getByTagName('balance');
-//    $UserBalance = $UserBalance->getPropertyValues($Client)[0];
-//    $balanceOld =  floatval($UserBalance->value());
-//
-//    $type == 1
-//        ?   $balanceNew = $balanceOld + floatval($value)
-//        :   $balanceNew = $balanceOld - floatval($value);
-//
-//    $UserBalance->value($balanceNew)->save();
     exit('0');
 }
 
@@ -272,6 +274,7 @@ if ($action === 'savePayment') {
  * Добавление комментария к платежу
  */
 if ($action === 'add_note') {
+    //TODO: добавить нормальную проверку прав доступа
     if (!User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]])) {
         Core_Page_Show::instance()->error(403);
     }
@@ -294,7 +297,8 @@ if ($action === 'add_note') {
  * Сохранение данных платежа
  */
 if ($action === 'payment_save') {
-    if (!User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]])) {
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT)) {
         Core_Page_Show::instance()->error(403);
     }
 
@@ -306,21 +310,6 @@ if ($action === 'payment_save') {
     if (is_null($Payment)) {
         Core_Page_Show::instance()->error(404);
     }
-
-//    $User = User_Controller::factory($Payment->user());
-//    $difference = intval($Payment->value()) - intval($value);
-//
-//    if ($difference !== 0 && $User->groupId() == ROLE_CLIENT) {
-//        $UserBalance = Core::factory( 'Property')->getByTagName('balance');
-//        $UserBalance = $UserBalance->getPropertyValues($User)[0];
-//        $balanceOld =  $UserBalance->value();
-//
-//        $Payment->type() == 1
-//            ?   $balanceNew = $balanceOld - $difference
-//            :   $balanceNew = $balanceOld + $difference;
-//
-//        $UserBalance->value($balanceNew)->save();
-//    }
 
     $Payment
         ->value($value)
@@ -337,7 +326,8 @@ if ($action === 'payment_save') {
  * Удаление пользовательского платежа
  */
 if ($action === 'payment_delete') {
-    if (!User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]])) {
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_CLIENT)) {
         Core_Page_Show::instance()->error(403);
     }
 
@@ -370,7 +360,8 @@ if ($action === 'payment_delete') {
  * Сохранение комментария к пользователю
  */
 if ($action === 'saveUserComment') {
-    if (!User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]])) {
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::USER_APPEND_COMMENT)) {
         Core_Page_Show::instance()->error(403);
     }
 
@@ -408,6 +399,10 @@ if ($action === 'edit_report_popup') {
     exit;
 }
 
+
+if (!Core_Access::instance()->hasCapability(Core_Access::USER_READ_CLIENTS)) {
+    Core_Page_Show::instance()->error(403);
+}
 
 /**
  * Обновление контента страницы

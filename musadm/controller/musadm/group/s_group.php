@@ -1,9 +1,12 @@
 <?php
 /**
+ * Настройки для раздела "Группы"
+ *
  * @author: BadWolf
  * @date: 24.04.2018 19:46
  * @version 20190603
  * @version 20190405
+ * @version 20190526
  */
 
 Core::factory('User_Controller');
@@ -27,8 +30,20 @@ Core_Page_Show::instance()->setParam('breadcumbs', $breadcumbs);
 
 $action = Core_Array::Get('action', null, PARAM_STRING);
 
+
+//основные права доступа к разделу
+$accessRead =   Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_GROUP_READ);
+$accessCreate = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_GROUP_CREATE);
+$accessEdit =   Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_GROUP_EDIT);
+$accessDelete = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_GROUP_DELETE);
+
+
 //Формирование содержания всплывающего окна состава группы
 if ($action === 'getGroupComposition') {
+    if (!$accessEdit) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $groupId = Core_Array::Get('group_id', null, PARAM_INT);
     if (is_null($groupId)) {
         Core_Page_Show::instance()->error(404);
@@ -40,7 +55,6 @@ if ($action === 'getGroupComposition') {
     }
 
     $Group->addEntities($Group->getClientList());
-
     $UserController = new User_Controller(User::current());
     $Users = $UserController
         ->groupId(ROLE_CLIENT)
@@ -48,26 +62,26 @@ if ($action === 'getGroupComposition') {
     $Users->queryBuilder()
         ->orderBy('surname', 'ASC')
         ->orderBy('name', 'ASC');
-
     Core::factory('Core_Entity')
         ->addEntity($Group, 'group')
         ->addEntities($Users->getUsers())
         ->xsl('musadm/groups/group_assignment.xsl')
         ->show();
-
     exit;
 }
 
-//Обновление содержимого страницы
-if ($action == 'refreshGroupTable') {
-    Core_Page_Show::instance()->execute();
-    exit;
-}
 
 //Формирование всплывающего окна создания/редактирования
 if ($action == 'updateForm') {
     $popupData = Core::factory('Core_Entity');
     $modelId = Core_Array::Get('group_id', 0, PARAM_INT);
+
+    if ($modelId == 0 && !$accessCreate) {
+        Core_Page_Show::instance()->error(403);
+    }
+    if ($modelId != 0 && !$accessEdit) {
+        Core_Page_Show::instance()->error(403);
+    }
 
     if ($modelId !== 0) {
         $Group = Core::factory('Schedule_Group', $modelId);
@@ -132,6 +146,10 @@ if ($action === 'groupSearchClient') {
 
 //Создание связей клиентов и группы
 if ($action === 'groupCreateAssignments') {
+    if (!$accessEdit) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $userIds = Core_Array::Get('userIds', [], PARAM_ARRAY);
     $groupId = Core_Array::Get('groupId', null, PARAM_INT);
 
@@ -167,6 +185,10 @@ if ($action === 'groupCreateAssignments') {
 
 //Удаление существующих связей группы с клиентами
 if ($action === 'groupDeleteAssignments') {
+    if (!$accessEdit) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $userIds = Core_Array::Get('userIds', [], PARAM_ARRAY);
     $groupId = Core_Array::Get('groupId', null, PARAM_INT);
 
@@ -198,5 +220,18 @@ if ($action === 'groupDeleteAssignments') {
     }
 
     echo json_encode($outputJson);
+    exit;
+}
+
+
+
+if (!$accessRead) {
+    Core_Page_Show::instance()->error(403);
+}
+
+
+//Обновление содержимого страницы
+if ($action == 'refreshGroupTable') {
+    Core_Page_Show::instance()->execute();
     exit;
 }

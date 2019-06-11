@@ -45,9 +45,11 @@
 
                     <xsl:choose>
                         <xsl:when test="periods = 1">
-                            <div>
-                                <a class="btn btn-red" onclick="newTaskPopup(0, 'refreshTasksTable')">Добавить задачу</a>
-                            </div>
+                            <xsl:if test="access_task_create = 1">
+                                <div>
+                                    <a class="btn btn-red" onclick="newTaskPopup(0, 'refreshTasksTable')">Добавить задачу</a>
+                                </div>
+                            </xsl:if>
                         </xsl:when>
                         <xsl:otherwise>
                             <div>

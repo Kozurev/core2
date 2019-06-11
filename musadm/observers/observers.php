@@ -656,3 +656,35 @@ Core::attachObserver('beforeTaskInsert', function($args) {
         }
     }
 });
+
+
+/**
+ * Причисление пользователя к какой-либо группе прав доступа при создании
+ */
+Core::attachObserver('afterUserInsert', function($args){
+    switch ($args[0]->groupId())
+    {
+        case ROLE_DIRECTOR:
+            $accessGroupId = 1;
+            break;
+
+        case ROLE_MANAGER:
+            $accessGroupId = 2;
+            break;
+
+        case ROLE_TEACHER:
+            $accessGroupId = 3;
+            break;
+
+        case ROLE_CLIENT:
+            $accessGroupId = 4;
+            break;
+
+        default: $accessGroupId = 0;
+    }
+
+    $Group = Core::factory('Core_Access_Group', $accessGroupId);
+    if (!is_null($Group)) {
+        $Group->appendUser($args[0]->getId());
+    }
+});

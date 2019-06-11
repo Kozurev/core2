@@ -7,7 +7,7 @@
         <section class="user-events">
             <input type="hidden" id='taskAfterAction' value='{afterTaskAction}' />
 
-            <xsl:if test="user/group_id = 5">
+            <xsl:if test="user/group_id = 5 and //access_user_append_comment = 1">
                 <div class="row">
                     <div class="col-md-3 col-xs-12 right">
                         <h4>Добавить комментарий</h4>

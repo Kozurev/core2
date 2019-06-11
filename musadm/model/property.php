@@ -6,15 +6,21 @@
  * @author Bad Wolf
  * @date ...
  * @version 20190220
+ * @version 20190529
  * Class Property
  */
 class Property extends Property_Model
 {
-
-    public function getByTagName( $tag_name )
+    /**
+     * Поиск доп. свйоства по уникальному названию
+     *
+     * @param $tagName
+     * @return Property|null
+     */
+    public function getByTagName($tagName)
     {
         return $this->queryBuilder()
-            ->where( 'tag_name', '=', $tag_name )
+            ->where('tag_name', '=', $tagName)
             ->find();
     }
 
@@ -25,42 +31,34 @@ class Property extends Property_Model
 	 * @param $obj - объект, значения свойства которого будет возвращено
 	 * @return array
 	 */
-	public function getPropertyValues( $obj )
+	public function getPropertyValues($obj)
 	{
-		if ( !$this->id || !$this->active() )
-        {
+		if (empty($this->id) || !$this->active()) {
             return [];
         }
 
-
-        $tableName = 'Property_' . ucfirst( $this->type() );
+        $tableName = 'Property_' . ucfirst($this->type());
         $modelName = $obj->getTableName();
-
-        $EmptyValue = Core::factory( $tableName )
-            ->property_id( $this->id )
-            ->model_name( $modelName )
+        $EmptyValue = Core::factory($tableName)
+            ->property_id($this->id)
+            ->model_name($modelName)
             ->value($this->defaultValue());
 
-		if ( $obj->getId() == 0 )
-        {
+		if ($obj->getId() == 0) {
             return [$EmptyValue];
         }
 
-        $EmptyValue->object_id( $obj->getId() );
+        $EmptyValue->object_id($obj->getId());
 
-		$PropertyValues = Core::factory( $tableName )->queryBuilder()
-			->where( 'property_id', '=', $this->getId() )
-			->where( 'model_name', '=', $modelName )
-			->where( 'object_id', '=', $obj->getId() )
+		$PropertyValues = Core::factory($tableName)->queryBuilder()
+			->where('property_id', '=', $this->getId())
+			->where('model_name', '=', $modelName)
+			->where('object_id', '=', $obj->getId())
 			->findAll();
 
-
-		if ( count( $PropertyValues ) == 0 )
-        {
+		if (count($PropertyValues) == 0) {
             return [$EmptyValue];
-        }
-        else
-        {
+        } else {
             return $PropertyValues;
         }
 	}
@@ -72,29 +70,25 @@ class Property extends Property_Model
 	 * @param $obj - объект, свойства которого бутуд возвращены
 	 * @return array
 	 */
-	public function getPropertiesList( $obj )
+	public function getPropertiesList($obj)
 	{
-	    if ( !is_object( $obj ) || !method_exists( $obj, "getId" ) )
-        {
+	    if (!is_object($obj) || !method_exists($obj, 'getId')) {
             return [];
         }
 
 	    $types = $this->getPropertyTypes();
         $Properties = [];
 
-        foreach( $types as $type )
-        {
+        foreach ($types as $type) {
             $tableName = 'Property_' . $type . '_Assigment';
-
-            $TypeProperties = Core::factory( $tableName )
+            $TypeProperties = Core::factory($tableName)
                 ->queryBuilder()
-                ->where( 'object_id', '=', $obj->getId() )
-                ->where( 'model_name', '=', $obj->getTableName() )
+                ->where('object_id', '=', $obj->getId())
+                ->where('model_name', '=', $obj->getTableName())
                 ->findAll();
 
-            foreach ( $TypeProperties as $PropertyAssignment )
-            {
-                $Properties[] = Core::factory( 'Property', $PropertyAssignment->property_id() );
+            foreach ($TypeProperties as $PropertyAssignment) {
+                $Properties[] = Core::factory('Property', $PropertyAssignment->property_id());
             }
         }
 
@@ -109,12 +103,10 @@ class Property extends Property_Model
 	 * @param $propertyId - id свойства, которое необходимо добавить в список свойств
 	 * @return null|object
 	 */
-	public function addToPropertiesList( $obj, $propertyId )
+	public function addToPropertiesList($obj, $propertyId)
 	{
-        $Property = Core::factory( 'Property', $propertyId );
-
-        if ( $Property === null )
-        {
+        $Property = Core::factory('Property', $propertyId);
+        if (is_null($Property)) {
             return null;
         }
 
@@ -124,24 +116,22 @@ class Property extends Property_Model
             ?   $objectId = 0
             :   $objectId = $obj->getId();
 
-        $Assignment = Core::factory( $tableName )
+        $Assignment = Core::factory($tableName)
             ->queryBuilder()
-            ->where( 'object_id', '=', $objectId )
-	        ->where( 'property_id', '=', $propertyId )
-            ->where( 'model_name', '=', $obj->getTableName() )
+            ->where('object_id', '=', $objectId)
+	        ->where('property_id', '=', $propertyId)
+            ->where('model_name', '=', $obj->getTableName())
             ->find();
 
-        if ( $Assignment !== null )
-        {
-            return null;
+        if (!is_null($Assignment)) {
+            return $Assignment;
         }
 
-        $NewAssignment = Core::factory( $tableName )
-            ->property_id( $propertyId )
-            ->object_id( $obj->getId() )
-            ->model_name( $obj->getTableName() );
+        $NewAssignment = Core::factory($tableName)
+            ->property_id($propertyId)
+            ->object_id($obj->getId())
+            ->model_name($obj->getTableName());
         $NewAssignment->save();
-
         return $NewAssignment;
 	}
 
@@ -153,12 +143,10 @@ class Property extends Property_Model
 	 * @param $propertyId - id свойства, которое необходимо удалить из списка свойств
 	 * @return null|Property
 	 */
-	public function deleteFromPropertiesList( $obj, $propertyId )
+	public function deleteFromPropertiesList($obj, $propertyId)
 	{
-        $Property = Core::factory('Property', $propertyId );
-
-        if ( $Property === null )
-        {
+        $Property = Core::factory('Property', $propertyId);
+        if (is_null($Property)) {
             return null;
         }
 
@@ -168,17 +156,15 @@ class Property extends Property_Model
             ?   $objectId = 0
             :   $objectId = $obj->getId();
 
-        $Assignment = Core::factory( $tableName )
-            ->where( 'object_id', '=', $objectId )
-            ->where( 'property_id', '=', $propertyId )
-            ->where( 'model_name', '=', $obj->getTableName() )
+        $Assignment = Core::factory( $tableName)
+            ->where('object_id', '=', $objectId)
+            ->where('property_id', '=', $propertyId)
+            ->where('model_name', '=', $obj->getTableName())
             ->find();
 
-        if ( $Assignment !== null )
-        {
+        if (!is_null($Assignment)) {
             $Assignment->delete();
         }
-
         return $this;
 	}
 
@@ -191,22 +177,20 @@ class Property extends Property_Model
 	 * @param $val - значение добавляемого свойства к объекту
 	 * @return null|object
 	 */
-	public function addNewValue( $obj, $val )
+	public function addNewValue($obj, $val)
 	{
-		if ( !$this->active() )
-        {
+		if (!$this->active()) {
             return null;
         }
 
-		$tableName = 'Property_' . ucfirst( $this->type() );
+		$tableName = 'Property_' . ucfirst($this->type());
 
-		$NewPropertyValue = Core::factory( $tableName )
-			->property_id( $this->id )
-			->model_name( $obj->getTableName() )
-			->object_id( $obj->getId() )
-			->value( $val );
+		$NewPropertyValue = Core::factory($tableName)
+			->property_id($this->id)
+			->model_name($obj->getTableName())
+			->object_id($obj->getId())
+			->value($val);
         $NewPropertyValue->save();
-
         return $NewPropertyValue;
 	}
 
@@ -216,42 +200,37 @@ class Property extends Property_Model
      *
      * @return array of objects
 	 */
-	private function getPropertyListValues( $obj )
+	private function getPropertyListValues($obj)
 	{
-		if ( $this->type != 'list' )
-        {
+		if ($this->type != 'list') {
             return [];
         }
 
-		$PropertyListValues = Core::factory( 'Property_List' )
+		$PropertyListValues = Core::factory('Property_List')
 		    ->queryBuilder()
-			->where( 'property_id', '=', $this->id )
-			->where( 'object_id', '=', $obj->getId() )
-            ->where( 'model_name', '=', $obj->getTableName() )
+			->where('property_id', '=', $this->id)
+			->where('object_id', '=', $obj->getId())
+            ->where('model_name', '=', $obj->getTableName())
 			->findAll();
 
-		if( count( $PropertyListValues ) == 0 && $this->default_value != '' )
-        {
-            $PropertyListValues[] = Core::factory( 'Property_List' )
-                ->property_id( $this->id )
-                ->object_id( $obj->getId() )
-                ->model_name( $obj->getTableName() )
-                ->value( $this->default_value );
+		if (count($PropertyListValues) == 0 && $this->default_value != '') {
+            $PropertyListValues[] = Core::factory('Property_List')
+                ->property_id($this->id)
+                ->object_id($obj->getId())
+                ->model_name($obj->getTableName())
+                ->value($this->default_value);
         }
 
 		$ListItems = [];
-
-		foreach ( $PropertyListValues as $ListValue )
-		{
-		    if ( $ListValue->value() == 0 )
-            {
+		foreach ($PropertyListValues as $ListValue) {
+		    if ($ListValue->value() == 0) {
                 continue;
             }
 
-			$ListItems[] = Core::factory( 'Property_List_Values' )
+			$ListItems[] = Core::factory('Property_List_Values')
                 ->queryBuilder()
-				->where( 'property_id', '=', $this->id )
-				->where( 'id', '=', $ListValue->value() )
+				->where('property_id', '=', $this->id)
+				->where('id', '=', $ListValue->value())
 				->find();
 		}
 
@@ -259,27 +238,23 @@ class Property extends Property_Model
 	}
 
 
-    public function delete( $obj = null )
+    public function delete($obj = null)
     {
-        $tableName = 'Property_' . ucfirst( $this->type() );
+        $tableName = 'Property_' . ucfirst($this->type());
 
-        $Assignments = Core::factory( $tableName . '_Assigment' )
+        $Assignments = Core::factory($tableName . '_Assigment')
             ->queryBuilder()
-            ->where( 'property_id', '=', $this->id )
+            ->where('property_id', '=', $this->id)
             ->findAll();
-
-        foreach ( $Assignments as $Assignment )
-        {
+        foreach ($Assignments as $Assignment) {
             $Assignment->delete();
         }
 
-        $Values = Core::factory( $tableName )
+        $Values = Core::factory($tableName)
             ->queryBuilder()
-            ->where( 'property_id', '=', $this->id )
+            ->where('property_id', '=', $this->id)
             ->findAll();
-
-        foreach ( $Values as $Value)
-        {
+        foreach ($Values as $Value) {
             $Value->delete();
         }
 
@@ -291,35 +266,27 @@ class Property extends Property_Model
      * @param $obj
      * @return $this|null
      */
-    public function clearForObject( $obj )
+    public function clearForObject($obj)
     {
-        if ( !is_object( $obj ) || !method_exists( $obj, 'getId' ) )
-        {
+        if (!is_object($obj) || !method_exists($obj, 'getId')) {
             return null;
         }
 
-        foreach ( $this->getPropertiesList( $obj ) as $prop )
-        {
-            $Values = $prop->getPropertyValues( $obj );
-
-            foreach ( $Values as $Value )
-            {
+        foreach ($this->getPropertiesList($obj) as $prop) {
+            $Values = $prop->getPropertyValues($obj);
+            foreach ($Values as $Value) {
                 $Value->delete();
             }
         }
 
-        foreach ( $this->getPropertyTypes() as $type )
-        {
+        foreach ($this->getPropertyTypes() as $type) {
             $tableName = 'Property_' . $type . '_Assigment';
-
-            $Assignments = Core::factory( $tableName )
+            $Assignments = Core::factory($tableName)
                 ->queryBuilder()
-                ->where( 'model_name', '=', $obj->getTableName() )
-                ->where( 'object_id', '=', $obj->getId() )
+                ->where('model_name', '=', $obj->getTableName())
+                ->where('object_id', '=', $obj->getId())
                 ->findAll();
-
-            foreach ( $Assignments as $Assignment )
-            {
+            foreach ($Assignments as $Assignment) {
                 $Assignment->delete();
             }
         }
@@ -328,61 +295,49 @@ class Property extends Property_Model
     }
 
 
-    public function getAllPropertiesList( $obj )
+    public function getAllPropertiesList($obj)
     {
         $types = $this->getPropertyTypes();
-        $Properties = array();
+        $Properties = [];
 
-        $obj->getId() == null
+        empty($obj->getId())
             ?   $objectId = 0
             :   $objectId = $obj->getId();
 
-        foreach ( $types as $type )
-        {
-            $Assignments = Core::factory( 'Property_' . $type . '_Assigment' )
+        foreach ($types as $type) {
+            $Assignments = Core::factory('Property_' . $type . '_Assigment')
                 ->queryBuilder()
-                ->where( 'model_name', '=', $obj->getTableName() )
+                ->where('model_name', '=', $obj->getTableName())
                 ->open()
-                    ->where( 'object_id', '=', $objectId )
-                    ->orWhere( 'object_id', "=", 0 )
+                    ->where('object_id', '=', $objectId)
+                    ->orWhere('object_id', '=', 0)
                 ->close()
                 ->findAll();
-
-            foreach ( $Assignments as $Assignment )
-            {
-                $Properties[] = Core::factory( 'Property', $Assignment->property_id() );
+            foreach ($Assignments as $Assignment) {
+                $Properties[] = Core::factory('Property', $Assignment->property_id());
             }
         }
 
-        if ( method_exists( $obj, 'getParent' ) )
-        {
+        if (method_exists($obj, 'getParent')) {
             $Parent = $obj->getParent();
-
-            if ( $Parent->getId() != null )
-            {
-                $ParentProperties = Core::factory( 'Property' )->getAllPropertiesList( $Parent );
-                $Properties = array_merge( $ParentProperties, $Properties );
+            if (!empty($Parent->getId())) {
+                $ParentProperties = Core::factory('Property')->getAllPropertiesList($Parent);
+                $Properties = array_merge($ParentProperties, $Properties);
             }
         }
 
         //Отсеивание повторяющихся свойств
         $propertiesIds = [];
         $returnsProperties = [];
-
-        foreach ( $Properties as $Property )
-        {
+        foreach ($Properties as $Property) {
             $propertiesIds[$Property->getId()] = 1;
         }
-
-        foreach ( $Properties as $Property )
-        {
-            if( Core_Array::getValue( $propertiesIds, $Property->getId(), null ) == 1 )
-            {
+        foreach ($Properties as $Property) {
+            if (Core_Array::getValue($propertiesIds, $Property->getId(), null) == 1) {
                 $returnsProperties[] = clone $Property;
                 $propertiesIds[$Property->getId()] = 0;
             }
         }
-
         return $returnsProperties;
     }
 
@@ -393,34 +348,28 @@ class Property extends Property_Model
      * @param bool $isSubordinate
      * @return array
      */
-    public function getList( $isSubordinate = true )
+    public function getList($isSubordinate = true)
     {
-        if ( $this->type != 'list' || $this->getId() == 0 )
-        {
+        if ($this->type != 'list' || $this->getId() == 0) {
             return [];
         }
 
-        $List = Core::factory( 'Property_List_Values' );
+        $List = Core::factory('Property_List_Values');
 
-        if ( $isSubordinate === true )
-        {
+        if ($isSubordinate === true) {
             $User = User::current();
-
-            if ( $User === null )
-            {
+            if (is_null($User)) {
                 return [];
             }
-
             $List->queryBuilder()
-                ->where( 'subordinated', '=', $User->getDirector()->getId() );
+                ->where('subordinated', '=', $User->getDirector()->getId());
         }
 
         return $List->queryBuilder()
-            ->where( 'property_id', '=', $this->id )
-            ->orderBy( 'sorting' )
-            ->orderBy( 'id', 'DESC' )
+            ->where('property_id', '=', $this->id)
+            ->orderBy('sorting')
+            ->orderBy('id', 'DESC')
             ->findAll();
-
     }
 
 }

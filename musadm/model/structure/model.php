@@ -27,7 +27,7 @@ class Structure_Model extends Core_Entity
      *
      * @var int
      */
-	protected $parent_id;
+	protected $parent_id = 0;
 
 
     /**
@@ -51,7 +51,7 @@ class Structure_Model extends Core_Entity
      *
      * @var int
      */
-	protected $template_id;
+	protected $template_id = 0;
 
 
     /**
@@ -59,7 +59,7 @@ class Structure_Model extends Core_Entity
      *
      * @var string
      */
-	protected $description;
+	protected $description = '';
 
 
     /**
@@ -67,7 +67,7 @@ class Structure_Model extends Core_Entity
      *
      * @var string
      */
-	protected $children_name;
+	protected $children_name = 'Structure_Item';
 
 
     /**
@@ -75,7 +75,7 @@ class Structure_Model extends Core_Entity
      *
      * @var int
      */
-	protected $active;
+	protected $active = 1;
 
 
     /**
@@ -83,7 +83,7 @@ class Structure_Model extends Core_Entity
      *
      * @var int
      */
-	protected $menu_id;
+	protected $menu_id = 0;
 
 
     /**

@@ -13,6 +13,13 @@ class Core_Page_Show extends Core
     private static $_instance = null;
 
 
+    private static $exceptionDirs = [
+        'templates',
+        'cron',
+        'api'
+    ];
+
+
     /**
      * Объект текущей структуры
      *
@@ -391,7 +398,7 @@ class Core_Page_Show extends Core
         $uri = $this->getURI();
         $segments = explode('/', $uri);
 
-        if ($segments[0] == 'templates' || $segments[0] == 'cron') {
+        if (in_array($segments[0], self::$exceptionDirs)) {
             include ROOT . '/' . $this->getURI();
             return;
         }

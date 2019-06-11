@@ -31,28 +31,24 @@
             <xsl:if test="buttons-panel = 1">
                 <div class="row buttons-panel center">
                     <xsl:call-template name="areas_row" />
-
                     <div>
                         <input class="form-control" type="number" id="search_id" placeholder="Номер лида" value="{lid_id}" />
                     </div>
-
                     <div>
                         <input class="form-control" type="text" id="search_number" placeholder="Телефон" value="{number}" />
                     </div>
-
                     <div>
                         <a class="btn btn-purple search">Поиск</a>
                     </div>
-
-                    <div>
-                        <a class="btn btn-purple create_lid">Создать лида</a>
-                    </div>
-
+                    <xsl:if test="//access_lid_create = 1">
+                        <div>
+                            <a class="btn btn-purple create_lid">Создать лида</a>
+                        </div>
+                    </xsl:if>
                     <xsl:if test="is-director = 1">
                         <div>
                             <a class="btn btn-purple show_lid_status" data-lidid="">Статусы</a>
                         </div>
-
                         <div>
                             <a href="#" class="btn btn-purple edit_property_list" data-prop-id="50">Источник</a>
                         </div>
@@ -229,12 +225,19 @@
                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                         <input type="date" class="form-control date_inp lid_date" data-lidid="{id}" >
                             <xsl:attribute name="value"><xsl:value-of select="control_date" /></xsl:attribute>
+
+                            <xsl:if test="/root/access_lid_edit = 0">
+                                <xsl:attribute name="disabled">disabled</xsl:attribute>
+                            </xsl:if>
                         </input>
                     </div>
 
                     <div class="col-ld-6 col-md-6 col-sm-12 col-xs-12">
                         <select name="status" class="form-control lid_status" data-lidid="{id}">
-                            <!--<xsl:variable name="status_id" select="property_value/id" />-->
+                            <xsl:if test="/root/access_lid_edit = 0">
+                                <xsl:attribute name="disabled">disabled</xsl:attribute>
+                            </xsl:if>
+
                             <option value="0"> ... </option>
                             <xsl:for-each select="/root/lid_status">
                                 <xsl:variable name="id" select="id" />
@@ -252,6 +255,10 @@
                 <div class="row">
                     <div class="col-ld-6 col-md-6 col-sm-12 col-xs-12">
                         <select class="form-control lid-area" data-lid-id="{id}">
+                            <xsl:if test="/root/access_lid_edit = 0">
+                                <xsl:attribute name="disabled">disabled</xsl:attribute>
+                            </xsl:if>
+
                             <option value="0"> ... </option>
                             <xsl:variable name="areaId" select="area_id" />
                             <xsl:for-each select="//schedule_area">
@@ -265,7 +272,10 @@
                         </select>
                     </div>
                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 center">
-                        <a class="action comment add_lid_comment" data-lidid="{id}" title="Добавить комментарий"><input type="hidden" value="kostul" /></a>
+                        <input type="hidden" />
+                        <xsl:if test="/root/access_lid_comment = 1">
+                            <a class="action comment add_lid_comment" data-lidid="{id}" title="Добавить комментарий"><input type="hidden" value="kostul" /></a>
+                        </xsl:if>
                     </div>
                 </div>
 

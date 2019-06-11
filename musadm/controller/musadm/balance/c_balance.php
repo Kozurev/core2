@@ -79,7 +79,19 @@ if ($isAdmin) {
         ->addEntity($clientNote, 'note')
         ->addEntity($lastEntry, 'entry')
         ->addEntity($perLesson, 'per_lesson')
-        ->addEntities($AbsentPeriods, 'absent');
+        ->addEntities($AbsentPeriods, 'absent')
+        ->addSimpleEntity(
+            'access_create_payment',
+            (int)Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT)
+        )
+        ->addSimpleEntity(
+            'access_buy_tarif',
+            (int)Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_BUY)
+        )
+        ->addSimpleEntity(
+            'access_schedule_absent',
+            (int)Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT)
+        );
 }
 
 //Баланс, кол-во индивидуальных занятий, кол-во групповых занятий
@@ -100,7 +112,7 @@ $OutputXml
     ->show();
 
 //Формирование таблицы расписания для клиентов
-if ($User->groupId() == ROLE_CLIENT) {
+if ($User->groupId() == ROLE_CLIENT && Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ)) {
     $userId = $User->getId();
     ?>
 
@@ -156,92 +168,105 @@ if ($User->groupId() == ROLE_CLIENT) {
 
 
 //Блок статистики посещаемости
-$UserReports = Core::factory('Schedule_Lesson_Report');
-$UserReports
-    ->queryBuilder()
-    ->select(['Schedule_Lesson_Report.id', 'attendance', 'date', 'lesson_id', 'client_id',
-        'surname', 'name', 'client_rate', 'teacher_rate', 'total_rate', 'type_id'])
-    ->leftJoin('User AS usr', 'usr.id = teacher_id')
-    ->orderBy('date', 'DESC');
-
-$ClientGroups = Core::factory('Schedule_Group_Assignment')
-    ->queryBuilder()
-    ->where('user_id', '=', $User->getId())
-    ->findAll();
-$UserGroups = [];
-foreach ($ClientGroups as $group) {
-    $UserGroups[] = $group->groupId();
-}
-if (count($UserGroups) > 0) {
+if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ)) {
+    Core::factory('Schedule_Lesson');
+    $UserReports = Core::factory('Schedule_Lesson_Report');
     $UserReports
         ->queryBuilder()
+        ->select(['Schedule_Lesson_Report.id', 'attendance', 'date', 'lesson_id', 'client_id',
+            'surname', 'name', 'client_rate', 'teacher_rate', 'total_rate', 'type_id'])
+        ->leftJoin('User AS usr', 'usr.id = teacher_id')
+        ->orderBy('date', 'DESC');
+
+    $ClientGroups = Core::factory('Schedule_Group_Assignment')
+        ->queryBuilder()
+        ->where('user_id', '=', $User->getId())
+        ->findAll();
+    $UserGroups = [];
+    foreach ($ClientGroups as $group) {
+        $UserGroups[] = $group->groupId();
+    }
+    if (count($UserGroups) > 0) {
+        $UserReports
+            ->queryBuilder()
             ->open()
-                ->where('client_id', '=', $User->getId())
-                ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
+            ->where('client_id', '=', $User->getId())
+            ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
             ->close()
             ->open()
-                ->orWhereIn('client_id', $UserGroups)
-                ->where('type_id', '=', Schedule_Lesson::TYPE_GROUP)
+            ->orWhereIn('client_id', $UserGroups)
+            ->where('type_id', '=', Schedule_Lesson::TYPE_GROUP)
             ->close();
-} else {
-    $UserReports->queryBuilder()
-        ->where('client_id', '=', $User->getId())
-        ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV);
-}
-
-$UserReports = $UserReports->findAll();
-foreach ($UserReports as $rep) {
-    $RepLesson = Core::factory('Schedule_Lesson', $rep->lessonId());
-    if (is_null($RepLesson)) {
-        continue;
+    } else {
+        $UserReports->queryBuilder()
+            ->where('client_id', '=', $User->getId())
+            ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV);
     }
 
-    $RepLesson->setRealTime($rep->date());
-    $rep->time_from = refactorTimeFormat($RepLesson->timeFrom());
-    $rep->time_to = refactorTimeFormat($RepLesson->timeTo());
-    $rep->date(refactorDateFormat($rep->date()));
+    $UserReports = $UserReports->findAll();
+    foreach ($UserReports as $rep) {
+        $RepLesson = Core::factory('Schedule_Lesson', $rep->lessonId());
+        if (is_null($RepLesson)) {
+            continue;
+        }
 
-    if ($rep->typeId() == Schedule_Lesson::TYPE_GROUP) {
-        $Group = Core::factory('Schedule_Group', $rep->clientId());
-        if (!is_null($Group)) {
-            $rep->surname = $Group->title();
-            $rep->name = '';
-            $ClientAttendance = $rep->getClientAttendance($User->getId());
-            if (is_null($ClientAttendance)) {
-                $rep->attendance(0);
-            } else {
-                $rep->attendance($ClientAttendance->attendance());
+        $RepLesson->setRealTime($rep->date());
+        $rep->time_from = refactorTimeFormat($RepLesson->timeFrom());
+        $rep->time_to = refactorTimeFormat($RepLesson->timeTo());
+        $rep->date(refactorDateFormat($rep->date()));
+
+        if ($rep->typeId() == Schedule_Lesson::TYPE_GROUP) {
+            $Group = Core::factory('Schedule_Group', $rep->clientId());
+            if (!is_null($Group)) {
+                $rep->surname = $Group->title();
+                $rep->name = '';
+                $ClientAttendance = $rep->getClientAttendance($User->getId());
+                if (is_null($ClientAttendance)) {
+                    $rep->attendance(0);
+                } else {
+                    $rep->attendance($ClientAttendance->attendance());
+                }
             }
         }
     }
-}
 
-Core::factory('Core_Entity')
-    ->addEntities($UserReports)
-    ->addSimpleEntity('is_director', $isDirector)
-    ->xsl('musadm/users/balance/attendance_report.xsl')
-    ->show();
+    Core::factory('Core_Entity')
+        ->addEntities($UserReports)
+        ->addSimpleEntity('is_director', $isDirector)
+        ->addSimpleEntity(
+            'access_schedule_report_edit',
+            (int)Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_EDIT)
+        )
+        ->xsl('musadm/users/balance/attendance_report.xsl')
+        ->show();
+}
 
 //Платежи
-$UserPayments = Core::factory('Payment')
-    ->queryBuilder()
-    ->orderBy('id', 'DESC')
-    ->where('user', '=', $User->getId())
-    ->findAll();
+if (Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_CLIENT)) {
+    $UserPayments = Core::factory('Payment')
+        ->queryBuilder()
+        ->orderBy('id', 'DESC')
+        ->where('user', '=', $User->getId())
+        ->findAll();
 
-foreach ($UserPayments as $payment) {
-    $UserPaymentsNotes = Core::factory('Property', 26)->getPropertyValues( $payment );
-    $UserPaymentsNotes = array_reverse($UserPaymentsNotes);
-    $payment->addEntities($UserPaymentsNotes, 'notes');
-    $payment->datetime(refactorDateFormat($payment->datetime()));
+    foreach ($UserPayments as $payment) {
+        $UserPaymentsNotes = Core::factory('Property', 26)->getPropertyValues( $payment );
+        $UserPaymentsNotes = array_reverse($UserPaymentsNotes);
+        $payment->addEntities($UserPaymentsNotes, 'notes');
+        $payment->datetime(refactorDateFormat($payment->datetime()));
+    }
+
+    Core::factory('Core_Entity')
+        ->addSimpleEntity('is_admin', $isAdmin)
+        ->addEntities($UserPayments)
+        ->addEntity($ParentUser, 'parent_user')
+        ->addSimpleEntity(
+            'access_payment_delete_client',
+            (int)Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_CLIENT)
+        )
+        ->xsl('musadm/users/balance/payments.xsl')
+        ->show();
 }
-
-Core::factory('Core_Entity')
-    ->addSimpleEntity('is_admin', $isAdmin)
-    ->addEntities($UserPayments)
-    ->addEntity($ParentUser, 'parent_user')
-    ->xsl('musadm/users/balance/payments.xsl')
-    ->show();
 
 //Новый раздел со списком событий
 if ($isAdmin === 1) {
@@ -254,7 +279,7 @@ if ($isAdmin === 1) {
 
     //Поиск задачь, связанных с пользователем
     Core::factory('Task_Controller');
-    $TaskController = new Task_Controller( $User );
+    $TaskController = new Task_Controller($User);
     $Tasks = $TaskController
         ->isPeriodControl(false)
         ->isLimitedAreasAccess(false)
@@ -277,7 +302,6 @@ if ($isAdmin === 1) {
 
     foreach ($UserEvents as $Event) {
         $Event->date = date('d.m.Y H:i', $Event->time());
-
         if ($Event->getId()) {
             $Event->text = $Event->getTemplateString(Event::STRING_SHORT);
         }
@@ -302,6 +326,10 @@ if ($isAdmin === 1) {
         ->addEntities($TasksPriorities)
         ->addEntities($Areas)
         ->addSimpleEntity('afterTaskAction', 'balance')
+        ->addSimpleEntity(
+            'access_user_append_comment',
+            (int)Core_Access::instance()->hasCapability(Core_Access::USER_APPEND_COMMENT)
+        )
         ->xsl('musadm/users/events.xsl')
         ->show();
 }

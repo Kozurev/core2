@@ -54,79 +54,112 @@
         <xsl:variable name="areaId" select="schedule_area_assignment/area_id" />
 
 
-        <tr class="{$class}">
+        <tr class="{$class}" id="user_{id}">
             <!--Фамилия-->
             <td>
-                <!--<a href="/{/root/wwwroot}authorize?auth_as={id}">-->
-                <a href="{/root/wwwroot}/balance/?userid={id}">
-                    <xsl:value-of select="surname" />
-                    <xsl:text> </xsl:text>
-                    <xsl:value-of select="name" />
-                </a>
+                <span class="user__fio">
+                    <a href="{/root/wwwroot}/balance/?userid={id}">
+                        <xsl:value-of select="surname" />
+                        <xsl:text> </xsl:text>
+                        <xsl:value-of select="name" />
+                    </a>
+                </span>
 
                 <!--Анкета (соглашение подписано)-->
-                <xsl:if test="property_value[property_id = 18]/value = '1'">
-                    <span class="contract" title="Соглашение подписано"><input type="hidden"/></span>
-                </xsl:if>
+                <span class="add__18">
+                    <xsl:if test="property_value[property_id = 18]/value = '1'">
+                        <span class="contract" title="Соглашение подписано"><input type="hidden"/></span>
+                    </xsl:if>
+                    <input type="hidden"/>
+                </span>
 
                 <!--Год рождения-->
-                <xsl:if test="property_value[property_id = 28]/value != ''">
-                    <xsl:text> </xsl:text>
-                    <xsl:value-of select="property_value[property_id = 28]/value" />
-                    <xsl:text> г.р.</xsl:text>
-                </xsl:if>
+                <span class="user__birth">
+                    <xsl:if test="property_value[property_id = 28]/value != ''">
+                        <xsl:text> </xsl:text>
+                        <xsl:value-of select="property_value[property_id = 28]/value" />
+                        <xsl:text> г.р.</xsl:text>
+                    </xsl:if>
+                </span>
 
                 <!--Поурочная оплата-->
-                <xsl:if test="property_value[property_id = 32]/value = '1'">
-                    <div class="notes">«Сменный график»</div>
-                </xsl:if>
+                <span class="add__32">
+                    <xsl:if test="property_value[property_id = 32]/value = '1'">
+                        <div class="notes">«Сменный график»</div>
+                    </xsl:if>
+                </span>
 
                 <!--Примечания-->
-                <div class="notes">
-                    <xsl:value-of select="property_value[property_id = 19]/value" />
-                </div>
+                <span class="add__19">
+                    <div class="notes">
+                        <xsl:value-of select="property_value[property_id = 19]/value" />
+                    </div>
+                </span>
             </td>
 
             <!--номер (номера) телефона-->
             <td>
-                <xsl:value-of select="phone_number" /><br/>
-                <xsl:value-of select="property_value[property_id = 16]/value" />
+                <span class="user__phone">
+                    <xsl:value-of select="phone_number" />
+                </span>
+                <br/>
+                <span class="add__16">
+                    <xsl:value-of select="property_value[property_id = 16]/value" />
+                </span>
             </td>
 
             <!--Баланс-->
             <td>
-                <xsl:value-of select="$balance" />
+                <span class="add__12">
+                    <xsl:value-of select="$balance" />
+                </span>
             </td>
 
             <td width="150px">
-                <xsl:value-of select="$count_indiv" />
+                <span class="add__13">
+                    <xsl:value-of select="$count_indiv" />
+                </span>
                 <xsl:text> / </xsl:text>
-                <xsl:value-of select="$count_group" />
+                <span class="add__14">
+                    <xsl:value-of select="$count_group" />
+                </span>
             </td>
 
             <!--Продрлжительность урока-->
             <td>
-                <xsl:value-of select="property_value[property_id = 17]/value" />
+                <span class="add__17">
+                    <xsl:value-of select="property_value[property_id = 17]/value" />
+                </span>
             </td>
 
             <!--Студия-->
             <td>
-                <xsl:value-of select="/root/schedule_area[id = $areaId]/title" />
+                <span class="user__areas">
+                    <xsl:value-of select="/root/schedule_area[id = $areaId]/title" />
+                </span>
             </td>
 
             <!--Действия-->
             <xsl:if test="//table-type = 'active'">
                 <td width="140px">
-                    <a class="action add_payment user_add_payment" href="#" data-userid="{id}" title="Добавить платеж"></a>
-                    <a class="action edit user_edit" href="#" data-userid="{id}" data-usergroup="{group_id}" title="Редактировать данные"></a>
-                    <a class="action archive user_archive" href="#" data-userid="{id}" title="Переместить в архив"></a>
+                    <xsl:if test="//access_payment_create_client = 1">
+                        <a class="action add_payment user_add_payment" href="#" data-userid="{id}" title="Добавить платеж"></a>
+                    </xsl:if>
+
+                    <xsl:if test="//access_user_edit_client = 1">
+                        <a class="action edit" href="#" onclick="getClientPopup({id})" title="Редактировать данные"></a>
+                    </xsl:if>
+
+                    <xsl:if test="//access_user_archive_client = 1">
+                        <a class="action archive user_archive" href="#" data-userid="{id}" title="Переместить в архив"></a>
+                    </xsl:if>
                 </td>
             </xsl:if>
 
             <xsl:if test="//table-type = 'archive'">
                 <td>
                     <a class="action unarchive user_unarchive" href="#" data-userid="{id}" title="Восстановить из архива"></a>
-                    <a class="action delete user_delete" href="#" data-model_id="{id}" data-model_name="User" title="Безвозвратное удаление"></a>
+                    <!--<a class="action delete user_delete" href="#" data-model_id="{id}" data-model_name="User" title="Безвозвратное удаление"></a>-->
                 </td>
             </xsl:if>
         </tr>

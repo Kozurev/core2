@@ -7,6 +7,7 @@
  * @date 25.01.2019 17:00
  * @version 20190219
  * @version 20190427
+ * @version 20190526
  * Class Task_Controller
  */
 class Task_Controller
@@ -540,6 +541,13 @@ class Task_Controller
         if (!is_null($this->forAreas) && count($this->forAreas) == 1) {
             $OutputXml->addSimpleEntity('current_area', $this->forAreas[0]->getId());
         }
+
+        //Права доступа
+        $OutputXml
+            ->addSimpleEntity('access_task_create', (int)Core_Access::instance()->hasCapability(Core_Access::TASK_CREATE))
+            ->addSimpleEntity('access_task_edit', (int)Core_Access::instance()->hasCapability(Core_Access::TASK_EDIT))
+            ->addSimpleEntity('access_task_delete', (int)Core_Access::instance()->hasCapability(Core_Access::TASK_DELETE))
+            ->addSimpleEntity('access_task_append_comment', (int)Core_Access::instance()->hasCapability(Core_Access::TASK_APPEND_COMMENT));
 
         return $OutputXml->show($isEcho);
     }

@@ -16,7 +16,7 @@
                                 <th>Время</th>
                                 <th>Статус</th>
                                 <th>Преподаватель</th>
-                                <xsl:if test="is_director = 1">
+                                <xsl:if test="access_schedule_report_edit = 1">
                                     <th colspan="2">Финансы</th>
                                 </xsl:if>
                             </tr>
@@ -71,7 +71,7 @@
                 </xsl:choose>
             </td>
 
-            <xsl:if test="//is_director = 1">
+            <xsl:if test="//access_schedule_report_edit = 1">
                 <td>
                     <xsl:value-of select="client_rate" />
                     / <xsl:value-of select="teacher_rate" />

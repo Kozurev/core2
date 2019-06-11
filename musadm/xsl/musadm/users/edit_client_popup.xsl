@@ -181,12 +181,11 @@
 
             <input type="hidden" name="id" value="{user/id}" />
             <input type="hidden" name="groupId" value="5" />
-            <input type="hidden" name="active" value="1" />
-            <input type="hidden" name="modelName" value="User" />
-
-
-            <button class="popop_user_submit btn btn-default">Сохранить</button>
+            <!--<input type="hidden" name="active" value="1" />-->
+            <!--<input type="hidden" name="modelName" value="User" />-->
         </form>
+
+        <button class="btn btn-default" onclick="User.saveFrom($('#createData'), User.saveClientCallback)">Сохранить</button>
 
         <script>
             $(".masked-phone").mask("+7(999) 999-9999");

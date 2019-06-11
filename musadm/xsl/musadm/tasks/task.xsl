@@ -33,12 +33,19 @@
                     <span class="form-control form-control-auto">№<xsl:value-of select="id" /></span>
                     <!--Дата контроля-->
                     <!--<div class="col-md-3 col-sm-6 col-xs-12">-->
-                        <input type="date" class="form-control" value="{date}" onchange="updateTaskDate({id},this.value)" />
+                        <input type="date" class="form-control" value="{date}" onchange="updateTaskDate({id},this.value)">
+                            <xsl:if test="/root/access_task_edit = 0">
+                                <xsl:attribute name="disabled">disabled</xsl:attribute>
+                            </xsl:if>
+                        </input>
                     <!--</div>-->
 
                     <!--Филлиал-->
                     <!--<div class="col-md-3 col-sm-6 col-xs-12">-->
                         <select name="area" class="form-control" onchange="updateTaskArea({id}, this.value)">
+                            <xsl:if test="/root/access_task_edit = 0">
+                                <xsl:attribute name="disabled">disabled</xsl:attribute>
+                            </xsl:if>
                             <xsl:variable name="areaId" select="area_id" />
                             <option value="0"> ... </option>
                             <xsl:for-each select="//schedule_area">
@@ -54,14 +61,20 @@
 
                     <xsl:if test="done = 0">
                         <!--<div class="col-md-1 col-sm-3 col-xs-3">-->
-                            <a class="action append_done" onclick="markAsDone({id}, taskAfterAction)" title="Закрыть задачу"><input type="hidden" /></a>
+                            <xsl:if test="/root/access_task_edit = 1">
+                                <a class="action append_done" onclick="markAsDone({id}, taskAfterAction)" title="Закрыть задачу"><input type="hidden" /></a>
+                            </xsl:if>
                         <!--</div>-->
                     </xsl:if>
                     <!--<div class="col-md-1 col-sm-3 col-xs-3">-->
-                    <a class="action comment task_add_note" title="Добавить комментарий" onclick="addTaskNotePopup({id})"><input type="hidden" /></a>
+                    <xsl:if test="/root/access_task_append_comment = 1">
+                        <a class="action comment task_add_note" title="Добавить комментарий" onclick="addTaskNotePopup({id})"><input type="hidden" /></a>
+                    </xsl:if>
                     <!--</div>-->
                     <!--<div class="col-md-1 col-sm-3 col-xs-3">-->
-                    <a class="action associate" title="Привязать к клиенту" onclick="assignmentTaskPopup({id})"><input type="hidden" /></a>
+                    <xsl:if test="/root/access_task_edit = 1">
+                        <a class="action associate" title="Привязать к клиенту" onclick="assignmentTaskPopup({id})"><input type="hidden" /></a>
+                    </xsl:if>
                     <!--</div>-->
                     <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">-->
 
@@ -80,8 +93,17 @@
 
                 <div class="row center">
                     <xsl:for-each select="//task_priority">
-                        <input type="radio" name="priority_{$id}" value="{id}" id="priority_{$id}_{id}" data-taskid="{$id}" data-card-size="{/root/card-size}"
-                            onchange="loaderOn(); changeTaskPriority({$id}, this.value, taskAfterAction)">
+                        <input type="radio" name="priority_{$id}" value="{id}" id="priority_{$id}_{id}">
+                            <xsl:choose>
+                                <xsl:when test="/root/access_task_edit = 1">
+                                    <xsl:attribute name="onchange">
+                                        loaderOn(); changeTaskPriority(<xsl:value-of select="$id" />, this.value, taskAfterAction)
+                                    </xsl:attribute>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="disabled">disabled</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
                             <xsl:if test="id = $priorityId">
                                 <xsl:attribute name="checked">checked</xsl:attribute>
                             </xsl:if>

@@ -1,12 +1,13 @@
 <?php
 /**
- * Created by PhpStorm.
+ * Страница менеджера 3 в 1
  *
- * @author Kozurev Egor
+ * @author BadWolf
  * @date 18.03.2018 21:21
  * @version 20190221
  * @version 20190412
  * @version 20190427
+ * @version 20190526
  */
 
 global $CFG;
@@ -34,6 +35,16 @@ if (User::checkUserAccess(['groups' => [ROLE_ADMIN]], $User )) {
 
 //Страница для менеджера
 if (User::checkUserAccess(['groups' => [ROLE_MANAGER]], $User)) {
+    $accessClientsRead = Core_Access::instance()->hasCapability(Core_Access::USER_READ_CLIENTS);
+    $accessLidRead =     Core_Access::instance()->hasCapability(Core_Access::LID_READ);
+    $accessLidCreate =   Core_Access::instance()->hasCapability(Core_Access::LID_CREATE);
+    $accessLidEdit =     Core_Access::instance()->hasCapability(Core_Access::LID_EDIT);
+    $accessLidComment =  Core_Access::instance()->hasCapability(Core_Access::LID_APPEND_COMMENT);
+    $accessTaskRead =    Core_Access::instance()->hasCapability(Core_Access::TASK_READ);
+    $accessTaskCreate =  Core_Access::instance()->hasCapability(Core_Access::TASK_CREATE);
+    $accessTaskEdit =    Core_Access::instance()->hasCapability(Core_Access::TASK_EDIT);
+    $accessTaskComment = Core_Access::instance()->hasCapability(Core_Access::TASK_APPEND_COMMENT);
+
     $Director = $User->getDirector();
     $subordinated = $Director->getId();
 
@@ -57,21 +68,39 @@ if (User::checkUserAccess(['groups' => [ROLE_MANAGER]], $User)) {
 
     <div class="dynamic-fixed-row">
         <?php
-        Core::factory('Core_Entity')
-            ->xsl('musadm/users/search-form.xsl')
-            ->show();
+        if ($accessClientsRead) {
+            Core::factory('Core_Entity')
+                ->addSimpleEntity(
+                        'access_user_create_client',
+                    (int)Core_Access::instance()->hasCapability(Core_Access::USER_CREATE_CLIENT)
+                )
+                ->xsl('musadm/users/search-form.xsl')
+                ->show();
+        }
         ?>
     </div>
 
     <section class="section-bordered">
         <div class="row">
-            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 lids">
-                <?$LidController->show();?>
-            </div>
+            <?php
+            if ($accessLidRead) {
+                ?>
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 lids">
+                    <?$LidController->show();?>
+                </div>
+                <?php
+            }
+            ?>
 
-            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 tasks">
-                <?$TaskController->show();?>
-            </div>
+            <?php
+            if ($accessTaskRead) {
+                ?>
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 tasks">
+                    <?$TaskController->show();?>
+                </div>
+                <?php
+            }
+            ?>
         </div>
     </section>
 

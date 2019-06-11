@@ -13,7 +13,7 @@
                             </xsl:call-template>
                         </td>
                         <td>
-                            <xsl:if test="is_admin = 1">
+                            <xsl:if test="access_create_payment = 1">
                                 <a class="action add_payment btn_balance" data-userid="{user/id}" title="Зачислить платеж">
                                     <!--Пополнить баланс-->
                                 </a>
@@ -33,9 +33,11 @@
                             </xsl:call-template>
                         </td>
                         <td>
-                            <a class="action buy btn_private_lessons" data-userid="{user/id}">
-                                <!--Купить индивидуальные занятия-->
-                            </a>
+                            <xsl:if test="access_buy_tarif = 1">
+                                <a class="action buy btn_private_lessons" data-userid="{user/id}">
+                                    <!--Купить индивидуальные занятия-->
+                                </a>
+                            </xsl:if>
                         </td>
                     </tr>
 
@@ -81,10 +83,12 @@
                                                 <span id="absent-to" class="{$periodClass}"><xsl:value-of select="date_to" /></span>
                                             </div>
 
-                                            <div class="col-md-6">
-                                                <a class="action edit" onclick="getScheduleAbsentPopup('', '', '', {id})"><xsl:text>&#x0A;</xsl:text></a>
-                                                <a class="action delete" onclick="deleteScheduleAbsent({id})"><xsl:text>&#x0A;</xsl:text></a>
-                                            </div>
+                                            <xsl:if test="/root/access_schedule_absent = 1">
+                                                <div class="col-md-6">
+                                                    <a class="action edit" onclick="getScheduleAbsentPopup('', '', '', {id})"><xsl:text>&#x0A;</xsl:text></a>
+                                                    <a class="action delete" onclick="deleteScheduleAbsent({id})"><xsl:text>&#x0A;</xsl:text></a>
+                                                </div>
+                                            </xsl:if>
                                         </div>
                                     </xsl:for-each>
                                 </td>
@@ -128,11 +132,13 @@
                                             <!--Добавить задачу-->
                                         <!--</a>-->
                                     <!--</div>-->
-                                    <div>
-                                        <a class="btn btn-orange" onclick="getScheduleAbsentPopup({user/id}, 1, getCurrentDate(), '')">
-                                            Добавить период отстствия
-                                        </a>
-                                    </div>
+                                    <xsl:if test="/root/access_schedule_absent = 1">
+                                        <div>
+                                            <a class="btn btn-orange" onclick="getScheduleAbsentPopup({user/id}, 1, getCurrentDate(), '')">
+                                                Добавить период отстствия
+                                            </a>
+                                        </div>
+                                    </xsl:if>
                                 </div>
                             </td>
                         </tr>

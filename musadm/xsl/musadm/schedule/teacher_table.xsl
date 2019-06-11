@@ -8,8 +8,6 @@
                     <th>Время</th>
                     <th>Преподаватель</th>
                     <td>Результат</td>
-                    <!--<th>Ученик / Группа</th>-->
-                    <!--<th>Отметка <br/>о явке</th>-->
                     <th>Действия</th>
                 </tr>
                 <xsl:apply-templates select="lesson" />
@@ -75,10 +73,10 @@
             </xsl:choose>
 
             <td>
-                <xsl:if test="is_reported = 0">
+                <xsl:if test="is_reported = 0 and /root/access_report_create = 1">
                     <a class="action save send_report" title="Сохранить отчет о проведении занятия"></a>
                 </xsl:if>
-                <xsl:if test="is_reported = 1 and /root/is_admin = 1">
+                <xsl:if test="is_reported = 1 and /root/access_report_delete = 1">
                     <a class="action unarchive delete_report" title="Отменить отправку отчета"></a>
                 </xsl:if>
             </td>

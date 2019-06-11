@@ -1,6 +1,6 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-    <xsl:template match="/">
+    <xsl:template match="root">
         <div class="row searching-row">
             <form action="." method="GET" id="search_client">
                 <div>
@@ -22,9 +22,11 @@
                 <div>
                     <a href="#" class="btn btn-red" id="user_search_clear">Очистить</a>
                 </div>
-                <div>
-                    <a href="#" class="btn btn-primary user_create" data-usergroup="5">Создать</a>
-                </div>
+                <xsl:if test="access_user_create_client = 1">
+                    <div>
+                        <a href="#" class="btn btn-primary user_create" data-usergroup="5">Создать</a>
+                    </div>
+                </xsl:if>
             </form>
         </div>
     </xsl:template>

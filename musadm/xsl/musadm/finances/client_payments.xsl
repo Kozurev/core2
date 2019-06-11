@@ -10,23 +10,18 @@
                 <div>
                     <h4>Период с:</h4>
                 </div>
-
                 <div>
                     <input type="date" class="form-control" name="date_from" value="{date_from}"/>
                 </div>
-
                 <div>
                     <h4>по:</h4>
                 </div>
-
                 <div>
                     <input type="date" class="form-control" name="date_to" value="{date_to}"/>
                 </div>
-
                 <div>
                     <a class="btn btn-green finances_show">Показать</a>
                 </div>
-
                 <xsl:call-template name="areas_row" />
             </div>
         </section>
@@ -39,87 +34,104 @@
             </div>
 
             <div class="row buttons-panel">
-                <div>
-                    <a class="btn btn-green finances_payment" data-after_save_action="payments">Добавить расход</a>
-                </div>
-
-                <div>
-                    <a class="btn btn-green tarifs_show">Тарифы</a>
-                </div>
-
-                <div>
-                    <a class="btn btn-green finances_payment_types">Категории расходов</a>
-                </div>
-
-                <div>
-                    <a class="btn btn-green finances_payment_rate_config">Настройки</a>
-                </div>
-            </div>
-        </section>
-
-
-        <div class="teacher_rate_config_block">
-            <xsl:call-template name="rate_config_table" >
-                <xsl:with-param name="director_id" select="director_id" />
-                <xsl:with-param name="teacher_indiv_rate" select="teacher_indiv_rate" />
-                <xsl:with-param name="teacher_group_rate" select="teacher_group_rate" />
-                <xsl:with-param name="teacher_consult_rate" select="teacher_consult_rate" />
-                <xsl:with-param name="absent_rate" select="absent_rate" />
-                <xsl:with-param name="absent_rate_type" select="absent_rate_type" />
-                <xsl:with-param name="absent_rate_val" select="absent_rate_val" />
-            </xsl:call-template>
-        </div>
-
-        <section class="tarifs section-bordered">
-            <div class="table-responsive">
-                <table  class="table table-striped table-statused">
-                    <thead>
-                        <tr class="header">
-                            <th>Название</th>
-                            <th>Цена</th>
-                            <th>Индив.</th>
-                            <th>Групп.</th>
-                            <th>Публичность</th>
-                            <th>Действия</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <xsl:apply-templates select="payment_tarif" />
-                    </tbody>
-                </table>
-
-                <div class="row buttons-panel center">
+                <xsl:if test="access_payment_create_all = 1">
                     <div>
-                        <a class="btn btn-green tarif_edit" href="#" data-tarifid="">Создать тариф</a>
+                        <a class="btn btn-green finances_payment" data-after_save_action="payments">Добавить расход</a>
                     </div>
+                </xsl:if>
+
+                <xsl:if test="access_payment_tarif_read = 1">
+                    <div>
+                        <a class="btn btn-green tarifs_show">Тарифы</a>
+                    </div>
+                </xsl:if>
+
+                <xsl:if test="access_payment_config = 1">
+                    <div>
+                        <a class="btn btn-green finances_payment_types">Категории расходов</a>
+                    </div>
+                </xsl:if>
+
+                <xsl:if test="access_payment_config = 1">
+                    <div>
+                        <a class="btn btn-green finances_payment_rate_config">Настройки</a>
+                    </div>
+                </xsl:if>
+            </div>
+        </section>
+
+
+        <xsl:if test="access_payment_config = 1">
+            <div class="teacher_rate_config_block">
+                <xsl:call-template name="rate_config_table" >
+                    <xsl:with-param name="director_id" select="director_id" />
+                    <xsl:with-param name="teacher_indiv_rate" select="teacher_indiv_rate" />
+                    <xsl:with-param name="teacher_group_rate" select="teacher_group_rate" />
+                    <xsl:with-param name="teacher_consult_rate" select="teacher_consult_rate" />
+                    <xsl:with-param name="absent_rate" select="absent_rate" />
+                    <xsl:with-param name="absent_rate_type" select="absent_rate_type" />
+                    <xsl:with-param name="absent_rate_val" select="absent_rate_val" />
+                </xsl:call-template>
+            </div>
+        </xsl:if>
+
+
+        <xsl:if test="access_payment_tarif_read = 1">
+            <section class="tarifs section-bordered">
+                <div class="table-responsive">
+                    <table  class="table table-striped table-statused">
+                        <thead>
+                            <tr class="header">
+                                <th>Название</th>
+                                <th>Цена</th>
+                                <th>Индив.</th>
+                                <th>Групп.</th>
+                                <th>Публичность</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <xsl:apply-templates select="payment_tarif" />
+                        </tbody>
+                    </table>
+
+                    <xsl:if test="access_payment_tarif_create = 1">
+                        <div class="row buttons-panel center">
+                            <div>
+                                <a class="btn btn-green tarif_edit" href="#" data-tarifid="">Создать тариф</a>
+                            </div>
+                        </div>
+                    </xsl:if>
                 </div>
-            </div>
-        </section>
+            </section>
+        </xsl:if>
 
 
-        <section>
-            <div class="table-responsive">
-                <table id="sortingTable" class="table table-striped task">
-                    <thead>
-                        <tr class="header">
-                            <th>№</th>
-                            <th>ФИО</th>
-                            <th>Сумма</th>
-                            <th>Примечание</th>
-                            <th>Дата</th>
-                            <th>Студия</th>
-                            <th>Категория</th>
-                            <th></th>
-                        </tr>
-                    </thead>
+        <xsl:if test="access_payment_read = 1">
+            <section>
+                <div class="table-responsive">
+                    <table id="sortingTable" class="table table-striped task">
+                        <thead>
+                            <tr class="header">
+                                <th>№</th>
+                                <th>ФИО</th>
+                                <th>Сумма</th>
+                                <th>Примечание</th>
+                                <th>Дата</th>
+                                <th>Студия</th>
+                                <th>Категория</th>
+                                <th></th>
+                            </tr>
+                        </thead>
 
-                    <tbody>
-                        <xsl:apply-templates select="payment" />
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                        <tbody>
+                            <xsl:apply-templates select="payment" />
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </xsl:if>
 
     </xsl:template>
 
@@ -147,7 +159,13 @@
             <td><xsl:value-of select="datetime" /></td>
             <td><xsl:value-of select="//schedule_area[id = $areaId]/title" /></td>
             <td><xsl:value-of select="//payment_type[id = $type]/title" /></td>
-            <td><a class="action edit payment_edit" href="#" data-id="{id}" data-after_save_action="payment" data-type="{type}" title="Редактирование платежа"></a></td>
+            <td>
+                <xsl:if test="(/root/access_payment_edit_client = 1 and type = 1)
+                            or (/root/access_payment_edit_teacher = 1 and type = 3)
+                            or (/root/access_payment_edit_all = 1 and type > 3)">
+                    <a class="action edit payment_edit" href="#" data-id="{id}" data-after_save_action="payment" data-type="{type}" title="Редактирование платежа"></a>
+                </xsl:if>
+            </td>
         </tr>
     </xsl:template>
 
@@ -169,8 +187,13 @@
                 </label>
             </td>
             <td>
-                <a class="action edit tarif_edit"       href="#" data-tarifid="{id}"></a>
-                <a class="action delete tarif_delete"   href="#" data-model_id="{id}" data-model_name="Payment_Tarif"></a>
+                <xsl:if test="/root/access_payment_tarif_edit = 1">
+                    <a class="action edit tarif_edit" href="#" data-tarifid="{id}"></a>
+                </xsl:if>
+
+                <xsl:if test="/root/access_payment_tarif_delete = 1">
+                    <a class="action delete tarif_delete"   href="#" data-model_id="{id}" data-model_name="Payment_Tarif"></a>
+                </xsl:if>
             </td>
         </tr>
     </xsl:template>

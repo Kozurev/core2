@@ -13,7 +13,6 @@
                     <xsl:value-of select="patronimyc" />
                 </a>
             </td>
-            <!--<td><xsl:value-of select="name" /></td>-->
             <td><xsl:value-of select="phone_number" /><br/></td>
 
             <td>
@@ -21,9 +20,15 @@
             </td>
 
             <td width="140px" class="right">
-                <a class="action edit user_edit" href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
+                <xsl:if test="//access_user_edit_manager = 1">
+                    <a class="action edit user_edit" href="#" data-userid="{id}" data-usergroup="{group_id}"></a>
+                </xsl:if>
+
                 <a class="action associate areas_assignments" href="#" data-model-id="{id}" data-model-name="User"></a>
-                <a class="action archive user_archive" href="#" data-userid="{id}"></a>
+
+                <xsl:if test="//access_user_archive_manager = 1">
+                    <a class="action archive user_archive" href="#" data-userid="{id}"></a>
+                </xsl:if>
             </td>
 
         </tr>

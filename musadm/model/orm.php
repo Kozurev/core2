@@ -573,6 +573,18 @@ class Orm
     }
 
 
+    /**
+     * Очистка списка выбираемых полей
+     *
+     * @return $this
+     */
+    public function clearSelect()
+    {
+        $this->select = [];
+        return $this;
+    }
+
+
 	/**
 	 * Метод указывающий список таблиц из которых делается выборка
      *
@@ -925,7 +937,7 @@ class Orm
 	/**
 	 * Выполняет запрос к бд
      *
-	 * @return object | null
+	 * @return mixed
 	 */
 	public function find()
 	{
