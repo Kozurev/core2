@@ -15,6 +15,12 @@ class Core_Access_Group_Controller
 
 
     /**
+     * @var User
+     */
+    private $User;
+
+
+    /**
      * Порядок сортировки групп
      *
      * @var array
@@ -55,11 +61,14 @@ class Core_Access_Group_Controller
     /**
      * Core_Access_Group_Controller constructor.
      */
-    public function __construct()
+    public function __construct(User $User = null)
     {
         Core::factory('Core_Access_Group');
         $Group = new Core_Access_Group();
         $this->GroupQuery = $Group->queryBuilder();
+        if (!is_null($User)) {
+            $this->User = $User;
+        }
     }
 
 
@@ -137,6 +146,14 @@ class Core_Access_Group_Controller
         //Выбор групп принадлежащих заданому родителю
         if (!is_null($this->forParent)) {
             $this->GroupQuery->where('parent_id', '=', $this->forParent);
+        }
+
+        if (!is_null($this->User)) {
+            $this->GroupQuery
+                ->open()
+                ->where('subordinated', '=', 0)
+                ->orWhere('subordinated', '=', $this->User->getDirector()->getId())
+                ->close();
         }
 
         foreach ($this->orderBy as $field => $order) {

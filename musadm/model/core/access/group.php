@@ -12,6 +12,15 @@ require_once ROOT . '/model/core/access/group/assignment.php';
 class Core_Access_Group extends Core_Access_Group_Model
 {
     /**
+     * Список сообщений при возникновении ошибки
+     *
+     * @var array
+     */
+    private $excMsg = [
+        'null_subordinate' => 'При формировании списка с указанием принадлежности одному директору необходимо авторизоваться'
+    ];
+
+    /**
      * Содзание принадлежности польователя к группе
      *
      * @param int $userId
@@ -63,9 +72,12 @@ class Core_Access_Group extends Core_Access_Group_Model
      * Поиск списка пользователей принадлежащих данной группе
      *
      * @param array $params
+     * @param bool $isSubordinate
+     * @param User $CurrentUser
+     * @throws Exception
      * @return array
      */
-    public function getUserList(array $params = []) : array
+    public function getUserList(array $params = [], bool $isSubordinate = true, User $CurrentUser = null) : array
     {
         if (empty($this->id)) {
             return [];
@@ -75,6 +87,21 @@ class Core_Access_Group extends Core_Access_Group_Model
 
             $Query = Core::factory('User')->queryBuilder()
                 ->join('Core_Access_Group_Assignment AS caga', 'caga.user_id = User.id AND caga.group_id = ' . $this->getId());
+
+            //Фильтр по директору (организации)
+            if ($isSubordinate === true) {
+                if (is_null($CurrentUser)) {
+                    $CurrentUser = User::current();
+                }
+                if (is_null($CurrentUser)) {
+                    throw new Exception(
+                        Core_Array::getValue($this->excMsg, 'null_subordinate', 'null_subordinate', PARAM_STRING)
+                    );
+                } else {
+                    $subordinated = $CurrentUser->getDirector()->getId();
+                    $Query->where('User.subordinated', '=', $subordinated);
+                }
+            }
 
             foreach ($paramFilter as $field => $value) {
                 if (in_array($field, $nonStrictFilter)) {
@@ -97,17 +124,37 @@ class Core_Access_Group extends Core_Access_Group_Model
     /**
      * Поиск количества пользователей, принадлежащих данной группе
      *
+     * @param bool $isSubordinate
+     * @param User $CurrentUser
+     * @throws Exception
      * @return int
      */
-    public function getCountUsers() : int
+    public function getCountUsers(bool $isSubordinate = true, User $CurrentUser = null) : int
     {
         if (empty($this->id)) {
             return 0;
         } else {
             $GroupAssignment = new Core_Access_Group_Assignment();
-            return $GroupAssignment->queryBuilder()
-                ->where('group_id', '=', $this->getId())
-                ->getCount();
+            $GroupAssignment->queryBuilder()
+                ->where($GroupAssignment->getTableName() . '.group_id', '=', $this->getId());
+
+            if ($isSubordinate === true) {
+                if (is_null($CurrentUser)) {
+                    $CurrentUser = User::current();
+                }
+                if (is_null($CurrentUser)) {
+                    throw new Exception(
+                        Core_Array::getValue($this->excMsg, 'null_subordinate', 'null_subordinate', PARAM_STRING)
+                    );
+                } else {
+                    $subordinated = $CurrentUser->getDirector()->getId();
+                    $GroupAssignment
+                        ->queryBuilder()
+                        ->join('User', ' User.id = user_id AND User.subordinated = ' . $subordinated);
+                }
+            }
+
+            return $GroupAssignment->getCount();
         }
     }
 
@@ -219,6 +266,7 @@ class Core_Access_Group extends Core_Access_Group_Model
         $Child = new Core_Access_Group();
         $Child->parentId($this->getId());
         $Child->title($title);
+        $Child->subordinated($this->subordinated);
         $Child->save();
         return $Child;
     }

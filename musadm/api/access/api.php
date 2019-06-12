@@ -9,6 +9,11 @@
 $action = Core_Array::Request('action', null, PARAM_STRING);
 
 
+$CurrentUser = User::current();
+if (is_null($CurrentUser) || $CurrentUser->groupId() !== ROLE_DIRECTOR) {
+    die(REST::error(0, 'Вы не авторизованы как директор'));
+}
+
 /**
  * Получения информации о группе для создания/редактирования
  *
@@ -38,7 +43,13 @@ if ($action === 'edit') {
     $output->title = is_null($Group->title()) ? '' : $Group->title();
     $output->description = is_null($Group->description()) ? '' : $Group->description();
     $output->parentId = $parentId;
-    $output->countUsers = $Group->getCountUsers();
+
+    try {
+        $output->countUsers = $Group->getCountUsers();
+    } catch (Exception $e) {
+        die(REST::error(3, $e->getMessage()));
+    }
+
     echo json_encode($output);
     exit;
 }
@@ -58,7 +69,7 @@ if ($action === 'edit') {
  * @OUTPUT_DATA:    title       string
  * @OUTPUT_DATA:    description string
  * @OUTPUT_DATA:    parentId    int
- * @OUTPUT_DATA:    contUsers   int
+ * @OUTPUT_DATA:    countUsers  int
  */
 if ($action === 'save') {
     $id = Core_Array::Get('id', 0, PARAM_INT);
@@ -83,7 +94,12 @@ if ($action === 'save') {
     $output->title = is_null($Group->title()) ? '' : $Group->title();
     $output->description = is_null($Group->description()) ? '' : $Group->description();
     $output->parentId = $Group->parentId();
-    $output->countUsers = $Group->getCountUsers();
+
+    try {
+        $output->countUsers = $Group->getCountUsers();
+    } catch (Exception $e) {
+        die(REST::error(3, $e->getMessage()));
+    }
 
     echo json_encode($output);
     exit;
@@ -164,7 +180,12 @@ if ($action === 'setCapability') {
     $stdGroup->title = $Group->title();
     $stdGroup->description = is_null($Group->description()) ? '' : $Group->description();
     $stdGroup->parentId = $Group->parentId();
-    $stdGroup->countUsers = $Group->getCountUsers();
+
+    try {
+        $stdGroup->countUsers = $Group->getCountUsers();
+    } catch (Exception $e) {
+        die(REST::error(3, $e->getMessage()));
+    }
 
     $output = new stdClass();
     $output->capability = Core_Array::getValue(Core_Access::instance()->capabilities, $capabilityName, '', PARAM_STRING);
@@ -209,9 +230,14 @@ if ($action === 'getList') {
     $result['group']->title = $Group->title();
     $result['group']->parentId = $Group->parentId();
     $result['group']->description = $Group->description();
-    $result['group']->countUsers = $Group->getCountUsers();
 
-    $Users = $Group->getUserList($params);
+    try {
+        $result['group']->countUsers = $Group->getCountUsers();
+        $Users = $Group->getUserList($params);
+    } catch (Exception $e) {
+        die(REST::error(3, $e->getMessage()));
+    }
+
     $result['users'] = [];
     foreach ($Users as $user) {
         $stdUser = new stdClass();

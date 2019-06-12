@@ -5,6 +5,7 @@
  * @author: BadWolf
  * @date 20.05.2019 21:36
  * @version 20190528
+ * @version 20190611
  */
 
 foreach ($_GET as $key => $param) {
@@ -41,7 +42,7 @@ if ($action === 'getList') {
     $paramOffset = Core_Array::getValue($params, 'offset', null, PARAM_INT);
     $paramsOrder = Core_Array::getValue($params, 'order', [], PARAM_ARRAY);
 
-    $Controller = new User_Controller();
+    $Controller = new User_Controller(User::current());
     $Controller->active($paramActive);
     $Controller->groupId($paramGroups);
     foreach ($paramFilter as $paramName => $paramValue) {

@@ -39,6 +39,14 @@ class Core_Access_Group_Model extends Core_Entity
 
 
     /**
+     * id директора (организации), которой принадлежит группа
+     *
+     * @var int
+     */
+    protected $subordinated = 0;
+
+
+    /**
      * @param int|null $parentId
      * @return $this|int
      */
@@ -68,12 +76,31 @@ class Core_Access_Group_Model extends Core_Entity
     }
 
 
+    /**
+     * @param string|null $description
+     * @return $this|string
+     */
     public function description(string $description = null)
     {
         if (is_null($description)) {
             return $this->description;
         } else {
             $this->description = $description;
+            return $this;
+        }
+    }
+
+
+    /**
+     * @param int|null $subordinated
+     * @return $this|int
+     */
+    public function subordinated(int $subordinated = null)
+    {
+        if (is_null($subordinated)) {
+            return intval($this->subordinated);
+        } else {
+            $this->subordinated = $subordinated;
             return $this;
         }
     }

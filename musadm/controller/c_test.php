@@ -75,6 +75,8 @@ Core::factory('Structure')
     ->action('musadm/access/index')
     ->templateId(10)
     ->save();
+$Orm->executeQuery('UPDATE User SET subordinated = id WHERE group_id = 6');
+
 //$Group = Core::factory('Core_Access_Group', 29);
 //debug($Group->hasCapability('task_read'), 1);
 //$Group = new Core_Access_Group();

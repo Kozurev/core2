@@ -181,7 +181,7 @@ class Core_Access
 
 
     /**
-     *
+     * Поиск группы прав доаступа, которой принадлежит пользователь
      *
      * @param User|null $User
      * @return Core_Access_Group|null
@@ -214,7 +214,8 @@ class Core_Access
                 id int PRIMARY KEY AUTO_INCREMENT,
                 parent_id int,
                 title VARCHAR(255),
-                description text
+                description text,
+                subordinated int
             );
         ');
         $Orm->executeQuery('
@@ -241,7 +242,6 @@ class Core_Access
         //Директор
         $Group1 = new Core_Access_Group();
         $Group1->title('Директор');
-        //$Group1->description('Описание: Директор');
         $Group1->save();
 
         $Directors = new User_Controller(User::current());
@@ -613,7 +613,6 @@ class Core_Access
 
         $Group1->capabilityForbidden(self::STATISTIC_READ);
 
-
-        debug($this->capabilities);
+        $Orm->executeQuery('UPDATE Access_Group SET subordinated = 0 WHERE 1');
     }
 }
