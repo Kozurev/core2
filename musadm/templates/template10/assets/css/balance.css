@@ -12,6 +12,11 @@
     overflow-y: auto;
 }
 
+.balance__countLessons {
+    cursor: pointer;
+}
+
+
 /*.balance-lessons::-webkit-scrollbar { width: 0; }*/
 /*.balance-lessons { -ms-overflow-style: none; }*/
 

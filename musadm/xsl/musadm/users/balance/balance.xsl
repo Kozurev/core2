@@ -24,13 +24,43 @@
                     <tr>
                         <td>Кол-во индивидуальных / групповых занятий</td>
                         <td>
-                            <xsl:call-template name="property">
-                                <xsl:with-param name="id" select="'13'"/>
-                            </xsl:call-template>
+                            <span>
+                                <xsl:choose>
+                                    <xsl:when test="access_user_edit_lessons = 1">
+                                        <span class="balance__countLessons" data-lessons-type="User.TYPE_INDIV" data-userid="{user/id}"
+                                              id="countLessonsIndiv"
+                                              title="Нажмите для редактирования кол-ва индивидуальных занятий">
+                                            <xsl:call-template name="property">
+                                                <xsl:with-param name="id" select="'13'"/>
+                                            </xsl:call-template>
+                                        </span>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:call-template name="property">
+                                            <xsl:with-param name="id" select="'13'"/>
+                                        </xsl:call-template>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </span>
                             <xsl:text> / </xsl:text>
-                            <xsl:call-template name="property">
-                                <xsl:with-param name="id" select="'14'"/>
-                            </xsl:call-template>
+                            <span>
+                                <xsl:choose>
+                                    <xsl:when test="access_user_edit_lessons = 1">
+                                        <span class="balance__countLessons" data-lessons-type="User.TYPE_GROUP" data-userid="{user/id}"
+                                              id="countLessonsGroup"
+                                              title="Нажмите для редактирования кол-ва групповых занятий">
+                                            <xsl:call-template name="property">
+                                                <xsl:with-param name="id" select="'14'"/>
+                                            </xsl:call-template>
+                                        </span>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:call-template name="property">
+                                            <xsl:with-param name="id" select="'14'"/>
+                                        </xsl:call-template>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </span>
                         </td>
                         <td>
                             <xsl:if test="access_buy_tarif = 1">
@@ -161,7 +191,6 @@
                 <xsl:value-of select="property[property_id=$id]/value" />
             </xsl:otherwise>
         </xsl:choose>
-
     </xsl:template>
 
 </xsl:stylesheet>

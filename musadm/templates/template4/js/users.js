@@ -269,6 +269,43 @@ $(function(){
 });
 
 
+
+/*-------------------------------------*/
+/*----------Новые обработчики----------*/
+/*-------------------------------------*/
+$(function() {
+    //Обработчик для редактирования кол-ва занятий клиентов из личного кабинета
+    $('.user-info').on('click', '.balance__countLessons', function(){
+        $(this).hide();
+        var id = $(this).attr('id');
+        var currentCount = Number($(this).text());
+        var userId = $(this).data('userid');
+        var lessonsType = $(this).data('lessons-type');
+        $(this).parent().append('<input ' +
+            'id="newCountLessonsVal" ' +
+            'value="'+currentCount+'" ' +
+            'class="form-control" ' +
+            'style="width: 50px; display: inline-block" ' +
+            'type="number"' +
+            'step="0.5">');
+        $(this).parent().append('<a ' +
+            'class="action save"' +
+            'id="saveCountLessons"' +
+            'style="vertical-align: middle"' +
+            'onclick="User.changeCountLessons('+userId+', User.OPERATION_SET, '+lessonsType+', $(\'#newCountLessonsVal\').val(), ' +
+            'function(response){' +
+            'var lessonsSpan = $(\'#'+id+'\');' +
+            'lessonsSpan.text(response.newCount);' +
+            'lessonsSpan.show();' +
+            '$(\'#saveCountLessons\').remove();' +
+            '$(\'#newCountLessonsVal\').remove();' +
+            '})"' +
+            '></a>');
+    });
+});
+
+
+
 /**
  * Применение фильтров для поиска клиентов
  *

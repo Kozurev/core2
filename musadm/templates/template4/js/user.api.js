@@ -1,6 +1,11 @@
 'use strict'
 
 class User {
+    static TYPE_INDIV = 1;
+    static TYPE_GROUP = 2;
+    static OPERATION_PLUS = 'plus';
+    static OPERATION_MINUS = 'minus';
+    static OPERATION_SET = 'set';
 
     /**
      * @returns {string}
@@ -56,6 +61,38 @@ class User {
             }
         });
     }
+
+
+    /**
+     * Изменение кол-ва занятий у клиента
+     *
+     * @param userId
+     * @param operation
+     * @param lessonsType
+     * @param num
+     * @param callBack
+     */
+    static changeCountLessons(userId, operation, lessonsType, num, callBack) {
+        $.ajax({
+            type: 'GET',
+            url: User.getApiLink(),
+            dataType: 'json',
+            data: {
+                action: 'changeCountLessons',
+                userId: userId,
+                operation: operation,
+                lessonsType: lessonsType,
+                number: num
+            },
+            success: function(response) {
+                callBack(response);
+            },
+            error: function(){
+                notificationError('При изменении кол-ва занятий клиента произошла ошибкаы');
+            }
+        });
+    }
+
 
 
     /**

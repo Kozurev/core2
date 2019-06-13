@@ -106,9 +106,7 @@ if ($action === 'save') {
     $pass2 = Core_Array::Post('pass2', '', PARAM_STRING);
 
     /**
-     * -----------------------------------------------------------------------------------------------------------------
-     * -----------------------------------------------Различные проверки------------------------------------------------
-     * -----------------------------------------------------------------------------------------------------------------
+     * Различные проверки
      */
     //Проверка на совпадение паролей
     if ((!empty($pass1) || !empty($pass2)) && $pass1 !== $pass2) {
@@ -136,9 +134,7 @@ if ($action === 'save') {
 
 
     /**
-     * -----------------------------------------------------------------------------------------------------------------
-     * -------------------------------------------Обновление основных свойств-------------------------------------------
-     * -----------------------------------------------------------------------------------------------------------------
+     * Обновление основных свойств
      */
     $User->surname($surname);
     $User->name($name);
@@ -153,9 +149,7 @@ if ($action === 'save') {
 
 
     /**
-     * -----------------------------------------------------------------------------------------------------------------
-     * -------------------------------------------Создание связей с филлиалами------------------------------------------
-     * -----------------------------------------------------------------------------------------------------------------
+     * Создание связей с филлиалами
      */
     $areas = Core_Array::Post('areas', null, PARAM_ARRAY);
     if (!is_null($areas)) {
@@ -185,9 +179,7 @@ if ($action === 'save') {
 
 
     /**
-     * -----------------------------------------------------------------------------------------------------------------
-     * ----------------------------------------Обновление дополнителньых свойств----------------------------------------
-     * -----------------------------------------------------------------------------------------------------------------
+     * Обновление дополнителньых свойств
      */
     $additionalAccumulate = []; //Массив для накопления всех значений доп. свойств
 
@@ -265,9 +257,7 @@ if ($action === 'save') {
 
 
     /**
-     * -----------------------------------------------------------------------------------------------------------------
-     * -----------------------------------------------Формирование ответа-----------------------------------------------
-     * -----------------------------------------------------------------------------------------------------------------
+     * Формирование ответа
      */
     $output = new stdClass();
 
@@ -327,6 +317,91 @@ if ($action === 'save') {
     $output->access->payment_create_client = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT);
     $output->access->user_edit_client = Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_CLIENT);
     $output->access->user_archive_client = Core_Access::instance()->hasCapability(Core_Access::USER_ARCHIVE_CLIENT);
+
+    die(json_encode($output));
+}
+
+
+/**
+ * Изменение кол-ва занятий
+ *
+ * @INPUT_GET:  userId      int         идентификатор пользователя
+ * @INPUT_GET:  operation   string      тип операции
+ * @INPUT_GET:  lessonsType string      тит редактируемых занятий (индивидуальные или групповые)
+ * @INPUT_GET:  number      float       значение на которое меняется текущий баланс занятий
+ *
+ * @OUTPUT:     json
+ *
+ * @OUTPUT_DATA: stdClass
+ *                  ->user        stdClass    объект содержащий краткую информацию о пользователе
+ *                  ->newCount    float       обновленное кол-во занятий
+ *                  ->oldCount    float       прежнее кол-во занятий
+ */
+if ($action === 'changeCountLessons') {
+    $userId = Core_Array::Get('userId', null, PARAM_INT);
+    $operation = Core_Array::Get('operation', null, PARAM_STRING);
+    $lessonsType = Core_Array::Get('lessonsType', null, PARAM_INT);
+    $number = Core_Array::Get('number', null, PARAM_FLOAT);
+
+    Core::factory('User_Controller');
+    Core::factory('Schedule_Lesson');
+    $output = new stdClass(); //Ответ
+
+    //Проверки
+    $existingOperations = ['set', 'plus', 'minus'];
+    $existingLessonTypes = [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_GROUP];
+
+    if (is_null($userId) || is_null($operation) || is_null($lessonsType) || is_null($number)) {
+        die(REST::error(1, 'Отсутствует один из обязательных параметров'));
+    }
+    if (!in_array($operation, $existingOperations)) {
+        die(REST::error(2, 'Параметр \'operation\' имеет недопустимое значение'));
+    }
+    if (!in_array($lessonsType, $existingLessonTypes)) {
+        die(REST::error(3, 'Параметр \'lessonsType\' имеет недопустимое значение'));
+    }
+
+    $Client = User_Controller::factory($userId);
+    if (is_null($Client)) {
+        die(REST::error(4, 'Пользователь с id: ' . $userId . ' не существует'));
+    }
+    if ($Client->groupId() !== ROLE_CLIENT) {
+        die(REST::error(5, 'Пользователь с id: ' . $userId . ' не является клиентом'));
+    }
+
+    $output->user = new stdClass();
+    $output->user->id = $Client->getId();
+    $output->user->surname = $Client->surname();
+    $output->user->name = $Client->name();
+    $output->user->groupId = $Client->groupId();
+    $output->user->patronymic = $Client->patronymic();
+    $output->user->phone = $Client->phoneNumber();
+    $output->user->login = $Client->login();
+
+    //Изменение баланса кол-ва занятий
+    if ($lessonsType == Schedule_Lesson::TYPE_INDIV) {
+        $propName = 'indiv_lessons';
+    } else {
+        $propName = 'group_lessons';
+    }
+    $UserLessons = Core::factory('Property')->getByTagName($propName);
+    $CountLessons = $UserLessons->getPropertyValues($Client)[0];
+
+    if ($operation == 'plus') {
+        $newCount = $CountLessons->value() + $number;
+    } elseif ($operation == 'minus') {
+        $newCount = $CountLessons->value() - $number;
+    } else {
+        $newCount = $number;
+    }
+
+    $output->oldCount = $CountLessons->value();
+    $output->newCount = $newCount;
+
+    if ($CountLessons->value() != $newCount) {
+        $CountLessons->value($newCount);
+        $CountLessons->save();
+    }
 
     die(json_encode($output));
 }

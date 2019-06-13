@@ -91,6 +91,10 @@ if ($isAdmin) {
         ->addSimpleEntity(
             'access_schedule_absent',
             (int)Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT)
+        )
+        ->addSimpleEntity(
+            'access_user_edit_lessons',
+            (int)Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_LESSONS)
         );
 }
 
