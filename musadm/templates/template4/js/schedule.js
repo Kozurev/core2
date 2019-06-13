@@ -477,7 +477,7 @@ function saveScheduleTask(formData, func) {
             if(response != '0') {
                 alert(response);
             } else {
-                notifySccess('Ваше обращение доставлено менеджерам');
+                notificationSuccess('Ваше обращение доставлено менеджерам');
             }
             closePopup();
             func();

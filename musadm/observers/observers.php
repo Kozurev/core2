@@ -504,7 +504,7 @@ Core::attachObserver('afterLidStatusDelete', function($args) {
 /**
  * Создание задачи с напоминанием о низком уровне баланса занятий клиента
  */
-Core::attachObserver('afterScheduleLessonReportInsert', function($args) {
+Core::attachObserver('afterScheduleLesson.makeReport', function($args) {
     Core::factory('Schedule_Lesson');
 
     $Report = $args[0];

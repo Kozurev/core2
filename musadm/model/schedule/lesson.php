@@ -235,6 +235,8 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      */
     public function makeReport(string $date, int $attendance, array $attendanceClients = [])
     {
+        Core::notify([&$this, &$date, &$attendance, &$attendanceClients], 'afterScheduleLesson.makeReport');
+
         $Report = Core::factory('Schedule_Lesson_Report')
             ->lessonId($this->id)
             ->attendance($attendance)
@@ -242,7 +244,6 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->date($date)
             ->typeId($this->type_id)
             ->clientId($this->client_id);
-            //->lessonType($this->lesson_type);
         //TODO: Убрать последнее свойство вообще из таблицы за ненадобностью
 
         if ($this->typeId() == self::TYPE_INDIV) {
@@ -390,6 +391,8 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             $Info->reportId($Report->getId());
             $Info->save();
         }
+
+        Core::notify([&$Report], 'afterScheduleLesson.makeReport');
     }
 
 
