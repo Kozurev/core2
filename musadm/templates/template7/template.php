@@ -26,7 +26,7 @@ is_object(Core_Page_Show::instance()->StructureItem)
         Core_Page_Show::instance()->css('/templates/template7/css/style.css');
     }
 
-    if ($areaId > 0 || $pageUserId > 0) { ?>
+    if ($areaId > 0 || $pageUserId > 0 || $User->groupId() == ROLE_TEACHER) { ?>
     <section>
         <div class="row calendar_small">
             <div>

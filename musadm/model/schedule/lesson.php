@@ -235,7 +235,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      */
     public function makeReport(string $date, int $attendance, array $attendanceClients = [])
     {
-        Core::notify([&$this, &$date, &$attendance, &$attendanceClients], 'afterScheduleLesson.makeReport');
+        Core::notify([&$this, &$date, &$attendance, &$attendanceClients], 'beforeScheduleLesson.makeReport');
 
         $Report = Core::factory('Schedule_Lesson_Report')
             ->lessonId($this->id)
