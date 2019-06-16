@@ -334,6 +334,14 @@ if ($isAdmin === 1) {
             'access_user_append_comment',
             (int)Core_Access::instance()->hasCapability(Core_Access::USER_APPEND_COMMENT)
         )
+        ->addSimpleEntity(
+            'access_task_edit',
+            (int)Core_Access::instance()->hasCapability(Core_Access::TASK_EDIT)
+        )
+        ->addSimpleEntity(
+            'access_task_append_comment',
+            (int)Core_Access::instance()->hasCapability(Core_Access::TASK_APPEND_COMMENT)
+        )
         ->xsl('musadm/users/events.xsl')
         ->show();
 }
