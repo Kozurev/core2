@@ -198,6 +198,7 @@ class User_Controller
             ->queryBuilder()
             ->select(['User.id', 'User.name', 'User.surname', 'phone_number', 'email', 'group_id', 'subordinated'])
             ->from(Core::factory('User')->getTableName());
+        $this->UserQuery->groupBy('User.id');
         //$this->UserQuery->limit(10);
     }
 
