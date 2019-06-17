@@ -275,7 +275,7 @@ $(function(){
 /*-------------------------------------*/
 $(function() {
     //Обработчик для редактирования кол-ва занятий клиентов из личного кабинета
-    $('.user-info').on('click', '.balance__countLessons', function(){
+    $('body').on('click', '.balance__countLessons', function(){
         $(this).hide();
         var id = $(this).attr('id');
         var currentCount = Number($(this).text());
