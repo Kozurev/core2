@@ -21,6 +21,7 @@ class Event extends Event_Model
     const SCHEDULE_EDIT_ABSENT_PERIOD =     27;
     const SCHEDULE_CHANGE_TIME =            5;
     const SCHEDULE_APPEND_CONSULT =         28;
+    const SCHEDULE_SET_ABSENT =             29;
 
     const CLIENT_ARCHIVE =                  7;
     const CLIENT_UNARCHIVE =                8;
@@ -108,8 +109,14 @@ class Event extends Event_Model
                 $date = refactorDateFormat($this->data()->date);
                 $this->data()->Lesson->lessonType() == 1
                     ?   $str .= 'Удален(а) из основного графика с ' . $date
-                    :   $str .= 'Отсутствует ' . $date;
+                    :   $str .= 'Удален(а) из актуального графика ' . $date;
                 return $str;
+                break;
+
+            case self::SCHEDULE_SET_ABSENT:
+                Core::factory('Schedule_Lesson');
+                $date = refactorDateFormat($this->data()->date);
+                return 'Отсутствует ' . $date;
                 break;
 
             case self::SCHEDULE_CREATE_ABSENT_PERIOD:

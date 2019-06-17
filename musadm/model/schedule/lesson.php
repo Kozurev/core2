@@ -145,8 +145,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             'Lesson' => &$this,
             'date' => $date,
         ];
-
-        Core::notify($observerArgs, 'ScheduleLessonMarkDeleted');
+        Core::notify($observerArgs, 'ScheduleLesson.markDeleted');
 
         if ($this->lesson_type == self::SCHEDULE_MAIN) { //Основной график
             if($this->insert_date == $this->delete_date) {
@@ -175,14 +174,15 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     public function setAbsent($date)
     {
         if ($this->lesson_type == self::SCHEDULE_CURRENT) {
+            $this->markDeleted($date);
+            return $this;
+        } elseif ($this->lesson_type == self::SCHEDULE_MAIN) {
             $observerArgs = [
                 'Lesson' => &$this,
                 'date' => $date,
             ];
-            Core::notify($observerArgs, 'ScheduleLessonMarkDeleted');
-            $this->delete();
-            return $this;
-        } elseif ($this->lesson_type == self::SCHEDULE_MAIN) {
+            Core::notify($observerArgs, 'beforeScheduleLesson.setAbsent');
+
             Core::factory('Schedule_Lesson_Absent')
                 ->date($date)
                 ->lessonId($this->id)
