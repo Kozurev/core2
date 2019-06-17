@@ -51,7 +51,7 @@ if ($action === 'edit_tarif_popup') {
         Core_Page_Show::instance()->error(403);
     }
 
-    is_null($tarifId)
+    !is_null($tarifId)
         ?   $Tarif = Core::factory('Payment_Tarif', $tarifId)
         :   $Tarif = Core::factory('Payment_Tarif');
 
