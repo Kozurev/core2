@@ -8,7 +8,7 @@
             </h3>
 
             <form method="GET" action="{wwwroot}/user/client" id="client-filter">
-                <div class="row">
+                <div class="row client-filter__options">
                     <div class="col-lg-3 dropdown-parent">
                         <h4>Филиалы</h4>
                         <div class="row">
