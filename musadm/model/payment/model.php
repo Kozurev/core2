@@ -138,7 +138,7 @@ class Payment_Model extends Core_Entity
     public function description(string $description = null)
     {
         if (is_null($description)) {
-            return $this->description;
+            return strval($this->description);
         } else {
             $this->description = $description;
             return $this;
