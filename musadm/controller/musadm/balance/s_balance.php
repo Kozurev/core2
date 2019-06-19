@@ -175,72 +175,72 @@ if ($action === 'updatePerLesson') {
 /**
  * Покупка тарифа
  */
-if ($action == 'buyTarif') {
-    //Проверка прав доступа
-    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_BUY)) {
-        Core_Page_Show::instance()->error(403);
-    }
-
-    $clientId = Core_Array::Get('userId', null, PARAM_INT);
-    $tarifId =  Core_Array::Get( 'tarifId', null, PARAM_INT);
-
-    $Client = User_Controller::factory($clientId);
-    $Tarif = Core::factory('Payment_Tarif', $tarifId);
-
-    if (is_null($Client) && is_null($Tarif)) {
-        Core_Page_Show::instance()->error(404);
-    }
-
-    $UserBalance = Core::factory('Property')->getByTagName('balance');
-    $UserBalance = $UserBalance->getPropertyValues($Client)[0];
-    if ($UserBalance->value() < $Tarif->price()) {
-        exit('Недостаточно средств для покупки данного тарифа');
-    }
-
-    $CountIndivLessons = Core::factory('Property')->getByTagName('indiv_lessons');
-    $CountGroupLessons = Core::factory('Property')->getByTagName('group_lessons');
-    $CountIndivLessons = $CountIndivLessons->getPropertyValues($Client)[0];
-    $CountGroupLessons = $CountGroupLessons->getPropertyValues($Client)[0];
-
-    //Корректировка кол-ва занятий
-    if ($Tarif->countIndiv() != 0) {
-        $CountIndivLessons->value($CountIndivLessons->value() + $Tarif->countIndiv())->save();
-    }
-
-    if ($Tarif->countGroup() != 0) {
-        $CountGroupLessons->value($CountGroupLessons->value() + $Tarif->countGroup())->save();
-    }
-
-    //Корректировка пользовательской медианы (средняя стоимость занятия)
-    $clientRate = [];
-    if ($Tarif->countIndiv() != 0 && $Tarif->countGroup() != 0) {
-        //TODO: при покупки комплексного тарифа пока что медиана не меняется. Надо уточнить будет этот момент в дальнейшем
-    }
-    elseif ($Tarif->countIndiv() != 0) {
-        $clientRate['client_rate_indiv'] = $Tarif->countIndiv();
-    }
-    elseif ($Tarif->countGroup() != 0) {
-        $clientRate['client_rate_group'] = $Tarif->countGroup();
-    }
-
-    foreach ($clientRate as $rateType => $countLessons) {
-        $ClientRateProperty = Core::factory('Property')->getByTagName($rateType);
-        $newClientRateValue = $Tarif->price() / $countLessons;
-        $newClientRateValue = round($newClientRateValue, 2);
-        $OldClientRateValue = $ClientRateProperty->getPropertyValues($Client)[0];
-        $OldClientRateValue->value($newClientRateValue)->save();
-    }
-
-    //Создание платежа
-    $Payment = Core::factory('Payment')
-        ->type(2)
-        ->user($Client->getId())
-        ->value($Tarif->price())
-        ->description("Покупка тарифа \"" . $Tarif->title() . "\"")
-        ->save();
-
-    exit;
-}
+//if ($action == 'buyTarif') {
+//    //Проверка прав доступа
+//    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_BUY)) {
+//        Core_Page_Show::instance()->error(403);
+//    }
+//
+//    $clientId = Core_Array::Get('userId', null, PARAM_INT);
+//    $tarifId =  Core_Array::Get( 'tarifId', null, PARAM_INT);
+//
+//    $Client = User_Controller::factory($clientId);
+//    $Tarif = Core::factory('Payment_Tarif', $tarifId);
+//
+//    if (is_null($Client) && is_null($Tarif)) {
+//        Core_Page_Show::instance()->error(404);
+//    }
+//
+//    $UserBalance = Core::factory('Property')->getByTagName('balance');
+//    $UserBalance = $UserBalance->getPropertyValues($Client)[0];
+//    if ($UserBalance->value() < $Tarif->price()) {
+//        exit('Недостаточно средств для покупки данного тарифа');
+//    }
+//
+//    $CountIndivLessons = Core::factory('Property')->getByTagName('indiv_lessons');
+//    $CountGroupLessons = Core::factory('Property')->getByTagName('group_lessons');
+//    $CountIndivLessons = $CountIndivLessons->getPropertyValues($Client)[0];
+//    $CountGroupLessons = $CountGroupLessons->getPropertyValues($Client)[0];
+//
+//    //Корректировка кол-ва занятий
+//    if ($Tarif->countIndiv() != 0) {
+//        $CountIndivLessons->value($CountIndivLessons->value() + $Tarif->countIndiv())->save();
+//    }
+//
+//    if ($Tarif->countGroup() != 0) {
+//        $CountGroupLessons->value($CountGroupLessons->value() + $Tarif->countGroup())->save();
+//    }
+//
+//    //Корректировка пользовательской медианы (средняя стоимость занятия)
+//    $clientRate = [];
+//    if ($Tarif->countIndiv() != 0 && $Tarif->countGroup() != 0) {
+//        //TODO: при покупки комплексного тарифа пока что медиана не меняется. Надо уточнить будет этот момент в дальнейшем
+//    }
+//    elseif ($Tarif->countIndiv() != 0) {
+//        $clientRate['client_rate_indiv'] = $Tarif->countIndiv();
+//    }
+//    elseif ($Tarif->countGroup() != 0) {
+//        $clientRate['client_rate_group'] = $Tarif->countGroup();
+//    }
+//
+//    foreach ($clientRate as $rateType => $countLessons) {
+//        $ClientRateProperty = Core::factory('Property')->getByTagName($rateType);
+//        $newClientRateValue = $Tarif->price() / $countLessons;
+//        $newClientRateValue = round($newClientRateValue, 2);
+//        $OldClientRateValue = $ClientRateProperty->getPropertyValues($Client)[0];
+//        $OldClientRateValue->value($newClientRateValue)->save();
+//    }
+//
+//    //Создание платежа
+//    $Payment = Core::factory('Payment')
+//        ->type(2)
+//        ->user($Client->getId())
+//        ->value($Tarif->price())
+//        ->description("Покупка тарифа \"" . $Tarif->title() . "\"")
+//        ->save();
+//
+//    exit;
+//}
 
 
 if ($action === 'savePayment') {

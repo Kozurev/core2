@@ -8,9 +8,11 @@
                     <tr>
                         <td>Баланс</td>
                         <td>
-                            <xsl:call-template name="property">
-                                <xsl:with-param name="id" select="'12'"/>
-                            </xsl:call-template>
+                            <span id="balance">
+                                <xsl:call-template name="property">
+                                    <xsl:with-param name="id" select="'12'"/>
+                                </xsl:call-template>
+                            </span>
                         </td>
                         <td>
                             <xsl:if test="access_create_payment = 1">
@@ -27,8 +29,8 @@
                             <span>
                                 <xsl:choose>
                                     <xsl:when test="access_user_edit_lessons = 1">
-                                        <span class="balance__countLessons" data-lessons-type="User.TYPE_INDIV" data-userid="{user/id}"
-                                              id="countLessonsIndiv"
+                                        <span id="countLessonsIndiv"
+                                              onclick="editClientCountLessons({user/id}, User.TYPE_INDIV, '#countLessonsIndiv')"
                                               title="Нажмите для редактирования кол-ва индивидуальных занятий">
                                             <xsl:call-template name="property">
                                                 <xsl:with-param name="id" select="'13'"/>
@@ -36,9 +38,11 @@
                                         </span>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:call-template name="property">
-                                            <xsl:with-param name="id" select="'13'"/>
-                                        </xsl:call-template>
+                                        <span id="countLessonsIndiv">
+                                            <xsl:call-template name="property">
+                                                <xsl:with-param name="id" select="'13'"/>
+                                            </xsl:call-template>
+                                        </span>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </span>
@@ -46,8 +50,8 @@
                             <span>
                                 <xsl:choose>
                                     <xsl:when test="access_user_edit_lessons = 1">
-                                        <span class="balance__countLessons" data-lessons-type="User.TYPE_GROUP" data-userid="{user/id}"
-                                              id="countLessonsGroup"
+                                        <span id="countLessonsGroup"
+                                              onclick="editClientCountLessons({user/id}, User.TYPE_GROUP, '#countLessonsGroup')"
                                               title="Нажмите для редактирования кол-ва групповых занятий">
                                             <xsl:call-template name="property">
                                                 <xsl:with-param name="id" select="'14'"/>
@@ -55,16 +59,18 @@
                                         </span>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:call-template name="property">
-                                            <xsl:with-param name="id" select="'14'"/>
-                                        </xsl:call-template>
+                                        <span id="countLessonsGroup">
+                                            <xsl:call-template name="property">
+                                                <xsl:with-param name="id" select="'14'"/>
+                                            </xsl:call-template>
+                                        </span>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </span>
                         </td>
                         <td>
                             <xsl:if test="access_buy_tarif = 1">
-                                <a class="action buy btn_private_lessons" data-userid="{user/id}">
+                                <a class="action buy" title="Купить тариф" onclick="loaderOn(); Tarif.getList([], getClientLcTarifsCallBack)">
                                     <!--Купить индивидуальные занятия-->
                                 </a>
                             </xsl:if>
