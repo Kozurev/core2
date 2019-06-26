@@ -436,16 +436,20 @@ Core::attachObserver('beforePaymentSave', function($args) {
             $difference = $Payment->value();
         }
 
-        Core::factory('User_Controller');
+        Core::requireClass('Property');
+        Core::requireClass('User_Controller');
+        Core::requireClass('Schedule_Area_Assignment');
+
         $Client = $Payment->getUser();
         if (!is_null($Client)) {
-            $UserBalance = Core::factory('Property')->getByTagName('balance');
-            $UserBalance = $UserBalance->getPropertyValues($Client)[0];
-            $balanceOld =  floatval($UserBalance->value());
+            $Property = new Property();
+            $UserBalance = $Property->getByTagName('balance');
+            $UserBalanceVal = $UserBalance->getPropertyValues($Client)[0];
+            $balanceOld =  floatval($UserBalanceVal->value());
             $Payment->type() == 1
                 ?   $balanceNew = $balanceOld + floatval($difference)
                 :   $balanceNew = $balanceOld - floatval($difference);
-            $UserBalance->value($balanceNew)->save();
+            $UserBalanceVal->value($balanceNew)->save();
         }
     }
 
@@ -453,12 +457,49 @@ Core::attachObserver('beforePaymentSave', function($args) {
     if ($Payment->areaId() == 0) {
         $PaymentUser = $Payment->getUser();
         if (!is_null($PaymentUser)) {
-            $UserAreas = Core::factory('Schedule_Area_Assignment')->getAreas($PaymentUser, true);
+            $AreasAssignments = new Schedule_Area_Assignment();
+            $UserAreas = $AreasAssignments->getAreas($PaymentUser, true);
             if (count($UserAreas) == 1) {
                 $Payment->areaId($UserAreas[0]->getId());
             }
         }
     }
+});
+
+
+/**
+ * Корректировка баланса клиента при удалении платежа
+ * удаление всех свяей с филиалами
+ * удаление всех значений доп. свойств
+ */
+Core::attachObserver('beforePaymentDelete', function($args) {
+    $Payment = $args[0];
+
+    //Корректировка баланса клиента
+    if ($Payment->type() == 1 || $Payment->type() == 2) {
+        Core::requireClass('Property');
+        Core::requireClass('User_Controller');
+        Core::requireClass('Schedule_Area_Assignment');
+
+        $Client = $Payment->getUser();
+        if (!is_null($Client)) {
+            $Property = new Property();
+            $UserBalance = $Property->getByTagName('balance');
+            $UserBalanceVal = $UserBalance->getPropertyValues($Client)[0];
+            $balanceOld =  floatval($UserBalanceVal->value());
+            $Payment->type() == 1
+                ?   $balanceNew = $balanceOld - floatval($Payment->value())
+                :   $balanceNew = $balanceOld + floatval($Payment->value());
+            $UserBalanceVal->value($balanceNew)->save();
+        }
+    }
+
+    //Удаление связи с филлиалами
+    $AreasAssignments = new Schedule_Area_Assignment();
+    $AreasAssignments->clearAssignments($Payment);
+
+    //Удаление всех доп. свойств
+    $Property->clearForObject($Payment);
 });
 
 
