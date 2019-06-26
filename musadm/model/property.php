@@ -20,48 +20,62 @@ class Property extends Property_Model
     public function getByTagName($tagName)
     {
         return $this->queryBuilder()
+            ->clearQuery()
             ->where('tag_name', '=', $tagName)
             ->find();
     }
 
 
-	/**
-	 * Возвращает список значений свойства объекта
+    /**
+     * Возвращает список значений свойства объекта
      *
-	 * @param $obj - объект, значения свойства которого будет возвращено
-	 * @return array
-	 */
-	public function getPropertyValues($obj)
-	{
-		if (empty($this->id) || !$this->active()) {
+     * @param $obj - объект, значения свойства которого будет возвращено
+     * @return array
+     */
+	public function getValues($obj)
+    {
+        if (empty($this->id) || !$this->active()) {
             return [];
         }
 
         $tableName = 'Property_' . ucfirst($this->type());
         $modelName = $obj->getTableName();
         $EmptyValue = Core::factory($tableName)
-            ->property_id($this->id)
-            ->model_name($modelName)
+            ->propertyId($this->id)
+            ->modelName($modelName)
             ->value($this->defaultValue());
 
-		if ($obj->getId() == 0) {
+        if ($obj->getId() == 0) {
             return [$EmptyValue];
         }
 
-        $EmptyValue->object_id($obj->getId());
+        $EmptyValue->objectId($obj->getId());
 
-		$PropertyValues = Core::factory($tableName)->queryBuilder()
-			->where('property_id', '=', $this->getId())
-			->where('model_name', '=', $modelName)
-			->where('object_id', '=', $obj->getId())
-			->findAll();
+        $PropertyValues = Core::factory($tableName)->queryBuilder()
+            ->where('property_id', '=', $this->getId())
+            ->where('model_name', '=', $modelName)
+            ->where('object_id', '=', $obj->getId())
+            ->findAll();
 
-		if (count($PropertyValues) == 0) {
+        if (count($PropertyValues) == 0) {
             return [$EmptyValue];
         } else {
             return $PropertyValues;
         }
-	}
+    }
+
+
+    /**
+     * Аналог метода getValues для обратной совместимости
+     *
+     * @param $obj
+     * @return array
+     * @throws Exception
+     */
+    public function getPropertyValues($obj)
+    {
+        return $this->getValues($obj);
+    }
 
 
 	/**
@@ -128,9 +142,9 @@ class Property extends Property_Model
         }
 
         $NewAssignment = Core::factory($tableName)
-            ->property_id($propertyId)
-            ->object_id($obj->getId())
-            ->model_name($obj->getTableName());
+            ->propertyId($propertyId)
+            ->objectId($obj->getId())
+            ->modelName($obj->getTableName());
         $NewAssignment->save();
         return $NewAssignment;
 	}
@@ -295,6 +309,12 @@ class Property extends Property_Model
     }
 
 
+    /**
+     * Поиск всех доп. свйоств связанны с объектом включая его "родителя"
+     *
+     * @param $obj
+     * @return array
+     */
     public function getAllPropertiesList($obj)
     {
         $types = $this->getPropertyTypes();
