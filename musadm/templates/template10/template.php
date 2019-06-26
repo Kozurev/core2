@@ -204,7 +204,15 @@
                         <ul class="nav navbar-nav navbar-right">
                             <?php
                             if (!is_null($pageUserId)) {
-                                echo "<li><a>". $User->phoneNumber()."</a></li>";
+                                $additionalNumber = Core::factory('Property')
+                                    ->getByTagName('add_phone')
+                                    ->getPropertyValues($User)[0]->value();
+                                echo "<li><a>";
+                                echo $User->phoneNumber();
+                                if (!empty($additionalNumber)) {
+                                    echo "<br>" . $additionalNumber;
+                                }
+                                echo "</a></li>";
                             }
                             ?>
                             <li><a><?=$surname . ' ' . $name?></a></li>
@@ -250,6 +258,8 @@
 
         </div><!--//page-wrapper-->
 
+    <a href="#" class="scroll scrollTop"></a>
+
 <footer class="footer text-center">
     <div class="container">
         <small class="copyright"><a href="http://musicmetod.ru/" target="_blank">ООО"Мьюзикметод"</a></small>
@@ -274,6 +284,9 @@ Core_Page_Show::instance()
     //API
     ->js('/templates/template4/js/access.api.js')
     ->js('/templates/template4/js/user.api.js')
+    ->js('/templates/template4/js/schedule.api.js')
+    ->js('/templates/template4/js/tarif.api.js')
+    ->js('/templates/template4/js/payment.api.js')
 
     ->js('/templates/template10/assets/js/main.js')
     ->js('/templates/template4/js/bootstrap.min.js')
@@ -285,6 +298,7 @@ Core_Page_Show::instance()
     ->js('/templates/template4/lib/tablesorter/beta-testing/pager-custom-controls.js')
     ->js('/templates/template4/js/main.js')
     ->js('/templates/template4/js/users.js')
+    ->js('/templates/template4/js/access.js')
     ->js('/templates/template4/js/payments.js')
     ->js('/templates/template4/js/groups.js')
     ->js('/templates/template4/js/lids.js')
