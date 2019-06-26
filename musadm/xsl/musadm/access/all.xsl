@@ -17,7 +17,7 @@
         </div>
         <xsl:if test="//core_access_group/parent_id != 0 or count(//core_access_group) = 0">
             <div class="row buttons-panel center">
-                <div><a class="btn btn-blue" onclick="Access.edit(0, {//parent_id})">Создать группу</a></div>
+                <div><a class="btn btn-blue" onclick="Access.edit(0, {//parent_id}, editAccessGroupCallback)">Создать группу</a></div>
             </div>
         </xsl:if>
     </xsl:template>
@@ -36,11 +36,11 @@
                 <span id="countUsers_{id}"><xsl:value-of select="countUsers" /></span>
             </td>
             <td>
-                <a class="action associate" onclick="Access.getUserList({id}, Access.userListCallBack)" title="Просмотреть/редактировать список полльзователей, принадлежащих группе"></a>
-                <a class="action edit" onclick="Access.edit({id}, {//parent_id})" title="Редактировать данные группы"></a>
+                <a class="action associate" onclick="Access.getUserList({id}, acessUserListCallBack)" title="Просмотреть/редактировать список полльзователей, принадлежащих группе"></a>
+                <a class="action edit" onclick="Access.edit({id}, {//parent_id}, editAccessGroupCallback)" title="Редактировать данные группы"></a>
                 <a class="action settings" href="{/root/wwwroot}/access?group_id={id}" title="Настройки прав доступа для группы"></a>
                 <xsl:if test="parent_id != 0">
-                    <a class="action delete" onclick="Access.remove({id}, Access.removeCallBack)" title="Удалить группу"></a>
+                    <a class="action delete" onclick="Access.remove({id}, accessGroupRemoveCallback)" title="Удалить группу"></a>
                 </xsl:if>
             </td>
         </tr>
