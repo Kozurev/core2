@@ -4,17 +4,16 @@
  *
  * @author Kozurev Egor
  * @date 20.04.2018 15:05
+ * @version 20190626
+ * Class Payment
  */
-
-
 class Payment extends Payment_Model
 {
-
     private $defaultUser;
 
     public function __construct()
     {
-        $this->defaultUser = Core::factory( "User" )->surname( "Неизвестно" );
+        $this->defaultUser = Core::factory('User')->surname('Неизвестно');
     }
 
 
@@ -25,20 +24,10 @@ class Payment extends Payment_Model
      */
     public function getUser()
     {
-        if ( $this->user == null || $this->user <= 0 )
-        {
-            return null;
-        }
-
-        $User = Core::factory( "User", $this->user );
-
-        if ( $User !== null )
-        {
-            return $User;
-        }
-        else
-        {
-            return null;
+        if (empty($this->user)) {
+            return $this->defaultUser;
+        } else {
+            return Core::factory('User', $this->user);
         }
     }
 
@@ -57,55 +46,46 @@ class Payment extends Payment_Model
      *      false - поиск включает в себя стандартные типы такие как: начисление, списание и выплата преподавателю,
      *              которые не подлежат редактированию / удалению
      *
+     * @throws Exception
      * @return array
      */
-    public function getTypes( bool $isSubordinated = true, bool $isEditable = true )
+    public function getTypes(bool $isSubordinated = true, bool $isEditable = true)
     {
-        $PaymentTypes = Core::factory( "Payment_Type" );
+        $PaymentTypes = Core::factory('Payment_Type');
 
         //Выборка типов платежа для определенной организации
-        if ( $isSubordinated === true )
-        {
+        if ($isSubordinated === true) {
             $User = User::current();
-
-            if ( $User === null )
-            {
-                exit ( "Для получения списка платежей с указателем isSubordinated = true необходимо авторизоваться" );
+            if (is_null($User)) {
+                throw new Exception('Для получения списка платежей необходимо авторизоваться');
             }
 
             $PaymentTypes->queryBuilder()
                 ->open()
-                    ->where( "subordinated", "=", $User->getDirector()->getId() )
-                    ->where( "subordinated", "=", 0, "OR" )
+                    ->where('subordinated', '=', $User->getDirector()->getId())
+                    ->orWhere('subordinated', '=', 0)
                 ->close();
         }
 
         //Выборка лишь редактируемых / удаляемых типов
-        if ( $isEditable === true )
-        {
-            $PaymentTypes->queryBuilder()
-                ->where( "is_deletable", "=", 1 );
+        if ($isEditable === true) {
+            $PaymentTypes->queryBuilder()->where('is_deletable', '=', 1);
         }
-
         return $PaymentTypes->findAll();
     }
 
 
-
-
-
-
-
-    public function save( $obj = null )
+    public function save($obj = null)
     {
-        Core::notify( [&$this], "beforePaymentSave" );
+        Core::notify([&$this], 'beforePaymentSave');
 
-        //if ( $this->isDeletable() !== 1 )   return $this;
-        if ( $this->datetime == "" )   $this->datetime = date( "Y-m-d" );
+        if (empty($this->datetime)) {
+            $this->datetime = date('Y-m-d');
+        }
 
         parent::save();
 
-        Core::notify( [&$this], "afterPaymentSave" );
+        Core::notify([&$this], 'afterPaymentSave');
     }
 
 
@@ -117,7 +97,7 @@ class Payment extends Payment_Model
 
         parent::delete();
 
-        Core::notify( [&$this], "beforePaymentDelete" );
+        Core::notify( [&$this], "afterPaymentDelete" );
     }
 
 }
