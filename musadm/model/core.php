@@ -1,11 +1,10 @@
 <?php
-
 /**
  * @author BadWolf
  * @version 20190327
  * Class Core
  */
-class Core //extends Orm
+class Core
 {
     /**
      * Массив установлденных наблюдателей
@@ -61,6 +60,37 @@ class Core //extends Orm
     }
 
 
+    /**
+     * Подключение файла с классом
+     *
+     * @param string $className
+     * @return array
+     */
+    public static function requireClass(string $className)
+    {
+        $filePath = ROOT . '/model';
+        $filePathSegments = explode('_', $className);
+        $classModelName = $className . '_Model';
+
+        foreach ($filePathSegments as $segment) {
+            $filePath .= '/' . lcfirst($segment);
+        }
+
+        //Подключение модели если такая существует
+        if (file_exists($filePath . '/model.php') && !class_exists($classModelName)) {
+            include_once $filePath . '/model.php';
+        }
+
+        //Подключение файла с методами
+        if (file_exists($filePath . '.php') && !class_exists($className)) {
+            include_once $filePath . '.php';
+            return ['success' => true];
+        } else {
+            return ['success' => false, 'error' => 'Core.requireClass: файл с классом ' . $className . ' не найден'];
+        }
+    }
+
+
 	/**
 	 * Подключает необходимый файл и создаёт объект класса
      *
@@ -70,33 +100,8 @@ class Core //extends Orm
 	 */
 	static public function factory(string $className, int $id = 0)
 	{
-		//Формирование пути к файлу класса
-		$segments = explode( "_", $className );
-		$model = $className . "_Model";
-		$filePath = ROOT . "/model";
-		$obj = null;
+	    Core::requireClass($className);
 
-		foreach ($segments as $segment) {
-            $filePath .= '/' . lcfirst($segment);
-        }
-
-		if (TEST_MODE_FACTORY) {
-			echo '<br>FilePath: ' . $filePath . '.php';
-			echo '<br>FilePath: ' . $filePath . '/model.php';
-			echo '<br>ClassName: ' . $className;
-			echo '<br>ClassName: ' . $className . '_Model';
-		}
-
-		//Подключение модели
-		if ( file_exists($filePath . '/model.php') && !class_exists($model)) {
-			 include_once $filePath . '/model.php';
-		}
-
-		//Подключение файла с методами
-		if (file_exists($filePath . '.php') && !class_exists($className)) {
-			 include_once $filePath . '.php';
-		}
-		
 		//Создание объекта класса
 		if (class_exists($className)) {
             $obj = new $className;
