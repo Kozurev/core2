@@ -427,6 +427,40 @@ class Core_Entity extends Core_Entity_Model
 
 
     /**
+     * Метод преобразования объекта в объект класса stdClass со значением всех свойств, объявленных в модели
+     *
+     * @return stdClass
+     */
+    public function toStd()
+    {
+        $Model = $this->getModel();
+        $stdModel = new stdClass();
+        foreach (get_object_vars($Model) as $propertyName => $propertyValue) {
+            if ($propertyName == 'id') {
+                $stdModel->id = $this->getId();
+                continue;
+            } else {
+                $snakeCaseGetter = $propertyName;
+                $camelCaseGetter = toCamelCase($propertyName);
+            }
+
+            if (method_exists($Model, $camelCaseGetter)) {
+                $value = $Model->$camelCaseGetter();
+            } elseif (method_exists($Model, $snakeCaseGetter)) {
+                $value = $Model->$snakeCaseGetter();
+            } else {
+                continue;
+            }
+
+            if (!is_array($value) && !is_object($value)) {
+                $stdModel->$propertyName = $value;
+            }
+        }
+        return $stdModel;
+    }
+
+
+    /**
      * Конвертирует, к примеру, "Structure_Item" в "structure_item"
      * Я знаю что этот метод реализован одной стандартной PHP-шной функцией mb_strtolower
      * но всё равно этот метод был создан с тем что в будущем формат преобразования немного изменится
