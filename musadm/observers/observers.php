@@ -421,6 +421,9 @@ Core::attachObserver('afterScheduleReportSave', function($args) {
 });
 
 
+/**
+ * Корректировка баланса клиента при сохранении/редактировании платежа типа начисление/списание
+ */
 Core::attachObserver('beforePaymentSave', function($args) {
     $Payment = $args[0];
 
