@@ -87,11 +87,11 @@ $(function(){
             closePopup();
         })
         //Начисление платежа пользователю (форма)
-        .on('click', '.user_add_payment', function(e) {
-            e.preventDefault();
-            var userId = $(this).data('userid');
-            getPaymentPopup(userId, root + '/user/client');
-        })
+        // .on('click', '.user_add_payment', function(e) {
+        //     e.preventDefault();
+        //     var userId = $(this).data('userid');
+        //     getPaymentPopup(userId, root + '/user/client');
+        // })
         //Сохранение заметок клиента
         .on('blur', '#client_notes', function() {
             loaderOn();
@@ -270,42 +270,6 @@ $(function(){
 
 
 
-/*-------------------------------------*/
-/*----------Новые обработчики----------*/
-/*-------------------------------------*/
-$(function() {
-    //Обработчик для редактирования кол-ва занятий клиентов из личного кабинета
-    $('body').on('click', '.balance__countLessons', function(){
-        $(this).hide();
-        var id = $(this).attr('id');
-        var currentCount = Number($(this).text());
-        var userId = $(this).data('userid');
-        var lessonsType = $(this).data('lessons-type');
-        $(this).parent().append('<input ' +
-            'id="newCountLessonsVal" ' +
-            'value="'+currentCount+'" ' +
-            'class="form-control" ' +
-            'style="width: 50px; display: inline-block" ' +
-            'type="number"' +
-            'step="0.5">');
-        $(this).parent().append('<a ' +
-            'class="action save"' +
-            'id="saveCountLessons"' +
-            'style="vertical-align: middle"' +
-            'onclick="User.changeCountLessons('+userId+', User.OPERATION_SET, '+lessonsType+', $(\'#newCountLessonsVal\').val(), ' +
-            'function(response){' +
-            'var lessonsSpan = $(\'#'+id+'\');' +
-            'lessonsSpan.text(response.newCount);' +
-            'lessonsSpan.show();' +
-            '$(\'#saveCountLessons\').remove();' +
-            '$(\'#newCountLessonsVal\').remove();' +
-            '})"' +
-            '></a>');
-    });
-});
-
-
-
 /**
  * Применение фильтров для поиска клиентов
  *
@@ -480,22 +444,22 @@ function updateUserPerLesson(userId, value, callback) {
  * @param userId
  * @param url
  */
-function getPaymentPopup(userId, url) {
-    $.ajax({
-        type: 'GET',
-        url: url,
-        data: {
-            action: 'getPaymentPopup',
-            userId: userId
-        },
-        success: function(response) {
-            showPopup(response);
-        },
-        error: function (response) {
-            notificationError(response);
-        }
-    });
-}
+// function getPaymentPopup(userId, url) {
+//     $.ajax({
+//         type: 'GET',
+//         url: url,
+//         data: {
+//             action: 'getPaymentPopup',
+//             userId: userId
+//         },
+//         success: function(response) {
+//             showPopup(response);
+//         },
+//         error: function (response) {
+//             notificationError(response);
+//         }
+//     });
+// }
 
 /**
  * Обновление контента страницы пользователей
@@ -669,4 +633,211 @@ function usersExport(href, form) {
     } else if (form.serialize() != '') {
         location = link + '&' + form.serialize();
     }
+}
+
+
+
+/*-----------------------------------------------*/
+/*---------------Новые обработчики---------------*/
+/*-----------------------------------------------*/
+
+/**
+ * Обработчик для редактирования количества занятий клиента
+ *
+ * @param userId
+ * @param lessonsType
+ * @param spanSelector
+ */
+function editClientCountLessons(userId, lessonsType, spanSelector) {
+    var span = $(spanSelector);
+    var currentCount = span.text();
+    span.hide();
+    span.parent().append('<input ' +
+        'id="newCountLessonsVal" ' +
+        'value="'+currentCount+'" ' +
+        'class="form-control" ' +
+        'style="width: 50px; display: inline-block" ' +
+        'type="number"' +
+        'step="0.5">');
+    span.parent().append('<a ' +
+        'class="action save"' +
+        'id="saveCountLessons"' +
+        'style="vertical-align: middle"' +
+        'onclick="User.changeCountLessons('+userId+', User.OPERATION_SET, '+lessonsType+', $(\'#newCountLessonsVal\').val(), ' +
+        'function(response){' +
+        'var lessonsSpan = $(\''+spanSelector+'\');' +
+        'lessonsSpan.text(response.newCount);' +
+        'lessonsSpan.show();' +
+        '$(\'#saveCountLessons\').remove();' +
+        '$(\'#newCountLessonsVal\').remove();' +
+        '})"' +
+        '></a>');
+}
+
+
+/**
+ * Колбек при сохранении данных пользователя
+ *
+ * @param response
+ */
+function saveClientCallback(response) {
+    if (typeof response.error !== 'undefined') {
+        notificationError(response.error.message);
+    } else {
+        var tr = $('#user_' + response.user.id);
+        if (tr.length == 0) {
+            $('.table').prepend(makeClientTr(response));
+        } else {
+            //ФИО
+            tr.find('.user__fio').find('a').text(response.user.surname + ' ' + response.user.name);
+            //Дата рождения
+            tr.find('.user__birth').text(' ' + response.additional.prop_28.values[0].value + ' г.р.');
+            //Соглашение подписано
+            if (response.additional.prop_18.values[0].value == 1) {
+                tr.find('.add__18').html('<span class="contract" title="Соглашение подписано"></span>');
+            } else {
+                tr.find('.add__18').empty();
+            }
+            //Телефоны
+            tr.find('.user__phone').text(response.user.phone);
+            tr.find('.add__16').text(response.additional.prop_16.values[0].value);
+            //Баланс
+            tr.find('.add__12').text(response.additional.prop_12.values[0].value);
+            //Кол-во занятий
+            tr.find('.add__13').text(response.additional.prop_13.values[0].value);
+            tr.find('.add__14').text(response.additional.prop_14.values[0].value);
+            //Длительность занятия
+            tr.find('.add__17').text(response.additional.prop_17.values[0].value);
+            //Филиал
+            if (response.areas.length > 0) {
+                tr.find('.user__areas').text(response.areas[0].title);
+            } else {
+                tr.find('.user__areas').empty();
+            }
+        }
+        closePopup();
+        loaderOff();
+    }
+}
+
+
+/**
+ * Создание новой строчки в таблице пользователей
+ *
+ * @param data
+ */
+function makeClientTr(data) {
+    var user = data.user;
+    var add = data.additional;
+
+    var tr = $('<tr class="neutral" id="user_'+user.id+'" role="row"></tr>');
+    var
+        td1 = $('<td></td>'),
+        td2 = $('<td></td>'),
+        td3 = $('<td></td>'),
+        td4 = $('<td></td>'),
+        td5 = $('<td></td>'),
+        td6 = $('<td></td>'),
+        td7 = $('<td width="140px"></td>');
+
+    //ФИО
+    td1.append('<span class="user__fio"><a href="'+root+'/balance/?userid='+user.id+'">'+user.surname+' '+user.name+'</a></span>');
+    //Соглашение подписано
+    td1.append('<span class="add__18"></span>');
+    if (add.prop_18.values[0].value == '1') {
+        td1.find('.add__18').html('<span class="contract" title="Соглашение подписано"><input type="hidden"/></span>');
+    }
+    //Год рождения
+    td1.append('<span class="user__birth"></span>');
+    if (add.prop_28.values[0].value != '') {
+        td1.find('.user__birth').text(add.prop_28.values[0].value+' г.р.');
+    }
+    //Поурочная оплата
+    td1.append('<span class="add__32"></span>');
+    if (add.prop_32.values[0].value == '1') {
+        td1.find('.add__32').append('<div class="notes">«Сменный график»</div>');
+    }
+    //Примечание
+    if (add.prop_19.values[0].value != '') {
+        td1.append('<span class="add__19"><div class="notes">'+add.prop_19.values[0].value+'</div></span>');
+    }
+
+    //Номера телефонов
+    td2.append('<span class="user__phone">'+user.phone+'</span>');
+    td2.append('<br/><span class="add__16">'+add.prop_16.values[0].value+'</span>');
+
+    //Баланс
+    td3.append('<span class="add__12">'+add.prop_12.values[0].value+'</span>');
+
+    //Занятия
+    td4.append('<span class="add__13">'+add.prop_13.values[0].value+'</span>');
+    td4.append(' / <span class="add__13">'+add.prop_14.values[0].value+'</span>');
+
+    //Длительность занятия
+    td5.append('<span class="add__17">'+add.prop_17.values[0].value+'</span>');
+
+    //Филиал
+    td6.append('<span class="user__areas"></span>');
+    if (data.areas.length > 0) {
+        td6.find('.user__areas').text(data.areas[0].title);
+    }
+
+    //Действия
+    if (data.access.payment_create_client) {
+        td7.append('<a class="action add_payment user_add_payment" href="#" data-userid="'+user.id+'" title="Добавить платеж"></a>');
+    }
+    if (data.access.user_edit_client) {
+        td7.append('<a class="action edit" href="#" onclick="getClientPopup('+user.id+')" title="Редактировать данные"></a>');
+    }
+    if (data.access.user_archive_client) {
+        td7.append('<a class="action archive user_archive" href="#" data-userid="'+user.id+'" title="Переместить в архив"></a>');
+    }
+
+    tr.append(td1);
+    tr.append(td2);
+    tr.append(td3);
+    tr.append(td4);
+    tr.append(td5);
+    tr.append(td6);
+    tr.append(td7);
+    return tr;
+}
+
+
+/**
+ * Формирование списка тарифов для покупки из личного кабинета
+ *
+ * @param response
+ */
+function getClientLcTarifsCallBack(response) {
+    if (response.error != undefined) {
+        notificationError(response.error.message);
+    } else {
+        var select = $('<select class="form-control" id="tarif-list"></select>');
+        $.each(response, function(key, tarif){
+            select.append('<option value="'+tarif.id+'">'
+                +tarif.title+' '+tarif.price+' р. индив: '+tarif.countIndiv+' групп: '+tarif.countGroup
+            +'</option>');
+        });
+        var btn = $('<button class="btn btn-default" ' +
+            'onclick="Tarif.buyTarif(' +
+                '$(\'#userid\').val(), ' +
+                '$(\'#tarif-list\').find(\'option:selected\').val(), ' +
+                'function(response){ ' +
+                    'closePopup();' +
+                    'if (response.error != undefined) { ' +
+                        'notificationError(\'Ошибка: \' + response.error.message); ' +
+                    '} else {' +
+                    '$(\'#balance\').text(Number($(\'#balance\').text()) - response.tarif.price);' +
+                    '$(\'#countLessonsIndiv\').text(response.user.countIndiv);' +
+                    '$(\'#countLessonsGroup\').text(response.user.countGroup);' +
+                    'notificationSuccess(\'Тариф успешно приобретен\')' +
+                '}}' +
+            ')">Купить</button>');
+        var row = $('<div class="row"></div>');
+        row.append(select);
+        row.append(btn);
+        showPopup(row);
+    }
+    loaderOff();
 }

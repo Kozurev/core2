@@ -185,7 +185,7 @@
             <!--<input type="hidden" name="modelName" value="User" />-->
         </form>
 
-        <button class="btn btn-default" onclick="User.saveFrom($('#createData'), User.saveClientCallback)">Сохранить</button>
+        <button class="btn btn-default" onclick="User.saveFrom($('#createData'), saveClientCallback)">Сохранить</button>
 
         <script>
             $(".masked-phone").mask("+7(999) 999-9999");
