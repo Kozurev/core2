@@ -45,6 +45,11 @@ h3 {
 	display: none;
 }
 
+#client-filter .client-filter__options {
+	max-height: 350px;
+	overflow-y: scroll;
+}
+
 #client-filter ul {
 	list-style: none;
 	margin: 0;
