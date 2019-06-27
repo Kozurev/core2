@@ -13,7 +13,7 @@ class Payment extends Payment_Model
 
     public function __construct()
     {
-        $this->defaultUser = Core::factory('User')->surname('Неизвестно');
+        $this->defaultUser = Core::factory('User')->surname('Расходы')->name('Организации');
     }
 
 
@@ -28,6 +28,21 @@ class Payment extends Payment_Model
             return $this->defaultUser;
         } else {
             return Core::factory('User', $this->user);
+        }
+    }
+
+
+    /**
+     * Геттер для объекта автора данного платежа
+     *
+     * @return User|null
+     */
+    public function getAuthor()
+    {
+        if (empty($this->authorId())) {
+            return null;
+        } else {
+            return Core::factory('User', $this->authorId());
         }
     }
 

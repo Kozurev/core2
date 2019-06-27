@@ -72,6 +72,23 @@ class Payment_Model extends Core_Entity
 
 
     /**
+     * id создателя платежа
+     *
+     * @var int
+     */
+    protected $author_id = 0;
+
+
+    /**
+     * ФИО автора на момент созания платежа
+     *
+     * @var string
+     */
+    protected $author_fio = '';
+
+
+
+    /**
      * @param int|null $user
      * @return $this|int
      */
@@ -177,9 +194,42 @@ class Payment_Model extends Core_Entity
 
 
     /**
-     * Параметры валидации при сохранении таблицы
+     * @param int|null $authorId
+     * @return $this|int
      */
-    public function schema()
+    public function authorId(int $authorId = null)
+    {
+        if (is_null($authorId)) {
+            return intval($this->author_id);
+        } else {
+            $this->author_id = $authorId;
+            return $this;
+        }
+    }
+
+
+    /**
+     * @param string|null $authorFio
+     * @return $this|string
+     */
+    public function authorFio(string $authorFio = null)
+    {
+        if (is_null($authorFio)) {
+            return strval($this->author_fio);
+        } else {
+            $this->author_fio = $authorFio;
+            return $this;
+        }
+    }
+
+
+
+    /**
+     * Параметры валидации при сохранении таблицы
+     *
+     * @return array
+     */
+    public function schema() : array
     {
         return [
             'id' => [
@@ -220,6 +270,16 @@ class Payment_Model extends Core_Entity
                 'required' => true,
                 'type' => PARAM_INT,
                 'minval' => 0
+            ],
+            'author_id' => [
+                'required' => false,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'author_fio' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
             ]
         ];
     }
