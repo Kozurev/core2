@@ -405,3 +405,31 @@ if ($action === 'changeCountLessons') {
 
     die(json_encode($output));
 }
+
+
+
+if ($action === 'getListByTeacherId') {
+    $teacherId = Core_Array::Get('teacherId', 0, PARAM_INT);
+    $Teacher = User_Controller::factory($teacherId);
+
+    if (is_null($Teacher)) {
+        die(REST::error(1, 'Преподаватель с id ' . $teacherId . ' не существует'));
+    }
+
+    $TeacherList = Core::factory('Property')->getByTagName('teachers');
+    $teacherFio = $Teacher->surname() . ' ' . $Teacher->name();
+    $TeacherProperty = Core::factory('Property_List_Values')
+        ->queryBuilder()
+        ->where('property_id', '=', $TeacherList->getId())
+        ->where('value', '=', $teacherFio)
+        ->find();
+
+    if (is_null($TeacherProperty)) {
+        die(REST::error(2, 'Значения доп. свйоства по данному преподавателю не обнаружено'));
+    }
+
+    $RestUsers = REST::user();
+    $RestUsers->appendFilter('property_' . $TeacherList->getId(), $TeacherProperty->getId());
+    $RestUsers->appendOrder('surname');
+    die($RestUsers->getList());
+}
