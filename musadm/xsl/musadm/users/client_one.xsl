@@ -143,7 +143,7 @@
             <xsl:if test="//table-type = 'active'">
                 <td width="140px">
                     <xsl:if test="//access_payment_create_client = 1">
-                        <a class="action add_payment user_add_payment" href="#" data-userid="{id}" title="Добавить платеж"></a>
+                        <a class="action add_payment" onclick="makeClientPaymentPopup(0, {id}, saveClientPaymentCallback)" title="Добавить платеж"></a>
                     </xsl:if>
 
                     <xsl:if test="//access_user_edit_client = 1">

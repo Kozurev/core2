@@ -7,9 +7,9 @@ $(function(){
             var areaId = $('select[name=area_id]').val();
             showFinancesHistory(dateFrom, dateTo, areaId);
         })
-        .on("click", ".finances_payment", function(){
-            editPaymentPopup(0, "payment");
-        })
+        // .on("click", ".finances_payment", function(){
+        //     editPaymentPopup(0, "payment");
+        // })
         .on("click", ".edit_rate", function(e){
             e.preventDefault();
 
@@ -104,49 +104,49 @@ $(function(){
             var teacherId = $("#teacher_id").val();
 
             savePropertyValue( propertyTagName, propertyValue, "User", teacherId );
-        })
-        //Открытие всплывающего окна добавления/удаления типов платежей
-        .on("click", ".finances_payment_types", function(e){
-            e.preventDefault();
-            showFinancesTypes();
-        })
-        //Сохранение нового типа платежа
-        .on("click", ".finances_payment_type_append", function(e){
-            e.preventDefault();
-            var newTypeName = $("#input_new_payment_type").val();
-
-            if(newTypeName.length == 0)
-            {
-                $("#input_new_payment_type").addClass("error");
-                $("label[for=input_new_payment_type]").addClass("error");
-                return false;
-            }
-
-            //loaderOn();
-            savePaymentType(0, newTypeName, function(response){
-                $(".finances_payment_type_list").append(response);
-                $("#input_new_payment_type").val("");
-                //loaderOff();
-            });
-        })
-        //Удаление типа(ов) платежа(эй)
-        .on("click", ".finances_payment_type_delete", function(e){
-            e.preventDefault();
-            var deletingTypes = $(".finances_payment_type_list").find("option:selected");
-
-            var deletingTypesIds = [];
-            $.each(deletingTypes, function(key, option){
-                deletingTypesIds.push($(option).val());
-            });
-
-            deletePaymentTypes(deletingTypesIds, function(response){
-                var options = $(".finances_payment_type_list").find("option:selected");
-                $.each(options, function(key, option){
-                    console.log(option);
-                    $(option).remove();
-                });
-            });
         });
+        //Открытие всплывающего окна добавления/удаления типов платежей
+        // .on("click", ".finances_payment_types", function(e){
+        //     e.preventDefault();
+        //     showFinancesTypes();
+        // })
+        //Сохранение нового типа платежа
+        // .on("click", ".finances_payment_type_append", function(e){
+        //     e.preventDefault();
+        //     var newTypeName = $("#input_new_payment_type").val();
+        //
+        //     if(newTypeName.length == 0)
+        //     {
+        //         $("#input_new_payment_type").addClass("error");
+        //         $("label[for=input_new_payment_type]").addClass("error");
+        //         return false;
+        //     }
+        //
+        //     //loaderOn();
+        //     savePaymentType(0, newTypeName, function(response){
+        //         $(".finances_payment_type_list").append(response);
+        //         $("#input_new_payment_type").val("");
+        //         //loaderOff();
+        //     });
+        // })
+        //Удаление типа(ов) платежа(эй)
+        // .on("click", ".finances_payment_type_delete", function(e){
+        //     e.preventDefault();
+        //     var deletingTypes = $(".finances_payment_type_list").find("option:selected");
+        //
+        //     var deletingTypesIds = [];
+        //     $.each(deletingTypes, function(key, option){
+        //         deletingTypesIds.push($(option).val());
+        //     });
+        //
+        //     deletePaymentTypes(deletingTypesIds, function(response){
+        //         var options = $(".finances_payment_type_list").find("option:selected");
+        //         $.each(options, function(key, option){
+        //             console.log(option);
+        //             $(option).remove();
+        //         });
+        //     });
+        // });
 
 
 });

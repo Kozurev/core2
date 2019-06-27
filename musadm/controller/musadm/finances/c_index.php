@@ -7,8 +7,15 @@
  * @version 20190410
  * @version 20190427
  * @version 20190526
+ * @version 20190626
  */
 
+Core::requireClass('Orm');
+Core::requireClass('Payment');
+Core::requireClass('Schedule_Area');
+
+$Payment = new Payment();
+$Area = new Schedule_Area();
 
 //основные права доступа
 $accessPaymentsRead = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_ALL);
@@ -49,13 +56,17 @@ $LessonTypes = Core::factory('Schedule_Lesson_Type')
     ->findAll();
 
 //Типы платежей
-$PaymentTypes = Core::factory('Payment')->getTypes(true, false);
+try {
+    $PaymentTypes = $Payment->getTypes(true, false);
+} catch (Exception $e) {
+    die($e->getMessage());
+}
 
 //Доступные филиалы
-$PaymentAreas = Core::factory('Schedule_Area')->getList();
+$PaymentAreas = $Area->getList();
 
 
-$Payments = Core::factory('Payment');
+$Payments = new Payment();
 $Payments->queryBuilder()
     ->where('subordinated', '=', $subordinated)
     ->where('type', '<>', 2)
@@ -63,45 +74,63 @@ $Payments->queryBuilder()
     ->orderBy('id', 'DESC');
 
 //Сумма поступлений
-$summ = Core::factory('Orm')
-    ->select('sum(value)', 'value')
+$income = new Orm();
+$income->select('sum(value)', 'value')
     ->from('Payment')
     ->where('type', '=', 1)
+    ->where('subordinated', '=', $subordinated);
+
+//Общая сумма расходов
+$expenses = new Orm();
+$expenses->select('sum(value)', 'value')
+    ->from('Payment')
+    ->where('type', '>', 2)
     ->where('subordinated', '=', $subordinated);
 
 //Указание временного промежутка выборки
 if ($dateFrom == $dateTo) {
     $Payments->queryBuilder()
         ->where('datetime', '=', $dateFrom);
-    $summ->where('datetime', '=', $dateFrom);
+    $income->where('datetime', '=', $dateFrom);
+    $expenses->where('datetime', '=', $dateFrom);
 } else {
     $Payments->queryBuilder()
         ->where('datetime', '>=', $dateFrom)
         ->where('datetime', '<=', $dateTo);
-    $summ
-        ->where('datetime', '>=', $dateFrom)
+    $income->where('datetime', '>=', $dateFrom)
+        ->where('datetime', '<=', $dateTo);
+    $expenses->where('datetime', '>=', $dateFrom)
         ->where('datetime', '<=', $dateTo);
 }
 
 if ($areaId !== 0) {
-    $Payments->queryBuilder()
-        ->where('area_id', '=', $areaId);
-    $summ->where('area_id', '=', $areaId);
+    $Payments->queryBuilder()->where('area_id', '=', $areaId);
+    $income->where('area_id', '=', $areaId);
+    $expenses->where('area_id', '=', $areaId);
 }
 
 $Payments = $Payments->findAll();
 
 //Поступления за период
-$summ = $summ->find();
-$summ->value == null
-    ?   $summ = 0
-    :   $summ = $summ->value;
+$incomeValue = $income->find()->value;
+$incomeValue = !empty($incomeValue) ? $incomeValue : 0;
 
-//Поиск информации о платеже: ФИО клиента/преподавателя и название филлиала
+//Расходы за период
+$expensesValue = $expenses->find()->value;
+$expensesValue = !empty($expensesValue) ? $expensesValue : 0;
+
+//Поиск информации о платеже: ФИО клиента/преподавателя и фио автора
 foreach ($Payments as $payment) {
     $PaymentUser = $payment->getUser();
     if (!is_null($PaymentUser)) {
         $payment->addEntity($PaymentUser);
+    }
+
+    if ($payment->authorId() > 0) {
+        $PaymentAuthor = $payment->getAuthor();
+        if (!is_null($PaymentAuthor)) {
+            $payment->addEntity($PaymentAuthor, 'author');
+        }
     }
 
     $payment->datetime(refactorDateFormat($payment->datetime()));
@@ -131,7 +160,8 @@ Core::factory('Core_Entity')
     ->addSimpleEntity('current_area', $areaId)
     ->addSimpleEntity('date_from', $dateFrom)
     ->addSimpleEntity('date_to', $dateTo)
-    ->addSimpleEntity('total_summ', $summ)
+    ->addSimpleEntity('total_income', $incomeValue)
+    ->addSimpleEntity('total_expenses', $expensesValue)
     //Настройки тарифов
     ->addSImpleEntity('director_id', $Director->getId())
     ->addSimpleEntity('teacher_indiv_rate', $defTeacherIndivRate)

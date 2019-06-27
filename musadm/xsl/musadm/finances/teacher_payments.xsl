@@ -15,10 +15,13 @@
                         <tr>
                             <td><input name="date" class="form-control" type="date" value="{date}"/></td>
                             <td><input name="summ" class="form-control" type="number" placeholder="Сумма" /></td>
-                            <td><input name="description" class="form-control" type="text" placeholder="Примечание к платежу" /></td>
+                            <td colspan="2"><input name="description" class="form-control" type="text" placeholder="Примечание к платежу" /></td>
                             <td class="center">
                                 <input type="hidden" name="userid" value="{userid}" />
-                                <a class="action pay add_teacher_payment" title="Добавить выплату"></a>
+                                <a class="action pay" onclick="Payment.save(
+                                    0, {//userid}, $('input[name=summ]').val(), 3, $('input[name=date]').val(), 0,
+                                    $('input[name=description]').val(), '', saveTeacherPaymentCallback
+                                )" title="Добавить выплату"></a>
                             </td>
                         </tr>
                     </xsl:if>
@@ -26,6 +29,7 @@
                         <th>Дата</th>
                         <th>Сумма</th>
                         <th>Примечание к платежу</th>
+                        <th>Автор</th>
                         <th><!----></th>
                     </tr>
                     <xsl:choose>
@@ -34,7 +38,7 @@
                         </xsl:when>
                         <xsl:otherwise>
                             <tr>
-                                <td colspan="4">Выплат не найдено</td>
+                                <td colspan="5">Выплат не найдено</td>
                             </tr>
                         </xsl:otherwise>
                     </xsl:choose>
@@ -47,7 +51,7 @@
 
     <xsl:template match="month">
         <tr>
-            <th colspan="4">
+            <th colspan="5">
                 <xsl:value-of select="month_name" />
             </th>
         </tr>
@@ -60,14 +64,19 @@
                     <xsl:if test="/root/access_payment_edit = 0 and /root/access_payment_delete = 0"><xsl:attribute name="colspan">2</xsl:attribute></xsl:if>
                     <xsl:value-of select="description" />
                 </td>
+                <td>
+                    <xsl:value-of select="author_fio" />
+                </td>
                 <xsl:if test="/root/access_payment_edit != 0 or /root/access_payment_delete != 0">
                     <td class="right">
                         <div class="row">
                             <xsl:if test="/root/access_payment_edit = 1">
-                                <a class="action edit payment_edit" href="#" data-id="{id}" data-after_save_action="teacher" title="Редактировать платеж"></a>
+                                <a class="action edit" title="Редактировать платеж"
+                                   onclick="makePaymentPopup({id}, refreshSchedule)" ></a>
                             </xsl:if>
                             <xsl:if test="/root/access_payment_delete = 1">
-                                <a class="action delete teacher_payment_delete" href="#" data-id="{id}" data-after_save_action="teacher" title="Удалить платеж"></a>
+                                <a class="action delete" title="Удалить платеж"
+                                    onclick="Payment.remove({id}, refreshSchedule)"></a>
                             </xsl:if>
                         </div>
                     </td>

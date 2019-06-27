@@ -29,14 +29,15 @@
         <section>
             <div class="row finances_total">
                 <div class="col-lg-12">
-                    <h4>За данный период суммарные поступления составили <xsl:value-of select="total_summ" /> руб.</h4>
+                    <h4>За данный период суммарные поступления составили <xsl:value-of select="total_income" /> руб.</h4>
+                    <h4>За данный период суммарные расходы составили <xsl:value-of select="total_expenses" /> руб.</h4>
                 </div>
             </div>
 
             <div class="row buttons-panel">
                 <xsl:if test="access_payment_create_all = 1">
                     <div>
-                        <a class="btn btn-green finances_payment" data-after_save_action="payments">Добавить расход</a>
+                        <a class="btn btn-green" onclick="makePaymentPopup(0, savePaymentCallback)">Добавить расход</a>
                     </div>
                 </xsl:if>
 
@@ -116,6 +117,7 @@
                             <tr class="header">
                                 <th>№</th>
                                 <th>ФИО</th>
+                                <th>Автор</th>
                                 <th>Сумма</th>
                                 <th>Примечание</th>
                                 <th>Дата</th>
@@ -140,9 +142,9 @@
         <xsl:variable name="type" select="type" />
         <xsl:variable name="areaId" select="area_id" />
 
-        <tr>
+        <tr id="payment_{id}">
             <td><xsl:value-of select="position()" /></td>
-            <td>
+            <td class="user">
                 <xsl:choose>
                     <xsl:when test="user/surname != ''">
                         <xsl:value-of select="user/surname" />
@@ -154,16 +156,36 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </td>
-            <td><xsl:value-of select="value" /></td>
-            <td><xsl:value-of select="description" /></td>
-            <td><xsl:value-of select="datetime" /></td>
-            <td><xsl:value-of select="//schedule_area[id = $areaId]/title" /></td>
-            <td><xsl:value-of select="//payment_type[id = $type]/title" /></td>
+            <td class="author">
+                <xsl:choose>
+                    <xsl:when test="author/surname != ''">
+                        <xsl:value-of select="author/surname" />
+                        <xsl:text>  </xsl:text>
+                        <xsl:value-of select="author/name" />
+                    </xsl:when>
+                    <xsl:when test="author_fio != ''">
+                        <xsl:value-of select="author_fio" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        Неизвестно
+                    </xsl:otherwise>
+                </xsl:choose>
+            </td>
+            <td class="value"><xsl:value-of select="value" /></td>
+            <td class="description"><xsl:value-of select="description" /></td>
+            <td class="date"><xsl:value-of select="datetime" /></td>
+            <td class="area"><xsl:value-of select="//schedule_area[id = $areaId]/title" /></td>
+            <td class="type"><xsl:value-of select="//payment_type[id = $type]/title" /></td>
             <td>
                 <xsl:if test="(/root/access_payment_edit_client = 1 and type = 1)
                             or (/root/access_payment_edit_teacher = 1 and type = 3)
                             or (/root/access_payment_edit_all = 1 and type > 3)">
-                    <a class="action edit payment_edit" href="#" data-id="{id}" data-after_save_action="payment" data-type="{type}" title="Редактирование платежа"></a>
+                    <a class="action edit" onclick="makePaymentPopup({id}, savePaymentCallback)" title="Редактирование платежа"></a>
+                </xsl:if>
+                <xsl:if test="(/root/access_payment_delete_client = 1 and type = 1)
+                            or (/root/access_payment_delete_teacher = 1 and type = 3)
+                            or (/root/access_payment_delete_all = 1 and type > 3)">
+                    <a class="action delete" onclick="Payment.remove({id}, removePaymentCallback)" title="Удаление платежа"></a>
                 </xsl:if>
             </td>
         </tr>
@@ -192,7 +214,7 @@
                 </xsl:if>
 
                 <xsl:if test="/root/access_payment_tarif_delete = 1">
-                    <a class="action delete tarif_delete"   href="#" data-model_id="{id}" data-model_name="Payment_Tarif"></a>
+                    <a class="action delete tarif_delete" href="#" data-model_id="{id}" data-model_name="Payment_Tarif"></a>
                 </xsl:if>
             </td>
         </tr>

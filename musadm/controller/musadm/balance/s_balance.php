@@ -66,59 +66,59 @@ if ($action === 'refreshTablePayments') {
 /**
  * Открытие всплывающего окна для начисления оплаты (создания платежа клиента с 2 полями для примечания)
  */
-if ($action === 'getPaymentPopup') {
-    //проверка прав доступа
-    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT)) {
-        Core_Page_Show::instance()->error(403);
-    }
-
-    $userId = Core_Array::Get('userId', null, PARAM_INT);
-    $Client = User_Controller::factory($userId);
-    if (is_null($userId) || is_null($Client)) {
-        Core_Page_Show::instance()->error(404);
-    }
-
-    Core::factory('Core_Entity')
-        ->addEntity($Client)
-        ->addSimpleEntity('function', 'balance')
-        ->xsl('musadm/users/balance/edit_payment_popup.xsl')
-        ->show();
-
-    exit;
-}
+//if ($action === 'getPaymentPopup') {
+//    //проверка прав доступа
+//    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT)) {
+//        Core_Page_Show::instance()->error(403);
+//    }
+//
+//    $userId = Core_Array::Get('userId', null, PARAM_INT);
+//    $Client = User_Controller::factory($userId);
+//    if (is_null($userId) || is_null($Client)) {
+//        Core_Page_Show::instance()->error(404);
+//    }
+//
+//    Core::factory('Core_Entity')
+//        ->addEntity($Client)
+//        ->addSimpleEntity('function', 'balance')
+//        ->xsl('musadm/users/balance/edit_payment_popup.xsl')
+//        ->show();
+//
+//    exit;
+//}
 
 
 /**
  * Открытие всплывающего окна для покупки тарифа
  */
-if ($action === 'getTarifPopup') {
-    //проверка прав доступа
-    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_BUY)) {
-        Core_Page_Show::instance()->error(403);
-    }
-
-    $userId =   Core_Array::Get('userid', null, PARAM_INT);
-    $Client = User_Controller::factory($userId);
-    if (is_null($Client)) {
-        Core_Page_Show::instance()->error(404);
-    }
-    $Director = $Client->getDirector();
-
-    $Tarifs = Core::factory('Payment_Tarif')
-        ->queryBuilder()
-        ->where('subordinated', '=', $Director->getId());
-    if (User::current()->groupId() == ROLE_CLIENT) {
-        $Tarifs->where('access', '=', 1);
-    }
-
-    Core::factory('Core_Entity')
-        ->addEntity($Client)
-        ->addEntities($Tarifs->findAll())
-        ->xsl('musadm/users/balance/buy_tarif_popup.xsl')
-        ->show();
-
-    exit;
-}
+//if ($action === 'getTarifPopup') {
+//    //проверка прав доступа
+//    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_BUY)) {
+//        Core_Page_Show::instance()->error(403);
+//    }
+//
+//    $userId =   Core_Array::Get('userid', null, PARAM_INT);
+//    $Client = User_Controller::factory($userId);
+//    if (is_null($Client)) {
+//        Core_Page_Show::instance()->error(404);
+//    }
+//    $Director = $Client->getDirector();
+//
+//    $Tarifs = Core::factory('Payment_Tarif')
+//        ->queryBuilder()
+//        ->where('subordinated', '=', $Director->getId());
+//    if (User::current()->groupId() == ROLE_CLIENT) {
+//        $Tarifs->where('access', '=', 1);
+//    }
+//
+//    Core::factory('Core_Entity')
+//        ->addEntity($Client)
+//        ->addEntities($Tarifs->findAll())
+//        ->xsl('musadm/users/balance/buy_tarif_popup.xsl')
+//        ->show();
+//
+//    exit;
+//}
 
 
 /**
@@ -214,7 +214,6 @@ if ($action === 'updatePerLesson') {
 //    //Корректировка пользовательской медианы (средняя стоимость занятия)
 //    $clientRate = [];
 //    if ($Tarif->countIndiv() != 0 && $Tarif->countGroup() != 0) {
-//        //TODO: при покупки комплексного тарифа пока что медиана не меняется. Надо уточнить будет этот момент в дальнейшем
 //    }
 //    elseif ($Tarif->countIndiv() != 0) {
 //        $clientRate['client_rate_indiv'] = $Tarif->countIndiv();
@@ -243,117 +242,117 @@ if ($action === 'updatePerLesson') {
 //}
 
 
-if ($action === 'savePayment') {
-    //проверка прав доступа
-    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT)) {
-        Core_Page_Show::instance()->error(403);
-    }
-
-    $userId =       Core_Array::Get('userid', null, PARAM_INT);
-    $value  =       Core_Array::Get('value', 0, PARAM_INT);
-    $description =  Core_Array::Get('description', '', PARAM_STRING);
-    $type =         Core_Array::Get('type', 0, PARAM_INT);
-    $description2 = Core_Array::Get('property_26', '');
-
-    $Payment = Core::factory('Payment')
-        ->user($userId)
-        ->type($type)
-        ->value($value)
-        ->description($description);
-    $Payment->save();
-
-    Core::factory('Property')
-        ->getByTagName('payment_comment')
-        ->addNewValue($Payment, $description2);
-
-    exit('0');
-}
+//if ($action === 'savePayment') {
+//    //проверка прав доступа
+//    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT)) {
+//        Core_Page_Show::instance()->error(403);
+//    }
+//
+//    $userId =       Core_Array::Get('userid', null, PARAM_INT);
+//    $value  =       Core_Array::Get('value', 0, PARAM_INT);
+//    $description =  Core_Array::Get('description', '', PARAM_STRING);
+//    $type =         Core_Array::Get('type', 0, PARAM_INT);
+//    $description2 = Core_Array::Get('property_26', '');
+//
+//    $Payment = Core::factory('Payment')
+//        ->user($userId)
+//        ->type($type)
+//        ->value($value)
+//        ->description($description);
+//    $Payment->save();
+//
+//    Core::factory('Property')
+//        ->getByTagName('payment_comment')
+//        ->addNewValue($Payment, $description2);
+//
+//    exit('0');
+//}
 
 
 /**
  * Добавление комментария к платежу
  */
-if ($action === 'add_note') {
-    //TODO: добавить нормальную проверку прав доступа
-    if (!User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]])) {
-        Core_Page_Show::instance()->error(403);
-    }
-
-    $modelId =  Core_Array::Get( 'model_id', 0, PARAM_INT );
-    $Payment =  Core::factory('Payment', $modelId);
-    $Notes =    Core::factory('Property')->getByTagName('payment_comment')->getPropertyValues($Payment);
-
-    Core::factory('Core_Entity')
-        ->addEntity($Payment)
-        ->addEntities($Notes, 'notes')
-        ->xsl('musadm/users/balance/add_payment_note.xsl')
-        ->show();
-
-    exit;
-}
+//if ($action === 'add_note') {
+//    //TODO: добавить нормальную проверку прав доступа
+//    if (!User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]])) {
+//        Core_Page_Show::instance()->error(403);
+//    }
+//
+//    $modelId =  Core_Array::Get( 'model_id', 0, PARAM_INT );
+//    $Payment =  Core::factory('Payment', $modelId);
+//    $Notes =    Core::factory('Property')->getByTagName('payment_comment')->getPropertyValues($Payment);
+//
+//    Core::factory('Core_Entity')
+//        ->addEntity($Payment)
+//        ->addEntities($Notes, 'notes')
+//        ->xsl('musadm/users/balance/add_payment_note.xsl')
+//        ->show();
+//
+//    exit;
+//}
 
 
 /**
  * Сохранение данных платежа
  */
-if ($action === 'payment_save') {
-    //проверка прав доступа
-    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT)) {
-        Core_Page_Show::instance()->error(403);
-    }
-
-    $id =     Core_Array::Get('id', 0, PARAM_INT);
-    $value =  Core_Array::Get('value', 0, PARAM_INT);
-    $date =   Core_Array::Get('date', date('Y-m-d'), PARAM_DATE);
-    $description = Core_Array::Get('description', '', PARAM_STRING);
-    $Payment = Core::factory('Payment', $id);
-    if (is_null($Payment)) {
-        Core_Page_Show::instance()->error(404);
-    }
-
-    $Payment
-        ->value($value)
-        ->datetime($date)
-        ->description($description)
-        ->save();
-
-    Core_Page_Show::instance()->execute();
-    exit;
-}
+//if ($action === 'payment_save') {
+//    //проверка прав доступа
+//    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT)) {
+//        Core_Page_Show::instance()->error(403);
+//    }
+//
+//    $id =     Core_Array::Get('id', 0, PARAM_INT);
+//    $value =  Core_Array::Get('value', 0, PARAM_INT);
+//    $date =   Core_Array::Get('date', date('Y-m-d'), PARAM_DATE);
+//    $description = Core_Array::Get('description', '', PARAM_STRING);
+//    $Payment = Core::factory('Payment', $id);
+//    if (is_null($Payment)) {
+//        Core_Page_Show::instance()->error(404);
+//    }
+//
+//    $Payment
+//        ->value($value)
+//        ->datetime($date)
+//        ->description($description)
+//        ->save();
+//
+//    Core_Page_Show::instance()->execute();
+//    exit;
+//}
 
 
 /**
  * Удаление пользовательского платежа
  */
-if ($action === 'payment_delete') {
-    //проверка прав доступа
-    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_CLIENT)) {
-        Core_Page_Show::instance()->error(403);
-    }
-
-    $id = Core_Array::Get('id', 0, PARAM_INT);
-    $Payment = Core::factory('Payment', $id);
-    if (is_null($Payment)) {
-        Core_Page_Show::instance()->error(404);
-    }
-
-    $User = User_Controller::factory($Payment->user());
-    if ($User->groupId() == ROLE_CLIENT) {
-        $UserBalance =  Core::factory('Property')->getByTagName('balance');
-        $UserBalance =  $UserBalance->getPropertyValues($User)[0];
-        $balanceOld =   $UserBalance->value();
-
-        $Payment->type() == 1
-            ?   $newBalance = $balanceOld - $Payment->value()
-            :   $newBalance = $balanceOld + $Payment->value();
-        $UserBalance
-            ->value($newBalance)
-            ->save();
-    }
-
-    $Payment->delete();
-    exit;
-}
+//if ($action === 'payment_delete') {
+//    //проверка прав доступа
+//    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_CLIENT)) {
+//        Core_Page_Show::instance()->error(403);
+//    }
+//
+//    $id = Core_Array::Get('id', 0, PARAM_INT);
+//    $Payment = Core::factory('Payment', $id);
+//    if (is_null($Payment)) {
+//        Core_Page_Show::instance()->error(404);
+//    }
+//
+//    $User = User_Controller::factory($Payment->user());
+//    if ($User->groupId() == ROLE_CLIENT) {
+//        $UserBalance =  Core::factory('Property')->getByTagName('balance');
+//        $UserBalance =  $UserBalance->getPropertyValues($User)[0];
+//        $balanceOld =   $UserBalance->value();
+//
+//        $Payment->type() == 1
+//            ?   $newBalance = $balanceOld - $Payment->value()
+//            :   $newBalance = $balanceOld + $Payment->value();
+//        $UserBalance
+//            ->value($newBalance)
+//            ->save();
+//    }
+//
+//    $Payment->delete();
+//    exit;
+//}
 
 
 /**

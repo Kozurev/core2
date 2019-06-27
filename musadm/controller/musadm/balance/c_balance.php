@@ -265,6 +265,10 @@ if (Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_CLIENT)) {
         ->addEntities($UserPayments)
         ->addEntity($ParentUser, 'parent_user')
         ->addSimpleEntity(
+            'access_payment_edit_client',
+            (int)Core_Access::instance()->hasCapability(Core_Access::PAYMENT_EDIT_CLIENT)
+        )
+        ->addSimpleEntity(
             'access_payment_delete_client',
             (int)Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_CLIENT)
         )

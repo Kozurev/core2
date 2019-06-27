@@ -16,7 +16,7 @@
                         </td>
                         <td>
                             <xsl:if test="access_create_payment = 1">
-                                <a class="action add_payment btn_balance" data-userid="{user/id}" title="Зачислить платеж">
+                                <a class="action add_payment" onclick="makeClientPaymentPopup(0, {user/id}, saveBalancePaymentCallback)" title="Зачислить платеж">
                                     <!--Пополнить баланс-->
                                 </a>
                             </xsl:if>
