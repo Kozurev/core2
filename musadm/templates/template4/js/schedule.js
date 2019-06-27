@@ -118,12 +118,14 @@ $(function(){
             //     return false;
             // }
 
+            var clientId = Form.find('select[name=clientId]').val();
+            var date = Form.find('input[name=insertDate]').val();
+            var areaId = Form.find('input[name=areaId]').val();
+            var lessonType = Form.find('input[name=lessonType]').val();
+            var typeId = Form.find('select[name=typeId]').val();
+
             //Создание задачи с напоминанием
             if ($('input[name=is_create_task]').is(':checked')) {
-                var clientId = Form.find('select[name=clientId]').val();
-                var date = Form.find('input[name=insertDate]').val();
-                var areaId = Form.find('input[name=areaId]').val();
-
                 $.ajax({
                     type: 'GET',
                     url: '',
@@ -136,7 +138,33 @@ $(function(){
                 });
             }
 
-            saveData('Main', function(response) { refreshSchedule(); });
+            //Если это индивидуальное занятие
+            if (typeId == 1) {
+                Schedule.checkAbsentPeriod(clientId, date, function(response){
+                    //Если есть существующий период отсутсвия
+                    if (response.isset == true) {
+                        //Постановка в основной график
+                        if (lessonType == 1) {
+                            if (confirm('В данное время у клиента существует активный период отсутсвия с '
+                                + response.period.dateFrom[1] + ' по ' + response.period.dateTo[1] + '. Хотите продолжить?')) {
+                                saveData('Main', function(response) { refreshSchedule(); });
+                            } else {
+                                loaderOff();
+                            }
+                        }
+                        //Постановка в актуальный график
+                        else {
+                            alert('Постановка клиента в расписание на данную дату невозможна, так как у него имеется активный'
+                                + ' период отсутствия с ' + response.period.dateFrom[1] + ' по ' + response.period.dateTo[1]);
+                            loaderOff();
+                        }
+                    } else {
+                        saveData('Main', function(response) { refreshSchedule(); });
+                    }
+                });
+            } else {
+                saveData('Main', function(response) { refreshSchedule(); });
+            }
         })
 
         //УДаление занятия из основного графика
@@ -225,6 +253,13 @@ $(function(){
                     }
                 });
             }
+        })
+
+        /**
+         * Формирование списка клиентов по принадлежности к преподавателю
+         */
+        .on('change', 'select[name=teacherId]', function(e){
+
         })
 
         /**
