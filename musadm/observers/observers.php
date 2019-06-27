@@ -422,10 +422,29 @@ Core::attachObserver('afterScheduleReportSave', function($args) {
 
 
 /**
+ * Задание начения author_id и author_fio для
+ */
+Core::attachObserver('beforePaymentInsert', function($args) {
+    $Payment = $args[0];
+    $User = User::parentAuth();
+    if (!is_null($User)) {
+        $Payment->authorId($User->getId());
+        $Payment->authorFio($User->surname() . ' ' . $User->name());
+    }
+});
+
+
+/**
  * Корректировка баланса клиента при сохранении/редактировании платежа типа начисление/списание
  */
 Core::attachObserver('beforePaymentSave', function($args) {
     $Payment = $args[0];
+
+    Core::requireClass('Property');
+    Core::requireClass('User_Controller');
+    Core::requireClass('Schedule_Area_Assignment');
+
+    $Property = new Property();
 
     //Корректировка баланса клиента
     if ($Payment->type() == 1 || $Payment->type() == 2) {
@@ -436,13 +455,8 @@ Core::attachObserver('beforePaymentSave', function($args) {
             $difference = $Payment->value();
         }
 
-        Core::requireClass('Property');
-        Core::requireClass('User_Controller');
-        Core::requireClass('Schedule_Area_Assignment');
-
         $Client = $Payment->getUser();
         if (!is_null($Client)) {
-            $Property = new Property();
             $UserBalance = $Property->getByTagName('balance');
             $UserBalanceVal = $UserBalance->getPropertyValues($Client)[0];
             $balanceOld =  floatval($UserBalanceVal->value());
@@ -475,15 +489,16 @@ Core::attachObserver('beforePaymentSave', function($args) {
 Core::attachObserver('beforePaymentDelete', function($args) {
     $Payment = $args[0];
 
+    Core::requireClass('Property');
+    Core::requireClass('User_Controller');
+    Core::requireClass('Schedule_Area_Assignment');
+
+    $Property = new Property();
+
     //Корректировка баланса клиента
     if ($Payment->type() == 1 || $Payment->type() == 2) {
-        Core::requireClass('Property');
-        Core::requireClass('User_Controller');
-        Core::requireClass('Schedule_Area_Assignment');
-
         $Client = $Payment->getUser();
         if (!is_null($Client)) {
-            $Property = new Property();
             $UserBalance = $Property->getByTagName('balance');
             $UserBalanceVal = $UserBalance->getPropertyValues($Client)[0];
             $balanceOld =  floatval($UserBalanceVal->value());
