@@ -434,6 +434,9 @@ class Core_Entity extends Core_Entity_Model
     public function toStd()
     {
         $Model = $this->getModel();
+        if (is_null($Model)) {
+            $Model = $this;
+        }
         $stdModel = new stdClass();
         foreach (get_object_vars($Model) as $propertyName => $propertyValue) {
             if ($propertyName == 'id') {
