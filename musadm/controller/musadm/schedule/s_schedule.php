@@ -42,7 +42,7 @@ $action = Core_Array::Get('action', null, PARAM_STRING);
 
 
 if (!$isTeacherPage && is_null(Core_Page_Show::instance()->StructureItem)
-    && !Core_Access::instance()->hasCapability(Core_Access::AREA_READ)) {
+    && !Core_Access::instance()->hasCapability(Core_Access::AREA_READ) && is_null($action)) {
     Core_Page_Show::instance()->error(403);
 }
 
