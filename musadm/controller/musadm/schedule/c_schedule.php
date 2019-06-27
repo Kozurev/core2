@@ -621,20 +621,20 @@ if ($User->groupId() == ROLE_TEACHER) {
             ->xsl('musadm/finances/teacher_rate_config.xsl')
             ->show();
     }
-}
-
-/**
- * Формирование списка филлиалов
- */
-if (Core_Access::instance()->hasCapability(Core_Access::AREA_READ) && !Core_Page_Show::instance()->StructureItem) {
-    global $CFG;
-    $Areas = Schedule_Area_Controller::factory()->getList(true, false);
-    Core::factory('Core_Entity')
-        ->addEntities($Areas)
-        ->addSimpleEntity('wwwroot', $CFG->rootdir)
-        ->addSimpleEntity('access_area_create', (int)Core_Access::instance()->hasCapability(Core_Access::AREA_CREATE))
-        ->addSimpleEntity('access_area_edit', (int)Core_Access::instance()->hasCapability(Core_Access::AREA_EDIT))
-        ->addSimpleEntity('access_area_delete', (int)Core_Access::instance()->hasCapability(Core_Access::AREA_DELETE))
-        ->xsl('musadm/schedule/areas.xsl')
-        ->show();
+} else {
+    /**
+     * Формирование списка филлиалов
+     */
+    if (Core_Access::instance()->hasCapability(Core_Access::AREA_READ) && !Core_Page_Show::instance()->StructureItem) {
+        global $CFG;
+        $Areas = Schedule_Area_Controller::factory()->getList(true, false);
+        Core::factory('Core_Entity')
+            ->addEntities($Areas)
+            ->addSimpleEntity('wwwroot', $CFG->rootdir)
+            ->addSimpleEntity('access_area_create', (int)Core_Access::instance()->hasCapability(Core_Access::AREA_CREATE))
+            ->addSimpleEntity('access_area_edit', (int)Core_Access::instance()->hasCapability(Core_Access::AREA_EDIT))
+            ->addSimpleEntity('access_area_delete', (int)Core_Access::instance()->hasCapability(Core_Access::AREA_DELETE))
+            ->xsl('musadm/schedule/areas.xsl')
+            ->show();
+    }
 }
