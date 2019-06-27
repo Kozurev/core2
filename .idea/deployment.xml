@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="musicmetod" uploadOnCheckin="d01031b4-4267-4740-864d-d745d25581c5">
+  <component name="PublishConfigData" serverName="musicmetod">
     <serverData>
       <paths name="musicmetod">
         <serverdata>
           <mappings>
-            <mapping deploy="/musadmold" local="$PROJECT_DIR$/musadm" web="/" />
+            <mapping deploy="/musadm" local="$PROJECT_DIR$/musadm" web="/" />
           </mappings>
         </serverdata>
       </paths>
     </serverData>
-    <option name="myUploadOnCheckinName" value="musicmetod" />
   </component>
 </project>
