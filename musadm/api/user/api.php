@@ -425,7 +425,12 @@ if ($action === 'getListByTeacherId') {
         ->find();
 
     if (is_null($TeacherProperty)) {
-        die(REST::error(2, 'Значения доп. свйоства по данному преподавателю не обнаружено'));
+        //die(REST::error(2, 'Значения доп. свйоства по данному преподавателю не обнаружено'));
+        Core::factory('Property_List_Values')
+            ->propertyId($TeacherList->getId())
+            ->value($teacherFio)
+            ->save();
+        exit(json_encode([]));
     }
 
     $RestUsers = REST::user();
