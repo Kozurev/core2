@@ -85,39 +85,6 @@ $(function(){
             loaderOn();
 
             var Form = $('#createData');
-            //Проверка кратности количества минут времени начала и окончания занятия
-            //var timestep = Form.find('#timestep').val();
-            //timestep = Number(timestep.substring(3, 5));
-            //var timeFrom = Form.find('input[name=timeFrom]').val();
-            //var timeTo = Form.find('input[name=timeTo]').val();
-            //var timeFromMinutes = Number(timeFrom.substring(3));
-            //var timeToMinutes = Number(timeTo.substring(3));
-            //var isTimeError = false;
-            //var inputSelector;
-
-            // if (timeFromMinutes % timestep > 0) {
-            //     isTimeError = true;
-            //     inputSelector = 'From';
-            // }
-            //
-            // if (timeToMinutes % timestep > 0) {
-            //     isTimeError = true;
-            //     inputSelector = 'To';
-            // }
-            //
-            // if (isTimeError == true) {
-            //     var input = Form.find('input[name=time' + inputSelector + ']');
-            //     input.addClass('error');
-            //     input.parent().append('<label ' +
-            //         'id="time'+ inputSelector +'-error" ' +
-            //         'class="error" ' +
-            //         'for="time'+ inputSelector +'" ' +
-            //         '>Количество минут указываемого времени занятия должно быть кратным ' + timestep + '</label>');
-            //
-            //     loaderOff();
-            //     return false;
-            // }
-
             var clientId = Form.find('select[name=clientId]').val();
             var date = Form.find('input[name=insertDate]').val();
             var areaId = Form.find('input[name=areaId]').val();
@@ -167,7 +134,7 @@ $(function(){
             }
         })
 
-        //УДаление занятия из основного графика
+        //Удаление занятия из основного графика
         .on('click', '.schedule_delete_main', function(e) {
             e.preventDefault();
             loaderOn();
@@ -233,25 +200,40 @@ $(function(){
                 loaderOff();
             } else {
                 var input = $('input[name=clientId]');
-                var inputBlock = input.parent();
-                input.remove();
-                inputBlock.append("<select name='clientId' class='form-control valid' ></select>");
+                var clientsList = $('#createData').find('select[name=clientId]');
+                if (input.length > 0) {
+                    var inputBlock = input.parent();
+                    inputBlock.append("<select name='clientId' class='form-control valid' ></select>");
+                    clientsList = inputBlock.find('select');
+                    input.remove();
+                }
 
                 $.each(rememberRow, function(index, value){
                     $(value).show();
                 });
 
-                $.ajax({
-                    type: 'GET',
-                    url: '',
-                    data: {action: 'getclientList', type: type},
-                    success: function(response) {
-                        var select = $('select[name=clientId]');
-                        select.empty();
-                        select.append(response);
+                clientsList.empty();
+                if (type == 1) {
+                    User.getList({
+                        select: ['id', 'surname', 'name'],
+                        active: true,
+                        groups: [5],
+                        order: { surname: 'ASC' }
+                    }, function(users) {
+                        clientsList.append('<option value="0"> ... </option>');
+                        $.each(users, function(key, user) {
+                            clientsList.append('<option value="'+user.id+'">'+user.surname + ' ' + user.name +'</option>');
+                        });
                         loaderOff();
-                    }
-                });
+                    });
+                } else {
+                    Group.getList({active: true}, function (groups) {
+                        $.each(groups, function (key, group) {
+                            clientsList.append('<option value="'+group.id+'">'+group.title+'</option>');
+                        });
+                        loaderOff();
+                    });
+                }
             }
         })
 
@@ -259,7 +241,44 @@ $(function(){
          * Формирование списка клиентов по принадлежности к преподавателю
          */
         .on('change', 'select[name=teacherId]', function(e){
+            var lessonTyeId = $('select[name=typeId]').val();
+            if (lessonTyeId == 1) {
+                var
+                    clientsList = $('select[name=clientId]'),
+                    selectedClient = clientsList.val(),
+                    selectedTeacher = $('select[name=teacherId]').val();
 
+                if (selectedClient > 0) {
+                    return false;
+                }
+
+                loaderOn();
+
+                if (selectedTeacher == 0) {
+                    clientsList.empty();
+                    User.getList({
+                        select: ['id', 'surname', 'name'],
+                        active: true,
+                        groups: [5],
+                        order: {surname: 'ASC'}
+                    }, function (users) {
+                        clientsList.append('<option value="0"> ... </option>');
+                        $.each(users, function (key, user) {
+                            clientsList.append('<option value="' + user.id + '">' + user.surname + ' ' + user.name + '</option>');
+                        });
+                        loaderOff();
+                    });
+                } else {
+                    clientsList.empty();
+                    User.getListByTeacherId(selectedTeacher, function (users) {
+                        clientsList.append('<option value="0"> ... </option>');
+                        $.each(users, function (key, user) {
+                            clientsList.append('<option value="' + user.id + '">' + user.surname + ' ' + user.name + '</option>');
+                        });
+                        loaderOff();
+                    });
+                }
+            }
         })
 
         /**
@@ -615,8 +634,9 @@ function getScheduleLessonPopup(classId, date, areaId, lessonType) {
         },
         success: function(response) {
             showPopup(response);
-            $('select[name=typeId]').val('1');
-            $('select[name=typeId]').trigger('change');
+            var clientsSelect = $('select[name=typeId]');
+            clientsSelect.val('1');
+            clientsSelect.trigger('change');
         }
     });
 }
