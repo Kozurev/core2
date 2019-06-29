@@ -3,10 +3,11 @@
  * @author BadWolf
  * @version 20190322
  * @version 20190526
+ * @version 20190628
  */
-Core::factory('User_Controller');
-Core::factory('Task_Controller');
-Core::factory('Schedule_Area_Controller');
+Core::requireClass('User_Controller');
+Core::requireClass('Task_Controller');
+Core::requireClass('Schedule_Area_Controller');
 
 $User = User::current();
 $Director = $User->getDirector();
@@ -298,39 +299,6 @@ if ($action === 'deleteReport') {
     }
 
     $Lesson->clearReports($date);
-    exit;
-}
-
-
-/**
- * Обновление списка клиентов/групп при выборе элемента из списка типов занятия
- */
-if ($action === 'getclientList') {
-    $type = Core_Array::Get('type', 0, PARAM_INT);
-
-    if ($type == 2) {
-        $Groups = Core::factory('Schedule_Group')
-            ->queryBuilder()
-            ->where('subordinated', '=', $subordinated)
-            ->orderBy('title')
-            ->findAll();
-        foreach ($Groups as $Group) {
-            echo "<option value='" . $Group->getId() . "'>" . $Group->title() . "</option>";
-        }
-    } elseif ($type == 1 || $type == 3) {
-        Core::factory('User_Controller');
-        $UserController = new User_Controller(User::current());
-        $UserController->queryBuilder()->orderBy('surname', 'ASC');
-        $Users = $UserController
-            ->groupId(ROLE_CLIENT)
-            ->isLimitedAreasAccess(true)
-            ->isWithAreaAssignments(false)
-            ->getUsers();
-        foreach ($Users as $User) {
-            echo "<option value='" . $User->getId() . "'>". $User->surname() . " " . $User->name() ."</option>";
-        }
-    }
-
     exit;
 }
 
