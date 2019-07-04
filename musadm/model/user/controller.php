@@ -191,6 +191,15 @@ class User_Controller
     private $filterType = self::FILTER_NOT_STRICT;
 
 
+    /**
+     * Массив идентификаторов найденных пользователей
+     *
+     * @var array
+     */
+    public $userIds = [];
+
+
+
     public function __construct(User $User = null)
     {
         $this->User = $User;
@@ -199,8 +208,8 @@ class User_Controller
             ->select(['User.id', 'User.name', 'User.surname', 'phone_number', 'email', 'group_id', 'subordinated'])
             ->from(Core::factory('User')->getTableName());
         $this->UserQuery->groupBy('User.id');
-        //$this->UserQuery->limit(10);
     }
+
 
     /**
      * Кастомная фабрика для пользователей
@@ -241,6 +250,7 @@ class User_Controller
         return $this->UserQuery;
     }
 
+
     /**
      * Метод добавления в окончательный XML различных простых тэгов
      *
@@ -255,6 +265,7 @@ class User_Controller
             ->_entityValue($entityValue);
         return $this;
     }
+
 
     /**
      * @param string $tableType
@@ -271,6 +282,7 @@ class User_Controller
         $this->tableType = $tableType;
         return $this;
     }
+
 
     /**
      * @param bool $isSubordinate
@@ -298,6 +310,7 @@ class User_Controller
         return $this;
     }
 
+
     /**
      * @param bool $isActiveExportBtn
      * @return User_Controller
@@ -312,6 +325,7 @@ class User_Controller
 
         return $this;
     }
+
 
     /**
      * @param bool $isShowCount
@@ -328,6 +342,7 @@ class User_Controller
         return $this;
     }
 
+
     /**
      * @param bool $isLimited
      * @return User_Controller
@@ -338,6 +353,7 @@ class User_Controller
         return $this;
     }
 
+
     /**
      * @param bool $isWithAreaAssignments
      * @return User_Controller
@@ -347,6 +363,7 @@ class User_Controller
         $this->isWithAreaAssignments = $isWithAreaAssignments;
         return $this;
     }
+
 
     /**
      * @param array $Areas
@@ -370,6 +387,7 @@ class User_Controller
         return $this;
     }
 
+
     /**
      * @param string $xslPath
      * @return User_Controller
@@ -379,6 +397,7 @@ class User_Controller
         $this->xsl = $xslPath;
         return $this;
     }
+
 
     /**
      * @param bool $isActive
@@ -397,6 +416,7 @@ class User_Controller
         return $this;
     }
 
+
     /**
      * @param $groupId
      * @return User_Controller
@@ -410,6 +430,7 @@ class User_Controller
         }
         return $this;
     }
+
 
     /**
      * @param $properties
@@ -434,6 +455,7 @@ class User_Controller
         return $this;
     }
 
+
     /**
      * @param string $paramName
      * @param $searchingValue
@@ -444,6 +466,7 @@ class User_Controller
         $this->filter[$paramName][] = $searchingValue;
         return $this;
     }
+
 
     /**
      * @param string $filterType
@@ -465,10 +488,21 @@ class User_Controller
     /**
      * @return int
      */
-    public function count()
+    public function getCountUsers()
     {
         return $this->countUsers;
     }
+
+
+    /**
+     * @return array
+     */
+    public function getUserIds() : array
+    {
+        return $this->userIds;
+    }
+
+
 
     /**
      * Поиск пользователей по указанным параметрам
@@ -637,7 +671,7 @@ class User_Controller
         }
 
         $Users = $this->UserQuery->findAll();
-        $this->countUsers = count( $Users );
+        $this->countUsers = count($Users);
 
         //Поиск доп. свйоств для групп и значений доп. свойств для каждого из пользователей
         if ($this->properties !== false) {
@@ -664,11 +698,9 @@ class User_Controller
                 }
             }
 
-            $userIds = [];
-
             //Сопоставление id пользователей с группами, которым они принадлежат
             for ($i = 0; $i < $this->countUsers; $i++) {
-                $userIds[] = $Users[$i]->getId();
+                $this->userIds[] = $Users[$i]->getId();
                 $this->Groups[$Users[$i]->groupId()]['groupUserIds'][] = $Users[$i]->getId();
             }
 
@@ -677,7 +709,7 @@ class User_Controller
                 $AreaAssignments = Core::factory('Schedule_Area_Assignment')
                     ->queryBuilder()
                     ->where('model_name', '=', 'User')
-                    ->whereIn('model_id', $userIds)
+                    ->whereIn('model_id', $this->userIds)
                     ->orderBy('model_id', 'DESC')
                     ->findAll();
 
@@ -739,7 +771,8 @@ class User_Controller
         $observerArgs['queryBuilder'] = &$this->UserQuery;
         $Users = $this->getUsers();
         $observerArgs['users'] = &$Users;
-        Core::notify($observerArgs, 'beforeUserControllerShow');
+        //Core::notify($observerArgs, 'beforeUserControllerShow');
+        Core::notify([&$this], 'beforeUserController.show');
 
         $OutputXml = Core::factory('Core_Entity')
             ->addSimpleEntity('wwwroot', $CFG->rootdir)
