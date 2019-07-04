@@ -28,6 +28,19 @@
                         <span>Всего:</span><span id="total-clients-count"><xsl:value-of select="count(user)" /></span>
                     </div>
                 </xsl:if>
+
+                <xsl:if test="avgAge != 0">
+                    <div>
+                        <span>Ср. возраст: <xsl:value-of select="avgAge" /></span>
+                    </div>
+                </xsl:if>
+
+                <div>
+                    <span>
+                        Ср. стоимость занятия:
+                        <xsl:value-of select="avgIndivCost" /> / <xsl:value-of select="avgGroupCost" />
+                    </span>
+                </div>
             </div>
         </xsl:if>
 
@@ -56,8 +69,5 @@
             </section>
         </xsl:if>
     </xsl:template>
-
-
-    
 
 </xsl:stylesheet>

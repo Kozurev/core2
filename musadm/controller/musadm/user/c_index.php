@@ -75,7 +75,67 @@ foreach ($_GET as $paramName => $values) {
     }
 }
 
+
+/**
+ * Подсчет среднего возроста клиентов и средней медианы п индивиуальным и групповым занятиям
+ */
+Core::attachObserver('beforeUserController.show', function($args) {
+    $UserController = $args[0];
+    $QueryBuilder = new Orm();
+
+    //Средний возраст
+    $birthYears = $QueryBuilder->select('value')
+        ->from('Property_String')
+        ->where('property_id', '=', 28)
+        ->where('value', '<>', '')
+        ->whereIn('object_id', $UserController->getUserIds())
+        ->findAll();
+
+    $yearsSum = 0;
+    $formatYearsCount = 0;
+    foreach ($birthYears as $year) {
+        if (mb_strlen($year->value) == 4) {
+            $yearsSum += intval($year->value);
+            $formatYearsCount++;
+        }
+    }
+
+    if ($formatYearsCount > 0) {
+        $avgYear = round($yearsSum / $formatYearsCount, 0);
+        $avgAge = intval(date('Y')) - $avgYear;
+    } else {
+        $avgAge = 0;
+    }
+
+    $UserController->addSimpleEntity('avgAge', $avgAge);
+
+    //Средняя медиана
+    $avgIndivCost = $QueryBuilder->clearQuery()
+        ->select('avg(value)', 'value')
+        ->from('Property_Int')
+        ->where('property_id', '=', 42)
+        ->where('value', '>', 0)
+        ->whereIn('object_id', $UserController->getUserIds())
+        ->find();
+
+    $avgGroupCost = $QueryBuilder->clearQuery()
+        ->select('avg(value)', 'value')
+        ->from('Property_Int')
+        ->where('property_id', '=', 43)
+        ->where('value', '>', 0)
+        ->whereIn('object_id', $UserController->getUserIds())
+        ->find();
+
+    $avgIndivCost = !is_null($avgIndivCost->value) ? round($avgIndivCost->value, 0) : 0;
+    $avgGroupCost = !is_null($avgGroupCost->value) ? round($avgGroupCost->value, 0) : 0;
+    $UserController->addSimpleEntity('avgIndivCost', $avgIndivCost);
+    $UserController->addSimpleEntity('avgGroupCost', $avgGroupCost);
+});
+
+
 $ClientController->show();
+
+Core::detachObserver('beforeUserController.show');
 
 //Список менеджеров для директора
 if ($groupId == ROLE_TEACHER && Core_Access::instance()->hasCapability(Core_Access::USER_READ_MANAGERS)) {
