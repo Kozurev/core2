@@ -11,7 +11,7 @@
                     </div>
 
                     <div>
-                        <input type="date" class="form-control" name="date_from" value="{date_from}"/>
+                        <input type="date" class="form-control" name="date_from" value="{//date_from}"/>
                     </div>
 
                     <div class="right">
@@ -19,7 +19,7 @@
                     </div>
 
                     <div>
-                        <input type="date" class="form-control" name="date_to" value="{date_to}"/>
+                        <input type="date" class="form-control" name="date_to" value="{//date_to}"/>
                     </div>
 
                     <div>

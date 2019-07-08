@@ -16,21 +16,28 @@ $AbsentConsult =    $AbsentConsult->getPropertyValues(User::current())[0]->value
 
 $today = date('Y-m-d');
 
-Core::factory('Lid_Controller');
-$LidController = new Lid_Controller(User::current());
+Core::requireClass('Lid_Controller');
+Core::requireClass('Lid_Controller_Extended');
+$LidController = new Lid_Controller_Extended(User::current());
 
 $areaId = Core_Array::Get('area_id', 0, PARAM_INT);
 if ($areaId !== 0) {
     $forArea = Core::factory('Schedule_Area', $areaId);
-    $LidController->forAreas([$forArea]);
-    $LidController->isEnableCommonLids(false);
+    //$LidController->forAreas([$forArea]);
+    $LidController->setAreas([$forArea]);
 }
 
 $phone = Core_Array::Get('phone', null, PARAM_STRING);
 if (!is_null($phone)) {
     $LidController->appendFilter('number', $phone);
     $LidController->addSimpleEntity('number', $phone);
-    $LidController->isPeriodControl(false);
+    $LidController->isEnabledPeriodControl(false);
+}
+
+$searchById = Core_Array::Get('lidid', null, PARAM_INT);
+if (!is_null($searchById)) {
+    $LidController->appendFilter('id', '=', $searchById);
+    $LidController->addSimpleEntity('lid_id', $searchById);
 }
 
 $LidController
@@ -40,11 +47,8 @@ $LidController
     ->periodTo(
         Core_Array::Get('date_to', $today, PARAM_DATE)
     )
-    ->lidId(
-        Core_Array::Get('lidid', null, PARAM_INT)
-    )
+    ->properties([50])
     ->isWithAreasAssignments(true)
-    ->properties(true)
     ->addSimpleEntity(
         'is-director', User::checkUserAccess(['groups' => [ROLE_DIRECTOR]]) ? 1 : 0
     )
