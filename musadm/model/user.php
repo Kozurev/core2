@@ -87,6 +87,9 @@ class User extends User_Model
             ->where('active', '=', 1)
 			->find();
 
+        $cookieTime = 3600 * 24 * 30;
+        setcookie('userdata', '', 0 - time() - $cookieTime, '/');
+
 		if (!is_null($ExistingUser)) {
 		    if ($remember === true) {
                 $cookieData = $ExistingUser->getId();
