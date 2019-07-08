@@ -17,41 +17,32 @@ class Schedule_Area_Controller
      * @param bool $isSubordinate
      * @return Schedule_Area|null
      */
-    public static function factory( int $id = null, bool $isSubordinate = true )
+    public static function factory(int $id = null, bool $isSubordinate = true)
     {
-        $ResArea = Core::factory( 'Schedule_Area' );
+        $Area = Core::factory('Schedule_Area');
 
-        if ( is_null( $id ) )
-        {
-            return $ResArea;
+        if (is_null($id)) {
+            return $Area;
         }
 
-        $ResArea
-            ->queryBuilder()
-            ->where( 'id', '=', $id );
+        $Area->queryBuilder()
+            ->where('id', '=', $id);
 
-        if ( $isSubordinate === true )
-        {
+        if ($isSubordinate === true) {
             $AuthUser = User::current();
-
-            if ( is_null( $AuthUser ) )
-            {
+            if (is_null($AuthUser)) {
                 return null;
             }
 
             $Director = $AuthUser->getDirector();
-
-            if ( is_null( $Director ) )
-            {
+            if (is_null($Director)) {
                 return null;
             }
 
-            $ResArea
-                ->queryBuilder()
-                ->where( 'subordinated', '=', $Director->getId() );
+            $Area->queryBuilder()
+                ->where('subordinated', '=', $Director->getId());
         }
-
-        return $ResArea->find();
+        return $Area->find();
     }
 
 
