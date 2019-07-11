@@ -127,7 +127,7 @@ class Lid extends Lid_Model
     /**
      * Поиск списка доступных статусов лида
      *
-     * @return array Property_List_Values
+     * @return array Lid_Status
      */
     public function getStatusList()
     {
@@ -182,7 +182,7 @@ class Lid extends Lid_Model
     /**
      * Метод поиска объекта текущего статуса
      *
-     * @return Property_List_Values
+     * @return Lid_Status
      */
     public function getStatus()
     {
