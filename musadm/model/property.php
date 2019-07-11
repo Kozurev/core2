@@ -7,6 +7,7 @@
  * @date ...
  * @version 20190220
  * @version 20190529
+ * @version 20190711
  * Class Property
  */
 class Property extends Property_Model
@@ -390,6 +391,22 @@ class Property extends Property_Model
             ->orderBy('sorting')
             ->orderBy('id', 'DESC')
             ->findAll();
+    }
+
+
+    /**
+     * Создание объекта значения доп. свйоства со значением по умолчанию
+     *
+     * @param $obj
+     * @return mixed
+     */
+    public function makeDefaultValue($obj)
+    {
+        return Core::factory('Property_' . $this->type())
+            ->modelName(get_class($obj))
+            ->objectId($obj->getId())
+            ->propertyId($this->getId())
+            ->value($this->default_value);
     }
 
 }
