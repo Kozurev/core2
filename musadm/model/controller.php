@@ -1,44 +1,61 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Egor
- * Date: 05.07.2019
- * Time: 19:11
+ * Родительский класс-контроллер для выборки объектов
+ *
+ * @author BadWolf
+ * @date 05.07.2019 19:11
+ * Class Controller
  */
-
 class Controller
 {
-    //Тип фильтров
+    /**
+     * Константа для указания "строгой" фильтрации для случаев без явно заданного условия
+     * строгая фильтрация подразумевает под собой полное совпадение с искомым значением
+     */
     const FILTER_STRICT = 'strict';
+
+    /**
+     * Константа для указания "мягкой" фильтрации для случаев без явно заданного условия
+     * мягкая фильтрация подразумевает под собой полное либо частичное совпадение с искомыи значениями
+     */
     const FILTER_NOT_STRICT = 'not-strict';
 
 
+
     /**
+     * Объект пользователя, для которого формируется выборка
+     *
      * @var User
      */
     protected $User;
 
 
     /**
+     * Экзэмпляр объекта для контроллера (к примеру: задача, лид или пользователь)
+     *
      * @var object
      */
     protected $Object;
 
 
     /**
+     * Объект конструктора запроса для выборки объектов
+     *
      * @var Orm
      */
     protected $QueryBuilder;
 
 
     /**
+     * Кастомные XML сущьности, добавляемые в результат поиска
+     *
      * @var array
      */
     protected $entities = [];
 
 
     /**
-     * Дополнительные простые тэги
+     * Кастомные простые XML сущьности, добавляемые в результат поиска
      *
      * @var array
      */
@@ -72,11 +89,11 @@ class Controller
 
 
     /**
-     * Список фильтров по типу ключ - название свойства => значение - искомое згначение
+     * Список фильтров по основным свойствам объектов
      *
      * @var array|null
      */
-    protected $filter;
+    protected $filter = [];
 
 
     /**
@@ -85,11 +102,17 @@ class Controller
      * Строгая фильтрация - полное совпадение существующего и искомого значения
      * Свойство принимает только значение одной из констант с префиксом 'FILTER_'
      *
-     * TODO: для значений доп. свойств пока что применяется только строгая фильтрация. Надо бы потом поправить
-     *
      * @var string
      */
     protected $filterType = self::FILTER_NOT_STRICT;
+
+
+    /**
+     * Список фильтров по значениям доп. свойств
+     *
+     * @var array
+     */
+    protected $addFilter = [];
 
 
     /**
@@ -101,6 +124,8 @@ class Controller
 
 
     /**
+     * Указатель на подгрузку связей с филлиалами в окончательный XML
+     *
      * @var bool
      */
     protected $isWithAreasAssignments = false;
@@ -113,7 +138,7 @@ class Controller
      *
      * @var bool
      */
-    private $isLimitedAreasAccess = true;
+    protected $isLimitedAreasAccess = true;
 
 
     /**
@@ -162,18 +187,27 @@ class Controller
     }
 
 
+    /**
+     * @return User
+     */
     public function getUser()
     {
         return $this->User;
     }
 
 
+    /**
+     * @param $obj
+     */
     protected function setObject($obj)
     {
         $this->Object = $obj;
     }
 
 
+    /**
+     * @return object
+     */
     public function getObject()
     {
         return $this->Object;
@@ -181,6 +215,10 @@ class Controller
 
 
     /**
+     * Добавление условие выборки объектов
+     * Данный фильтр применяется лишь к основным свойствам объектам, не к значениям доп. свойств
+     * для фильтрации по значениям доп. свойств существует метод: appendAddFilter
+     *
      * @param string $paramName
      * @param $condition
      * @param null $searchingValue
@@ -216,19 +254,10 @@ class Controller
 
 
     /**
-     * УДаление последнего заданного значения по фильтру данного свойства
+     * Задание типа фильтрации для случаев без задания явного условия
+     * Значение аргумента filterType должно быть одной из констант с префиксом "FILTER_"
+     * Тип фильтрации не играет роли если в качестве значения передается массив
      *
-     * @param string $paramName
-     * @return $this
-     */
-    public function removeFilter(string $paramName)
-    {
-        unset($this->filter[$paramName]);
-        return $this;
-    }
-
-
-    /**
      * @param string $filterType
      * @return $this|string
      */
@@ -251,6 +280,25 @@ class Controller
     public function getFilterType()
     {
         return $this->filterType;
+    }
+
+
+    /**
+     * Добавление фильтров по значениям доп. свойств
+     *
+     * @param int $propertyId
+     * @param $condition
+     * @param $propertyValue
+     * @return $this
+     */
+    public function appendAddFilter(int $propertyId, $condition, $propertyValue = null)
+    {
+        if (is_null($propertyValue)) {
+            $propertyValue = $condition;
+            $condition = null;
+        }
+        $this->addFilter[$propertyId][] = ['condition' => $condition, 'value' => $propertyValue];
+        return $this;
     }
 
 
@@ -402,6 +450,148 @@ class Controller
     }
 
 
+    /**
+     * Фильтрация уже найденных объектов по значениям доп. свойств
+     *
+     * @param array $foundObjects
+     */
+    protected function addFilterExecute(array &$foundObjects)
+    {
+        foreach ($this->addFilter as $propertyId => $filterParams) {
+            $NewQueryBuilder = $this->Object->queryBuilder()->clearQuery();
+            $Property = Core::factory('Property', $propertyId);
+            if (is_null($Property)) {
+                continue;
+            }
+            $propertyTableName = 'Property_' . ucfirst($Property->type());
+            $propertyTableVal = $Property->type() == 'list' ? 'p.value_id' : 'p.value';
+            $joinConditions = $this->Object->getTableName() . '.id = p.object_id AND p.model_name = \''
+                . get_class($this->Object) . '\' AND p.property_id = ' . $propertyId;
+            foreach ($filterParams as $param) {
+                $condition = Core_Array::getValue($param, 'condition', null, PARAM_STRING);
+                $value = Core_Array::getValue($param, 'value', null);
+
+                //Если ищем совпадение в элементом массива
+                if (is_array($value) && count($value) > 0) {
+                    //Если присутствует значение по умолчанию
+                    if (in_array($Property->defaultValue(), $value)) {
+                        $NewQueryBuilder->open()
+                            ->where($propertyTableVal, 'IS', 'NULL')
+                            ->orWhereIn($propertyTableVal, $value)
+                            ->close();
+                    } else {
+                        $NewQueryBuilder->whereIn($propertyTableVal, $value);
+                    }
+                }
+
+                //Фильтрация по явно заданному условию
+                if (!is_null($condition)) {
+                    if ($value == $Property->defaultValue()) {
+                        $NewQueryBuilder->open()
+                            ->where($propertyTableVal, 'IS', 'NULL')
+                            ->orWhere($propertyTableVal, $condition, $value)
+                            ->close();
+                    } else {
+                        $NewQueryBuilder->where($propertyTableVal, $condition, $value);
+                    }
+                } else { //Фильтрация без явно заданного условия
+                    //Мягкая фильтрация
+                    if ($this->getFilterType() == self::FILTER_NOT_STRICT) {
+                        if ($value == $Property->defaultValue()) {
+                            $NewQueryBuilder->open()
+                                ->where($propertyTableVal, 'IS', 'NULL')
+                                ->orWhere($propertyTableVal, '=', $value)
+                                ->orWhere($propertyTableVal, '=', '%' . $value . '%')
+                                ->orWhere($propertyTableVal, '=', $value . '%')
+                                ->orWhere($propertyTableVal, '=', '%' . $value)
+                                ->close();
+                        } else {
+                            $NewQueryBuilder->open()
+                                ->where($propertyTableVal, '=', $value)
+                                ->orWhere($propertyTableVal, '=', '%' . $value . '%')
+                                ->orWhere($propertyTableVal, '=', $value . '%')
+                                ->orWhere($propertyTableVal, '=', '%' . $value)
+                                ->close();
+                        }
+                    } else {
+                        //Строгая фильтрация
+                        if ($value == $Property->defaultValue()) {
+                            $NewQueryBuilder->open()
+                                ->where($propertyTableVal, 'IS', 'NULL')
+                                ->orWhere($propertyTableVal, '=', $value)
+                                ->close();
+                        } else {
+                            //Мягкая фильтрация
+                            $NewQueryBuilder->where($propertyTableVal, '=', $value);
+                        }
+                    }
+                }
+
+                $NewObjectsIds = $NewQueryBuilder
+                    ->select($this->Object->getTableName() . '.id', 'id')
+                    ->leftJoin($propertyTableName . ' AS p', $joinConditions)
+                    ->whereIn($this->Object->getTableName() . '.id', $this->foundObjectsIds)
+                    ->findAll();
+
+                $this->foundObjectsIds = [];
+                foreach ($NewObjectsIds as $obj) {
+                    $this->foundObjectsIds[] = $obj->getId();
+                }
+            }
+        }
+
+        foreach ($foundObjects as $key => $foundObject) {
+            if (!in_array($foundObject->getId(), $this->foundObjectsIds)) {
+                unset($foundObjects[$key]);
+            }
+        }
+        $foundObjects = array_values($foundObjects);
+        //return $foundObjects;
+    }
+
+
+    /**
+     * Подгрузка значений доп. свойств к объектам
+     *
+     * @param array $Objects
+     */
+    public function addPropValues(array &$Objects)
+    {
+        if (is_array($this->properties) && count($this->properties) > 0) {
+            foreach ($this->properties as $Property) {
+                $propValueTable = 'Property_' . ucfirst($Property->type());
+                $PropertyValues = Core::factory($propValueTable)
+                    ->queryBuilder()
+                    ->where('model_name', '=', 'Lid')
+                    ->where('property_id', '=', $Property->getId())
+                    ->whereIn('object_id', $this->foundObjectsIds)
+                    ->orderBy('object_id', 'DESC')
+                    ->findAll();
+
+                $objectsPropertiesAssignment = []; //Массив идентификаторов объектов, к которым найдено значение доп. свойства
+                foreach ($Objects as $Object) {
+                    foreach ($PropertyValues as $Value) {
+                        if ($Object->getId() == $Value->objectId()) {
+                            $objectsPropertiesAssignment[] = $Object->getId();
+                            $Object->addEntity($Value, 'property_value');
+                        }
+                    }
+                }
+
+                foreach ($Objects as $Object) {
+                    if (!in_array($Object->getId(), $objectsPropertiesAssignment)) {
+                        $Object->addEntity($Property->makeDefaultValue($Object), 'property_value');
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+     * @param null $OutputXml
+     * @return mixed
+     */
     public function show($OutputXml = null)
     {
         if (is_null($OutputXml)) {
@@ -413,7 +603,7 @@ class Controller
             $OutputXml->addEntity($Entity);
         }
 
-        if (!is_null($this->properties) && count($this->properties) > 0) {
+        if (is_array($this->properties) && count($this->properties) > 0) {
             foreach ($this->properties as $Property) {
                 if ($Property->type() == 'list') {
                     $Property->addEntity(
@@ -441,7 +631,7 @@ class Controller
             $OutputXml->addSimpleEntity('current_area', $this->areasIds[0]);
         }
 
-        return $OutputXml->xsl($this->getXsl())->show();
+        return $OutputXml->xsl($this->getXsl());
     }
 
 
