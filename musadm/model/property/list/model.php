@@ -2,6 +2,7 @@
 /**
  * @author BadWolf
  * @version 20190328
+ * @version 20190711
  * Class Property_List_Model
  */
 class Property_List_Model extends Core_Entity
@@ -138,7 +139,7 @@ class Property_List_Model extends Core_Entity
      */
     public function value_id(int $value = null)
     {
-        return $this->value($value = null);
+        return $this->value($value);
     }
 
 
