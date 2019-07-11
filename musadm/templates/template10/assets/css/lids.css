@@ -1,5 +1,23 @@
+.section-lids .item {
+    width: 94%;
+}
+
+.section-lids .item-inner {
+    overflow-y: hidden;
+}
+
+.section-lids .comments-column {
+    overflow-y: scroll;
+    max-height: 290px;
+}
+
 .lids .form-control {
     min-width: 95px;
+}
+
+.lids input,
+.lids select {
+    margin: 5px 0;
 }
 
 .lids .lid_submit {
@@ -14,7 +32,7 @@
 
 .lids .lid_status {
     /*width: 40%;*/
-    margin-left: 5%;
+    /*margin-left: 5%;*/
     display: inline-block;
 }
 

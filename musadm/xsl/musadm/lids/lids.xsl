@@ -42,7 +42,7 @@
                     </div>
                     <xsl:if test="//access_lid_create = 1">
                         <div>
-                            <a class="btn btn-purple create_lid">Создать лида</a>
+                            <a class="btn btn-purple" onclick="makeLidPopup(0)">Создать лида</a>
                         </div>
                     </xsl:if>
                     <xsl:if test="is-director = 1">
@@ -116,7 +116,7 @@
             </section>
         </xsl:if>
 
-        <section class="cards-section text-center">
+        <section class="cards-section section-lids text-center">
             <div id="cards-wrapper" class="cards-wrapper row">
                 <xsl:choose>
                     <xsl:when test="count(lid) != 0">
@@ -184,45 +184,45 @@
 
         <div class="item {//lid_status[id = $statusId]/item_class}">
             <div class="item-inner">
-                <h3 class="title">
-                    <xsl:value-of select="id" /> <xsl:text> </xsl:text>
-                    <xsl:value-of select="surname" /><xsl:text> </xsl:text>
-                    <xsl:value-of select="name" /><xsl:text> </xsl:text>
-                    <xsl:value-of select="patronimyc" /><xsl:text> </xsl:text>
-                </h3>
-
-                <xsl:if test="number != ''">
-                    <p class="intro">
-                        <span>Телефон: </span><xsl:value-of select="number" />
-                    </p>
-                </xsl:if>
-
-                <xsl:if test="vk != ''">
-                    <p class="intro">
-                        <span>ВК: </span><xsl:value-of select="vk" />
-                    </p>
-                </xsl:if>
-
-                <xsl:variable name="source">
-                    <xsl:choose>
-                        <xsl:when test="count(property_value[property_id = 50]) = 1">
-                            <xsl:variable name="sourceId" select="property_value[property_id = 50]/value_id" />
-                            <xsl:value-of select="//property_list_values[id=$sourceId]/value" />
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="source" />
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:variable>
-
-                <xsl:if test="$source != ''">
-                    <p class="intro">
-                        <span>Источник: </span><xsl:value-of select="$source" />
-                    </p>
-                </xsl:if>
-
                 <div class="row">
-                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="col-sm-3 col-xs-12">
+                        <h3 class="title">
+                            <xsl:value-of select="id" /> <xsl:text> </xsl:text>
+                            <xsl:value-of select="surname" /><xsl:text> </xsl:text>
+                            <xsl:value-of select="name" /><xsl:text> </xsl:text>
+                            <xsl:value-of select="patronimyc" /><xsl:text> </xsl:text>
+                        </h3>
+
+                        <xsl:if test="number != ''">
+                            <p class="intro">
+                                <span>Телефон: </span><xsl:value-of select="number" />
+                            </p>
+                        </xsl:if>
+
+                        <xsl:if test="vk != ''">
+                            <p class="intro">
+                                <span>ВК: </span><xsl:value-of select="vk" />
+                            </p>
+                        </xsl:if>
+
+                        <xsl:variable name="source">
+                            <xsl:choose>
+                                <xsl:when test="count(property_value[property_id = 50]) = 1">
+                                    <xsl:variable name="sourceId" select="property_value[property_id = 50]/value_id" />
+                                    <xsl:value-of select="//property_list_values[id=$sourceId]/value" />
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="source" />
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:variable>
+
+                        <xsl:if test="$source != ''">
+                            <p class="intro">
+                                <span>Источник: </span><xsl:value-of select="$source" />
+                            </p>
+                        </xsl:if>
+
                         <input type="date" class="form-control date_inp lid_date" data-lidid="{id}" >
                             <xsl:attribute name="value"><xsl:value-of select="control_date" /></xsl:attribute>
 
@@ -230,9 +230,7 @@
                                 <xsl:attribute name="disabled">disabled</xsl:attribute>
                             </xsl:if>
                         </input>
-                    </div>
 
-                    <div class="col-ld-6 col-md-6 col-sm-12 col-xs-12">
                         <select name="status" class="form-control lid_status" data-lidid="{id}">
                             <xsl:if test="/root/access_lid_edit = 0">
                                 <xsl:attribute name="disabled">disabled</xsl:attribute>
@@ -249,11 +247,7 @@
                                 </option>
                             </xsl:for-each>
                         </select>
-                    </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-ld-6 col-md-6 col-sm-12 col-xs-12">
                         <select class="form-control lid-area" data-lid-id="{id}">
                             <xsl:if test="/root/access_lid_edit = 0">
                                 <xsl:attribute name="disabled">disabled</xsl:attribute>
@@ -270,38 +264,36 @@
                                 </option>
                             </xsl:for-each>
                         </select>
-                    </div>
-                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 center">
-                        <input type="hidden" />
+
                         <xsl:if test="/root/access_lid_comment = 1">
-                            <a class="action comment add_lid_comment" data-lidid="{id}" title="Добавить комментарий"><input type="hidden" value="kostul" /></a>
+                            <a class="btn btn-purple" data-lidid="{id}" title="Добавить комментарий">Добавить комментарий</a>
                         </xsl:if>
                     </div>
-                </div>
+                    <div class="col-sm-9 col-xs-12 comments-column">
+                        <div class="comments">
+                            <input type="hidden" value="KOCTb|J|b" />
+                            <xsl:for-each select="comments/lid_comment">
+                                <xsl:variable name="author" select="author_id" />
+                                <div class="block">
+                                    <div class="comment_header">
+                                        <div class="author">
+                                            <xsl:value-of select="surname" />
+                                            <xsl:text> </xsl:text>
+                                            <xsl:value-of select="name" />
+                                        </div>
+                                        <div class="date">
+                                            <xsl:value-of select="datetime" />
+                                        </div>
+                                    </div>
 
-                <div class="comments">
-                    <input type="hidden" value="KOCTb|J|b" />
-                    <xsl:for-each select="comments/lid_comment">
-                        <xsl:variable name="author" select="author_id" />
-                        <div class="block">
-                            <div class="comment_header">
-                                <div class="author">
-                                    <xsl:value-of select="surname" />
-                                    <xsl:text> </xsl:text>
-                                    <xsl:value-of select="name" />
+                                    <div class="comment_body">
+                                        <xsl:value-of select="text" />
+                                    </div>
                                 </div>
-                                <div class="date">
-                                    <xsl:value-of select="datetime" />
-                                </div>
-                            </div>
-
-                            <div class="comment_body">
-                                <xsl:value-of select="text" />
-                            </div>
+                            </xsl:for-each>
                         </div>
-                    </xsl:for-each>
+                    </div>
                 </div>
-
             </div><!--//item-inner-->
         </div><!--//item-->
 
