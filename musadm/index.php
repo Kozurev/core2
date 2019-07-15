@@ -13,6 +13,7 @@ require_once ROOT . '/constants.php';
 //Установление соединения с базой данных
 require_once ROOT . '/model/db.php';
 require_once ROOT . '/config/config.php';
+require_once ROOT . '/model/core.php';
 require_once ROOT . '/includes.php';
 require_once ROOT . '/model/core/array.php';
 
@@ -27,7 +28,7 @@ if (is_null( Core_Array::Session('core/user_backup', null))) {
 
 //Подключение обязательных биьлиотек
 require_once ROOT . '/model/orm.php';
-require_once ROOT . '/model/core.php';
+//require_once ROOT . '/model/core.php';
 require_once ROOT . '/observers/observers.php';
 require_once ROOT . '/model/core/entity/model.php';
 require_once ROOT . '/model/core/entity.php';
