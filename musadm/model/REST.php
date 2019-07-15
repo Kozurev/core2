@@ -7,15 +7,29 @@
  * Class REST
  */
 require_once ROOT . '/model/rest/user.php';
+Core::requireClass('Rest_Lid');
 
 class REST
 {
+    const STATUS_SUCCESS = 'success';
+    const STATUS_ERROR = 'error';
+
+
     /**
      * @return Rest_User
      */
     public static function user() : Rest_User
     {
         return new Rest_User();
+    }
+
+
+    /**
+     * @return Rest_Lid
+     */
+    public static function lid() : Rest_Lid
+    {
+        return new Rest_Lid();
     }
 
 
@@ -59,11 +73,35 @@ class REST
      * @param string $message
      * @return string
      */
-    public static function error(int $num, string $message)
+    public static function error(int $num, string $message) : string
     {
         $error = new stdClass();
         $error->code = $num;
         $error->message = $message;
         return json_encode(['error' => $error]);
+    }
+
+
+    /**
+     * Метод для формирование ответа формата JSON для API
+     *
+     * @param string $status
+     * @param string $message
+     * @return string
+     */
+    public static function status(string $status, string $message) : string
+    {
+        $output = new stdClass();
+        $output->message = $message;
+
+        if ($status === self::STATUS_SUCCESS) {
+            $output->status = true;
+        } elseif ($status === self::STATUS_ERROR) {
+            $output->status = false;
+        } else {
+            $output->status = null;
+        }
+
+        return json_encode($output);
     }
 }
