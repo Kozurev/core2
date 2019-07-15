@@ -450,6 +450,18 @@ class Orm
 
 
     /**
+     * Очистка заданного порядка сортировки
+     *
+     * @return $this
+     */
+    public function clearOrderBy()
+    {
+        $this->order = [];
+        return $this;
+    }
+
+
+    /**
      * Геттер для сформированной строки SQL-запроса
      *
      * @return string
