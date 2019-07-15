@@ -51,6 +51,17 @@ class Property_Controller
     }
 
 
+    /**
+     * Фабрика для объекта "Доп. свойство" по значению tag_name
+     *
+     * @param string $tagName
+     * @return Property|null
+     */
+    public static function factoryByTag(string $tagName)
+    {
+        return Core::factory('Property')->getByTagName($tagName);
+    }
+
 
     /**
      * Фабрика для элемента списка свойства
