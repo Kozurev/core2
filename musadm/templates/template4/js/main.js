@@ -3,6 +3,28 @@
 var root = $('#rootdir').val();
 
 
+/**
+ * Проверка ответа API от сервера на наличие "успеха" или "ошибки"
+ *
+ * @param response
+ * @returns {boolean}
+ */
+function checkResponseStatus(response) {
+    let result;
+    if (response.status == undefined) {
+        result = true;
+    } else if (response.status == true) {
+        notificationSuccess(response.message);
+        result = true;
+    } else if (response.status == false) {
+        notificationError(response.message);
+        result = false;
+    } else {
+        result = false;
+    }
+    return result;
+}
+
 function getCurrentDate() {
     var date = new Date();
     var year = date.getFullYear();
@@ -35,7 +57,14 @@ function loaderOff(){
  * @param data - html данные окна
  */
 function showPopup(data) {
-    var
+    if (data != undefined) {
+        prependPopup(data);
+    }
+    $('.popup').show();
+}
+
+function prependPopup(data) {
+    let
         overlay = $('.overlay'),
         popup = $('.popup');
 
@@ -43,16 +72,15 @@ function showPopup(data) {
     popup.empty();
     popup.append('<a href="#" class="popup_close"></a>');
     popup.append(data);
-    popup.show('fast');
 }
 
 function closePopup() {
-    var
+    let
         overlay = $('.overlay'),
         popup = $('.popup');
 
     overlay.hide();
-    popup.hide('fast');
+    popup.hide();
     popup.empty();
 }
 
@@ -197,29 +225,29 @@ function updateActive(modelName, modelId, value, func) {
  * @param url - адрес запроса после root + "/user/" (client || balance)
  * @param func - выполняемая функция по получению ответа от ajax-запроса
  */
-function savePayment(userId, value, description, adminNote, type, url, func) {
-    $.ajax({
-        type: 'GET',
-        url: root + '/' + url,
-        data: {
-            action: 'savePayment',
-            userid: userId,
-            value: value,
-            type: type,
-            description: description,
-            property_26: adminNote
-        },
-        success: function(response) {
-            if(response != '0') {
-                notificationError('Ошибка: ' + response);
-            }
-            closePopup();
-            if(typeof func === 'function') {
-                func(response);
-            }
-        },
-        error: function(response) {
-            notificationError('Произошла ошибка при сохранении платежа');
-        }
-    });
-}
+// function savePayment(userId, value, description, adminNote, type, url, func) {
+//     $.ajax({
+//         type: 'GET',
+//         url: root + '/' + url,
+//         data: {
+//             action: 'savePayment',
+//             userid: userId,
+//             value: value,
+//             type: type,
+//             description: description,
+//             property_26: adminNote
+//         },
+//         success: function(response) {
+//             if(response != '0') {
+//                 notificationError('Ошибка: ' + response);
+//             }
+//             closePopup();
+//             if(typeof func === 'function') {
+//                 func(response);
+//             }
+//         },
+//         error: function(response) {
+//             notificationError('Произошла ошибка при сохранении платежа');
+//         }
+//     });
+// }
