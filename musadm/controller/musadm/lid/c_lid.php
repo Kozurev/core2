@@ -23,7 +23,6 @@ $LidController = new Lid_Controller_Extended(User::current());
 $areaId = Core_Array::Get('area_id', 0, PARAM_INT);
 if ($areaId !== 0) {
     $forArea = Core::factory('Schedule_Area', $areaId);
-    //$LidController->forAreas([$forArea]);
     $LidController->setAreas([$forArea]);
 }
 
@@ -40,6 +39,11 @@ if (!is_null($searchById)) {
     $LidController->addSimpleEntity('lid_id', $searchById);
 }
 
+$LidController->getQueryBuilder()
+    ->clearOrderBy()
+    ->orderBy('priority_id', 'DESC')
+    ->orderBy('id', 'DESC');
+
 $LidController
     ->periodFrom(
         Core_Array::Get('date_from', $today, PARAM_DATE)
@@ -47,7 +51,7 @@ $LidController
     ->periodTo(
         Core_Array::Get('date_to', $today, PARAM_DATE)
     )
-    ->properties([50])
+    ->properties([50, 54])
     ->isWithAreasAssignments(true)
     ->addSimpleEntity(
         'is-director', User::checkUserAccess(['groups' => [ROLE_DIRECTOR]]) ? 1 : 0
