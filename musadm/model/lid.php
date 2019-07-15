@@ -5,6 +5,7 @@
  * @author BadWolf
  * @date 24.04.2018 22:10
  * @version 20190328
+ * @version 20190712
  * Class Lid
  */
 class Lid extends Lid_Model
@@ -20,9 +21,9 @@ class Lid extends Lid_Model
             'old_date' => $this->controlDate()
         ];
 
-        Core::notify($ObserverArgs, 'beforeLidChangeDate');
+        Core::notify($ObserverArgs, 'before.Lid.changeDate');
         $this->controlDate($date)->save();
-        Core::notify($ObserverArgs, 'afterLidChangeDate');
+        Core::notify($ObserverArgs, 'after.Lid.changeDate');
     }
 
 
@@ -36,9 +37,9 @@ class Lid extends Lid_Model
             $this->control_date = date('Y-m-d');
         }
 
-        Core::notify([&$this], 'beforeLidSave');
+        Core::notify([&$this], 'before.Lid.save');
         parent::save();
-        Core::notify([&$this], 'afterLidSave');
+        Core::notify([&$this], 'after.Lid.save');
     }
 
 
@@ -48,28 +49,28 @@ class Lid extends Lid_Model
      */
     public function delete($obj = null)
     {
-        Core::notify([&$this], 'beforeLidDelete');
+        Core::notify([&$this], 'before.Lid.delete');
 
         if (!is_null($this->id)) {
             $Comments = Core::factory('Lid_Comment')
                 ->queryBuilder()
                 ->where('lid_id', '=', $this->id)
                 ->findAll();
-
             foreach ($Comments as $Comment) {
                 $Comment->delete();
             }
-
             Core::factory('Property')->clearForObject($this);
         }
 
         parent::delete();
         
-        Core::notify([&$this], 'afterLidDelete');
+        Core::notify([&$this], 'after.Lid.delete');
     }
 
 
     /**
+     * Получение списко комментариев лида в уже отсортированном порядке
+     *
      * @return array
      */
     public function getComments()
@@ -91,7 +92,7 @@ class Lid extends Lid_Model
      *
      * @param string $text
      * @param bool $triggerObserver
-     * @return $this
+     * @return Lid_Comment
      */
     public function addComment(string $text, $triggerObserver = true)
     {
@@ -111,16 +112,16 @@ class Lid extends Lid_Model
             ->text($text);
 
         if ($triggerObserver === true) {
-            Core::notify([&$Comment], 'beforeLidAddComment');
+            Core::notify([&$Comment], 'before.Lid.addComment');
         }
 
         $Comment->save();
 
         if ($triggerObserver === true) {
-            Core::notify( [&$Comment], 'afterLidAddComment' );
+            Core::notify( [&$Comment], 'after.Lid.addComment' );
         }
 
-        return $this;
+        return $Comment;
     }
 
 
@@ -170,10 +171,10 @@ class Lid extends Lid_Model
             'new_status' => $Status
         ];
 
-        Core::notify($observerArgs, 'beforeChangeLidStatus');
+        Core::notify($observerArgs, 'before.Lid.changeStatus');
         $this->statusId($statusId)->save();
         $observerArgs['Lid'] = &$this;
-        Core::notify($observerArgs, 'afterChangeLidStatus');
+        Core::notify($observerArgs, 'after.Lid.changeStatus');
 
         return $this;
     }
@@ -191,6 +192,27 @@ class Lid extends Lid_Model
             ->where('id', '=', $this->statusId())
             ->where('subordinated', '=', $this->subordinated())
             ->find();
+    }
+
+
+    /**
+     * Изменение приоритета
+     *
+     * @param int $priorityId
+     * @return $this
+     */
+    public function changePriority(int $priorityId)
+    {
+        $observerArgs = [
+            0 => &$this,
+            'oldPriority' => $this->priorityId(),
+            'newPriority' => $priorityId
+        ];
+        Core::notify($observerArgs, 'before.Lid.changePriority');
+        $this->priorityId($priorityId);
+        $this->save();
+        Core::notify($observerArgs, 'after.Lid.changePriority');
+        return $this;
     }
 
 }
