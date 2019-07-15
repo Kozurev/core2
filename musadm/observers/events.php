@@ -330,7 +330,7 @@ Core::attachObserver('afterLidInsert', function($args) {
 /**
  * Изменение даты контроля лида
  */
-Core::attachObserver( 'afterLidChangeDate', function($args) {
+Core::attachObserver( 'after.Lid.changeDate', function($args) {
     $EventData = new stdClass();
     $EventData->Lid = $args['Lid'];
     $EventData->old_date = $args['old_date'];
@@ -345,17 +345,7 @@ Core::attachObserver( 'afterLidChangeDate', function($args) {
 /**
  * Добавление комментария лиду
  */
-Core::attachObserver('beforeLidCommentInsert', function($args) {
-    $countLidComments = Core::factory('Lid_Comment')
-        ->queryBuilder()
-        ->where('lid_id', '=', $args[0]->lidId())
-        ->getCount();
-
-    //Если это первый комментарий - тогда это создание лида
-    if ($countLidComments === 0) {
-        return;
-    }
-
+Core::attachObserver('before.Lid.addComment', function($args) {
     $EventData = new stdClass();
     $EventData->Comment = $args[0];
     Core::factory('Event')
