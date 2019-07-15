@@ -88,6 +88,18 @@ class Lid_Model extends Core_Entity
 
 
     /**
+     * Указатель на приоритет лида
+     * Список приоритетов, пока что, задан статически:
+     *  1 - низкий
+     *  2 - средний
+     *  3 - высокий
+     *
+     * @var int
+     */
+    protected $priority_id = 1;
+
+
+    /**
      * @param string|null $name
      * @return $this|string
      */
@@ -226,6 +238,21 @@ class Lid_Model extends Core_Entity
     }
 
 
+    /**
+     * @param int|null $priorityId
+     * @return $this|int
+     */
+    public function priorityId(int $priorityId = null)
+    {
+        if (is_null($priorityId)) {
+            return intval($this->priority_id);
+        } else {
+            $this->priority_id = $priorityId;
+            return $this;
+        }
+    }
+
+
     //Параметры валидации при сохранении таблицы
     public function schema()
     {
@@ -274,6 +301,11 @@ class Lid_Model extends Core_Entity
                 'type' => PARAM_INT,
                 'minval' => 0
             ],
+            'priority_id' => [
+                'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ]
         ];
     }
 
