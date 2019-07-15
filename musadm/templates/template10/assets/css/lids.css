@@ -2,13 +2,22 @@
     width: 94%;
 }
 
-.section-lids .item-inner {
-    overflow-y: hidden;
+/*.section-lids .item-inner {*/
+    /*overflow-y: hidden;*/
+/*}*/
+
+/*.section-lids .comments-column {*/
+    /*overflow-y: scroll;*/
+    /*max-height: 290px;*/
+/*}*/
+
+.section-lids .item .title,
+.section-lids .item .intro {
+    margin-bottom: 5px;
 }
 
-.section-lids .comments-column {
-    overflow-y: scroll;
-    max-height: 290px;
+.section-lids .item .action {
+    margin-right: 10px;
 }
 
 .lids .form-control {
@@ -26,18 +35,14 @@
 }
 
 .lids .lid_date {
-    /*width: 40%;*/
     display: inline-block;
 }
 
 .lids .lid_status {
-    /*width: 40%;*/
-    /*margin-left: 5%;*/
     display: inline-block;
 }
 
 .lids .add_lid_comment {
-    /*width: 10%;*/
     margin-left: 5%;
     position: relative;
     top: 13px;
