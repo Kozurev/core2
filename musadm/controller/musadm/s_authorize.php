@@ -1,14 +1,15 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Egor
- * Date: 18.03.2018
- * Time: 22:12
+ * Страница обработчиков связанных с авторизацией
+ *
+ * @author BadWolf
+ * @date 18.03.2018 22:12
+ * @version 2019-07-16
  */
 
 global $CFG;
 
-Core::factory('User_Controller');
+Core::requireClass('User_Controller');
 $User = User_Controller::factory();
 $CurrentUser = User::current();
 
@@ -45,7 +46,7 @@ if (isset($_GET['disauthorize'])) {
 //Авторизация "под именем"
 if (Core_Array::Get('auth_as', 0, PARAM_INT) !== 0) {
     User::authAs(Core_Array::Get('auth_as', 0, PARAM_INT));
-    $url = $CFG->rootdir ;
+    $url = $CFG->rootdir . '/';
     header('Location: ' . $url);
 }
 
@@ -56,7 +57,7 @@ if (Core_Array::Get('auth_revert', false, PARAM_BOOL) !== false) {
     if (is_null($CurrentUser)) {
         $url = $CFG->rootdir . '/authorize/';
     } else {
-        $url = $CFG->rootdir;
+        $url = $CFG->rootdir . '/';
     }
     header('Location: ' . $url);
 }
@@ -65,7 +66,7 @@ if (Core_Array::Get('auth_revert', false, PARAM_BOOL) !== false) {
 //Если пользователь уже авторизован
 if (!is_null($CurrentUser)) {
     $uri = Core_Array::Get('back', $CFG->rootdir);
-    header('Location: ' . $uri);
+    header('Location: ' . $uri . '/');
 }
 
 
