@@ -575,10 +575,20 @@ class Controller
                     ->orderBy('object_id', 'DESC')
                     ->findAll();
 
+                if ($Property->type() == 'list') {
+                    $PropertyList = [];
+                    foreach ($Property->getList() as $item) {
+                        $PropertyList[$item->getId()] = $item->value();
+                    }
+                }
+
                 $objectsPropertiesAssignment = []; //Массив идентификаторов объектов, к которым найдено значение доп. свойства
                 foreach ($Objects as $Object) {
                     foreach ($PropertyValues as $Value) {
                         if ($Object->getId() == $Value->objectId()) {
+                            if ($Property->type() == 'list') {
+                                $Value->value = $PropertyList[$Value->value()];
+                            }
                             $objectsPropertiesAssignment[] = $Object->getId();
                             $Object->addEntity($Value, 'property_value');
                             $objPropName = 'property_' . $Value->propertyId();
@@ -593,6 +603,10 @@ class Controller
 
                 foreach ($Objects as $Object) {
                     if (!in_array($Object->getId(), $objectsPropertiesAssignment)) {
+                        $Value = $Property->makeDefaultValue($Object);
+                        if ($Property->type() == 'list') {
+                            $Value->value = isset($PropertyList[$Value->value()]) ? $PropertyList[$Value->value()] : '';
+                        }
                         $Object->addEntity($Property->makeDefaultValue($Object), 'property_value');
                         $objPropName = 'property_' . $Property->getId();
                         if (isset($Object->$objPropName)) {
