@@ -4,8 +4,7 @@
         <xsl:variable name="currentArea" select="//current_area" />
         <div><h4>Филиалы</h4></div>
         <div>
-            <select class="form-control" name="area_id"
-                    onchange="refreshLidTable()">
+            <select class="form-control" name="area_id">
                 <option value="0">...</option>
                 <xsl:for-each select="//assignment_areas" >
                     <xsl:variable name="areaId" select="id" />
