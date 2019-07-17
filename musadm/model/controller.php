@@ -405,6 +405,14 @@ class Controller
                     $this->properties[] = $Property;
                 }
             }
+        } elseif (is_int($properties)) {
+            if (!is_array($this->properties)) {
+                $this->properties = [];
+            }
+            $Property = Core::factory('Property', $properties);
+            if (!is_null($Property)) {
+                $this->properties[] = $Property;
+            }
         } elseif (is_bool($properties) && $properties === true) {
             $this->properties = Core::factory('Property')->getPropertiesList($this->getObject());
         }
@@ -573,6 +581,12 @@ class Controller
                         if ($Object->getId() == $Value->objectId()) {
                             $objectsPropertiesAssignment[] = $Object->getId();
                             $Object->addEntity($Value, 'property_value');
+                            $objPropName = 'property_' . $Value->propertyId();
+                            if (isset($Object->$objPropName)) {
+                                $Object->$objPropName[] = $Value;
+                            } else {
+                                $Object->$objPropName = [$Value];
+                            }
                         }
                     }
                 }
@@ -580,6 +594,12 @@ class Controller
                 foreach ($Objects as $Object) {
                     if (!in_array($Object->getId(), $objectsPropertiesAssignment)) {
                         $Object->addEntity($Property->makeDefaultValue($Object), 'property_value');
+                        $objPropName = 'property_' . $Property->getId();
+                        if (isset($Object->$objPropName)) {
+                            $Object->$objPropName[] = $Value;
+                        } else {
+                            $Object->$objPropName = [$Value];
+                        }
                     }
                 }
             }
