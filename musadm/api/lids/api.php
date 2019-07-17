@@ -25,6 +25,83 @@ Core::requireClass('Property_Controller');
 Core::requireClass('Schedule_Area_Controller');
 
 
+if ($action === 'getList') {
+    $params = Core_Array::Get('params', [], PARAM_ARRAY);
+
+    //Список основных параметров выборки пользователей
+    $paramSelect = Core_Array::getValue($params, 'select', [], PARAM_ARRAY);
+    $paramFilter = Core_Array::getValue($params, 'filter', [], PARAM_ARRAY);
+    $paramCount  = Core_Array::getValue($params, 'count', null, PARAM_INT);
+    $paramOffset = Core_Array::getValue($params, 'offset', null, PARAM_INT);
+    $paramsOrder = Core_Array::getValue($params, 'order', [], PARAM_ARRAY);
+    $paramsDateFrom = Core_Array::getValue($params, 'date_from', null, PARAM_DATE);
+    $paramsDateTo =   Core_Array::getValue($params, 'date_to', null, PARAM_DATE);
+
+
+    $Controller = new Lid_Controller_Extended(User::current());
+    $Controller->getQueryBuilder()->clearQuery();
+
+    if (!is_null($paramsDateFrom)) {
+        $Controller->periodFrom($paramsDateFrom);
+    }
+    if (!is_null($paramsDateTo)) {
+        $Controller->periodTo($paramsDateTo);
+    }
+
+    foreach ($paramFilter as $paramName => $paramValue) {
+        $Controller->appendFilter($paramName, $paramValue);
+    }
+
+    foreach ($paramsOrder as $field => $order) {
+        $Controller->getQueryBuilder()->orderBy($field, $order);
+    }
+
+    $selectedFields = [];
+    $selectedProperties = [];
+    foreach ($paramSelect as $field) {
+        if (stristr($field, 'property_')) {
+            $selectedProperties[] = substr($field, 9);
+        } else {
+            $selectedFields[] = $field;
+        }
+    }
+    $Controller->getQueryBuilder()->clearSelect()->select($selectedFields);
+    $Controller->properties($selectedProperties);
+
+    if (!is_null($paramCount)) {
+        $Controller->getQueryBuilder()->limit($paramCount);
+    }
+
+    if (!is_null($paramOffset)) {
+        $Controller->getQueryBuilder()->offset($paramOffset);
+    }
+
+    $output = [];
+    foreach ($Controller->getLids() as $Lid) {
+        $stdLid = $Lid->toStd();
+        $stdLid->comments = [];
+        foreach ($Lid->comments as $comment) {
+            $stdLid->comments[] = $comment->toStd();
+        }
+        foreach ($selectedProperties as $propId) {
+            $objPropName = 'property_' . $propId;
+            foreach ($Lid->$objPropName as $propVal) {
+                $stdPropVal = $propVal->toStd();
+                $stdPropVal->value = $propVal->value;
+                if (isset($stdLid->$objPropName)) {
+                    $stdLid->$objPropName[] = $stdPropVal;
+                } else {
+                    $stdLid->$objPropName = [$stdPropVal];
+                }
+            }
+        }
+        $output[] = $stdLid;
+    }
+
+    exit(json_encode($output));
+}
+
+
 /**
  * Получение информации о конкретном лиде
  */

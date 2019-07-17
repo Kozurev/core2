@@ -8,6 +8,28 @@ class Lids {
 
 
     /**
+     *
+     *
+     * @param params
+     * @param callback
+     */
+    static getList(params, callback) {
+        $.ajax({
+            type: 'GET',
+            url: Lids.getApiLink(),
+            dataType: 'json',
+            data: {
+                action: 'getList',
+                params: params
+            },
+            success: function (response) {
+                callback(response);
+            }
+        });
+    }
+
+
+    /**
      * Получение информации о лиде
      *
      * @param id
