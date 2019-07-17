@@ -414,15 +414,14 @@ class Controller
 
 
     /**
-     * @param array $areasIds
+     * @param array $Areas
      * @return $this
      */
-    public function setAreas(array $areasIds)
+    public function setAreas(array $Areas)
     {
         Core::requireClass('Schedule_Area_Controller');
-        foreach ($areasIds as $areaId) {
-            $Area = Schedule_Area_Controller::factory($areaId, true);
-            if (!is_null($Area)) {
+        foreach ($Areas as $Area) {
+            if (!is_null($Area) && !empty($Area->getId())) {
                 $this->areasIds[] = $Area->getId();
             }
         }
