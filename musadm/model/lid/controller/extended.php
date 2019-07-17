@@ -190,7 +190,11 @@ class Lid_Controller_Extended extends Controller
     }
 
 
-
+    /**
+     * Поиск лидов по заданным параметрам
+     *
+     * @return array
+     */
     public function getLids()
     {
         if ($this->isSubordinate()) {
@@ -198,7 +202,7 @@ class Lid_Controller_Extended extends Controller
         }
 
         if ($this->isEnabledPeriodControl()) {
-            if ($this->periodFrom() == $this->periodTo()) {
+            if (($this->periodFrom() == $this->periodTo()) && !empty($this->periodTo())) {
                 $this->appendFilter('control_date', '=', $this->periodFrom());
             } else {
                 if (!empty($this->periodFrom())) {
