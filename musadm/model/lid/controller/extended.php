@@ -79,7 +79,7 @@ class Lid_Controller_Extended extends Controller
         $Lid = new Lid();
         $this->setObject($Lid);
         $this->setQueryBuilder($Lid->queryBuilder());
-        $this->getQueryBuilder()->orderBy('id', 'DESC');
+        $this->getQueryBuilder()->orderBy('priority_id', 'DESC');
         $this->setXsl('musadm/lids/lids.xsl');
     }
 
@@ -262,7 +262,7 @@ class Lid_Controller_Extended extends Controller
 
             foreach ($Lids as $Lid) {
                 $LidComments = Core::factory('Core_Entity')->_entityName('comments');
-
+                $Lid->comments = [];
                 foreach ($Comments as $key => $Comment) {
                     if ($Lid->getId() === $Comment->lidId()) {
                         //Преобразование строки с датой и временем в нормальный формат
@@ -271,6 +271,7 @@ class Lid_Controller_Extended extends Controller
                         $commentDatetime = date('d.m.y H:i', $commentDatetime);
                         $Comment->datetime($commentDatetime);
                         $LidComments->addEntity($Comment);
+                        $Lid->comments[] = $Comment;
                         unset ($Comments[$key]);
                     }
                 }
