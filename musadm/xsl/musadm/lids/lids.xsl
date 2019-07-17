@@ -5,44 +5,59 @@
     <xsl:template match="root">
         <section class="section-bordered">
             <xsl:if test="periods = 1">
-                <div class="row finances-calendar">
-                    <div class="right">
-                        <h4>Период с:</h4>
-                    </div>
+                <form name="filter_lids" id="filter_lids">
+                    <div class="row finances-calendar">
+                        <div class="right">
+                            <h4>Период с:</h4>
+                        </div>
 
-                    <div>
-                        <input type="date" class="form-control" name="date_from" value="{//date_from}"/>
-                    </div>
+                        <div>
+                            <input type="date" class="form-control" name="date_from" value="{//date_from}"/>
+                        </div>
 
-                    <div class="right">
-                        <h4>по:</h4>
-                    </div>
+                        <div class="right">
+                            <h4>по:</h4>
+                        </div>
 
-                    <div>
-                        <input type="date" class="form-control" name="date_to" value="{//date_to}"/>
-                    </div>
+                        <div>
+                            <input type="date" class="form-control" name="date_to" value="{//date_to}"/>
+                        </div>
 
-                    <div>
-                        <a class="btn btn-purple lids_show">Показать</a>
+                        <xsl:call-template name="areas_row" />
+                        <!--<div>-->
+                            <!--<a class="btn btn-purple lids_show">Показать</a>-->
+                        <!--</div>-->
                     </div>
+                    <div class="row buttons-panel center">
+                        <!--<xsl:call-template name="areas_row" />-->
+                        <div>
+                            <input class="form-control" type="number" name="id" placeholder="Номер лида" />
+                        </div>
+                        <div>
+                            <input class="form-control" type="text" name="number" placeholder="Телефон"/>
+                        </div>
 
-                    <xsl:call-template name="areas_row" />
-                </div>
+                        <div class="right">
+                            <h4>Статусы:</h4>
+                        </div>
+                        <div>
+                            <select name="status_id" class="form-control">
+                                <option value="0"> ... </option>
+                                <xsl:for-each select="lid_status">
+                                    <option value="{id}"><xsl:value-of select="title" /></option>
+                                </xsl:for-each>
+                            </select>
+                        </div>
+
+                        <div>
+                            <a class="btn btn-purple lids_search">Показать</a>
+                        </div>
+                    </div>
+                </form>
             </xsl:if>
 
             <xsl:if test="buttons-panel = 1">
                 <div class="row buttons-panel center">
-                    <!--<xsl:call-template name="areas_row" />-->
-                    <div>
-                        <input class="form-control" type="number" id="search_id" placeholder="Номер лида" value="{lid_id}" />
-                    </div>
-                    <div>
-                        <input class="form-control" type="text" id="search_number" placeholder="Телефон" value="{number}" />
-                    </div>
-                    <div>
-                        <a class="btn btn-purple search">Поиск</a>
-                    </div>
-
                     <xsl:if test="//access_lid_create = 1">
                         <div>
                             <a class="btn btn-purple" onclick="makeLidPopup(0)">Создать лида</a>

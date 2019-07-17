@@ -3,81 +3,37 @@ var root = $('#rootdir').val();
 
 $(function () {
     $(document)
-        // .on('click', '.lid_submit', function (e) {
-        //     e.preventDefault();
-        //     loaderOn();
-        //     var data = '';
-        //     data += 'surname=' + $('input[name=surname]').val();
-        //     data += '&comment=' + $('textarea[name=comment]').val();
-        //     data += '&name=' + $('input[name=name]').val();
-        //     data += '&number=' + $('input[name=number]').val();
-        //     data += '&vk=' + $('input[name=vk]').val();
-        //     data += '&status_id=' + $('select[name=status_id]').val();
-        //     data += '&area_id=' + $('select[name=area_id]').val();
-        //     data += '&control_date=' + $('input[name=control_date]').val();
-        //     data += '&source_select=' + $('select[name=source_select]').val();
-        //     data += '&source_input=' + $('input[name=source_input]').val();
-        //     closePopup();
-        //     saveLid(data, refreshLidTable);
-        // })
-        // .on('click', '.add_lid_comment', function (e) {
-        //     e.preventDefault();
-        //     var lidid = $(this).data('lidid');
-        //     getCommentPopup(lidid);
-        // })
-        // .on('click', '.popop_lid_comment_submit', function (e) {
-        //     e.preventDefault();
-        //     loaderOn();
-        //     if ($('#createData').find('textarea').val() == '') {
-        //         closePopup();
-        //         loaderOff();
-        //         return;
-        //     }
-        //     saveData('Main', function (response) {
-        //         refreshLidTable();
-        //     });
-        // })
-        // .on('change', '.lid_status', function () {
-        //     loaderOn();
-        //     var lidid = $(this).data('lidid');
-        //     var statusid = $(this).val();
-        //     changeStatus(lidid, statusid, refreshLidTable);
-        // })
-        // .on('change', '.lid_date', function () {
-        //     loaderOn();
-        //     var lidid = $(this).data('lidid');
-        //     var date = $(this).val();
-        //     changeDate(lidid, date, loaderOff);
-        // })
-        // .on('click', '.lids_show', function () {
-        //     loaderOn();
-        //     refreshLidTable();
-        // })
-        .on('click', '.search', function(e) {
+        .on('click', '.lids_search', function(e) {
             e.preventDefault();
+
             loaderOn();
-            var idInp = $('#search_id');
-            var numberInp = $('#search_number');
-            var lidId = idInp.val();
-            var number = numberInp.val();
-            if (lidId == '' && number == '') {
-                idInp.addClass('error');
-                numberInp.addClass('error');
-                alert('Введите номер лида в соответствующее поле');
+            let filtersForm = $('#filter_lids');
+            let formInputs = filtersForm.find('input, select');
+            let params = {filter: {}};
+
+            $.each(formInputs, function(key, inp){
+                if ($(inp).val() != '' && $(inp).val() != 0) {
+                    if ($(inp).attr('name') == 'date_from' || $(inp).attr('name') == 'date_to') {
+                        params[$(inp).attr('name')] = $(inp).val();
+                    } else {
+                        params.filter[$(inp).attr('name')] = $(inp).val();
+                    }
+                }
+            });
+
+            params.order = {priority_id: 'ASC', id: 'ASC'};
+            params.select = ['property_50', 'property_54'];
+
+            Lids.getList(params, function(lids){
+                let lidsBlock = $('.section-lids').find('.row');
+                lidsBlock.empty();
+                console.log(lids);
+                $.each(lids, function(key, lid){
+                    prependLidCard(lid, lidsBlock);
+                });
                 loaderOff();
-                return false;
-            }
-            findLid(lidId, number);
+            });
         })
-        // .on('change', '.lid-area', function () {
-        //     var areaId = $(this).val();
-        //     var lidId = $(this).data('lid-id');
-        //     updateLidArea(lidId, areaId, function (response) {});
-        // })
-        // .on('click', '.create_lid', function (e) {
-        //     e.preventDefault();
-        //     editLidPopup('');
-        // })
         .on('click', '.show_lid_status', function(e) {
             e.preventDefault();
             var statusesTable = $('.lid_statuses_table');
@@ -251,188 +207,6 @@ function refreshLidTable() {
     });
 }
 
-
-/**
- * Изменение филиала лида
- *
- * @param lidId
- * @param areaId
- * @param func
- */
-// function updateLidArea(lidId, areaId, func) {
-//     $.ajax({
-//         type: 'GET',
-//         url: root + '/lids',
-//         data: {
-//             action: 'updateLidArea',
-//             lid_id: lidId,
-//             area_id: areaId
-//         },
-//         success: function (response) {
-//             if(response != '') {
-//                 notificationError('Ошибка: ' + response);
-//             } else {
-//                 notificationSuccess('Изменения успешно сохранены');
-//             }
-//
-//             func(response);
-//         },
-//         error: function (response) {
-//             notificationError('При изменении филлиала лида произошла ошибка');
-//         }
-//     });
-// }
-
-
-/**
- * Открытие всплывающего окна создания лида
- *
- * @param lidId
- */
-// function editLidPopup(lidId) {
-//     $.ajax({
-//         type: 'GET',
-//         url: root + '/lids',
-//         data: {
-//             action: 'editLidPopup',
-//             lid_id: lidId
-//         },
-//         success: function (response) {
-//             showPopup(response);
-//         }
-//     });
-// }
-
-
-/**
- * Поиск лида по id или номеру телефона
- *
- * @param id - id лида
- * @param phone - номер телефона лида
- */
-function findLid(id, phone) {
-    loaderOn();
-    $.ajax({
-        type: 'GET',
-        url: '',
-        async: false,
-        data: {
-            action: 'refreshLidTable',
-            lidid: id,
-            phone: phone
-        },
-        success: function (response) {
-            $('.lids').html(response);
-            loaderOff();
-        }
-    });
-}
-
-
-/**
- * Открытие всплывающего окна для добавления комментария
- *
- * @param lidid - id лида
- */
-// function getCommentPopup(lidid) {
-//     $.ajax({
-//         type: 'GET',
-//         url: root + '/lids',
-//         data: {
-//             action: 'add_note_popup',
-//             model_id: lidid
-//         },
-//         success: function (responce) {
-//             showPopup(responce);
-//         }
-//     });
-// }
-
-
-/**
- * Сохранение лида
- *
- * @param data - данные формы создания лида
- * @param func - функция, выполняющаяся после сохранения
- */
-// function saveLid(data, func) {
-//     $.ajax({
-//         type: 'GET',
-//         url: root + '/lids?action=save_lid',
-//         async: false,
-//         data: data,
-//         success: function(response) {
-//             if(response != '') {
-//                 notificationError('При сохранении лида произошла ошибка: ' + response);
-//             } else {
-//                 notificationSuccess('Лид успешно сохранен');
-//             }
-//             func();
-//         },
-//         error: function (response) {
-//             notificationError('Ошибка');
-//         }
-//     });
-// }
-
-
-/**
- * Обработчик изменения статуса лида
- *
- * @param lidid - id лида
- * @param statusid - id статуса
- * @param func - функция выполняющаяся после выполнения
- */
-// function changeStatus(lidid, statusid, func) {
-//     $.ajax({
-//         type: 'GET',
-//         url: root + '/lids',
-//         data: {
-//             action: 'changeStatus',
-//             model_id: lidid,
-//             status_id: statusid
-//         },
-//         success: function (response) {
-//             if(response != '') {
-//                 notificationError('Ошибка: ' + response);
-//             } else {
-//                 notificationSuccess('Статус лида успешно изменен');
-//             }
-//
-//             func();
-//         }
-//     });
-// }
-
-
-/**
- * Изменение даты контроля лида
- *
- * @param lidid
- * @param date
- * @param func
- */
-// function changeDate(lidid, date, func) {
-//     $.ajax({
-//         type: 'GET',
-//         url: root + '/lids',
-//         async: false,
-//         data: {
-//             action: 'changeDate',
-//             model_id: lidid,
-//             date: date
-//         },
-//         success: function (response) {
-//             if(response != '') {
-//                 notificationError('Ошибка: ' + response);
-//             } else {
-//                 notificationSuccess('Дата контроля лида успешно изменена на: <br/>' + date);
-//             }
-//
-//             func();
-//         }
-//     });
-// }
 
 
 /**
@@ -697,17 +471,17 @@ function prependLidCard(lid, block) {
                         if (lid.vk != '') {
                             card += '<p class="intro"><span>ВК: </span><span class="vk">'+lid.vk+'</span></p>';
                         }
-                        if (lid.property_54.value != null) {
+                        if (lid.property_54[0].value != '') {
                             card += '<p class="intro"><span>Маркер: </span><span class="marker">'+lid.property_54.value+'</span></p>';
                         }
-                        if (lid.source != '' || lid.property_50.value != null) {
+                        if (lid.source != '' || lid.property_50[0].value != '') {
                             card +=
                                 '<p class="intro"><span>Источник: </span>' +
                                     '<span class="source">';
                                     if (lid.source != '') {
                                         card += lid.source;
                                     } else {
-                                        card += lid.property_50.value;
+                                        card += lid.property_50[0].value;
                                     }
                             card += '</span></p>';
                         }
@@ -845,7 +619,7 @@ function saveLidFrom(form, callback) {
  * @param lid
  */
 function saveLidCallback(lid) {
-    let lidsSection = $('.section-lids'),
+    let lidsSection = $('.section-lids').find('.cards-wrapper'),
         lidCard = $('.lid_' + lid.id);
 
     if (lidCard.length == 0) {
