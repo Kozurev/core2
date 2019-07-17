@@ -40,22 +40,32 @@ class Lids {
      * @param callback
      */
     static getStatusList(callback) {
-        $.ajax({
-            type: 'GET',
-            url: Lids.getApiLink(),
-            dataType: 'json',
-            data: {
-                action: 'getStatusList'
-            },
-            success: function (response) {
-                if (typeof callback == 'function') {
-                    callback(response);
+        let cache = localStorage.getItem('lids.getStatusList');
+        if (cache == null) {
+            $.ajax({
+                type: 'GET',
+                url: Lids.getApiLink(),
+                dataType: 'json',
+                data: {
+                    action: 'getStatusList'
+                },
+                success: function (response) {
+                    if (response.error == undefined && response.status != false) {
+                        localStorage.setItem('lids.getStatusList', JSON.stringify(response));
+                    }
+                    if (typeof callback == 'function') {
+                        callback(response);
+                    }
+                },
+                error: function () {
+                    notificationError('Произзошла ошибка во время поиска статусов лидов');
                 }
-            },
-            error: function () {
-                notificationError('Произзошла ошибка во время поиска статусов лидов');
+            });
+        } else {
+            if (typeof callback == 'function') {
+                callback(JSON.parse(cache));
             }
-        });
+        }
     }
 
 

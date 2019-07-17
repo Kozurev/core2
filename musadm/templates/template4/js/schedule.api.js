@@ -40,14 +40,23 @@ class Schedule {
      */
     static getAreasList(params, callBack) {
         params.action = 'getAreasList';
-        $.ajax({
-            type: 'GET',
-            url: Schedule.getApiLink(),
-            dataType: 'json',
-            data: params,
-            success: function(response) {
-                callBack(response);
-            }
-        });
+        let cache = localStorage.getItem('schedule.getAreasList.areas');
+        let lastCacheParams = localStorage.getItem('schedule.getAreasList.lastParams');
+
+        if (JSON.stringify(params) == lastCacheParams && cache != null) {
+            callBack(JSON.parse(cache));
+        } else {
+            $.ajax({
+                type: 'GET',
+                url: Schedule.getApiLink(),
+                dataType: 'json',
+                data: params,
+                success: function(response) {
+                    localStorage.setItem('schedule.getAreasList.lastParams', JSON.stringify(params));
+                    localStorage.setItem('schedule.getAreasList.areas', JSON.stringify(response));
+                    callBack(response);
+                }
+            });
+        }
     }
 }
