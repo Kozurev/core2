@@ -625,7 +625,7 @@ class Core_Entity extends Core_Entity_Model
      *                          либо метод вернет его в виде строки
      * @return string
      */
-    public function show(bool $isShowing = true) : string
+    public function show(bool $isShowing = true)
     {
         if ($this->xsl() == '') {
             exit ('Не указан путь к XSL шаблону');
