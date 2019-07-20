@@ -1,23 +1,24 @@
 <?php
 
-// if(!class_exists("Structure_Model"))
-// 	include ROOT."/model/structure/structure_model.php";
-
+/**
+ * @author BadWolf
+ * @version 2019-07-20
+ *
+ * Class Structure
+ */
 class Structure extends Structure_Model
 {
 
     /**
      * Возвращает объект родительской структуры
+     *
      * @return Structure | bool
      */
 	public function getParent()
     {
-        if ( $this->parentId() != 0 )
-        {
-            return Core::factory( "Structure", $this->parent_id );
-        }
-        else
-        {
+        if ($this->parentId() != 0) {
+            return Core::factory('Structure', $this->parent_id);
+        } else {
             return null;
         }
     }
@@ -25,14 +26,15 @@ class Structure extends Structure_Model
 
     /**
      * Рекурсивная проверка на принадлежность "$oStructure" древу дочерних структур
-     * @param Structure $oStructure - проверяемый элемент
+     *
+     * @param Structure $Structure - проверяемый элемент
      * @return bool
      */
-    public function isChild( $Structure )
+    public function isChild($Structure)
     {
-        if( $Structure->parentId() == $this->id )  return true;
-        if( $Structure->parentId() == 0 )          return false;
-        return $this->isChild( $Structure->getParent() );
+        if ($Structure->parentId() == $this->getId())   return true;
+        if ($Structure->parentId() == 0)                return false;
+        return $this->isChild($Structure->getParent());
     }
 
 
@@ -45,17 +47,18 @@ class Structure extends Structure_Model
      */
     public function getChildren()
     {
-        $Children = Core::factory( "Structure" )->queryBuilder()
-            ->where( "parent_id", "=", $this->id )
+        $Children = Core::factory('Structure')
+            ->queryBuilder()
+            ->where('parent_id', '=', $this->getId())
             ->findAll();
 
-        if ( count( $Children ) == 0 ) return [];
+        if (empty($Children)) {
+            return [];
+        }
 
         $Result = $Children;
-
-        foreach ( $Children as $ChildStructure )
-        {
-            $Result = array_merge( $Result, $ChildStructure->getChildren( true ) );
+        foreach ($Children as $ChildStructure) {
+            $Result = array_merge($Result, $ChildStructure->getChildren(true));
         }
 
         return $Result;
@@ -65,19 +68,19 @@ class Structure extends Structure_Model
     /**
      * Реализация рекурсивного удаления структур
      */
-    public function delete( $obj = null )
+    public function delete($obj = null)
     {
-        Core::notify( [&$this], "beforeStructureDelete" );
+        Core::notify([&$this], 'before.Structure.delete');
         parent::delete();
-        Core::notify( [&$this], "afterStructureDelete" );
+        Core::notify([&$this], 'after.Structure.delete');
     }
 
 
-    public function save( $obj = null )
+    public function save($obj = null)
     {
-        Core::notify( [&$this], "beforeStructureSave" );
+        Core::notify([&$this], 'before.Structure.save');
         parent::save();
-        Core::notify( [&$this], "afterStructureSave" );
+        Core::notify([&$this], 'after.Structure.save');
     }
 
 

@@ -222,7 +222,7 @@ Core::attachObserver('afterUserAuthorize', function($args) {
 /**
  * Удаление всех связей и значений доп. свойств при удалении объекта структуры
  */
-Core::attachObserver('beforeStructureDelete', function($args) {
+Core::attachObserver('before.Structure.delete', function($args) {
     $Structure = $args[0];
     Core::factory('Property')->clearForObject($Structure);
 });
@@ -240,7 +240,7 @@ Core::attachObserver('beforeItemDelete', function($args) {
 /**
  * Рекурсивное удаление всех дочерних структур и элементов всех уровней вложенности
  */
-Core::attachObserver('beforeStructureDelete', function($args) {
+Core::attachObserver('before.Structure.delete', function($args) {
     $id = $args[0]->getId();
 
     $ChildrenItems = Core::factory('Structure_Item')
@@ -263,7 +263,7 @@ Core::attachObserver('beforeStructureDelete', function($args) {
 /**
  * Проверка на совпадение пути структуры для избежания дублирования пути
  */
-Core::attachObserver('beforeStructureSave', function($args) {
+Core::attachObserver('before.Structure.save', function($args) {
     $Structure = $args[0];
 
     $RootStructure = Core::factory('Structure')
