@@ -72,6 +72,7 @@
         $accessGroups = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_GROUP_READ);
         $accessTasks = Core_Access::instance()->hasCapability(Core_Access::TASK_READ);
         $accessLids = Core_Access::instance()->hasCapability(Core_Access::LID_READ);
+        $accessLidStats = Core_Access::instance()->hasCapability(Core_Access::LID_STATISTIC);
         $accessCertificates = Core_Access::instance()->hasCapability(Core_Access::CERTIFICATE_READ);
         $accessFinances = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_ALL);
         $accessTarifs = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_READ);
@@ -164,8 +165,16 @@
                             }
 
                             //Лиды
-                            if ($accessLids) {
+                            if ($accessLids && !$accessLidStats) {
                                 echo '<li><a href="'.$CFG->rootdir.'/lids">Лиды</a></li>';
+                            } elseif ($accessLids && $accessLidStats) {
+                                echo '<li class="dropdown">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Лиды<span class="caret"></span></a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="'.$CFG->rootdir.'/lids">Общий список</a></li>
+                                            <li><a href="'.$CFG->rootdir.'/lids/statistic">Статистика</a></li>
+                                        </ul>
+                                    </li>';
                             }
 
                             //Сертификаты
