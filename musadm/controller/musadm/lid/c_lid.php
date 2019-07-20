@@ -7,12 +7,12 @@
  * @version 20190324
  */
 
-$OnConsult =        Core::factory('Property')->getByTagName('lid_status_consult');
-$AttendedConsult =  Core::factory('Property')->getByTagName('lid_status_consult_attended');
-$AbsentConsult =    Core::factory('Property')->getByTagName('lid_status_consult_absent');
-$OnConsult =        $OnConsult->getPropertyValues(User::current())[0]->value();
-$AttendedConsult =  $AttendedConsult->getPropertyValues(User::current())[0]->value();
-$AbsentConsult =    $AbsentConsult->getPropertyValues(User::current())[0]->value();
+//$OnConsult =        Core::factory('Property')->getByTagName('lid_status_consult');
+//$AttendedConsult =  Core::factory('Property')->getByTagName('lid_status_consult_attended');
+//$AbsentConsult =    Core::factory('Property')->getByTagName('lid_status_consult_absent');
+//$OnConsult =        $OnConsult->getPropertyValues(User::current())[0]->value();
+//$AttendedConsult =  $AttendedConsult->getPropertyValues(User::current())[0]->value();
+//$AbsentConsult =    $AbsentConsult->getPropertyValues(User::current())[0]->value();
 
 $today = date('Y-m-d');
 
@@ -59,7 +59,7 @@ $LidController
     ->addSimpleEntity(
         'directorid', User::current()->getDirector()->getId()
     )
-    ->addSimpleEntity('lid_status_consult', $OnConsult)
-    ->addSimpleEntity('lid_status_consult_attended', $AttendedConsult)
-    ->addSimpleEntity('lid_status_consult_absent', $AbsentConsult)
+//    ->addSimpleEntity('lid_status_consult', $OnConsult)
+//    ->addSimpleEntity('lid_status_consult_attended', $AttendedConsult)
+//    ->addSimpleEntity('lid_status_consult_absent', $AbsentConsult)
     ->show();
