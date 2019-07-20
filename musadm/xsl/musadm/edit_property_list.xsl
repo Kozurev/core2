@@ -28,7 +28,7 @@
                         <a href="#" class="btn btn-orange btn-large" id="property_list_edit">Изменить</a>
                     </div>
                     <div class="col-lg-6 col-md-8 col-sm-12 col-xs-12">
-                        <a href="#" class="btn btn-red btn-large" id="property_list_delete">Удалить</a>
+                        <a href="#" class="btn btn-red btn-large" id="property_list_delete" data-prop-id="{property/id}">Удалить</a>
                     </div>
                 </div>
             </div>

@@ -8,6 +8,11 @@ class PropertyList {
     };
 
 
+    static clearCache(propId) {
+        localStorage.removeItem('propertyList.getList_' + propId);
+    }
+
+
     /**
      * Формирование списка значений доп. свойства
      *
@@ -16,7 +21,7 @@ class PropertyList {
      */
     static getList(propertyId, callback) {
         let cache = localStorage.getItem('propertyList.getList_' + propertyId);
-        if (cache == null) {
+        if (cache === null) {
             $.ajax({
                 type: 'GET',
                 url: PropertyList.getApiLink(),

@@ -26,6 +26,8 @@ $(function(){
             savePropertyListValue(id, propId, value, function(response) {
                 valueInput.val('');
 
+                PropertyList.clearCache(propId);
+
                 if(saveBtn.data('id') == 0) { //Создание нового элемента
                     var previousOptions = itemsList.html();
                     itemsList.html(
@@ -55,15 +57,15 @@ $(function(){
             $('.btn-cancel-block').css('display', 'none');
             $('#property_list_save').data('id', 0);
             $('#property_list_value').val('');
+            let propId = $(this).data('prop-id');
 
             $.each(options, function(key, option){
                 deletePropertyListValue($(option).val(), function(response){
-                    if(response != '')
-                    {
+                    if(response != '') {
                         alert(response);
                     }
-
                     $(option).remove();
+                    PropertyList.clearCache(propId);
                 });
             });
         })
