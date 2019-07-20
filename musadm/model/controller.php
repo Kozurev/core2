@@ -587,7 +587,7 @@ class Controller
                     foreach ($PropertyValues as $Value) {
                         if ($Object->getId() == $Value->objectId()) {
                             if ($Property->type() == 'list') {
-                                $Value->value = $PropertyList[$Value->value()];
+                                $Value->value = $PropertyList[$Value->value()] ?? 'неизвестно';
                             }
                             $objectsPropertiesAssignment[] = $Object->getId();
                             $Object->addEntity($Value, 'property_value');
