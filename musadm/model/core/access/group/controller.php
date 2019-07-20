@@ -172,6 +172,7 @@ class Core_Access_Group_Controller
                 ->queryBuilder()
                 ->whereIn('group_id', $groupsIds)
                 ->orderBy('group_id', 'ASC')
+                ->orderBy('name', 'ASC')
                 ->findAll();
 
             foreach ($Groups as $Group) {
