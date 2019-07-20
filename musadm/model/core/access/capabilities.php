@@ -17,6 +17,7 @@ return [
     'lid_edit' => 'Изменение лида',
     'lid_delete' => 'Удаление лида',
     'lid_append_comment' => 'Добавление комментария к лиду',
+    'lid_statistic' => 'Просмотр статистики лидов',
 
     'user_read_clients' => 'Просмотр клиентов',
     'user_read_teachers' => 'Просмотр преподавателей',

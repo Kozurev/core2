@@ -35,6 +35,7 @@ class Core_Access
     const LID_EDIT = 'lid_edit';
     const LID_DELETE = 'lid_delete';
     const LID_APPEND_COMMENT = 'lid_append_comment';
+    const LID_STATISTIC = 'lid_statistic';
 
     const SCHEDULE_READ = 'schedule_read';
     const SCHEDULE_CREATE = 'schedule_create';
