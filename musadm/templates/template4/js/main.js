@@ -215,39 +215,15 @@ function updateActive(modelName, modelId, value, func) {
 
 
 /**
- * Сохранение платежа
+ * Аналог PHP функции empty
  *
- * @param userId - id пользователя, к которому привязан платеж
- * @param value - сумма платежа
- * @param description - описание платежа (примечание)
- * @param adminNote - описание платежа (примечание)
- * @param type - тип платежа (зачисление, списание и т.д.)
- * @param url - адрес запроса после root + "/user/" (client || balance)
- * @param func - выполняемая функция по получению ответа от ajax-запроса
+ * @param val
+ * @returns {boolean}
  */
-// function savePayment(userId, value, description, adminNote, type, url, func) {
-//     $.ajax({
-//         type: 'GET',
-//         url: root + '/' + url,
-//         data: {
-//             action: 'savePayment',
-//             userid: userId,
-//             value: value,
-//             type: type,
-//             description: description,
-//             property_26: adminNote
-//         },
-//         success: function(response) {
-//             if(response != '0') {
-//                 notificationError('Ошибка: ' + response);
-//             }
-//             closePopup();
-//             if(typeof func === 'function') {
-//                 func(response);
-//             }
-//         },
-//         error: function(response) {
-//             notificationError('Произошла ошибка при сохранении платежа');
-//         }
-//     });
-// }
+function empty(val) {
+    if (val == undefined || val == 0 || val == '' || val == '0' || val == null) {
+        return true;
+    } else {
+        return false;
+    }
+}
