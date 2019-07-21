@@ -454,7 +454,7 @@ function makeLidPopup(lidId) {
  * @param block
  */
 function prependLidCard(lid, block) {
-    let isSelected;
+    let isSelected, style;
     let card =
         '<div class="item lid_'+lid.id+'">' +
             '<div class="item-inner">' +
@@ -465,26 +465,28 @@ function prependLidCard(lid, block) {
                             '<span class="surname">'+lid.surname+' </span>' +
                             '<span class="name">'+lid.name+' </span>' +
                         '</h3>';
-                        if (lid.number != '') {
-                            card += '<p class="intro"><span>Телефон: </span><span class="number">'+lid.number+'</span></p>';
+
+                        style = lid.number == '' ? 'style="display:none"' : '';
+                        card += '<p class="intro" '+style+'><span>Телефон: </span><span class="number">'+lid.number+'</span></p>';
+
+                        style = lid.vk == '' ? 'style="display:none"' : '';
+                        card += '<p class="intro" '+style+'><span>ВК: </span><span class="vk">'+lid.vk+'</span></p>';
+
+                        style = empty(lid.property_54[0].value_id) ? 'style="display:none"' : '';
+                        card += '<p class="intro" '+style+'><span>Маркер: </span><span class="marker">'+lid.property_54[0].value+'</span></p>';
+
+                        style = empty(lid.source) && empty(lid.property_50[0].value_id) ? 'style="display:none"' : '';
+                        let source = '';
+                        if (!empty(lid.source) || !empty(lid.property_50[0].value_id)) {
+                            if (lid.source != '') {
+                                source = lid.soukrce;
+                            } else {
+                                console.log(lid.property_50[0].value);
+                                source = lid.property_50[0].value;
+                            }
                         }
-                        if (lid.vk != '') {
-                            card += '<p class="intro"><span>ВК: </span><span class="vk">'+lid.vk+'</span></p>';
-                        }
-                        if (lid.property_54[0].value != '') {
-                            card += '<p class="intro"><span>Маркер: </span><span class="marker">'+lid.property_54.value+'</span></p>';
-                        }
-                        if (lid.source != '' || lid.property_50[0].value != '') {
-                            card +=
-                                '<p class="intro"><span>Источник: </span>' +
-                                    '<span class="source">';
-                                    if (lid.source != '') {
-                                        card += lid.source;
-                                    } else {
-                                        card += lid.property_50[0].value;
-                                    }
-                            card += '</span></p>';
-                        }
+                        card += '<p class="intro" '+style+'><span>Источник: </span><span class="source">'+source+'</span></p>';
+
         card +=
                         '<input type="date" class="form-control date_inp lid_date" onchange="Lids.changeDate('+lid.id+', this.value)" value="'+lid.control_date+'">' +
                         '<select name="status" class="form-control lid_status" onchange="Lids.changeStatus('+lid.id+', this.value, changeLidStatusCallback)">' +
@@ -621,7 +623,7 @@ function saveLidFrom(form, callback) {
 function saveLidCallback(lid) {
     let lidsSection = $('.section-lids').find('.cards-wrapper'),
         lidCard = $('.lid_' + lid.id);
-
+console.log(lid);
     if (lidCard.length == 0) {
         prependLidCard(lid, lidsSection);
     } else {
@@ -647,23 +649,23 @@ function saveLidCallback(lid) {
         }
 
         let marker = lidCard.find('.marker');
-        if (lid.property_54.value_id == 0) {
+        if (lid.property_54[0].value_id == 0) {
             marker.empty();
             marker.parent().hide();
         } else {
-            marker.text(lid.property_54.value);
+            marker.text(lid.property_54[0].value);
             marker.parent().show();
         }
 
         let source = lidCard.find('.source');
-        if (lid.source == '' && lid.property_50.value_id == 0) {
+        if (lid.source == '' && lid.property_50[0].value_id == 0) {
             source.empty();
             source.parent().hide();
         } else {
             if (lid.source != '') {
                 source.text(lid.source);
             } else {
-                source.text(lid.property_50.value);
+                source.text(lid.property_50[0].value);
             }
             source.parent().show();
         }

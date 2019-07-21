@@ -81,7 +81,14 @@ if ($action === 'getList') {
         $stdLid = $Lid->toStd();
         $stdLid->comments = [];
         foreach ($Lid->comments as $comment) {
-            $stdLid->comments[] = $comment->toStd();
+            $stdComment = $comment->toStd();
+            $CommentAuthor = User_Controller::factory($comment->authorId());
+            $stdComment->authorFio = $CommentAuthor->surname() . ' ' . $CommentAuthor->name();
+            $commentDatetime = $comment->datetime();
+            $commentDatetime = strtotime($commentDatetime);
+            $commentDatetime = date('d.m.y H:i', $commentDatetime);
+            $stdComment->refactoredDatetime = $commentDatetime;
+            $stdLid->comments[] = $stdComment;
         }
         foreach ($selectedProperties as $propId) {
             $objPropName = 'property_' . $propId;
@@ -226,23 +233,25 @@ if ($action === 'save') {
     //Сохранение источника лида
     $LidSourceProperty = Property_Controller::factoryByTag('lid_source');
     $lidSourceId = Core_Array::Post('property_50', (int)$LidSourceProperty->defaultValue(), PARAM_INT);
+    $response->property_50 = [];
+    $response->property_54 = [];
     if ($lidSourceId != $LidSourceProperty->defaultValue()) {
         if (is_null($id)) {
             $NewSourceVal = $LidSourceProperty->addNewValue($Lid, $lidSourceId);
-            $response->property_50 = $NewSourceVal->toStd();
+            $response->property_50[] = $NewSourceVal->toStd();
         } else {
             $ExistingLidSourceVal = $LidSourceProperty->getValues($Lid)[0];
             $ExistingLidSourceVal->value($lidSourceId)->save();
-            $response->property_50 = $ExistingLidSourceVal->toStd();
+            $response->property_50[] = $ExistingLidSourceVal->toStd();
         }
     } else {
         $ExistingLidSourceVal = $LidSourceProperty->getValues($Lid);
         if (!empty($ExistingLidSourceVal[0]->getId())) {
             $ExistingLidSourceVal[0]->delete();
         }
-        $response->property_50 = $LidSourceProperty->makeDefaultValue($Lid)->toStd();
+        $response->property_50[] = $LidSourceProperty->makeDefaultValue($Lid)->toStd();
     }
-    $response->property_50->value = Property_Controller::factoryListValue($response->property_50->value_id)->value();
+    $response->property_50[0]->value = Property_Controller::factoryListValue($response->property_50[0]->value_id)->value();
 
     //Сохранение маркера лида
     $LidMarkerProperty = Property_Controller::factoryByTag('lid_marker');
@@ -250,20 +259,20 @@ if ($action === 'save') {
     if ($lidMarkerId != $LidMarkerProperty->defaultValue()) {
         if (is_null($id)) {
             $NewMarkerVal = $LidMarkerProperty->addNewValue($Lid, $lidMarkerId);
-            $response->property_54 = $NewMarkerVal->toStd();
+            $response->property_54[] = $NewMarkerVal->toStd();
         } else {
             $ExistingLidMarkerVal = $LidMarkerProperty->getValues($Lid)[0];
             $ExistingLidMarkerVal->value($lidMarkerId)->save();
-            $response->property_54 = $ExistingLidMarkerVal->toStd();
+            $response->property_54[] = $ExistingLidMarkerVal->toStd();
         }
     } else {
         $ExistingLidMarkerVal = $LidMarkerProperty->getValues($Lid);
         if (!empty($ExistingLidMarkerVal[0]->getId())) {
             $ExistingLidMarkerVal[0]->delete();
         }
-        $response->property_54 = $LidMarkerProperty->makeDefaultValue($Lid)->toStd();
+        $response->property_54[] = $LidMarkerProperty->makeDefaultValue($Lid)->toStd();
     }
-    $response->property_54->value = Property_Controller::factoryListValue($response->property_54->value_id)->value();
+    $response->property_54[0]->value = Property_Controller::factoryListValue($response->property_54[0]->value_id)->value();
 
     exit(json_encode($response));
 }
