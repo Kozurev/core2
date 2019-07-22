@@ -25,6 +25,7 @@ class PropertyList {
             $.ajax({
                 type: 'GET',
                 url: PropertyList.getApiLink(),
+                async: false,
                 dataType: 'json',
                 data: {
                     action: 'getList',

@@ -7,6 +7,11 @@ class Lids {
     };
 
 
+    static clearCache() {
+        localStorage.removeItem('lids.getStatusList');
+    }
+
+
     /**
      *
      *
@@ -67,6 +72,7 @@ class Lids {
             $.ajax({
                 type: 'GET',
                 url: Lids.getApiLink(),
+                async: false,
                 dataType: 'json',
                 data: {
                     action: 'getStatusList'

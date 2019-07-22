@@ -7,6 +7,11 @@ class Schedule {
     };
 
 
+    static clearCache() {
+        localStorage.removeItem('schedule.getAreasList.areas');
+        localStorage.removeItem('schedule.getAreasList.lastParams');
+    }
+
 
     /**
      * Проверка на существование периода отсутствия у клиента на определенную дату
@@ -49,6 +54,7 @@ class Schedule {
             $.ajax({
                 type: 'GET',
                 url: Schedule.getApiLink(),
+                async: false,
                 dataType: 'json',
                 data: params,
                 success: function(response) {
