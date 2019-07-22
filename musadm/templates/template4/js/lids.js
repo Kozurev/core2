@@ -3,37 +3,6 @@ var root = $('#rootdir').val();
 
 $(function () {
     $(document)
-        .on('click', '.lids_search', function(e) {
-            e.preventDefault();
-
-            loaderOn();
-            let filtersForm = $('#filter_lids');
-            let formInputs = filtersForm.find('input, select');
-            let params = {filter: {}};
-
-            $.each(formInputs, function(key, inp){
-                if ($(inp).val() != '' && $(inp).val() != 0) {
-                    if ($(inp).attr('name') == 'date_from' || $(inp).attr('name') == 'date_to') {
-                        params[$(inp).attr('name')] = $(inp).val();
-                    } else {
-                        params.filter[$(inp).attr('name')] = $(inp).val();
-                    }
-                }
-            });
-
-            params.order = {priority_id: 'ASC', id: 'ASC'};
-            params.select = ['property_50', 'property_54'];
-
-            Lids.getList(params, function(lids){
-                let lidsBlock = $('.section-lids').find('.row');
-                lidsBlock.empty();
-                console.log(lids);
-                $.each(lids, function(key, lid){
-                    prependLidCard(lid, lidsBlock);
-                });
-                loaderOff();
-            });
-        })
         .on('click', '.show_lid_status', function(e) {
             e.preventDefault();
             var statusesTable = $('.lid_statuses_table');
@@ -303,7 +272,59 @@ function deleteLidStatus(id, callback) {
 /*--------------------------------------Новые обработчики--------------------------------------*/
 /*---------------------------------------------------------------------------------------------*/
 $(function(){
+    $('body')
+        //Обработчик события поиска лидов по заданным параметрам
+        .on('click', '.lids_search', function(e) {
+            e.preventDefault();
+            loaderOn();
+            let filtersForm = $('#filter_lids');
+            let formInputs = filtersForm.find('input, select');
+            let params = {filter: {}};
 
+            $.each(formInputs, function(key, inp){
+                if ($(inp).val() != '' && $(inp).val() != 0) {
+                    if ($(inp).attr('name') == 'date_from' || $(inp).attr('name') == 'date_to') {
+                        params[$(inp).attr('name')] = $(inp).val();
+                    } else {
+                        params.filter[$(inp).attr('name')] = $(inp).val();
+                    }
+                }
+            });
+
+            params.order = {priority_id: 'ASC', id: 'ASC'};
+            params.select = ['property_50', 'property_54'];
+
+            Lids.clearCache();
+            Schedule.clearCache();
+
+            Lids.getList(params, function(lids){
+                let lidsBlock = $('.section-lids').find('.row');
+                lidsBlock.empty();
+                $.each(lids, function(key, lid){
+                    prependLidCard(lid, lidsBlock);
+                });
+                loaderOff();
+            });
+        })
+        //Обновление данных страницы аналитики лидов
+        .on('click', '.lids_statistic_show', function(e){
+            e.preventDefault();
+            loaderOn();
+            let formData = $('#filter_lids_statistic').serialize();
+            $.ajax({
+                type: 'GET',
+                url: root + '/lids/statistic?action=refresh',
+                data: formData,
+                success: function (response) {
+                    $('.lids').html(response);
+                    loaderOff();
+                },
+                error: function () {
+                    notificationError('Произошла ошибка');
+                    loaderOff();
+                }
+            });
+        });
 });
 
 
@@ -481,7 +502,7 @@ function prependLidCard(lid, block) {
                             if (lid.source != '') {
                                 source = lid.soukrce;
                             } else {
-                                console.log(lid.property_50[0].value);
+                                //console.log(lid.property_50[0].value);
                                 source = lid.property_50[0].value;
                             }
                         }
@@ -623,7 +644,7 @@ function saveLidFrom(form, callback) {
 function saveLidCallback(lid) {
     let lidsSection = $('.section-lids').find('.cards-wrapper'),
         lidCard = $('.lid_' + lid.id);
-console.log(lid);
+
     if (lidCard.length == 0) {
         prependLidCard(lid, lidsSection);
     } else {

@@ -1,0 +1,39 @@
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:xsk="http://www.w3.org/1999/XSL/Transform">
+
+    <xsl:template match="root">
+        <xsl:for-each select="table">
+            <section>
+                <table class="table table-hover table-striped table-bordered sortingTable">
+                    <thead>
+                        <tr>
+                            <th><xsl:value-of select="title" /></th>
+                            <xsl:for-each select="/root/lid_status">
+                                <th class="center"><xsl:value-of select="title" /></th>
+                            </xsl:for-each>
+                            <th class="right">Всего</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <xsl:apply-templates select="val" />
+                    </tbody>
+                </table>
+            </section>
+        </xsl:for-each>
+    </xsl:template>
+
+
+    <xsl:template match="val">
+        <tr>
+            <td><xsl:value-of select="title" /></td>
+            <xsl:apply-templates select="status" />
+            <td class="right"><xsl:value-of select="total_count" /></td>
+        </tr>
+    </xsl:template>
+
+
+    <xsl:template match="status">
+        <td class="center"><xsl:value-of select="count_lids" /></td>
+    </xsl:template>
+
+</xsl:stylesheet>
