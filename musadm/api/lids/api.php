@@ -48,8 +48,15 @@ if ($action === 'getList') {
         $Controller->periodTo($paramsDateTo);
     }
 
+    $filterStrictFor = ['status_id', 'area_id'];
     foreach ($paramFilter as $paramName => $paramValue) {
-        $Controller->appendFilter($paramName, $paramValue);
+        if (!in_array($paramName, $filterStrictFor)) {
+            $Controller->appendFilter($paramName, $paramValue);
+        } else {
+            $Controller->setFilterType(Lid_Controller_Extended::FILTER_STRICT);
+            $Controller->appendFilter($paramName, $paramValue);
+            $Controller->setFilterType(Lid_Controller_Extended::FILTER_NOT_STRICT);
+        }
     }
 
     foreach ($paramsOrder as $field => $order) {
