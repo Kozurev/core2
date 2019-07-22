@@ -56,9 +56,9 @@ $LidController
     ->addSimpleEntity(
         'is-director', User::checkUserAccess(['groups' => [ROLE_DIRECTOR]]) ? 1 : 0
     )
-    ->addSimpleEntity(
-        'directorid', User::current()->getDirector()->getId()
-    )
+//    ->addSimpleEntity(
+//        'directorid', User::current()->getDirector()->getId()
+//    )
 //    ->addSimpleEntity('lid_status_consult', $OnConsult)
 //    ->addSimpleEntity('lid_status_consult_attended', $AttendedConsult)
 //    ->addSimpleEntity('lid_status_consult_absent', $AbsentConsult)
