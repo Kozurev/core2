@@ -1,5 +1,5 @@
 .page {
-	width: 90% !important
+	width: 100% !important
 }
 
 .schedule {
@@ -15,11 +15,6 @@
 	margin-bottom: 1px;
 }
 
-/*.schedule .teacher_footer {*/
-	/*font-size: 17px;*/
-	/*text-align: center;*/
-/*}*/
-
 .schedule table .schedule_class:hover {
 	cursor: pointer;
 }
@@ -30,11 +25,8 @@
 }
 
 .schedule .table-responsive {
-	overflow-x: inherit;
+	overflow-x: scroll;
 }
-
-/*.schedule .teacher_payments_block::-webkit-scrollbar { width: 0; }*/
-/*.schedule .teacher_payments_block { -ms-overflow-style: none; }*/
 
 /**
  * Таблица >>

@@ -4,6 +4,7 @@
  *
  * @author BadWolf
  * @date 08.05.2018 14:37
+ * @version 2019-07-22
  */
 
 function array_pop_lesson($Lessons, $time, $classId)
@@ -52,18 +53,23 @@ function updateLastLessonTime($Lesson, &$maxTime, $time, $period)
 
 /**
  * Получение данных о занятии
- * @param $oLesson
+ *
+ * @param $Lesson
  * @return array
  */
 function getLessonData($Lesson)
 {
+    Core::requireClass('Property_Controller');
+    Core::requireClass('Schedule_Lesson');
+    Core::requireClass('Lid_Controller');
+
     $output = [
         'client'    =>  '',
         'teacher'   =>  '',
         'client_status' =>  '',
     ];
 
-    if ($Lesson->typeId() == 2) {
+    if ($Lesson->typeId() == Schedule_Lesson::TYPE_GROUP) {
         $Group = $Lesson->getGroup();
 
         if ($Lesson->teacherId() == 0) {
@@ -84,7 +90,7 @@ function getLessonData($Lesson)
             $output['client'] = $Group->title();
             $output['client_status'] = 'group';
         }
-    } elseif ($Lesson->typeId() == 1) {
+    } elseif ($Lesson->typeId() == Schedule_Lesson::TYPE_INDIV) {
         $Teacher = $Lesson->getTeacher();
         $Client = $Lesson->getClient();
 
@@ -94,26 +100,23 @@ function getLessonData($Lesson)
         if (!$Client->getId()) {
             $output['client_status'] = 'neutral';
         } else {
-            $countPrivateLessons = Core::factory('Property', 13)
-                ->getPropertyValues($Client)[0]->value();
-            $countGroupLessons = Core::factory('Property', 14)
-                ->getPropertyValues($Client)[0]->value();
+            $countPrivateLessons = Property_Controller::factoryByTag('indiv_lessons')->getValues($Client)[0]->value();
+            $countGroupLessons = Property_Controller::factoryByTag('group_lessons')->getValues($Client)[0]->value();
 
-            if ( $countGroupLessons < 0 || $countPrivateLessons < 0 ) {
+            if ($countGroupLessons < 0 || $countPrivateLessons < 0) {
                 $output['client_status'] = 'negative';
-            } elseif ( $countPrivateLessons > 1 || $countGroupLessons > 1 ) {
+            } elseif ($countPrivateLessons > 1 || $countGroupLessons > 1) {
                 $output['client_status'] = 'positive';
             } else {
                 $output['client_status'] = 'neutral';
             }
 
-            $vk = Core::factory('Property', 9)
-                ->getPropertyValues($Client)[0]->value();
+            $vk = Property_Controller::factoryByTag('vk')->getValues($Client)[0]->value();
             if ($vk != '') {
                 $output['client_status'] .= ' vk';
             }
         }
-    } elseif ( $Lesson->typeId() == 3 ) {
+    } elseif ($Lesson->typeId() == Schedule_Lesson::TYPE_CONSULT) {
         $Teacher = $Lesson->getTeacher();
         $output['teacher'] = $Teacher->surname() . ' ' . $Teacher->name();
         $output['client'] = 'Консультация';
@@ -121,6 +124,18 @@ function getLessonData($Lesson)
 
         if ($Lesson->clientId() != 0) {
             $output['client'] .= ' ' . $Lesson->clientId();
+            $Lid = Lid_Controller::factory($Lesson->clientId());
+            if (!is_null($Lid)) {
+                if (!empty($Lid->surname())) {
+                    $output['client'] .= ' ' . $Lid->surname();
+                }
+                if (!empty($Lid->name())) {
+                    $output['client'] .= ' ' . $Lid->name();
+                }
+                if (!empty($Lid->number())) {
+                    $output['client'] .= ' ' . $Lid->number();
+                }
+            }
         }
     }
 

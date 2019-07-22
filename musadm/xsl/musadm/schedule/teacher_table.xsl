@@ -50,7 +50,26 @@
                             <label for="attendance_{$lidId}">
                                 Консультация
                                 <xsl:if test="client_id != 0">
+                                    <!--<xsl:apply-templates select="client" />-->
                                     <xsl:value-of select="client_id" />
+
+                                    <xsl:if test="client/name != '' or client/surname != '' or client/number != ''">
+                                        <xsl:text> (</xsl:text>
+                                        <xsl:if test="client/surname != ''">
+                                            <xsl:value-of select="client/surname" />
+                                            <xsl:text> </xsl:text>
+                                        </xsl:if>
+
+                                        <xsl:if test="client/name != ''">
+                                            <xsl:value-of select="client/name" />
+                                            <xsl:text> </xsl:text>
+                                        </xsl:if>
+
+                                        <xsl:if test="client/number != ''">
+                                            <xsl:value-of select="client/number" />
+                                        </xsl:if>
+                                        <xsl:text>)</xsl:text>
+                                    </xsl:if>
                                 </xsl:if>
                             </label>
                         </xsl:when>
