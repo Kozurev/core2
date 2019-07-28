@@ -157,6 +157,14 @@ class Controller
     protected $foundObjectsIds = [];
 
 
+    /**
+     * Массив найденных объектов
+     *
+     * @var array
+     */
+    protected $foundObjects = [];
+
+
 
     /**
      * @param Orm $QueryBuilder
@@ -224,19 +232,18 @@ class Controller
      * @param null $searchingValue
      * @return $this
      */
-    public function appendFilter(string $paramName, $condition, $searchingValue = null)
+    public function appendFilter(string $paramName, $searchingValue, $condition = null, $type = null)
     {
-        if (is_null($searchingValue)) {
-            $searchingValue = $condition;
-            $condition = null;
+        if (is_null($type)) {
+            $type = $this->getFilterType();
         }
 
         if (is_array($searchingValue)) {
             $this->QueryBuilder->whereIn($paramName, $searchingValue);
         } else {
-            if (is_null($condition) && $this->filterType == self::FILTER_STRICT) {
+            if (is_null($condition) && $type == self::FILTER_STRICT) {
                 $this->QueryBuilder->where($paramName, '=', $searchingValue);
-            } elseif (is_null($condition) && $this->filterType == self::FILTER_NOT_STRICT) {
+            } elseif (is_null($condition) && $type == self::FILTER_NOT_STRICT) {
                 $this->QueryBuilder
                     ->open()
                     ->where($paramName, '=', $searchingValue)
@@ -459,10 +466,8 @@ class Controller
 
     /**
      * Фильтрация уже найденных объектов по значениям доп. свойств
-     *
-     * @param array $foundObjects
      */
-    protected function addFilterExecute(array &$foundObjects)
+    protected function addFilterExecute()
     {
         foreach ($this->addFilter as $propertyId => $filterParams) {
             $NewQueryBuilder = $this->Object->queryBuilder()->clearQuery();
@@ -547,22 +552,19 @@ class Controller
             }
         }
 
-        foreach ($foundObjects as $key => $foundObject) {
+        foreach ($this->foundObjects as $key => $foundObject) {
             if (!in_array($foundObject->getId(), $this->foundObjectsIds)) {
-                unset($foundObjects[$key]);
+                unset($this->foundObjects[$key]);
             }
         }
-        $foundObjects = array_values($foundObjects);
-        //return $foundObjects;
+        $this->foundObjects = array_values($this->foundObjects);
     }
 
 
     /**
      * Подгрузка значений доп. свойств к объектам
-     *
-     * @param array $Objects
      */
-    public function addPropValues(array &$Objects)
+    public function addPropValues()
     {
         if (is_array($this->properties) && count($this->properties) > 0) {
             foreach ($this->properties as $Property) {
@@ -575,6 +577,7 @@ class Controller
                     ->orderBy('object_id', 'DESC')
                     ->findAll();
 
+                //Поиск
                 if ($Property->type() == 'list') {
                     $PropertyList = [];
                     foreach ($Property->getList() as $item) {
@@ -583,7 +586,7 @@ class Controller
                 }
 
                 $objectsPropertiesAssignment = []; //Массив идентификаторов объектов, к которым найдено значение доп. свойства
-                foreach ($Objects as $Object) {
+                foreach ($this->foundObjects as $Object) {
                     foreach ($PropertyValues as $Value) {
                         if ($Object->getId() == $Value->objectId()) {
                             if ($Property->type() == 'list') {
@@ -601,7 +604,7 @@ class Controller
                     }
                 }
 
-                foreach ($Objects as $Object) {
+                foreach ($this->foundObjects as $Object) {
                     if (!in_array($Object->getId(), $objectsPropertiesAssignment)) {
                         $Value = $Property->makeDefaultValue($Object);
                         if ($Property->type() == 'list') {
@@ -615,9 +618,9 @@ class Controller
                             $Object->$objPropName = [$Value];
                         }
                     }
-                }
-            }
-        }
+                } //end foreach
+            } //end properties foreach
+        } //end condition properties exists
     }
 
 
