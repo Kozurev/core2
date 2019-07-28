@@ -165,16 +165,16 @@
                             }
 
                             //Лиды
-                            if ($accessLids && !$accessLidStats) {
-                                echo '<li><a href="'.$CFG->rootdir.'/lids">Лиды</a></li>';
-                            } elseif ($accessLids && $accessLidStats) {
+                            if ($accessLids) {
                                 echo '<li class="dropdown">
                                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">Лиды<span class="caret"></span></a>
                                         <ul class="dropdown-menu">
                                             <li><a href="'.$CFG->rootdir.'/lids">Общий список</a></li>
-                                            <li><a href="'.$CFG->rootdir.'/lids/statistic">Статистика</a></li>
-                                        </ul>
-                                    </li>';
+                                            <li><a href="'.$CFG->rootdir.'/lids/consults">Консультации</a></li>';
+                                    if ($accessLidStats) {
+                                        echo '<li><a href="' . $CFG->rootdir . '/lids/statistic">Статистика</a></li>';
+                                    }
+                                echo '</ul></li>';
                             }
 
                             //Сертификаты
