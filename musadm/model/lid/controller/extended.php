@@ -230,11 +230,11 @@ class Lid_Controller_Extended extends Controller
         if (count($this->areasIds) > 0) {
             if ($this->isEnableCommonLids == true) {
                 $this->QueryBuilder->open()
-                    ->where('area_id', '=', 0)
-                    ->orWhereIn('area_id', $this->areasIds)
+                    ->where('Lid.area_id', '=', 0)
+                    ->orWhereIn('Lid.area_id', $this->areasIds)
                     ->close();
             } else {
-                $this->QueryBuilder->whereIn('area_id', $this->areasIds);
+                $this->QueryBuilder->whereIn('Lid.area_id', $this->areasIds);
             }
         }
 
