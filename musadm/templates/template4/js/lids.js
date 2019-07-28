@@ -278,18 +278,7 @@ $(function(){
             e.preventDefault();
             loaderOn();
             let filtersForm = $('#filter_lids');
-            //let formInputs = filtersForm.find('input, select');
             let params = {filter: {}};
-
-            // $.each(formInputs, function(key, inp){
-            //     if ($(inp).val() != '' && $(inp).val() != 0) {
-            //         if ($(inp).attr('name') == 'date_from' || $(inp).attr('name') == 'date_to') {
-            //             params[$(inp).attr('name')] = $(inp).val();
-            //         } else {
-            //             params.filter[$(inp).attr('name')] = $(inp).val();
-            //         }
-            //     }
-            // });
 
             let periodFrom = filtersForm.find('input[name=date_from]').val();
             let periodTo = filtersForm.find('input[name=date_to]').val();
@@ -533,10 +522,20 @@ function prependLidCard(lid, block) {
                         '</h3>';
 
                         style = lid.number == '' ? 'style="display:none"' : '';
-                        card += '<p class="intro" '+style+'><span>Телефон: </span><span class="number">'+lid.number+'</span></p>';
+                        card += '<p class="intro" '+style+'><span class="number">'+lid.number+'</span></p>';
 
                         style = lid.vk == '' ? 'style="display:none"' : '';
                         card += '<p class="intro" '+style+'><span>ВК: </span><span class="vk">'+lid.vk+'</span></p>';
+        card +=
+                        '<input type="date" class="form-control date_inp lid_date" onchange="Lids.changeDate('+lid.id+', this.value)" value="'+lid.control_date+'">' +
+                        '<select name="status" class="form-control lid_status" onchange="Lids.changeStatus('+lid.id+', this.value, changeLidStatusCallback)">' +
+                            '<option value="0"> ... </option>' +
+                        '</select>' +
+                        '<select class="form-control lid-area" onchange="Lids.changeArea('+lid.id+', this.value)">' +
+                            '<option value="0"> ... </option>' +
+                        '</select>' +
+                        '<select class="form-control lid_priority" onchange="Lids.changePriority('+lid.id+', this.value)">' +
+                        '</select>';
 
                         style = empty(lid.property_54[0].value_id) ? 'style="display:none"' : '';
                         card += '<p class="intro" '+style+'><span>Маркер: </span><span class="marker">'+lid.property_54[0].value+'</span></p>';
@@ -547,22 +546,12 @@ function prependLidCard(lid, block) {
                             if (lid.source != '') {
                                 source = lid.soukrce;
                             } else {
-                                //console.log(lid.property_50[0].value);
                                 source = lid.property_50[0].value;
                             }
                         }
                         card += '<p class="intro" '+style+'><span>Источник: </span><span class="source">'+source+'</span></p>';
 
         card +=
-                        '<input type="date" class="form-control date_inp lid_date" onchange="Lids.changeDate('+lid.id+', this.value)" value="'+lid.control_date+'">' +
-                        '<select name="status" class="form-control lid_status" onchange="Lids.changeStatus('+lid.id+', this.value, changeLidStatusCallback)">' +
-                            '<option value="0"> ... </option>' +
-                        '</select>' +
-                        '<select class="form-control lid-area" onchange="Lids.changeArea('+lid.id+', this.value)">' +
-                            '<option value="0"> ... </option>' +
-                        '</select>' +
-                        '<select class="form-control lid_priority" onchange="Lids.changePriority('+lid.id+', this.value)">' +
-                        '</select>' +
                         '<a class="action edit" onclick="makeLidPopup('+lid.id+')" title="Редактировать лида"></a>' +
                         '<a class="action comment" title="Добавить комментарий" onclick="makeLidCommentPopup(0, '+lid.id+', saveLidCommentCallback)"></a>' +
                     '</div>' +

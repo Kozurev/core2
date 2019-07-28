@@ -18,7 +18,7 @@
                             <xsl:if test="number = ''">
                                 <xsl:attribute name="style">display:none</xsl:attribute>
                             </xsl:if>
-                            <span>Телефон: </span><span class="number"><xsl:value-of select="number" /></span>
+                            <span class="number"><xsl:value-of select="number" /></span>
                         </p>
 
                         <p class="intro">
@@ -26,34 +26,6 @@
                                 <xsl:attribute name="style">display:none</xsl:attribute>
                             </xsl:if>
                             <span>ВК: </span><span class="vk"><xsl:value-of select="vk" /></span>
-                        </p>
-
-
-                        <p class="intro">
-                            <xsl:if test="property_value[property_id = 54]/value_id = 0">
-                                <xsl:attribute name="style">display:none</xsl:attribute>
-                            </xsl:if>
-                            <xsl:variable name="markerId" select="property_value[property_id = 54]/value_id" />
-                            <span>Маркер: </span><span class="marker"><xsl:value-of select="//property_list_values[id=$markerId]/value" /></span>
-                        </p>
-
-                        <xsl:variable name="source">
-                            <xsl:choose>
-                                <xsl:when test="property_value[property_id = 50]/value_id > 0">
-                                    <xsl:variable name="sourceId" select="property_value[property_id = 50]/value_id" />
-                                    <xsl:value-of select="//property_list_values[id=$sourceId]/value" />
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:value-of select="source" />
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </xsl:variable>
-
-                        <p class="intro">
-                            <xsl:if test="$source = ''">
-                                <xsl:attribute name="style">display:none</xsl:attribute>
-                            </xsl:if>
-                            <span>Источник: </span><span  class="source"><xsl:value-of select="$source" /></span>
                         </p>
 
                         <input type="date" class="form-control date_inp lid_date" onchange="Lids.changeDate({id}, this.value)">
@@ -107,6 +79,33 @@
                                 </option>
                             </xsl:for-each>
                         </select>
+
+                        <p class="intro">
+                            <xsl:if test="property_value[property_id = 54]/value_id = 0">
+                                <xsl:attribute name="style">display:none</xsl:attribute>
+                            </xsl:if>
+                            <xsl:variable name="markerId" select="property_value[property_id = 54]/value_id" />
+                            <span>Маркер: </span><span class="marker"><xsl:value-of select="//property_list_values[id=$markerId]/value" /></span>
+                        </p>
+
+                        <xsl:variable name="source">
+                            <xsl:choose>
+                                <xsl:when test="property_value[property_id = 50]/value_id > 0">
+                                    <xsl:variable name="sourceId" select="property_value[property_id = 50]/value_id" />
+                                    <xsl:value-of select="//property_list_values[id=$sourceId]/value" />
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="source" />
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:variable>
+
+                        <p class="intro">
+                            <xsl:if test="$source = ''">
+                                <xsl:attribute name="style">display:none</xsl:attribute>
+                            </xsl:if>
+                            <span>Источник: </span><span  class="source"><xsl:value-of select="$source" /></span>
+                        </p>
 
                         <xsl:if test="/root/access_lid_edit = 1">
                             <a class="action edit" onclick="makeLidPopup({id})" title="Редактировать лида"><input type="hidden" value="KOCTb|J|b" /></a>
