@@ -278,18 +278,42 @@ $(function(){
             e.preventDefault();
             loaderOn();
             let filtersForm = $('#filter_lids');
-            let formInputs = filtersForm.find('input, select');
+            //let formInputs = filtersForm.find('input, select');
             let params = {filter: {}};
 
-            $.each(formInputs, function(key, inp){
-                if ($(inp).val() != '' && $(inp).val() != 0) {
-                    if ($(inp).attr('name') == 'date_from' || $(inp).attr('name') == 'date_to') {
-                        params[$(inp).attr('name')] = $(inp).val();
-                    } else {
-                        params.filter[$(inp).attr('name')] = $(inp).val();
-                    }
-                }
-            });
+            // $.each(formInputs, function(key, inp){
+            //     if ($(inp).val() != '' && $(inp).val() != 0) {
+            //         if ($(inp).attr('name') == 'date_from' || $(inp).attr('name') == 'date_to') {
+            //             params[$(inp).attr('name')] = $(inp).val();
+            //         } else {
+            //             params.filter[$(inp).attr('name')] = $(inp).val();
+            //         }
+            //     }
+            // });
+
+            let periodFrom = filtersForm.find('input[name=date_from]').val();
+            let periodTo = filtersForm.find('input[name=date_to]').val();
+            let id = filtersForm.find('input[name=id]').val();
+            let number = filtersForm.find('input[name=number]').val();
+            let statusId = filtersForm.find('select[name=status_id]').val();
+            let areaId = filtersForm.find('select[name=area_id]').val();
+
+            if (id == '' && number == '') {
+                params['date_from'] = periodFrom;
+                params['date_to'] = periodTo;
+            }
+            if (statusId > 0) {
+                params.filter['status_id'] = statusId;
+            }
+            if (areaId > 0) {
+                params.filter['area_id'] = areaId;
+            }
+            if (id > 0) {
+                params.filter['id'] = id;
+            }
+            if (number != '') {
+                params.filter['number'] = number;
+            }
 
             params.order = {priority_id: 'ASC', id: 'ASC'};
             params.select = ['property_50', 'property_54'];
