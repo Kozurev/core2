@@ -11,6 +11,7 @@ $CFG = new stdClass();
 
 //Корневой каталог
 $CFG->rootdir = "/musadm";
+$CFG->wwwroot = "http://musadm/musadm";
 
 //Список индексируемых объектов как элементы структур
 $CFG->items_mapping = array(
