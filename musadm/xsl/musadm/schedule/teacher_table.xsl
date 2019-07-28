@@ -62,12 +62,11 @@
 
                                         <xsl:if test="client/name != ''">
                                             <xsl:value-of select="client/name" />
-                                            <xsl:text> </xsl:text>
                                         </xsl:if>
 
-                                        <xsl:if test="client/number != ''">
-                                            <xsl:value-of select="client/number" />
-                                        </xsl:if>
+                                        <!--<xsl:if test="client/number != ''">-->
+                                            <!--<xsl:value-of select="client/number" />-->
+                                        <!--</xsl:if>-->
                                         <xsl:text>)</xsl:text>
                                     </xsl:if>
                                 </xsl:if>
