@@ -324,6 +324,24 @@ $(function(){
                     loaderOff();
                 }
             });
+        })
+        .on('click', '.lids_consult_show', function(e){
+            e.preventDefault();
+            loaderOn();
+            let formData = $('#filter_lids').serialize();
+            $.ajax({
+                type: 'GET',
+                url: root + '/lids/consults?action=refresh',
+                data: formData,
+                success: function (response) {
+                    $('.lids').html(response);
+                    loaderOff();
+                },
+                error: function () {
+                    notificationError('Произошла ошибка');
+                    loaderOff();
+                }
+            });
         });
 });
 
@@ -405,6 +423,9 @@ function makeLidPopup(lidId) {
         prependPopup(popupData);
 
         let isSelected;
+
+        PropertyList.clearCache(50);
+        PropertyList.clearCache(54);
 
         //Подгрузка списка источников
         PropertyList.getList(54, function(markers){
