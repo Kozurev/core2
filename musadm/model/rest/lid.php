@@ -10,7 +10,7 @@ class Rest_Lid extends Rest_Controller
      */
     public function __construct()
     {
-        $this->apiUrl = 'http://musadm/musadm/api/lids/api.php';
+        $this->apiUrl = 'http://musicmetod.ru/musadm/api/lids/api.php';
     }
 
 

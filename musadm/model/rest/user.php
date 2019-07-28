@@ -29,7 +29,7 @@ class Rest_User extends Rest_Controller
      */
     public function __construct()
     {
-        $this->apiUrl = 'http://musadm/musadm/api/user/api.php';
+        $this->apiUrl = 'http://musicmetod.ru/musadm/api/user/api.php';
     }
 
 
