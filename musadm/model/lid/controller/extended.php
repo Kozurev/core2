@@ -130,7 +130,6 @@ class Lid_Controller_Extended extends Controller
             return $this->periodFrom;
         } else {
             $this->periodFrom = $from;
-            //$this->appendFilter('control_date', '>=', $from);
             $this->addSimpleEntity('date_from', $this->periodFrom);
             return $this;
         }
@@ -147,7 +146,6 @@ class Lid_Controller_Extended extends Controller
             return $this->periodTo;
         } else {
             $this->periodTo = $to;
-            //$this->appendFilter('control_date', '<=', $to);
             $this->addSimpleEntity('date_to', $this->periodTo);
             return $this;
         }
@@ -197,19 +195,21 @@ class Lid_Controller_Extended extends Controller
      */
     public function getLids()
     {
+        Core::notify([&$this], 'before.LidControllerExtended.getLids');
+
         if ($this->isSubordinate()) {
             $this->getQueryBuilder()->where('subordinated', '=', $this->getSubordinate());
         }
 
         if ($this->isEnabledPeriodControl()) {
             if (($this->periodFrom() == $this->periodTo()) && !empty($this->periodTo())) {
-                $this->appendFilter('control_date', '=', $this->periodFrom());
+                $this->appendFilter('control_date', $this->periodFrom(), '=');
             } else {
                 if (!empty($this->periodFrom())) {
-                    $this->appendFilter('control_date', '>=', $this->periodFrom());
+                    $this->appendFilter('control_date', $this->periodFrom(), '>=');
                 }
                 if (!empty($this->periodTo())) {
-                    $this->appendFilter('control_date', '<=', $this->periodTo());
+                    $this->appendFilter('control_date', $this->periodTo(), '<=');
                 }
             }
         }
@@ -238,17 +238,17 @@ class Lid_Controller_Extended extends Controller
             }
         }
 
-        $Lids = $this->QueryBuilder->findAll();
-        $this->countFoundObjects = count($Lids);
-        foreach ($Lids as $Lid) {
+        $this->foundObjects = $this->QueryBuilder->findAll();
+        $this->countFoundObjects = count($this->foundObjects);
+        foreach ($this->foundObjects as $Lid) {
             $this->foundObjectsIds[] = $Lid->getId();
         }
 
         //Фильтрация по значениям доп.свйотв
-        $this->addFilterExecute($Lids);
+        $this->addFilterExecute();
 
         //Подгрузка значений доп. свойств
-        $this->addPropValues($Lids);
+        $this->addPropValues();
 
         //Поиск комментариев
         if ($this->isWithComments === true) {
@@ -260,7 +260,7 @@ class Lid_Controller_Extended extends Controller
                 ->orderBy('Lid_Comment.id', 'DESC')
                 ->findAll();
 
-            foreach ($Lids as $Lid) {
+            foreach ($this->foundObjects as $Lid) {
                 $LidComments = Core::factory('Core_Entity')->_entityName('comments');
                 $Lid->comments = [];
                 foreach ($Comments as $key => $Comment) {
@@ -280,7 +280,9 @@ class Lid_Controller_Extended extends Controller
             }
         }
 
-        return $Lids;
+        Core::notify([&$this], 'before.LidControllerExtended.getLids');
+
+        return $this->foundObjects;
     }
 
 

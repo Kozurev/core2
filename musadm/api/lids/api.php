@@ -53,9 +53,7 @@ if ($action === 'getList') {
         if (!in_array($paramName, $filterStrictFor)) {
             $Controller->appendFilter($paramName, $paramValue);
         } else {
-            $Controller->setFilterType(Lid_Controller_Extended::FILTER_STRICT);
-            $Controller->appendFilter($paramName, $paramValue);
-            $Controller->setFilterType(Lid_Controller_Extended::FILTER_NOT_STRICT);
+            $Controller->appendFilter($paramName, $paramValue, '=');
         }
     }
 
