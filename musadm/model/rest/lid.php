@@ -10,7 +10,8 @@ class Rest_Lid extends Rest_Controller
      */
     public function __construct()
     {
-        $this->apiUrl = 'http://musicmetod.ru/musadm/api/lids/api.php';
+        global $CFG;
+        $this->apiUrl = $CFG->wwwroot . '/api/lids/api.php';
     }
 
 

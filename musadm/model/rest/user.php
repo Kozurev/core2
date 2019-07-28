@@ -29,7 +29,8 @@ class Rest_User extends Rest_Controller
      */
     public function __construct()
     {
-        $this->apiUrl = 'http://musicmetod.ru/musadm/api/user/api.php';
+        global $CFG;
+        $this->apiUrl = $CFG->wwwroot . '/api/user/api.php';
     }
 
 
