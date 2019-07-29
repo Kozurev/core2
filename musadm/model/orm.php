@@ -425,6 +425,22 @@ class Orm
 
 
     /**
+     * Статический аналог метода executeQuery
+     *
+     * @param string $query
+     * @return PDOStatement
+     */
+    static public function execute(string $query)
+    {
+        if (self::isDebugSql()) {
+            echo "<br>Строка из метода <b>execute()</b>: " . $query;
+        }
+        $result = DB::instance()->query($query);
+        return $result;
+    }
+
+
+    /**
      * Установления значений по умолчанию для свойств учавствующих в формировании запроса
      *
      * @return self
@@ -489,6 +505,8 @@ class Orm
             $val = $value->val;
         } elseif ($value === 'NULL' || $value === null) {
             $val = 'NULL';
+        } elseif (is_numeric($value)) {
+            $val = $value;
         } else {
             $val = '\'' . $value . '\'';
         }
