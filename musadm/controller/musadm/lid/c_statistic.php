@@ -7,6 +7,7 @@
  */
 
 Core::requireClass('Lid');
+Core::requireClass('Lid_Controller');
 Core::requireClass('Property_Controller');
 
 $subordinated = User::current()->getDirector()->getId();
@@ -15,6 +16,7 @@ $dateFrom = Core_Array::Get('date_from', date('Y-m-d'), PARAM_DATE);
 $dateTo = Core_Array::Get('date_to', date('Y-m-d'), PARAM_DATE);
 
 $Lid = new Lid();
+
 
 $QueryBuilder = new Orm();
 $QueryBuilder
@@ -64,6 +66,10 @@ $statisticForPropVal = [
     '50' => $Sources,
     '54' => $Markers
 ];
+$statisticTitles = [
+    '50' => 'источникам',
+    '54' => 'маркерам'
+];
 
 foreach ($statisticForPropVal as $propId => $propValues) {
     $Output = new Core_Entity();
@@ -95,7 +101,67 @@ foreach ($statisticForPropVal as $propId => $propValues) {
         $Output->addEntity($PropVal, 'val');
     }
 
+    $Output->addSimpleEntity('table-title', $statisticTitles[$propId]);
     $StatisticOutput->addEntity($Output);
 }
 
 $StatisticOutput->show();
+
+$LidsOutput = Core::factory('Core_Entity');
+$totalCount = Lid_Controller::factory()
+    ->queryBuilder()
+    ->where('subordinated', '=', $subordinated);
+
+if ($dateFrom == $dateTo) {
+    $totalCount->where('control_date', '=', $dateFrom);
+} else {
+    $totalCount->where('control_date', '>=', $dateFrom);
+    $totalCount->where('control_date', '<=', $dateTo);
+}
+
+$totalCount = $totalCount->getCount();
+if (count($Statuses) > 0) {
+    foreach ($Statuses as $key => $status) {
+        $queryString = Core::factory('Orm')
+            ->select('count(Lid.id)', 'count')
+            ->from('Lid')
+            ->where('subordinated', '=', $subordinated)
+            ->where('status_id', '=', $status->getId());
+
+        if ($dateFrom == $dateTo) {
+            $queryString->where('control_date', '=', $dateFrom);
+        } else {
+            $queryString->where('control_date', '>=', $dateFrom);
+            $queryString->where( 'control_date', '<=', $dateTo );
+        }
+
+        $queryString = $queryString->getQueryString();
+        $Result = Core::factory('Orm')->executeQuery($queryString);
+
+        if ($Result != false) {
+            $Result = $Result->fetch();
+            $count = $Result['count'];
+            $totalCount == 0
+                ?   $percents = 0
+                :   $percents = round($count * 100 / $totalCount, 1);
+        } else {
+            $count = 0;
+            $percents = 0;
+        }
+
+        $outputStatus = clone $Statuses[$key];
+        $outputStatus->addSimpleEntity('count', $count);
+        $outputStatus->addSimpleEntity('percents', round($percents, 2));
+        $LidsOutput->addEntity($outputStatus, 'status');
+    }
+}
+
+echo '<section class="section-bordered">';
+echo '<h3 class="center">Общая сводка</h3>';
+echo '<div class="row center-block">';
+echo '<div class="col-lg-4"></div>';
+$LidsOutput
+    ->addSimpleEntity('total', $totalCount)
+    ->xsl('musadm/statistic/lids.xsl')
+    ->show();
+echo '</div></section>';

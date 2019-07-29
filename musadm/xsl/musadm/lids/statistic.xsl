@@ -4,6 +4,7 @@
     <xsl:template match="root">
         <xsl:for-each select="table">
             <section>
+                <h3>Статистика по <xsl:value-of select="table-title" /></h3>
                 <table class="table table-hover table-striped table-bordered sortingTable">
                     <thead>
                         <tr>
