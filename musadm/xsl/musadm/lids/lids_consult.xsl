@@ -29,10 +29,10 @@
                     <div class="row buttons-panel center">
                         <!--<xsl:call-template name="areas_row" />-->
                         <div>
-                            <input class="form-control" type="number" name="id" placeholder="Номер лида" />
+                            <input class="form-control" type="number" name="id" placeholder="Номер лида" value="{lid_id}" />
                         </div>
                         <div>
-                            <input class="form-control" type="text" name="number" placeholder="Телефон"/>
+                            <input class="form-control" type="text" name="number" placeholder="Телефон" value="{number}"/>
                         </div>
 
                         <div class="right">

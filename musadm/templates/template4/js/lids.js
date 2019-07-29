@@ -342,6 +342,7 @@ $(function(){
             e.preventDefault();
             loaderOn();
             let formData = $('#filter_lids').serialize();
+            console.log(formData);
             $.ajax({
                 type: 'GET',
                 url: root + '/lids/consults?action=refresh',
