@@ -45,14 +45,24 @@ if ($action === 'getList') {
     $Controller = new User_Controller(User::current());
     $Controller->active($paramActive);
     $Controller->groupId($paramGroups);
+
+    $userTableName = Core::factory('User')->getTableName();
+
     foreach ($paramFilter as $paramName => $paramValue) {
-        $Controller->appendFilter($paramName, $paramValue);
+        $Controller->appendFilter($userTableName . '.' . $paramName, $paramValue);
     }
     foreach ($paramsOrder as $field => $order) {
         $Controller->queryBuilder()->orderBy($field, $order);
     }
     if (!is_null($paramSelect)) {
-        $Controller->queryBuilder()->clearSelect()->select($paramSelect);
+        if (!is_array($paramSelect)) {
+            $paramSelect = [$paramSelect];
+        }
+        $userSelectFields = [];
+        foreach ($paramSelect as $key => $paramName) {
+            $userSelectFields[] = $userTableName . '.' . $paramName;
+        }
+        $Controller->queryBuilder()->clearSelect()->select($userSelectFields);
     }
     if (!is_null($paramCount)) {
         $Controller->queryBuilder()->limit($paramCount);
