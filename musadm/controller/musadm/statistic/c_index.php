@@ -7,6 +7,7 @@
  * @version 20190221
  * @version 20190405
  * @version 20190414
+ * @version 20190729
  */
 
 $dateFormat = 'Y-m-d';
@@ -17,136 +18,233 @@ $areaId =   Core_Array::Get('area_id', 0, PARAM_INT);
 
 $Director = User::current()->getDirector();
 $subordinated = $Director->getId();
+$userTableName = Core::factory('User')->getTableName();
+$areasTable = Core::factory('Schedule_Area')->getTableName();
+$areaAsgmTable = Core::factory('Schedule_Area_Assignment')->getTableName();
 
+$Orm = new Orm();
 
 echo "<div class='row'>";
 
+
 //Статистика по балансу и урокам
-$queryString = Core::factory('Orm')
+$totalBalanceQuery = clone $Orm->clearQuery()
     ->select('sum(value)', 'sum')
-    ->from('Property_Int AS p')
-    ->join('User AS u', 'u.id = p.object_id')
-    ->where('u.active', '=', 1)
-    ->where('u.subordinated', '=', $subordinated)
-    ->where('u.group_id', '=', ROLE_CLIENT)
+    ->from('Property_Int', 'p')
+    ->join($userTableName.' AS u',
+         'u.id = p.object_id AND 
+                    u.active = 1 AND 
+                    u.subordinated = ' . $subordinated . ' AND 
+                    u.group_id = ' . ROLE_CLIENT
+    )
     ->where('p.model_name', '=', 'User')
     ->where('p.property_id', '=', 12);
 
 if ($areaId !== 0) {
-    $queryString->join(
-        'Schedule_Area_Assignment as saa',
+    $totalBalanceQuery->join(
+        $areaAsgmTable.' as saa',
         'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
     );
 }
 
-$queryString = $queryString->getQueryString();
-$Result = Core::factory('Orm')->executeQuery($queryString);
+$Result = Orm::execute($totalBalanceQuery->getQueryString());
 $Result = $Result->fetch();
 $Result['sum'] != null
     ?   $sum = $Result['sum']
     :   $sum = 0;
 
+
 //Кол-во оплаченных индивидуальных уроков
-$queryString = Core::factory('Orm')
+$indivLessonsQuery = clone $Orm->clearQuery()
     ->select('sum(value)', 'sum')
-    ->from('Property_Int AS p')
-    ->join('User AS u', 'u.id = p.object_id')
-    ->where('u.active', '=', 1)
-    ->where('u.subordinated', '=', $subordinated)
-    ->where('u.group_id', '=', ROLE_CLIENT)
+    ->from('Property_Int', 'p')
+    ->join($userTableName.' AS u',
+         'u.id = p.object_id AND 
+                    u.active = 1 AND 
+                    u.subordinated = ' . $subordinated . ' AND 
+                    u.group_id = ' . ROLE_CLIENT
+    )
     ->where('p.model_name', '=', 'User')
     ->where('p.property_id', '=', 13)
     ->where('value', '>', 0);
 
 if ($areaId !== 0) {
-    $queryString->join(
-        'Schedule_Area_Assignment as saa',
+    $indivLessonsQuery->join(
+        $areaAsgmTable.' as saa',
         'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
     );
 }
 
-$queryString = $queryString->getQueryString();
-$Result = Core::factory('Orm')->executeQuery($queryString);
+$Result = Orm::execute($indivLessonsQuery->getQueryString());
 $Result = $Result->fetch();
 $Result['sum'] != null
     ?   $indiv_lessons_pos = $Result['sum']
     :   $indiv_lessons_pos = 0;
 
+
 //Кол-во неоплаченных индивидуальных уроков
-$queryString = Core::factory('Orm')
+$indivLessonsDebtQuery = clone $Orm->clearQuery()
     ->select('sum(value)', 'sum')
-    ->from('Property_Int AS p')
-    ->join('User AS u', 'u.id = p.object_id')
-    ->where('u.active', '=', 1)
-    ->where('u.group_id', '=', ROLE_CLIENT)
+    ->from('Property_Int', 'p')
+    ->join($userTableName.' AS u',
+         'u.id = p.object_id AND 
+                    u.active = 1 AND 
+                    u.subordinated = ' . $subordinated . ' AND 
+                    u.group_id = ' . ROLE_CLIENT
+    )
     ->where('p.model_name', '=', 'User')
-    ->where('u.subordinated', '=', $subordinated)
     ->where('p.property_id', '=', 13)
     ->where('value', '<', 0);
 
 if ($areaId !== 0) {
-    $queryString->join(
-        'Schedule_Area_Assignment as saa',
+    $indivLessonsDebtQuery->join(
+        $areaAsgmTable.' as saa',
         'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
     );
 }
 
-$queryString = $queryString->getQueryString();
-$Result = Core::factory('Orm')->executeQuery($queryString);
+$Result = Orm::execute($indivLessonsDebtQuery->getQueryString());
 $Result = $Result->fetch();
 $Result['sum'] != null
     ?   $indiv_lessons_neg = $Result['sum']
     :   $indiv_lessons_neg = 0;
 
+
 //Кол-во оплаченных групповых уроков
-$queryString = Core::factory('Orm')
+$groupLessonsQuery = clone $Orm->clearQuery()
     ->select('sum(value)', 'sum')
-    ->from('Property_Int AS p')
-    ->join('User AS u', 'u.id = p.object_id')
-    ->where('u.active', '=', 1)
-    ->where('u.subordinated', '=', $subordinated)
-    ->where('u.group_id', '=', ROLE_CLIENT)
+    ->from('Property_Int', 'p')
+    ->join($userTableName.' AS u',
+         'u.id = p.object_id AND 
+                    u.active = 1 AND 
+                    u.subordinated = ' . $subordinated . ' AND 
+                    u.group_id = ' . ROLE_CLIENT
+    )
     ->where('p.model_name', '=', 'User')
     ->where('p.property_id', '=', 14)
     ->where('value', '>', 0);
 
 if ($areaId !== 0) {
-    $queryString->join(
-        'Schedule_Area_Assignment as saa',
+    $groupLessonsQuery->join(
+        $areaAsgmTable.' as saa',
         'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
     );
 }
 
-$queryString = $queryString->getQueryString();
-$Result = Core::factory('Orm')->executeQuery($queryString);
+$Result = Orm::execute($groupLessonsQuery->getQueryString());
 $Result = $Result->fetch();
 $Result['sum'] != null
     ?   $group_lessons_pos = $Result['sum']
     :   $group_lessons_pos = 0;
 
+
 //Кол-во неоплаченных груповых уроков
-$queryString = Core::factory('Orm')
+$groupLessonsDebtQuery = clone $Orm->clearQuery()
     ->select('sum(value)', 'sum')
-    ->from('Property_Int AS p')
-    ->join('User AS u', 'u.id = p.object_id')
-    ->where('u.active', '=', 1)
-    ->where('u.subordinated', '=', $subordinated)
+    ->from('Property_Int', 'p')
+    ->join($userTableName.' AS u',
+         'u.id = p.object_id AND 
+                    u.active = 1 AND 
+                    u.subordinated = ' . $subordinated . ' AND 
+                    u.group_id = ' . ROLE_CLIENT
+    )
     ->where('property_id', '=', 14)
     ->where('value', '<', 0);
 
 if ($areaId !== 0) {
-    $queryString->join(
-        'Schedule_Area_Assignment as saa',
+    $groupLessonsDebtQuery->join(
+        $areaAsgmTable.' as saa',
         'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
     );
 }
 
-$queryString = $queryString->getQueryString();
-$Result = Core::factory('Orm')->executeQuery($queryString);
+$Result = Orm::execute($groupLessonsDebtQuery->getQueryString());
 $Result = $Result->fetch();
 $Result['sum'] != null
     ?   $group_lessons_neg = $Result['sum']
     :   $group_lessons_neg = 0;
+
+
+//Средний возраст
+$birthYears = clone $Orm->clearQuery()
+    ->select('value')
+    ->from('Property_String', 'p')
+    ->join($userTableName.' AS u',
+         'u.id = p.object_id AND 
+                    u.active = 1 AND 
+                    u.subordinated = ' . $subordinated . ' AND 
+                    u.group_id = ' . ROLE_CLIENT
+    )
+    ->where('property_id', '=', 28)
+    ->where('value', '<>', '');
+
+if ($areaId !== 0) {
+    $birthYears->join(
+        $areaAsgmTable.' as saa',
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+    );
+}
+
+$birthYears = $birthYears->findAll();
+
+$yearsSum = 0;
+$formatYearsCount = 0;
+foreach ($birthYears as $year) {
+    if (mb_strlen($year->value) == 4) {
+        $yearsSum += intval($year->value);
+        $formatYearsCount++;
+    }
+}
+
+if ($formatYearsCount > 0) {
+    $avgYear = round($yearsSum / $formatYearsCount, 0);
+    $avgAge = intval(date('Y')) - $avgYear;
+} else {
+    $avgAge = 0;
+}
+
+
+//Средняя медиана
+$avgIndivCost = clone $Orm->clearQuery()
+    ->select('avg(value)', 'value')
+    ->from('Property_Int', 'p')
+    ->join($userTableName.' AS u',
+         'u.id = p.object_id AND 
+                    u.active = 1 AND 
+                    u.subordinated = ' . $subordinated . ' AND 
+                    u.group_id = ' . ROLE_CLIENT
+    )
+    ->where('property_id', '=', 42)
+    ->where('value', '>', 0);
+
+$avgGroupCost = clone $Orm->clearQuery()
+    ->select('avg(value)', 'value')
+    ->from('Property_Int', 'p')
+    ->join($userTableName.' AS u',
+         'u.id = p.object_id AND 
+                    u.active = 1 AND 
+                    u.subordinated = ' . $subordinated . ' AND 
+                    u.group_id = ' . ROLE_CLIENT
+    )
+    ->where('property_id', '=', 43)
+    ->where('value', '>', 0);
+
+if ($areaId !== 0) {
+    $avgIndivCost->join(
+        $areaAsgmTable.' as saa',
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+    );
+    $avgGroupCost->join(
+        $areaAsgmTable.' as saa',
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+    );
+}
+
+$avgIndivCost = $avgIndivCost->find();
+$avgGroupCost = $avgGroupCost->find();
+$avgIndivCost = is_object($avgIndivCost) && !is_null($avgIndivCost->value) ? round($avgIndivCost->value, 0) : 0;
+$avgGroupCost = is_object($avgGroupCost) && !is_null($avgGroupCost->value) ? round($avgGroupCost->value, 0) : 0;
+
 
 Core::factory('Core_Entity')
     ->addSimpleEntity('balance', $sum)
@@ -154,14 +252,19 @@ Core::factory('Core_Entity')
     ->addSimpleEntity('indiv_neg', $indiv_lessons_neg * -1)
     ->addSimpleEntity('group_pos', $group_lessons_pos)
     ->addSimpleEntity('group_neg', $group_lessons_neg * -1)
+    ->addSimpleEntity('avgAge', $avgAge)
+    ->addSimpleEntity('avgIndivMediana', $avgIndivCost)
+    ->addSimpleEntity('avgGroupMediana', $avgGroupCost)
     ->xsl('musadm/statistic/balance.xsl')
     ->show();
+
 
 /**
  * Статистика по лидам
  */
+Core::requireClass('Lid_Controller');
 $LidsOutput = Core::factory('Core_Entity');
-$totalCount = Core::factory('Lid')
+$totalCount = Lid_Controller::factory()
     ->queryBuilder()
     ->where('subordinated', '=', $subordinated);
 

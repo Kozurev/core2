@@ -27,6 +27,18 @@
                     <td>Кол-во неоплаченных групповых уроков:</td>
                     <td><xsl:value-of select="group_neg" /></td>
                 </tr>
+                <tr>
+                    <td>Средняя медиана (индив. / групп.) :</td>
+                    <td>
+                        <xsl:value-of select="avgIndivMediana" />
+                        <xsl:text>/</xsl:text>
+                        <xsl:value-of select="avgGroupMediana" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Средний возраст:</td>
+                    <td><xsl:value-of select="avgAge" /></td>
+                </tr>
             </table>
         </div>
     </xsl:template>
