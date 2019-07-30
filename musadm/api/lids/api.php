@@ -87,8 +87,10 @@ if ($action === 'getList') {
         $stdLid->comments = [];
         foreach ($Lid->comments as $comment) {
             $stdComment = $comment->toStd();
-            $CommentAuthor = User_Controller::factory($comment->authorId());
-            $stdComment->authorFio = $CommentAuthor->surname() . ' ' . $CommentAuthor->name();
+            $CommentAuthor = User_Controller::factory($comment->authorId(), false);
+            $stdComment->authorFio = !is_null($CommentAuthor)
+                ?   $CommentAuthor->surname() . ' ' . $CommentAuthor->name()
+                :   'Неизвестно';
             $commentDatetime = $comment->datetime();
             $commentDatetime = strtotime($commentDatetime);
             $commentDatetime = date('d.m.y H:i', $commentDatetime);
