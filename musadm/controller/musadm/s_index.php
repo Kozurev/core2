@@ -245,7 +245,7 @@ if ($action === 'search_client') {
     }
 
     $SearchingClientsHtml = $ClientController->show(false);
-    if ($ClientController->count() > 0) {
+    if (count($ClientController->getUserIds()) > 0) {
         echo "<div class='users'>";
         echo $SearchingClientsHtml;
         echo "</div>";
