@@ -192,6 +192,10 @@ class Controller
     protected function setUser(User $User)
     {
         $this->User = $User;
+        $UserDirector = $User->getDirector();
+        if (!is_null($UserDirector)) {
+            $this->setSubordinate($UserDirector->getId());
+        }
     }
 
 
