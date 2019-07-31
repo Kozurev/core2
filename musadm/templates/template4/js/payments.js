@@ -495,7 +495,7 @@ function makeClientPaymentPopup(paymentId, userId, saveCallback) {
 
             popupData +=
             "            <div class=\"column\">\n" +
-            "                <span>Тип операци</span>\n" +
+            "                <span>Тип операции</span>\n" +
             "            </div>\n" +
             "            <div class=\"column\">\n" +
             "                <p style=\"margin-top: 5px\">\n" +

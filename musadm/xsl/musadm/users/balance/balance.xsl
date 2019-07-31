@@ -171,7 +171,7 @@
                                     <xsl:if test="/root/access_schedule_absent = 1">
                                         <div>
                                             <a class="btn btn-orange" onclick="getScheduleAbsentPopup({user/id}, 1, getCurrentDate(), '')">
-                                                Добавить период отстствия
+                                                Добавить период отсутствия
                                             </a>
                                         </div>
                                     </xsl:if>

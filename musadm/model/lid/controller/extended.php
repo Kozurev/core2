@@ -314,7 +314,7 @@ class Lid_Controller_Extended extends Controller
         $priorities[1]->title = 'Средний';
         $priorities[2] = new stdClass();
         $priorities[2]->id = 3;
-        $priorities[2]->title = 'Выысокий';
+        $priorities[2]->title = 'Высокий';
 
         $OutputXml
             ->addEntities($this->getLids())
