@@ -155,8 +155,8 @@ $(function(){
                 if (lid != '') {
                     $('input[name="name"]').val(lid.name);
                     $('input[name="surname"]').val(lid.surname);
-                    $('input[name="phoneNumber"]').val(lid.phone);
-                    $('input[name="property_9[]"]').val(lid.vk);
+                    $('input[name="phoneNumber"]').val(lid.number);
+                    $('input[name="property_9[]"').val(lid.vk);
                     $('select[name="areas[]"').val(lid.area_id);
                     $('.get_lid_data_row').remove();
                 } else {
