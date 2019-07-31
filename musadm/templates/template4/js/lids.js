@@ -141,6 +141,9 @@ $(function () {
                     case 'lid_status_consult_absent':
                         msg += 'пропуска консультации';
                         break;
+                    case 'lid_status_client' :
+                        msg += 'записи';
+                        break;
                     default: msg = 'Неизвестной настройке';
                 }
 
@@ -746,4 +749,29 @@ function changeLidStatusCallback(response) {
         let lidCard = $('.lid_' + response.lid.id);
         lidCard.attr('class', 'item ' + response.status.item_class + ' lid_' + response.lid.id);
     }
+}
+
+
+function makeClientFromLidPopup(lidId) {
+    loaderOn();
+    makeClientPopup(0, function () {
+        $('#lid_id').val(lidId);
+        $('#get_lid_data').trigger('click');
+        localStorage.setItem('clientFromLidId', lidId);
+        $('.popup').find('.btn-default').attr('onclick', 'User.saveFrom($(\'#createData\'), makeClientFromLidCallback)');
+        showPopup();
+    });
+}
+
+
+function makeClientFromLidCallback(client) {
+    Lids.getPrioritySetting(Lids.STATUS_CLIENT, function(status){
+        let lidId = localStorage.getItem('clientFromLidId');
+        localStorage.removeItem('clientFromLidId');
+        Lids.changeStatus(lidId, status.id, function(response){
+            changeLidStatusCallback(response);
+            loaderOff();
+            closePopup();
+        });
+    });
 }

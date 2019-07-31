@@ -340,24 +340,6 @@ if ($action === 'export') {
 }
 
 
-//Получение данных лида для заполнения формы создания клиента
-if ($action === 'getLidData') {
-    $lidId = Core_Array::Get('lidId', null, PARAM_INT);
-    $Lid = Lid_Controller::factory($lidId);
-    if (is_null($lidId) || is_null($Lid)) {
-        exit;
-    }
-
-    $LidEncode = new stdClass();
-    $LidEncode->name = $Lid->name();
-    $LidEncode->surname = $Lid->surname();
-    $LidEncode->phone = $Lid->number();
-    $LidEncode->vk = $Lid->vk();
-    echo json_encode($LidEncode);
-    exit;
-}
-
-
 //Открытие всплывающего окна создания/удаления связей сущьности с филиалами для типа связи многие ко многим
 if ($action === 'showAssignmentsPopup') {
     $modelId =   Core_Array::Get('model_id', 0, PARAM_INT);

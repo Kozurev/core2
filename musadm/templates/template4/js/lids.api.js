@@ -12,6 +12,12 @@ class Lids {
     }
 
 
+    static STATUS_CONSULT = 'lid_status_consult';
+    static STATUS_CONSULT_ATTENDED = 'lid_status_consult_attended';
+    static STATUS_CONSULT_ABSENT = 'lid_status_consult_absent';
+    static STATUS_CLIENT = 'lid_status_client';
+
+
     /**
      *
      *
@@ -273,6 +279,27 @@ class Lids {
                 commentId: commentId,
                 lidId: lidId,
                 text: text
+            },
+            success: function (response) {
+                if (typeof callback == 'function') {
+                    callback(response);
+                }
+            },
+            error: function () {
+                notificationError('Произзошла ошибка во время изменения статуса лида');
+            }
+        });
+    }
+
+
+    static getPrioritySetting(statusType, callback) {
+        $.ajax({
+            type: 'GET',
+            url: Lids.getApiLink(),
+            dataType: 'json',
+            data: {
+                action: 'getPrioritySetting',
+                statusType: statusType
             },
             success: function (response) {
                 if (typeof callback == 'function') {

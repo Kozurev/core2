@@ -37,7 +37,7 @@
         </div>
 
         <section class="section-bordered lid_statuses_table">
-            <h4 class="section-title">Настройки статусов лидов</h4>
+            <h3 class="section-title">Настройки статусов лидов</h3>
             <input type="hidden" id="directorid" value="{directorid}"/>
             <table class="table table-stripped" id="table-lid-statuses">
                 <thead>
@@ -47,6 +47,7 @@
                         <th class="center">Статус после создания консультации</th>
                         <th class="center">Статус после присутствия на консультации</th>
                         <th class="center">Статус после отсутствия на консультации</th>
+                        <th class="center">Статус после того как лид стал клиентом</th>
                         <th width="95px"></th>
                     </tr>
                 </thead>
@@ -81,6 +82,15 @@
                             <label for="lid_status_consult_absent_0"></label>
                         </td>
 
+                        <td class="center">
+                            <input type="radio" name="lid_status_client" id="lid_status_client_0" value="0">
+                                <xsl:if test="lid_status_client = 0">
+                                    <xsl:attribute name="checked">checked</xsl:attribute>
+                                </xsl:if>
+                            </input>
+                            <label for="lid_status_client_0"></label>
+                        </td>
+
                         <td></td>
                     </tr>
                 </tbody>
@@ -88,7 +98,7 @@
 
             <div class="row buttons-panel center">
                 <div>
-                    <a class="edit_lid_status btn btn-purple">Создать статус</a>
+                    <a class="edit_lid_status btn btn-orange">Создать статус</a>
                 </div>
             </div>
         </section>
@@ -133,6 +143,15 @@
                     </xsl:if>
                 </input>
                 <label for="lid_status_consult_absent_{id}"></label>
+            </td>
+
+            <td class="center">
+                <input type="radio" name="lid_status_client" id="lid_status_client_{id}" value="{id}">
+                    <xsl:if test="/root/lid_status_client = $id">
+                        <xsl:attribute name="checked">checked</xsl:attribute>
+                    </xsl:if>
+                </input>
+                <label for="lid_status_client_{id}"></label>
             </td>
 
             <td class="right">

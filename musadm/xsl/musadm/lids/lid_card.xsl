@@ -113,6 +113,7 @@
                         <xsl:if test="/root/access_lid_comment = 1">
                             <a class="action comment" title="Добавить комментарий" onclick="makeLidCommentPopup(0, {id}, saveLidCommentCallback)"><input type="hidden" value="KOCTb|J|b" /></a>
                         </xsl:if>
+                        <a class="action add_user" title="Создать пользователя" onclick="makeClientFromLidPopup({id})"><input type="hidden" value="KOCTb|J|b" /></a>
                     </div>
                     <div class="col-sm-9 col-xs-12 comments-column">
                         <div class="comments">

@@ -151,31 +151,18 @@ $(function(){
                 return false;
             }
             loaderOn();
-
-            $.ajax({
-                type: 'GET',
-                url: root + '/user/client',
-                dataType: 'json',
-                data: {
-                    action: 'getLidData',
-                    lidId: lidId
-                },
-                success: function(response) {
-                    if (response != '') {
-                        $('input[name="name"]').val(response.name);
-                        $('input[name="surname"]').val(response.surname);
-                        $('input[name="phoneNumber"]').val(response.phone);
-                        $('input[name="property_9[]"]').val(response.vk);
-                        $('.get_lid_data_row').remove();
-                    } else {
-                        notificationError("Лида с номером " + lidId + " не существует");
-                    }
-                    loaderOff();
-                },
-                error: function (response) {
+            Lids.getLid(lidId, function (lid) {
+                if (lid != '') {
+                    $('input[name="name"]').val(lid.name);
+                    $('input[name="surname"]').val(lid.surname);
+                    $('input[name="phoneNumber"]').val(lid.phone);
+                    $('input[name="property_9[]"]').val(lid.vk);
+                    $('select[name="areas[]"').val(lid.area_id);
+                    $('.get_lid_data_row').remove();
+                } else {
                     notificationError("Лида с номером " + lidId + " не существует");
-                    loaderOff();
                 }
+                loaderOff();
             });
         })
         //Поиск клиента на странице менеджера
@@ -538,6 +525,24 @@ function getClientPopup(userId) {
 }
 
 
+function makeClientPopup(userId, callback) {
+    $.ajax({
+        type: 'GET',
+        url: root + '/user/client',
+        data: {
+            action: 'updateFormClient',
+            userId: userId
+        },
+        success: function(response) {
+            prependPopup(response);
+            if (typeof callback == 'function') {
+                callback();
+            }
+        }
+    });
+}
+
+
 /**
  * Открытие всплывающего окна редактирования данных преподавателя
  *
@@ -784,7 +789,7 @@ function makeClientTr(data) {
 
     //Действия
     if (data.access.payment_create_client) {
-        td7.append('<a class="action add_payment user_add_payment" href="#" data-userid="'+user.id+'" title="Добавить платеж"></a>');
+        td7.append('<a class="action add_payment" onclick="makeClientPaymentPopup(0, '+user.id+', saveClientPaymentCallback)" title="Добавить платеж"></a>');
     }
     if (data.access.user_edit_client) {
         td7.append('<a class="action edit" href="#" onclick="getClientPopup('+user.id+')" title="Редактировать данные"></a>');

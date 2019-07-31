@@ -475,3 +475,24 @@ if ($action === 'saveComment') {
 
     exit(json_encode($response));
 }
+
+
+/**
+ *
+ */
+if ($action === 'getPrioritySetting') {
+    $statusType = Core_Array::Get('statusType', null, PARAM_STRING);
+    $StatusSetting = Property_Controller::factoryByTag($statusType);
+    if (is_null($statusType) || is_null($StatusSetting)) {
+        exit(REST::status(REST::STATUS_ERROR, 'Указанного вами типа настройки не существует'));
+    } else {
+        $Director = User::current()->getDirector();
+        if (is_null($Director)) {
+            exit(REST::status(REST::STATUS_ERROR, 'Не удалось найти директора к которому привязано значение настройки'));
+        }
+        $settingStatusId = $StatusSetting->getValues($Director)[0]->value();
+        $Status = Core::factory('Lid_Status', $settingStatusId);
+        $response = $Status->toStd();
+    }
+    exit(json_encode($response));
+}

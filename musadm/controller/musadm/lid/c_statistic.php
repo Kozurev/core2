@@ -40,9 +40,11 @@ $Statuses = $Lid->getStatusList();
 $OnConsult =        Property_Controller::factoryByTag('lid_status_consult');
 $AttendedConsult =  Property_Controller::factoryByTag('lid_status_consult_attended');
 $AbsentConsult =    Property_Controller::factoryByTag('lid_status_consult_absent');
-$OnConsult =        $OnConsult->getValues(User::current())[0]->value();
-$AttendedConsult =  $AttendedConsult->getValues(User::current())[0]->value();
-$AbsentConsult =    $AbsentConsult->getValues(User::current())[0]->value();
+$LidClient =        Property_Controller::factoryByTag('lid_status_client');
+$OnConsult =        $OnConsult->getValues(User::current()->getDirector())[0]->value();
+$AttendedConsult =  $AttendedConsult->getValues(User::current()->getDirector())[0]->value();
+$AbsentConsult =    $AbsentConsult->getValues(User::current()->getDirector())[0]->value();
+$LidClient =        $LidClient->getValues(User::current()->getDirector())[0]->value();
 
 $StatusesOutput = new Core_Entity();
 $StatusesOutput
@@ -52,6 +54,7 @@ $StatusesOutput
     ->addSimpleEntity('lid_status_consult', $OnConsult)
     ->addSimpleEntity('lid_status_consult_attended', $AttendedConsult)
     ->addSimpleEntity('lid_status_consult_absent', $AbsentConsult)
+    ->addSimpleEntity('lid_status_client', $LidClient)
     ->xsl('musadm/lids/statuses.xsl')
     ->addEntities($Statuses)
     ->show();

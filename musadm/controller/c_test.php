@@ -64,3 +64,16 @@ $Orm = new Orm();
 //Core::factory('Core_Access_Group', 4)->capabilityForbidden(Core_Access::LID_STATISTIC);
 //Core::factory('Core_Access_Group', 5)->capabilityAllow(Core_Access::LID_STATISTIC);
 //Core::factory('Core_Access_Group', 6)->capabilityAllow(Core_Access::LID_STATISTIC);
+
+$LidStatusClient = Core::factory('Property')
+    ->tagName('lid_status_client')
+    ->title('Статус: стал клиентом')
+    ->description('Статус, присваевымый лиду после того как он стал клиентом')
+    ->type('int')
+    ->defaultValue(0)
+    ->dir(0)
+    ->sorting(0)
+    ->save();
+//$LidStatusClient = Core::factory('Property', 55);
+$Director = Core::factory('User', 516);
+$LidStatusClient->addNewValue($Director, 4);

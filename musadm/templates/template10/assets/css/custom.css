@@ -241,6 +241,11 @@ section {
     background: url("../images/arrow-right.png");
     background-size: cover;
 }
+
+.add_user {
+    background: url("../images/add_user.png");
+    background-size: cover;
+}
 /**
  *  <<Конец
  *  Иконки действий
