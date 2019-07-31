@@ -441,6 +441,8 @@ function makeLidPopup(lidId) {
 
         let isSelected;
 
+        Schedule.clearCache();
+        Lids.clearCache();
         PropertyList.clearCache(50);
         PropertyList.clearCache(54);
 
