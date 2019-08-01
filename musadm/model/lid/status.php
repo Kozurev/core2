@@ -180,7 +180,7 @@ class Lid_Status extends Core_Entity
         $default->class = 'item-default';
 
         $orange = new stdClass();
-        $orange->name = 'Ораньжевый';
+        $orange->name = 'Оранжевый';
         $orange->class = 'item-orange';
 
         $blue = new stdClass();
