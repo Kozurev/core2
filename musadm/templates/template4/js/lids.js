@@ -560,6 +560,7 @@ function prependLidCard(lid, block) {
         card +=
                         '<a class="action edit" onclick="makeLidPopup('+lid.id+')" title="Редактировать лида"></a>' +
                         '<a class="action comment" title="Добавить комментарий" onclick="makeLidCommentPopup(0, '+lid.id+', saveLidCommentCallback)"></a>' +
+                        '<a class="action add_user" title="Создать пользователя" onclick="makeClientFromLidPopup('+lid.id+')"></a>' +
                     '</div>' +
                     '<div class="col-sm-9 col-xs-12 comments-column">' +
                         '<div class="comments">';
