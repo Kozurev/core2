@@ -9,10 +9,10 @@
                     <thead>
                         <tr>
                             <th><xsl:value-of select="title" /></th>
+                            <th class="right">Всего</th>
                             <xsl:for-each select="/root/lid_status">
                                 <th class="center"><xsl:value-of select="title" /></th>
                             </xsl:for-each>
-                            <th class="right">Всего</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -27,8 +27,8 @@
     <xsl:template match="val">
         <tr>
             <td><xsl:value-of select="title" /></td>
-            <xsl:apply-templates select="status" />
             <td class="right"><xsl:value-of select="total_count" /></td>
+            <xsl:apply-templates select="status" />
         </tr>
     </xsl:template>
 
