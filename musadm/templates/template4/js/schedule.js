@@ -542,8 +542,8 @@ function saveScheduleTask(formData, func) {
 
 
 function refreshSchedule() {
-    $(".schedule_calendar").trigger('change');
-    $("#month").trigger('change');
+    $('.schedule_calendar').trigger('change');
+    $('#month').trigger('change');
 }
 
 function getSchedule(userId, date, func) {

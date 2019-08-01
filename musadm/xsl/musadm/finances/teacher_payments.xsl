@@ -13,15 +13,12 @@
                 <table class="table table-striped teacher_payments">
                     <xsl:if test="access_payment_create = 1">
                         <tr>
-                            <td><input name="date" class="form-control" type="date" value="{date}"/></td>
-                            <td><input name="summ" class="form-control" type="number" placeholder="Сумма" /></td>
+                            <td><input name="date" id="paymentDate" class="form-control" type="date" value="{date}"/></td>
+                            <td><input name="summ" id="paymentVal" class="form-control" type="number" placeholder="Сумма" /></td>
                             <td colspan="2"><input name="description" class="form-control" type="text" placeholder="Примечание к платежу" /></td>
                             <td class="center">
                                 <input type="hidden" name="userid" value="{userid}" />
-                                <a class="action pay" onclick="Payment.save(
-                                    0, {//userid}, $('input[name=summ]').val(), 3, $('input[name=date]').val(), 0,
-                                    $('input[name=description]').val(), '', saveTeacherPaymentCallback
-                                )" title="Добавить выплату"></a>
+                                <a class="action pay" onclick="Payment.save(0, {//userid}, $('#paymentVal').val(), 3, $('#paymentDate').val(), 0, $('input[name=description]').val(), '', saveTeacherPaymentCallback)" title="Добавить выплату"></a>
                             </td>
                         </tr>
                     </xsl:if>
