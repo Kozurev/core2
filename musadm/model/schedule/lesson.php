@@ -323,7 +323,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         if ($attendance == 1) {
             $Report->teacherRate($teacherRateValue);
         } elseif ($attendance == 0 && $this->typeId() == self::TYPE_GROUP) {
-            $Report->teacherRate($teacherRateValue);
+            $Report->teacherRate($teacherAbsentValue);
         } else {
             $Report->teacherRate($teacherAbsentValue);
         }
@@ -371,6 +371,8 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
                 if ($presence == 0 && $this->typeId() == self::TYPE_INDIV) {
                     $clientRateValue *= $absentRateValue;
+                } elseif ($presence == 0 && $this->typeId() == self::TYPE_GROUP) {
+                    $clientRateValue = 0.0;
                 }
             } else {
                 $clientRateValue = 0.0;
