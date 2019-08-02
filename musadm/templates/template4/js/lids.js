@@ -768,13 +768,18 @@ function makeClientFromLidPopup(lidId) {
 
 
 function makeClientFromLidCallback(client) {
-    Lids.getPrioritySetting(Lids.STATUS_CLIENT, function(status){
-        let lidId = localStorage.getItem('clientFromLidId');
-        localStorage.removeItem('clientFromLidId');
-        Lids.changeStatus(lidId, status.id, function(response){
-            changeLidStatusCallback(response);
-            loaderOff();
-            closePopup();
+    if (client.error == undefined) {
+        Lids.getPrioritySetting(Lids.STATUS_CLIENT, function(status){
+            let lidId = localStorage.getItem('clientFromLidId');
+            localStorage.removeItem('clientFromLidId');
+            Lids.changeStatus(lidId, status.id, function(response){
+                changeLidStatusCallback(response);
+                loaderOff();
+                closePopup();
+            });
         });
-    });
+    } else {
+        notificationError(client.error.message);
+        loaderOff();
+    }
 }
