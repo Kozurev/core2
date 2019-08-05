@@ -158,20 +158,18 @@ $(function () {
  * Перезагрузка блока с классом lids
  */
 function refreshLidTable() {
-    var dateFrom = $("input[name=date_from]").val();
-    var dateTo = $("input[name=date_to]").val();
-    var areaId = $('select[name=area_id]').val();
+    // var dateFrom = $("input[name=date_from]").val();
+    // var dateTo = $("input[name=date_to]").val();
+    // var areaId = $('select[name=area_id]').val();
+    let filtersForm = $('#filter_lids');
+    let data = filtersForm.serialize();
+    data += '&action=refreshLidTable';
 
     $.ajax({
         type: 'GET',
         url: '',
         async: false,
-        data: {
-            action: 'refreshLidTable',
-            date_from: dateFrom,
-            date_to: dateTo,
-            area_id: areaId
-        },
+        data: data,
         success: function (response) {
             $('.lids').html(response);
             loaderOff();
@@ -280,47 +278,51 @@ $(function(){
         .on('click', '.lids_search', function(e) {
             e.preventDefault();
             loaderOn();
-            let filtersForm = $('#filter_lids');
-            let params = {filter: {}};
+            //let filtersForm = $('#filter_lids');
+            //let data = filtersForm.serialize();
+            //data += '&action=refreshLidTable';
+            refreshLidTable();
+            // let params = {filter: {}};
+            //
+            // let periodFrom = filtersForm.find('input[name=date_from]').val();
+            // let periodTo = filtersForm.find('input[name=date_to]').val();
+            // let id = filtersForm.find('input[name=id]').val();
+            // let number = filtersForm.find('input[name=number]').val();
+            // let statusId = filtersForm.find('select[name=status_id]').val();
+            // let areaId = filtersForm.find('select[name=area_id]').val();
+            //
+            // if (id == '' && number == '') {
+            //     params['date_from'] = periodFrom;
+            //     params['date_to'] = periodTo;
+            // }
+            // if (statusId > 0) {
+            //     params.filter['status_id'] = statusId;
+            // }
+            // if (areaId > 0) {
+            //     params.filter['area_id'] = areaId;
+            // }
+            // if (id > 0) {
+            //     params.filter['id'] = id;
+            // }
+            // if (number != '') {
+            //     params.filter['number'] = number;
+            // }
+            //
+            // params.order = {priority_id: 'ASC', id: 'ASC'};
+            // params.select = ['property_50', 'property_54'];
 
-            let periodFrom = filtersForm.find('input[name=date_from]').val();
-            let periodTo = filtersForm.find('input[name=date_to]').val();
-            let id = filtersForm.find('input[name=id]').val();
-            let number = filtersForm.find('input[name=number]').val();
-            let statusId = filtersForm.find('select[name=status_id]').val();
-            let areaId = filtersForm.find('select[name=area_id]').val();
-
-            if (id == '' && number == '') {
-                params['date_from'] = periodFrom;
-                params['date_to'] = periodTo;
-            }
-            if (statusId > 0) {
-                params.filter['status_id'] = statusId;
-            }
-            if (areaId > 0) {
-                params.filter['area_id'] = areaId;
-            }
-            if (id > 0) {
-                params.filter['id'] = id;
-            }
-            if (number != '') {
-                params.filter['number'] = number;
-            }
-
-            params.order = {priority_id: 'ASC', id: 'ASC'};
-            params.select = ['property_50', 'property_54'];
-
-            Lids.clearCache();
-            Schedule.clearCache();
-
-            Lids.getList(params, function(lids){
-                let lidsBlock = $('.section-lids').find('.row');
-                lidsBlock.empty();
-                $.each(lids, function(key, lid){
-                    prependLidCard(lid, lidsBlock);
-                });
-                loaderOff();
-            });
+            // Lids.clearCache();
+            // Schedule.clearCache();
+            //
+            // Lids.getList(params, function(lids){
+            //     console.log(lids);
+            //     let lidsBlock = $('.section-lids').find('.row');
+            //     lidsBlock.empty();
+            //     $.each(lids, function(key, lid){
+            //         prependLidCard(lid, lidsBlock);
+            //     });
+            //     loaderOff();
+            // });
         })
         //Обновление данных страницы аналитики лидов
         .on('click', '.lids_statistic_show', function(e){
@@ -345,7 +347,6 @@ $(function(){
             e.preventDefault();
             loaderOn();
             let formData = $('#filter_lids').serialize();
-            console.log(formData);
             $.ajax({
                 type: 'GET',
                 url: root + '/lids/consults?action=refresh',
@@ -618,7 +619,7 @@ function prependLidCard(lid, block) {
 function makeLidCommentBlock(comment) {
     return '<div class="block">' +
             '<div class="comment_header">' +
-                '<div class="author">'+comment.authorFio+'</div>' +
+                '<div class="author">'+comment.author_fullname+'</div>' +
                 '<div class="date">'+comment.refactoredDatetime+'</div>' +
             '</div>' +
             '<div class="comment_body">'+comment.text+'</div>' +
@@ -641,6 +642,7 @@ function makeLidCommentPopup(commentId, lidId, callback) {
 function saveLidCommentCallback(comment) {
     if (comment.status == false) {
         notificationError(comment.message);
+        loaderOff();
     } else {
         $('.lid_' + comment.lid_id).find('.comments').prepend(makeLidCommentBlock(comment));
     }

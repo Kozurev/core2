@@ -32,10 +32,10 @@
                     <div class="row buttons-panel center">
                         <!--<xsl:call-template name="areas_row" />-->
                         <div>
-                            <input class="form-control" type="number" name="id" placeholder="Номер лида" />
+                            <input class="form-control" type="number" name="id" placeholder="Номер лида" value="{/root/id}"/>
                         </div>
                         <div>
-                            <input class="form-control" type="text" name="number" placeholder="Телефон"/>
+                            <input class="form-control" type="text" name="number" placeholder="Телефон" value="{/root/number}"/>
                         </div>
 
                         <div class="right">
@@ -45,7 +45,13 @@
                             <select name="status_id" class="form-control">
                                 <option value="0"> ... </option>
                                 <xsl:for-each select="lid_status">
-                                    <option value="{id}"><xsl:value-of select="title" /></option>
+                                    <xsl:variable name="id" select="id" />
+                                    <option value="{id}">
+                                        <xsl:if test="$id = /root/status_id">
+                                            <xsl:attribute name="selected">selected</xsl:attribute>
+                                        </xsl:if>
+                                        <xsl:value-of select="title" />
+                                    </option>
                                 </xsl:for-each>
                             </select>
                         </div>
