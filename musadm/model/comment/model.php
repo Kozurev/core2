@@ -1,13 +1,17 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Kozurev Egor
- * Date: 31.01.2019
- * Time: 10:26
+ * Модель комментария
+ *
+ * @author BadWolf
+ * @date 31.01.2019 10:26
+ * @version 20190802
+ * Class Comment_Model
  */
-
 class Comment_Model extends Core_Entity
 {
+    /**
+     * @var int
+     */
     protected $id;
 
     /**
@@ -42,88 +46,64 @@ class Comment_Model extends Core_Entity
     protected $text;
 
 
-    /**
-     * Название класса объекта с которым связан комментарий
-     *
-     * @var string
-     */
-    protected $model_name;
-
 
     /**
-     * id объекта с которым связан комментарий
-     *
-     * @var int
+     * @param string|null $datetime
+     * @return $this|string
      */
-    protected $model_id;
-
-
-
-
-    public function getId()
+    public function datetime(string $datetime = null)
     {
-        return intval( $this->id );
+        if (is_null($datetime)) {
+            return strval($this->datetime);
+        } else {
+            $this->datetime = strval($datetime);
+            return $this;
+        }
     }
 
 
-    public function datetime( $val = null )
+    /**
+     * @param int|null $authorId
+     * @return $this|int
+     */
+    public function authorId(int $authorId = null)
     {
-        if ( is_null( $val ) )  return strval( $this->datetime );
-
-        $this->datetime = strval( $val );
-
-        return $this;
+        if (is_null($authorId)) {
+            return intval($this->author_id);
+        } else {
+            $this->author_id = $authorId;
+            return $this;
+        }
     }
 
 
-    public function authorId( $val = null )
+    /**
+     * @param string|null $authorFullname
+     * @return $this|string
+     */
+    public function authorFullname(string $authorFullname = null)
     {
-        if ( is_null( $val ) )  return intval( $this->author_id );
-
-        $this->author_id = intval( $val );
-
-        return $this;
+        if (is_null($authorFullname)) {
+            return strval($this->author_fullname);
+        } else {
+            $this->author_fullname = $authorFullname;
+            return $this;
+        }
     }
 
 
-    public function authorFullname( $val = null )
+    /**
+     * @param string|null $text
+     * @return $this|string
+     */
+    public function text(string $text = null)
     {
-        if ( is_null( $val ) )  return strval( $this->author_fullname );
-
-        $this->author_fullname = strval( $val );
-
-        return $this;
+        if (is_null($text)) {
+            return strval($this->text);
+        } else {
+            $this->text = $text;
+            return $this;
+        }
     }
-
-
-    public function text( $val = null )
-    {
-        if ( is_null( $val ) )  return strval( $this->text );
-
-        $this->text = strval( $val );
-
-        return $this;
-    }
-
-
-    public function modelName( $val = null )
-    {
-        if ( is_null( $val ) )  return strval( $this->model_name );
-
-        $this->model_name = strval( $val );
-
-        return $this;
-    }
-
-
-    public function modelId( $val = null )
-    {
-        if ( is_null( $val ) )  return intval( $this->model_id );
-
-        $this->model_id = intval( $val );
-
-        return $this;
-    }
-
 
 }

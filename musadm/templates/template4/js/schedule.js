@@ -292,6 +292,7 @@ $(function(){
             var date = tr.find('input[name=date]').val();
             var typeId = tr.find('input[name=typeId]').val();
             var attendance = tr.find('input[type=checkbox]');
+            var note = tr.find('input[name=note]');
 
             var ajaxData = {
                 action: 'teacherReport',
@@ -312,6 +313,7 @@ $(function(){
                 ajaxData['attendance'] = Number($(attendance[0]).is(':checked'));
             }
 
+            //Отправка данных о проведенном занятии
             $.ajax({
                 type: 'GET',
                 url: '',
@@ -320,7 +322,15 @@ $(function(){
                     if (response != '') {
                         notificationError(response);
                     }
-                    refreshSchedule();
+                    //Создание комментария лиду
+                    if (typeId == 3 && note.lendth != 0 && note.val() != '') {
+                        Lids.saveComment(0, note.data('lidid'), note.val(), function(response){
+                            checkResponseStatus(response);
+                            refreshSchedule();
+                        });
+                    } else {
+                        refreshSchedule();
+                    }
                 },
                 error: function(response) {
                     notificationError('Произошла ошибка: ' + response);

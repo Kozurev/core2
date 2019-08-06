@@ -118,17 +118,14 @@
                     <div class="col-sm-9 col-xs-12 comments-column">
                         <div class="comments">
                             <input type="hidden" value="KOCTb|J|b" />
-                            <xsl:for-each select="comments/lid_comment[text != '']">
-                                <xsl:variable name="author" select="author_id" />
+                            <xsl:for-each select="comments/comment[text != '']">
                                 <div class="block">
                                     <div class="comment_header">
                                         <div class="author">
-                                            <xsl:value-of select="surname" />
-                                            <xsl:text> </xsl:text>
-                                            <xsl:value-of select="name" />
+                                            <xsl:value-of select="author_fullname" />
                                         </div>
                                         <div class="date">
-                                            <xsl:value-of select="datetime" />
+                                            <xsl:value-of select="refactoredDatetime" />
                                         </div>
                                     </div>
 

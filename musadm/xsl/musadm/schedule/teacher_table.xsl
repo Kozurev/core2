@@ -37,9 +37,12 @@
                     <xsl:choose>
                         <xsl:when test="type_id = 3">
                             <xsl:variable name="lidId" select="client_id" />
+                            <xsl:variable name="isReported">
+                                <xsl:value-of select="count(report)" />
+                            </xsl:variable>
 
                             <input type="checkbox" name="attendance_{$lidId}" id="attendance_{$lidId}">
-                                <xsl:if test="report/id">
+                                <xsl:if test="$isReported = 1">
                                     <xsl:attribute name="disabled">disabled</xsl:attribute>
                                 </xsl:if>
                                 <xsl:if test="report/attendance = 1">
@@ -50,27 +53,23 @@
                             <label for="attendance_{$lidId}">
                                 Консультация
                                 <xsl:if test="client_id != 0">
-                                    <!--<xsl:apply-templates select="client" />-->
                                     <xsl:value-of select="client_id" />
-
                                     <xsl:if test="client/name != '' or client/surname != '' or client/number != ''">
                                         <xsl:text> (</xsl:text>
                                         <xsl:if test="client/surname != ''">
                                             <xsl:value-of select="client/surname" />
                                             <xsl:text> </xsl:text>
                                         </xsl:if>
-
                                         <xsl:if test="client/name != ''">
                                             <xsl:value-of select="client/name" />
                                         </xsl:if>
-
-                                        <!--<xsl:if test="client/number != ''">-->
-                                            <!--<xsl:value-of select="client/number" />-->
-                                        <!--</xsl:if>-->
                                         <xsl:text>)</xsl:text>
                                     </xsl:if>
                                 </xsl:if>
                             </label>
+                            <xsl:if test="$isReported = 0 and $lidId > 0">
+                                <input type="text" class="form-control" placeholder="Примечание" name="note" data-lidid="{$lidId}"/>
+                            </xsl:if>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:apply-templates select="client" />

@@ -345,7 +345,7 @@ Core::attachObserver( 'after.Lid.changeDate', function($args) {
 /**
  * Добавление комментария лиду
  */
-Core::attachObserver('before.Lid.addComment', function($args) {
+Core::attachObserver('after.Lid.addComment', function($args) {
     $EventData = new stdClass();
     $EventData->Comment = $args[0];
     Core::factory('Event')

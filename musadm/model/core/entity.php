@@ -433,33 +433,41 @@ class Core_Entity extends Core_Entity_Model
      */
     public function toStd()
     {
-        $Model = $this->getModel();
-        if (is_null($Model)) {
-            $Model = $this;
-        }
-        $stdModel = new stdClass();
-        foreach (get_object_vars($Model) as $propertyName => $propertyValue) {
-            if ($propertyName == 'id') {
-                $stdModel->id = $this->getId();
-                continue;
-            } else {
-                $snakeCaseGetter = $propertyName;
-                $camelCaseGetter = toCamelCase($propertyName);
-            }
+//        $Model = $this->getModel();
+//        if (is_null($Model)) {
+//            $Model = $this;
+//        }
+//        $stdModel = new stdClass();
+//        foreach (get_object_vars($Model) as $propertyName => $propertyValue) {
+//            if ($propertyName == 'id') {
+//                $stdModel->id = $this->getId();
+//                continue;
+//            } else {
+//                $snakeCaseGetter = $propertyName;
+//                $camelCaseGetter = toCamelCase($propertyName);
+//            }
+//
+//            if (method_exists($Model, $camelCaseGetter)) {
+//                $value = $Model->$camelCaseGetter();
+//            } elseif (method_exists($Model, $snakeCaseGetter)) {
+//                $value = $Model->$snakeCaseGetter();
+//            } else {
+//                continue;
+//            }
+//
+//            if (!is_array($value) && !is_object($value)) {
+//                $stdModel->$propertyName = $value;
+//            }
+//        }
 
-            if (method_exists($Model, $camelCaseGetter)) {
-                $value = $Model->$camelCaseGetter();
-            } elseif (method_exists($Model, $snakeCaseGetter)) {
-                $value = $Model->$snakeCaseGetter();
-            } else {
-                continue;
-            }
-
-            if (!is_array($value) && !is_object($value)) {
-                $stdModel->$propertyName = $value;
+        $std = new stdClass();
+        $forbiddenProps = ['childrenObjects', 'aEntityVars'];
+        foreach(get_object_vars($this) as $var => $value) {
+            if (!in_array($var, $forbiddenProps)) {
+                $std->$var = $value;
             }
         }
-        return $stdModel;
+        return $std;
     }
 
 

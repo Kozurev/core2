@@ -14,7 +14,6 @@ require_once ROOT . '/constants.php';
 require_once ROOT . '/model/db.php';
 require_once ROOT . '/config/config.php';
 require_once ROOT . '/model/core.php';
-require_once ROOT . '/includes.php';
 require_once ROOT . '/model/core/array.php';
 
 
@@ -40,6 +39,7 @@ require_once ROOT . '/model/property/assigment.php';
 require_once ROOT . '/model/constant/model.php';
 require_once ROOT . '/model/constant.php';
 require_once ROOT . '/model/core/page/show.php';
+require_once ROOT . '/includes.php';
 
 //Установка системных констант
 //TODO: убрать эти константы и переработать механизм отладки аналогично Orm::Debug()

@@ -6,6 +6,7 @@
  * @date 24.04.2018 22:10
  * @version 20190328
  * @version 20190712
+ * @version 20190803
  * Class Lid
  */
 class Lid extends Lid_Model
@@ -71,20 +72,61 @@ class Lid extends Lid_Model
     /**
      * Получение списко комментариев лида в уже отсортированном порядке
      *
+     * @throws Exception
      * @return array
      */
     public function getComments()
     {
-        if (empty($this->id)) {
-            return [];
-        }
+//        if (empty($this->id)) {
+//            return [];
+//        }
+//
+//        return Core::factory('Lid_Comment')
+//            ->queryBuilder()
+//            ->where('lid_id', '=', $this->id)
+//            ->orderBy('datetime', 'DESC')
+//            ->findAll();
 
-        return Core::factory('Lid_Comment')
-            ->queryBuilder()
-            ->where('lid_id', '=', $this->id)
-            ->orderBy('datetime', 'DESC')
-            ->findAll();
+        return Comment::getAll($this);
     }
+
+
+//    /**
+//     * Добавление комментария к лиду
+//     *
+//     * @param string $text
+//     * @param bool $triggerObserver
+//     * @return Lid_Comment
+//     */
+//    public function addComment(string $text, $triggerObserver = true)
+//    {
+//        if (empty($this->id)) {
+//            exit('Не указан id лида при сохранении комментария');
+//        }
+//
+//        $User = User::current();
+//        is_null($User)
+//            ?   $authorId = 0
+//            :   $authorId = $User->getId();
+//
+//        $Comment = Core::factory('Lid_Comment')
+//            ->datetime(date('Y-m-d H:i:s'))
+//            ->authorId($authorId)
+//            ->lidId($this->id)
+//            ->text($text);
+//
+//        if ($triggerObserver === true) {
+//            Core::notify([&$Comment], 'before.Lid.addComment');
+//        }
+//
+//        $Comment->save();
+//
+//        if ($triggerObserver === true) {
+//            Core::notify( [&$Comment], 'after.Lid.addComment' );
+//        }
+//
+//        return $Comment;
+//    }
 
 
     /**
@@ -92,36 +134,28 @@ class Lid extends Lid_Model
      *
      * @param string $text
      * @param bool $triggerObserver
-     * @return Lid_Comment
+     * @throws Exception
+     * @return Comment|null
      */
     public function addComment(string $text, $triggerObserver = true)
     {
-        if (empty($this->id)) {
-            exit('Не указан id лида при сохранении комментария');
-        }
-
-        $User = User::current();
-        is_null($User)
-            ?   $authorId = 0
-            :   $authorId = $User->getId();
-
-        $Comment = Core::factory('Lid_Comment')
-            ->datetime(date('Y-m-d H:i:s'))
-            ->authorId($authorId)
-            ->lidId($this->id)
-            ->text($text);
+        Core::requireClass('Comment');
 
         if ($triggerObserver === true) {
-            Core::notify([&$Comment], 'before.Lid.addComment');
+            Core::notify([&$this], 'before.Lid.addComment');
         }
 
-        $Comment->save();
+        $NewComment = Comment::create($this, $text);
+
+        if (is_null($NewComment)) {
+            return null;
+        }
 
         if ($triggerObserver === true) {
-            Core::notify( [&$Comment], 'after.Lid.addComment' );
+            Core::notify([&$NewComment], 'after.Lid.addComment' );
         }
 
-        return $Comment;
+        return $NewComment;
     }
 
 

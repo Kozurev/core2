@@ -142,6 +142,14 @@ class Controller
 
 
     /**
+     * Поиск лидов производится с комментариями или без
+     *
+     * @var bool
+     */
+    protected $isWithComments = true;
+
+
+    /**
      * Кол-во найденных объектов
      *
      * @var int
@@ -349,6 +357,17 @@ class Controller
     public function isLimitedAreasAccess(bool $isLimited)
     {
         $this->isLimitedAreasAccess = $isLimited;
+        return $this;
+    }
+
+
+    /**
+     * @param bool $isWithComments
+     * @return $this
+     */
+    public function isWithComments(bool $isWithComments)
+    {
+        $this->isWithComments = $isWithComments;
         return $this;
     }
 
@@ -625,6 +644,44 @@ class Controller
                 } //end foreach
             } //end properties foreach
         } //end condition properties exists
+    }
+
+
+    /**
+     * Добавление комментариев к объектам
+     */
+    public function addComments()
+    {
+        $Comment = new Comment();
+        $Assignment = Comment::getAssignment($this->Object);
+        $Comments = $Comment->queryBuilder()
+            ->addSelect('asgm.object_id', 'objectId')
+            ->join(
+                $Assignment->getTableName() . ' AS asgm',
+                'asgm.object_id in ('.implode(', ' ,$this->foundObjectsIds).') 
+                AND asgm.comment_id = '.$Comment->getTableName().'.id'
+            )
+            //->orderBy('datetime', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->findAll();
+
+        foreach ($this->foundObjects as $Object) {
+            $XmlComments = Core::factory('Core_Entity')->_entityName('comments');
+            $Object->comments = [];
+            foreach ($Comments as $key => $Comment) {
+                if ($Object->getId() == $Comment->objectId) {
+                    //Преобразование строки с датой и временем в нормальный формат
+                    $commentDatetime = $Comment->datetime();
+                    $commentDatetime = strtotime($commentDatetime);
+                    $commentDatetime = date('d.m.y H:i', $commentDatetime);
+                    $Comment->refactoredDatetime = $commentDatetime;
+                    $XmlComments->addEntity($Comment);
+                    $Object->comments[] = $Comment;
+                    unset ($Comments[$key]);
+                }
+            }
+            $Object->addEntity($XmlComments);
+        }
     }
 
 

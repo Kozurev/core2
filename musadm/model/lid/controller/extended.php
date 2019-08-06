@@ -10,15 +10,6 @@ Core::requireClass('Controller');
 
 class Lid_Controller_Extended extends Controller
 {
-
-    /**
-     * Поиск лидов производится с комментариями или без
-     *
-     * @var bool
-     */
-    protected $isWithComments = true;
-
-
     /**
      * Поиск лидов производится со списком статусов или юез
      *
@@ -83,16 +74,6 @@ class Lid_Controller_Extended extends Controller
         $this->setXsl('musadm/lids/lids.xsl');
     }
 
-
-    /**
-     * @param bool $isWithComments
-     * @return $this
-     */
-    public function isWithComments(bool $isWithComments)
-    {
-        $this->isWithComments = $isWithComments;
-        return $this;
-    }
 
     /**
      * @param bool $isWithStatuses
@@ -252,32 +233,7 @@ class Lid_Controller_Extended extends Controller
 
         //Поиск комментариев
         if ($this->isWithComments === true) {
-            $Comments = Core::factory('Lid_Comment')
-                ->queryBuilder()
-                ->addSelect(['surname', 'name'])
-                ->leftJoin('User', 'User.id = author_id')
-                ->whereIn('lid_id', $this->foundObjectsIds)
-                ->orderBy('Lid_Comment.id', 'DESC')
-                ->findAll();
-
-            foreach ($this->foundObjects as $Lid) {
-                $LidComments = Core::factory('Core_Entity')->_entityName('comments');
-                $Lid->comments = [];
-                foreach ($Comments as $key => $Comment) {
-                    if ($Lid->getId() === $Comment->lidId()) {
-                        //Преобразование строки с датой и временем в нормальный формат
-                        $commentDatetime = $Comment->datetime();
-                        $commentDatetime = strtotime($commentDatetime);
-                        $commentDatetime = date('d.m.y H:i', $commentDatetime);
-                        $Comment->datetime($commentDatetime);
-                        $LidComments->addEntity($Comment);
-                        $Lid->comments[] = $Comment;
-                        unset ($Comments[$key]);
-                    }
-                }
-
-                $Lid->addEntity($LidComments);
-            }
+            $this->addComments();
         }
 
         Core::notify([&$this], 'before.LidControllerExtended.getLids');

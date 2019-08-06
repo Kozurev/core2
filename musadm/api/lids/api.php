@@ -87,14 +87,14 @@ if ($action === 'getList') {
         $stdLid->comments = [];
         foreach ($Lid->comments as $comment) {
             $stdComment = $comment->toStd();
-            $CommentAuthor = User_Controller::factory($comment->authorId(), false);
-            $stdComment->authorFio = !is_null($CommentAuthor)
-                ?   $CommentAuthor->surname() . ' ' . $CommentAuthor->name()
-                :   'Неизвестно';
-            $commentDatetime = $comment->datetime();
-            $commentDatetime = strtotime($commentDatetime);
-            $commentDatetime = date('d.m.y H:i', $commentDatetime);
-            $stdComment->refactoredDatetime = $commentDatetime;
+//            $CommentAuthor = User_Controller::factory($comment->authorId(), false);
+//            $stdComment->authorFio = !is_null($CommentAuthor)
+//                ?   $CommentAuthor->surname() . ' ' . $CommentAuthor->name()
+//                :   'Неизвестно';
+//            $commentDatetime = $comment->datetime();
+//            $commentDatetime = strtotime($commentDatetime);
+//            $commentDatetime = date('d.m.y H:i', $commentDatetime);
+//            $stdComment->refactoredDatetime = $commentDatetime;
             $stdLid->comments[] = $stdComment;
         }
         foreach ($selectedProperties as $propId) {
@@ -153,15 +153,21 @@ if ($action === 'getLid' || $action === 'getById') {
     $response = $Lid->toStd();
 
     //Подгрузка комментариев
+    try {
+        $Comments = $Lid->getComments();
+    } catch (Exception $e) {
+        exit(REST::status(REST::STATUS_ERROR, $e->getMessage()));
+    }
+
     $response->comments = [];
-    foreach ($Lid->getComments() as $Comment) {
+    foreach ($Comments as $Comment) {
         $stdComment = $Comment->toStd();
-        $CommentAuthor = User_Controller::factory($Comment->authorId(), $isSubordinated);
-        $stdComment->authorFio = $CommentAuthor->surname() . ' ' . $CommentAuthor->name();
-        $commentDatetime = $Comment->datetime();
-        $commentDatetime = strtotime($commentDatetime);
-        $commentDatetime = date('d.m.y H:i', $commentDatetime);
-        $stdComment->refactoredDatetime = $commentDatetime;
+//        $CommentAuthor = User_Controller::factory($Comment->authorId(), $isSubordinated);
+//        $stdComment->authorFio = $CommentAuthor->surname() . ' ' . $CommentAuthor->name();
+//        $commentDatetime = $Comment->datetime();
+//        $commentDatetime = strtotime($commentDatetime);
+//        $commentDatetime = date('d.m.y H:i', $commentDatetime);
+//        $stdComment->refactoredDatetime = $commentDatetime;
         $response->comments[] = $stdComment;
     }
 
@@ -463,13 +469,19 @@ if ($action === 'saveComment') {
         if (is_null($Lid)) {
             exit(REST::status(REST::STATUS_ERROR, 'Лид с id ' . $lidId . ' не найден'));
         }
-        $LidComment = $Lid->addComment($commentText);
+
+        try {
+            $LidComment = $Lid->addComment($commentText);
+        } catch (Exception $e) {
+            exit(REST::status(REST::STATUS_ERROR, $e->getMessage()));
+        }
     }
 
     $response = $LidComment->toStd();
+    $response->lid_id = $Lid->getId();
 
     //Сбор информации об авторе и дате создания комментария
-    $CommentAuthor = User_Controller::factory($LidComment->authorId());
+    $CommentAuthor = User_Controller::factory($LidComment->authorId(), false);
     $response->authorFio = $CommentAuthor->surname() . ' ' . $CommentAuthor->name();
     $commentDatetime = $LidComment->datetime();
     $commentDatetime = strtotime($commentDatetime);
@@ -481,7 +493,7 @@ if ($action === 'saveComment') {
 
 
 /**
- *
+ * Поиск значения настройки приоритетов лидов
  */
 if ($action === 'getPrioritySetting') {
     $statusType = Core_Array::Get('statusType', null, PARAM_STRING);
