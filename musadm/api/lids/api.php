@@ -235,10 +235,12 @@ if ($action === 'save') {
     $comment = Core_Array::Post('comment', '', PARAM_STRING);
     $response->comments = [];
     if (!empty($comment)) {
-        $NewComment = $Lid->addComment($comment, false);
+        try {
+            $NewComment = $Lid->addComment($comment, false);
+        } catch (Exception $e) {
+            exit(REST::status(REST::STATUS_ERROR, $e->getMessage()));
+        }
         $stdComment = $NewComment->toStd();
-        $CommentAuthor = User_Controller::factory($NewComment->authorId());
-        $stdComment->authorFio = $CommentAuthor->surname() . ' ' . $CommentAuthor->name();
         $commentDatetime = $NewComment->datetime();
         $commentDatetime = strtotime($commentDatetime);
         $commentDatetime = date('d.m.y H:i', $commentDatetime);
