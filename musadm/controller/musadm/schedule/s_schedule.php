@@ -28,6 +28,9 @@ if ($isTeacherPage == true) {
     if (is_null($Teacher)) {
         Core_Page_Show::instance()->error(404);
     }
+    if (!Core_Access::instance()->hasCapability(Core_Access::USER_LC_TEACHER)) {
+        Core_Page_Show::instance()->error(403);
+    }
 
     $teacherFio = $Teacher->surname() . ' ' . $Teacher->name();
     Core_Page_Show::instance()->title = $teacherFio . ' | Личный кабинет';

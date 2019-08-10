@@ -25,7 +25,7 @@ if (Core_Array::Get('ajax', 0) == 1) {
     exit;
 }
 
-Core::factory('User_Controller');
+Core::requireClass('User_Controller');
 $User = User::current();
 
 if (is_null($User)) {
@@ -399,7 +399,7 @@ if ($action === 'edit_report_popup') {
 }
 
 
-if (!Core_Access::instance()->hasCapability(Core_Access::USER_READ_CLIENTS)) {
+if (!Core_Access::instance()->hasCapability(Core_Access::USER_LC_CLIENT)) {
     Core_Page_Show::instance()->error(403);
 }
 

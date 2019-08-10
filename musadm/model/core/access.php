@@ -23,6 +23,8 @@ class Core_Access
     const USER_DELETE = 'user_delete';
     const USER_EDIT_LESSONS = 'user_edit_lessons';
     const USER_APPEND_COMMENT = 'user_append_comment';
+    const USER_LC_CLIENT = 'user_lc_client';
+    const USER_LC_TEACHER = 'user_lc_teacher';
 
     const TASK_READ = 'task_read';
     const TASK_CREATE = 'task_create';
@@ -38,6 +40,7 @@ class Core_Access
     const LID_STATISTIC = 'lid_statistic';
 
     const SCHEDULE_READ = 'schedule_read';
+    const SCHEDULE_READ_USER = 'schedule_read_user';
     const SCHEDULE_CREATE = 'schedule_create';
     const SCHEDULE_EDIT = 'schedule_edit';
     const SCHEDULE_DELETE = 'schedule_delete';

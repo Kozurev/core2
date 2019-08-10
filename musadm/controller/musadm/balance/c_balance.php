@@ -116,7 +116,7 @@ $OutputXml
     ->show();
 
 //Формирование таблицы расписания для клиентов
-if ($User->groupId() == ROLE_CLIENT && Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ)) {
+if ($User->groupId() == ROLE_CLIENT && Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ_USER)) {
     $userId = $User->getId();
     ?>
 

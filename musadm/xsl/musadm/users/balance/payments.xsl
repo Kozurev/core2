@@ -65,15 +65,17 @@
                 </span>
             </td>
 
-            <td style="text-align:center">
-                <a class="action comment" onclick="makePaymentCommentPopup({id}, savePaymentCommentClient)" title="Добавить комментарий"></a>
-                <xsl:if test="//access_payment_edit_client = 1">
-                    <a class="action edit" onclick="makeClientPaymentPopup({id}, {user}, saveBalancePaymentCallback)" title="Редактирование платежа"></a>
-                </xsl:if>
-                <xsl:if test="//access_payment_delete_client = 1">
-                    <a class="action delete" onclick="Payment.remove({id}, removeBalancePaymentCallback)" title="Удаление платежа"></a>
-                </xsl:if>
-            </td>
+            <xsl:if test="/root/is_admin = 1">
+                <td style="text-align:center">
+                    <a class="action comment" onclick="makePaymentCommentPopup({id}, savePaymentCommentClient)" title="Добавить комментарий"></a>
+                    <xsl:if test="//access_payment_edit_client = 1">
+                        <a class="action edit" onclick="makeClientPaymentPopup({id}, {user}, saveBalancePaymentCallback)" title="Редактирование платежа"></a>
+                    </xsl:if>
+                    <xsl:if test="//access_payment_delete_client = 1">
+                        <a class="action delete" onclick="Payment.remove({id}, removeBalancePaymentCallback)" title="Удаление платежа"></a>
+                    </xsl:if>
+                </td>
+            </xsl:if>
         </tr>
     </xsl:template>
 

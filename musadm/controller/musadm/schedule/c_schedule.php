@@ -328,7 +328,7 @@ if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
  * Формирование таблицы расписания для преподавателей
  */
 if ($User->groupId() == ROLE_TEACHER) {
-    $accessScheduleRead = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ);
+    $accessScheduleRead = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ_USER);
     $accessReportRead =   Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ);
     $accessReportCreate = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_CREATE);
     $accessReportDelete = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_DELETE);
@@ -344,7 +344,7 @@ if ($User->groupId() == ROLE_TEACHER) {
     }
     $year = getYear($date);
 
-    if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ)) {
+    if ($accessScheduleRead) {
         echo '<section class="section-bordered">';
         Core::factory('Schedule_Controller')
             ->userId($userId)
