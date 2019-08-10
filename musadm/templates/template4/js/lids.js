@@ -551,7 +551,7 @@ function prependLidCard(lid, block) {
                         let source = '';
                         if (!empty(lid.source) || !empty(lid.property_50[0].value_id)) {
                             if (lid.source != '') {
-                                source = lid.soukrce;
+                                source = lid.source;
                             } else {
                                 source = lid.property_50[0].value;
                             }
