@@ -91,10 +91,10 @@ if ($action === 'getList') {
 //            $stdComment->authorFio = !is_null($CommentAuthor)
 //                ?   $CommentAuthor->surname() . ' ' . $CommentAuthor->name()
 //                :   'Неизвестно';
-//            $commentDatetime = $comment->datetime();
-//            $commentDatetime = strtotime($commentDatetime);
-//            $commentDatetime = date('d.m.y H:i', $commentDatetime);
-//            $stdComment->refactoredDatetime = $commentDatetime;
+            $commentDatetime = $comment->datetime();
+            $commentDatetime = strtotime($commentDatetime);
+            $commentDatetime = date('d.m.y H:i', $commentDatetime);
+            $stdComment->refactoredDatetime = $commentDatetime;
             $stdLid->comments[] = $stdComment;
         }
         foreach ($selectedProperties as $propId) {
@@ -164,10 +164,10 @@ if ($action === 'getLid' || $action === 'getById') {
         $stdComment = $Comment->toStd();
 //        $CommentAuthor = User_Controller::factory($Comment->authorId(), $isSubordinated);
 //        $stdComment->authorFio = $CommentAuthor->surname() . ' ' . $CommentAuthor->name();
-//        $commentDatetime = $Comment->datetime();
-//        $commentDatetime = strtotime($commentDatetime);
-//        $commentDatetime = date('d.m.y H:i', $commentDatetime);
-//        $stdComment->refactoredDatetime = $commentDatetime;
+        $commentDatetime = $Comment->datetime();
+        $commentDatetime = strtotime($commentDatetime);
+        $commentDatetime = date('d.m.y H:i', $commentDatetime);
+        $stdComment->refactoredDatetime = $commentDatetime;
         $response->comments[] = $stdComment;
     }
 
