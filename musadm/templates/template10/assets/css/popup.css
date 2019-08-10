@@ -100,7 +100,7 @@
     margin-bottom: 20px;
 }
 
-.popup .popup-row-block div {
+.popup .popup-row-block > div {
     padding-left: 0;
 }
 

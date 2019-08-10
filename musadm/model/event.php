@@ -235,8 +235,26 @@ class Event extends Event_Model
                 break;
 
             case self::LID_APPEND_COMMENT:
-                Core::factory('Lid_Comment');
-                $id = $this->data()->Comment->lidId();
+                Core::requireClass('Lid');
+                Core::requireClass('Lid_Comment');
+                Core::requireClass('Comment');
+                if ($this->data()->Comment instanceof Lid_Comment) {
+                    $id = $this->data()->Comment->lidId();
+                } elseif ($this->data()->Comment instanceof Comment) {
+                    if (isset($this->data()->Lid)) {
+                        $id = $this->data()->Lid->getId();
+                    } else {
+                        $Assignment = Core::factory('Lid_Comment_Assignment')
+                            ->queryBuilder()
+                            ->where('comment_id', '=', $this->data()->Comment->getId())
+                            ->find();
+                        if (is_null($Assignment)) {
+                            $id = 'Неизвестно';
+                        } else {
+                            $id = $Assignment->objectId();
+                        }
+                    }
+                }
                 return "Добавил(а) комментарий к лиду 
                 <a href='#' class='info-by-id' data-model='Lid' data-id='" . $id . "'>№$id</a> 
                 с текстом '" . $this->data()->Comment->text() . "'";

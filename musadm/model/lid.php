@@ -152,7 +152,7 @@ class Lid extends Lid_Model
         }
 
         if ($triggerObserver === true) {
-            Core::notify([&$NewComment], 'after.Lid.addComment' );
+            Core::notify([&$NewComment, &$this], 'after.Lid.addComment' );
         }
 
         return $NewComment;

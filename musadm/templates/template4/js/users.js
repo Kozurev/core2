@@ -193,7 +193,20 @@ $(function(){
             e.preventDefault();
             var model = $(this).data('model');
             var id = $(this).data('id');
-            getObjectPopupInfo(id, model);
+
+            if (model == 'Lid') {
+                loaderOn();
+                Lids.getLid(id, function(lid){
+                    var popupData = '<div class="popup-row-block cards-section section-lids text-center"></div>';
+                    prependPopup(popupData, 80);
+                    //$('.info-by-id')
+                    prependLidCard(lid, $('.section-lids'));
+                    showPopup();
+                    loaderOff();
+                });
+            } else {
+                getObjectPopupInfo(id, model);
+            }
         })
         .on('click', '.events_show', function(e) {
             e.preventDefault();
