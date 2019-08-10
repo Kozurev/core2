@@ -63,7 +63,7 @@ function showPopup(data) {
     $('.popup').show();
 }
 
-function prependPopup(data) {
+function prependPopup(data, popupSize) {
     let
         overlay = $('.overlay'),
         popup = $('.popup');
@@ -72,6 +72,10 @@ function prependPopup(data) {
     popup.empty();
     popup.append('<a href="#" class="popup_close"></a>');
     popup.append(data);
+
+    if (popupSize != undefined) {
+        popup.css({'width' : popupSize + '%', 'left' : (100 - popupSize) / 2 + '%'});
+    }
 }
 
 function closePopup() {
