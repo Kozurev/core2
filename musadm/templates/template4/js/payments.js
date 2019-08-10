@@ -632,10 +632,11 @@ function removeBalancePaymentCallback(payment) {
     $('#client_payment_' + payment.id).remove();
     var clientBalance = $('#balance');
     var clientBalanceVal = Number(clientBalance.text());
-    if (payment.typeId == '1') {
-        clientBalance.text(clientBalanceVal + payment.value);
-    } else {
+    console.log(payment.type == 1);
+    if (payment.type == 1) {
         clientBalance.text(clientBalanceVal - payment.value);
+    } else {
+        clientBalance.text(clientBalanceVal + Number(payment.value));
     }
 }
 
