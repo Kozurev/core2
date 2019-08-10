@@ -122,13 +122,13 @@ class Payment_Tarif_Model extends Core_Entity
 
 
     /**
-     * @param int|null $access
+     * @param null $access
      * @return $this|int
      */
-    public function access(int $access = null)
+    public function access($access = null)
     {
         if (is_null($access)) {
-            return $this->access;
+            return intval($this->access);
         } elseif ($access == true) {
             $this->access = 1;
         } elseif ($access == false) {
