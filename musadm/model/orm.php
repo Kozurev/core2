@@ -4,6 +4,7 @@
  * Класс-конструктор SQL-запросов
  *
  * @version 20190422
+ * @version 20190811 - добавлен метод sum и изменено название метода getCount в count
  * Class Orm
  */
 class Orm 
@@ -112,8 +113,10 @@ class Orm
     private $close = 0;
 
 
-
-
+    /**
+     * Orm constructor.
+     * @param null $obj
+     */
     public function __construct($obj = null)
     {
         if (!is_null($obj)) {
@@ -174,31 +177,71 @@ class Orm
 
 
 	/**
-	 * Возвращает количество элементов в базе
+	 * Аналог метода count() для нормальной работы старого кода
      *
 	 * @return int
 	 */
 	public function getCount()
 	{
-	    $beforeSelect = $this->select;
+	    return $this->count();
+	}
 
-		$this->select('count(' . $this->table . '.id)', 'count');
-		$this->setQueryString();
-		$result = DB::instance()->query( $this->queryString );
+
+    /**
+     * Возвращает количество записей в таблице, удовлетворяющих заданным условиям
+     *
+     * @return int
+     */
+	public function count()
+    {
+        $beforeSelect = $this->select;
+
+        $this->select('count(' . $this->table . '.id)', 'count');
+        $this->setQueryString();
+        $result = DB::instance()->query($this->queryString);
 
         if (self::isDebugSql()) {
-            echo "<br>Строка запроса метода <b>getCount()</b>: " . $this->queryString;
+            echo "<br>Строка запроса метода <b>сount()</b>: " . $this->queryString;
         }
 
-		if ($result == false) {
+        if ($result == false) {
             return 0;
+        } else {
+            $this->queryString = '';
+            $this->select = $beforeSelect;
+            $result = $result->fetch();
+            return intval($result['count']);
+        }
+    }
+
+
+    /**
+     * Вычисление суммы значений поля по заданным условиям
+     *
+     * @param $field
+     * @return float
+     */
+    public function sum($field)
+    {
+        $beforeSelect = $this->select;
+
+        $this->select('sum(' . $this->table . '.' . $field . ')', 'sum');
+        $this->setQueryString();
+        $result = DB::instance()->query($this->queryString);
+
+        if (self::isDebugSql()) {
+            echo "<br>Строка запроса метода <b>sum()</b>: " . $this->queryString;
         }
 
-        $this->queryString = '';
-        $this->select = $beforeSelect;
-		$result = $result->fetch();
-		return intval($result['count']);
-	}
+        if ($result == false) {
+            return 0;
+        } else {
+            $this->queryString = '';
+            $this->select = $beforeSelect;
+            $result = $result->fetch();
+            return floatval($result['sum']);
+        }
+    }
 
 
 	/**
