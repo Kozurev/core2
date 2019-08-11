@@ -461,7 +461,7 @@ class Core_Entity extends Core_Entity_Model
 //        }
 
         $std = new stdClass();
-        $forbiddenProps = ['childrenObjects', 'aEntityVars'];
+        $forbiddenProps = ['childrenObjects', 'aEntityVars', 'validateErrors'];
         foreach(get_object_vars($this) as $var => $value) {
             if (!in_array($var, $forbiddenProps)) {
                 $std->$var = $value;
