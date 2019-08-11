@@ -4,16 +4,17 @@
  * @version 20190327
  * @version 20190418
  * @version 20190526
+ * @version 20190811
  */
 
-$userId = Core_Array::Get('userid', null, PARAM_INT);
+Core::requireClass('User_Controller');
 
+$userId = Core_Array::Get('userid', null, PARAM_INT);
 is_null($userId)
     ?   $User = User::current()
-    :   $User = Core::factory('User', $userId);
-
-
+    :   $User = User_Controller::factory($userId);
 $userId = $User->getId();
+
 
 $today = date('Y-m-d');
 $date = Core_Array::Get('date', $today, PARAM_STRING);
@@ -44,9 +45,9 @@ if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
         ->where('area_id', '=', $areaId)
         ->orderBy('time_from');
 
-    if ($User->groupId() == ROLE_TEACHER) {
-        $Lessons->where('teacher_id', '=', $User->getId());
-    }
+//    if ($User->groupId() == ROLE_TEACHER) {
+//        $Lessons->where('teacher_id', '=', $User->getId());
+//    }
 
     $CurrentLessons = clone $Lessons;
     $CurrentLessons
@@ -526,11 +527,46 @@ if ($User->groupId() == ROLE_TEACHER) {
 
         foreach ($Payments as $Payment) {
             if (getMonth($Payment->datetime()) != $prevMonth) {
-                $monthName = getMonthName($Payment->datetime() ) . ' ' . getYear($Payment->datetime());
+                $monthName = getMonthName($Payment->datetime()) . ' ' . getYear($Payment->datetime());
                 $index++;
                 $prevMonth = getMonth($Payment->datetime());
                 $MonthesPayments[$index] = Core::factory('Core_Entity')->_entityName('month');
                 $MonthesPayments[$index]->addSimpleEntity('month_name', $monthName);
+
+                /**
+                 * Подсчет общего числа выплат за месяц
+                 * @date 11.08.2019
+                 */
+                //вычисление даты начала месяца, в котором был совершен платеж
+                $paymentMonthNum = getMonth($Payment->datetime());
+                $paymentMonth = $paymentMonthNum < 10
+                    ?   '0' . $paymentMonthNum
+                    :   $paymentMonthNum;
+                $paymentYear = getYear($Payment->datetime());
+                $paymentMonthStart = $paymentYear . '-' . $paymentMonth . '-01';
+
+                //вычисление даты начала следующего месяца от того, в котором был совершен платеж
+                if ($paymentMonthNum == 12) {
+                    $paymentNextMonth = '01';
+                    $paymentNextYear = $paymentYear + 1;
+                } else {
+                    $paymentNextMonthNum = $paymentMonthNum + 1;
+                    $paymentNextMonth = $paymentNextMonthNum < 10
+                        ?   '0' . $paymentNextMonthNum
+                        :   $paymentNextMonthNum;
+                    $paymentNextYear = $paymentYear;
+                }
+                $paymentNextMonthStart = $paymentNextYear . '-' . $paymentNextMonth . '-01';
+
+                $monthTotalPayed = Core::factory('Payment')
+                    ->queryBuilder()
+                    ->select('sum(value)', 'total')
+                    ->where('user', '=', $User->getId())
+                    ->where('type', '=', 3)
+                    ->where('datetime', '>=', $paymentMonthStart)
+                    ->where('datetime', '<', $paymentNextMonthStart)
+                    ->sum('value');
+                $MonthesPayments[$index]->addSimpleEntity('month_total_pay', $monthTotalPayed);
             }
 
             $Payment->datetime(date('d.m.Y', strtotime($Payment->datetime())));
@@ -558,7 +594,7 @@ if ($User->groupId() == ROLE_TEACHER) {
             ->addSimpleEntity('date', date('Y-m-d'))
             ->addSimpleEntity('debt', $debt)
             ->addSimpleEntity('total-payed', $totalPayed)
-            ->xsl( 'musadm/finances/teacher_payments.xsl')
+            ->xsl('musadm/finances/teacher_payments.xsl')
             ->show();
     }
 

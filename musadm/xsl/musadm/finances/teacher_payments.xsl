@@ -48,8 +48,11 @@
 
     <xsl:template match="month">
         <tr>
-            <th colspan="5">
+            <th>
                 <xsl:value-of select="month_name" />
+            </th>
+            <th colspan="4">
+                <span>Выплачено: </span><span class="month_total_pay"><xsl:value-of select="month_total_pay" /></span>
             </th>
         </tr>
 
