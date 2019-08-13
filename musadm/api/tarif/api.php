@@ -133,6 +133,7 @@ if ($action === 'buyForClient') {
         $newClientRateValue = round($newClientRateValue, 2);
         $OldClientRateValue = $ClientRateProperty->getPropertyValues($Client)[0];
         $OldClientRateValue->value($newClientRateValue)->save();
+        $response['rate'][$rateType] = $newClientRateValue;
     }
 
     //Создание платежа

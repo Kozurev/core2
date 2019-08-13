@@ -79,13 +79,46 @@
 
                     <xsl:if test="is_admin = 1">
                         <tr>
+                            <td>Значение медиан (индивидуальной/групповой)</td>
+                            <td>
+                                <xsl:choose>
+                                    <xsl:when test="access_user_edit_lessons = 1">
+                                        <span>
+                                            <span id="medianaIdiv" onclick="editClientRate({user/id}, 'client_rate_indiv', '#medianaIdiv')"
+                                                title="Нажмите для корректировки медианы">
+                                                <xsl:value-of select="mediana_indiv" />
+                                            </span>
+                                        </span>
+                                        <xsl:text> / </xsl:text>
+                                        <span>
+                                            <span id="medianaGroup" onclick="editClientRate({user/id}, 'client_rate_group', '#medianaGroup')"
+                                                  title="Нажмите для корректировки медианы">
+                                                <xsl:value-of select="mediana_group" />
+                                            </span>
+                                        </span>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <span id="medianaIdiv">
+                                            <xsl:value-of select="mediana_indiv" />
+                                        </span>
+                                        <xsl:text> / </xsl:text>
+                                        <span id="medianaGroup">
+                                            <xsl:value-of select="mediana_group" />
+                                        </span>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </td>
+                            <td></td>
+                        </tr>
+
+                        <tr>
                             <td>Сменный график</td>
 
                             <td><!--dng--></td>
 
                             <td>
-                                <input type="checkbox" id="per_lesson" class="checkbox-new" data-userid="{note/object_id}" >
-                                    <xsl:if test="per_lesson/value = 1">
+                                <input type="checkbox" id="per_lesson" class="checkbox-new" data-userid="{user/id}" >
+                                    <xsl:if test="per_lesson = 1">
                                         <xsl:attribute name="checked">checked</xsl:attribute>
                                     </xsl:if>
                                 </input>
@@ -128,18 +161,13 @@
                                         </div>
                                     </xsl:for-each>
                                 </td>
-
-                                <!--<td>-->
-                                    <!--<a class="action edit" onclick="getScheduleAbsentPopup('', '', '', {absent/id})"><xsl:text>&#x0A;</xsl:text></a>-->
-                                    <!--<a class="action delete" onclick="deleteScheduleAbsent({absent/id})"><xsl:text>&#x0A;</xsl:text></a>-->
-                                <!--</td>-->
                             </tr>
                         </xsl:if>
 
-                        <xsl:if test="entry/value != ''">
+                        <xsl:if test="entry != ''">
                             <tr>
                                 <td>Последяя авторизация</td>
-                                <td colspan="2"><xsl:value-of select="entry/value" /></td>
+                                <td colspan="2"><xsl:value-of select="entry" /></td>
                             </tr>
                         </xsl:if>
 
@@ -147,10 +175,10 @@
                             <td>Статус</td>
 
                             <td colspan="2">
-                                <textarea class="form-control" placeholder="Заметки" id="client_notes" data-userid="{note/object_id}" >
+                                <textarea class="form-control" placeholder="Заметки" id="client_notes" data-userid="{user/id}" >
                                     <xsl:choose>
-                                        <xsl:when test="note/value != ''">
-                                            <xsl:value-of select="note/value" />
+                                        <xsl:when test="note != ''">
+                                            <xsl:value-of select="note" />
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <xsl:text>&#x0A;</xsl:text>
@@ -163,11 +191,6 @@
                         <tr>
                             <td colspan="3">
                                 <div class="row buttons-panel center">
-                                    <!--<div>-->
-                                        <!--<a class="btn btn-blue" onclick="newTaskPopup({user/id}, 'refreshUserTable')">-->
-                                            <!--Добавить задачу-->
-                                        <!--</a>-->
-                                    <!--</div>-->
                                     <xsl:if test="/root/access_schedule_absent = 1">
                                         <div>
                                             <a class="btn btn-orange" onclick="getScheduleAbsentPopup({user/id}, 1, getCurrentDate(), '')">
@@ -178,6 +201,14 @@
                                 </div>
                             </td>
                         </tr>
+                        <xsl:if test="prev_lid != '0'">
+                            <td colspan="3" class="center">
+                                Создан из лида №
+                                <a href="#" class="info-by-id" data-model="Lid" data-id="{prev_lid}">
+                                    <xsl:value-of select="prev_lid" />
+                                </a>
+                            </td>
+                        </xsl:if>
                     </xsl:if>
 
                 </table>

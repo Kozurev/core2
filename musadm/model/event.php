@@ -4,13 +4,15 @@
  *
  * @author Kozurev Egor
  * @date 26.11.2018 14:59
+ *
  * @version 20190328
  * @version 20190412
+ * @version 20190811 - доработан метод getTemplateString для случаев добавления комментариев к лидам и пользователям
+ *
  * Class Event
  */
 class Event extends Event_Model
 {
-
     /**
      * Список констант идентификаторов типов событий
      * Примечание: при создании нового типа в таблице Event_Type необходимо создать аналогичную новой записи константу
@@ -52,6 +54,9 @@ class Event extends Event_Model
     const STRING_SHORT =    'short';    //Строка НЕ начинается с фамилии и имени клиента/преподавателя
 
 
+    /**
+     * @return string
+     */
     public function getTypeName() : string
     {
         if ($this->typeId() > 0) {
@@ -92,10 +97,10 @@ class Event extends Event_Model
             return 'При сохранении события типа \'' . $this->getTypeName() . '\' произошла неизвестная ошибка';
         }
 
-        switch ($this->type_id)
+        switch ($this->typeId())
         {
             case self::SCHEDULE_APPEND_USER:
-                Core::factory('Schedule_Lesson');
+                Core::requireClass('Schedule_Lesson');
                 $this->data()->Lesson->lessonType() == 1
                     ?   $str .= 'Основной график с '
                     :   $str .= 'Актуальный график на ' ;
@@ -105,7 +110,7 @@ class Event extends Event_Model
                 break;
 
             case self::SCHEDULE_REMOVE_USER:
-                Core::factory('Schedule_Lesson');
+                Core::requireClass('Schedule_Lesson');
                 $date = refactorDateFormat($this->data()->date);
                 $this->data()->Lesson->lessonType() == 1
                     ?   $str .= 'Удален(а) из основного графика с ' . $date
@@ -114,20 +119,20 @@ class Event extends Event_Model
                 break;
 
             case self::SCHEDULE_SET_ABSENT:
-                Core::factory('Schedule_Lesson');
+                Core::requireClass('Schedule_Lesson');
                 $date = refactorDateFormat($this->data()->date);
                 return 'Отсутствует ' . $date;
                 break;
 
             case self::SCHEDULE_CREATE_ABSENT_PERIOD:
-                Core::factory('Schedule_Absent');
+                Core::requireClass('Schedule_Absent');
                 $dateFrom = refactorDateFormat($this->data()->Period->dateFrom());
                 $dateTo =   refactorDateFormat($this->data()->Period->dateTo());
                 return $str . 'Отсутствует с ' . $dateFrom . ' по ' . $dateTo;
                 break;
 
             case self::SCHEDULE_CHANGE_TIME:
-                Core::factory('Schedule_Lesson');
+                Core::requireClass('Schedule_Lesson');
                 $date =         refactorDateFormat($this->data()->date);
                 $oldTimeFrom =  refactorTimeFormat($this->data()->Lesson->timeFrom());
                 $newTimeFrom =  refactorTimeFormat($this->data()->new_time_from);
@@ -137,7 +142,7 @@ class Event extends Event_Model
                 break;
 
             case self::SCHEDULE_EDIT_ABSENT_PERIOD:
-                Core::factory('Schedule_Absent');
+                Core::requireClass('Schedule_Absent');
                 $oldDateFrom =  refactorDateFormat($this->data()->old_Period->dateFrom());
                 $oldDateTo =    refactorDateFormat($this->data()->old_Period->dateTo());
                 $newDateFrom =  refactorDateFormat($this->data()->new_Period->dateFrom());
@@ -147,8 +152,8 @@ class Event extends Event_Model
                 break;
 
             case self::SCHEDULE_APPEND_CONSULT:
-                Core::factory('Schedule_Lesson');
-                Core::factory('Lid');
+                Core::requireClass('Schedule_Lesson');
+                Core::requireClass('Lid');
                 $Lesson =   $this->data()->Lesson;
                 $timeFrom = refactorTimeFormat($Lesson->timeFrom());
                 $timeTo =   refactorTimeFormat($Lesson->timeTo());
@@ -169,31 +174,32 @@ class Event extends Event_Model
                 break;
 
             case self::CLIENT_APPEND_COMMENT:
-                Core::factory('User_Comment');
+                Core::requireClass('Comment');
+                Core::requireClass('User_Comment');
                 return $str . 'Добавлен комментарий с текстом: ' . $this->data()->Comment->text();
 
             case self::PAYMENT_CHANGE_BALANCE:
-                Core::factory('Payment');
+                Core::requireClass('Payment');
                 return $str . 'Внесение оплаты пользователю на сумму ' . $this->data()->Payment->value() . ' руб.';
                 break;
 
             case self::PAYMENT_HOST_COSTS:
-                Core::factory('Payment');
+                Core::requireClass('Payment');
                 return 'Внесение хозрасходов на сумму ' . $this->data()->Payment->value() . ' руб.';
                 break;
 
             case self::PAYMENT_TEACHER_PAYMENT:
-                Core::factory('Payment');
+                Core::requireClass('Payment');
                 return 'преп. ' . $this->user_assignment_fio . '. Выплата на сумму ' . $this->data()->Payment->value() . ' руб.';
                 break;
 
             case self::PAYMENT_APPEND_COMMENT:
-                Core::factory('Property_String');
+                Core::requireClass('Property_String');
                 return 'Добавил(а) комментарий к платежу с текстом: \''. $this->data()->Comment->value() .'\'';
                 break;
 
             case self::TASK_CREATE:
-                Core::factory('Task_Note');
+                Core::requireClass('Task_Note');
                 $id =   $this->data()->Note->taskId();
                 $text = $this->data()->Note->text();
                 return "Добавил(а) задачу 
@@ -208,7 +214,7 @@ class Event extends Event_Model
                 break;
 
             case self::TASK_APPEND_COMMENT:
-                Core::factory('Task_Note');
+                Core::requireClass('Task_Note');
                 $id =   $this->data()->Note->taskId();
                 $text = $this->data()->Note->text();
                 return "Добавил(а) комментарий к задаче 
@@ -226,7 +232,7 @@ class Event extends Event_Model
                 break;
 
             case self::LID_CREATE:
-                Core::factory('Lid');
+                Core::requireClass('Lid');
                 $id =           $this->data()->Lid->getId();
                 $lidSurname =   $this->data()->Lid->surname();
                 $lidName =      $this->data()->Lid->name();
@@ -261,7 +267,7 @@ class Event extends Event_Model
                 break; 
 
             case self::LID_CHANGE_DATE:
-                Core::factory('Lid');
+                Core::requireClass('Lid');
                 $id =       $this->data()->Lid->getId();
                 $oldDate =  refactorDateFormat($this->data()->old_date);
                 $newDate =  refactorDateFormat($this->data()->new_date);
@@ -271,7 +277,7 @@ class Event extends Event_Model
                 break;
 
             case self::CERTIFICATE_CREATE:
-                Core::factory('Certificate');
+                Core::requireClass('Certificate');
                 $id =   $this->data()->Certificate->getId();
                 $num =  $this->data()->Certificate->number();
                 return "Добавил(а) сертификат 
@@ -279,7 +285,7 @@ class Event extends Event_Model
                 break;
 
             case self::CERTIFICATE_APPEND_COMMENT:
-                Core::factory('Certificate_Note');
+                Core::requireClass('Certificate_Note');
                 $id =   $this->data()->Note->certificateId();
                 $num =  Core::factory( 'Certificate', $id )->number();
                 return "Сертификат 
@@ -291,13 +297,14 @@ class Event extends Event_Model
         }
     }
 
+
     /**
      * @param null $obj
      * @return void
      */
     public function save($obj = null)
     {
-        Core::notify([&$this], 'beforeEventSave');
+        Core::notify([&$this], 'before.Event.save');
 
         //Задание значение времени события
         if ($this->time === 0) {
@@ -322,13 +329,13 @@ class Event extends Event_Model
             try {
                 $this->data = serialize($this->data);
             } catch (Exception $e) {
-                echo "<h2>" . $e->getMessage() . "</h2>";
+                echo "<h2>Ошибка во время сохранения события: " . $e->getMessage() . "</h2>";
                 return;
             }
         }
 
         parent::save();
-        Core::notify([&$this], 'afterEventSave');
+        Core::notify([&$this], 'afterEvent.save');
     }
 
 

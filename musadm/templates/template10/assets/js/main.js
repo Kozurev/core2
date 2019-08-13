@@ -55,7 +55,7 @@ $(document).ready(function() {
 
     $(".table").tablesorter();
 
-    $(".masked-phone").mask("+7(999) 999-99-99");
+    $(".masked-phone").mask("+79999999999");
 
 });
 
@@ -63,24 +63,24 @@ $(document).ready(function() {
 var loaderTimeout = 100;
 var messageTimeout = 3000;
 
-//Большое модальное окно для форм и изображений
-var popupSmall = $("#ekkoLightbox-640");
+// //Большое модальное окно для форм и изображений
+// var popupSmall = $("#ekkoLightbox-640");
+//
+// //Маленькое модальное окно для сообщений
+// var popupBig = $("#ekkoLightbox-641");
 
-//Маленькое модальное окно для сообщений
-var popupBig = $("#ekkoLightbox-641");
 
-
-function showPopup(title, data) {
-    popupBig.find(".modal-title").text(title);
-    popupBig.find(".content").html(data);
-    popupBig.show("slow");
-}
-
-function closePopup() {
-    popupBig.hide("slow");
-    popupBig.find(".modal-title").empty();
-    popupBig.find(".content").empty();
-}
+// function showPopup(title, data) {
+//     popupBig.find(".modal-title").text(title);
+//     popupBig.find(".content").html(data);
+//     popupBig.show("slow");
+// }
+//
+// function closePopup() {
+//     popupBig.hide("slow");
+//     popupBig.find(".modal-title").empty();
+//     popupBig.find(".content").empty();
+// }
 
 //Запуск лоадера
 function loaderOn(){
@@ -96,23 +96,23 @@ function loaderOff(){
 }
 
 
-function showError(errorText) {
-    popupSmall.find(".modal-title").text("Ошибка");
-    popupSmall.find(".content").html(errorText);
-    popupSmall.addClass("error");
-    popupSmall.slideDown("slow");
-}
-
-function showMessage(title, text, status) {
-    popupSmall.find(".modal-title").text(title);
-    popupSmall.find(".content").html(text);
-    if(status === undefined) {
-        status = "default";
-    }
-    popupSmall.addClass(status);
-    popupSmall.slideDown("slow");
-    setTimeout('$("#ekkoLightbox-640").slideUp("slow");', messageTimeout);
-}
+// function showError(errorText) {
+//     popupSmall.find(".modal-title").text("Ошибка");
+//     popupSmall.find(".content").html(errorText);
+//     popupSmall.addClass("error");
+//     popupSmall.slideDown("slow");
+// }
+//
+// function showMessage(title, text, status) {
+//     popupSmall.find(".modal-title").text(title);
+//     popupSmall.find(".content").html(text);
+//     if(status === undefined) {
+//         status = "default";
+//     }
+//     popupSmall.addClass(status);
+//     popupSmall.slideDown("slow");
+//     setTimeout('$("#ekkoLightbox-640").slideUp("slow");', messageTimeout);
+// }
 
 
 function notificationSuccess(str) {

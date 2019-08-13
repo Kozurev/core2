@@ -134,13 +134,15 @@ $(function(){
                 }
             });
         })
+        //Сохранеине комментария к клиенту
         .on('click', '#user_comment_save', function(e) {
             e.preventDefault();
-            var text = $('#user_comment').val();
-            if (text != '') {
+            let commentText = $('#user_comment').val();
+            let userId = $(this).data('userid');
+            if (commentText != '') {
                 loaderOn();
-                var userId = $(this).data('userid');
-                saveUserComment(userId, text, refreshUserTable);
+                //saveUserComment(userId, text, refreshUserTable);
+                User.saveComment(userId, {text: commentText}, refreshUserTable);
             }
         })
         .on('click', '#get_lid_data', function(e) {
@@ -151,6 +153,7 @@ $(function(){
                 return false;
             }
             loaderOn();
+            $('.popup').find('form').append('<input type="hidden" name="property_56[]" value="'+lidId+'" />');
             Lids.getLid(lidId, function (lid) {
                 if (lid != '') {
                     $('input[name="name"]').val(lid.name);
@@ -438,28 +441,6 @@ function updateUserPerLesson(userId, value, callback) {
     });
 }
 
-/**
- * Открытие всплывающего окна для создания платежа
- *
- * @param userId
- * @param url
- */
-// function getPaymentPopup(userId, url) {
-//     $.ajax({
-//         type: 'GET',
-//         url: url,
-//         data: {
-//             action: 'getPaymentPopup',
-//             userId: userId
-//         },
-//         success: function(response) {
-//             showPopup(response);
-//         },
-//         error: function (response) {
-//             notificationError(response);
-//         }
-//     });
-// }
 
 /**
  * Обновление контента страницы пользователей
@@ -616,32 +597,6 @@ function getManagerPopup(userId) {
 }
 
 
-/**
- * Создание комментария к клиенту
- *
- * @param userId
- * @param text
- * @param callback
- */
-function saveUserComment(userId, text, callback) {
-    $.ajax({
-        type: 'GET',
-        url: root + '/balance',
-        data: {
-            action: 'saveUserComment',
-            userId: userId,
-            text: text
-        },
-        success: function(response) {
-            $('.users').html(response);
-            if (typeof callback == 'function') {
-                callback(response);
-            }
-            loaderOff();
-        }
-    });
-}
-
 
 function usersExport(href, form) {
     var link = href + '?action=export';
@@ -693,6 +648,33 @@ function editClientCountLessons(userId, lessonsType, spanSelector) {
 }
 
 
+function editClientRate(userId, rateName, spanSelector) {
+    let span = $(spanSelector);
+    let currentVal = span.text();
+    span.hide();
+    span.parent().append('<input ' +
+        'id="newMedianaVal" ' +
+        'value="'+currentVal+'" ' +
+        'class="form-control" ' +
+        'style="width: 50px; display: inline-block" ' +
+        'type="number"' +
+        'step="0.5">');
+    span.parent().append('<a ' +
+        'class="action save"' +
+        'id="saveMedianaVal"' +
+        'style="vertical-align: middle"' +
+        'onclick="savePropertyValue(\''+rateName+'\', $(\'#newMedianaVal\').val(), \'User\', ' + userId + ', ' +
+        'function(response){' +
+        'let lessonsSpan = $(\''+spanSelector+'\');' +
+        'lessonsSpan.text($(\'#newMedianaVal\').val());' +
+        'lessonsSpan.show();' +
+        '$(\'#saveMedianaVal\').remove();' +
+        '$(\'#newMedianaVal\').remove();' +
+        '})"' +
+        '></a>');
+}
+
+
 /**
  * Колбек при сохранении данных пользователя
  *
@@ -701,10 +683,19 @@ function editClientCountLessons(userId, lessonsType, spanSelector) {
 function saveClientCallback(response) {
     if (typeof response.error !== 'undefined') {
         notificationError(response.error.message);
+        loaderOff();
     } else {
         var tr = $('#user_' + response.user.id);
         if (tr.length == 0) {
             $('.table').prepend(makeClientTr(response));
+            var prevLid = response.additional.prop_56.values[0].value;
+            if (prevLid > 0) {
+                Lids.getPrioritySetting(Lids.STATUS_CLIENT, function(status){
+                    Lids.changeStatus(prevLid, status.id, function(response){
+                        Lids.saveComment(0, prevLid, 'Добавлен в клиенты');
+                    });
+                });
+            }
         } else {
             //ФИО
             tr.find('.user__fio').find('a').text(response.user.surname + ' ' + response.user.name);
@@ -849,6 +840,8 @@ function getClientLcTarifsCallBack(response) {
                     '$(\'#balance\').text(Number($(\'#balance\').text()) - response.tarif.price);' +
                     '$(\'#countLessonsIndiv\').text(response.user.countIndiv);' +
                     '$(\'#countLessonsGroup\').text(response.user.countGroup);' +
+                    'if (response.rate.client_rate_indiv != undefined) { $(\'#medianaIdiv\').text(response.rate.client_rate_indiv); }' +
+                    'if (response.rate.client_rate_group != undefined) { $(\'#medianaGroup\').text(response.rate.client_rate_group); }' +
                     'notificationSuccess(\'Тариф успешно приобретен\')' +
                 '}}' +
             ')">Купить</button>');

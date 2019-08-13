@@ -43,7 +43,7 @@ class User extends User_Model
 	public function save()
 	{
         if (empty($this->register_date)) {
-            $this->register_date = date( 'Y-m-d');
+            $this->register_date = date('Y-m-d');
         }
 
         Core::notify([&$this], 'beforeUserSave');
@@ -276,34 +276,57 @@ class User extends User_Model
     }
 
 
+//    /**
+//     * Добавление комментария к кользователю
+//     *
+//     * @param string $text - текст комментария
+//     * @param int $userId - id пользователя к которому создается комментарий
+//     * @param int $authorId - id автора комментария
+//     * @return User
+//     * @date 30.11.2018 14:02
+//     */
+//    public function addComment(string $text, int $userId = 0, int $authorId = 0)
+//    {
+//        if ($userId === 0 && empty($this->id)) {
+//            die("Невозможно добавить комментарий не указав id пользователя");
+//        }
+//
+//        if ($userId === 0) {
+//            $userId = $this->getId();
+//        }
+//
+//        $Comment = Core::factory('User_Comment')
+//            ->authorId($authorId)
+//            ->userId($userId)
+//            ->text($text);
+//
+//        Core::notify([&$Comment], 'beforeUserAddComment');
+//        $Comment->save();
+//        Core::notify([&$Comment], 'afterUserAddComment');
+//        return $this;
+//    }
+
+
     /**
-     * Добавление комментария к кользователю
-     *
-     * @param string $text - текст комментария
-     * @param int $userId - id пользователя к которому создается комментарий
-     * @param int $authorId - id автора комментария
-     * @return User
-     * @date 30.11.2018 14:02
+     * @param string $text
+     * @param int|null $authorId
+     * @param string|null $date
+     * @return Comment|null
+     * @throws Exception
      */
-    public function addComment(string $text, int $userId = 0, int $authorId = 0)
+    public function addComment(string $text, int $authorId = null, string $date = null)
     {
-        if ($userId === 0 && empty($this->id)) {
-            die("Невозможно добавить комментарий не указав id пользователя");
+        Core::requireClass('Comment');
+        Core::notify([&$this], 'before.User.addComment');
+
+        $NewComment = Comment::create($this, $text, $authorId, $date);
+
+        if (is_null($NewComment)) {
+            return null;
         }
 
-        if ($userId === 0) {
-            $userId = $this->getId();
-        }
-
-        $Comment = Core::factory('User_Comment')
-            ->authorId($authorId)
-            ->userId($userId)
-            ->text($text);
-
-        Core::notify([&$Comment], 'beforeUserAddComment');
-        $Comment->save();
-        Core::notify([&$Comment], 'afterUserAddComment');
-        return $this;
+        Core::notify([&$NewComment, &$this], 'after.User.addComment');
+        return $NewComment;
     }
 
 

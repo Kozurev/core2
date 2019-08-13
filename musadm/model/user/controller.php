@@ -486,6 +486,15 @@ class User_Controller
 
 
     /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->User;
+    }
+
+
+    /**
      * @return int
      */
     public function getCountUsers()

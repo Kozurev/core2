@@ -358,21 +358,21 @@ if ($action === 'updatePerLesson') {
 /**
  * Сохранение комментария к пользователю
  */
-if ($action === 'saveUserComment') {
-    //проверка прав доступа
-    if (!Core_Access::instance()->hasCapability(Core_Access::USER_APPEND_COMMENT)) {
-        Core_Page_Show::instance()->error(403);
-    }
-
-    $userId = Core_Array::Get('userId', null, PARAM_INT);
-    if (is_null($userId)) {
-        Core_Page_Show::instance()->error(404);
-    }
-    $text = Core_Array::Get('text', '', PARAM_STRING);
-    Core::factory('User')->addComment($text, $userId);
-
-    exit;
-}
+//if ($action === 'saveUserComment') {
+//    //проверка прав доступа
+//    if (!Core_Access::instance()->hasCapability(Core_Access::USER_APPEND_COMMENT)) {
+//        Core_Page_Show::instance()->error(403);
+//    }
+//
+//    $userId = Core_Array::Get('userId', null, PARAM_INT);
+//    if (is_null($userId)) {
+//        Core_Page_Show::instance()->error(404);
+//    }
+//    $text = Core_Array::Get('text', '', PARAM_STRING);
+//    Core::factory('User')->addComment($text, $userId);
+//
+//    exit;
+//}
 
 
 /**

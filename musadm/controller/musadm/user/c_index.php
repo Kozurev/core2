@@ -83,9 +83,15 @@ Core::attachObserver('beforeUserController.show', function($args) {
     $UserController = $args[0];
     $QueryBuilder = new Orm();
 
+    $subordinated = $UserController->getUser()->getDirector()->getId();
+
     //Средний возраст
     $birthYears = $QueryBuilder->select('value')
-        ->from('Property_String')
+        ->from('Property_String', 'pr_s')
+        ->join(
+            $UserController->getUser()->getTableName() . ' as u',
+            'u.id = pr_s.object_id and u.subordinated = ' . $subordinated
+        )
         ->where('property_id', '=', 28)
         ->where('value', '<>', '')
         ->whereIn('object_id', $UserController->getUserIds())
@@ -112,7 +118,11 @@ Core::attachObserver('beforeUserController.show', function($args) {
     //Средняя медиана
     $avgIndivCost = $QueryBuilder->clearQuery()
         ->select('avg(value)', 'value')
-        ->from('Property_Int')
+        ->from('Property_Int', 'pr_i')
+        ->join(
+            $UserController->getUser()->getTableName() . ' as u',
+            'u.id = pr_i.object_id and u.subordinated = ' . $subordinated
+        )
         ->where('property_id', '=', 42)
         ->where('value', '>', 0)
         ->whereIn('object_id', $UserController->getUserIds())
@@ -120,7 +130,11 @@ Core::attachObserver('beforeUserController.show', function($args) {
 
     $avgGroupCost = $QueryBuilder->clearQuery()
         ->select('avg(value)', 'value')
-        ->from('Property_Int')
+        ->from('Property_Int', 'pr_i')
+        ->join(
+            $UserController->getUser()->getTableName() . ' as u',
+            'u.id = pr_i.object_id and u.subordinated = ' . $subordinated
+        )
         ->where('property_id', '=', 43)
         ->where('value', '>', 0)
         ->whereIn('object_id', $UserController->getUserIds())

@@ -6,6 +6,7 @@
  * @date 27.11.2018 18:24
  * @version 20190221
  * @version 20190617
+ * @version 20190811 - Переименованы и доработаны обработчики добавления комментариев к лидам и клиентам
  */
 
 
@@ -386,12 +387,13 @@ Core::attachObserver( 'afterCertificateAddComment', function($args) {
 /**
  * Добавление комментария к пользователю в новом разделе
  */
-Core::attachObserver('afterUserAddComment', function($args) {
+Core::attachObserver('after.User.addComment', function($args) {
     $EventData = new stdClass();
     $EventData->Comment = $args[0];
     Core::factory('User_Controller');
-    $userAssignmentId = $args[0]->userId();
-    $User = User_Controller::factory( $userAssignmentId );
+    $userAssignmentId = $args[1]->getId();
+    $User = User_Controller::factory($userAssignmentId);
+    $EventData->User = $args[1];
     $userAssignmentFio = $User->surname() . ' ' . $User->name();
     Core::factory('Event')
         ->userAssignmentId($userAssignmentId)

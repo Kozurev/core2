@@ -25,7 +25,8 @@ User::checkUserAccess(['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]])
 //id клиента под которым авторизован менеджер/директор
 $pageClientId = Core_Array::Get('userid', null, PARAM_INT);
 
-Core::factory( 'User_Controller' );
+Core::requireClass( 'User_Controller');
+Core::requireClass('Property_Controller');
 
 //Получение объекта пользователя клиента
 if (is_null($pageClientId)) {
@@ -50,12 +51,27 @@ if ($isAdmin) {
     $today = date('Y-m-d');
     $todayTime = strtotime($today);
 
-    $ClientNote = Core::factory('Property')->getByTagName('notes');
-    $clientNote = $ClientNote->getPropertyValues($User)[0];
-    $PerLesson = Core::factory('Property')->getByTagName('per_lesson');
-    $perLesson = $PerLesson->getPropertyValues($User)[0];
-    $LastEntry = Core::factory('Property')->getByTagName('last_entry');
-    $lastEntry = $LastEntry->getPropertyValues($User)[0];
+    //Клиентские заметки
+    $ClientNote = Property_Controller::factoryByTag('notes');
+    $clientNote = $ClientNote->getValues($User)[0]->value();
+
+    //Поурочная оплата
+    $PerLesson = Property_Controller::factoryByTag('per_lesson');
+    $perLesson = $PerLesson->getValues($User)[0]->value();
+
+    //Дата последней авторизации
+    $LastEntry = Property_Controller::factoryByTag('last_entry');
+    $lastEntry = $LastEntry->getValues($User)[0]->value();
+
+    //id лида, из которого был создан клиент
+    $PrevLid = Property_Controller::factoryByTag('lid_before_client');
+    $prevLid = $PrevLid->getValues($User)[0]->value();
+
+    //Значение медиан
+    $MedianaIndiv = Property_Controller::factoryByTag('client_rate_indiv');
+    $MedianaGroup = Property_Controller::factoryByTag('client_rate_group');
+    $medianaIndiv = $MedianaIndiv->getValues($User)[0]->value();
+    $medianaGroup = $MedianaGroup->getValues($User)[0]->value();
 
     $AbsentPeriods = Core::factory('Schedule_Absent')
         ->queryBuilder()
@@ -76,9 +92,12 @@ if ($isAdmin) {
     }
 
     $OutputXml
-        ->addEntity($clientNote, 'note')
-        ->addEntity($lastEntry, 'entry')
-        ->addEntity($perLesson, 'per_lesson')
+        ->addSimpleEntity('note', $clientNote)
+        ->addSimpleEntity('entry', $lastEntry)
+        ->addSimpleEntity('per_lesson', $perLesson)
+        ->addSimpleEntity('prev_lid', $prevLid)
+        ->addSimpleEntity('mediana_indiv', $medianaIndiv)
+        ->addSimpleEntity('mediana_group', $medianaGroup)
         ->addEntities($AbsentPeriods, 'absent')
         ->addSimpleEntity(
             'access_create_payment',

@@ -84,6 +84,7 @@ function closePopup() {
         popup = $('.popup');
 
     overlay.hide();
+    popup.removeAttr('style');
     popup.hide();
     popup.empty();
 }

@@ -440,6 +440,8 @@ function makeLidPopup(lidId) {
 
         prependPopup(popupData);
 
+        $(".masked-phone").mask("+79999999999");
+
         let isSelected;
 
         Schedule.clearCache();
@@ -763,7 +765,7 @@ function makeClientFromLidPopup(lidId) {
         $('#lid_id').val(lidId);
         $('#get_lid_data').trigger('click');
         localStorage.setItem('clientFromLidId', lidId);
-        $('.popup').find('.btn-default').attr('onclick', 'User.saveFrom($(\'#createData\'), makeClientFromLidCallback)');
+        $('.popup').find('.btn-default').attr('onclick', 'User.saveFrom(\'#createData\', makeClientFromLidCallback)');
         showPopup();
     });
 }
@@ -776,6 +778,9 @@ function makeClientFromLidCallback(client) {
             localStorage.removeItem('clientFromLidId');
             Lids.changeStatus(lidId, status.id, function(response){
                 changeLidStatusCallback(response);
+                Lids.getLid(lidId, function(lid){
+                    Lids.saveComment(0, lidId, 'Добавлен в клиенты', saveLidCommentCallback);
+                });
                 loaderOff();
                 closePopup();
             });
