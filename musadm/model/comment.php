@@ -5,24 +5,45 @@
  * @author Kozurev Egor
  * @date 31.01.2019 10:25
  * @version 20190802
+ *
+ * Class Comment
  */
 class Comment extends Comment_Model
 {
+
+    /**
+     * @param null $id
+     * @return Comment | null
+     */
+    public static function factory($id = null)
+    {
+        if (empty($id)) {
+            return Core::factory('Comment');
+        } else {
+            return Core::factory('Comment', $id);
+        }
+    }
+
+
     /**
      * Создание комментария и связи с объектом
      *
      * @param $object
      * @param $text
      * @param null $authorId
+     * @param null $datetime
      * @throws Exception
      * @return Comment
      */
-    public static function create($object, $text, $authorId = null)
+    public static function create($object, $text, $authorId = null, $datetime = null)
     {
         $Comment = new Comment();
         $Comment->text($text);
         if (!is_null($authorId)) {
             $Comment->authorId($authorId);
+        }
+        if (!is_null($datetime)) {
+            $Comment->datetime($datetime);
         }
         $Comment->save();
 
@@ -155,14 +176,13 @@ class Comment extends Comment_Model
             $this->datetime = date('Y-m-d H:i:s');
         }
 
-        if (empty($this->authorId())) {
-            $User = User::parentAuth();
-            if (!is_null($User)) {
-                $this->authorId($User->getId());
-                if (empty($this->authorFullname())) {
-                    $this->authorFullname($User->surname()  . ' ' . $User->name());
-                }
-            }
+        $User = User::parentAuth();
+
+        if (empty($this->authorId()) && !is_null($User)) {
+            $this->authorId($User->getId());
+        }
+        if (empty($this->authorFullname()) && !empty($this->authorId()) && !is_null($User)) {
+            $this->authorFullname($User->surname()  . ' ' . $User->name());
         }
 
         Core::notify([&$this], 'before.Comment.save');
