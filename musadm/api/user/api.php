@@ -417,7 +417,10 @@ if ($action === 'changeCountLessons') {
 }
 
 
-
+/**
+ * Выборка пользователей по значению доп. свойства принадлежности к преподавателю
+ * однако id преподавателя и id элемента списка преподавателей разные, поэтому и нужен данный обработчик
+ */
 if ($action === 'getListByTeacherId') {
     $teacherId = Core_Array::Get('teacherId', 0, PARAM_INT);
     $Teacher = User_Controller::factory($teacherId);
@@ -435,7 +438,6 @@ if ($action === 'getListByTeacherId') {
         ->find();
 
     if (is_null($TeacherProperty)) {
-        //die(REST::error(2, 'Значения доп. свйоства по данному преподавателю не обнаружено'));
         Core::factory('Property_List_Values')
             ->propertyId($TeacherList->getId())
             ->value($teacherFio)
@@ -447,4 +449,52 @@ if ($action === 'getListByTeacherId') {
     $RestUsers->appendFilter('property_' . $TeacherList->getId(), $TeacherProperty->getId());
     $RestUsers->appendOrder('surname');
     die($RestUsers->getList());
+}
+
+
+/**
+ * Добавление комментария к пользователю
+ */
+if ($action === 'saveComment') {
+    Core::requireClass('Comment');
+
+    $userId = Core_Array::Post('userId', null, PARAM_INT);
+    $User = User_Controller::factory($userId);
+    if (is_null($userId) || is_null($User)) {
+        die(REST::status(REST::STATUS_ERROR, 'Пользователь с id ' . strval($userId) . ' не найден'));
+    }
+
+    $commentId = Core_Array::Post('id', null, PARAM_INT);
+    $authorId = Core_Array::Post('authorId', 0, PARAM_INT);
+    $datetime = Core_Array::Post('datetime', date('Y-m-d H:i:s'), PARAM_DATETIME);
+    $text = Core_Array::Post('text', '', PARAM_STRING);
+
+    if (empty($text)) {
+        die(REST::status(REST::STATUS_ERROR, 'Текст комментария к пользователю не может быть пустым'));
+    }
+
+    if (is_null($commentId)) {
+        try {
+            $UserComment = $User->addComment($text, $authorId, $datetime);
+        } catch (Exception $e) {
+            die(REST::status(REST::STATUS_ERROR, $e->getMessage()));
+        }
+    } else {
+        $UserComment = Comment::factory($commentId);
+        $UserComment->authorId($authorId);
+        $UserComment->datetime($datetime);
+        $UserComment->text($text);
+        $UserComment->save();
+    }
+
+    $response = new stdClass();
+    $response->user = $User->toStd();
+    $response->comment = $UserComment->toStd();
+
+    $commentDatetime = $UserComment->datetime();
+    $commentDatetime = strtotime($commentDatetime);
+    $commentDatetime = date('d.m.y H:i', $commentDatetime);
+    $response->comment->refactoredDatetime = $commentDatetime;
+
+    die(json_encode($response));
 }

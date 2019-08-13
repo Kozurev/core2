@@ -65,13 +65,15 @@ class User {
      * @param callBack
      */
     static save(userData, callBack) {
-        userData += '&action=save';
+        userData.append('action', 'save');
 
         $.ajax({
             type: 'POST',
             url: User.getApiLink(),
             dataType: 'json',
             data: userData,
+            contentType: false,
+            processData: false,
             success: function (response) {
                 callBack(response);
             },
@@ -118,21 +120,48 @@ class User {
     /**
      * Метод сохранения пользователя из данных формы
      *
-     * @param form
+     * @param formSelector
      * @param callBack
      */
-    static saveFrom(form, callBack) {
+    static saveFrom(formSelector, callBack) {
         loaderOn();
-        if (form.valid() == false) {
+        let jqForm = $(formSelector);
+        if (jqForm.valid() == false) {
             loaderOff();
         } else {
-            var user = form.serialize();
-            var unchecked = form.find('input[type=checkbox]:unchecked');
-            for (var i = 0; i < unchecked.length; i++) {
-                user += '&' + $(unchecked[i]).attr('name') + '=0';
-            }
+            let user = new FormData(jqForm.get(0));
             User.save(user, callBack);
         }
+    }
+
+
+    /**
+     * Добавление комментария к пользователю
+     *
+     * @param userId
+     * @param comment
+     * @param callback
+     */
+    static saveComment(userId, comment, callback) {
+        var ajaxData = comment;
+        ajaxData.userId = userId;
+        ajaxData.action = 'saveComment';
+
+        $.ajax({
+            type: 'POST',
+            url: User.getApiLink(),
+            dataType: 'json',
+            data: ajaxData,
+            success: function (response) {
+                if (callback != undefined) {
+                    callback(response);
+                }
+            },
+            error: function() {
+                notificationError('При сохранении комментария пользователя произошла ошибка');
+                loaderOff();
+            }
+        });
     }
 
 }
