@@ -469,7 +469,7 @@ if ($action === 'save_task') {
 }
 
 if ($action === 'addAbsentTask') {
-    $dateTo =   Core_Array::Get('date_to', null, PARAM_STRING);
+    $dateTo =   Core_Array::Get('date_to', null, PARAM_DATE);
     $clientId = Core_Array::Get('client_id', 0, PARAM_INT);
 
     if (is_null($dateTo) || $clientId === 0) {
@@ -497,7 +497,7 @@ if ($action === 'addAbsentTask') {
  * Создание задачи с напоминанием об уточнении времени следующего занятия
  */
 if ($action === 'create_schedule_task') {
-    $date =     Core_Array::Get('date', date('Y-m-d'), PARAM_DATE);
+    $date = Core_Array::Get('date', date('Y-m-d'), PARAM_DATE);
     $clientId = Core_Array::Get('clientId', 0, PARAM_INT);
     $areaId = Core_Array::Get('areaId', 0, PARAM_INT);
 
@@ -505,6 +505,10 @@ if ($action === 'create_schedule_task') {
     if (is_null($Client)) {
         Core_Page_Show::instance()->error(404);
     }
+
+    $date = new DateTime($date);
+    $date->modify('+1 day');
+    $date = $date->format('Y-m-d');
 
     $taskNoteText = $Client->surname() . ' ' . $Client->name() . ' обсудить следующее занятие.';
     $Task = Task_Controller::factory();
