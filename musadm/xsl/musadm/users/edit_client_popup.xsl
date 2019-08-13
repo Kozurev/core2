@@ -181,14 +181,12 @@
 
             <input type="hidden" name="id" value="{user/id}" />
             <input type="hidden" name="groupId" value="5" />
-            <!--<input type="hidden" name="active" value="1" />-->
-            <!--<input type="hidden" name="modelName" value="User" />-->
         </form>
 
-        <button class="btn btn-default" onclick="User.saveFrom($('#createData'), saveClientCallback)">Сохранить</button>
+        <button class="btn btn-default" onclick="User.saveFrom('#createData', saveClientCallback)">Сохранить</button>
 
         <script>
-            $(".masked-phone").mask("+7(999) 999-9999");
+            $(".masked-phone").mask("+79999999999");
         </script>
     </xsl:template>
 

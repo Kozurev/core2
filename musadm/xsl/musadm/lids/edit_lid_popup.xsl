@@ -124,7 +124,7 @@
         </form>
 
         <script>
-            $(".masked-phone").mask("7(999) 999-9999");
+            $(".masked-phone").mask("+79999999999");
         </script>
 
     </xsl:template>
