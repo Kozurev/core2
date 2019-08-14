@@ -5,12 +5,14 @@
  * @author Kozurev Egor
  * @date 11.04.2018 22:16
  * @version 20190414
+ * @version 20190814 - исправлен баг формирования всплывающего окна редактирования преподавателя
  */
 
 
-Core::factory('User_Controller');
-Core::factory('Lid_Controller');
-Core::factory('Schedule_Area_Controller');
+Core::requireClass('User_Controller');
+Core::requireClass('Lid_Controller');
+Core::requireClass('Schedule_Area_Controller');
+Core::requireClass('Property_Controller');
 
 
 $User = User::current();
@@ -51,14 +53,14 @@ if ($action === 'updateFormClient') {
             $Client->addSimpleEntity('area_id', $AreaAssignments[0]->areaId());
         }
 
-        $Properties[] = Core::factory('Property', 16)->getPropertyValues($Client)[0]; //Доп. телефон
-        $Properties[] = Core::factory('Property',  9)->getPropertyValues($Client)[0]; //Ссылка вк
-        $Properties[] = Core::factory('Property', 17)->getPropertyValues($Client)[0]; //Длительность урока
-        $Properties[] = Core::factory('Property', 18)->getPropertyValues($Client)[0]; //Соглашение подписано
-        $Properties[] = Core::factory('Property', 20)->getPropertyValues($Client)[0]; //Учителя
-        $Properties[] = Core::factory('Property', 28)->getPropertyValues($Client)[0]; //Год рождения
-        $Properties = array_merge($Properties, Core::factory('Property', 21)->getPropertyValues($Client)); //Учителя
-        $Properties = array_merge($Properties, Core::factory('Property', 20)->getPropertyValues($Client)); //Направление подготовки (инструмент)
+        $Properties[] = Property_Controller::factoryByTag('add_phone')->getValues($Client)[0]; //Доп. телефон
+        $Properties[] = Property_Controller::factoryByTag('vk')->getValues($Client)[0]; //Ссылка вк
+        $Properties[] = Property_Controller::factoryByTag('lesson_time')->getValues($Client)[0]; //Длительность урока
+        $Properties[] = Property_Controller::factory(18)->getValues($Client)[0]; //Соглашение подписано
+        $Properties[] = Property_Controller::factoryByTag('instrument')->getValues($Client)[0]; //Инструмент
+        $Properties[] = Property_Controller::factoryByTag('birth')->getValues($Client)[0]; //Год рождения
+        $Properties = array_merge($Properties, Property_Controller::factoryByTag('teachers')->getValues($Client)); //Учителя
+        $Properties = array_merge($Properties, Property_Controller::factoryByTag('instrument')->getValues($Client)); //Направление подготовки (инструмент)
     } else {
         $Client = User_Controller::factory();
         $Properties[] = Core::factory('Property_Int')
@@ -108,8 +110,9 @@ if ($action === 'updateFormTeacher') {
             exit (Core::getMessage('NOT_FOUND', ['Преподаватель', $userId]));
         }
 
-        $Properties[] = Core::factory('Property', 20)->getPropertyValues($Teacher)[0];    //Инструмент
-        $Properties[] = Core::factory('Property', 31)->getPropertyValues($Teacher)[0];    //Инструмент
+        $Properties[] = Property_Controller::factoryByTag('instrument')->getValues($Teacher)[0];    //Инструмент
+        $Properties[] = Property_Controller::factoryByTag('teacher_schedule')->getValues($Teacher)[0];    //Расписание
+        $Properties[] = Property_Controller::factoryByTag('birth')->getValues($Teacher)[0];    //Расписание
         $output->addEntities($Properties, 'property_value');
     } else {
         $Teacher = User_Controller::factory();

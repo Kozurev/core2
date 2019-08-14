@@ -86,16 +86,20 @@ Core::attachObserver('beforeUserController.show', function($args) {
     $subordinated = $UserController->getUser()->getDirector()->getId();
 
     //Средний возраст
-    $birthYears = $QueryBuilder->select('value')
-        ->from('Property_String', 'pr_s')
-        ->join(
-            $UserController->getUser()->getTableName() . ' as u',
-            'u.id = pr_s.object_id and u.subordinated = ' . $subordinated
-        )
-        ->where('property_id', '=', 28)
-        ->where('value', '<>', '')
-        ->whereIn('object_id', $UserController->getUserIds())
-        ->findAll();
+    if (!empty($UserController->getUserIds())) {
+        $birthYears = $QueryBuilder->select('value')
+            ->from('Property_String', 'pr_s')
+            ->join(
+                $UserController->getUser()->getTableName() . ' as u',
+                'u.id = pr_s.object_id and u.subordinated = ' . $subordinated
+            )
+            ->where('property_id', '=', 28)
+            ->where('value', '<>', '')
+            ->whereIn('object_id', $UserController->getUserIds())
+            ->findAll();
+    } else {
+        $birthYears = [];
+    }
 
     $yearsSum = 0;
     $formatYearsCount = 0;
@@ -116,29 +120,36 @@ Core::attachObserver('beforeUserController.show', function($args) {
     $UserController->addSimpleEntity('avgAge', $avgAge);
 
     //Средняя медиана
-    $avgIndivCost = $QueryBuilder->clearQuery()
-        ->select('avg(value)', 'value')
-        ->from('Property_Int', 'pr_i')
-        ->join(
-            $UserController->getUser()->getTableName() . ' as u',
-            'u.id = pr_i.object_id and u.subordinated = ' . $subordinated
-        )
-        ->where('property_id', '=', 42)
-        ->where('value', '>', 0)
-        ->whereIn('object_id', $UserController->getUserIds())
-        ->find();
+    if (!empty($UserController->getUserIds())) {
+        $avgIndivCost = $QueryBuilder->clearQuery()
+            ->select('avg(value)', 'value')
+            ->from('Property_Int', 'pr_i')
+            ->join(
+                $UserController->getUser()->getTableName() . ' as u',
+                'u.id = pr_i.object_id and u.subordinated = ' . $subordinated
+            )
+            ->where('property_id', '=', 42)
+            ->where('value', '>', 0)
+            ->whereIn('object_id', $UserController->getUserIds())
+            ->find();
 
-    $avgGroupCost = $QueryBuilder->clearQuery()
-        ->select('avg(value)', 'value')
-        ->from('Property_Int', 'pr_i')
-        ->join(
-            $UserController->getUser()->getTableName() . ' as u',
-            'u.id = pr_i.object_id and u.subordinated = ' . $subordinated
-        )
-        ->where('property_id', '=', 43)
-        ->where('value', '>', 0)
-        ->whereIn('object_id', $UserController->getUserIds())
-        ->find();
+        $avgGroupCost = $QueryBuilder->clearQuery()
+            ->select('avg(value)', 'value')
+            ->from('Property_Int', 'pr_i')
+            ->join(
+                $UserController->getUser()->getTableName() . ' as u',
+                'u.id = pr_i.object_id and u.subordinated = ' . $subordinated
+            )
+            ->where('property_id', '=', 43)
+            ->where('value', '>', 0)
+            ->whereIn('object_id', $UserController->getUserIds())
+            ->find();
+    } else {
+        $avgIndivCost = new stdClass();
+        $avgGroupCost = new stdClass();
+        $avgIndivCost->value = null;
+        $avgGroupCost->value = null;
+    }
 
     $avgIndivCost = !is_null($avgIndivCost->value) ? round($avgIndivCost->value, 0) : 0;
     $avgGroupCost = !is_null($avgGroupCost->value) ? round($avgGroupCost->value, 0) : 0;
