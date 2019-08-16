@@ -56,6 +56,8 @@
                         <div>
                             <a class="btn btn-blue lids_consult_show">Показать</a>
                         </div>
+
+                        <div><h4>Всего: <xsl:value-of select="count(//lid)" /></h4></div>
                     </div>
                 </form>
             </xsl:if>

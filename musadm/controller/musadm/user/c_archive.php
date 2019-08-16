@@ -46,17 +46,53 @@
 $User = User::current();
 
 $User->groupId() == 2
-    ?   $ForAreas = Core::factory( 'Schedule_Area_Assignment' )->getAreas( $User )
+    ?   $ForAreas = Core::factory('Schedule_Area_Assignment')->getAreas($User)
     :   $ForAreas = [];
 
-Core::factory( 'User_Controller' );
-$UserController = new User_Controller( User::current() );
+Core::factory('User_Controller');
+$UserController = new User_Controller(User::current());
+
+
+//Фильтры
+Core::requireClass('Schedule_Area_Controller');
+Core::requireClass('Schedule_Area_Assignment');
+$ScheduleAssignment = new Schedule_Area_Assignment();
+
+foreach ($_GET as $paramName => $values) {
+    if ($paramName === 'areas') {
+        foreach ($_GET['areas'] as $areaId) {
+            try {
+                if ($areaId > 0
+                    && ($ScheduleAssignment->issetAssignment(User::current(), intval($areaId)) !== null)
+                    || User::checkUserAccess(['groups' => [ROLE_DIRECTOR]])
+                ) {
+                    $Area = Schedule_Area_Controller::factory(intval($areaId));
+                    if ($Area !== null) {
+                        $UserController->forAreas([$Area]);
+                    }
+                }
+            } catch (Exception $e) {
+                die($e->getMessage());
+            }
+        }
+        continue;
+    }
+
+    if (strpos($paramName, 'property_') !== false) {
+        foreach ($_GET[$paramName] as $value) {
+            $propId = explode('property_', $value)[0];
+            $UserController->appendFilter($paramName, $value);
+        }
+    }
+}
+
 $UserController
-    ->active( false )
-    ->properties( true )
-    ->forAreas( $ForAreas )
-    ->tableType( User_Controller::TABLE_ARCHIVE )
-    ->groupId( [2, 4, 5] )
-    ->addSimpleEntity( 'page-theme-color', 'primary' )
-    ->xsl( 'musadm/users/clients.xsl' )
+    ->isActiveBtnPanel(false)
+    ->active(false)
+    ->properties(true)
+    ->forAreas($ForAreas)
+    ->tableType(User_Controller::TABLE_ARCHIVE)
+    ->groupId([2, 4, 5])
+    ->addSimpleEntity('page-theme-color', 'primary')
+    ->xsl('musadm/users/clients.xsl')
     ->show();

@@ -203,3 +203,34 @@ function saveTask(formData, callBack) {
         }
     });
 }
+
+
+
+
+/*-----------------------------------------------------------------
+ *-------------------Новые обработчики и функции-------------------
+ *----------------------------------------------------------------*/
+
+function makeTeacherTaskPopup(teacherId) {
+    loaderOn();
+    prependPopup('<div class="popup-row-block row"><form id="taskFromTeacher"></form></div>');
+    var
+        popup = $('.popup'),
+        popupForm = $('#taskFromTeacher');
+    popupForm.append('<div class="col-md-4 center"><span>Ученик</span></div>');
+    popupForm.append('<div class="col-md-8"><select class="form-control" name="associate"><option value="0">...</option></select></div>');
+    popupForm.append('<div class="col-md-4 center"><span>Текст</span></div>');
+    popupForm.append('<div class="col-md-8"><textarea class="form-control" name="comment" rows="5" required></textarea></div>');
+    popupForm.append('<input type="hidden" name="priority_id" value="2" />');
+    popup.append('<button class="btn btn-default" onclick="Task.saveFrom(\'#taskFromTeacher\', ' +
+        'function(response){ checkResponseStatus(response); loaderOff(); closePopup(); if(response.task !== undefined){ notificationSuccess(\'Сообщение успешно отправлено\'); } })">Отправить</button>');
+
+    var clientsSelect = popupForm.find('select');
+    User.getListByTeacherId(teacherId, function(clients){
+        $.each(clients, function(key, client){
+            clientsSelect.append('<option value="'+client.id+'">'+client.surname + ' ' + client.name + '</option>');
+        });
+        showPopup();
+        loaderOff();
+    });
+}

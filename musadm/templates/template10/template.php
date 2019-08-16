@@ -298,6 +298,7 @@ Core_Page_Show::instance()
     ->js('/templates/template4/js/payment.api.js')
     ->js('/templates/template4/js/groups.api.js')
     ->js('/templates/template4/js/lids.api.js')
+    ->js('/templates/template4/js/task.api.js')
     ->js('/templates/template4/js/property_list.api.js')
 
     ->js('/templates/template10/assets/js/main.js')

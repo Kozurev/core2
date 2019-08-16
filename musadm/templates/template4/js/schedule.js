@@ -516,18 +516,18 @@ function getScheduleAreaPopup(areaId) {
 }
 
 
-function newScheduleTaskPopup() {
-    $.ajax({
-        type: 'GET',
-        url: '',
-        data: {
-            action: 'new_task_popup',
-        },
-        success: function(response) {
-            showPopup(response);
-        }
-    });
-}
+// function newScheduleTaskPopup() {
+//     $.ajax({
+//         type: 'GET',
+//         url: '',
+//         data: {
+//             action: 'new_task_popup',
+//         },
+//         success: function(response) {
+//             showPopup(response);
+//         }
+//     });
+// }
 
 
 function saveScheduleTask(formData, func) {

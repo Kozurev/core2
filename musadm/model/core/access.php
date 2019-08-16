@@ -25,6 +25,7 @@ class Core_Access
     const USER_APPEND_COMMENT = 'user_append_comment';
     const USER_LC_CLIENT = 'user_lc_client';
     const USER_LC_TEACHER = 'user_lc_teacher';
+    const USER_EXPORT = 'user_export';
 
     const TASK_READ = 'task_read';
     const TASK_CREATE = 'task_create';

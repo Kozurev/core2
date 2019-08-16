@@ -73,7 +73,11 @@ Core::attachObserver('ScheduleLesson.markDeleted', function($args) {
 Core::attachObserver('beforeScheduleLesson.setAbsent', function($args) {
     $Lesson = $args['Lesson'];
     $Client = $Lesson->getClient();
-    $ClientFio = $Client->surname() . ' ' . $Client->name();
+    if ($Client instanceof User) {
+        $ClientFio = $Client->surname() . ' ' . $Client->name();
+    } else {
+        $ClientFio = '';
+    }
     $EventData = new stdClass();
     $EventData->Lesson = $Lesson;
     $EventData->date = $args['date'];
@@ -305,7 +309,7 @@ Core::attachObserver( 'ChangeTaskControlDate', function($args) {
 });
 
 
-Core::attachObserver('TaskMarkAsDone', function($args) {
+Core::attachObserver('before.Task.markAsDone', function($args) {
     $EventData = new stdClass();
     $EventData->task_id = $args[0];
     Core::factory('Event')

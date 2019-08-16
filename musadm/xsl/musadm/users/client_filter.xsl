@@ -7,7 +7,7 @@
                 <i class="fa fa-chevron-down"><input type="hidden" name="kostul"/></i>
             </h3>
 
-            <form method="GET" action="{wwwroot}/user/client" id="client-filter">
+            <form method="GET" action="{wwwroot}{action}" id="client-filter">
                 <div class="row client-filter__options">
                     <div class="col-lg-3 dropdown-parent">
                         <h4>Филиалы</h4>

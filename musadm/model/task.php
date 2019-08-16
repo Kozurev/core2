@@ -73,7 +73,7 @@ class Task extends Task_Model
             if (is_null(User::current())) {
                 $Note->authorId(0);
             } else {
-                $Note->authorId(User::current()->getId());
+                $Note->authorId(User::parentAuth()->getId());
             }
         } else {
             $Note->authorId($authorId);
@@ -105,7 +105,7 @@ class Task extends Task_Model
             return $this;
         }
 
-        Core::notify([&$this], 'TaskMarkAsDone');
+        Core::notify([&$this], 'before.Task.markAsDone');
 
         $this
             ->doneDate(date('Y-m-d'))
@@ -136,33 +136,47 @@ class Task extends Task_Model
     }
 
 
+    /**
+     * @return false|int
+     */
     public function time()
     {
-        return strtotime( $this->date );
+        return strtotime($this->date);
     }
 
 
-    public function save( $obj = null )
+    /**
+     * @param null $obj
+     * @return $this
+     */
+    public function save($obj = null)
     {
-        Core::notify( [&$this], "beforeTaskSave" );
+        Core::notify([&$this], 'before.Task.save');
 
-        if ( $this->date == "" )   $this->date = date( "Y-m-d" );
+        if (empty($this->date)) {
+            $this->date = date('Y-m-d');
+        }
 
         parent::save();
-
-        Core::notify( [&$this], "afterTaskSave" );
-
+        Core::notify([&$this], 'after.Task.save');
         return $this;
     }
 
 
-    public function delete( $obj = null )
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
+    public function delete($obj = null)
     {
-        Core::notify( [&$this], "beforeTaskDelete" );
+        Core::notify([&$this], 'before.Task.delete');
+
+        foreach ($this->getNotes() as $Note) {
+            $Note->delete();
+        }
 
         parent::delete();
-
-        Core::notify( [&$this], "afterTaskDelete" );
+        Core::notify([&$this], 'after.Task.delete');
     }
 
 }

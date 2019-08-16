@@ -794,6 +794,10 @@ class User_Controller
                 Core::factory('Schedule_Area')->getList(true, false)
             )
             ->addSimpleEntity(
+                'access_user_export',
+                (int)Core_Access::instance()->hasCapability(Core_Access::USER_EXPORT)
+            )
+            ->addSimpleEntity(
                 'access_user_read_clients',
                 (int)Core_Access::instance()->hasCapability(Core_Access::USER_READ_CLIENTS)
             )

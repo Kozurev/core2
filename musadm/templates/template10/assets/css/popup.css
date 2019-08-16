@@ -120,6 +120,11 @@
 }
 
 
+.popup span {
+    font-size: 20px;
+}
+
+
 @media(min-width: 1024px) {
 
     .popup {

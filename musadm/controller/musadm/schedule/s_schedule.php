@@ -441,19 +441,20 @@ if ($action === 'saveScheduleChangeTimePopup') {
 
 /**
  * Создание обращения к менеджерам
+ * TODO: Удалить этот обработчик вместе с XSL шаблоном
  */
-if ($action === 'new_task_popup') {
-    $TaskTypes = Core::factory('Task_Type')->findAll();
-    $date = date('Y-m-d');
-
-    Core::factory('Core_Entity')
-        ->addEntities($TaskTypes)
-        ->addSimpleEntity('date', $date)
-        ->xsl('musadm/schedule/new_task_popup.xsl')
-        ->show();
-
-    exit;
-}
+//if ($action === 'new_task_popup') {
+//    $TaskTypes = Core::factory('Task_Type')->findAll();
+//    $date = date('Y-m-d');
+//
+//    Core::factory('Core_Entity')
+//        ->addEntities($TaskTypes)
+//        ->addSimpleEntity('date', $date)
+//        ->xsl('musadm/schedule/new_task_popup.xsl')
+//        ->show();
+//
+//    exit;
+//}
 
 
 if ($action === 'save_task') {

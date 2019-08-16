@@ -15,7 +15,7 @@
                     </div>
                 </xsl:if>
 
-                <xsl:if test="active-export-btn = 1">
+                <xsl:if test="active-export-btn = 1 and access_user_export = 1">
                     <div>
                         <button class="btn btn-{page-theme-color}" onclick="usersExport('client', $('#client-filter'))">
                             Экспорт в Excel
