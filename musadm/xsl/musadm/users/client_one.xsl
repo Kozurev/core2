@@ -147,11 +147,11 @@
                     </xsl:if>
 
                     <xsl:if test="//access_user_edit_client = 1">
-                        <a class="action edit" href="#" onclick="getClientPopup({id})" title="Редактировать данные"></a>
+                        <a class="action edit" onclick="getClientPopup({id})" title="Редактировать данные"></a>
                     </xsl:if>
 
                     <xsl:if test="//access_user_archive_client = 1">
-                        <a class="action archive user_archive" href="#" data-userid="{id}" title="Переместить в архив"></a>
+                        <a class="action archive user_archive" data-userid="{id}" title="Переместить в архив"></a>
                     </xsl:if>
                 </td>
             </xsl:if>

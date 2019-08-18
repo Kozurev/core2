@@ -796,10 +796,10 @@ function makeClientTr(data) {
         td7.append('<a class="action add_payment" onclick="makeClientPaymentPopup(0, '+user.id+', saveClientPaymentCallback)" title="Добавить платеж"></a>');
     }
     if (data.access.user_edit_client) {
-        td7.append('<a class="action edit" href="#" onclick="getClientPopup('+user.id+')" title="Редактировать данные"></a>');
+        td7.append('<a class="action edit" onclick="getClientPopup('+user.id+')" title="Редактировать данные"></a>');
     }
     if (data.access.user_archive_client) {
-        td7.append('<a class="action archive user_archive" href="#" data-userid="'+user.id+'" title="Переместить в архив"></a>');
+        td7.append('<a class="action archive user_archive" data-userid="'+user.id+'" title="Переместить в архив"></a>');
     }
 
     tr.append(td1);
