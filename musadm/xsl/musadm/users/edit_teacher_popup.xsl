@@ -117,9 +117,6 @@
             <button class="popop_user_submit btn btn-default">Сохранить</button>
         </form>
 
-        <script>
-            $(".masked-phone").mask("+79999999999");
-        </script>
     </xsl:template>
 
 
