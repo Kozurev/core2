@@ -9,9 +9,10 @@ $(function() {
 
             var
                 from =  $('.finances-calendar').find('input[name=date_from]').val(),
-                to =    $('.finances-calendar').find('input[name=date_to]').val();
+                to =    $('.finances-calendar').find('input[name=date_to]').val(),
+                areaId= $('#statistic-areas-select').val();
 
-            showStatistic(from, to, 0, function(response) {
+            showStatistic(from, to, areaId, function(response) {
                 $('.statistic').html(response);
                 loaderOff();
             });
