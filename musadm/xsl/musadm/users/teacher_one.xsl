@@ -6,7 +6,7 @@
 
 	<xsl:template match="user">
         <xsl:variable name="groupId" select="group_id" />
-        <xsl:variable name="instrumentId" select="property_value[property_id = 20]/value_id" />
+        <!--<xsl:variable name="instrumentId" select="property_value[property_id = 20]/value_id" />-->
 
         <tr>
             <td>
@@ -27,8 +27,11 @@
             </td>
 
             <td>
-                <!--<xsl:value-of select="property_value[property_id = 20]/value" />-->
-                <xsl:value-of select="/root/user_group[id = $groupId]/property[tag_name = 'instrument']/values/item[id = $instrumentId]/value" />
+                <xsl:for-each select="property_value[property_id = 20]">
+                    <xsl:variable name="instrumentId" select="value_id" />
+                    <xsl:value-of select="/root/user_group[id = $groupId]/property[tag_name = 'instrument']/values/item[id = $instrumentId]/value" />
+                    <br/>
+                </xsl:for-each>
             </td>
 
             <td>

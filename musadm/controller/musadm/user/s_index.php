@@ -6,6 +6,7 @@
  * @date 11.04.2018 22:16
  * @version 20190414
  * @version 20190814 - исправлен баг формирования всплывающего окна редактирования преподавателя
+ * @version 20190818 - добавлена возможность указания нескольких инструментов одному преподу
  */
 
 
@@ -18,12 +19,6 @@ Core::requireClass('Property_Controller');
 $User = User::current();
 $Director = $User->getDirector();
 $subordinated = $Director->getId();
-$accessRules = ['groups' => [ROLE_ADMIN, ROLE_DIRECTOR, ROLE_MANAGER]];
-
-//if (!User::checkUserAccess($accessRules, $User)) {
-//    Core_Page_Show::instance()->error(404);
-//}
-
 $action = Core_Array::Get('action', null, PARAM_STRING);
 
 
@@ -110,7 +105,8 @@ if ($action === 'updateFormTeacher') {
             exit (Core::getMessage('NOT_FOUND', ['Преподаватель', $userId]));
         }
 
-        $Properties[] = Property_Controller::factoryByTag('instrument')->getValues($Teacher)[0];    //Инструмент
+        $Properties = [];
+        $Properties += Property_Controller::factoryByTag('instrument')->getValues($Teacher);    //Инструмент
         $Properties[] = Property_Controller::factoryByTag('teacher_schedule')->getValues($Teacher)[0];    //Расписание
         $Properties[] = Property_Controller::factoryByTag('birth')->getValues($Teacher)[0];    //Расписание
         $output->addEntities($Properties, 'property_value');

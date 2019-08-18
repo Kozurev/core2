@@ -84,7 +84,7 @@
                 <span>Инструмент</span>
             </div>
             <div class="column">
-                <select name="property_20[]" class="form-control">
+                <select name="property_20[]" class="form-control" multiple="multiple" size="4">
                     <option value="0">...</option>
                     <xsl:call-template name="property_list">
                         <xsl:with-param name="property_id" select="20" />
@@ -126,9 +126,10 @@
         <xsl:for-each select="property_list[property_id=$property_id]">
             <xsl:variable name="id" select="id" />
             <option value="{$id}">
-                <xsl:if test="//property_value[property_id = $property_id]/value_id = $id">
+                <xsl:if test="count(//property_value[property_id = $property_id][value_id = $id]) != 0">
                     <xsl:attribute name="selected">selected</xsl:attribute>
                 </xsl:if>
+                <!--<xsl:value-of select="count(//property_value[property_id = $property_id][value_id = $id])" />-->
                 <xsl:value-of select="value" />
             </option>
         </xsl:for-each>
