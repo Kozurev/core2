@@ -7,9 +7,6 @@ $(function(){
             var areaId = $('select[name=area_id]').val();
             showFinancesHistory(dateFrom, dateTo, areaId);
         })
-        // .on("click", ".finances_payment", function(){
-        //     editPaymentPopup(0, "payment");
-        // })
         .on("click", ".edit_rate", function(e){
             e.preventDefault();
 
@@ -24,6 +21,9 @@ $(function(){
 
             valueInput.val(oldValue);
             valueInput.css("display", "inline-block");
+            if (valueInput.attr("type") == "text") {
+                valueInput.css("max-width", "225px");
+            }
         })
         .on("click", ".save_rate", function(e){
             e.preventDefault();
@@ -44,7 +44,7 @@ $(function(){
             var propertyValue = valueInput.val();
             var directorId = $("#director_id").val();
 
-            savePropertyValue( propertyTagName, propertyValue, "User", directorId );
+            savePropertyValue(propertyTagName, propertyValue, "User", directorId);
         })
         .on("change", ".is_default_rate", function(){
             var propertyValue;

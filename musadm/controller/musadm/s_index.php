@@ -133,12 +133,12 @@ if ($action === 'deletePropertyListValue') {
  */
 if ($action === 'savePropertyValue') {
     $propertyName = Core_Array::Get('prop_name', null, PARAM_STRING);
-    $propertyValue= Core_Array::Get('value', null, PARAM_FLOAT);
+    $propertyValue= Core_Array::Get('value', null, PARAM_STRING);
     $modelId =      Core_Array::Get('model_id', null, PARAM_INT);
     $modelName =    Core_Array::Get('model_name', null, PARAM_STRING);
 
     $Object = Core::factory($modelName);
-    $Property = Core::factory('Property')->getByTagName($propertyName);
+    $Property = Property_Controller::factoryByTag($propertyName);
 
     if (is_null($Property) || is_null($Object)) {
         Core_Page_Show::instance()->error(404);
@@ -160,8 +160,9 @@ if ($action === 'savePropertyValue') {
         Core_Page_Show::instance()->error(404);
     }
 
-    $Value = $Property->getPropertyValues($Object)[0];
-    $Value->value($propertyValue)->save();
+    $Value = $Property->getValues($Object)[0];
+    $Value->value($propertyValue);
+    $Value->save();
     exit;
 }
 

@@ -320,33 +320,29 @@ class Admin_Menu_Main
     /**
      *	Изменение активности объекта
      */
-    public function updateActive( $aParams )
+    public function updateActive($aParams)
     {
-        $modelName =    Core_Array::getValue( $aParams, 'model_name', '', PARAM_STRING );
-        $modelId =      Core_Array::getValue( $aParams, 'model_id', 0, PARAM_INT );
-        $value =        Core_Array::getValue( $aParams, 'value', null, PARAM_BOOL );
+        $modelName =    Core_Array::getValue($aParams, 'model_name', '', PARAM_STRING);
+        $modelId =      Core_Array::getValue($aParams, 'model_id', 0, PARAM_INT);
+        $value =        Core_Array::getValue($aParams, 'value', null, PARAM_BOOL);
 
-        $eventObjectName = explode( '_', $modelName );
-        $eventObjectName = implode( '', $eventObjectName );
+        $eventObjectName = explode('_', $modelName);
+        $eventObjectName = implode('', $eventObjectName);
 
         $value === true
-            ?   $eventType = 'Activate'
-            :   $eventType = 'Deactivate';
+            ?   $eventType = 'activate'
+            :   $eventType = 'deactivate';
 
-        $obj = Core::factory( $modelName, $modelId );
+        $obj = Core::factory($modelName, $modelId);
 
         //Проверка на существование объекта
-        if ( $obj === null )
-        {
-            Core_Page_Show::instance()->error( 403 );
+        if (is_null($obj)) {
+            Core_Page_Show::instance()->error(403);
         }
 
-        Core::notify( [$obj], 'before' . $eventObjectName . $eventType );
-
+        Core::notify([$obj], 'before.' . $eventObjectName . '.' . $eventType);
         $obj->active( $value )->save();
-
-        Core::notify( [$obj], 'after' . $eventObjectName . $eventType );
-
+        Core::notify([$obj], 'after.' . $eventObjectName . '.' . $eventType);
         echo 0;
     }
 
@@ -354,19 +350,17 @@ class Admin_Menu_Main
     /**
      * Обработчик удаления объекта
      */
-    public function deleteAction( $aParams )
+    public function deleteAction($aParams)
     {
-        $modelName =    Core_Array::getValue( $aParams, 'model_name', '', PARAM_STRING );
-        $modelId =      Core_Array::getValue( $aParams, 'model_id', 0, PARAM_INT );
+        $modelName =    Core_Array::getValue($aParams, 'model_name', '', PARAM_STRING);
+        $modelId =      Core_Array::getValue($aParams, 'model_id', 0, PARAM_INT);
 
-        $obj = Core::factory( $modelName, $modelId );
+        $obj = Core::factory($modelName, $modelId);
 
         //Проверка на существование объекта
-        if ( $obj === null )
-        {
-            Core_Page_Show::instance()->error( 403 );
+        if (is_null($obj)) {
+            Core_Page_Show::instance()->error(403);
         }
-
         $obj->delete();
         echo 0;
     }

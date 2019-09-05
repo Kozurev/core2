@@ -12,6 +12,7 @@
 
 Core::requireClass('Orm');
 Core::requireClass('Payment');
+Core::requireClass('Property_Controller');
 Core::requireClass('Schedule_Area');
 
 $Payment = new Payment();
@@ -151,6 +152,10 @@ $defAbsentRate =        $DefAbsentRate->getPropertyValues($Director)[0]->value()
 $defAbsentRateType =    $DefAbsentRateType->getPropertyValues($Director)[0]->value();
 $defAbsentRateVal =     $DefAbsentRateVal->getPropertyValues($Director)[0]->value();
 
+//API Токен авторизации эквайринга
+$ApiToken = Property_Controller::factoryByTag('payment_sberbank_token');
+$apiToken = $ApiToken->getValues($Director)[0]->value();
+
 Core::factory('Core_Entity')
     ->addEntities($Payments)
     ->addEntities($Tarifs)
@@ -184,5 +189,6 @@ Core::factory('Core_Entity')
     ->addSimpleEntity('access_payment_tarif_create', (int)$accessTarifCreate)
     ->addSimpleEntity('access_payment_tarif_edit', (int)$accessTarifEdit)
     ->addSimpleEntity('access_payment_tarif_delete', (int)$accessTarifDelete)
+    ->addSimpleEntity('api_token', $apiToken)
     ->xsl('musadm/finances/client_payments.xsl')
     ->show();

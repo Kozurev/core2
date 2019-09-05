@@ -189,6 +189,19 @@ class Event_Model extends Core_Entity
     }
 
 
+    public function setData($data)
+    {
+        $this->data = json_encode($data, JSON_UNESCAPED_UNICODE);
+        return $this;
+    }
+
+
+    public function getData()
+    {
+        return json_decode($this->data);
+    }
+
+
     //Параметры валидации при сохранении таблицы
     public function schema()
     {

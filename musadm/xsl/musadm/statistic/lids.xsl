@@ -2,7 +2,24 @@
 
     <xsl:template match="root">
         <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
-        <!--<h3>Лиды</h3>-->
+            <xsl:variable name="selectedTeacherId" select="selectedTeacherId" />
+            <xsl:if test="count(user) != 0">
+                <select class="form-control" id="lids_statistic_teacherId">
+                    <option value="0"> ... </option>
+                    <xsl:for-each select="user">
+                        <!--<xsl:variable name="id" select="id" />-->
+                        <option value="{id}">
+                            <xsl:if test="id = $selectedTeacherId">
+                                <xsl:attribute name="selected">selected</xsl:attribute>
+                            </xsl:if>
+                            <xsl:value-of select="surname" />
+                            <xsl:text> </xsl:text>
+                            <xsl:value-of select="name" />
+                        </option>
+                    </xsl:for-each>
+                </select>
+            </xsl:if>
+
             <table class="table table-bordered table-hover statistic_lids_table">
                 <tr>
                     <th colspan="2">Лиды</th>

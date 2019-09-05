@@ -194,4 +194,50 @@ class Payment {
         });
     }
 
+
+    /**
+     * Вызов всплывающего окна для оплаты через личный кабинет
+     *
+     * @returns {*}
+     */
+    static getSberApi() {
+        return ipayCheckout({
+                currency: 'RUB',
+                order_number: '',
+                description: 'Пополнение лицевого счета'
+            },
+            function(order) { Payment.sberApiSuccess(order) },
+            function(order) { Payment.sberApiError(order) })
+    }
+
+
+    /**
+     * Создание платежа после оплаты клиентом и формирование чека
+     *
+     * @param order
+     */
+    static sberApiSuccess(order) {
+        var
+            clientId = $('#userid').val(),
+            sum = order.formattedAmount,
+            description = order.orderDescription,
+            comment = 'Самостоятельное пополнение баланса клиентом. Номер платежа: ' + order.orderNumber;
+
+        Payment.save(0, clientId, sum, 1, '', 0, description, comment, function(payment){
+            var checkData = {};
+            checkData.paymentId =   payment.id;
+            checkData.userId =      payment.userId;
+            checkData.userEmail =   order.email;
+            checkData.description = payment.description;
+            checkData.sum =         payment.value;
+            Initpro.sendCheck(checkData, function(check) {
+                window.location.reload();
+            });
+        });
+    }
+
+    static sberApiError(order) {
+        console.log(order);
+    }
+
 }

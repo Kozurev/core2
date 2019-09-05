@@ -93,73 +93,65 @@ class Event extends Event_Model
             $str = '';
         }
 
-        if (is_null($this->data())) {
+        if (is_null($this->getData())) {
             return 'При сохранении события типа \'' . $this->getTypeName() . '\' произошла неизвестная ошибка';
         }
 
         switch ($this->typeId())
         {
             case self::SCHEDULE_APPEND_USER:
-                Core::requireClass('Schedule_Lesson');
-                $this->data()->Lesson->lessonType() == 1
+                $this->getData()->lesson->lesson_type == 1
                     ?   $str .= 'Основной график с '
                     :   $str .= 'Актуальный график на ' ;
-                $insertDate = refactorDateFormat($this->data()->Lesson->insertDate());
-                $timeStart = $this->data()->Lesson->timeFrom();
-                return $str . $insertDate . ' в ' . $timeStart;
+                $insertDate = refactorDateFormat($this->getData()->lesson->insert_date);
+                $timeStart = $this->getData()->lesson->time_from;
+                return $str . $insertDate . ' в ' . substr($timeStart, 0, 5);
                 break;
 
             case self::SCHEDULE_REMOVE_USER:
-                Core::requireClass('Schedule_Lesson');
-                $date = refactorDateFormat($this->data()->date);
-                $this->data()->Lesson->lessonType() == 1
+                $date = refactorDateFormat($this->getData()->removeDate);
+                $this->getData()->lesson->lesson_type == 1
                     ?   $str .= 'Удален(а) из основного графика с ' . $date
                     :   $str .= 'Удален(а) из актуального графика ' . $date;
                 return $str;
                 break;
 
             case self::SCHEDULE_SET_ABSENT:
-                Core::requireClass('Schedule_Lesson');
-                $date = refactorDateFormat($this->data()->date);
+                $date = refactorDateFormat($this->getData()->absentDate);
                 return 'Отсутствует ' . $date;
                 break;
 
             case self::SCHEDULE_CREATE_ABSENT_PERIOD:
-                Core::requireClass('Schedule_Absent');
-                $dateFrom = refactorDateFormat($this->data()->Period->dateFrom());
-                $dateTo =   refactorDateFormat($this->data()->Period->dateTo());
+                $dateFrom = refactorDateFormat($this->getData()->period->date_from);
+                $dateTo =   refactorDateFormat($this->getData()->period->date_to);
                 return $str . 'Отсутствует с ' . $dateFrom . ' по ' . $dateTo;
                 break;
 
             case self::SCHEDULE_CHANGE_TIME:
-                Core::requireClass('Schedule_Lesson');
-                $date =         refactorDateFormat($this->data()->date);
-                $oldTimeFrom =  refactorTimeFormat($this->data()->Lesson->timeFrom());
-                $newTimeFrom =  refactorTimeFormat($this->data()->new_time_from);
+                $date =         refactorDateFormat($this->getData()->date);
+                $oldTimeFrom =  refactorTimeFormat($this->getData()->lesson->time_from);
+                $newTimeFrom =  refactorTimeFormat($this->getData()->new_time_from);
                 return $str . ' Актуальный график изменился на ' . $date
                             . '; старое время ' . $oldTimeFrom
                             . ', новое время ' . $newTimeFrom . '.';
                 break;
 
             case self::SCHEDULE_EDIT_ABSENT_PERIOD:
-                Core::requireClass('Schedule_Absent');
-                $oldDateFrom =  refactorDateFormat($this->data()->old_Period->dateFrom());
-                $oldDateTo =    refactorDateFormat($this->data()->old_Period->dateTo());
-                $newDateFrom =  refactorDateFormat($this->data()->new_Period->dateFrom());
-                $newDateTo =    refactorDateFormat($this->data()->new_Period->dateTo());
+                $oldDateFrom =  refactorDateFormat($this->getData()->old_period->date_from);
+                $oldDateTo =    refactorDateFormat($this->getData()->old_period->date_to);
+                $newDateFrom =  refactorDateFormat($this->getData()->new_period->date_from);
+                $newDateTo =    refactorDateFormat($this->getData()->new_period->date_to);
                 return $str . 'Период отсутствия изменен с: ' . $oldDateFrom . ' - ' . $oldDateTo
                                                     . ' на: ' . $newDateFrom . ' - ' . $newDateTo;
                 break;
 
             case self::SCHEDULE_APPEND_CONSULT:
-                Core::requireClass('Schedule_Lesson');
-                Core::requireClass('Lid');
-                $Lesson =   $this->data()->Lesson;
-                $timeFrom = refactorTimeFormat($Lesson->timeFrom());
-                $timeTo =   refactorTimeFormat($Lesson->timeTo());
+                $Lesson =   $this->getData()->lesson;
+                $timeFrom = refactorTimeFormat($Lesson->time_from);
+                $timeTo =   refactorTimeFormat($Lesson->time_to);
                 $str = 'Добавил(а) консультацию c ' . $timeFrom . ' по ' . $timeTo . '. ';
                 if ($Lesson->clientId()) {
-                    $lidId = $this->data()->Lid->getId();
+                    $lidId = $this->getData()->lid->id;
                     $str .= "Лид <a href='#' class='info-by-id' data-model='Lid' data-id='".$lidId."'>№".$lidId."</a>";
                 }
                 return $str;
@@ -174,120 +166,89 @@ class Event extends Event_Model
                 break;
 
             case self::CLIENT_APPEND_COMMENT:
-                Core::requireClass('Comment');
-                Core::requireClass('User_Comment');
-                return $str . 'Добавлен комментарий с текстом: ' . $this->data()->Comment->text();
+                return $str . 'Добавлен комментарий с текстом: ' . $this->getData()->comment->text;
 
             case self::PAYMENT_CHANGE_BALANCE:
-                Core::requireClass('Payment');
-                return $str . 'Внесение оплаты пользователю на сумму ' . $this->data()->Payment->value() . ' руб.';
+                return $str . 'Внесение оплаты пользователю на сумму ' . $this->getData()->payment->value . ' руб.';
                 break;
 
             case self::PAYMENT_HOST_COSTS:
-                Core::requireClass('Payment');
-                return 'Внесение хозрасходов на сумму ' . $this->data()->Payment->value() . ' руб.';
+                return 'Внесение хозрасходов на сумму ' . $this->getData()->payment->value . ' руб.';
                 break;
 
             case self::PAYMENT_TEACHER_PAYMENT:
-                Core::requireClass('Payment');
-                return 'преп. ' . $this->user_assignment_fio . '. Выплата на сумму ' . $this->data()->Payment->value() . ' руб.';
+                return 'преп. ' . $this->user_assignment_fio . '. Выплата на сумму ' . $this->getData()->payment->value . ' руб.';
                 break;
 
             case self::PAYMENT_APPEND_COMMENT:
-                Core::requireClass('Property_String');
-                return 'Добавил(а) комментарий к платежу с текстом: \''. $this->data()->Comment->value() .'\'';
+                return 'Добавил(а) комментарий к платежу с текстом: \''. $this->getData()->comment->value .'\'';
                 break;
 
             case self::TASK_CREATE:
-                Core::requireClass('Task_Note');
-                $id =   $this->data()->Note->taskId();
-                $text = $this->data()->Note->text();
+                $id =   $this->getData()->note->task_id;
+                $text = $this->getData()->note->text;
                 return "Добавил(а) задачу 
                         <a href='#' class='info-by-id' data-model='Task' data-id='" . $id . "'>№" . $id . "</a> 
                         с комментарием: '" . $text . "'";
                 break;
 
             case self::TASK_DONE:
-                $id = $this->data()->task_id->getId();
+                $id = $this->getData()->task_id->getId();
                 return "Закрыл(а) задачу 
                         <a href='#' class='info-by-id' data-model='Task' data-id='" . $id ."'>№" . $id . "</a>";
                 break;
 
             case self::TASK_APPEND_COMMENT:
-                Core::requireClass('Task_Note');
-                $id =   $this->data()->Note->taskId();
-                $text = $this->data()->Note->text();
+                $id =   $this->getData()->note->task_id;
+                $text = $this->getData()->note->text;
                 return "Добавил(а) комментарий к задаче 
                         <a href='#' class='info-by-id' data-model='Task' data-id='" . $id . "'>№" . $id . "</a> 
                         с текстом: '" . $text . "'";
                 break;
 
             case self::TASK_CHANGE_DATE:
-                $id =       $this->data()->task_id;
-                $newDate =  refactorDateFormat($this->data()->new_date);
-                $oldDate =  refactorDateFormat($this->data()->old_date);
+                $id =       $this->getData()->task_id;
+                $newDate =  refactorDateFormat($this->getData()->new_date);
+                $oldDate =  refactorDateFormat($this->getData()->old_date);
                 return "Задача 
                         <a href='#' class='info-by-id' data-model='Task' data-id='" . $id . "'>№" . $id . "</a>. 
                         Изменение даты с " . $oldDate . " на " . $newDate;
                 break;
 
             case self::LID_CREATE:
-                Core::requireClass('Lid');
-                $id =           $this->data()->Lid->getId();
-                $lidSurname =   $this->data()->Lid->surname();
-                $lidName =      $this->data()->Lid->name();
+                $id =           $this->getData()->lid->id;
+                $lidSurname =   $this->getData()->lid->surname;
+                $lidName =      $this->getData()->lid->name;
                 return "Добавил(а) лида 
                         <a href='#' class='info-by-id' data-model='Lid' data-id='" . $id . "'>№$id</a> $lidSurname $lidName";
                 break;
 
             case self::LID_APPEND_COMMENT:
-                Core::requireClass('Lid');
-                Core::requireClass('Lid_Comment');
-                Core::requireClass('Comment');
-                if ($this->data()->Comment instanceof Lid_Comment) {
-                    $id = $this->data()->Comment->lidId();
-                } elseif ($this->data()->Comment instanceof Comment) {
-                    if (isset($this->data()->Lid)) {
-                        $id = $this->data()->Lid->getId();
-                    } else {
-                        $Assignment = Core::factory('Lid_Comment_Assignment')
-                            ->queryBuilder()
-                            ->where('comment_id', '=', $this->data()->Comment->getId())
-                            ->find();
-                        if (is_null($Assignment)) {
-                            $id = 'Неизвестно';
-                        } else {
-                            $id = $Assignment->objectId();
-                        }
-                    }
-                }
+                $id = $this->getData()->lid->id;
                 return "Добавил(а) комментарий к лиду 
                 <a href='#' class='info-by-id' data-model='Lid' data-id='" . $id . "'>№$id</a> 
-                с текстом '" . $this->data()->Comment->text() . "'";
+                с текстом '" . $this->getData()->comment->text . "'";
                 break; 
 
             case self::LID_CHANGE_DATE:
-                Core::requireClass('Lid');
-                $id =       $this->data()->Lid->getId();
-                $oldDate =  refactorDateFormat($this->data()->old_date);
-                $newDate =  refactorDateFormat($this->data()->new_date);
+                $id =       $this->getData()->lid->id;
+                $oldDate =  refactorDateFormat($this->getData()->old_date);
+                $newDate =  refactorDateFormat($this->getData()->new_date);
                 return "Лид 
                         <a href='#' class='info-by-id' data-model='Lid' data-id='" . $id . "'>№$id</a>. 
                         Изменение даты с " . $oldDate . " на " . $newDate;
                 break;
 
             case self::CERTIFICATE_CREATE:
-                Core::requireClass('Certificate');
-                $id =   $this->data()->Certificate->getId();
-                $num =  $this->data()->Certificate->number();
+                $id =   $this->getData()->certificate->id;
+                $num =  $this->getData()->certificate->number;
                 return "Добавил(а) сертификат 
                         <a href='#' class='info-by-id' data-model='Certificate' data-id='" . $id . "'>№" . $num . "</a>";
                 break;
 
             case self::CERTIFICATE_APPEND_COMMENT:
-                Core::requireClass('Certificate_Note');
-                $id =   $this->data()->Note->certificateId();
-                $num =  Core::factory( 'Certificate', $id )->number();
+                $id =   $this->getData()->note->certificate_id;
+                $num =  Core::factory('Certificate', $id)->number();
                 return "Сертификат 
                         <a href='#' class='info-by-id' data-model='Certificate' data-id='" . $id . "'>№$num</a>. "
                         . $this->data()->Note->text();
@@ -327,7 +288,7 @@ class Event extends Event_Model
         //Конвертация дополнительных данных события в строку
         if (is_array($this->data) || is_object($this->data)) {
             try {
-                $this->data = serialize($this->data);
+                $this->data = json_encode($this->data);
             } catch (Exception $e) {
                 echo "<h2>Ошибка во время сохранения события: " . $e->getMessage() . "</h2>";
                 return;
@@ -335,7 +296,7 @@ class Event extends Event_Model
         }
 
         parent::save();
-        Core::notify([&$this], 'afterEvent.save');
+        Core::notify([&$this], 'after.Event.save');
     }
 
 

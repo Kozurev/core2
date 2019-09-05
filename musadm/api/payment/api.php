@@ -97,14 +97,14 @@ if ($action === 'getPayment') {
  * Пока что реализован функционал лишь для сохранения одного доп. комментария
  */
 if ($action === 'save') {
-    $id = Core_Array::Get('id', null, PARAM_INT);
-    $typeId = Core_Array::Get('typeId', 0, PARAM_INT);
-    $date = Core_Array::Get('date', date('Y-m-d'), PARAM_DATE);
-    $userId = Core_Array::Get('userId', 0, PARAM_INT);
-    $areaId = Core_Array::Get('areaId', 0, PARAM_INT);
-    $value = Core_Array::Get('value', 0, PARAM_INT);
-    $description = Core_Array::Get('description', '', PARAM_STRING);
-    $comment = Core_Array::Get('comment', null, PARAM_STRING);
+    $id =           Core_Array::Get('id', null, PARAM_INT);
+    $typeId =       Core_Array::Get('typeId', 0, PARAM_INT);
+    $date =         Core_Array::Get('date', date('Y-m-d'), PARAM_DATE);
+    $userId =       Core_Array::Get('userId', 0, PARAM_INT);
+    $areaId =       Core_Array::Get('areaId', 0, PARAM_INT);
+    $value =        Core_Array::Get('value', 0, PARAM_INT);
+    $description =  Core_Array::Get('description', '', PARAM_STRING);
+    $comment =      Core_Array::Get('comment', null, PARAM_STRING);
 
     $Payment = Payment_Controller::factory($id);
     $Payment->type($typeId);

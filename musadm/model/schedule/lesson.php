@@ -143,7 +143,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     {
         $observerArgs = [
             'Lesson' => &$this,
-            'date' => $date,
+            'removeDate' => $date,
         ];
         Core::notify($observerArgs, 'ScheduleLesson.markDeleted');
 
@@ -179,9 +179,9 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         } elseif ($this->lesson_type == self::SCHEDULE_MAIN) {
             $observerArgs = [
                 'Lesson' => &$this,
-                'date' => $date,
+                'absentDate' => $date,
             ];
-            Core::notify($observerArgs, 'beforeScheduleLesson.setAbsent');
+            Core::notify($observerArgs, 'before.ScheduleLesson.setAbsent');
 
             Core::factory('Schedule_Lesson_Absent')
                 ->date($date)
@@ -504,7 +504,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             'new_time_from' => $timeFrom,
             'new_time_to' => $timeTo
         ];
-        Core::notify($observerArgs, 'ScheduleLessonTimemodify');
+        Core::notify($observerArgs, 'ScheduleLesson.timemodify');
 
         if ($this->lesson_type == self::SCHEDULE_CURRENT) {  //Актуальный график
             $this->time_from = $timeFrom;

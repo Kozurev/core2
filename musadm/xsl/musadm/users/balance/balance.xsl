@@ -15,9 +15,15 @@
                             </span>
                         </td>
                         <td>
-                            <xsl:if test="access_create_payment = 1">
+                            <xsl:if test="access_create_payment = 1 and is_admin = 1">
                                 <a class="action add_payment" onclick="makeClientPaymentPopup(0, {user/id}, saveBalancePaymentCallback)" title="Зачислить платеж">
                                     <!--Пополнить баланс-->
+                                </a>
+                            </xsl:if>
+                            <xsl:if test="is_admin = 0">
+                                <a onclick="Payment.getSberApi()"
+                                   class="btn btn-xs btn-outline btn-primary">
+                                    Пополнить баланс
                                 </a>
                             </xsl:if>
                         </td>

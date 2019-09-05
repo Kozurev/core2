@@ -72,6 +72,7 @@
                     <xsl:with-param name="absent_rate" select="absent_rate" />
                     <xsl:with-param name="absent_rate_type" select="absent_rate_type" />
                     <xsl:with-param name="absent_rate_val" select="absent_rate_val" />
+                    <xsl:with-param name="api_token" select="api_token" />
                 </xsl:call-template>
             </div>
         </xsl:if>

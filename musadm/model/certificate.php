@@ -142,13 +142,13 @@ class Certificate extends Core_Entity
             ->certificateId($this->id);
 
         if ($triggerObserver == true) {
-            Core::notify([&$Note], 'beforeCertificateAddComment');
+            Core::notify([&$Note], 'before.Certificate.addComment');
         }
 
         $Note->save();
 
         if ($triggerObserver == true) {
-            Core::notify([&$Note], 'afterCertificateAddComment');
+            Core::notify([&$Note], 'after.Certificate.addComment');
         }
     }
 

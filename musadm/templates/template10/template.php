@@ -1,3 +1,9 @@
+<?php
+    $Director = User::current()->getDirector();
+    Core::requireClass('Property_Controller');
+    $SberToken = Property_Controller::factoryByTag('payment_sberbank_token');
+    $sberTokenVal = $SberToken->getValues($Director)[0]->value();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +16,15 @@
     <meta name="author" content="">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Bitter' rel='stylesheet'>
+    <script src="https://3dsec.sberbank.ru/demopayment/docsite/assets/js/ipay.js"></script>
+    <script>
+        <?php
+            if (!empty($sberTokenVal)) {
+                //echo 'var ipay = new IPAY({api_token: "pqjg1i2mjl9qjdbmvg5rcok1n9"});';
+                echo 'var ipay = new IPAY({api_token: "'.$sberTokenVal.'"});';
+            }
+        ?>
+    </script>
     <?
     Core_Page_Show::instance()
         ->css('/templates/template10/assets/plugins/bootstrap/css/bootstrap.min.css')
@@ -30,7 +45,7 @@
 
         global $CFG;
         Core::factory('User_Controller');
-        $Director = User::current()->getDirector();
+        //$Director = User::current()->getDirector();
         $subordinated = $Director->getId();
         $pageUserId = Core_Array::Get('userid', null, PARAM_INT);
 
@@ -61,22 +76,22 @@
         }
 
         //Права доступа к разделам
-        $accessClients = Core_Access::instance()->hasCapability(Core_Access::USER_READ_CLIENTS);
-        $accessTeachers = Core_Access::instance()->hasCapability(Core_Access::USER_READ_TEACHERS);
-        $accessManagers = Core_Access::instance()->hasCapability(Core_Access::USER_READ_MANAGERS);
-        $accessArchiveC = Core_Access::instance()->hasCapability(Core_Access::USER_ARCHIVE_CLIENT);
-        $accessArchiveT = Core_Access::instance()->hasCapability(Core_Access::USER_ARCHIVE_TEACHER);
-        $accessArchiveM = Core_Access::instance()->hasCapability(Core_Access::USER_ARCHIVE_MANAGER);
-        $accessScheduleRead = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ);
+        $accessClients =            Core_Access::instance()->hasCapability(Core_Access::USER_READ_CLIENTS);
+        $accessTeachers =           Core_Access::instance()->hasCapability(Core_Access::USER_READ_TEACHERS);
+        $accessManagers =           Core_Access::instance()->hasCapability(Core_Access::USER_READ_MANAGERS);
+        $accessArchiveC =           Core_Access::instance()->hasCapability(Core_Access::USER_ARCHIVE_CLIENT);
+        $accessArchiveT =           Core_Access::instance()->hasCapability(Core_Access::USER_ARCHIVE_TEACHER);
+        $accessArchiveM =           Core_Access::instance()->hasCapability(Core_Access::USER_ARCHIVE_MANAGER);
+        $accessScheduleRead =       Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ);
         $accessScheduleAreaCreate = Core_Access::instance()->hasCapability(Core_Access::AREA_READ);
-        $accessGroups = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_GROUP_READ);
-        $accessTasks = Core_Access::instance()->hasCapability(Core_Access::TASK_READ);
-        $accessLids = Core_Access::instance()->hasCapability(Core_Access::LID_READ);
-        $accessLidStats = Core_Access::instance()->hasCapability(Core_Access::LID_STATISTIC);
-        $accessCertificates = Core_Access::instance()->hasCapability(Core_Access::CERTIFICATE_READ);
-        $accessFinances = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_ALL);
-        $accessTarifs = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_READ);
-        $accessStatistic = Core_Access::instance()->hasCapability(Core_Access::STATISTIC_READ);
+        $accessGroups =             Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_GROUP_READ);
+        $accessTasks =              Core_Access::instance()->hasCapability(Core_Access::TASK_READ);
+        $accessLids =               Core_Access::instance()->hasCapability(Core_Access::LID_READ);
+        $accessLidStats =           Core_Access::instance()->hasCapability(Core_Access::LID_STATISTIC);
+        $accessCertificates =       Core_Access::instance()->hasCapability(Core_Access::CERTIFICATE_READ);
+        $accessFinances =           Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_ALL);
+        $accessTarifs =             Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_READ);
+        $accessStatistic =          Core_Access::instance()->hasCapability(Core_Access::STATISTIC_READ);
     ?>
 </head>
 
@@ -300,6 +315,7 @@ Core_Page_Show::instance()
     ->js('/templates/template4/js/lids.api.js')
     ->js('/templates/template4/js/task.api.js')
     ->js('/templates/template4/js/property_list.api.js')
+    ->js('/templates/template4/js/initpro.api.js')
 
     ->js('/templates/template10/assets/js/main.js')
     ->js('/templates/template4/js/bootstrap.min.js')

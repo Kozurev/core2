@@ -257,12 +257,12 @@ class Orm
 		$eventObjectName = implode('', $eventObjectName);
 
 		if ($obj->getId() > 0) {
-            $eventType = 'Update';
+            $eventType = 'update';
         } else {
-            $eventType = 'Insert';
+            $eventType = 'insert';
         }
 
-        Core::notify([&$obj], 'before' . $eventObjectName . $eventType);
+        Core::notify([&$obj], 'before.' . $eventObjectName . '.' . $eventType);
 
         $objData = $obj->getObjectProperties();
         unset($objData['id']);
@@ -320,7 +320,7 @@ class Orm
             $obj->setId(intval(DB::instance()->lastInsertId()));
 		}
 
-        Core::notify([&$obj], 'after' . $eventObjectName . $eventType);
+        Core::notify([&$obj], 'after.' . $eventObjectName . '.' . $eventType);
 		return $obj;
 	}
 

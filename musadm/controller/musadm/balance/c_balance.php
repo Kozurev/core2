@@ -98,23 +98,7 @@ if ($isAdmin) {
         ->addSimpleEntity('prev_lid', $prevLid)
         ->addSimpleEntity('mediana_indiv', $medianaIndiv)
         ->addSimpleEntity('mediana_group', $medianaGroup)
-        ->addEntities($AbsentPeriods, 'absent')
-        ->addSimpleEntity(
-            'access_create_payment',
-            (int)Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT)
-        )
-        ->addSimpleEntity(
-            'access_buy_tarif',
-            (int)Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_BUY)
-        )
-        ->addSimpleEntity(
-            'access_schedule_absent',
-            (int)Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT)
-        )
-        ->addSimpleEntity(
-            'access_user_edit_lessons',
-            (int)Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_LESSONS)
-        );
+        ->addEntities($AbsentPeriods, 'absent');
 }
 
 //Баланс, кол-во индивидуальных занятий, кол-во групповых занятий
@@ -132,6 +116,22 @@ $OutputXml
     ->addEntity($privateLessons, 'property')
     ->addEntity($groupLessons, 'property')
     ->xsl('musadm/users/balance/balance.xsl')
+    ->addSimpleEntity(
+        'access_create_payment',
+        (int)Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT)
+    )
+    ->addSimpleEntity(
+        'access_buy_tarif',
+        (int)Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_BUY)
+    )
+    ->addSimpleEntity(
+        'access_schedule_absent',
+        (int)Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT)
+    )
+    ->addSimpleEntity(
+        'access_user_edit_lessons',
+        (int)Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_LESSONS)
+    )
     ->show();
 
 //Формирование таблицы расписания для клиентов

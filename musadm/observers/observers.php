@@ -40,7 +40,7 @@ Core::attachObserver('beforeUserInsert', function($args) {
 });
 
 
-Core::attachObserver('beforeUserActivate', function($args) {
+Core::attachObserver('before.User.activate', function($args) {
     $User = $args[0];
 
     $Director = User::current()->getDirector();
@@ -84,7 +84,7 @@ Core::attachObserver('beforeUserDelete', function($args) {
 });
 
 
-Core::attachObserver('beforeUserDeactivate', function($args) {
+Core::attachObserver('before.User.deactivate', function($args) {
     $User = $args[0];
 
     if ($User->groupId() == ROLE_TEACHER) {
@@ -343,7 +343,7 @@ Core::attachObserver('beforeItemSave', function($args) {
 /**
  * При выставлении консультации с указанием лида создается комментарий
  */
-Core::attachObserver('beforeScheduleLessonSave', function($args) {
+Core::attachObserver('before.ScheduleLesson.insert', function($args) {
     $Lesson = $args[0];
     $typeId = $Lesson->typeId();
     $clientId = $Lesson->clientId();
@@ -352,14 +352,14 @@ Core::attachObserver('beforeScheduleLessonSave', function($args) {
         return;
     }
 
-    Core::factory('Lid_Controller');
+    Core::requireClass('Lid_Controller');
     $Lid = Lid_Controller::factory($clientId);
     if (is_null($Lid)) {
         die('Лида с номером ' . $clientId . ' не существует');
     }
 
     $commentText = 'Консультация назначена на ' . date('d.m.Y', strtotime($Lesson->insertDate()));
-    $commentText .= ' в ' . $Lesson->timeFrom();
+    $commentText .= ' в ' . substr($Lesson->timeFrom(), 0, 5);
     $commentText .= ', преп. ' . $Lesson->getTeacher()->surname();
     $Lid->addComment($commentText);
 

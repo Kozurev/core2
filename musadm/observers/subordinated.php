@@ -9,7 +9,7 @@
  */
 
 
-Core::attachObserver('beforeScheduleAreaInsert', function($args) {
+Core::attachObserver('before.ScheduleArea.insert', function($args) {
     $Area = $args[0];
     if (empty($Area->subordinated())) {
         $User = User::current()->getDirector();
@@ -18,7 +18,7 @@ Core::attachObserver('beforeScheduleAreaInsert', function($args) {
 });
 
 
-Core::attachObserver('beforePaymentInsert', function($args) {
+Core::attachObserver('before.Payment.insert', function($args) {
     $Payment = $args[0];
     if (empty($Payment->subordinated())) {
         $User = User::current()->getDirector();
@@ -27,7 +27,7 @@ Core::attachObserver('beforePaymentInsert', function($args) {
 });
 
 
-Core::attachObserver('beforeScheduleGroupInsert', function($args) {
+Core::attachObserver('before.ScheduleGroup.insert', function($args) {
     $Group = $args[0];
     if (empty($Group->subordinated())) {
         $User = User::current()->getDirector();
@@ -36,7 +36,7 @@ Core::attachObserver('beforeScheduleGroupInsert', function($args) {
 });
 
 
-Core::attachObserver('beforeTaskInsert', function($args) {
+Core::attachObserver('before.Task.insert', function($args) {
     $Task = $args[0];
     if (empty($Task->subordinated())) {
         $User = User::current()->getDirector();
@@ -45,7 +45,7 @@ Core::attachObserver('beforeTaskInsert', function($args) {
 });
 
 
-Core::attachObserver('beforePaymentTarifInsert', function($args) {
+Core::attachObserver('before.PaymentTarif.insert', function($args) {
     $Tarif = $args[0];
     if (empty($Tarif->subordinated())) {
         $User = User::current()->getDirector();
@@ -54,7 +54,7 @@ Core::attachObserver('beforePaymentTarifInsert', function($args) {
 });
 
 
-Core::attachObserver('beforePropertyListValuesInsert', function($args) {
+Core::attachObserver('before.PropertyListValues.insert', function($args) {
     $PropertyListValue = $args[0];
     if (empty($PropertyListValue->subordinated())) {
         $User = User::current()->getDirector();
@@ -63,7 +63,7 @@ Core::attachObserver('beforePropertyListValuesInsert', function($args) {
 });
 
 
-Core::attachObserver('beforePaymentTypeInsert', function($args) {
+Core::attachObserver('before.PaymentType.insert', function($args) {
     $PaymentType = $args[0];
     if (empty($PaymentType->subordinated())) {
         $User = User::current()->getDirector();
@@ -72,7 +72,7 @@ Core::attachObserver('beforePaymentTypeInsert', function($args) {
 });
 
 
-Core::attachObserver('beforeLidStatusInsert', function($args) {
+Core::attachObserver('before.LidStatus.insert', function($args) {
     $LidStatus = $args[0];
     if (empty($LidStatus->subordinated())) {
         $User = User::current()->getDirector();
@@ -84,7 +84,7 @@ Core::attachObserver('beforeLidStatusInsert', function($args) {
 /**
  * При создании лида задание значения свойства subordinated
  */
-Core::attachObserver('beforeLidInsert', function($args) {
+Core::attachObserver('before.Lid.insert', function($args) {
     $Lid = $args[0];
     if (empty($Lid->subordinated())) {
         $User = User::current()->getDirector();
@@ -93,7 +93,7 @@ Core::attachObserver('beforeLidInsert', function($args) {
 });
 
 
-Core::attachObserver('beforeCoreAccessGroupInsert', function($args) {
+Core::attachObserver('before.CoreAccessGroup.insert', function($args) {
     $Group = $args[0];
     if (empty($Group->subordinated())) {
         $User = User::current()->getDirector();

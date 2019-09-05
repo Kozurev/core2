@@ -79,7 +79,7 @@ if ($action === 'update_date') {
         'old_date' => $Task->date(),
         'new_date' => $date
     ];
-    Core::notify($ObserverArgs, 'ChangeTaskControlDate');
+    Core::notify($ObserverArgs, 'Task.changeControlDate');
     $Task->date($date)->save();
     exit;
 }

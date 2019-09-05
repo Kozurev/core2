@@ -8,6 +8,7 @@
         <xsl:param name="absent_rate" />
         <xsl:param name="absent_rate_type" />
         <xsl:param name="absent_rate_val" />
+        <xsl:param name="api_token" />
 
         <section class="section-bordered">
             <input type="hidden" value="{$director_id}" id="director_id" />
@@ -84,6 +85,17 @@
                                 <a class="action save save_rate" title="Сохранить"></a>
                             </td>
 
+                        </tr>
+                        <tr>
+                            <td colspan="2">API токен эквайринга</td>
+                            <td class="right">
+                                <span class="current_value"><xsl:value-of select="$api_token" /></span>
+                                <input type="text" class="form-control edit_rate_value" data-prop-name="payment_sberbank_token" value="{$api_token}" />
+                            </td>
+                            <td class="right">
+                                <a class="action edit edit_rate" title="Редактировать"></a>
+                                <a class="action save save_rate" title="Сохранить"></a>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
