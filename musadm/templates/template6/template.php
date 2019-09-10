@@ -19,8 +19,10 @@ if (
 
     if (Core_Page_Show::instance()->Structure->path() == 'archive') {
         $formAction = '/user/archive';
+        $usersActive = 0;
     } else {
         $formAction = '/user/client';
+        $usersActive = 1;
     }
 
     global $CFG;
@@ -28,6 +30,7 @@ if (
     Core::factory('Core_Entity')
         ->addSimpleEntity('wwwroot', $CFG->rootdir)
         ->addSimpleEntity('action', $formAction)
+        ->addSimpleEntity('usersActive', $usersActive)
         ->addEntities($Areas)
         ->addEntities($Instruments, 'property_value')
         ->addEntities($Teachers, 'property_value')

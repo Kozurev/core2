@@ -602,9 +602,9 @@ function usersExport(href, form) {
     var link = href + '?action=export';
 
     if (form === undefined) {
-        location = link;
-    } else if (form.serialize() != '') {
-        location = link + '&' + form.serialize();
+        window.location.href = link;
+    } else  {
+        window.location.href = link + '&' + form.serialize();
     }
 }
 

@@ -306,6 +306,10 @@ if ($action === 'export') {
             continue;
         }
 
+        if ($paramName == 'active') {
+            $ClientController->active(boolval($values));
+        }
+
         if (strpos($paramName, 'property_') !== false) {
             foreach ($_GET[$paramName] as $value) {
                 $propId = explode('property_', $value)[0];

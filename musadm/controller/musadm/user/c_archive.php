@@ -88,6 +88,7 @@ foreach ($_GET as $paramName => $values) {
 
 $UserController
     ->isActiveBtnPanel(false)
+    ->isActiveExportBtn(true)
     ->active(false)
     ->properties(true)
     ->forAreas($ForAreas)

@@ -61,6 +61,8 @@
                     </div>
                 </div>
 
+                <input type="hidden" name="active" value="{usersActive}" />
+
                 <div class="row right">
                     <input type="submit" class="btn btn-primary" value="Применить" />
                 </div>

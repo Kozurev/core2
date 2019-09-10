@@ -44,6 +44,15 @@
             </div>
         </xsl:if>
 
+        <xsl:if test="active-btn-panel = 0 and active-export-btn = 1">
+            <div class="row buttons-panel">
+                <div>
+                    <button class="btn btn-{page-theme-color}" onclick="usersExport('client', $('#client-filter'))">
+                        Экспорт в Excel
+                    </button>
+                </div>
+            </div>
+        </xsl:if>
 
         <xsl:if test="access_user_read_clients = 1">
             <section>
