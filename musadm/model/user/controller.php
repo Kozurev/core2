@@ -781,7 +781,7 @@ class User_Controller
         $Users = $this->getUsers();
         $observerArgs['users'] = &$Users;
         //Core::notify($observerArgs, 'beforeUserControllerShow');
-        Core::notify([&$this], 'beforeUserController.show');
+        Core::notify($observerArgs, 'beforeUserController.show');
 
         $OutputXml = Core::factory('Core_Entity')
             ->addSimpleEntity('wwwroot', $CFG->rootdir)

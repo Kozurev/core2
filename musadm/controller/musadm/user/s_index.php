@@ -318,8 +318,8 @@ if ($action === 'export') {
         }
     }
 
-    Core::attachObserver('beforeUserControllerShow', function($args) {
-        $pattern = '/[^0-9]/';
+    Core::attachObserver('beforeUserController.show', function($args) {
+        $pattern = '~[^0-9]+~';
         $replacement = '';
 
         foreach ($args['users'] as $User) {
