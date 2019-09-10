@@ -777,10 +777,10 @@ class User_Controller
         global $CFG;
 
         $observerArgs = [];
+        $observerArgs[0] = &$this;
         $observerArgs['queryBuilder'] = &$this->UserQuery;
         $Users = $this->getUsers();
         $observerArgs['users'] = &$Users;
-        //Core::notify($observerArgs, 'beforeUserControllerShow');
         Core::notify($observerArgs, 'beforeUserController.show');
 
         $OutputXml = Core::factory('Core_Entity')

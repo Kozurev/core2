@@ -23,6 +23,8 @@
             </td>
             <td>
                 <xsl:value-of select="phone_number" />
+            </td>
+            <td>
                 <xsl:apply-templates select="property_value[property_id = 16]" />
             </td>
         </tr>
@@ -30,7 +32,7 @@
 
 
     <xsl:template match="property_value">
-        <br/><xsl:value-of select="value" />
+        <xsl:value-of select="value" /><br/>
     </xsl:template>
 
 
