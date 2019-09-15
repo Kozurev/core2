@@ -155,6 +155,7 @@ if (count($Statuses) > 0) {
 
 $TeachersController = new User_Controller(User::current());
 $Teachers = $TeachersController
+    ->filterType(User_Controller::FILTER_STRICT)
     ->appendFilter('group_id', ROLE_TEACHER)
     ->getUsers();
 
@@ -186,15 +187,12 @@ $Output->addEntity($OutputFilters);
 $Output->xsl('musadm/lids/statistic_filtered.xsl');
 
 foreach ($Sources as $source) {
-//        if ($sourceId !== 0 && $sourceId !== $source->getId()) {
-//            continue;
-//        }
-
     $LidsController = new Lid_Controller_Extended();
+    $LidsController->isWithComments(false);
     $LidsController->getQueryBuilder()->select(['id']);
-    $LidsController->appendAddFilter($SourceProp->getId(), $source->getId());
+    $LidsController->appendAddFilter($SourceProp->getId(), '=', $source->getId());
     if ($markerId !== 0) {
-        $LidsController->appendAddFilter($MarkerProp->getId(), $markerId);
+        $LidsController->appendAddFilter($MarkerProp->getId(), '=', $markerId);
     }
 
     $totalCount = count($LidsController->getLids());
@@ -203,7 +201,7 @@ foreach ($Sources as $source) {
     foreach ($Statuses as $status) {
         $StatusCloned = clone $status;
         $ControllerCloned = clone $LidsController;
-        $ControllerCloned->appendFilter('status_id', $status->getId());
+        $ControllerCloned->appendFilter('status_id', $status->getId(), '=', Lid_Controller_Extended::FILTER_STRICT);
         $countWithStatus = count($ControllerCloned->getLids());
         $StatusCloned->addSimpleEntity('count_lids', $countWithStatus);
         $source->addEntity($StatusCloned, 'status');

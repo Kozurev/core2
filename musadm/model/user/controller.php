@@ -478,7 +478,7 @@ class User_Controller
             self::FILTER_STRICT,
             self::FILTER_NOT_STRICT
         ];
-        if (!in_array($filterType, $existingTypes)) {
+        if (in_array($filterType, $existingTypes)) {
             $this->filterType = $filterType;
         }
         return $this;

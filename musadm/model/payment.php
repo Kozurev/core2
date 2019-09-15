@@ -9,6 +9,11 @@
  */
 class Payment extends Payment_Model
 {
+    const TYPE_INCOME = 1;
+    const TYPE_DEBIT = 2;
+    const TYPE_TEACHER = 3;
+    const TYPE_CASHBACK = 15;
+
     private $defaultUser;
 
     public function __construct()
@@ -90,29 +95,30 @@ class Payment extends Payment_Model
     }
 
 
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
     public function save($obj = null)
     {
-        Core::notify([&$this], 'beforePaymentSave');
-
+        Core::notify([&$this], 'before.Payment.save');
         if (empty($this->datetime)) {
             $this->datetime = date('Y-m-d');
         }
-
         parent::save();
-
-        Core::notify([&$this], 'afterPaymentSave');
+        Core::notify([&$this], 'after.Payment.save');
     }
 
 
-    public function delete( $obj = null )
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
+    public function delete($obj = null)
     {
-        Core::notify( [&$this], "beforePaymentDelete" );
-
-        //if ( $this->isDeletable() !== 1 )   return;
-
+        Core::notify([&$this], 'before.Payment.delete');
         parent::delete();
-
-        Core::notify( [&$this], "afterPaymentDelete" );
+        Core::notify([&$this], 'after.Payment.delete');
     }
 
 }

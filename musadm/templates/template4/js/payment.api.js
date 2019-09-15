@@ -201,13 +201,17 @@ class Payment {
      * @returns {*}
      */
     static getSberApi() {
-        return ipayCheckout({
-                currency: 'RUB',
-                order_number: '',
-                description: 'Пополнение лицевого счета'
-            },
-            function(order) { Payment.sberApiSuccess(order) },
-            function(order) { Payment.sberApiError(order) })
+        if (typeof ipay === 'undefined') {
+            notificationError('Пополнение баланса недоступно');
+        } else {
+            return ipayCheckout({
+                    currency: 'RUB',
+                    order_number: '',
+                    description: 'Пополнение лицевого счета'
+                },
+                function(order) { Payment.sberApiSuccess(order) },
+                function(order) { Payment.sberApiError(order) });
+        }
     }
 
 

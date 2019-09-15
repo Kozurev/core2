@@ -22,6 +22,8 @@ User::checkUserAccess(['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]])
     ?   $isDirector = 1
     :   $isDirector = 0;
 
+$Director = User::current()->getDirector();
+
 //id клиента под которым авторизован менеджер/директор
 $pageClientId = Core_Array::Get('userid', null, PARAM_INT);
 
@@ -44,7 +46,7 @@ if (is_null($User)) {
     Core_Page_Show::instance()->error(403);
 }
 
-$OutputXml = Core::factory( 'Core_Entity' );
+$OutputXml = Core::factory('Core_Entity');
 
 //Пользовательские примечания и дата последней авторизации
 if ($isAdmin) {
@@ -109,9 +111,13 @@ $balance =          $Balance->getPropertyValues($User)[0];
 $privateLessons =   $PrivateLessons->getPropertyValues($User)[0];
 $groupLessons =     $GroupLessons->getPropertyValues($User)[0];
 
+$ApiTokenSber = Property_Controller::factoryByTag('payment_sberbank_token');
+$apiTokenSber = $ApiTokenSber->getValues($Director)[0]->value();
+
 $OutputXml
     ->addEntity($User)
     ->addSimpleEntity('is_admin', $isAdmin)
+    ->addSimpleEntity('api_token_sber', $apiTokenSber)
     ->addEntity($balance, 'property')
     ->addEntity($privateLessons, 'property')
     ->addEntity($groupLessons, 'property')

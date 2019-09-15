@@ -17,7 +17,7 @@
             </div>
 
             <div class="col-lg-2 col-md-3 col-sm-6">
-                <span>Сменный график: </span>
+                <span>Поурочно: </span>
 
                 <input type="checkbox" id="per_lesson" class="checkbox-new" data-userid="{note/object_id}" >
                     <xsl:if test="per_lesson/value = 1">

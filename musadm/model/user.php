@@ -46,7 +46,7 @@ class User extends User_Model
             $this->register_date = date('Y-m-d');
         }
 
-        Core::notify([&$this], 'beforeUserSave');
+        Core::notify([&$this], 'before.User.save');
 
 		if (empty($this->id) && $this->isUserExists($this->login)) {
 			echo "<br>Пользователь с такими данными уже существует( $this->login ) <br/>";
@@ -54,7 +54,7 @@ class User extends User_Model
 		}
 
 		parent::save();
-        Core::notify([&$this], 'afterUserSave');
+        Core::notify([&$this], 'after.User.save');
         return $this;
 	}
 
@@ -65,9 +65,9 @@ class User extends User_Model
      */
 	public function delete($obj = null)
     {
-        Core::notify([&$this], 'beforeUserDelete');
+        Core::notify([&$this], 'before.User.delete');
         parent::delete();
-        Core::notify([&$this], 'afterUserDelete');
+        Core::notify([&$this], 'after.User.delete');
     }
 
 
@@ -79,7 +79,7 @@ class User extends User_Model
 	 */
 	public function authorize(bool $remember = false)
 	{
-        Core::notify([&$this], 'beforeUserAuthorize');
+        Core::notify([&$this], 'before.User.authorize');
 
 		$ExistingUser = $this->queryBuilder()
 			->where('login', '=', $this->login)
@@ -102,7 +102,7 @@ class User extends User_Model
 		    $_SESSION['core']['user_object'] = serialize($ExistingUser);
 		}
 
-        Core::notify([&$ExistingUser], 'afterUserAuthorize');
+        Core::notify([&$ExistingUser], 'after.User.authorize');
 		return $ExistingUser;
 	}
 

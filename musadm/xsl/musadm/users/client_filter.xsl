@@ -39,7 +39,7 @@
                     </div>
 
                     <div class="col-lg-3">
-                        <h4>Сменный график</h4>
+                        <h4>Поурочно</h4>
                         <div class="row">
                             <ul class="list">
                                 <li>

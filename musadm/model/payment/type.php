@@ -128,9 +128,9 @@ class Payment_Type extends Core_Entity
     {
         Core::notify([&$this],'beforePaymentTypeSave');
 
-        if ($this->isDeletable() !== 1) {
-            return;
-        }
+//        if ($this->isDeletable() !== 1) {
+//            return;
+//        }
 
         parent::save();
 

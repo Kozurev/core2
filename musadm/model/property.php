@@ -71,7 +71,6 @@ class Property extends Property_Model
      *
      * @param $obj
      * @return array
-     * @throws Exception
      */
     public function getPropertyValues($obj)
     {

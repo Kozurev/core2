@@ -20,7 +20,7 @@
                                     <!--Пополнить баланс-->
                                 </a>
                             </xsl:if>
-                            <xsl:if test="is_admin = 0">
+                            <xsl:if test="is_admin = 0 and api_token_sber != ''">
                                 <a onclick="Payment.getSberApi()"
                                    class="btn btn-xs btn-outline btn-primary">
                                     Пополнить баланс
@@ -118,7 +118,7 @@
                         </tr>
 
                         <tr>
-                            <td>Сменный график</td>
+                            <td>Поурочно</td>
 
                             <td><!--dng--></td>
 

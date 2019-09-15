@@ -36,7 +36,7 @@
     <xsl:template match="payment">
         <xsl:variable name="class">
             <xsl:choose>
-                <xsl:when test="type = 1">positive</xsl:when>
+                <xsl:when test="type = 1 or type = 15">positive</xsl:when>
                 <xsl:when test="type = 2">negative</xsl:when>
                 <xsl:otherwise>neutral</xsl:otherwise>
             </xsl:choose>

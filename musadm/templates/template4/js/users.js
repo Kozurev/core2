@@ -764,7 +764,7 @@ function makeClientTr(data) {
     //Поурочная оплата
     td1.append('<span class="add__32"></span>');
     if (add.prop_32.values[0].value == '1') {
-        td1.find('.add__32').append('<div class="notes">«Сменный график»</div>');
+        td1.find('.add__32').append('<div class="notes">«Поурочно»</div>');
     }
     //Примечание
     if (add.prop_19.values[0].value != '') {

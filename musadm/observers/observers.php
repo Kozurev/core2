@@ -15,7 +15,7 @@ require_once 'events.php';
 /**
  * Добавление ФИО преподавателя в список дополнительного свойства "Преподаватель"
  */
-Core::attachObserver('beforeUserInsert', function($args) {
+Core::attachObserver('before.User.insert', function($args) {
     $User = $args[0];
 
     $Director = User::current()->getDirector();
@@ -60,7 +60,7 @@ Core::attachObserver('before.User.activate', function($args) {
 /**
  * Удаление пункта списка дополнительного свойства "Преподаватель"
  */
-Core::attachObserver('beforeUserDelete', function($args) {
+Core::attachObserver('before.User.delete', function($args) {
     $User = $args[0];
 
     if ($User->groupId() == ROLE_TEACHER) {
@@ -151,7 +151,7 @@ Core::attachObserver('beforePropertyListValuesDelete', function($args) {
 /**
  * Удаление всех занятий и связей с группами, принадлежащие этому пользователю
  */
-Core::attachObserver('beforeUserDelete', function($args) {
+Core::attachObserver('before.User.delete', function($args) {
     $User = $args[0];
 
     //Удаление принадлежности к группам
@@ -201,7 +201,7 @@ Core::attachObserver('beforeTemplateDelete', function($args) {
 /**
  * Запись даты/времени последней авторизации пользователя
  */
-Core::attachObserver('afterUserAuthorize', function($args) {
+Core::attachObserver('after.User.authorize', function($args) {
     $User = $args[0];
 
     if (!is_null($User) && $User->groupId() == ROLE_CLIENT) {
@@ -424,7 +424,7 @@ Core::attachObserver('afterScheduleReportSave', function($args) {
 /**
  * Задание начения author_id и author_fio для
  */
-Core::attachObserver('beforePaymentInsert', function($args) {
+Core::attachObserver('before.Payment.insert', function($args) {
     $Payment = $args[0];
     $User = User::parentAuth();
     if (!is_null($User)) {
@@ -437,7 +437,7 @@ Core::attachObserver('beforePaymentInsert', function($args) {
 /**
  * Корректировка баланса клиента при сохранении/редактировании платежа типа начисление/списание
  */
-Core::attachObserver('beforePaymentSave', function($args) {
+Core::attachObserver('before.Payment.save', function($args) {
     $Payment = $args[0];
 
     Core::requireClass('Property');
@@ -447,7 +447,9 @@ Core::attachObserver('beforePaymentSave', function($args) {
     $Property = new Property();
 
     //Корректировка баланса клиента
-    if ($Payment->type() == 1 || $Payment->type() == 2) {
+    if ($Payment->type() == Payment::TYPE_INCOME
+    || $Payment->type() == Payment::TYPE_DEBIT
+    || $Payment->type() == Payment::TYPE_CASHBACK) {
         if ($Payment->getId() > 0) {
             $OldPayment = Core::factory('Payment', $Payment->getId());
             $difference = $Payment->value() - $OldPayment->value();
@@ -460,7 +462,7 @@ Core::attachObserver('beforePaymentSave', function($args) {
             $UserBalance = $Property->getByTagName('balance');
             $UserBalanceVal = $UserBalance->getPropertyValues($Client)[0];
             $balanceOld =  floatval($UserBalanceVal->value());
-            $Payment->type() == 1
+            $Payment->type() == Payment::TYPE_INCOME || $Payment->type() == Payment::TYPE_CASHBACK
                 ?   $balanceNew = $balanceOld + floatval($difference)
                 :   $balanceNew = $balanceOld - floatval($difference);
             $UserBalanceVal->value($balanceNew)->save();
@@ -486,7 +488,7 @@ Core::attachObserver('beforePaymentSave', function($args) {
  * удаление всех свяей с филиалами
  * удаление всех значений доп. свойств
  */
-Core::attachObserver('beforePaymentDelete', function($args) {
+Core::attachObserver('before.Payment.delete', function($args) {
     $Payment = $args[0];
 
     Core::requireClass('Property');
@@ -496,13 +498,15 @@ Core::attachObserver('beforePaymentDelete', function($args) {
     $Property = new Property();
 
     //Корректировка баланса клиента
-    if ($Payment->type() == 1 || $Payment->type() == 2) {
+    if ($Payment->type() == Payment::TYPE_INCOME
+    || $Payment->type() == Payment::TYPE_DEBIT
+    || $Payment->type() == Payment::TYPE_CASHBACK) {
         $Client = $Payment->getUser();
         if (!is_null($Client)) {
             $UserBalance = $Property->getByTagName('balance');
             $UserBalanceVal = $UserBalance->getPropertyValues($Client)[0];
             $balanceOld =  floatval($UserBalanceVal->value());
-            $Payment->type() == 1
+            $Payment->type() == Payment::TYPE_INCOME || $Payment->type() == Payment::TYPE_CASHBACK
                 ?   $balanceNew = $balanceOld - floatval($Payment->value())
                 :   $balanceNew = $balanceOld + floatval($Payment->value());
             $UserBalanceVal->value($balanceNew)->save();

@@ -339,6 +339,7 @@ if ($action === 'export') {
     });
 
     $ClientController->show();
+    Core::detachObserver('beforeUserController.show');
     exit;
 }
 

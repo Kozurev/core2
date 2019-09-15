@@ -30,6 +30,7 @@
             <div class="row finances_total">
                 <div class="col-lg-12">
                     <h4>За данный период суммарные поступления составили <xsl:value-of select="total_income" /> руб.</h4>
+                    <h4>За данный период суммарный кэшбэк составил <xsl:value-of select="total_cashback" /> руб.</h4>
                     <h4>За данный период суммарные расходы составили <xsl:value-of select="total_expenses" /> руб.</h4>
                 </div>
             </div>
@@ -73,6 +74,7 @@
                     <xsl:with-param name="absent_rate_type" select="absent_rate_type" />
                     <xsl:with-param name="absent_rate_val" select="absent_rate_val" />
                     <xsl:with-param name="api_token" select="api_token" />
+                    <xsl:with-param name="cashback" select="cashback" />
                 </xsl:call-template>
             </div>
         </xsl:if>

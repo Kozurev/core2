@@ -25,16 +25,23 @@ $Orm = new Orm();
 //    ->sorting(0);
 //$ApiToken->save();
 //
+//$CashBack = Core::factory('Property')
+//    ->tagName('payment_cashback')
+//    ->title('Кэшбэк')
+//    ->description('Процент кэшбэка начисляемого клиентам после пополнения баланса')
+//    ->type('int')
+//    ->defaultValue(0)
+//    ->dir(0)
+//    ->sorting(0);
+//$CashBack->save();
+//
 ////pqjg1i2mjl9qjdbmvg5rcok1n9
 //$Director1 = Core::factory('User', 516);
-//$Director2 = Core::factory('User', 585);
 //$ApiToken->addNewValue($Director1, 'pqjg1i2mjl9qjdbmvg5rcok1n9');
-//$ApiToken->addNewValue($Director2, 'pqjg1i2mjl9qjdbmvg5rcok1n9');
-
-//Core::requireClass('Rest_Initpro');
-//$payment = new stdClass();
-//$payment->id = 12345;
-//$payment->value = 1.0;
-//$payment->email = 'creative27016@gmail.com';
-//Rest_Initpro::makeAuth(Rest_Initpro::METHOD_POST);
-//Rest_Initpro::sendCheck($payment);
+//$CashBack->addNewValue($Director1, 4);
+//
+//$CashBack = Core::factory('Payment_Type')
+//    ->title('Кэшбэк')
+//    ->subordinated(0)
+//    ->isDeletable(0);
+//$CashBack->save();
