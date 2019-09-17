@@ -330,7 +330,7 @@ $(function(){
             loaderOn();
             let formData = new FormData($('#filter_lids_statistic').get(0));
             formData.append('markerId', $('#lid_statistic_markerId').val());
-            //formData.append('sourceId', $('#lid_statistic_sourceId').val());
+            formData.append('sourceId', $('#lid_statistic_sourceId').val());
             formData.append('teacherId', $('#lids_statistic_teacherId').val());
             //formData.append('action', 'refresh');
             $.ajax({
@@ -349,7 +349,7 @@ $(function(){
                 }
             });
         })
-        .on('change', '#lid_statistic_markerId, #lids_statistic_teacherId', function(){
+        .on('change', '#lid_statistic_markerId, #lid_statistic_sourceId, #lids_statistic_teacherId', function(){
             $('.lids_statistic_show').trigger('click');
         })
         .on('click', '.lids_consult_show', function(e){

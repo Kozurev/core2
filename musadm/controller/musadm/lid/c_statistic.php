@@ -11,6 +11,7 @@ Core::requireClass('Lid_Controller');
 Core::requireClass('Property_Controller');
 Core::requireClass('Lid_Controller_Extended');
 Core::requireClass('User_Controller');
+Core::requireClass('Schedule_Lesson');
 
 
 $dateFrom =     Core_Array::Post('date_from', date('Y-m-d'), PARAM_DATE);
@@ -128,7 +129,6 @@ if ($dateFrom == $dateTo) {
 }
 
 if ($teacherId !== 0) {
-    Core::requireClass('Schedule_Lesson');
     $reportTableName = Core::factory('Schedule_Lesson_Report')->getTableName();
     $Count->join(
         $reportTableName . ' AS rep',
@@ -175,9 +175,10 @@ echo '</div></section>';
 //Сводка по маркерам/источникам/преподам
 //$sourceId = Core_Array::Post('sourceId', 0, PARAM_INT);
 $markerId = Core_Array::Post('markerId', 0, PARAM_INT);
+$sourceId = Core_Array::Post('sourceId', 0, PARAM_INT);
 $Output = new Core_Entity();
-//$Output->addSimpleEntity('sourceId', $sourceId);
 $Output->addSimpleEntity('markerId', $markerId);
+$Output->addSimpleEntity('sourceId', $sourceId);
 $Output->addEntities($Statuses);
 $OutputFilters = new Core_Entity();
 $OutputFilters->_entityName('filters');
@@ -190,9 +191,22 @@ foreach ($Sources as $source) {
     $LidsController = new Lid_Controller_Extended();
     $LidsController->isWithComments(false);
     $LidsController->getQueryBuilder()->select(['id']);
+
+    if ($markerId === 0 && $sourceId !== 0 && $source->getId() !== $sourceId) {
+        continue;
+    }
+
     $LidsController->appendAddFilter($SourceProp->getId(), '=', $source->getId());
+
     if ($markerId !== 0) {
         $LidsController->appendAddFilter($MarkerProp->getId(), '=', $markerId);
+    } elseif ($sourceId !== 0) {
+        if ($dateFrom === $dateTo) {
+            $LidsController->appendFilter('control_date', $dateFrom, '=', Lid_Controller_Extended::FILTER_STRICT);
+        } else {
+            $LidsController->appendFilter('control_date', $dateFrom, '>=', Lid_Controller_Extended::FILTER_STRICT);
+            $LidsController->appendFilter('control_date', $dateTo, '<=', Lid_Controller_Extended::FILTER_STRICT);
+        }
     }
 
     $totalCount = count($LidsController->getLids());
