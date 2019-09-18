@@ -345,7 +345,7 @@ Core::attachObserver( 'Task.changeControlDate', function($args) {
 Core::attachObserver('before.Task.markAsDone', function($args) {
     $Event = new Event();
     $EventData = new stdClass();
-    $EventData->task_id = $args[0];
+    $EventData->task_id = $args[0]->getId();
     $Event->typeId(Event::TASK_DONE)
         ->setData($EventData)
         ->save();

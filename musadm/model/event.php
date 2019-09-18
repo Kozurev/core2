@@ -193,7 +193,7 @@ class Event extends Event_Model
                 break;
 
             case self::TASK_DONE:
-                $id = $this->getData()->task_id->getId();
+                $id = $this->getData()->task_id;
                 return "Закрыл(а) задачу 
                         <a href='#' class='info-by-id' data-model='Task' data-id='" . $id ."'>№" . $id . "</a>";
                 break;
