@@ -724,7 +724,7 @@ Core::attachObserver('beforeTaskInsert', function($args) {
 /**
  * Причисление пользователя к какой-либо группе прав доступа при создании
  */
-Core::attachObserver('afterUserInsert', function($args){
+Core::attachObserver('after.User.insert', function($args){
     switch ($args[0]->groupId())
     {
         case ROLE_DIRECTOR:
