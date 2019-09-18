@@ -53,12 +53,26 @@
 
         <xsl:variable name="areaId" select="schedule_area_assignment/area_id" />
 
+        <xsl:variable name="kabinet">
+            <xsl:choose>
+                <xsl:when test="group_id = 5">
+                    <xsl:value-of select="/root/wwwroot" />/balance?userid=<xsl:value-of select="id" />
+                </xsl:when>
+                <xsl:when test="group_id = 4">
+                    <xsl:value-of select="/root/wwwroot" />/schedule?userid=<xsl:value-of select="id" />
+                </xsl:when>
+                <xsl:otherwise>#</xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
 
         <tr class="{$class}" id="user_{id}">
             <!--Фамилия-->
             <td>
                 <span class="user__fio">
-                    <a href="{/root/wwwroot}/balance/?userid={id}">
+                    <a>
+                        <xsl:if test="$kabinet != '#'">
+                            <xsl:attribute name="href"><xsl:value-of select="$kabinet" /></xsl:attribute>
+                        </xsl:if>
                         <xsl:value-of select="surname" />
                         <xsl:text> </xsl:text>
                         <xsl:value-of select="name" />
