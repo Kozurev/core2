@@ -26,25 +26,25 @@
                         </xsl:for-each>
                     </select>
                 </div>
-                <div class="col-md-2 col-xs-4 right">
-                    <h4>Источник:</h4>
-                </div>
-                <div class="col-md-2 col-xs-8">
-                    <select class="form-control" id="lid_statistic_sourceId">
-                        <option value="0"> ... </option>
-                        <xsl:for-each select="filters/source">
-                            <option value="{id}">
-                                <xsl:if test="id = $selectedSourceId">
-                                    <xsl:attribute name="selected">selected</xsl:attribute>
-                                </xsl:if>
-                                <xsl:value-of select="value" />
-                            </option>
-                        </xsl:for-each>
-                    </select>
-                </div>
-                <div class="col-md-2 col-xs-12">
-                    <a class="btn btn-orange btn-block lids_statistic_show">Показать</a>
-                </div>
+                <!--<div class="col-md-2 col-xs-4 right">-->
+                    <!--<h4>Источник:</h4>-->
+                <!--</div>-->
+                <!--<div class="col-md-2 col-xs-8">-->
+                    <!--<select class="form-control" id="lid_statistic_sourceId">-->
+                        <!--<option value="0"> ... </option>-->
+                        <!--<xsl:for-each select="filters/source">-->
+                            <!--<option value="{id}">-->
+                                <!--<xsl:if test="id = $selectedSourceId">-->
+                                    <!--<xsl:attribute name="selected">selected</xsl:attribute>-->
+                                <!--</xsl:if>-->
+                                <!--<xsl:value-of select="value" />-->
+                            <!--</option>-->
+                        <!--</xsl:for-each>-->
+                    <!--</select>-->
+                <!--</div>-->
+                <!--<div class="col-md-2 col-xs-12">-->
+                    <!--<a class="btn btn-orange btn-block lids_statistic_show">Показать</a>-->
+                <!--</div>-->
             </div>
 
             <!--<xsl:choose>-->

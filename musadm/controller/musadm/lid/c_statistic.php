@@ -187,6 +187,12 @@ $OutputFilters->addEntities($Sources, 'source');
 $Output->addEntity($OutputFilters);
 $Output->xsl('musadm/lids/statistic_filtered.xsl');
 
+
+$Sources[] = Core::factory('Property_List_Values')
+    ->propertyId(50)
+    ->value('Другое')
+    ->setId(0);
+
 foreach ($Sources as $source) {
     $LidsController = new Lid_Controller_Extended();
     $LidsController->isWithComments(false);
@@ -200,7 +206,7 @@ foreach ($Sources as $source) {
 
     if ($markerId !== 0) {
         $LidsController->appendAddFilter($MarkerProp->getId(), '=', $markerId);
-    } elseif ($sourceId !== 0) {
+    } else {
         if ($dateFrom === $dateTo) {
             $LidsController->appendFilter('control_date', $dateFrom, '=', Lid_Controller_Extended::FILTER_STRICT);
         } else {
