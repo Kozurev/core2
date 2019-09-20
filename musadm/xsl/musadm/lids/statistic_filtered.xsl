@@ -64,6 +64,17 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr>
+                                    <td>Общее</td>
+                                    <td class="right">
+                                        <xsl:value-of select="/root/totalCount" />
+                                    </td>
+                                    <xsl:for-each select="/root/lid_status">
+                                        <td class="center">
+                                            <xsl:value-of select="totalCount" />
+                                        </td>
+                                    </xsl:for-each>
+                                </tr>
                                 <xsl:apply-templates select="source" />
                             </tbody>
                         </table>

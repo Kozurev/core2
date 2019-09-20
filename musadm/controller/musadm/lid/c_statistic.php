@@ -187,7 +187,13 @@ $OutputFilters->addEntities($Sources, 'source');
 $Output->addEntity($OutputFilters);
 $Output->xsl('musadm/lids/statistic_filtered.xsl');
 
+//Свойство для подсчета общего числа лидов
+foreach ($Statuses as $Status) {
+    $Status->totalCount = 0;
+}
 
+
+//Для подсчета кол-ва лидов, у которых вручную прописан статус
 $Sources[] = Core::factory('Property_List_Values')
     ->propertyId(50)
     ->value('Другое')
@@ -225,11 +231,16 @@ foreach ($Sources as $source) {
         $countWithStatus = count($ControllerCloned->getLids());
         $StatusCloned->addSimpleEntity('count_lids', $countWithStatus);
         $source->addEntity($StatusCloned, 'status');
-        //echo '<br/> source: ' . $source->value() . ' with status: ' . $StatusCloned->title() . ' count: ' . $countWithStatus;
+        $status->totalCount += $countWithStatus;
     }
 
     $Output->addEntity($source, 'source');
 }
 
+$totalCount = 0;
+foreach ($Statuses as $Status) {
+    $totalCount += $Status->totalCount;
+}
+$Output->addSimpleEntity('totalCount', $totalCount);
 
 $Output->show();
