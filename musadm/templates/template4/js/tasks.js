@@ -54,7 +54,8 @@ function taskAfterAction() {
             refreshTasksTable(
                 $('input[name=date_from]').val(),
                 $('input[name=date_to]').val(),
-                $('select[name=area_id]').val()
+                $('select[name=area_id]').val(),
+                $('input[name=task_id]').val()
             );
             break;
         default: loaderOff();
@@ -152,7 +153,8 @@ function updateTaskArea(taskId, areaId) {
 }
 
 
-function refreshTasksTable(from, to, areaId) {
+function refreshTasksTable(from, to, areaId, taskId) {
+    loaderOn();
     $.ajax({
         type: 'GET',
         url: '',
@@ -160,10 +162,14 @@ function refreshTasksTable(from, to, areaId) {
             action: 'refreshTasksTable',
             date_from: from,
             date_to: to,
-            areaId: areaId
+            areaId: areaId,
+            taskId: taskId
         },
         success: function(response) {
             $('.tasks').html(response);
+            loaderOff();
+        },
+        error: function () {
             loaderOff();
         }
     });

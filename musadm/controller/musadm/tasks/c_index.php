@@ -9,9 +9,10 @@
  */
 
 $today = date('Y-m-d');
-$from = Core_Array::Get('date_from', null, PARAM_DATE);
-$to =   Core_Array::Get('date_to', null, PARAM_DATE);
-$areaId = Core_Array::Get('areaId', 0, PARAM_INT);
+$from =     Core_Array::Get('date_from', null, PARAM_DATE);
+$to =       Core_Array::Get('date_to', null, PARAM_DATE);
+$areaId =   Core_Array::Get('areaId', 0, PARAM_INT);
+$taskId =   Core_Array::Get('taskId', 0, PARAM_INT);
 
 $Director = User::current()->getDirector();
 $subordinated = $Director->getId();
@@ -23,6 +24,11 @@ if ($areaId !== 0) {
     $forArea = Core::factory('Schedule_Area', $areaId);
     $TaskController->forAreas([$forArea]);
     $TaskController->isEnableCommonTasks(false);
+}
+
+if ($taskId > 0) {
+    $TaskController->taskId($taskId);
+    $TaskController->addSimpleEntity('task_id', $taskId);
 }
 
 $TaskController

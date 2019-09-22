@@ -8,7 +8,8 @@
                     onchange="refreshTasksTable(
                         $('input[name=date_from]').val(),
                         $('input[name=date_to]').val(),
-                        $('select[name=area_id]').val()
+                        $('select[name=area_id]').val(),
+                        $('input[name=task_id]').val()
                     )">
                 <option value="0">...</option>
                 <xsl:for-each select="//assignment_areas" >

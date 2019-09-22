@@ -27,11 +27,20 @@
                     </div>
 
                     <div>
+                        <h4>№</h4>
+                    </div>
+
+                    <div>
+                        <input class="form-control" name="task_id" value="{task_id}" style="max-width: 90px" />
+                    </div>
+
+                    <div>
                         <a class="btn btn-red"
                            onclick="refreshTasksTable(
                                 $('input[name=date_from]').val(),
                                 $('input[name=date_to]').val(),
-                                $('select[name=area_id]').val()
+                                $('select[name=area_id]').val(),
+                                $('input[name=task_id]').val()
                             )">
                             Показать
                         </a>
