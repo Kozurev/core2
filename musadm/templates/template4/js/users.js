@@ -271,6 +271,15 @@ $(function(){
         });
 });
 
+function changeClientsPage(page) {
+    if (page > 0) {
+        let form = $('#client-filter');
+        form.append('<input type="hidden" name="page" value="'+page+'" />');
+        applyClientFilter(form, function(response) {
+            $('.users').html(response);
+        });
+    }
+}
 
 
 /**

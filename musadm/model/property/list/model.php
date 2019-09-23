@@ -47,12 +47,12 @@ class Property_List_Model extends Core_Entity
      * @param int|null $objectId
      * @return $this|int
      */
-    public function objectId(int $objectId = null)
+    public function objectId($objectId = null)
     {
         if (is_null($objectId)) {
             return intval($this->object_id);
         } else {
-            $this->object_id = $objectId;
+            $this->object_id = intval($objectId);
             return $this;
         }
     }
@@ -62,7 +62,7 @@ class Property_List_Model extends Core_Entity
      * @param int|null $objectId
      * @return int|Property_Assigment_Model
      */
-    public function object_id(int $objectId = null)
+    public function object_id($objectId = null)
     {
         return $this->objectId($objectId);
     }
@@ -97,12 +97,12 @@ class Property_List_Model extends Core_Entity
      * @param int|null $propertyId
      * @return $this|int
      */
-    public function propertyId(int $propertyId = null)
+    public function propertyId($propertyId = null)
     {
         if (is_null($propertyId)) {
             return intval($this->property_id);
         } else {
-            $this->property_id = $propertyId;
+            $this->property_id = intval($propertyId);
             return $this;
         }
     }
@@ -112,7 +112,7 @@ class Property_List_Model extends Core_Entity
      * @param int|null $propertyId
      * @return int|Property_Assigment_Model
      */
-    public function property_id(int $propertyId = null)
+    public function property_id($propertyId = null)
     {
         return $this->propertyId($propertyId);
     }
@@ -122,12 +122,12 @@ class Property_List_Model extends Core_Entity
      * @param int|null $value
      * @return $this|int
      */
-    public function value(int $value = null)
+    public function value($value = null)
     {
         if (is_null($value)) {
             return intval($this->value_id);
         } else {
-            $this->value_id = $value;
+            $this->value_id = intval($value);
             return $this;
         }
     }
@@ -137,7 +137,7 @@ class Property_List_Model extends Core_Entity
      * @param int|null $value
      * @return int|Property_List_Model
      */
-    public function value_id(int $value = null)
+    public function value_id($value = null)
     {
         return $this->value($value);
     }

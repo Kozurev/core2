@@ -204,11 +204,12 @@ class Orm
             echo "<br>Строка запроса метода <b>сount()</b>: " . $this->queryString;
         }
 
+        $this->queryString = '';
+        $this->select = $beforeSelect;
+
         if ($result == false) {
             return 0;
         } else {
-            $this->queryString = '';
-            $this->select = $beforeSelect;
             $result = $result->fetch();
             return intval($result['count']);
         }

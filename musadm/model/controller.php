@@ -173,6 +173,30 @@ class Controller
     protected $foundObjects = [];
 
 
+    /**
+     * @var bool
+     */
+    protected $isPaginate = false;
+
+
+    /**
+     * Пагинация
+     *
+     * @var Pagination
+     */
+    protected $pagination;
+
+
+    /**
+     * Controller constructor.
+     * @param array $params
+     */
+    public function __construct($params = [])
+    {
+        Core::requireClass('Pagination');
+        $this->pagination = new Pagination();
+    }
+
 
     /**
      * @param Orm $QueryBuilder
@@ -235,6 +259,48 @@ class Controller
 
 
     /**
+     * @return array
+     */
+    public function getFoundObjects()
+    {
+        return $this->foundObjects;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getFoundObjectsIds()
+    {
+        return $this->foundObjectsIds;
+    }
+
+
+    /**
+     * @param bool|null $isPaginate
+     * @return $this|bool
+     */
+    public function isPaginate(bool $isPaginate = null)
+    {
+        if (is_null($isPaginate)) {
+            return $this->isPaginate;
+        } else {
+            $this->isPaginate = $isPaginate;
+            return $this;
+        }
+    }
+
+
+    /**
+     * @return Pagination
+     */
+    public function paginate()
+    {
+        return $this->pagination;
+    }
+
+
+    /**
      * Добавление условие выборки объектов
      * Данный фильтр применяется лишь к основным свойствам объектам, не к значениям доп. свойств
      * для фильтрации по значениям доп. свойств существует метод: appendAddFilter
@@ -255,7 +321,7 @@ class Controller
         } else {
             if (is_null($condition) && $type == self::FILTER_STRICT) {
                 $this->QueryBuilder->where($paramName, '=', $searchingValue);
-            } elseif (is_null($condition) && $type == self::FILTER_NOT_STRICT) {
+            } elseif (is_null($condition) || $type == self::FILTER_NOT_STRICT) {
                 $this->QueryBuilder
                     ->open()
                     ->where($paramName, '=', $searchingValue)
@@ -351,24 +417,32 @@ class Controller
 
 
     /**
-     * @param bool $isLimited
-     * @return $this
+     * @param bool|null $isLimited
+     * @return $this|bool
      */
-    public function isLimitedAreasAccess(bool $isLimited)
+    public function isLimitedAreasAccess(bool $isLimited = null)
     {
-        $this->isLimitedAreasAccess = $isLimited;
-        return $this;
+        if (is_null($isLimited)) {
+            return $this->isLimitedAreasAccess;
+        } else {
+            $this->isLimitedAreasAccess = $isLimited;
+            return $this;
+        }
     }
 
 
     /**
-     * @param bool $isWithComments
-     * @return $this
+     * @param bool|null $isWithComments
+     * @return $this|bool
      */
-    public function isWithComments(bool $isWithComments)
+    public function isWithComments(bool $isWithComments = null)
     {
-        $this->isWithComments = $isWithComments;
-        return $this;
+        if (is_null($isWithComments)) {
+            return $this->isWithComments;
+        } else {
+            $this->isWithComments = $isWithComments;
+            return $this;
+        }
     }
 
 
@@ -382,6 +456,19 @@ class Controller
         $this->entities[$tag][] = $Entity;
         return $this;
     }
+
+
+    /**
+     * @param $Entities
+     * @param $tag
+     * @return $this
+     */
+    public function addEntities($Entities, $tag)
+    {
+        $this->entities[$tag] = $Entities;
+        return $this;
+    }
+
 
     /**
      * Метод добавления в окончательный XML различных простых тэгов
@@ -492,17 +579,22 @@ class Controller
      */
     protected function addFilterExecute()
     {
+        if (empty($this->addFilter)) {
+            return;
+        }
+
         foreach ($this->addFilter as $propertyId => $filterParams) {
-            $NewQueryBuilder = $this->Object->queryBuilder()->clearQuery();
-            $Property = Core::factory('Property', $propertyId);
-            if (is_null($Property)) {
-                continue;
-            }
-            $propertyTableName = 'Property_' . ucfirst($Property->type());
-            $propertyTableVal = $Property->type() == 'list' ? 'p.value_id' : 'p.value';
-            $joinConditions = $this->Object->getTableName() . '.id = p.object_id AND p.model_name = \''
-                . get_class($this->Object) . '\' AND p.property_id = ' . $propertyId;
             foreach ($filterParams as $param) {
+                $NewQueryBuilder = $this->Object->queryBuilder()->clearQuery();
+                $Property = Core::factory('Property', $propertyId);
+                if (is_null($Property)) {
+                    continue;
+                }
+                $propertyTableName = 'Property_' . ucfirst($Property->type());
+                $propertyTableVal = $Property->type() == 'list' ? 'p.value_id' : 'p.value';
+                $joinConditions = $this->Object->getTableName() . '.id = p.object_id AND p.model_name = \''
+                    . get_class($this->Object) . '\' AND p.property_id = ' . $propertyId;
+
                 $condition = Core_Array::getValue($param, 'condition', null, PARAM_STRING);
                 $value = Core_Array::getValue($param, 'value', null);
 
@@ -517,52 +609,53 @@ class Controller
                     } else {
                         $NewQueryBuilder->whereIn($propertyTableVal, $value);
                     }
-                }
-
-                //Фильтрация по явно заданному условию
-                if (!is_null($condition)) {
-                    if ($value == $Property->defaultValue()) {
-                        $NewQueryBuilder->open()
-                            ->where($propertyTableVal, 'IS', 'NULL')
-                            ->orWhere($propertyTableVal, $condition, $value)
-                            ->close();
-                    } else {
-                        $NewQueryBuilder->where($propertyTableVal, $condition, $value);
-                    }
-                } else { //Фильтрация без явно заданного условия
-                    //Мягкая фильтрация
-                    if ($this->getFilterType() == self::FILTER_NOT_STRICT) {
+                } else {
+                    //Фильтрация по явно заданному условию
+                    if (!is_null($condition)) {
                         if ($value == $Property->defaultValue()) {
                             $NewQueryBuilder->open()
                                 ->where($propertyTableVal, 'IS', 'NULL')
-                                ->orWhere($propertyTableVal, '=', $value)
-                                ->orWhere($propertyTableVal, '=', '%' . $value . '%')
-                                ->orWhere($propertyTableVal, '=', $value . '%')
-                                ->orWhere($propertyTableVal, '=', '%' . $value)
+                                ->orWhere($propertyTableVal, $condition, $value)
                                 ->close();
                         } else {
-                            $NewQueryBuilder->open()
-                                ->where($propertyTableVal, '=', $value)
-                                ->orWhere($propertyTableVal, '=', '%' . $value . '%')
-                                ->orWhere($propertyTableVal, '=', $value . '%')
-                                ->orWhere($propertyTableVal, '=', '%' . $value)
-                                ->close();
+                            $NewQueryBuilder->where($propertyTableVal, $condition, $value);
                         }
-                    } else {
-                        //Строгая фильтрация
-                        if ($value == $Property->defaultValue()) {
-                            $NewQueryBuilder->open()
-                                ->where($propertyTableVal, 'IS', 'NULL')
-                                ->orWhere($propertyTableVal, '=', $value)
-                                ->close();
+                    } else { //Фильтрация без явно заданного условия
+                        //Мягкая фильтрация
+                        if ($this->getFilterType() == self::FILTER_NOT_STRICT) {
+                            if ($value == $Property->defaultValue()) {
+                                $NewQueryBuilder->open()
+                                    ->where($propertyTableVal, 'IS', 'NULL')
+                                    ->orWhere($propertyTableVal, '=', $value)
+                                    ->orWhere($propertyTableVal, '=', '%' . $value . '%')
+                                    ->orWhere($propertyTableVal, '=', $value . '%')
+                                    ->orWhere($propertyTableVal, '=', '%' . $value)
+                                    ->close();
+                            } else {
+                                $NewQueryBuilder->open()
+                                    ->where($propertyTableVal, '=', $value)
+                                    ->orWhere($propertyTableVal, '=', '%' . $value . '%')
+                                    ->orWhere($propertyTableVal, '=', $value . '%')
+                                    ->orWhere($propertyTableVal, '=', '%' . $value)
+                                    ->close();
+                            }
                         } else {
-                            //Мягкая фильтрация
-                            $NewQueryBuilder->where($propertyTableVal, '=', $value);
+                            //Строгая фильтрация
+                            if ($value == $Property->defaultValue()) {
+                                $NewQueryBuilder->open()
+                                    ->where($propertyTableVal, 'IS', 'NULL')
+                                    ->orWhere($propertyTableVal, '=', $value)
+                                    ->close();
+                            } else {
+                                //Мягкая фильтрация
+                                $NewQueryBuilder->where($propertyTableVal, '=', $value);
+                            }
                         }
                     }
                 }
 
                 $NewObjectsIds = $NewQueryBuilder
+                    ->clearSelect()
                     ->select($this->Object->getTableName() . '.id', 'id')
                     ->leftJoin($propertyTableName . ' AS p', $joinConditions)
                     ->whereIn($this->Object->getTableName() . '.id', $this->foundObjectsIds)
@@ -581,6 +674,25 @@ class Controller
             }
         }
         $this->foundObjects = array_values($this->foundObjects);
+
+        if ($this->isPaginate() === true) {
+            $this->paginate()->setTotalCount(count($this->foundObjects));
+            for ($i = 0; $i < $this->paginate()->getOffset(); $i++) {
+                if (isset($this->foundObjects[$i])) {
+                    unset($this->foundObjects[$i]);
+                }
+            }
+            $this->foundObjects = array_values($this->foundObjects);
+            $tmpCount = count($this->foundObjects);
+            for ($i = $this->paginate()->getLimit(); $i < $tmpCount; $i++) {
+                if (isset($this->foundObjects[$i])) {
+                    unset($this->foundObjects[$i]);
+                }
+            }
+            $this->foundObjects = array_values($this->foundObjects);
+        }
+
+        $this->countFoundObjects = count($this->foundObjects);
     }
 
 
@@ -594,7 +706,7 @@ class Controller
                 $propValueTable = 'Property_' . ucfirst($Property->type());
                 $PropertyValues = Core::factory($propValueTable)
                     ->queryBuilder()
-                    ->where('model_name', '=', 'Lid')
+                    ->where('model_name', '=', get_class($this->Object))
                     ->where('property_id', '=', $Property->getId())
                     ->whereIn('object_id', $this->foundObjectsIds)
                     ->orderBy('object_id', 'DESC')
@@ -686,13 +798,38 @@ class Controller
 
 
     /**
+     *
+     */
+    public function addAreasAssignments()
+    {
+        $Areas = Core::factory('Schedule_Area')->getList();
+        $this->addEntities($Areas, 'schedule_area');
+
+        $Assignments = Core::factory('Schedule_Area_Assignment')
+            ->queryBuilder()
+            ->where('model_name', '=', get_class($this->Object))
+            ->whereIn('model_id', $this->foundObjectsIds)
+            ->findAll();
+
+        foreach ($this->foundObjects as $Object) {
+            foreach ($Assignments as $asgmKey => $Assignment) {
+                if ($Object->getId() == $Assignment->modelId()) {
+                    $Object->addEntity($Assignment);
+                    unset($Assignments[$asgmKey]);
+                }
+            }
+        }
+    }
+
+
+    /**
      * @param null $OutputXml
      * @return mixed
      */
     public function show($OutputXml = null)
     {
         if (is_null($OutputXml)) {
-            $OutputXml = Core::factory('Core_Entity');
+            $OutputXml = new Core_Entity();
         }
 
         //Добавление кастомных тэгов
@@ -730,7 +867,4 @@ class Controller
 
         return $OutputXml->xsl($this->getXsl());
     }
-
-
-
 }

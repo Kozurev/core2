@@ -35,18 +35,25 @@
 /*}*/
 
 
-h3 {
-	cursor: pointer;
-}
-
-
 #client-filter {
 	margin-bottom: 10px;
 	display: none;
 }
 
+#show-client-filter {
+	cursor: pointer;
+}
+
+#show-client-filter span {
+	font-size: 19px;
+}
+
+#show-client-filter i {
+	font-size: 12px;
+}
+
 #client-filter .client-filter__options {
-	max-height: 350px;
+	max-height: 285px;
 	overflow-y: scroll;
 }
 
@@ -56,8 +63,20 @@ h3 {
 	padding: 0;
 }
 
-#client-filter ul li span {
-	vertical-align: super;
+#client-filter ul li {
+	margin-bottom: 3px;
+}
+
+#client-filter ul li input {
+	margin: 0;
+}
+
+#client-filter ul li label {
+	/*vertical-align: middle;*/
+	margin: 0;
+	font-weight: normal;
+	margin-left: 5px;
+	cursor: pointer;
 }
 
 /*.users .client-info .table {*/

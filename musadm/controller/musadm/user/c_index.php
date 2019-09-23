@@ -9,8 +9,11 @@
  * @version 20190410
  */
 
-Core::factory('User_Controller');
-Core::factory('Schedule_Area_Controller');
+//Core::factory('User_Controller');
+Core::requireClass('User_Controller_Extended');
+Core::requireClass('Schedule_Area_Controller');
+Core::requireClass('Schedule_Area_Assignment');
+
 $isDirector = intval(User::current()->groupId() == ROLE_DIRECTOR);
 $groupId = Core_Page_Show::instance()->StructureItem->getId();
 
@@ -38,40 +41,53 @@ if ($groupId == ROLE_CLIENT) {
     ];
 }
 
-$ClientController = new User_Controller(User::current());
+$ClientController = new User_Controller_Extended(User::current());
 $ClientController
     ->properties($propertiesIds)
-    ->tableType(User_Controller::TABLE_ACTIVE)
-    ->groupId($groupId)
+    ->setGroup($groupId)
     ->isShowCount(true)
+    ->isPaginate(true)
     ->addSimpleEntity('page-theme-color', 'primary')
     ->addSimpleEntity('is_director', $isDirector)
-    ->xsl($xsl);
-$ClientController->queryBuilder()->orderBy('id', 'DESC');
-$ScheduleAssignment = Core::factory('Schedule_Area_Assignment');
+    ->addSimpleEntity('table-type', User_Controller_Extended::TABLE_ACTIVE)
+    ->setXsl($xsl);
+
+$ClientController->paginate()->setCurrentPage(
+    Core_Array::Get('page', 1, PARAM_INT)
+);
+if (isset($_GET['page'])) {
+    unset($_GET['page']);
+}
+
 
 //Фильтры
+$ScheduleAssignment = new Schedule_Area_Assignment();
+unset($_GET['action']);
 foreach ($_GET as $paramName => $values) {
     if ($paramName === 'areas') {
         foreach ($_GET['areas'] as $areaId) {
-            if ($areaId > 0
-                && ($ScheduleAssignment->issetAssignment(User::current(), intval($areaId)) !== null)
-                || User::checkUserAccess(['groups' => [ROLE_DIRECTOR]])
-            ) {
-                $Area = Schedule_Area_Controller::factory(intval($areaId));
-                if ($Area !== null) {
-                    $ClientController->forAreas([$Area]);
+            try {
+                if ($areaId > 0
+                    && ($ScheduleAssignment->issetAssignment(User::current(), intval($areaId)) !== null)
+                    || User::checkUserAccess(['groups' => [ROLE_DIRECTOR]])
+                ) {
+                    $Area = Schedule_Area_Controller::factory(intval($areaId));
+                    if ($Area !== null) {
+                        $ClientController->setAreas([$Area]);
+                    }
                 }
+            } catch(Exception $e) {
+                die('Ошибка: ' . $e->getMessage());
             }
         }
         continue;
     }
 
     if (strpos($paramName, 'property_') !== false) {
-        foreach ($_GET[$paramName] as $value) {
-            $propId = explode('property_', $value)[0];
-            $ClientController->appendFilter($paramName, $value);
-        }
+        $propId = explode('property_', $paramName)[1];
+        $ClientController->appendAddFilter(intval($propId), '=', $values);
+    } elseif (!empty($values)) {
+        $ClientController->appendFilter($paramName, $values, '=', User_Controller_Extended::FILTER_NOT_STRICT);
     }
 }
 
@@ -79,14 +95,14 @@ foreach ($_GET as $paramName => $values) {
 /**
  * Подсчет среднего возроста клиентов и средней медианы п индивиуальным и групповым занятиям
  */
-Core::attachObserver('beforeUserController.show', function($args) {
-    $UserController = $args[0];
+Core::attachObserver('before.UserControllerExtended.show', function($args) {
+    $UserController = $args['controller'];
     $QueryBuilder = new Orm();
 
     $subordinated = $UserController->getUser()->getDirector()->getId();
 
     //Средний возраст
-    if (!empty($UserController->getUserIds())) {
+    if (!empty($UserController->getFoundObjectsIds())) {
         $birthYears = $QueryBuilder->select('value')
             ->from('Property_String', 'pr_s')
             ->join(
@@ -95,7 +111,7 @@ Core::attachObserver('beforeUserController.show', function($args) {
             )
             ->where('property_id', '=', 28)
             ->where('value', '<>', '')
-            ->whereIn('object_id', $UserController->getUserIds())
+            ->whereIn('object_id', $UserController->getFoundObjectsIds())
             ->findAll();
     } else {
         $birthYears = [];
@@ -120,7 +136,7 @@ Core::attachObserver('beforeUserController.show', function($args) {
     $UserController->addSimpleEntity('avgAge', $avgAge);
 
     //Средняя медиана
-    if (!empty($UserController->getUserIds())) {
+    if (!empty($UserController->getFoundObjectsIds())) {
         $avgIndivCost = $QueryBuilder->clearQuery()
             ->select('avg(value)', 'value')
             ->from('Property_Int', 'pr_i')
@@ -130,7 +146,7 @@ Core::attachObserver('beforeUserController.show', function($args) {
             )
             ->where('property_id', '=', 42)
             ->where('value', '>', 0)
-            ->whereIn('object_id', $UserController->getUserIds())
+            ->whereIn('object_id', $UserController->getFoundObjectsIds())
             ->find();
 
         $avgGroupCost = $QueryBuilder->clearQuery()
@@ -142,7 +158,7 @@ Core::attachObserver('beforeUserController.show', function($args) {
             )
             ->where('property_id', '=', 43)
             ->where('value', '>', 0)
-            ->whereIn('object_id', $UserController->getUserIds())
+            ->whereIn('object_id', $UserController->getFoundObjectsIds())
             ->find();
     } else {
         $avgIndivCost = new stdClass();
@@ -157,10 +173,13 @@ Core::attachObserver('beforeUserController.show', function($args) {
     $UserController->addSimpleEntity('avgGroupCost', $avgGroupCost);
 });
 
+try {
+    $ClientController->show();
+} catch(Exception $e) {
+    die('Ошибка: ' . $e->getMessage());
+}
 
-$ClientController->show();
-
-Core::detachObserver('beforeUserController.show');
+Core::detachObserver('before.UserControllerExtended.show');
 
 //Список менеджеров для директора
 if ($groupId == ROLE_TEACHER && Core_Access::instance()->hasCapability(Core_Access::USER_READ_MANAGERS)) {

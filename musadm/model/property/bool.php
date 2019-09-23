@@ -39,10 +39,10 @@ class Property_Bool extends Core_Entity
 
 
     /**
-     * @param int|null $value
+     * @param null $value
      * @return $this|int
      */
-    public function value(int $value = null)
+    public function value($value = null)
     {
         if (is_null($value))	{
             return intval($this->value);
