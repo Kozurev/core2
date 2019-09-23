@@ -5,7 +5,7 @@
       <paths name="musicmetod">
         <serverdata>
           <mappings>
-            <mapping deploy="/musadmnew" local="$PROJECT_DIR$/musadm" web="/" />
+            <mapping deploy="/musadm" local="$PROJECT_DIR$/musadm" web="/" />
           </mappings>
         </serverdata>
       </paths>
