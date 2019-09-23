@@ -248,6 +248,7 @@ class Lid_Controller_Extended extends Controller
      */
     public function show($OutputXml = null)
     {
+        global $CFG;
         $OutputXml = Core::factory('Core_Entity');
 
         //Условие вывода панели с указанием периода
@@ -273,6 +274,7 @@ class Lid_Controller_Extended extends Controller
         $priorities[2]->title = 'Высокий';
 
         $OutputXml
+            ->addSimpleEntity('wwwroot', $CFG->wwwroot)
             ->addEntities($this->getLids())
             ->addEntities(Core::factory('Schedule_Area')->getList())
             ->addEntities(Core::factory('Lid_Status')->getList())
