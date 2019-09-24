@@ -17,6 +17,8 @@ Core::requireClass('Schedule_Area_Assignment');
 $isDirector = intval(User::current()->groupId() == ROLE_DIRECTOR);
 $groupId = Core_Page_Show::instance()->StructureItem->getId();
 
+$ClientController = new User_Controller_Extended(User::current());
+
 if ($groupId == ROLE_CLIENT) {
     $xsl = 'musadm/users/clients.xsl';
     $propertiesIds = [
@@ -32,6 +34,14 @@ if ($groupId == ROLE_CLIENT) {
         20, //Направление подготовки (инструмент)
         28  //Год рождения
     ];
+
+    $ClientController->paginate()->setCurrentPage(
+        Core_Array::Get('page', 1, PARAM_INT)
+    );
+    $ClientController->isPaginate(true);
+    if (isset($_GET['page'])) {
+        unset($_GET['page']);
+    }
 } elseif ($groupId == ROLE_TEACHER) {
     $xsl = 'musadm/users/teachers.xsl';
     $propertiesIds = [
@@ -41,24 +51,14 @@ if ($groupId == ROLE_CLIENT) {
     ];
 }
 
-$ClientController = new User_Controller_Extended(User::current());
 $ClientController
     ->properties($propertiesIds)
     ->setGroup($groupId)
     ->isShowCount(true)
-    ->isPaginate(true)
     ->addSimpleEntity('page-theme-color', 'primary')
     ->addSimpleEntity('is_director', $isDirector)
     ->addSimpleEntity('table-type', User_Controller_Extended::TABLE_ACTIVE)
     ->setXsl($xsl);
-
-$ClientController->paginate()->setCurrentPage(
-    Core_Array::Get('page', 1, PARAM_INT)
-);
-if (isset($_GET['page'])) {
-    unset($_GET['page']);
-}
-
 
 //Фильтры
 $ScheduleAssignment = new Schedule_Area_Assignment();
