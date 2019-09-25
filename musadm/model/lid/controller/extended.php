@@ -184,13 +184,13 @@ class Lid_Controller_Extended extends Controller
 
         if ($this->isEnabledPeriodControl()) {
             if (($this->periodFrom() == $this->periodTo()) && !empty($this->periodTo())) {
-                $this->appendFilter('control_date', $this->periodFrom(), '=');
+                $this->appendFilter('control_date', $this->periodFrom(), '=', Controller::FILTER_STRICT);
             } else {
                 if (!empty($this->periodFrom())) {
-                    $this->appendFilter('control_date', $this->periodFrom(), '>=');
+                    $this->appendFilter('control_date', $this->periodFrom(), '>=', Controller::FILTER_STRICT);
                 }
                 if (!empty($this->periodTo())) {
-                    $this->appendFilter('control_date', $this->periodTo(), '<=');
+                    $this->appendFilter('control_date', $this->periodTo(), '<=', Controller::FILTER_STRICT);
                 }
             }
         }
