@@ -253,14 +253,15 @@ $(function(){
         .on('click', '#show-client-filter', function() {
             var
                 form = $('#client-filter'),
+                filters = form.find('.client-filter__options'),
                 i    = $(this).find('i');
 
-            if (form.css('display') == 'none') {
+            if (filters.css('display') == 'none') {
                 i.css('transform', 'rotate(180deg)');
-                form.show('fast');
+                filters.show('fast');
             } else {
                 i.css('transform', 'none');
-                form.hide('fast');
+                filters.hide('fast');
             }
         })
         .on('submit', '#client-filter', function(e) {

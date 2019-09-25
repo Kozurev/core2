@@ -20,7 +20,6 @@
 	cursor: help;
 }
 
-
 .user-events .cards-section {
 	margin-bottom: 10px;
 }
@@ -29,15 +28,8 @@
 	margin-bottom: 30px;
 }
 
-/*.user-events .event_task .tasks-comments {*/
-	/*padding-left: 30px;*/
-	/*margin-top: -15px;*/
-/*}*/
-
-
 #client-filter {
 	margin-bottom: 10px;
-	display: none;
 }
 
 #show-client-filter {
@@ -45,7 +37,7 @@
 }
 
 #show-client-filter span {
-	font-size: 19px;
+	font-size: 18px;
 }
 
 #show-client-filter i {
@@ -55,6 +47,7 @@
 #client-filter .client-filter__options {
 	max-height: 285px;
 	overflow-y: scroll;
+	display: none;
 }
 
 #client-filter ul {
@@ -72,13 +65,8 @@
 }
 
 #client-filter ul li label {
-	/*vertical-align: middle;*/
 	margin: 0;
 	font-weight: normal;
 	margin-left: 5px;
 	cursor: pointer;
 }
-
-/*.users .client-info .table {*/
-	/*font-size: 16px;*/
-/*}*/
