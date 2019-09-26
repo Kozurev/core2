@@ -184,6 +184,7 @@ class Comment extends Comment_Model
         if (empty($this->authorFullname()) && !empty($this->authorId()) && !is_null($User)) {
             $this->authorFullname($User->surname()  . ' ' . $User->name());
         }
+        $this->text = htmlspecialchars($this->text);
 
         Core::notify([&$this], 'before.Comment.save');
         parent::save();
