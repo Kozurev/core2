@@ -713,9 +713,9 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             }
         }
 
-        Core::notify([&$this], 'beforeScheduleLessonSave');
+        Core::notify([&$this], 'before.ScheduleLesson.save');
         parent::save();
-        Core::notify([&$this], 'afterScheduleLessonSave');
+        Core::notify([&$this], 'after.ScheduleLesson.save');
     }
 
 }

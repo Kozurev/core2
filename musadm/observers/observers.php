@@ -343,7 +343,7 @@ Core::attachObserver('beforeItemSave', function($args) {
 /**
  * При выставлении консультации с указанием лида создается комментарий
  */
-Core::attachObserver('before.ScheduleLesson.insert', function($args) {
+Core::attachObserver('before.ScheduleLesson.save', function($args) {
     $Lesson = $args[0];
     $typeId = $Lesson->typeId();
     $clientId = $Lesson->clientId();
