@@ -67,12 +67,12 @@ class Schedule_Group_Model extends Core_Entity
      * @param int|null $teacherId
      * @return $this|int
      */
-    public function teacherId(int $teacherId = null)
+    public function teacherId($teacherId = null)
     {
         if (is_null($teacherId)) {
             return intval($this->teacher_id);
         } else {
-            $this->teacher_id = $teacherId;
+            $this->teacher_id = intval($teacherId);
             return $this;
         }
     }
@@ -102,7 +102,13 @@ class Schedule_Group_Model extends Core_Entity
         if (is_null($duration)) {
             return $this->duration;
         } else {
-            $this->duration = $duration;
+            if (isTime($duration)) {
+                $this->duration = $duration;
+            } else {
+                $duration = substr($duration, 0, 5);
+                $duration .= ':00';
+                $this->duration = $duration;
+            }
             return $this;
         }
     }
@@ -112,7 +118,7 @@ class Schedule_Group_Model extends Core_Entity
      * @param int|null $subordinated
      * @return $this|int
      */
-    public function subordinated(int $subordinated = null)
+    public function subordinated($subordinated = null)
     {
         if (is_null($subordinated)) {
             return intval($this->subordinated);
@@ -127,7 +133,7 @@ class Schedule_Group_Model extends Core_Entity
      * @param int|null $active
      * @return $this|int
      */
-    public function active(int $active = null)
+    public function active($active = null)
     {
         if (is_null($active)) {
             return intval($this->active);
@@ -182,14 +188,11 @@ class Schedule_Group_Model extends Core_Entity
             'duration' => [
                 'required' => true,
                 'type' => PARAM_STRING,
-                'minlength' => 8,
-                'maxlength' => 8
+                'length' => 8
             ],
             'active' => [
                 'required' => true,
-                'type' => PARAM_INT,
-                'minval' => 0,
-                'maxval' => 1
+                'type' => PARAM_BOOL
             ],
             'subordinated' => [
                 'required' => true,
