@@ -331,3 +331,42 @@ function translite($str)
 
     return $result;
 }
+
+
+/**
+ * Определяет, является ли строка датой формата "Y-m-d"
+ *
+ * @date 20.09.2019 18:14
+ * @param string $str
+ * @return bool
+ */
+function isDate(string $str) : bool
+{
+    return preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/', $str);
+}
+
+
+/**
+ * Опедеяет, является ли строка временем формата "H:i:s"
+ *
+ * @date 20.09.2019 18:14
+ * @param string $str
+ * @return bool
+ */
+function isTime(string $str) : bool
+{
+    return preg_match('/^(00|[0-9]|1[0-9]|2[0-3]):([0-9]|[0-5][0-9]):([0-9]|[0-5][0-9])$/', $str);
+}
+
+
+/**
+ * Определяет, является ли строка датой и временем формата "Y-m-d H:i:s"
+ *
+ * @date 20.09.2019 18:14
+ * @param string $str
+ * @return bool
+ */
+function isDatetime(string $str) : bool
+{
+    return preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (00|[0-9]|1[0-9]|2[0-3]):([0-9]|[0-5][0-9]):([0-9]|[0-5][0-9])$/', $str);
+}
