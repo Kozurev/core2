@@ -109,19 +109,19 @@ class Core_Array
                     break;
 
                 case PARAM_DATE:
-                    if (!(is_string($value) && preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/', $value))) {
+                    if (!(is_string($value) && isDate($value))) {
                         $value = $default;
                     }
                     break;
 
                 case PARAM_TIME:
-                    if (!(is_string($value) && preg_match('/^(00|[0-9]|1[0-9]|2[0-3]):([0-9]|[0-5][0-9]):([0-9]|[0-5][0-9])$/', $value))) {
+                    if (!(is_string($value) && isTime($value))) {
                         $value = $default;
                     }
                     break;
 
                 case PARAM_DATETIME:
-                    if (!(is_string($value) && preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (00|[0-9]|1[0-9]|2[0-3]):([0-9]|[0-5][0-9]):([0-9]|[0-5][0-9])$/', $value))) {
+                    if (!(is_string($value) && isTime($value))) {
                         $value = $default;
                     }
                     break;
