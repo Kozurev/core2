@@ -19,6 +19,7 @@ class Core_Entity extends Core_Entity_Model
 {
     const VALID_REQUIRED = 'required';
     const VALID_TYPE = 'type';
+    const VALID_LENGTH = 'length';
     const VALID_MIN_LENGTH = 'minlength';
     const VALID_MAX_LENGTH = 'maxlength';
     const VALID_MIN_VALUE = 'minval';
@@ -34,34 +35,8 @@ class Core_Entity extends Core_Entity_Model
 
 
     /**
-     * Core_Entity constructor.
-     * @param int|null $id
-     */
-//    public function __construct(int $id = null)
-//    {
-//        global $DB;
-//
-//        if (!is_null($id)) {
-//            try {
-//                //TODO: адаптировать данный метод не только для CMS Moodle; сделать его независимым
-//                $existingRecord = $DB->get_record($this->getTableName(false), ['id' => $id]);
-//            } catch(dml_exception $exception) {
-//                die($exception->getMessage());
-//            }
-//
-//            if ($existingRecord !== false) {
-//                $data = get_object_vars($existingRecord);
-//                foreach ($data as $propName => $propValue) {
-//                    $setterName = toCamelCase($propName);
-//                    $this->$setterName($propValue);
-//                }
-//            }
-//        }
-//    }
-
-
-    /**
      * Валидация значнеий сохраняемого объекта
+     * все ошибки валидации сохраняются в свойство $validateErrors
      *
      * @return bool
      */
@@ -72,12 +47,13 @@ class Core_Entity extends Core_Entity_Model
         }
 
         foreach ($this->schema() as $propName => $rules) {
-            $isRequired = Core_Array::getValue($rules, 'required', false, PARAM_BOOL);
-            $type = Core_Array::getValue($rules, 'type', null, PARAM_STRING);
-            $minLength = Core_Array::getValue($rules, 'minlength', null, PARAM_INT);
-            $maxLength = Core_Array::getValue($rules, 'maxlength', null, PARAM_INT);
-            $minVal = Core_Array::getValue($rules, 'minval', null, PARAM_FLOAT);
-            $maxVal = Core_Array::getValue($rules, 'maxval', null, PARAM_FLOAT);
+            $isRequired =   Core_Array::getValue($rules, 'required', false, PARAM_BOOL);
+            $type =         Core_Array::getValue($rules, 'type', null, PARAM_STRING);
+            $length =       Core_Array::getValue($rules, 'length', null, PARAM_INT);
+            $minLength =    Core_Array::getValue($rules, 'minlength', null, PARAM_INT);
+            $maxLength =    Core_Array::getValue($rules, 'maxlength', null, PARAM_INT);
+            $minVal =       Core_Array::getValue($rules, 'minval', null, PARAM_FLOAT);
+            $maxVal =       Core_Array::getValue($rules, 'maxval', null, PARAM_FLOAT);
 
             //check required
             if ($isRequired === true) {
@@ -87,10 +63,9 @@ class Core_Entity extends Core_Entity_Model
                         self::VALID_REQUIRED,
                         ['valid' => true, 'current' => false]
                     );
-                    return false;
                 }
             } elseif ($isRequired === false && is_null($this->$propName)) {
-                return true;
+                continue;
             }
 
             //check type
@@ -101,31 +76,55 @@ class Core_Entity extends Core_Entity_Model
                         self::VALID_TYPE,
                         ['valid' => PARAM_STRING, 'current' => gettype($this->$propName)]
                     );
-                    return false;
                 } elseif ($type == PARAM_INT && ($this->$propName != intval($this->$propName))) {
                     $this->setValidateError(
                         get_class($this) . '->' . $propName,
                         self::VALID_TYPE,
                         ['valid' => PARAM_INT, 'current' => gettype($this->$propName)]
                     );
-                    return false;
                 } elseif ($type == PARAM_FLOAT && !is_numeric($this->$propName)) {
                     $this->setValidateError(
                         get_class($this) . '->' . $propName,
                         self::VALID_TYPE,
                         ['valid' => PARAM_FLOAT, 'current' => gettype($this->$propName)]
                     );
-                    return false;
                 } elseif ($type == PARAM_BOOL && ($this->$propName != 0 && $this->$propName != 1)) {
                     $this->setValidateError(
                         get_class($this) . '->' . $propName,
                         self::VALID_TYPE,
-                        ['valid' => PARAM_BOOL, 'current' => gettype($this->$propName)]
+                        ['valid' => PARAM_BOOL, 'current' => $this->$propName]
                     );
-                    return false;
+                } elseif ($type == PARAM_DATE && !isDate($this->$propName)) {
+                    $this->setValidateError(
+                        get_class($this) . '->' . $propName,
+                        self::VALID_TYPE,
+                        ['valid' => PARAM_DATE, 'current' => $this->$propName]
+                    );
+                } elseif ($type == PARAM_TIME && !isTime($this->$propName)) {
+                    $this->setValidateError(
+                        get_class($this) . '->' . $propName,
+                        self::VALID_TYPE,
+                        ['valid' => PARAM_TIME, 'current' => $this->$propName]
+                    );
                 }
+                elseif ($type == PARAM_DATETIME && !isDatetime($this->$propName)) {
+                    $this->setValidateError(
+                        get_class($this) . '->' . $propName,
+                        self::VALID_TYPE,
+                        ['valid' => PARAM_DATETIME, 'current' => $this->$propName]
+                    );
+                }
+            }
 
-                //TODO: add check types: PARAM_DATE, PARAM_TIME, PARAM_DATETIME
+            //check length
+            if (!is_null($length) && $type === PARAM_STRING) {
+                if (mb_strlen($this->$propName) != $length) {
+                    $this->setValidateError(
+                        get_class($this) . '->' . $propName,
+                        self::VALID_LENGTH,
+                        ['valid' => $length, 'current' => mb_strlen($this->$propName)]
+                    );
+                }
             }
 
             //check maxlength
@@ -136,7 +135,6 @@ class Core_Entity extends Core_Entity_Model
                         self::VALID_MAX_LENGTH,
                         ['valid' => $maxLength, 'current' => mb_strlen($this->$propName)]
                     );
-                    return false;
                 }
             }
 
@@ -148,7 +146,6 @@ class Core_Entity extends Core_Entity_Model
                         self::VALID_MIN_LENGTH,
                         ['valid' => $minLength, 'current' => mb_strlen($this->$propName)]
                     );
-                    return false;
                 }
             }
 
@@ -160,7 +157,6 @@ class Core_Entity extends Core_Entity_Model
                         self::VALID_MAX_VALUE,
                         ['valid' => $maxVal, 'current' => $this->$propName]
                     );
-                    return false;
                 }
             }
 
@@ -172,13 +168,11 @@ class Core_Entity extends Core_Entity_Model
                         self::VALID_MIN_VALUE,
                         ['valid' => $minVal, 'current' => $this->$propName]
                     );
-                    return false;
                 }
             }
-
         } //end schema foreach
 
-        return true;
+        return empty($this->getValidateErrors());
     }
 
 
@@ -234,6 +228,7 @@ class Core_Entity extends Core_Entity_Model
 
     /**
      * @return $this
+     * @throws Exception
      */
     public function save()
     {
@@ -246,45 +241,52 @@ class Core_Entity extends Core_Entity_Model
             }
             $this->queryBuilder()->save($this);
         } else {
+            $errorMsg = '';
             foreach ($this->getValidateErrors() as $propName => $errors) {
                 foreach ($errors as $errorType => $errorData) {
                     switch ($errorType)
                     {
                         case self::VALID_REQUIRED:
-                            echo '<br/>Свойство ' . $propName . ' не может быть пустым';
+                            $errorMsg .= '<br/>Свойство ' . $propName . ' не может быть пустым';
                             break;
 
                         case self::VALID_TYPE:
-                            echo '<br/>Свойство ' . $propName . ' должно иметь тип: ' . $errorData['valid']
+                            $errorMsg .= '<br/>Свойство ' . $propName . ' должно иметь тип: ' . $errorData['valid']
                                 . '; текущий тип: ' . $errorData['current'];
                             break;
 
+                        case self::VALID_LENGTH:
+                            $errorMsg .= '<br/>Свойство ' . $propName . ' должно иметь длинну ' . $errorData['valid']
+                                . '; текущая длинна значения: ' . $errorData['current'];
+                            break;
+
                         case self::VALID_MAX_LENGTH:
-                            echo '<br/>Длина значения свойства ' . $propName . ' не должна превышать ' . $errorData['valid']
+                            $errorMsg .= '<br/>Длина значения свойства ' . $propName . ' не должна превышать ' . $errorData['valid']
                                 . ' символов; текущая длина: ' . $errorData['current'];
                             break;
 
                         case self::VALID_MIN_LENGTH:
-                            echo '<br/>Длина значения свойства ' . $propName . ' должна быть более ' . $errorData['valid']
+                            $errorMsg .= '<br/>Длина значения свойства ' . $propName . ' должна быть более ' . $errorData['valid']
                                 . ' символов; текущая длина: ' . $errorData['current'];
                             break;
 
                         case self::VALID_MAX_VALUE:
-                            echo '<br/>Значение свойства ' . $propName . ' не должно быть более ' . $errorData['valid']
+                            $errorMsg .= '<br/>Значение свойства ' . $propName . ' не должно быть более ' . $errorData['valid']
                                 . '; текущее значение: ' . $errorData['current'];
                             break;
 
                         case self::VALID_MIN_VALUE:
-                            echo '<br/>Значение свойства ' . $propName . ' должно быть более ' . $errorData['valid']
+                            $errorMsg .= '<br/>Значение свойства ' . $propName . ' должно быть более ' . $errorData['valid']
                                 . '; текущее значение: ' . $errorData['current'];
                             break;
 
                         default:
-                            echo '<br/>Свойство ' > $propName . ' не прошло валидацию типа \'' . $errorType . '\'; должно быть: '
+                            $errorMsg .= '<br/>Свойство ' > $propName . ' не прошло валидацию типа \'' . $errorType . '\'; должно быть: '
                                 . $errorData['valid'] . '; текущее значение: ' . $errorData['current'];
                     }
                 }
             }
+            throw new Exception($errorMsg);
         }
 
         return $this;
@@ -293,6 +295,7 @@ class Core_Entity extends Core_Entity_Model
 
     /**
      * @return $this
+     * @throws Exception
      */
     public function delete()
     {
@@ -307,6 +310,7 @@ class Core_Entity extends Core_Entity_Model
 
     /**
      * @return $this
+     * @throws Exception
      */
     public function markAsDeleted()
     {
@@ -433,33 +437,6 @@ class Core_Entity extends Core_Entity_Model
      */
     public function toStd()
     {
-//        $Model = $this->getModel();
-//        if (is_null($Model)) {
-//            $Model = $this;
-//        }
-//        $stdModel = new stdClass();
-//        foreach (get_object_vars($Model) as $propertyName => $propertyValue) {
-//            if ($propertyName == 'id') {
-//                $stdModel->id = $this->getId();
-//                continue;
-//            } else {
-//                $snakeCaseGetter = $propertyName;
-//                $camelCaseGetter = toCamelCase($propertyName);
-//            }
-//
-//            if (method_exists($Model, $camelCaseGetter)) {
-//                $value = $Model->$camelCaseGetter();
-//            } elseif (method_exists($Model, $snakeCaseGetter)) {
-//                $value = $Model->$snakeCaseGetter();
-//            } else {
-//                continue;
-//            }
-//
-//            if (!is_array($value) && !is_object($value)) {
-//                $stdModel->$propertyName = $value;
-//            }
-//        }
-
         $std = new stdClass();
         $forbiddenProps = ['childrenObjects', 'aEntityVars', 'validateErrors'];
         foreach(get_object_vars($this) as $var => $value) {
