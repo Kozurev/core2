@@ -358,7 +358,7 @@ class User_Model extends Core_Entity
             'subordinated' => [
                 'required' => true,
                 'type' => PARAM_INT,
-                'minval' => 1
+                'minval' => 0
             ]
         ];
     }

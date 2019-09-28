@@ -38,6 +38,7 @@ class User extends User_Model
 	 * При сохранении пользователя необходима проверка на заполненность логина и пароля,
      * а также проверка на совпадение логина с уже существующим пользователем
      *
+     * @throws Exception
      * @return self;
 	 */
 	public function save()
@@ -61,6 +62,7 @@ class User extends User_Model
 
     /**
      * @param null $obj
+     * @throws Exception
      * @return $this|void
      */
 	public function delete($obj = null)

@@ -155,7 +155,11 @@ if ($action === 'save') {
     if (!empty($pass1)) {
         $User->password($pass1);
     }
-    $User->save();
+    try {
+        $User->save();
+    } catch (Exception $e) {
+        die(REST::error(5, $e->getMessage()));
+    }
 
 
     /**

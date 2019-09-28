@@ -33,9 +33,7 @@ Core::attachObserver('before.User.insert', function($args) {
     //TODO: добавить обработчик ещё и для редактирования учетной записи преподавателя. Если измениться его имя или фамилия то элемент списка свойства 'преподаватели' не изменится
 
     if ($User->groupId() != ROLE_DIRECTOR && $User->groupId() != ROLE_ADMIN) {
-        if ($User->subordinated() == 0) {
-            $User->subordinated($subordinated);
-        }
+        $User->subordinated($subordinated);
     }
 });
 
