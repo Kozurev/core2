@@ -336,7 +336,7 @@ class Schedule_Lesson_Model extends Core_Entity
             'client_id' => [
                 'required' => true,
                 'type' => PARAM_INT,
-                'minval' => 1
+                'minval' => 0
             ],
             'type_id' => [
                 'required' => true,
