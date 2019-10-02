@@ -177,7 +177,7 @@ class Schedule_Group_Model extends Core_Entity
                 'maxlength' => 255
             ],
             'note' => [
-                'required' => true,
+                'required' => false,
                 'type' => PARAM_STRING
             ],
             'teacher_id' => [
