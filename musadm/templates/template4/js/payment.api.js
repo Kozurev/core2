@@ -207,7 +207,7 @@ class Payment {
             return ipayCheckout({
                     currency: 'RUB',
                     order_number: '',
-                    description: 'Пополнение лицевого счета'
+                    description: 'Оплата музыкального обучения'
                 },
                 function(order) { Payment.sberApiSuccess(order) },
                 function(order) { Payment.sberApiError(order) });

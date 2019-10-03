@@ -16,7 +16,10 @@
     <meta name="author" content="">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Bitter' rel='stylesheet'>
-    <script src="https://3dsec.sberbank.ru/demopayment/docsite/assets/js/ipay.js"></script>
+<!--    <script src="https://3dsec.sberbank.ru/demopayment/docsite/assets/js/ipay.js"></script>-->
+    <?php
+    Core_Page_Show::instance()->js('/templates/template10/assets/js/ipay.js');
+    ?>
     <script>
         <?php
             if (!empty($sberTokenVal)) {
