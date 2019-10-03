@@ -58,7 +58,7 @@
                         </div>
 
                         <div>
-                            <a class="btn btn-blue" href="{wwwroot}/lids/consults?action=export">Экспорт</a>
+                            <a class="btn btn-blue" href="#" onclick="lidsExport($('#filter_lids'))">Экспорт</a>
                         </div>
 
                         <div><h4>Всего: <xsl:value-of select="count(//lid)" /></h4></div>

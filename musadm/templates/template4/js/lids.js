@@ -278,51 +278,7 @@ $(function(){
         .on('click', '.lids_search', function(e) {
             e.preventDefault();
             loaderOn();
-            //let filtersForm = $('#filter_lids');
-            //let data = filtersForm.serialize();
-            //data += '&action=refreshLidTable';
             refreshLidTable();
-            // let params = {filter: {}};
-            //
-            // let periodFrom = filtersForm.find('input[name=date_from]').val();
-            // let periodTo = filtersForm.find('input[name=date_to]').val();
-            // let id = filtersForm.find('input[name=id]').val();
-            // let number = filtersForm.find('input[name=number]').val();
-            // let statusId = filtersForm.find('select[name=status_id]').val();
-            // let areaId = filtersForm.find('select[name=area_id]').val();
-            //
-            // if (id == '' && number == '') {
-            //     params['date_from'] = periodFrom;
-            //     params['date_to'] = periodTo;
-            // }
-            // if (statusId > 0) {
-            //     params.filter['status_id'] = statusId;
-            // }
-            // if (areaId > 0) {
-            //     params.filter['area_id'] = areaId;
-            // }
-            // if (id > 0) {
-            //     params.filter['id'] = id;
-            // }
-            // if (number != '') {
-            //     params.filter['number'] = number;
-            // }
-            //
-            // params.order = {priority_id: 'ASC', id: 'ASC'};
-            // params.select = ['property_50', 'property_54'];
-
-            // Lids.clearCache();
-            // Schedule.clearCache();
-            //
-            // Lids.getList(params, function(lids){
-            //     console.log(lids);
-            //     let lidsBlock = $('.section-lids').find('.row');
-            //     lidsBlock.empty();
-            //     $.each(lids, function(key, lid){
-            //         prependLidCard(lid, lidsBlock);
-            //     });
-            //     loaderOff();
-            // });
         })
         //Обновление данных страницы аналитики лидов
         .on('click', '.lids_statistic_show', function(e){
@@ -372,6 +328,20 @@ $(function(){
         });
 });
 
+
+/**
+ * Функция для экспорта лидов в excel из раздела "Консультации"
+ *
+ * @param filterForm
+ */
+function lidsExport(filterForm) {
+    var link = root + '/lids/consults?action=export';
+    if (filterForm === undefined) {
+        window.location.href = link;
+    } else  {
+        window.location.href = link + '&' + filterForm.serialize();
+    }
+}
 
 
 /**
