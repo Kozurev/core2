@@ -193,7 +193,7 @@ class Schedule_Area_Model extends Core_Entity
                 'required' => true,
                 'type' => PARAM_INT,
                 'minval' => 0,
-                'maxval' => 1
+                'maxval' => 0
             ]
         ];
     }
