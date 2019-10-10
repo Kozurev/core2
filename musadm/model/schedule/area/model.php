@@ -60,7 +60,7 @@ class Schedule_Area_Model extends Core_Entity
      *
      * @var int
      */
-    protected $subordinated;
+    protected $subordinated = 0;
 
 
     /**
@@ -191,9 +191,7 @@ class Schedule_Area_Model extends Core_Entity
             ],
             'active' => [
                 'required' => true,
-                'type' => PARAM_INT,
-                'minval' => 0,
-                'maxval' => 0
+                'type' => PARAM_BOOL
             ]
         ];
     }
