@@ -3,7 +3,7 @@ class Group {
      * @returns {string}
      */
     static getApiLink () {
-        return root + '/api/groups/api.php';
+        return root + '/api/groups/index.php';
     };
 
 

@@ -15,7 +15,7 @@
                     <xsl:text> </xsl:text>
                     <xsl:value-of select="name" />
                     <xsl:text> </xsl:text>
-                    <xsl:value-of select="patronimyc" />
+                    <xsl:value-of select="patronymic" />
                 </a>
                 <xsl:if test="property_value[property_id = 28]/value">
                     <br/><xsl:value-of select="property_value[property_id = 28]/value" />

@@ -157,18 +157,19 @@ $(function () {
 /**
  * Перезагрузка блока с классом lids
  */
-function refreshLidTable() {
-    // var dateFrom = $("input[name=date_from]").val();
-    // var dateTo = $("input[name=date_to]").val();
-    // var areaId = $('select[name=area_id]').val();
+function refreshLidTable(page) {
+    loaderOn();
     let filtersForm = $('#filter_lids');
     let data = filtersForm.serialize();
     data += '&action=refreshLidTable';
 
+    if (page !== undefined && page > 0) {
+        data += '&page=' + page;
+    }
+
     $.ajax({
         type: 'GET',
         url: '',
-        async: false,
         data: data,
         success: function (response) {
             $('.lids').html(response);
@@ -277,7 +278,6 @@ $(function(){
         //Обработчик события поиска лидов по заданным параметрам
         .on('click', '.lids_search', function(e) {
             e.preventDefault();
-            loaderOn();
             refreshLidTable();
         })
         //Обновление данных страницы аналитики лидов
@@ -399,6 +399,13 @@ function makeLidPopup(lidId) {
                 '<input class="form-control" type="text" value="'+lid.source+'" id="source_input" name="source" placeholder="Источник">' +
             '</div>' +
             '<hr>' +
+            '<div class="column"><span>Направление подготовки</span></div>' +
+            '<div class="column">' +
+                '<select class="form-control" name="property_20" id="instrument_select">' +
+                    '<option value="0">Не определен</option>' +
+                '</select>' +
+            '</div>' +
+            '<hr>' +
             '<div class="column"><span>Приоритет</span></div>' +
             '<div class="column">' +
                 '<select class="form-control" name="priorityId" id="priorityId">' +
@@ -477,9 +484,18 @@ function makeLidPopup(lidId) {
                                         isSelected = priority.id == lid.priority_id ? 'selected' : '';
                                         priorityList.append('<option value="'+priority.id+'" '+isSelected+'>'+priority.title+'</option>');
                                     });
+
+                                    PropertyList.getList(20, function(instruments) {
+                                        let instrumentsList = $('#instrument_select');
+                                        $.each(instruments, function(key, instrument){
+                                            isSelected = instrument.id == lid.property_20[0].value_id ? 'selected' : '';
+                                            instrumentsList.append('<option value="'+instrument.id+'" '+isSelected+'>'+instrument.value+'</option>');
+                                        });
+
+                                        loaderOff();
+                                        showPopup();
+                                    });
                                 });
-                                showPopup();
-                                loaderOff();
                             });
                         });
                     }
@@ -598,13 +614,27 @@ function prependLidCard(lid, block) {
  * @returns {string}
  */
 function makeLidCommentBlock(comment) {
-    return '<div class="block">' +
+    let block =
+        '<div class="block">' +
             '<div class="comment_header">' +
                 '<div class="author">'+comment.author_fullname+'</div>' +
                 '<div class="date">'+comment.refactoredDatetime+'</div>' +
             '</div>' +
-            '<div class="comment_body">'+comment.text+'</div>' +
+            '<div class="comment_body">'
+                +comment.text;
+    if (typeof comment.files != 'undefined' && comment.files.length > 0) {
+        block +=
+                '<hr/>' +
+                '<div class="comment_files">';
+        $.each(comment.files, function(key, file){
+            block += '<a target="_blank" href="'+file.link+'">'+file.real_name+'</a><br/>';
+        });
+        block += '</div>';
+    }
+    block +=
+            '</div>' +
         '</div>';
+    return block;
 }
 
 
@@ -613,6 +643,8 @@ function makeLidCommentPopup(commentId, lidId, callback) {
         '<div class="popup-row-block">' +
         '<div class="column"><span>Комментарий</span></div>' +
         '<div class="column"><textarea name="text" id="lidCommentText"></textarea></div>' +
+        '<div class="column"><span>Доп. файлы</span></div>' +
+        '<div class="column"><input type="file" name="lidCommentFile" id="lidCommentFile" /></div>' +
         '<button class="btn btn-default" ' +
         'onclick="Lids.saveComment('+commentId+', '+lidId+', $(\'#lidCommentText\').val(), '+callback+')">Сохранить</button>' +
         '</div>';
@@ -625,8 +657,19 @@ function saveLidCommentCallback(comment) {
         notificationError(comment.message);
         loaderOff();
     } else {
-        $('.lid_' + comment.lid_id).find('.comments').prepend(makeLidCommentBlock(comment));
+        let lidCommentsBlock = $('.lid_' + comment.lid_id).find('.comments');
+        let commentFile = $('#lidCommentFile');
+        if (commentFile.get(0).files.length == 0) {
+            lidCommentsBlock.prepend(makeLidCommentBlock(comment));
+        } else {
+            //Загрузка файла и прикрепление его к комментарию
+            FileManager.upload(0, 0, commentFile, 'Comment', comment.id, function(response) {
+                comment.files = [response.file];
+                lidCommentsBlock.prepend(makeLidCommentBlock(comment));
+            });
+        }
     }
+
     closePopup();
 }
 
@@ -650,6 +693,7 @@ function saveLidFrom(form, callback) {
     lidData.areaId = form.find('select[name=area_id]').val();
     lidData.source = form.find('input[name=source]').val();
     lidData.priorityId = form.find('select[name=priorityId]').val();
+    lidData.property_20 = form.find('select[name=property_20]').val();
     lidData.property_50 = form.find('select[name=property_50]').val();
     lidData.property_54 = form.find('select[name=property_54]').val();
     let comment = form.find('textarea[name=comment]');
@@ -767,5 +811,16 @@ function makeClientFromLidCallback(client) {
     } else {
         notificationError(client.error.message);
         loaderOff();
+    }
+}
+
+
+function changeClientsPage(page) {
+    if (page > 0) {
+        let form = $('#client-filter');
+        form.append('<input type="hidden" name="page" value="'+page+'" />');
+        applyClientFilter(form, function(response) {
+            $('.users').html(response);
+        });
     }
 }

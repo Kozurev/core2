@@ -8,6 +8,8 @@
  * @version 20190526
  */
 
+authOrOut();
+
 $User = User::current();
 
 $breadcumbs[0] = new stdClass();

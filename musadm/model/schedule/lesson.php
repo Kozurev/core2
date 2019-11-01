@@ -8,13 +8,6 @@
  */
 class Schedule_Lesson extends Schedule_Lesson_Model
 {
-    const TYPE_INDIV = 1;
-    const TYPE_GROUP = 2;
-    const TYPE_CONSULT = 3;
-
-    const SCHEDULE_MAIN = 1;
-    const SCHEDULE_CURRENT = 2;
-
     /**
      * В случае отсутствия искомого объекта либо отсутствия обязательных значений свойств
      * геттер будет возвращать объекты по умолчанию
@@ -22,6 +15,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     private $defaultUser;
     private $defaultGroup;
     private $defaultLid;
+    private $defaultArea;
 
 
     /**
@@ -40,6 +34,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         $this->defaultUser = Core::factory('User')->surname('Неизвестно');
         $this->defaultGroup = Core::factory('Schedule_Group')->title('Неизвестно');
         $this->defaultLid = Core::factory('Lid')->surname('Неизвестно');
+        $this->defaultArea = Core::factory('Schedule_Area')->title('Неизвестно');
     }
 
 
@@ -134,6 +129,20 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
 
     /**
+     * @return Schedule_Area
+     */
+    public function getArea()
+    {
+        $Area = Core::factory('Schedule_Area', $this->areaId());
+        if (empty($Area)) {
+            return $this->defaultArea;
+        } else {
+            return $Area;
+        }
+    }
+
+
+    /**
      * Пометка удаления занятия
      *
      * @param $date - дата удаления
@@ -148,7 +157,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         Core::notify($observerArgs, 'ScheduleLesson.markDeleted');
 
         if ($this->lesson_type == self::SCHEDULE_MAIN) { //Основной график
-            if($this->insert_date == $this->delete_date) {
+            if($this->insert_date == $date) {
                 $this->delete();
             } else {
                 $this->delete_date = $date;
@@ -211,10 +220,10 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
         $ClientAbsent = Core::factory('Schedule_Absent')
             ->queryBuilder()
-            ->where('client_id', '=', $this->client_id)
-            ->where('date_from', '<=', $date )
-            ->where('date_to', '>=', $date )
-            ->where('type_id', '=', $this->type_id )
+            ->where('object_id', '=', $this->client_id)
+            ->where('date_from', '<=', $date)
+            ->where('date_to', '>=', $date)
+            ->where('type_id', '=', $this->type_id)
             ->find();
 
         if (is_null($Absent) && is_null($ClientAbsent)) {
@@ -231,11 +240,15 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      * @param string $date
      * @param int $attendance
      * @param array $attendanceClients
-     * @return void
+     * @return Schedule_Lesson_Report|null
      */
     public function makeReport(string $date, int $attendance, array $attendanceClients = [])
     {
-        Core::notify([&$this, &$date, &$attendance, &$attendanceClients], 'beforeScheduleLesson.makeReport');
+        if ($this->isReported($date)) {
+            return null;
+        }
+
+        Core::notify([&$this, &$date, &$attendance, &$attendanceClients], 'before.ScheduleLesson.makeReport');
 
         $Report = Core::factory('Schedule_Lesson_Report')
             ->lessonId($this->id)
@@ -244,14 +257,13 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->date($date)
             ->typeId($this->type_id)
             ->clientId($this->client_id);
-        //TODO: Убрать последнее свойство вообще из таблицы за ненадобностью
 
         if ($this->typeId() == self::TYPE_INDIV) {
             $attendanceClients[$this->clientId()] = $attendance;
         }
 
-        $Director = User::current()->getDirector();
-        Core::factory('User_Controller');
+        $Director = User_Auth::current()->getDirector();
+        Core::requireClass('User_Controller');
 
         if ($this->typeId() == self::TYPE_INDIV) {
             $clientLessons = 'indiv_lessons';
@@ -328,15 +340,6 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             $Report->teacherRate($teacherAbsentValue);
         }
 
-        $ExistingReport = Core::factory('Schedule_Lesson_Report')
-            ->queryBuilder()
-            ->where('lesson_id', '=', $this->id)
-            ->where('date', '=', $date)
-            ->find();
-        if (!is_null($ExistingReport)) {
-            $ExistingReport->delete();
-        }
-
         //Доп информация о присутствии клиента на занятии
         $ClientsAttendancesInfo = [];
 
@@ -394,7 +397,9 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             $Info->save();
         }
 
-        Core::notify([&$Report], 'afterScheduleLesson.makeReport');
+        Core::notify([&$Report], 'after.ScheduleLesson.makeReport');
+
+        return $Report;
     }
 
 
@@ -481,7 +486,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         if (isset($this->oldid) && !empty($this->oldid)) {
             $Reports->where('lesson_id', '=', $this->oldid);
         } else {
-            $Reports->where('lesson_id', '=', $this->id);
+            $Reports->where('lesson_id', '=', $this->getId());
         }
 
         return $Reports->find();
@@ -595,9 +600,9 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
     public function delete($obj = null)
     {
-        Core::notify([&$this], 'beforeScheduleLessonDelete');
+        Core::notify([&$this], 'before.ScheduleLesson.delete');
         parent::delete();
-        Core::notify([&$this], 'afterScheduleLessonDelete');
+        Core::notify([&$this], 'after.ScheduleLesson.delete');
     }
 
 
@@ -671,7 +676,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
         $Lessons = Core::factory('Schedule_Lesson')
             ->queryBuilder()
-            ->where('id', '<>', $this->id)
+            ->where('id', '<>', $this->getId())
             ->where('area_id', '=', $this->area_id)
             ->where('class_id', '=', $this->class_id)
             ->open()
@@ -714,8 +719,11 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         }
 
         Core::notify([&$this], 'before.ScheduleLesson.save');
-        parent::save();
+        if (empty(parent::save())) {
+            return null;
+        }
         Core::notify([&$this], 'after.ScheduleLesson.save');
+        return $this;
     }
 
 }

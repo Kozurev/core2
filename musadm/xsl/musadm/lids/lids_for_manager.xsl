@@ -60,7 +60,7 @@
                     <xsl:value-of select="id" /> <xsl:text> </xsl:text>
                     <xsl:value-of select="surname" /><xsl:text> </xsl:text>
                     <xsl:value-of select="name" /><xsl:text> </xsl:text>
-                    <xsl:value-of select="patronimyc" /><xsl:text> </xsl:text>
+                    <xsl:value-of select="patronymic" /><xsl:text> </xsl:text>
                 </h3>
 
                 <xsl:if test="number != ''">

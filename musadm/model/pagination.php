@@ -1,9 +1,9 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Egor
- * Date: 21.09.2019
- * Time: 12:50
+ * Класс для реализации пагинации в контроллерах
+ *
+ * @author BadWolf
+ * @date 21.09.2019 12:50
  * Class Pagination
  */
 class Pagination extends Core_Entity

@@ -29,7 +29,7 @@ Core::attachObserver('after.ScheduleLesson.insert', function($args) {
             ->typeId(Event::SCHEDULE_APPEND_USER)
             ->setData($EventData)
             ->save();
-    } elseif ($Lesson->typeId() == Schedule_Lesson::TYPE_GROUP) {
+    } elseif ($Lesson->typeId() == Schedule_Lesson::TYPE_CONSULT) {
         $Event->typeId(Event::SCHEDULE_APPEND_CONSULT);
         if ($Lesson->clientId()) {
             $Lid = $Lesson->getClient();

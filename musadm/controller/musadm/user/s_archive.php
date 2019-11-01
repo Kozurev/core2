@@ -7,6 +7,8 @@
  * @version 20190815 - добавлены фильтры
  */
 
+authOrOut();
+
 $breadcumbs[0] = new stdClass();
 $breadcumbs[0]->title = Core_Page_Show::instance()->Structure->title();
 $breadcumbs[0]->active = 1;
@@ -21,7 +23,7 @@ Core_Page_Show::instance()->setParam('breadcumbs', $breadcumbs);
 
 
 $User = User::current();
-$accessRules = ['groups' => [2, 6]];
+$accessRules = ['groups' => [ROLE_MANAGER, ROLE_DIRECTOR]];
 
 if (!User::checkUserAccess($accessRules, $User)) {
     Core_Page_Show::instance()->error404();

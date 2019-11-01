@@ -3,7 +3,7 @@ class Lids {
      * @returns {string}
      */
     static getApiLink () {
-        return root + '/api/lids/api.php';
+        return root + '/api/lids/index.php';
     };
 
 

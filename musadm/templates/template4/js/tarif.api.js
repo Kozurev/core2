@@ -6,7 +6,7 @@ class Tarif {
      * @returns {string}
      */
     static getApiLink () {
-        return root + '/api/tarif/api.php';
+        return root + '/api/tarif/index.php';
     };
 
 

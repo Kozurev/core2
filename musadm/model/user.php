@@ -1,4 +1,15 @@
 <?php
+/**
+ * Класс реализующий методы для работы с пользователями
+ *
+ * @author BadWolf
+ * @version 20191020
+ * @version 20191027 - методы, связанные с авторизацией, вынесены теперь в отдельный класс
+ * Class User
+ */
+
+Core::requireClass('User_Auth');
+
 class User extends User_Model
 {
 
@@ -38,7 +49,6 @@ class User extends User_Model
 	 * При сохранении пользователя необходима проверка на заполненность логина и пароля,
      * а также проверка на совпадение логина с уже существующим пользователем
      *
-     * @throws Exception
      * @return self;
 	 */
 	public function save()
@@ -49,12 +59,17 @@ class User extends User_Model
 
         Core::notify([&$this], 'before.User.save');
 
+        if (empty($this->authToken())) {
+            $this->authToken(uniqidReal($this->getMaxAuthTokenLength()));
+        }
+
 		if (empty($this->id) && $this->isUserExists($this->login)) {
-			echo "<br>Пользователь с такими данными уже существует( $this->login ) <br/>";
 			return $this;
 		}
 
-		parent::save();
+		if (empty(parent::save())) {
+		    return null;
+        }
         Core::notify([&$this], 'after.User.save');
         return $this;
 	}
@@ -76,79 +91,38 @@ class User extends User_Model
 	/**
 	 * Авторизация пользователя
      *
+     * @param string $login
+     * @param string $pass
      * @param bool $remember - указатель "Запомнить меня" при истинном значении создается файл кукки
-     * @return object
+     * @return bool
+     * @deprecated
 	 */
-	public function authorize(bool $remember = false)
+	public static function authorize(string $login, string $pass, bool $remember = false)
 	{
-        Core::notify([&$this], 'before.User.authorize');
-
-		$ExistingUser = $this->queryBuilder()
-			->where('login', '=', $this->login)
-			->where('password', '=', $this->password)
-            ->where('active', '=', 1)
-			->find();
-
-        $cookieTime = 3600 * 24 * 30;
-        setcookie('userdata', '', 0 - time() - $cookieTime, '/');
-
-		if (!is_null($ExistingUser)) {
-		    if ($remember === true) {
-                $cookieData = $ExistingUser->getId();
-                $cookieTime = 3600 * 24 * 30;
-                setcookie('userdata', $cookieData, time() + $cookieTime, '/');
-            }
-
-            $_SESSION['core']['user'] = $ExistingUser->getId();
-		    $_SESSION['core']['user_backup'] = [];
-		    $_SESSION['core']['user_object'] = serialize($ExistingUser);
-		}
-
-        Core::notify([&$ExistingUser], 'after.User.authorize');
-		return $ExistingUser;
+        return User_Auth::auth($login, $pass, $remember);
 	}
 
 
     /**
-     * Статический аналог метода getCurrent
+     * Статический аналог метода getCurrent для получение данных текущего авторизованного пользователя
      *
-     * @return User
+     * @return User|null
+     * @deprecated
      */
     public static function current()
     {
-        if (Core_Array::Cookie('userdata', 0, PARAM_INT) != 0) {
-            $_SESSION['core']['user'] = Core_Array::Cookie('userdata', 0, PARAM_INT);
-        }
-
-        if (Core_Array::Session('core/user_object', null) !== null) {
-            $User = Core_Array::Session('core/user_object', null);
-            return unserialize($User);
-        }
-
-        if (Core_Array::Session('core/user', 0, PARAM_INT) != 0) {
-            $CurrentUser = Core::factory('User', Core_Array::Session('core/user', 0, PARAM_INT));
-            if (!is_null($CurrentUser) && $CurrentUser->active() == 1) {
-                $_SESSION['core']['user_object'] = serialize($CurrentUser);
-                return $CurrentUser;
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
+        return User_Auth::current();
     }
 
 
 	/**
 	 * Метод выхода из учетной записи
+     *
+     * @deprecated
 	 */
 	static public function disauthorize()
 	{	
-		unset($_SESSION['core']['user']);
-		unset($_SESSION['core']['user_object']);
-		unset($_SESSION['core']['user_backup']);
-		$cookieTime = 3600 * 24 * 30;
-        setcookie('userdata', '', 0 - time() - $cookieTime, '/');
+		User_Auth::logout();
 	}
 
 
@@ -164,24 +138,20 @@ class User extends User_Model
         $groups =       Core_Array::getValue($params, 'groups', null, PARAM_ARRAY);
         $forSuperuser = Core_Array::getValue($params, 'superuser', null, PARAM_BOOL);
 
-        if (is_null( $User)) {
-            $CurrentUser = self::current();
+        if (is_null($User)) {
+            $CurrentUser = User_Auth::current();
         } else {
             $CurrentUser = $User;
         }
-
         if (is_null($CurrentUser)) {
             return false;
         }
-
         if (!is_null($groups) && !in_array($CurrentUser->groupId(), $groups)) {
             return false;
         }
-
         if ($forSuperuser == true && $CurrentUser->superuser() != 1) {
             return false;
         }
-
         return true;
     }
 
@@ -192,34 +162,23 @@ class User extends User_Model
      * и есть возможность вернуться к предыдущей учетной записи при помощи метода authRevert
      *
      * @param int $userId - id пользователя, от имени которого происходит авторизация
+     * @deprecated
      */
     public static function authAs(int $userId)
     {
-        $CurrentUser = self::current();
-
-        if (!is_null($CurrentUser) && self::checkUserAccess(['groups' => [ROLE_ADMIN, ROLE_MANAGER, ROLE_DIRECTOR]], $CurrentUser)) {
-            $_SESSION['core']['user_backup'][] = Core_Array::Session('core/user', 0, PARAM_INT);
-            //TODO: Добавить проверку на существование пользователя и принадлежность его к той же организации
-            $_SESSION['core']['user'] = $userId;
-            $_SESSION['core']['user_object'] = serialize(Core::factory('User', $userId));
-        }
+        User_Auth::authAs($userId);
     }
 
 
     /**
      * Метод обратной авторизации - возвращение к предыдущей учетной записи
      * после использования метода authAs
+     *
+     * @deprecated
      */
     public static function authRevert()
     {
-        $userId = array_pop($_SESSION['core']['user_backup']);
-
-        if (is_null($userId)) {
-            self::disauthorize();
-        } else {
-            $_SESSION['core']['user'] = $userId;
-            $_SESSION['core']['user_object'] = serialize(Core::factory('User', $userId));
-        }
+        User_Auth::authRevert();
     }
 
 
@@ -227,17 +186,11 @@ class User extends User_Model
      * Проверка на авторизованность под чужим именем
      *
      * @return bool
+     * @deprecated
      */
     public static function isAuthAs()
     {
-        $sessionAuthAs =    Core_Array::Session('core/user_backup', false, PARAM_ARRAY);
-        $getParamAuthAs =   Core_Array::Get('userid', false, PARAM_INT);
-
-        if ($sessionAuthAs || $getParamAuthAs) {
-            return true;
-        } else {
-            return false;
-        }
+        return User_Auth::isAuthAs();
     }
 
 
@@ -245,20 +198,11 @@ class User extends User_Model
      * Получение пользователя, под которым происходила самая первая рекурсивная авторизация
      *
      * @return object|bool
+     * @deprecated
      */
     public static function parentAuth()
     {
-        $backup = Core_Array::Session('core/user_backup', null, PARAM_ARRAY);
-
-        if (is_null($backup)) {
-            return self::current();
-        }
-
-        if (count($backup) == 0) {
-            return self::current();
-        }
-
-        return Core::factory('User', $backup[0]);
+        return User_Auth::parentAuth();
     }
 
 
@@ -278,38 +222,9 @@ class User extends User_Model
     }
 
 
-//    /**
-//     * Добавление комментария к кользователю
-//     *
-//     * @param string $text - текст комментария
-//     * @param int $userId - id пользователя к которому создается комментарий
-//     * @param int $authorId - id автора комментария
-//     * @return User
-//     * @date 30.11.2018 14:02
-//     */
-//    public function addComment(string $text, int $userId = 0, int $authorId = 0)
-//    {
-//        if ($userId === 0 && empty($this->id)) {
-//            die("Невозможно добавить комментарий не указав id пользователя");
-//        }
-//
-//        if ($userId === 0) {
-//            $userId = $this->getId();
-//        }
-//
-//        $Comment = Core::factory('User_Comment')
-//            ->authorId($authorId)
-//            ->userId($userId)
-//            ->text($text);
-//
-//        Core::notify([&$Comment], 'beforeUserAddComment');
-//        $Comment->save();
-//        Core::notify([&$Comment], 'afterUserAddComment');
-//        return $this;
-//    }
-
-
     /**
+     * Добавление комментария к пользователю
+     *
      * @param string $text
      * @param int|null $authorId
      * @param string|null $date
@@ -322,7 +237,6 @@ class User extends User_Model
         Core::notify([&$this], 'before.User.addComment');
 
         $NewComment = Comment::create($this, $text, $authorId, $date);
-
         if (is_null($NewComment)) {
             return null;
         }
@@ -340,11 +254,12 @@ class User extends User_Model
      */
     public function getOrganizationName()
     {
+        Core::requireClass('Property_Controller');
         $Director = $this->getDirector();
         if ($Director->groupId() !== ROLE_DIRECTOR) {
             return '';
         } else {
-            $Property = Core::factory('Property')->getByTagName('organization');
+            $Property = Property_Controller::factoryByTag('organization');
             $organization = $Property->getPropertyValues($Director)[0]->value();
             return $organization;
         }
@@ -361,9 +276,8 @@ class User extends User_Model
     public static function isSubordinate($Object, User $User = null)
     {
         if (is_null($User)) {
-            $User = self::current();
+            $User = User_Auth::current();
         }
-
         if (is_null($User)) {
             return false;
         }
@@ -373,20 +287,49 @@ class User extends User_Model
         if (!is_object($Object)) {
             return false;
         }
-
         if (!method_exists($Object, 'subordinated')) {
             return true;
         }
-
         if ($User->getId() > 0 && $User->groupId() == ROLE_DIRECTOR && $Object->subordinated() == $User->getId()) {
             return true;
         }
-
         if ($User->subordinated() == $Object->subordinated()) {
             return true;
         }
-
         return false;
+    }
+
+
+    /**
+     * Создание авторизационного токена для пользователя
+     */
+    public function createAuthToken()
+    {
+        $this->authToken(uniqidReal(self::getMaxAuthTokenLength()));
+        $this->save();
+    }
+
+
+    /**
+     * Геттер для авторизационного токена пользователя
+     *
+     * @return $this|string
+     */
+    public function getAuthToken()
+    {
+        if (empty($this->authToken())) {
+            $this->createAuthToken();
+        }
+        return $this->authToken();
+    }
+
+
+    /**
+     * @return int
+     */
+    public static function getMaxAuthTokenLength()
+    {
+        return 50;
     }
 
 }

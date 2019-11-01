@@ -30,7 +30,7 @@ class Rest_User extends Rest_Controller
     public function __construct()
     {
         global $CFG;
-        $this->apiUrl = $CFG->wwwroot . '/api/user/api.php';
+        $this->apiUrl = $CFG->wwwroot . '/api/user';
     }
 
 

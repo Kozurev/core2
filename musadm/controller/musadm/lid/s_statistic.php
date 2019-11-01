@@ -6,6 +6,7 @@
  * @date 20.07.2019 13:07
  */
 
+authOrOut();
 
 $breadcumbs[0] = new stdClass();
 $breadcumbs[0]->title = Core_Page_Show::instance()->Structure->getParent()->title();

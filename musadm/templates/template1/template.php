@@ -10,6 +10,8 @@
         ->css('/templates/template1/css/bootstrap.min.css')
         ->showCss()
     ?>
+
+    <script src="https://www.google.com/recaptcha/api.js?hl=ru"></script>
 </head>
 
 <?php
@@ -25,6 +27,12 @@ if ($startYear == date('Y')) {
     <style>
         .wrapper {
             height: 100vh;
+        }
+
+        .re {
+            height: 78px;
+            margin-top: 10px;
+            margin-left: 18px;
         }
 
         footer {

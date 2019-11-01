@@ -14,40 +14,6 @@
 class Event extends Event_Model
 {
     /**
-     * Список констант идентификаторов типов событий
-     * Примечание: при создании нового типа в таблице Event_Type необходимо создать аналогичную новой записи константу
-     */
-    const SCHEDULE_APPEND_USER =            2;
-    const SCHEDULE_REMOVE_USER =            3;
-    const SCHEDULE_CREATE_ABSENT_PERIOD =   4;
-    const SCHEDULE_EDIT_ABSENT_PERIOD =     27;
-    const SCHEDULE_CHANGE_TIME =            5;
-    const SCHEDULE_APPEND_CONSULT =         28;
-    const SCHEDULE_SET_ABSENT =             29;
-
-    const CLIENT_ARCHIVE =                  7;
-    const CLIENT_UNARCHIVE =                8;
-    const CLIENT_APPEND_COMMENT =           9;
-
-    const PAYMENT_CHANGE_BALANCE =          11;
-    const PAYMENT_HOST_COSTS =              12;
-    const PAYMENT_TEACHER_PAYMENT =         13;
-    const PAYMENT_APPEND_COMMENT =          14;
-
-    const TASK_CREATE =                     16;
-    const TASK_DONE =                       17;
-    const TASK_APPEND_COMMENT =             18;
-    const TASK_CHANGE_DATE =                19;
-
-    const LID_CREATE =                      21;
-    const LID_APPEND_COMMENT =              22;
-    const LID_CHANGE_DATE =                 23;
-
-    const CERTIFICATE_CREATE =              25;
-    const CERTIFICATE_APPEND_COMMENT =      26;
-
-
-    /**
      * Тип формирования шаблона строки
      */
     const STRING_FULL =     'full';     //Строка начинается с фамилии и имени клиента/преподавателя
@@ -150,7 +116,7 @@ class Event extends Event_Model
                 $timeFrom = refactorTimeFormat($Lesson->time_from);
                 $timeTo =   refactorTimeFormat($Lesson->time_to);
                 $str = 'Добавил(а) консультацию c ' . $timeFrom . ' по ' . $timeTo . '. ';
-                if ($Lesson->clientId()) {
+                if ($Lesson->client_id) {
                     $lidId = $this->getData()->lid->id;
                     $str .= "Лид <a href='#' class='info-by-id' data-model='Lid' data-id='".$lidId."'>№".$lidId."</a>";
                 }
@@ -261,7 +227,7 @@ class Event extends Event_Model
 
     /**
      * @param null $obj
-     * @return void
+     * @return null|$this
      */
     public function save($obj = null)
     {
@@ -279,8 +245,8 @@ class Event extends Event_Model
             if (!is_null($CurrentUser)) {
                 $this->author_id =  $CurrentUser->getId();
                 $this->author_fio = $CurrentUser->surname() . ' ' . $CurrentUser->name();
-                if($CurrentUser->patronimyc() != '') {
-                    $this->author_fio .= ' ' . $CurrentUser->patronimyc();
+                if($CurrentUser->patronymic() != '') {
+                    $this->author_fio .= ' ' . $CurrentUser->patronymic();
                 }
             }
         }
@@ -291,12 +257,17 @@ class Event extends Event_Model
                 $this->data = json_encode($this->data);
             } catch (Exception $e) {
                 echo "<h2>Ошибка во время сохранения события: " . $e->getMessage() . "</h2>";
-                return;
+                return null;
             }
         }
 
-        parent::save();
+        if (empty(parent::save())) {
+            return null;
+        }
+
         Core::notify([&$this], 'after.Event.save');
+
+        return $this;
     }
 
 

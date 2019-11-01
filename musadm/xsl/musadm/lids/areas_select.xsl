@@ -2,7 +2,7 @@
 
     <xsl:template name="areas_row">
         <xsl:variable name="currentArea" select="//current_area" />
-        <div><h4>Филиалы</h4></div>
+        <div><h4>Филиал</h4></div>
         <div>
             <select class="form-control" name="area_id">
                 <option value="0">...</option>

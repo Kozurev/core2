@@ -43,3 +43,20 @@ define('ROLE_DIRECTOR',    6);
 define('ROLE_MANAGER',     2);
 define('ROLE_TEACHER',     4);
 define('ROLE_CLIENT',      5);
+
+
+/**
+ * Идентификаторы моделей
+ * Подобные идентификаторы можно было бы брать из таблицы Admin_Form_Modelname
+ * но так как данная таблица устарела и не используется то было приянто решение ввести отдельные константы
+ * Используются данные идентификаторы, в основном, в связующих таблицах
+ *
+ * @date 27.09.2019 13:35
+ */
+define('MODEL_UNDEFINED',       0);
+define('MODEL_USER_ID',         1);
+define('MODEL_LID_ID',          2);
+define('MODEL_TASK_ID',         3);
+define('MODEL_PAYMENT_ID',      4);
+define('MODEL_COMMENT_ID',      5);
+define('MODEL_CERTIFICATE_ID',  6);

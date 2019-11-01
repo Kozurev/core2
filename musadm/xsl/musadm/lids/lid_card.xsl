@@ -28,6 +28,14 @@
                             <span>ВК: </span><span class="vk"><xsl:value-of select="vk" /></span>
                         </p>
 
+                        <xsl:if test="/root/access_lid_edit = 1">
+                            <a class="action edit" onclick="makeLidPopup({id})" title="Редактировать лида"><input type="hidden" value="KOCTb|J|b" /></a>
+                        </xsl:if>
+                        <xsl:if test="/root/access_lid_comment = 1">
+                            <a class="action comment" title="Добавить комментарий" onclick="makeLidCommentPopup(0, {id}, saveLidCommentCallback)"><input type="hidden" value="KOCTb|J|b" /></a>
+                        </xsl:if>
+                        <a class="action add_user" title="Создать пользователя" onclick="makeClientFromLidPopup({id})"><input type="hidden" value="KOCTb|J|b" /></a>
+
                         <input type="date" class="form-control date_inp lid_date" onchange="Lids.changeDate({id}, this.value)">
                             <xsl:attribute name="value"><xsl:value-of select="control_date" /></xsl:attribute>
                             <xsl:if test="/root/access_lid_edit = 0">
@@ -106,14 +114,6 @@
                             </xsl:if>
                             <span>Источник: </span><span  class="source"><xsl:value-of select="$source" /></span>
                         </p>
-
-                        <xsl:if test="/root/access_lid_edit = 1">
-                            <a class="action edit" onclick="makeLidPopup({id})" title="Редактировать лида"><input type="hidden" value="KOCTb|J|b" /></a>
-                        </xsl:if>
-                        <xsl:if test="/root/access_lid_comment = 1">
-                            <a class="action comment" title="Добавить комментарий" onclick="makeLidCommentPopup(0, {id}, saveLidCommentCallback)"><input type="hidden" value="KOCTb|J|b" /></a>
-                        </xsl:if>
-                        <a class="action add_user" title="Создать пользователя" onclick="makeClientFromLidPopup({id})"><input type="hidden" value="KOCTb|J|b" /></a>
                     </div>
                     <div class="col-sm-9 col-xs-12 comments-column">
                         <div class="comments">
@@ -131,6 +131,14 @@
 
                                     <div class="comment_body">
                                         <xsl:value-of select="text" />
+                                        <xsl:if test="count(file) &gt; 0">
+                                            <hr/>
+                                            <div class="comment_files">
+                                                <xsl:for-each select="file">
+                                                    <a target="_blank" href="{link}"><xsl:value-of select="real_name" /></a><br/>
+                                                </xsl:for-each>
+                                            </div>
+                                        </xsl:if>
                                     </div>
                                 </div>
                             </xsl:for-each>

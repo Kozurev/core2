@@ -31,7 +31,15 @@ class Core_Entity extends Core_Entity_Model
      *
      * @var array
      */
-    private $validateErrors = [];
+    private $_validateErrors = [];
+
+
+    /**
+     * Информация об ошибках валидации модели в формате строки
+     *
+     * @var array
+     */
+    private $_validateErrorsStr = [];
 
 
     /**
@@ -40,7 +48,7 @@ class Core_Entity extends Core_Entity_Model
      *
      * @return bool
      */
-    public function validate() : bool
+    public function _validateModel() : bool
     {
         if (!method_exists($this, 'schema')) {
             return true;
@@ -58,7 +66,7 @@ class Core_Entity extends Core_Entity_Model
             //check required
             if ($isRequired === true) {
                 if (is_null($this->$propName)) {
-                    $this->setValidateError(
+                    $this->_setValidateError(
                         get_class($this) . '->' . $propName,
                         self::VALID_REQUIRED,
                         ['valid' => true, 'current' => false]
@@ -71,44 +79,44 @@ class Core_Entity extends Core_Entity_Model
             //check type
             if (!is_null($type)) {
                 if ($type == PARAM_STRING && (is_object($this->$propName) || is_array($this->$propName))) {
-                    $this->setValidateError(
+                    $this->_setValidateError(
                         get_class($this) . '->' . $propName,
                         self::VALID_TYPE,
                         ['valid' => PARAM_STRING, 'current' => gettype($this->$propName)]
                     );
                 } elseif ($type == PARAM_INT && ($this->$propName != intval($this->$propName))) {
-                    $this->setValidateError(
+                    $this->_setValidateError(
                         get_class($this) . '->' . $propName,
                         self::VALID_TYPE,
                         ['valid' => PARAM_INT, 'current' => gettype($this->$propName)]
                     );
                 } elseif ($type == PARAM_FLOAT && !is_numeric($this->$propName)) {
-                    $this->setValidateError(
+                    $this->_setValidateError(
                         get_class($this) . '->' . $propName,
                         self::VALID_TYPE,
                         ['valid' => PARAM_FLOAT, 'current' => gettype($this->$propName)]
                     );
                 } elseif ($type == PARAM_BOOL && ($this->$propName != 0 && $this->$propName != 1)) {
-                    $this->setValidateError(
+                    $this->_setValidateError(
                         get_class($this) . '->' . $propName,
                         self::VALID_TYPE,
                         ['valid' => PARAM_BOOL, 'current' => $this->$propName]
                     );
                 } elseif ($type == PARAM_DATE && !isDate($this->$propName)) {
-                    $this->setValidateError(
+                    $this->_setValidateError(
                         get_class($this) . '->' . $propName,
                         self::VALID_TYPE,
                         ['valid' => PARAM_DATE, 'current' => $this->$propName]
                     );
                 } elseif ($type == PARAM_TIME && !isTime($this->$propName)) {
-                    $this->setValidateError(
+                    $this->_setValidateError(
                         get_class($this) . '->' . $propName,
                         self::VALID_TYPE,
                         ['valid' => PARAM_TIME, 'current' => $this->$propName]
                     );
                 }
                 elseif ($type == PARAM_DATETIME && !isDatetime($this->$propName)) {
-                    $this->setValidateError(
+                    $this->_setValidateError(
                         get_class($this) . '->' . $propName,
                         self::VALID_TYPE,
                         ['valid' => PARAM_DATETIME, 'current' => $this->$propName]
@@ -119,7 +127,7 @@ class Core_Entity extends Core_Entity_Model
             //check length
             if (!is_null($length) && $type === PARAM_STRING) {
                 if (mb_strlen($this->$propName) != $length) {
-                    $this->setValidateError(
+                    $this->_setValidateError(
                         get_class($this) . '->' . $propName,
                         self::VALID_LENGTH,
                         ['valid' => $length, 'current' => mb_strlen($this->$propName)]
@@ -130,7 +138,7 @@ class Core_Entity extends Core_Entity_Model
             //check maxlength
             if (!is_null($maxLength) && $type === PARAM_STRING) {
                 if (mb_strlen($this->$propName) > $maxLength) {
-                    $this->setValidateError(
+                    $this->_setValidateError(
                         get_class($this) . '->' . $propName,
                         self::VALID_MAX_LENGTH,
                         ['valid' => $maxLength, 'current' => mb_strlen($this->$propName)]
@@ -141,7 +149,7 @@ class Core_Entity extends Core_Entity_Model
             //check minlength
             if (!is_null($minLength) && $type === PARAM_STRING) {
                 if (mb_strlen($this->$propName) < $minLength) {
-                    $this->setValidateError(
+                    $this->_setValidateError(
                         get_class($this) . '->' . $propName,
                         self::VALID_MIN_LENGTH,
                         ['valid' => $minLength, 'current' => mb_strlen($this->$propName)]
@@ -152,7 +160,7 @@ class Core_Entity extends Core_Entity_Model
             //check max val
             if (!is_null($maxVal) && in_array($type, [PARAM_INT, PARAM_FLOAT])) {
                 if ($this->$propName > $maxVal) {
-                    $this->setValidateError(
+                    $this->_setValidateError(
                         get_class($this) . '->' . $propName,
                         self::VALID_MAX_VALUE,
                         ['valid' => $maxVal, 'current' => $this->$propName]
@@ -163,7 +171,7 @@ class Core_Entity extends Core_Entity_Model
             //check min val
             if (!is_null($minVal) && in_array($type, [PARAM_INT, PARAM_FLOAT])) {
                 if ($this->$propName < $minVal) {
-                    $this->setValidateError(
+                    $this->_setValidateError(
                         get_class($this) . '->' . $propName,
                         self::VALID_MIN_VALUE,
                         ['valid' => $minVal, 'current' => $this->$propName]
@@ -172,7 +180,7 @@ class Core_Entity extends Core_Entity_Model
             }
         } //end schema foreach
 
-        return empty($this->getValidateErrors());
+        return empty($this->_getValidateErrors());
     }
 
 
@@ -181,18 +189,31 @@ class Core_Entity extends Core_Entity_Model
      * @param string $errorType
      * @param array $errorData
      */
-    public function setValidateError(string $property, string $errorType, array $errorData)
+    public function _setValidateError(string $property, string $errorType, array $errorData)
     {
-        $this->validateErrors[$property][$errorType] = $errorData;
+        $this->_validateErrors[$property][$errorType] = $errorData;
     }
 
 
     /**
      * @return array
      */
-    public function getValidateErrors() : array
+    public function _getValidateErrors() : array
     {
-        return $this->validateErrors;
+        return $this->_validateErrors;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function _getValidateErrorsStr()
+    {
+        $returnStr = '';
+        foreach ($this->_validateErrorsStr as $error) {
+            $returnStr .= $error . PHP_EOL;
+        }
+        return $returnStr;
     }
 
 
@@ -227,75 +248,77 @@ class Core_Entity extends Core_Entity_Model
 
 
     /**
-     * @return $this
-     * @throws Exception
+     * Валидация и сохранение объекта в ЬД
+     * при неудачной валидации объекта вернется NULL
+     * а список ошибок можно посмотреть в $_validateErrors или $_validateErrorsStr
+     *
+     * @return $this|null
      */
     public function save()
     {
-        if ($this->validate() === true) {
-            if ($this->timestamps() === true) {
-                $this->timemodified(time());
-                if (empty($this->id)) {
-                    $this->timecreated(time());
-                }
+        if ($this->timestamps() === true) {
+            $currentDatetime = date('Y-m-d H:i:s');
+            $this->timemodified($currentDatetime);
+            if (empty($this->id)) {
+                $this->timecreated($currentDatetime);
             }
+        }
+
+        if ($this->_validateModel() === true) {
             $this->queryBuilder()->save($this);
+            return $this;
         } else {
-            $errorMsg = '';
-            foreach ($this->getValidateErrors() as $propName => $errors) {
+            foreach ($this->_getValidateErrors() as $propName => $errors) {
                 foreach ($errors as $errorType => $errorData) {
                     switch ($errorType)
                     {
                         case self::VALID_REQUIRED:
-                            $errorMsg .= '<br/>Свойство ' . $propName . ' не может быть пустым';
+                            $this->_validateErrorsStr[] .= 'Свойство ' . $propName . ' не может быть пустым';
                             break;
 
                         case self::VALID_TYPE:
-                            $errorMsg .= '<br/>Свойство ' . $propName . ' должно иметь тип: ' . $errorData['valid']
+                            $this->_validateErrorsStr[] .= 'Свойство ' . $propName . ' должно иметь тип: ' . $errorData['valid']
                                 . '; текущий тип: ' . $errorData['current'];
                             break;
 
                         case self::VALID_LENGTH:
-                            $errorMsg .= '<br/>Свойство ' . $propName . ' должно иметь длинну ' . $errorData['valid']
+                            $this->_validateErrorsStr[] .= 'Свойство ' . $propName . ' должно иметь длинну ' . $errorData['valid']
                                 . '; текущая длинна значения: ' . $errorData['current'];
                             break;
 
                         case self::VALID_MAX_LENGTH:
-                            $errorMsg .= '<br/>Длина значения свойства ' . $propName . ' не должна превышать ' . $errorData['valid']
+                            $this->_validateErrorsStr[] .= 'Длина значения свойства ' . $propName . ' не должна превышать ' . $errorData['valid']
                                 . ' символов; текущая длина: ' . $errorData['current'];
                             break;
 
                         case self::VALID_MIN_LENGTH:
-                            $errorMsg .= '<br/>Длина значения свойства ' . $propName . ' должна быть более ' . $errorData['valid']
+                            $this->_validateErrorsStr[] .= 'Длина значения свойства ' . $propName . ' должна быть более ' . $errorData['valid']
                                 . ' символов; текущая длина: ' . $errorData['current'];
                             break;
 
                         case self::VALID_MAX_VALUE:
-                            $errorMsg .= '<br/>Значение свойства ' . $propName . ' не должно быть более ' . $errorData['valid']
+                            $this->_validateErrorsStr[] .= 'Значение свойства ' . $propName . ' не должно быть более ' . $errorData['valid']
                                 . '; текущее значение: ' . $errorData['current'];
                             break;
 
                         case self::VALID_MIN_VALUE:
-                            $errorMsg .= '<br/>Значение свойства ' . $propName . ' должно быть более ' . $errorData['valid']
+                            $this->_validateErrorsStr[] .= 'Значение свойства ' . $propName . ' должно быть более ' . $errorData['valid']
                                 . '; текущее значение: ' . $errorData['current'];
                             break;
 
                         default:
-                            $errorMsg .= '<br/>Свойство ' > $propName . ' не прошло валидацию типа \'' . $errorType . '\'; должно быть: '
+                            $this->_validateErrorsStr[] .= 'Свойство ' > $propName . ' не прошло валидацию типа \'' . $errorType . '\'; должно быть: '
                                 . $errorData['valid'] . '; текущее значение: ' . $errorData['current'];
                     }
                 }
             }
-            throw new Exception($errorMsg);
+            return null;
         }
-
-        return $this;
     }
 
 
     /**
      * @return $this
-     * @throws Exception
      */
     public function delete()
     {
@@ -310,11 +333,10 @@ class Core_Entity extends Core_Entity_Model
 
     /**
      * @return $this
-     * @throws Exception
      */
     public function markAsDeleted()
     {
-        if (isset($this->id) && !empty($this->id) && isset($this->deleted)) {
+        if (!empty($this->id) && isset($this->deleted)) {
             $this->deleted(1);
             $this->save();
         }
@@ -334,10 +356,9 @@ class Core_Entity extends Core_Entity_Model
     /**
      * Возвращает название таблицы для объекта
      *
-     * @param bool $isWithPrefix
      * @return string
      */
-    public function getTableName(bool $isWithPrefix = true) : string
+    public function getTableName() : string
     {
         if (method_exists($this, 'databaseTableName')) {
             return $this->databaseTableName();
@@ -438,7 +459,7 @@ class Core_Entity extends Core_Entity_Model
     public function toStd()
     {
         $std = new stdClass();
-        $forbiddenProps = ['childrenObjects', 'aEntityVars', 'validateErrors'];
+        $forbiddenProps = ['childrenObjects', 'aEntityVars', '_validateErrors', '_validateErrorsStr'];
         foreach(get_object_vars($this) as $var => $value) {
             if (!in_array($var, $forbiddenProps)) {
                 $std->$var = $value;
@@ -713,6 +734,26 @@ class Core_Entity extends Core_Entity_Model
     public function safeDelete()
     {
         return false;
+    }
+
+
+    /**
+     * Получение идентификатора модели
+     *
+     * @return int
+     */
+    public function _getModelId() : int
+    {
+        switch (get_class($this))
+        {
+            case 'User':        return MODEL_USER_ID;
+            case 'Lid':         return MODEL_LID_ID;
+            case 'Task':        return MODEL_TASK_ID;
+            case 'Payment':     return MODEL_PAYMENT_ID;
+            case 'Comment':     return MODEL_COMMENT_ID;
+            case 'Certificate': return MODEL_CERTIFICATE_ID;
+            default:            return MODEL_UNDEFINED;
+        }
     }
 
 }

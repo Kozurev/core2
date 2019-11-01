@@ -107,8 +107,8 @@ class Schedule_Group extends Schedule_Group_Model
 
         $ExistingAssignment = Core::factory( 'Schedule_Group_Assignment' )
             ->queryBuilder()
-            ->where( 'group_id', '=', $this->id )
-            ->where( 'user_id', '=', $userId )
+            ->where('group_id', '=', $this->id)
+            ->where('user_id', '=', $userId)
             ->find();
 
         if (!is_null($ExistingAssignment)) {
@@ -123,32 +123,46 @@ class Schedule_Group extends Schedule_Group_Model
      * @param User $Client
      * @return array
      */
-    public function getClientGroups(User $Client) : array
+    public static function getClientGroups(User $Client) : array
     {
         if (empty($Client->getId())) {
             return [];
         }
-
         return Core::factory('Schedule_Group')
             ->queryBuilder()
-            ->join('Schedule_Group_Assignment AS sga', 'sga.user_id = ' . $Client->getId() . ' AND Schedule_Group.id = sga.group_id')
+            ->join(
+                'Schedule_Group_Assignment AS sga',
+                'sga.user_id = ' . $Client->getId() . ' AND Schedule_Group.id = sga.group_id'
+            )
             ->findAll();
     }
 
 
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
     public function delete($obj = null)
     {
-        Core::notify([&$this], 'beforeScheduleGroupDelete');
+        Core::notify([&$this], 'before.ScheduleGroup.delete');
+        $this->clearClientList();
         parent::delete();
-        Core::notify([&$this], 'afterScheduleGroupDelete');
+        Core::notify([&$this], 'after.ScheduleGroup.delete');
     }
 
 
+    /**
+     * @param null $obj
+     * @return $this|null
+     */
     public function save($obj = null)
     {
         Core::notify([&$this], 'beforeScheduleGroupSave');
-        parent::save();
+        if (empty(parent::save())) {
+            return null;
+        }
         Core::notify([&$this], 'afterScheduleGroupSave');
+        return $this;
     }
 
 }

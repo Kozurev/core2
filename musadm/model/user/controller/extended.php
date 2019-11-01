@@ -174,7 +174,6 @@ class User_Controller_Extended extends Controller
 
     /**
      * @return array
-     * @throws Exception
      */
     public function getUsers()
     {
@@ -199,7 +198,12 @@ class User_Controller_Extended extends Controller
         if (!empty($this->areasIds)) {
             $areasIds = $this->areasIds;
         } elseif ($this->getUser()->groupId() !== ROLE_DIRECTOR && $this->isLimitedAreasAccess() === true) {
-            foreach ($AreaAssignment->getAreas($this->getUser()) as $Area) {
+            $Areas = $AreaAssignment->getAreas($this->getUser());
+            if (empty($Areas)) {
+                //TODO: надо что-то придмать как отлавливать ошибку, если пользователь не авторизован
+                return [];
+            }
+            foreach ($Areas as $Area) {
                 $areasIds[] = $Area->getId();
             }
         }
@@ -212,14 +216,7 @@ class User_Controller_Extended extends Controller
         }
 
         //Пагинация
-        if ($this->isPaginate() === true && empty($this->addFilter)) {
-            $this->paginate()->setTotalCount(
-                $this->getQueryBuilder()->count()
-            );
-            $this->getQueryBuilder()
-                ->limit($this->paginate()->getLimit())
-                ->offset($this->paginate()->getOffset());
-        }
+        $this->paginateExecute();
 
         $this->foundObjects = $this->QueryBuilder->findAll();
         $this->countFoundObjects = count($this->foundObjects);
@@ -248,7 +245,6 @@ class User_Controller_Extended extends Controller
     /**
      * @param null $OutputXml
      * @return mixed
-     * @throws Exception
      */
     public function show($OutputXml = null)
     {

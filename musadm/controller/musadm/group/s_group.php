@@ -11,6 +11,8 @@
 
 Core::factory('User_Controller');
 
+authOrOut();
+
 $User = User::current();
 $accessRules = ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]];
 if (!User::checkUserAccess($accessRules, $User)) {

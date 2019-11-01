@@ -32,6 +32,11 @@ section {
     margin: 0;
 }
 
+.row > div {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
 .error {
     color: red;
     border-color: red;
@@ -51,6 +56,10 @@ section {
 
 .center {
     text-align: center;
+}
+
+.va-middle {
+    vertical-align: middle !important;
 }
 
 .green {
@@ -142,6 +151,11 @@ section {
     background-color: white;
     border-bottom: 2px solid #d1d5da;
     padding: 5px 15px;
+}
+
+.block .comment_body hr {
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 /**
  *  <<Конец
@@ -517,8 +531,11 @@ section {
 
 
 
-
-
+@media (min-width: 1200px) {
+    .container {
+        /*width: 1370px;*/
+    }
+}
 
 
 @media(min-width: 1024px) {

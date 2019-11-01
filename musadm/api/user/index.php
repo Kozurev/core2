@@ -6,7 +6,14 @@
  * @date 20.05.2019 21:36
  * @version 20190528
  * @version 20190611
+ * @version 20191021
  */
+
+
+Core::requireClass('User');
+Core::requireClass('User_Controller');
+Core::requireClass('Property_Controller');
+
 
 foreach ($_GET as $key => $param) {
     if (substr($key, 0, 4) == 'amp;') {
@@ -17,8 +24,6 @@ foreach ($_GET as $key => $param) {
 
 
 $action = Core_Array::Request('action', null, PARAM_STRING);
-
-Core::factory('User_Controller');
 
 
 /**
@@ -109,7 +114,7 @@ if ($action === 'save') {
     $surname = Core_Array::Post('surname', '', PARAM_STRING);
     $name = Core_Array::Post('name', '', PARAM_STRING);
     $groupId = Core_Array::Post('groupId', null, PARAM_INT);
-    $patronymic = Core_Array::Post('patronimyc', '', PARAM_STRING);
+    $patronymic = Core_Array::Post('patronymic', '', PARAM_STRING);
     $phone = Core_Array::Post('phoneNumber', '', PARAM_STRING);
     $login = Core_Array::Post('login', null, PARAM_STRING);
     $pass1 = Core_Array::Post('pass1', '', PARAM_STRING);
@@ -501,4 +506,80 @@ if ($action === 'saveComment') {
     $response->comment->refactoredDatetime = $commentDatetime;
 
     die(json_encode($response));
+}
+
+
+/**
+ * Авторизация пользователя - получение авторизационного токена
+ */
+if ($action === 'do_auth') {
+    $login = Core_Array::Post('login', '', PARAM_STRING);
+    $password = Core_Array::Post('password', '', PARAM_STRING);
+
+    $response = new stdClass();
+    $response->token = null;
+    $response->errors = [];
+
+    if (empty($login)) {
+        $response->errors[] = 'empty_login';
+    }
+    if (empty($password)) {
+        $response->errors[] = 'empty_password';
+    }
+
+    $User = User_Auth::userVerify($login, $password);
+    if (!empty($User)) {
+        //$User = User_Auth::current();
+        $response->errors = null;
+        $response->token = $User->getAuthToken();
+    } else {
+        $response->errors[] = 'invalid_auth';
+    }
+    exit(json_encode($response));
+}
+
+
+/**
+ * Получение данных пользователя по токену
+ *
+ * TODO: Добавить проверку кол-ва неудачных попыток получить данные
+ */
+if ($action === 'get_user') {
+    $response = new stdClass();
+    $response->error = null;
+    $response->user = null;
+
+    $User = User::current();
+    if (empty($User)) {
+        $response->error = 'invalid_auth';
+    } else {
+        $response->user = $User->toStd();
+        if (isset($response->user->password)) {
+            unset($response->user->password);
+        }
+        if (isset($response->user->auth_token)) {
+            unset($response->user->auth_token);
+        }
+        if (isset($response->user->superuser)) {
+            unset($response->user->superuser);
+        }
+
+        if ($User->groupId() == ROLE_CLIENT) {
+            $Vk =           Property_Controller::factoryByTag('vk');
+            $Balance =      Property_Controller::factoryByTag('balance');
+            $LessonsIndiv = Property_Controller::factoryByTag('indiv_lessons');
+            $LessonsGroup = Property_Controller::factoryByTag('group_lessons');
+            $AddPhone =     Property_Controller::factoryByTag('add_phone');
+
+            $response->user->vk = $Vk->getValues($User)[0]->value();
+            $response->user->additional_phone_number = $AddPhone->getValues($User)[0]->value();
+            $response->user->balance = new stdClass();
+            $response->user->balance->amount = $Balance->getValues($User)[0]->value();
+            $response->user->balance->lessons_indiv = $LessonsIndiv->getValues($User)[0]->value();
+            $response->user->balance->lessons_group = $LessonsGroup->getValues($User)[0]->value();
+        }
+        //TODO: надо бы потом добавить подгрузку доп. свойств и для дрги групп
+    }
+
+    exit(json_encode($response));
 }

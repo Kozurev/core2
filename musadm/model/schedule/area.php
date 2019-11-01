@@ -145,17 +145,28 @@ class Schedule_Area extends Schedule_Area_Model
     }
 
 
+    /**
+     * @param null $obj
+     * @return $this|null
+     */
     public function save($obj = null)
     {
-        Core::notify([&$this], 'beforeScheduleAreaSave');
+        Core::notify([&$this], 'before.ScheduleArea.save');
         if (isset($this->oldTitle)) {
             unset($this->oldTitle);
         }
-        parent::save();
-        Core::notify([&$this], 'afterScheduleAreaSave');
+        if (empty(parent::save())) {
+            return null;
+        }
+        Core::notify([&$this], 'after.ScheduleArea.save');
+        return $this;
     }
 
 
+    /**
+     * @param null $obj
+     * @return $this|void
+     */
     public function delete($obj = null)
     {
         Core::notify([&$this], 'beforeScheduleAreaDelete');

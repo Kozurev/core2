@@ -108,7 +108,7 @@ Core::attachObserver('before.User.deactivate', function($args) {
 /**
  * Создание элемента списка "Студия"
  */
-Core::attachObserver( 'beforeScheduleAreaSave', function( $args ) {
+Core::attachObserver( 'before.ScheduleArea.save', function( $args ) {
     $Area = $args[0];
 
     $Director = User::current()->getDirector();
@@ -131,7 +131,7 @@ Core::attachObserver( 'beforeScheduleAreaSave', function( $args ) {
 /**
  * Удаление всех связей с удаляемым элементом списка доп. свойства
  */
-Core::attachObserver('beforePropertyListValuesDelete', function($args) {
+Core::attachObserver('before.PropertyListValues.delete', function($args) {
     $PropertyListValue = $args[0];
 
     $PropertyLists = Core::factory('Property_List')
@@ -177,7 +177,7 @@ Core::attachObserver('before.User.delete', function($args) {
 /**
  * Рекурсивное удаление вложенных макетов и диекторий при удалении директории
  */
-Core::attachObserver('beforeTemplateDirDelete', function($args) {
+Core::attachObserver('before.TemplateDir.delete', function($args) {
     $ChildrenTemplates = $args[0]->getChildren();
     foreach ($ChildrenTemplates as $ChildTemplate) {
         $ChildTemplate->delete();
@@ -197,27 +197,6 @@ Core::attachObserver('beforeTemplateDelete', function($args) {
 
 
 /**
- * Запись даты/времени последней авторизации пользователя
- */
-Core::attachObserver('after.User.authorize', function($args) {
-    $User = $args[0];
-
-    if (!is_null($User) && $User->groupId() == ROLE_CLIENT) {
-        $Property = Core::factory( 'Property')->getByTagName('last_entry');
-        $Property->addToPropertiesList($User, 22);
-        $now = date("d.m.Y H:i");
-        $value = $Property->getPropertyValues($User)[0];
-
-        if ($value->getId()) {
-            $value->value($now)->save();
-        } else {
-            $Property->addNewValue($User, $now);
-        }
-    }
-});
-
-
-/**
  * Удаление всех связей и значений доп. свойств при удалении объекта структуры
  */
 Core::attachObserver('before.Structure.delete', function($args) {
@@ -229,7 +208,7 @@ Core::attachObserver('before.Structure.delete', function($args) {
 /**
  * Удаление всех связей и значений доп. свойств при удалении объекта Элемента структуры
  */
-Core::attachObserver('beforeItemDelete', function($args) {
+Core::attachObserver('before.Item.delete', function($args) {
     $Structure = $args[0];
     Core::factory('Property')->clearForObject($Structure);
 });
@@ -301,7 +280,7 @@ Core::attachObserver('before.Structure.save', function($args) {
 /**
  * Проверка на совпадение пути элемента структуры для избежания дублирования пути
  */
-Core::attachObserver('beforeItemSave', function($args) {
+Core::attachObserver('before.Item.save', function($args) {
     $Structure = $args[0];
 
     $RootStructure = Core::factory('Structure')
@@ -376,7 +355,7 @@ Core::attachObserver('before.ScheduleLesson.save', function($args) {
  * Создание комментария у лида о проведенной консультации
  * и изменение статуса, если лид присутствовал
  */
-Core::attachObserver('afterScheduleReportSave', function($args) {
+Core::attachObserver('after.ScheduleReport.save', function($args) {
     $Report = $args[0];
     Core::factory('Schedule_Lesson');
 
@@ -546,7 +525,7 @@ Core::attachObserver('before.Task.save', function($args) {
 /**
  * При удалении статуса лида все лиды имеющие этот статус приобретали статус '0'
  */
-Core::attachObserver('afterLidStatusDelete', function($args) {
+Core::attachObserver('after.LidStatus.delete', function($args) {
     $Status = $args[0];
 
     $subordinated = User::current()->getDirector()->getId();
@@ -565,13 +544,12 @@ Core::attachObserver('afterLidStatusDelete', function($args) {
 /**
  * Создание задачи с напоминанием о низком уровне баланса занятий клиента
  */
-Core::attachObserver('afterScheduleLesson.makeReport', function($args) {
-    Core::factory('Schedule_Lesson');
+Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
+    Core::requireClass('Schedule_Lesson');
+    Core::requireClass('Schedule_Group');
 
     $Report = $args[0];
-    //$Client = $Report->getClient();
     $Lesson = Core::factory('Schedule_Lesson', $Report->lessonId());
-    //$LessonArea = Core::factory('Schedule_Area_Assignment')->getArea($Lesson);
 
     /**
      * Проверка остатка занятий у клиента
@@ -637,7 +615,7 @@ Core::attachObserver('afterScheduleLesson.makeReport', function($args) {
          * и создание задачи с напоминание о звонке
          */
         if ($attendance == false) {
-            $ClientGroups = Core::factory('Schedule_Group')->getClientGroups($Client);
+            $ClientGroups = Schedule_Group::getClientGroups($Client);
             $clientGroupsIds = [];
             foreach ($ClientGroups as $Group) {
                 $clientGroupsIds[] = $Group->getId();
@@ -721,6 +699,8 @@ Core::attachObserver('beforeTaskInsert', function($args) {
 
 /**
  * Причисление пользователя к какой-либо группе прав доступа при создании
+ *
+ * TODO:
  */
 Core::attachObserver('after.User.insert', function($args){
     switch ($args[0]->groupId())
@@ -748,4 +728,58 @@ Core::attachObserver('after.User.insert', function($args){
     if (!is_null($Group)) {
         $Group->appendUser($args[0]->getId());
     }
+});
+
+
+/**
+ * Создание задачи при выставлении периода отсутствия преподаватея
+ */
+Core::attachObserver('after.ScheduleAbsent.save', function($args) {
+    Core::requireClass('Schedule_Lesson');
+    Core::requireClass('Schedule_Controller_Extended');
+
+    $AbsentPeriod = $args[0];
+    if ($AbsentPeriod->typeId() != 1) {
+        return;
+    }
+    $periodUserId = $AbsentPeriod->objectId();
+    $User = User_Controller::factory($periodUserId);
+    if ($User->groupId() != ROLE_TEACHER) {
+        return;
+    }
+
+    $Task = Core::factory('Task');
+    $Task->priorityId(Task::PRIORITY_HIGH);
+    $UserAreas = Core::factory('Schedule_Area_Assignment')->getAreas($User);
+    if (count($UserAreas) == 1) {
+        $Task->areaId($UserAreas[0]->getId());
+    }
+    if (!$Task->save()) {
+        return;
+    }
+
+    $taskComment = 'Преподаватель ' . $User->surname() . ' ' . $User->name() . '. Период отсутствия с '
+        . refactorDateFormat($AbsentPeriod->dateFrom()) . ' ' . refactorTimeFormat($AbsentPeriod->timeFrom())
+        . ' по ' . refactorDateFormat($AbsentPeriod->dateTo()) . ' ' . refactorTimeFormat($AbsentPeriod->timeTo())
+        . ' проверить расписание: ';
+
+    $teacherSchedule = Schedule_Controller_Extended::getSchedule($User, $AbsentPeriod->dateFrom(), $AbsentPeriod->dateTo());
+    if (count($teacherSchedule) > 0) {
+        foreach ($teacherSchedule as $day) {
+            $taskComment .= refactorDateFormat($day->date) . ' ';
+            foreach ($day->lessons as $Lesson) {
+                //Проверка на то что занятие подпадает под время периода отсутствия
+                if ((compareDate($day->date, '==', $AbsentPeriod->dateFrom()) && compareTime($Lesson->timeTo(), '<=', $AbsentPeriod->timeFrom()))
+                    || (compareDate($day->date, '==', $AbsentPeriod->dateTo()) && compareTime($Lesson->timeFrom(), '>=', $AbsentPeriod->timeTo()))) {
+                    continue;
+                }
+
+                $Client = $Lesson->getClient();
+                $taskComment .= $Lesson->getArea()->title() . ' ';
+                $taskComment .= refactorTimeFormat($Lesson->timeFrom()) . ' - ' . refactorTimeFormat($Lesson->timeTo()) . ' ';
+                $taskComment .= $Client->surname() . ' ' . $Client->name() . '; ';
+            }
+        }
+    }
+    $Task->addNote($taskComment);
 });

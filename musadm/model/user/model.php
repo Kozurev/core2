@@ -9,81 +9,77 @@
 class User_Model extends Core_Entity
 {
     /**
-     * @var int
-     */
-	protected $id;
-
-
-    /**
      * @var string
      */
 	protected $name;
-
 
     /**
      * @var string
      */
 	protected $surname;
 
-
     /**
      * @var string
      */
-	protected $patronimyc = '';
-
+	protected $patronymic = '';
 
     /**
      * @var string
      */
 	protected $phone_number = '';
 
-
     /**
      * @var string
      */
 	protected $email = '';
-
 
     /**
      * @var string
      */
 	protected $login;
 
-
     /**
      * @var string
      */
 	protected $password;
 
-
     /**
+     * id группы пользователей
+     *
      * @var int
      */
 	protected $group_id;
-
 
     /**
      * @var string
      */
 	protected $register_date;
 
-
     /**
+     * Указатель активности пользователя
+     *
      * @var int
      */
 	protected $active = 1;
 
-
     /**
+     * Указатель на "Главного администратора"
+     *
      * @var int
      */
 	protected $superuser = 0;
 
-
     /**
+     * id директора, которому принадлежит пользователь
+     *
      * @var int
      */
 	protected $subordinated = 0;
+
+    /**
+     * @var string
+     */
+	protected $auth_token = '';
 
 
     /**
@@ -128,14 +124,12 @@ class User_Model extends Core_Entity
 		if (is_null($pass)) {
 		    return $this->password;
         }
-
 		$pass = trim($pass);
 		if ($type === false) {
-            $this->password = md5($pass);
+            $this->password = password_hash($pass, PASSWORD_DEFAULT);
         } elseif ($type == true) {
             $this->password = $pass;
         }
-
 		return $this;
 	}
 
@@ -186,31 +180,15 @@ class User_Model extends Core_Entity
 
 
     /**
-     * TODO: изменить ошибку названия свойства на - patronymic
-     * @param string|null $patronymic
-     * @return $this|string
-     */
-	public function patronimyc(string $patronymic = null)
-	{
-		if (is_null($patronymic)) {
-		    return $this->patronimyc;
-        } else {
-            $this->patronimyc = trim($patronymic);
-            return $this;
-        }
-	}
-
-
-    /**
      * @param string|null $patronymic
      * @return $this|string
      */
     public function patronymic(string $patronymic = null)
     {
         if (is_null($patronymic)) {
-            return $this->patronimyc;
+            return $this->patronymic;
         } else {
-            $this->patronimyc = trim($patronymic);
+            $this->patronymic = trim($patronymic);
             return $this;
         }
     }
@@ -259,11 +237,11 @@ class User_Model extends Core_Entity
      * @param int|null $superuser
      * @return $this|int
      */
-	public function superuser(int $superuser = null)
+	public function superuser($superuser = null)
 	{
 		if (is_null($superuser)) {
 		    return intval($this->superuser);
-        } elseif ($superuser == true ) {
+        } elseif ($superuser == true) {
             $this->superuser = 1;
         } elseif ($superuser == false) {
 		    $this->superuser = 0;
@@ -282,6 +260,21 @@ class User_Model extends Core_Entity
             return intval($this->subordinated);
         } else {
             $this->subordinated = $subordinated;
+            return $this;
+        }
+    }
+
+
+    /**
+     * @param string|null $authToken
+     * @return $this|string
+     */
+    public function authToken(string $authToken = null)
+    {
+        if (is_null($authToken)) {
+            return $this->auth_token;
+        } else {
+            $this->auth_token = $authToken;
             return $this;
         }
     }
@@ -307,7 +300,7 @@ class User_Model extends Core_Entity
                 'type' => PARAM_STRING,
                 'maxlength' => 255
             ],
-            'patronimyc' => [
+            'patronymic' => [
                 'required' => false,
                 'type' => PARAM_STRING,
                 'maxlength' => 255
@@ -345,20 +338,21 @@ class User_Model extends Core_Entity
             ],
             'active' => [
                 'required' => false,
-                'type' => PARAM_INT,
-                'minval' => 0,
-                'maxval' => 1
+                'type' => PARAM_BOOL
             ],
             'superuser' => [
                 'required' => false,
-                'type' => PARAM_INT,
-                'minval' => 0,
-                'maxval' => 1
+                'type' => PARAM_BOOL
             ],
             'subordinated' => [
                 'required' => true,
                 'type' => PARAM_INT,
                 'minval' => 0
+            ],
+            'auth_token' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'maxlength' => 50
             ]
         ];
     }

@@ -3,7 +3,7 @@ class Schedule {
      * @returns {string}
      */
     static getApiLink () {
-        return root + '/api/schedule/api.php';
+        return root + '/api/schedule/index.php';
     };
 
 
@@ -16,20 +16,16 @@ class Schedule {
     /**
      * Проверка на существование периода отсутствия у клиента на определенную дату
      *
-     * @param userId
-     * @param date
+     * @param params
      * @param callBack
      */
-    static checkAbsentPeriod(userId, date, callBack) {
+    static checkAbsentPeriod(params, callBack) {
+        params.action = 'checkAbsentPeriod';
         $.ajax({
             type: 'GET',
             url: Schedule.getApiLink(),
             dataType: 'json',
-            data: {
-                action: 'checkAbsentPeriod',
-                userId: userId,
-                date: date
-            },
+            data: params,
             success: function(response) {
                 callBack(response);
             }
@@ -64,5 +60,30 @@ class Schedule {
                 }
             });
         }
+    }
+
+
+    /**
+     * Сохранение периода отсутствия
+     *
+     * @param absent
+     * @param callback
+     */
+    static saveAbsentPeriod(absent, callback) {
+        absent.action = 'saveAbsentPeriod';
+        $.ajax({
+            type: 'POST',
+            url: Schedule.getApiLink(),
+            dataType: 'json',
+            data: absent,
+            success: function(response) {
+                if (typeof callback == 'function') {
+                    callback(response);
+                }
+            },
+            error: function(response) {
+                checkResponseStatus(response);
+            }
+        });
     }
 }

@@ -4,7 +4,7 @@ class Initpro {
      * @returns {string}
      */
     static getApiLink () {
-        return root + '/api/initpro/api.php';
+        return root + '/api/initpro/index.php';
     };
 
 

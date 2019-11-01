@@ -5,6 +5,9 @@
  * @author BadWolf
  * @date 10.05.2019 19:47
  */
+
+authOrOut();
+
 global $CFG;
 if (!User::checkUserAccess(['groups' => [ROLE_ADMIN]], User::parentAuth())) {
     Core_Page_Show::instance()->error(403);

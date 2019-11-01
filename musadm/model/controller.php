@@ -575,6 +575,22 @@ class Controller
 
 
     /**
+     * Установление рамок пагинации если не задано фильтрации по доп. свойствам
+     */
+    protected function paginateExecute()
+    {
+        if ($this->isPaginate() === true && empty($this->addFilter)) {
+            $this->paginate()->setTotalCount(
+                $this->getQueryBuilder()->count()
+            );
+            $this->getQueryBuilder()
+                ->limit($this->paginate()->getLimit())
+                ->offset($this->paginate()->getOffset());
+        }
+    }
+
+
+    /**
      * Фильтрация уже найденных объектов по значениям доп. свойств
      */
     protected function addFilterExecute()
@@ -764,6 +780,10 @@ class Controller
      */
     public function addComments()
     {
+        Core::requireClass('File');
+        Core::requireClass('File_Assignment');
+
+        //Поиск комемнтариев для всех найденных ранее объектов
         $Comment = new Comment();
         $Assignment = Comment::getAssignment($this->Object);
         $Comments = $Comment->queryBuilder()
@@ -773,9 +793,32 @@ class Controller
                 'asgm.object_id in ('.implode(', ' ,$this->foundObjectsIds).') 
                 AND asgm.comment_id = '.$Comment->getTableName().'.id'
             )
-            //->orderBy('datetime', 'DESC')
             ->orderBy('id', 'DESC')
             ->findAll();
+
+        //Подгрузка файлов
+        $commentsIds = [];
+        foreach ($Comments as $Comment) {
+            $commentsIds[] = $Comment->getId();
+        }
+        $File = new File;
+        $FileAssignment = new File_Assignment;
+        $Files = $File->queryBuilder()
+            ->addSelect('asgm.object_id', 'objectId')
+            ->join($FileAssignment->getTableName() . ' as asgm', 'asgm.file_id = ' . $File->getTableName()
+                . '.id AND asgm.model_id = ' . MODEL_COMMENT_ID
+                . ' AND asgm.object_id in (' . implode(', ', $commentsIds) . ')'
+            )
+            ->findAll();
+        
+        foreach ($Comments as $Comment) {
+            foreach ($Files as $fileKey => $File) {
+                if ($Comment->getId() === intval($File->objectId)) {
+                    $File->link = $File->getLink();
+                    $Comment->addEntity($File);
+                }
+            }
+        }
 
         foreach ($this->foundObjects as $Object) {
             $XmlComments = Core::factory('Core_Entity')->_entityName('comments');

@@ -25,12 +25,8 @@
                         </div>
 
                         <xsl:call-template name="areas_row" />
-                        <!--<div>-->
-                            <!--<a class="btn btn-purple lids_show">Показать</a>-->
-                        <!--</div>-->
                     </div>
                     <div class="row buttons-panel center">
-                        <!--<xsl:call-template name="areas_row" />-->
                         <div>
                             <input class="form-control" type="number" name="id" placeholder="Номер лида" value="{/root/id}"/>
                         </div>
@@ -38,12 +34,9 @@
                             <input class="form-control" type="text" name="number" placeholder="Телефон" value="{/root/number}"/>
                         </div>
 
-                        <div class="right">
-                            <h4>Статусы:</h4>
-                        </div>
                         <div>
                             <select name="status_id" class="form-control">
-                                <option value="0"> ... </option>
+                                <option value="0">Статус</option>
                                 <xsl:for-each select="lid_status">
                                     <xsl:variable name="id" select="id" />
                                     <option value="{id}">
@@ -56,6 +49,22 @@
                             </select>
                         </div>
 
+                        <div>
+                            <select name="instrument" class="form-control">
+                                <option value="0">Инструмент</option>
+                                <xsl:for-each select="//property[tag_name='instrument']/values/property_list_values">
+                                    <xsl:variable name="id" select="id" />
+                                    <option value="{id}">
+                                        <xsl:if test="$id = /root/instrument">
+                                            <xsl:attribute name="selected">selected</xsl:attribute>
+                                        </xsl:if>
+                                        <xsl:value-of select="value" />
+                                    </option>
+                                </xsl:for-each>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row buttons-panel center">
                         <div>
                             <a class="btn btn-purple lids_search">Показать</a>
                         </div>
@@ -71,6 +80,64 @@
         </section>
 
         <section class="cards-section section-lids text-center">
+            <ul class="pagination pagination-sm">
+                <!--Первая страница-->
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="refreshLidTable(1)">Первая</a>
+                </li>
+
+                <!--Указатель на предыдущую страницу-->
+                <li class="page-item">
+                    <xsl:if test="pagination/currentPage = 1">
+                        <xsl:attribute name="class">
+                            page-item disabled
+                        </xsl:attribute>
+                    </xsl:if>
+                    <a class="page-link" href="#" onclick="refreshLidTable({pagination/prevPage})">
+                        <span aria-hidden="true">←</span>
+                    </a>
+                </li>
+                <!--Предыдущая страница-->
+                <xsl:if test="pagination/prevPage != 0">
+                    <li class="page-item">
+                        <a class="page-link" href="#" onclick="refreshLidTable({pagination/prevPage})">
+                            <xsl:value-of select="pagination/prevPage" />
+                        </a>
+                    </li>
+                </xsl:if>
+
+                <!--Текущая страница-->
+                <li class="page-item active">
+                    <a class="page-link" href="#" onclick="refreshLidTable({pagination/currentPage})">
+                        <xsl:value-of select="pagination/currentPage" />
+                    </a>
+                </li>
+
+                <!--Следующая страница-->
+                <xsl:if test="pagination/nextPage != 0">
+                    <li class="page-item">
+                        <a class="page-link" href="#" onclick="refreshLidTable({pagination/nextPage})">
+                            <xsl:value-of select="pagination/nextPage" />
+                        </a>
+                    </li>
+                </xsl:if>
+
+                <!--Указатель на следующую страницу-->
+                <li class="page-item">
+                    <xsl:if test="pagination/currentPage = pagination/countPages">
+                        <xsl:attribute name="class">
+                            page-item disabled
+                        </xsl:attribute>
+                    </xsl:if>
+                    <a class="page-link" href="#" onclick="refreshLidTable({pagination/nextPage})">
+                        <span aria-hidden="true">→</span>
+                    </a>
+                </li>
+
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="refreshLidTable({pagination/countPages})">Последняя</a>
+                </li>
+            </ul>
             <div id="cards-wrapper" class="cards-wrapper row">
                 <xsl:choose>
                     <xsl:when test="count(lid) != 0">

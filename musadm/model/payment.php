@@ -97,7 +97,7 @@ class Payment extends Payment_Model
 
     /**
      * @param null $obj
-     * @return $this|void
+     * @return $this|null
      */
     public function save($obj = null)
     {
@@ -105,8 +105,11 @@ class Payment extends Payment_Model
         if (empty($this->datetime)) {
             $this->datetime = date('Y-m-d');
         }
-        parent::save();
+        if (empty(parent::save())) {
+            return null;
+        }
         Core::notify([&$this], 'after.Payment.save');
+        return $this;
     }
 
 

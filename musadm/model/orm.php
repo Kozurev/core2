@@ -15,7 +15,7 @@ class Orm
      *
      * @var string
      */
-	protected $queryString = '';
+	//protected $queryString = '';
 
 
     /**
@@ -195,16 +195,14 @@ class Orm
 	public function count()
     {
         $beforeSelect = $this->select;
-
         $this->select('count(' . $this->table . '.id)', 'count');
-        $this->setQueryString();
-        $result = DB::instance()->query($this->queryString);
+        $query = $this->getQueryString();
+        $result = DB::instance()->query($query);
 
         if (self::isDebugSql()) {
-            echo "<br>Строка запроса метода <b>сount()</b>: " . $this->queryString;
+            echo '<br>Строка запроса метода <b>сount()</b>: ' . $query;
         }
 
-        $this->queryString = '';
         $this->select = $beforeSelect;
 
         if ($result == false) {
@@ -225,19 +223,17 @@ class Orm
     public function sum($field)
     {
         $beforeSelect = $this->select;
-
         $this->select('sum(' . $this->table . '.' . $field . ')', 'sum');
-        $this->setQueryString();
-        $result = DB::instance()->query($this->queryString);
+        $query = $this->getQueryString();
+        $result = DB::instance()->query($query);
 
         if (self::isDebugSql()) {
-            echo "<br>Строка запроса метода <b>sum()</b>: " . $this->queryString;
+            echo '<br>Строка запроса метода <b>sum()</b>: ' . $query;
         }
 
         if ($result == false) {
             return 0;
         } else {
-            $this->queryString = '';
             $this->select = $beforeSelect;
             $result = $result->fetch();
             return floatval($result['sum']);
@@ -273,7 +269,7 @@ class Orm
 
         //Если этот элемент уже существует в базе данных
 		if ($this->object->getId()) {
-			$queryStr = 'UPDATE ' . $this->table . ' SET ';
+			$queryStr = 'UPDATE ' . $obj->getTableName() . ' SET ';
 			for ($i = 0; $i < count($objData); $i++) {
                 $queryStr .= '`' . $aRows[$i] . '` = ' . $this->parseValue($aValues[$i]);
 			    if ($i + 1 < count($objData)) {
@@ -283,7 +279,7 @@ class Orm
 			}
 			$queryStr .= 'WHERE `id` = ' . $obj->getId() . ' ';
 		} else { //Если это новый элемент
-			$queryStr = 'INSERT INTO ' . $this->table . '(';
+			$queryStr = 'INSERT INTO ' . $obj->getTableName() . '(';
 			for ($i = 0; $i < count($objData); $i++) {
 			    $queryStr .= $aRows[$i];
 			    if ($i + 1 < count($objData)) {
@@ -306,12 +302,7 @@ class Orm
 			echo "<br>Строка запроса метода <b>save()</b>: ".$queryStr;
 		}
 
-		try {
-			DB::instance()->query($queryStr);
-		}
-		catch (PDOException $Exception) {
-			echo $Exception->getMessage();
-		}
+		DB::instance()->query($queryStr);
 
 		/**
          * Если объект только что был сохранен в таблицу то устанавливается значение
@@ -329,15 +320,15 @@ class Orm
     /**
      * Метод для формирования строки запроса
      *
-     * @return void
+     * @return string
      */
-    private function setQueryString()
+    public function getQueryString()
     {
         /**
          * Формирование списка выбираемых столбцов из таблиц
          * Задание значений для SELECT
          */
-        $this->queryString = 'SELECT ';
+        $queryString = 'SELECT ';
 
         if (count($this->select) == 0) { //Выборка происходит только по колонкам таблицы объекта
             $tableRows = array_keys($this->object->getObjectProperties());
@@ -348,11 +339,11 @@ class Orm
                     continue;
                 }
 
-                $this->queryString .= $row;
+                $queryString .= $row;
                 if ($i + 1 < count($tableRows)) {
-                    $this->queryString .= ',';
+                    $queryString .= ',';
                 }
-                $this->queryString .= ' ';
+                $queryString .= ' ';
             }
         } else { //Выбираемые колонки таблицы (таблиц) были заданы
             for ($i = 0; $i < count($this->select); $i++) {
@@ -360,18 +351,18 @@ class Orm
                     continue;
                 }
 
-                $this->queryString .= $this->select[$i];
+                $queryString .= $this->select[$i];
                 if ($i + 1 < count($this->select)) {
-                    $this->queryString .= ',';
+                    $queryString .= ',';
                 }
-                $this->queryString .= ' ';
+                $queryString .= ' ';
             }
         }
 
         //Дополнительные колонки таблицы для выборки
         if (count($this->addSelecting) > 0) {
             for ($i = 0; $i < count($this->addSelecting); $i++) {
-                $this->queryString .= ', ' . $this->addSelecting[$i] . ' ';
+                $queryString .= ', ' . $this->addSelecting[$i] . ' ';
             }
         }
 
@@ -379,76 +370,79 @@ class Orm
          * Формирование списка таблиз из которых происходит выборка данных
          * Формирование значений для FROM
          */
-        $this->queryString .= 'FROM ';
+        $queryString .= 'FROM ';
         if (count($this->from) == 0) {
-            $this->queryString .= $this->table;
+            $queryString .= $this->table;
         } else {
             for ($i = 0; $i < count($this->from); $i++) {
-                $this->queryString .= $this->from[$i];
+                $queryString .= $this->from[$i];
                 if ($i + 1 < count($this->from)) {
-                    $this->queryString .= ',';
+                    $queryString .= ',';
                 }
-                $this->queryString .= ' ';
+                $queryString .= ' ';
             }
         }
 
         /**
          * Формирование всех JOIN-ов
+         * TODO: Исправить уязвимость SQL инъекций в условиях джоина
          */
         if (count($this->join) > 0) {
             foreach ($this->join as $joining) {
-                $this->queryString .= ' ' . $joining->type . ' JOIN ';
-                $this->queryString .= $joining->table;
-                $this->queryString .= ' ON ' . $joining->conditions;
+                $queryString .= ' ' . $joining->type . ' JOIN ';
+                $queryString .= $joining->table;
+                $queryString .= ' ON ' . $joining->conditions;
             }
         }
 
         if ($this->where != '') {
-            $this->queryString .= ' WHERE ' . $this->where;
+            $queryString .= ' WHERE ' . $this->where;
         }
 
         /**
          * Задание условий группировки
          */
         if (count($this->groupBy) > 0) {
-            $this->queryString .= ' GROUP BY ';
+            $queryString .= ' GROUP BY ';
 
             for ($i = 0; $i < count($this->groupBy); $i++) {
-                $this->queryString .= $this->groupBy[$i];
+                $queryString .= $this->groupBy[$i];
                 if ($i + 1 < count($this->groupBy)) {
-                    $this->queryString .= ',';
+                    $queryString .= ',';
                 }
-                $this->queryString .= ' ';
+                $queryString .= ' ';
             }
         }
 
         if ($this->having != '') {
-            $this->queryString .= ' HAVING ' . $this->having;
+            $queryString .= ' HAVING ' . $this->having;
         }
 
         /**
          * Формирование условий сортировки
          */
         if (count($this->order) > 0) {
-            $this->queryString .= ' ORDER BY ';
+            $queryString .= ' ORDER BY ';
             $orderRows = array_keys($this->order);
             $orderSortings = array_values($this->order);
             for ($i = 0; $i < count($this->order); $i++) {
-                $this->queryString .= $orderRows[$i] . ' ' . $orderSortings[$i];
+                $queryString .= $orderRows[$i] . ' ' . $orderSortings[$i];
                 if ($i + 1 < count($this->order)) {
-                    $this->queryString .= ',';
+                    $queryString .= ',';
                 }
-                $this->queryString .= ' ';
+                $queryString .= ' ';
             }
         }
 
         if ($this->limit != '') {
-            $this->queryString .= ' LIMIT ' . $this->limit;
+            $queryString .= ' LIMIT ' . $this->limit;
         }
 
         if ($this->offset != '') {
-            $this->queryString .= ' OFFSET ' . $this->offset;
+            $queryString .= ' OFFSET ' . $this->offset;
         }
+
+        return $queryString;
     }
 
 
@@ -491,7 +485,6 @@ class Orm
      */
     public function clearQuery()
     {
-        $this->queryString = '';
         $this->select = [];
         $this->addSelecting = [];
         $this->forbiddenTags = [];
@@ -522,23 +515,9 @@ class Orm
 
 
     /**
-     * Геттер для сформированной строки SQL-запроса
-     *
-     * @return string
-     */
-    public function getQueryString()
-    {
-        $this->setQueryString();
-        return $this->queryString;
-    }
-
-
-    /**
      * Обертывание значения в одинарные ковычки
      *
      * @date 29.01.2019 12:23
-     *
-     * TODO: доработать данный метод: добавить больше проверок и защиту от SQL-инъекций
      *
      * @param $value
      * @return string
@@ -549,10 +528,9 @@ class Orm
             $val = $value->val;
         } elseif ($value === 'NULL' || $value === null) {
             $val = 'NULL';
-        } elseif (is_numeric($value)) {
-            $val = $value;
         } else {
-            $val = '\'' . $value . '\'';
+            $val = '\'' . addslashes($value) . '\'';
+            $val = htmlspecialchars($val);
         }
         return $val;
     }
@@ -560,24 +538,18 @@ class Orm
 
     /**
      * Удаление Объекта из базы данных
+     *
+     * @param $obj
      */
     public function delete($obj)
     {
-        $query = 'DELETE FROM ' . $this->table . ' WHERE id = ' . $obj->getId();
-        DB::instance()->query( $query );
+        $query = 'DELETE FROM ' . $obj->getTableName() . ' WHERE id = ' . $obj->getId();
+        DB::instance()->query($query);
         if (self::isDebugSql()) {
-            echo "<br>Строка из метода <b>delete()</b>: " . $query;
+            echo '<br>Строка из метода <b>delete()</b>: ' . $query;
         }
     }
 
-
-
-
-/**
- * 	---------------------------------------------------------
- *	Основные методы формирования SQL запроса
- *	Начало>>
- */
 
 	/**
 	 * Метод указывающий название таблицы и параметры, которые из неё будут выбираться.
@@ -805,6 +777,13 @@ class Orm
             $this->where .= ' OR ';
         }
 
+        if ($this->open != 0) {
+            for ($i = 0; $i < $this->open; $i++) {
+                $this->where .= ' (';
+            }
+            $this->open = 0;
+        }
+
         $this->where .= $row . ' in(';
         for ($i = 0; $i < count($values); $i++) {
             $i == 0
@@ -933,6 +912,11 @@ class Orm
     }
 
 
+    /**
+     * @param $table
+     * @param $conditions
+     * @return $this
+     */
     public function rightJoin($table, $conditions)
     {
         $joining = new stdClass();
@@ -977,77 +961,62 @@ class Orm
 
 
 	/**
-	 * Метод выполняющий запрос к бд
+	 * Поиск записей в базе данных
      *
 	 * @return array
 	 */
 	public function findAll()
 	{
-		$this->setQueryString();
+		$query = $this->getQueryString();
 
 		if (self::isDebugSql()) {
-			echo "<br>Строка запроса из метода <b>findAll()</b>: ".$this->queryString;
+			echo '<br>Строка запроса из метода <b>findAll()</b>: ' . $query;
 		}
 
-		try {
-			$result = DB::instance()->query($this->queryString);
-			if (!$result) {
-			    return [];
-            }
+        $result = DB::instance()->query($query);
 
-            !is_null($this->class)
-                ?   $fetchClass = $this->class
-                :   $fetchClass = 'stdClass';
+        if (!$result) {
+            return [];
+        }
 
-			$result->setFetchMode(PDO::FETCH_CLASS, $fetchClass);
-			return $result->fetchAll();
-		} catch(PDOException $Exception) {
-			echo $Exception->getMessage();
-			return [];
-		}
+        !is_null($this->class)
+            ?   $fetchClass = $this->class
+            :   $fetchClass = 'stdClass';
+
+        $result->setFetchMode(PDO::FETCH_CLASS, $fetchClass);
+        return $result->fetchAll();
 	}
 
 
 	/**
-	 * Выполняет запрос к бд
+	 * Выполняет запрос поиска одной записи в таблице и возвращает его в виде объекта класса
      *
 	 * @return mixed
 	 */
 	public function find()
 	{
-		$this->setQueryString();
+		$query = $this->getQueryString() . ' LIMIT 1';
 
 		if (self::isDebugSql()) {
-			echo "<br>Строка запроса из метода <b>find()</b>: ".$this->queryString;
+			echo '<br>Строка запроса из метода <b>find()</b>: ' . $query;
 		}
 
-		try {
-			$result = DB::instance()->query($this->queryString);
-			if ($result == false) {
-                return null;
-            }
+        $result = DB::instance()->query($query);
 
-            !is_null($this->class)
-                ?   $fetchClass = $this->class
-                :   $fetchClass = 'stdClass';
+        if ($result == false) {
+            return null;
+        }
 
-			$result->setFetchMode(PDO::FETCH_CLASS, $fetchClass);
-			$result = $result->fetch();
+        !is_null($this->class)
+            ?   $fetchClass = $this->class
+            :   $fetchClass = 'stdClass';
 
-			 if ($result == false) {
-                 return null;
-             }
-             return $result;
-		} catch(PDOException $Exception) {
-			echo $Exception->getMessage();
-			return null;
-		}
+        $result->setFetchMode(PDO::FETCH_CLASS, $fetchClass);
+        $result = $result->fetch();
+
+         if ($result == false) {
+             return null;
+         }
+         return $result;
 	}
-
-
-/**
- *	<<Конец
- *	Основные методы формирования SQL запроса
- *	---------------------------------------------------------
- */
 }

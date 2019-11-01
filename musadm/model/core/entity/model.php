@@ -6,6 +6,7 @@
  */
 class Core_Entity_Model
 {
+    protected $id;
 
     protected $aEntityVars = [
         'name' => 'root',
@@ -20,33 +21,33 @@ class Core_Entity_Model
 
 
     /**
-     * @param int|null $time
+     * @param string|null $datetime
      * @return $this|int|null
      */
-    public function timecreated(int $time = null)
+    public function timecreated($datetime = null)
     {
-        if (is_null($time) && isset($this->timecreated)) {
-            return intval($this->timecreated);
-        } elseif (is_null($time) && !isset($this->timecreated)) {
+        if (is_null($datetime) && isset($this->timecreated)) {
+            return $this->timecreated;
+        } elseif (is_null($datetime) && !isset($this->timecreated)) {
             return null;
         } else {
-            $this->timecreated = $time;
+            $this->timecreated = $datetime;
             return $this;
         }
     }
 
     /**
-     * @param int|null $time
+     * @param string|null $datetime
      * @return $this|int
      */
-    public function timemodified(int $time = null)
+    public function timemodified(string $datetime = null)
     {
-        if (is_null($time) && isset($this->timemodified)) {
+        if (is_null($datetime) && isset($this->timemodified)) {
             return intval($this->timemodified);
-        } elseif (is_null($time) && !isset($this->timemodified)) {
+        } elseif (is_null($datetime) && !isset($this->timemodified)) {
             return null;
         } else {
-            $this->timecreated = $time;
+            $this->timemodified = $datetime;
             return $this;
         }
     }

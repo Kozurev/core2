@@ -30,7 +30,7 @@ class Lid extends Lid_Model
 
     /**
      * @param null $obj
-     * @return $this|void
+     * @return $this|null
      */
     public function save($obj = null)
     {
@@ -39,8 +39,11 @@ class Lid extends Lid_Model
         }
 
         Core::notify([&$this], 'before.Lid.save');
-        parent::save();
+        if (empty(parent::save())) {
+            return null;
+        }
         Core::notify([&$this], 'after.Lid.save');
+        return $this;
     }
 
 

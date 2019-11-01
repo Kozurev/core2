@@ -125,7 +125,7 @@ class Task_Note extends Core_Entity
 
     /**
      * @param null $obj
-     * @return $this|void
+     * @return $this|null
      */
     public function save($obj = null)
     {
@@ -138,8 +138,12 @@ class Task_Note extends Core_Entity
             $this->author_id = User::parentAuth()->getId();
         }
 
-        parent::save();
+        if (empty(parent::save())) {
+            return null;
+        }
+
         Core::notify([&$this], 'afterTaskNoteSave');
+        return $this;
     }
 
 

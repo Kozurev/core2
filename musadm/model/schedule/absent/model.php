@@ -5,23 +5,17 @@
  * @author BadWolf
  * @date 07.05.2018 11:29
  * @version 20190401
+ * @version 20191014
  * Class Schedule_Absent_Model
  */
 class Schedule_Absent_Model extends Core_Entity
 {
     /**
-     * @var int
-     */
-    protected $id;
-
-
-    /**
      * id клиента с которым связан период отсутствия
      *
      * @var int
      */
-    protected $client_id;
-
+    protected $object_id = 0;
 
     /**
      * Дата начала периода отсутствия
@@ -30,7 +24,6 @@ class Schedule_Absent_Model extends Core_Entity
      */
     protected $date_from;
 
-
     /**
      * Дата завершения периода отсутствия
      *
@@ -38,25 +31,38 @@ class Schedule_Absent_Model extends Core_Entity
      */
     protected $date_to;
 
+    /**
+     * Время начала периода отсутствия
+     *
+     * @var string
+     */
+    protected $time_from = '00:00:00';
 
     /**
-     * id типа периода отсутствия (1 - клиент; 2 - группа)
+     * Время окончания периода отсутствия
+     *
+     * @var string
+     */
+    protected $time_to = '00:00:00';
+
+    /**
+     * id типа периода отсутствия (1 - клиент; 2 - группа; 3 - преподаватель)
      *
      * @var int
      */
-    protected $type_id;
+    protected $type_id = 0;
 
 
     /**
-     * @param int|null $clientId
+     * @param int|null $objectId
      * @return $this|int
      */
-    public function clientId(int $clientId = null)
+    public function objectId(int $objectId = null)
     {
-        if (is_null($clientId)) {
-            return intval($this->client_id);
+        if (is_null($objectId)) {
+            return intval($this->object_id);
         } else {
-            $this->client_id = $clientId;
+            $this->object_id = $objectId;
             return $this;
         }
     }
@@ -93,6 +99,44 @@ class Schedule_Absent_Model extends Core_Entity
 
 
     /**
+     * @param string|null $timeFrom
+     * @return $this|string
+     */
+    public function timeFrom(string $timeFrom = null)
+    {
+        if (is_null($timeFrom)) {
+            return $this->time_from;
+        } else {
+            if (strlen($timeFrom) == 5) {
+                $this->time_from = $timeFrom . ':00';
+            } else {
+                $this->time_from = $timeFrom;
+            }
+            return $this;
+        }
+    }
+
+
+    /**
+     * @param string|null $timeTo
+     * @return $this|string
+     */
+    public function timeTo(string $timeTo = null)
+    {
+        if (is_null($timeTo)) {
+            return $this->time_to;
+        } else {
+            if (strlen($timeTo) == 5) {
+                $this->time_to = $timeTo . ':00';
+            } else {
+                $this->time_to = $timeTo;
+            }
+            return $this;
+        }
+    }
+
+
+    /**
      * @param int|null $typeId
      * @return $this|int
      */
@@ -120,16 +164,24 @@ class Schedule_Absent_Model extends Core_Entity
             'date_from' => [
                 'required' => true,
                 'type' => PARAM_STRING,
-                'minlength' => 10,
-                'maxlength' => 10
+                'length' => 10
             ],
             'date_to' => [
                 'required' => true,
                 'type' => PARAM_STRING,
-                'minlength' => 10,
-                'maxlength' => 10
+                'length' => 10
             ],
-            'client_id' => [
+            'time_from' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'length' => 8
+            ],
+            'time_to' => [
+                'required' => true,
+                'type' => PARAM_STRING,
+                'length' => 8
+            ],
+            'object_id' => [
                 'required' => true,
                 'type' => PARAM_INT,
                 'minval' => 1

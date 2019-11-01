@@ -2,23 +2,20 @@
 var root = $('#rootdir').val();
 
 $(function(){
-    var days = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+    let days = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
 
-    /**
-     * Отмена перехода по ссылке при клике на элемент выпадающего списка
-     */
+    //Отмена перехода по ссылке при клике на элемент выпадающего списка
     $('.submenu').on('click', 'a', function(e){ e.preventDefault(); });
 
-
     $('body')
-
         //Подгрузка данных расписания при изменении даты в календаре
         .on('change', '.schedule_calendar', function() {
             loaderOn();
-            var date = $('.schedule_calendar').val();
-            var userid = $('#userid').val();
-            var newDate = new Date($('.schedule_calendar').val());
-            var dayName = days[newDate.getDay()];
+            let
+                date = $('.schedule_calendar').val(),
+                userid = $('#userid').val(),
+                newDate = new Date($('.schedule_calendar').val()),
+                dayName = days[newDate.getDay()];
             $('.day_name').text(dayName);
             getSchedule(userid, date, loaderOff);
         })
@@ -26,12 +23,11 @@ $(function(){
         //Открытие всплывающего окна создания периода отсутствия
          .on('click', '.schedule_absent', function(e) {
             e.preventDefault();
-            var
-                clientid =  $(this).parent().parent().data('clientid'),
-                typeid =    $(this).parent().parent().data('typeid'),
+            let
+                userId =  $(this).parent().parent().data('clientid'),
+                typeId =    $(this).parent().parent().data('typeid'),
                 date =      $('#schedule_calendar').val();
-
-            getScheduleAbsentPopup(clientid, typeid, date);
+            getScheduleAbsentPopup(userId, typeId, date);
         })
 
         //Сохранение данных периода отсутствия
@@ -39,26 +35,44 @@ $(function(){
             e.preventDefault();
             loaderOn();
 
-            var
-                dateTo = $('input[name=dateTo]').val(),
-                dateFrom = $('input[name=dateFrom]').val(),
-                clientId = $("input[name=clientId]").val();
+            let
+                form = $('#createData'),
+                absentData = {};
+
+            absentData.id = form.find('input[name=id]').val();
+            absentData.objectId = form.find('input[name=objectId]').val();
+            absentData.dateFrom = form.find('input[name=dateFrom]').val();
+            absentData.dateTo = form.find('input[name=dateTo]').val();
+            absentData.timeFrom = form.find('input[name=timeFrom]').val();
+            absentData.timeTo = form.find('input[name=timeTo]').val();
+            absentData.typeId = form.find('input[name=typeId]').val();
 
             if ($('#absent_add_task').is(':checked')) {
-                addAbsentTask(dateTo, clientId);
+                addAbsentTask(absentData.dateTo, absentData.objectId);
             }
 
-            saveData('Main', function(response) {
-                if ($('.users').length == 0) {
-                    refreshSchedule();
-                } else {
-                    refreshUserTable();
-                }
+            Schedule.saveAbsentPeriod(absentData, function (response) {
+                if (checkResponseStatus(response)) {
+                    var msg = 'Период отсутствия с ' + response.absent.refactoredDateFrom + ' ';
+                    if (response.absent.refactoredTimeFrom != '00:00') {
+                        msg += response.absent.refactoredTimeFrom;
+                    }
+                    msg += ' по ' + response.absent.refactoredDateTo + ' ';
+                    if (response.absent.refactoredTimeTo != '00:00') {
+                        msg += response.absent.refactoredTimeTo;
+                    }
+                    msg += ' успешно сохранен';
 
-                if (response == '0') {
-                    notificationSuccess('Период отсутствия с ' + dateFrom + ' по ' + dateTo + ' успешно сохранен');
+                    notificationSuccess(msg);
+                    closePopup();
+                    if ($('.users').length == 0) {
+                        refreshSchedule();
+                    } else {
+                        refreshUserTable();
+                    }
                 } else {
-                    notificationError('При сохранении периода отсутствия произошла ошибка: ' + response);
+                    closePopup();
+                    loaderOff();
                 }
             });
         })
@@ -86,13 +100,17 @@ $(function(){
 
             var Form = $('#createData');
             var clientId = Form.find('select[name=clientId]').val();
+            var teacherId = Form.find('select[name=teacherId]').val();
             var date = Form.find('input[name=insertDate]').val();
+            var timeFrom = Form.find('input[name=timeFrom]').val();
+            var timeTo = Form.find('input[name=timeTo]').val();
             var areaId = Form.find('input[name=areaId]').val();
             var lessonType = Form.find('input[name=lessonType]').val();
             var typeId = Form.find('select[name=typeId]').val();
 
             //Создание задачи с напоминанием
-            if ($('input[name=is_create_task]').is(':checked')) {
+            var isCreateTask = $('input[name=is_create_task]');
+            if (isCreateTask.is(':checked')) {
                 $.ajax({
                     type: 'GET',
                     url: '',
@@ -104,10 +122,11 @@ $(function(){
                     }
                 });
             }
+            isCreateTask.remove();
 
             //Если это индивидуальное занятие
             if (typeId == 1) {
-                Schedule.checkAbsentPeriod(clientId, date, function(response){
+                Schedule.checkAbsentPeriod({userId: clientId, date: date}, function(response){
                     //Если есть существующий период отсутсвия
                     if (response.isset == true) {
                         //Постановка в основной график
@@ -126,7 +145,18 @@ $(function(){
                             loaderOff();
                         }
                     } else {
-                        saveData('Main', function(response) { refreshSchedule(); });
+                        Schedule.checkAbsentPeriod({
+                            userId: teacherId,
+                            date: date,
+                            timeFrom: timeFrom,
+                            timeTo: timeTo}, function(response) {
+                            if (response.isset == true) {
+                                alert('В указанное время преподаватель отсутствует');
+                                loaderOff();
+                            } else {
+                                saveData('Main', function(response) { refreshSchedule(); });
+                            }
+                        });
                     }
                 });
             } else {
@@ -293,6 +323,7 @@ $(function(){
             var typeId = tr.find('input[name=typeId]').val();
             var attendance = tr.find('input[type=checkbox]');
             var note = tr.find('input[name=note]');
+            var fileInput = tr.find('input[type=file]');
 
             var ajaxData = {
                 action: 'teacherReport',
@@ -318,18 +349,21 @@ $(function(){
                 type: 'GET',
                 url: '',
                 data: ajaxData,
+                dataType: 'json',
                 success: function(response) {
-                    if (response != '') {
-                        notificationError(response);
-                    }
-                    //Создание комментария лиду
-                    if (typeId == 3 && note.lendth != 0 && note.val() != '') {
-                        Lids.saveComment(0, note.data('lidid'), note.val(), function(response){
-                            checkResponseStatus(response);
+                    if (checkResponseStatus(response)) {
+                        //Создание комментария лиду
+                        if (typeId == 3 && note.lendth != 0 && note.val() != '') {
+                            Lids.saveComment(0, note.data('lidid'), note.val(), function(response){
+                                if (checkResponseStatus(response)) {
+                                    FileManager.upload(0, 1, fileInput, 'Comment', response.id, function(file) {
+                                        refreshSchedule();
+                                    });
+                                }
+                            });
+                        } else {
                             refreshSchedule();
-                        });
-                    } else {
-                        refreshSchedule();
+                        }
                     }
                 },
                 error: function(response) {
@@ -516,20 +550,6 @@ function getScheduleAreaPopup(areaId) {
 }
 
 
-// function newScheduleTaskPopup() {
-//     $.ajax({
-//         type: 'GET',
-//         url: '',
-//         data: {
-//             action: 'new_task_popup',
-//         },
-//         success: function(response) {
-//             showPopup(response);
-//         }
-//     });
-// }
-
-
 function saveScheduleTask(formData, func) {
     formData += '&action=save_task';
 
@@ -578,20 +598,20 @@ function getSchedule(userId, date, func) {
 /**
  * Открытие всплывающего окна создания/редактирования периода отсутствия
  *
- * @param clientId
+ * @param objectId
  * @param typeId
  * @param date
  * @param id
  */
-function getScheduleAbsentPopup(clientId, typeId, date, id) {
+function getScheduleAbsentPopup(objectId, typeId, date, id) {
     $.ajax({
         type: 'GET',
         url: root + '/schedule',
         async: false,
         data: {
             action: 'getScheduleAbsentPopup',
-            client_id: clientId,
-            type_id: typeId,
+            objectId: objectId,
+            typeId: typeId,
             date: date,
             id: id
         },
@@ -606,8 +626,9 @@ function getScheduleAbsentPopup(clientId, typeId, date, id) {
  * Удаление периода отсутствия клиента
  *
  * @param id
+ * @param callback
  */
-function deleteScheduleAbsent(id) {
+function deleteScheduleAbsent(id, callback) {
     loaderOn();
     $.ajax({
         type: 'GET',
@@ -618,16 +639,32 @@ function deleteScheduleAbsent(id) {
             id: id
         },
         success: function(response) {
-            notificationSuccess('Период отсутствия для клиента ' + response.fio + ' с ' + response.dateFrom + ' по '
-                + response.dateTo + ' успешно удален');
-            $('.row[data-period-id='+id+']').remove();
-            loaderOff();
+            if (typeof callback == 'function') {
+                callback(response);
+            }
         },
         error: function() {
             notificationError('При удалении периода отсутсвия произошла ошибка');
             loaderOff();
         }
     });
+}
+
+
+/**
+ * Колбэк для удаления периода отсутствия клиента
+ *
+ * @param response
+ */
+function deleteAbsentClientCallback(response) {
+    notificationSuccess('Период отсутствия ' + response.fio + ' с ' + response.dateFrom + ' по '
+        + response.dateTo + ' успешно удален');
+    $('.row[data-period-id='+response.id+']').remove();
+    let absentRow = $('#absent-row');
+    if (absentRow.find('.periods').find('div').length == 0) {
+        absentRow.remove();
+    }
+    loaderOff();
 }
 
 

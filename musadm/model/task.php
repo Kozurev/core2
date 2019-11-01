@@ -9,11 +9,10 @@
  */
 class Task extends Task_Model
 {
-    //Текст комментария при закрытии задачи
-    const TASK_DONE_COMMENT = 'Задача закрыта';
 
-    //Текст задачи при возвращения к работе
-    const TASK_DONE_REVERT_COMMENT = 'Задача восстановлена на доработку';
+    const PRIORITY_NORMAl = 1;  //Обычный приоритет
+    const PRIORITY_MEDIUM = 2;  //Средний приоритет
+    const PRIORITY_HIGH = 3;    //Высокий приоритет
 
 
     /**
@@ -42,7 +41,7 @@ class Task extends Task_Model
      */
     public function doneComment() : string
     {
-        return self::TASK_DONE_COMMENT;
+        return 'Задача закрыта';
     }
 
 
@@ -53,7 +52,7 @@ class Task extends Task_Model
      */
     public function doneRevertComment() : string
     {
-        return self::TASK_DONE_REVERT_COMMENT;
+        return 'Задача восстановлена на доработку';
     }
 
 
@@ -157,7 +156,10 @@ class Task extends Task_Model
             $this->date = date('Y-m-d');
         }
 
-        parent::save();
+        if (empty(parent::save())) {
+            return null;
+        }
+
         Core::notify([&$this], 'after.Task.save');
         return $this;
     }

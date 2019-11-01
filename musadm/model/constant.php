@@ -56,9 +56,11 @@ class Constant extends Constant_Model
 	}
 
 
-	/**
-	 * Метод включает в себя проверку на существование константы с таким же именем
-	 */
+    /**
+     * Метод включает в себя проверку на существование константы с таким же именем
+     *
+     * @return $this|null
+     */
 	public function save()
 	{
 		$const = Core::factory('Constant')
@@ -70,7 +72,10 @@ class Constant extends Constant_Model
 		    die('Константа с таким именем уже существует');
         }
 
-		parent::save();
+        if (empty(parent::save())) {
+            return null;
+        }
+        return $this;
 	}
 
 

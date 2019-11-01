@@ -24,7 +24,9 @@
         </script>
 
         <form name="createData" id="createData" action=".">
-            <div class="center"><h3>Добавление урока в <xsl:value-of select="schedule_type" /> расписание</h3></div>
+            <div class="center">
+                <h3>Добавление урока в <xsl:value-of select="schedule_type" /> расписание</h3>
+            </div>
 
             <input type="hidden" value="{//timestep}" id="timestep" />
 
@@ -34,8 +36,11 @@
             <div class="column">
                 <select class="form-control" name="teacherId">
                     <option value="0">...</option>
-                    <xsl:for-each select="user[group_id = 4]">
+                    <xsl:for-each select="user">
                         <option value="{id}">
+                            <xsl:if test="is_absent = 1">
+                                <xsl:attribute name="style">color:red</xsl:attribute>
+                            </xsl:if>
                             <xsl:value-of select="surname" />
                             <xsl:text> </xsl:text>
                             <xsl:value-of select="name" />

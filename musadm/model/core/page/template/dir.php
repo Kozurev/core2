@@ -51,20 +51,23 @@ class Core_Page_Template_Dir extends Core_Page_Template_Dir_Model
      */
     public function delete($obj = null)
     {
-        Core::notify([&$this], 'beforeTemplateDirDelete');
+        Core::notify([&$this], 'before.TemplateDir.delete');
         parent::delete();
-        Core::notify([&$this], 'afterTemplateDirDelete');
+        Core::notify([&$this], 'after.TemplateDir.delete');
     }
 
 
     /**
      * @param null $obj
-     * @return $this|void
+     * @return $this|null
      */
     public function save($obj = null)
     {
-        Core::notify([&$this], 'beforeTemplateDirSave');
-        parent::save();
-        Core::notify([&$this], 'afterTemplateDirSave');
+        Core::notify([&$this], 'before.TemplateDir.save');
+        if (empty(parent::save())) {
+            return null;
+        }
+        Core::notify([&$this], 'after.TemplateDir.save');
+        return $this;
     }
 }

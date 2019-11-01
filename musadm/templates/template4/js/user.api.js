@@ -11,13 +11,13 @@ class User {
      * @returns {string}
      */
     static getApiLink () {
-        return root + '/api/user/api.php';
+        return root + '/api/user/index.php';
     };
 
 
     /**
      * Формирование списка пользователей с учетом заданых параметров
-     * список параметров более детально описан в файле: api/user/api.php
+     * список параметров более детально описан в файле: api/user
      *
      * @param params
      * @param callBack

@@ -47,7 +47,7 @@
                 <span>Отчество</span>
             </div>
             <div class="column">
-                <input class="form-control" type="text" value="{user/patronimyc}" name="patronimyc"  />
+                <input class="form-control" type="text" value="{user/patronymic}" name="patronymic"  />
             </div><hr/>
             <div class="column">
                 <span>Телефон</span>

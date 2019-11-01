@@ -11,9 +11,37 @@
 class Event_Model extends Core_Entity
 {
     /**
-     * @var int
+     * Список констант идентификаторов типов событий
+     * Примечание: при создании нового типа в таблице Event_Type необходимо создать аналогичную новой записи константу
      */
-    protected $id;
+    const SCHEDULE_APPEND_USER =            2;
+    const SCHEDULE_REMOVE_USER =            3;
+    const SCHEDULE_CREATE_ABSENT_PERIOD =   4;
+    const SCHEDULE_EDIT_ABSENT_PERIOD =     27;
+    const SCHEDULE_CHANGE_TIME =            5;
+    const SCHEDULE_APPEND_CONSULT =         28;
+    const SCHEDULE_SET_ABSENT =             29;
+
+    const CLIENT_ARCHIVE =                  7;
+    const CLIENT_UNARCHIVE =                8;
+    const CLIENT_APPEND_COMMENT =           9;
+
+    const PAYMENT_CHANGE_BALANCE =          11;
+    const PAYMENT_HOST_COSTS =              12;
+    const PAYMENT_TEACHER_PAYMENT =         13;
+    const PAYMENT_APPEND_COMMENT =          14;
+
+    const TASK_CREATE =                     16;
+    const TASK_DONE =                       17;
+    const TASK_APPEND_COMMENT =             18;
+    const TASK_CHANGE_DATE =                19;
+
+    const LID_CREATE =                      21;
+    const LID_APPEND_COMMENT =              22;
+    const LID_CHANGE_DATE =                 23;
+
+    const CERTIFICATE_CREATE =              25;
+    const CERTIFICATE_APPEND_COMMENT =      26;
 
 
     /**
@@ -166,6 +194,7 @@ class Event_Model extends Core_Entity
     /**
      * @param stdClass|array|null $data
      * @return $this|mixed|string
+     * @deprecated
      */
     public function data($data = null)
     {

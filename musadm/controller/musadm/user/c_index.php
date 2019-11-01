@@ -63,6 +63,7 @@ $ClientController
 //Фильтры
 $ScheduleAssignment = new Schedule_Area_Assignment();
 unset($_GET['action']);
+unset($_GET['active']);
 foreach ($_GET as $paramName => $values) {
     if ($paramName === 'areas') {
         foreach ($_GET['areas'] as $areaId) {
@@ -87,7 +88,7 @@ foreach ($_GET as $paramName => $values) {
         $propId = explode('property_', $paramName)[1];
         $ClientController->appendAddFilter(intval($propId), '=', $values);
     } elseif (!empty($values)) {
-        $ClientController->appendFilter($paramName, $values, '=', User_Controller_Extended::FILTER_NOT_STRICT);
+        $ClientController->appendFilter($paramName, $values, '=', Controller::FILTER_NOT_STRICT);
     }
 }
 
@@ -173,11 +174,9 @@ Core::attachObserver('before.UserControllerExtended.show', function($args) {
     $UserController->addSimpleEntity('avgGroupCost', $avgGroupCost);
 });
 
-try {
-    $ClientController->show();
-} catch(Exception $e) {
-    die('Ошибка: ' . $e->getMessage());
-}
+
+$ClientController->show();
+
 
 Core::detachObserver('before.UserControllerExtended.show');
 

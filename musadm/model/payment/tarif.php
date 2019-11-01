@@ -11,13 +11,16 @@ class Payment_Tarif extends Payment_Tarif_Model
 {
     /**
      * @param null $obj
-     * @return $this|void
+     * @return $this|null
      */
     public function save($obj = null)
     {
-        Core::notify([&$this], 'beforePaymentTarifSave');
-        parent::save();
-        Core::notify([&$this], 'afterPaymentTarifSave');
+        Core::notify([&$this], 'before.PaymentTarif.save');
+        if (is_null(parent::save())) {
+            return null;
+        }
+        Core::notify([&$this], 'after.PaymentTarif.save');
+        return $this;
     }
 
 
@@ -27,8 +30,8 @@ class Payment_Tarif extends Payment_Tarif_Model
      */
     public function delete($obj = null)
     {
-        Core::notify([&$this], 'beforePaymentTarifDelete');
+        Core::notify([&$this], 'before.PaymentTarif.delete');
         parent::delete();
-        Core::notify([&$this], 'afterPaymentTarifDelete');
+        Core::notify([&$this], 'after.PaymentTarif.delete');
     }
 }

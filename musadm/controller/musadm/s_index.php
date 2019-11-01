@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * Индексная страница для менеджеров
  *
  * @author Bad Wolf
  * @date 18.03.2018 21:21
@@ -8,16 +8,10 @@
  * @version 20190427
  */
 
+authOrOut();
 
 $User = User::current();
 $access = ['groups' => [ROLE_ADMIN, ROLE_MANAGER, ROLE_DIRECTOR]];
-
-if (is_null($User)) {
-    $host  = Core_Array::Server('HTTP_HOST', '');
-    $uri   = rtrim(dirname(Core_Array::Server('PHP_SELF', '', PARAM_STRING)), '/\\');
-    header("Location: http://$host$uri/authorize?back=$host$uri/");
-    exit;
-}
 
 $host  = Core_Array::Server('HTTP_HOST', '', PARAM_STRING);
 $uri   = rtrim(dirname(Core_Array::Server('PHP_SELF', '', PARAM_STRING)), '/\\');

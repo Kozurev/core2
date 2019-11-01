@@ -4,7 +4,7 @@ class PropertyList {
      * @returns {string}
      */
     static getApiLink () {
-        return root + '/api/property_list/api.php';
+        return root + '/api/property_list/index.php';
     };
 
 

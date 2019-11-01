@@ -42,20 +42,23 @@ class Core_Page_Template extends Core_Page_Template_Model
      */
     public function delete($obj = null)
     {
-        Core::notify([&$this], 'beforeTemplateDelete');
+        Core::notify([&$this], 'before.Template.delete');
         parent::delete();
-        Core::notify([&$this], 'afterTemplateDelete');
+        Core::notify([&$this], 'after.Template.delete');
     }
 
 
     /**
      * @param null $obj
-     * @return $this|void
+     * @return $this|null
      */
     public function save($obj = null)
     {
-        Core::notify([&$this], 'beforeTemplateSave');
-        parent::save();
-        Core::notify([&$this], 'afterTemplateSave');
+        Core::notify([&$this], 'before.Template.save');
+        if (empty(parent::save())) {
+            return null;
+        }
+        Core::notify([&$this], 'after.Template.save');
+        return $this;
     }
 }

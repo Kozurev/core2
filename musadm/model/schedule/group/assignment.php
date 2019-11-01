@@ -76,7 +76,7 @@ class Schedule_Group_Assignment extends Core_Entity
                 'type' => PARAM_INT,
                 'minval' => 1
             ],
-            'client_id' => [
+            'user_id' => [
                 'required' => true,
                 'type' => PARAM_INT,
                 'minval' => 1

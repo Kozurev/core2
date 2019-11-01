@@ -94,7 +94,6 @@ function compareTime(string $time1, string $condition, string $time2) : bool
             }
 
         case '>=':
-
             if ($totalCountSeconds1 >= $totalCountSeconds2) {
                 return true;
             }
@@ -132,6 +131,38 @@ function compareTime(string $time1, string $condition, string $time2) : bool
 
 
 /**
+ * Проверка на принадлежность времени $time временному промежутку с $rangeStart по $rangeEnd
+ * параметр $inclusive является казателем на временной промежуток с ... по .. ВКЛЮЧИТЕЛЬНО
+ *
+ * @param string $time
+ * @param string $rangeStart
+ * @param string $rangeEnd
+ * @param bool $inclusive
+ * @return bool
+ */
+function isTimeInRange(string $time, string $rangeStart, string $rangeEnd, bool $inclusive = false) : bool
+{
+    $sec = toSeconds($time);
+    $secR1 = toSeconds($rangeStart);
+    $secR2 = toSeconds($rangeEnd);
+
+    if ($inclusive === true) {
+        if ($sec >= $secR1 && $sec <= $secR2) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        if ($sec > $secR1 && $sec < $secR2) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+
+/**
  * Деление времени
  * ХЗ почему функция возвращает целочисленное значение, но так надо, иначе не работает
  *
@@ -145,10 +176,10 @@ function divTime(string $time1, string $time2, string $divType) : int
     $totalCountSeconds1 = toSeconds($time1);
     $totalCountSeconds2 = toSeconds($time2);
 
-    if ( $divType == '/' ) {
-        return intval( $totalCountSeconds1 / $totalCountSeconds2 );
-    } elseif ( $divType == '%' ) {
-        return intval( $totalCountSeconds1 % $totalCountSeconds2 );
+    if ($divType == '/') {
+        return intval($totalCountSeconds1 / $totalCountSeconds2);
+    } elseif ($divType == '%') {
+        return intval($totalCountSeconds1 % $totalCountSeconds2);
     } else {
         return 0;
     }
@@ -236,13 +267,49 @@ function refactorTimeFormat(string $time) : string
  * @param string $type - тип: full - с годом (d.m.Y); short - без года (d.m)
  * @return string
  */
-function refactorDateFormat ($date, $glue = '.', $type = 'full')
+function refactorDateFormat($date, $glue = '.', $type = 'full')
 {
     $type === 'short'
         ?   $format = 'd' . $glue . 'm'
         :   $format = 'd' . $glue . 'm' . $glue . 'y';
 
     return date($format, strtotime($date));
+}
+
+
+/**
+ * Сравнение даты
+ * Формат даты учитывается только для строгого сравнения "===" и "!=="
+ * К примеру:
+ *      "22.10.19" "==" "2019-10-22" --> true
+ *      "22.10.19" "===" "2019-10-22" --> false
+ *
+ * @param string $date1
+ * @param string $condition
+ * @param string $date2
+ * @return bool
+ */
+function compareDate($date1, $condition, $date2)
+{
+    if (empty($date1) || empty($condition) || empty($date2)) {
+        return false;
+    }
+
+    $time1 = strtotime($date1);
+    $time2 = strtotime($date2);
+
+    switch ($condition)
+    {
+        case '==':  return $time1 == $time2;
+        case '!=':  return $time1 != $time2;
+        case '>':   return $time1 > $time2;
+        case '>=':  return $time1 >= $time2;
+        case '<':   return $time1 < $time2;
+        case '<=':  return $time1 <= $time2;
+        case '===': return $date1 === $date2;
+        case '!==': return $date1 !== $date2;
+        default:    return false;
+    }
 }
 
 
@@ -369,4 +436,59 @@ function isTime(string $str) : bool
 function isDatetime(string $str) : bool
 {
     return preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (00|[0-9]|1[0-9]|2[0-3]):([0-9]|[0-5][0-9]):([0-9]|[0-5][0-9])$/', $str);
+}
+
+
+/**
+ * Функция генерации случайной уникальной строки
+ *
+ * @param int $length
+ * @return bool|string
+ */
+function uniqidReal($length = 13) : string
+{
+    // uniqid gives 13 chars, but you could adjust it to your needs.
+    if (function_exists('random_bytes')) {
+        $bytes = random_bytes(ceil($length / 2));
+    } elseif (function_exists('openssl_random_pseudo_bytes')) {
+        $bytes = openssl_random_pseudo_bytes(ceil($length / 2));
+    } else {
+        return uniqid();
+    }
+    return substr(bin2hex($bytes), 0, $length);
+}
+
+
+/**
+ * Функция для проверки авторизации пользователя и если он не авторизован то редирект на страницу авторизации
+ */
+function authOrOut()
+{
+    if (empty(User_Auth::current())) {
+        header('Location: ' . mapping('auth', ['back' => $_SERVER['REQUEST_URI']]));
+        exit;
+    }
+}
+
+
+/**
+ * Функция для определения адреса страницы по её названию
+ *
+ * @param string $route
+ * @param array $params
+ * @return string
+ */
+function mapping(string $route, $params = []) : string
+{
+    global $CFG;
+
+    $mapping = [
+        'auth' => 'authorize'
+    ];
+
+    $getParams = !empty($params)
+        ?   '?' . http_build_query($params)
+        :   '';
+
+    return $CFG->wwwroot . '/' . $mapping[$route] . $getParams ?? '';
 }

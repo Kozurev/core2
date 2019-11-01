@@ -3,6 +3,7 @@
     Core::requireClass('Property_Controller');
     $SberToken = Property_Controller::factoryByTag('payment_sberbank_token');
     $sberTokenVal = $SberToken->getValues($Director)[0]->value();
+    Core_Page_Show::instance()->cacheVersion('20191011');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,19 +17,22 @@
     <meta name="author" content="">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Bitter' rel='stylesheet'>
-<!--    <script src="https://3dsec.sberbank.ru/demopayment/docsite/assets/js/ipay.js"></script>-->
+
+    <script src="https://www.google.com/recaptcha/api.js?hl=ru"></script>
+
+
     <?php
-    Core_Page_Show::instance()->js('/templates/template10/assets/js/ipay.js');
+    Core_Page_Show::instance()
+        ->js('/templates/template10/assets/js/ipay.js');
     ?>
     <script>
         <?php
             if (!empty($sberTokenVal)) {
-                //echo 'var ipay = new IPAY({api_token: "pqjg1i2mjl9qjdbmvg5rcok1n9"});';
-                echo 'var ipay = new IPAY({api_token: "'.$sberTokenVal.'"});';
+                echo 'var ipay = new IPAY({api_token: "'.$sberTokenVal.'"});' . PHP_EOL;
             }
         ?>
     </script>
-    <?
+    <?php
     Core_Page_Show::instance()
         ->css('/templates/template10/assets/plugins/bootstrap/css/bootstrap.min.css')
         ->css('/templates/template10/assets/plugins/font-awesome/css/font-awesome.css')
@@ -190,7 +194,7 @@
                                             <li><a href="'.$CFG->rootdir.'/lids">Общий список</a></li>
                                             <li><a href="'.$CFG->rootdir.'/lids/consults">Консультации</a></li>';
                                     if ($accessLidStats) {
-                                        echo '<li><a href="' . $CFG->rootdir . '/lids/statistic">Статистика</a></li>';
+                                        echo '<li><a href="' . $CFG->rootdir . '/lids/statistic">Аналитика</a></li>';
                                     }
                                 echo '</ul></li>';
                             }
@@ -319,6 +323,7 @@ Core_Page_Show::instance()
     ->js('/templates/template4/js/task.api.js')
     ->js('/templates/template4/js/property_list.api.js')
     ->js('/templates/template4/js/initpro.api.js')
+    ->js('/templates/template4/js/file.api.js')
 
     ->js('/templates/template10/assets/js/main.js')
     ->js('/templates/template4/js/bootstrap.min.js')

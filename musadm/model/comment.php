@@ -168,7 +168,7 @@ class Comment extends Comment_Model
 
 
     /**
-     * @return $this|void
+     * @return $this|null
      */
     public function save()
     {
@@ -187,8 +187,14 @@ class Comment extends Comment_Model
         $this->text = htmlspecialchars($this->text);
 
         Core::notify([&$this], 'before.Comment.save');
-        parent::save();
+
+        if (empty(parent::save())) {
+            return null;
+        }
+
         Core::notify([&$this], 'after.Comment.save');
+
+        return $this;
     }
 
 

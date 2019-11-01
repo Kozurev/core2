@@ -101,7 +101,7 @@ class Schedule_Lesson_TimeModified extends Core_Entity
 
     /**
      * @param null $obj
-     * @return $this|void
+     * @return $this|null
      */
     public function save($obj = null)
     {
@@ -117,7 +117,11 @@ class Schedule_Lesson_TimeModified extends Core_Entity
             $this->time_to .= ':00';
         }
 
-        parent::save();
+        if (empty(parent::save())) {
+            return null;
+        }
+
+        return $this;
     }
 
 

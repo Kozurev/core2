@@ -30,7 +30,7 @@ function addTaskNotePopup(taskId) {
     var popupData = "" +
         "<form name=\"createData\" id=\"createData\" action=\".\" novalidate=\"novalidate\">" +
         "<div class=\"column\"><span>Текст задачи</span><span style=\"color:red\">*</span></div>" +
-        "<div class=\"column\"><input type=\"text\" required name=\"text\" class=\"form-control\"></div>" +
+        "<div class=\"column\"><textarea required name=\"text\" class=\"form-control\"></textarea></div>" +
         "<input type='hidden' name='id' value=''>" +
         "<input type='hidden' name='modelName' value='Task_Note'>" +
         "<input type='hidden' name='taskId' value='"+taskId+"'>" +

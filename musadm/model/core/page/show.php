@@ -85,10 +85,20 @@ class Core_Page_Show extends Core
      * @var array
      */
     private $errorCodes = [
+        '200' => '',
         '400' => 'Bad request',
+        '401' => 'Unauthorized',
         '403' => 'Access forbidden',
         '404' => 'Page not found'
     ];
+
+
+    /**
+     * Версия кэша css/js в браузере пользователей
+     *
+     * @var string|null
+     */
+    private $cacheVersion = '';
 
 
 
@@ -169,11 +179,34 @@ class Core_Page_Show extends Core
      * Метод для задания кода заголовка страницы и вывода текста ошибки
      *
      * @param int $code - код ошибки
+     * @param array $data
+     * @param bool $isJson
      */
-    public function error(int $code)
+    public function error(int $code, array $data = [], bool $isJson = false)
     {
         http_response_code($code);
-        exit(Core_Array::getValue($this->errorCodes, $code, 'Ошибка'));
+        if (!empty($data)) {
+            $error = $data;
+        } else {
+            $error = Core_Array::getValue($this->errorCodes, $code, 'Error');
+        }
+
+        if (!$isJson) {
+            die($error);
+        } else {
+            die(json_encode(['error' => $error]));
+        }
+    }
+
+
+    /**
+     * @param $version
+     */
+    public function cacheVersion($version)
+    {
+        if (is_string($version) || is_int($version)) {
+            $this->cacheVersion = '?' . htmlspecialchars($version);
+        }
     }
 
 
@@ -246,7 +279,7 @@ class Core_Page_Show extends Core
     public function css(string $path)
     {
         global $CFG;
-        echo '<link rel="stylesheet" type="text/css" href="' . $CFG->rootdir . $path . '">' . PHP_EOL;
+        echo '<link rel="stylesheet" type="text/css" href="' . $CFG->rootdir . $path . $this->cacheVersion . '">' . PHP_EOL;
         return $this;   
     }
 
@@ -262,7 +295,7 @@ class Core_Page_Show extends Core
 
         $templateName = 'template' . $this->Template->getId();
         $path = $CFG->rootdir . '/templates/' . $templateName . '/css/style.css';
-        echo '<link rel="stylesheet" type="text/css" href="' . $path . '">' . PHP_EOL;
+        echo '<link rel="stylesheet" type="text/css" href="' . $path . $this->cacheVersion . '">' . PHP_EOL;
         return $this;
     }
 
@@ -276,7 +309,7 @@ class Core_Page_Show extends Core
     public function js(string $path)
     {
         global $CFG;
-        echo '<script src="' . $CFG->rootdir . $path . '"></script>' . PHP_EOL;
+        echo '<script src="' . $CFG->rootdir . $path . $this->cacheVersion . '"></script>' . PHP_EOL;
         return $this;   
     }
 
@@ -292,7 +325,7 @@ class Core_Page_Show extends Core
 
         $templateName = 'template' . $this->Template->getId();
         $path = $CFG->rootdir . '/templates/' . $templateName . '/js/js.js';
-        echo '<script src="' . $path . '"></script>' . PHP_EOL;
+        echo '<script src="' . $path . $this->cacheVersion . '"></script>' . PHP_EOL;
         return $this;       
     }
 
@@ -399,7 +432,14 @@ class Core_Page_Show extends Core
         $segments = explode('/', $uri);
 
         if (in_array($segments[0], self::$exceptionDirs)) {
-            include ROOT . '/' . $this->getURI();
+            $filePath = ROOT . '/' . $this->getURI();
+            if (is_file($filePath)) {
+                include $filePath;
+            } elseif (is_file($filePath . '/index.php')) {
+                include $filePath . '/index.php';
+            } else {
+                $this->error(404);
+            }
             return;
         }
 

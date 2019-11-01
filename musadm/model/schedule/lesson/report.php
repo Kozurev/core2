@@ -94,13 +94,19 @@ class Schedule_Lesson_Report extends Schedule_Lesson_Report_Model
     }
 
 
+    /**
+     * @param null $obj
+     * @return $this|null
+     */
     public function save($obj = null)
     {
         $this->total_rate = $this->clientRate() - $this->teacherRate();
-
-        Core::notify([&$this], 'beforeScheduleReportSave');
-        parent::save();
-        Core::notify([&$this], 'afterScheduleReportSave');
+        Core::notify([&$this], 'before.ScheduleReport.save');
+        if (empty(parent::save())) {
+            return null;
+        }
+        Core::notify([&$this], 'after.ScheduleReport.save');
+        return $this;
     }
 
 

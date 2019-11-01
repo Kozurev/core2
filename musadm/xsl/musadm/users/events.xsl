@@ -12,13 +12,13 @@
                     <div class="col-md-3 col-xs-12 right">
                         <h4>Добавить комментарий</h4>
                     </div>
-                    <div class="col-md-5 col-xs-6 left">
+                    <div class="col-md-5 col-xs-12 left">
                         <input class="form-control" id="user_comment" placeholder="Комментарий" />
                     </div>
-                    <div class="col-md-2 col-xs-3">
+                    <div class="col-md-2 col-xs-6">
                         <a class="btn btn-orange" id="user_comment_save" href="#" data-userid="{user/id}">Сохранить</a>
                     </div>
-                    <div class="col-md-2 col-xs-3 left">
+                    <div class="col-md-2 col-xs-6 left">
                         <a class="btn btn-blue" onclick="newTaskPopup({user/id}, 'refreshUserTable')">Добавить задачу</a>
                     </div>
                 </div>

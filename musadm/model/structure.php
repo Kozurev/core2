@@ -79,8 +79,11 @@ class Structure extends Structure_Model
     public function save($obj = null)
     {
         Core::notify([&$this], 'before.Structure.save');
-        parent::save();
+        if (empty(parent::save())) {
+            return null;
+        }
         Core::notify([&$this], 'after.Structure.save');
+        return $this;
     }
 
 

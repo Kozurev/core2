@@ -8,7 +8,7 @@ class Access {
      * @returns {string}
      */
     static getApiLink () {
-        return root + '/api/access/api.php';
+        return root + '/api/access/index.php';
     };
 
 

@@ -122,19 +122,16 @@ class Payment_Type extends Core_Entity
 
     /**
      * @param null $obj
-     * @return $this|void
+     * @return $this|null
      */
     public function save($obj = null)
     {
-        Core::notify([&$this],'beforePaymentTypeSave');
-
-//        if ($this->isDeletable() !== 1) {
-//            return;
-//        }
-
-        parent::save();
-
-        Core::notify([&$this],'afterPaymentTypeSave');
+        Core::notify([&$this],'before.PaymentType.save');
+        if (empty(parent::save())) {
+            return null;
+        }
+        Core::notify([&$this],'after.PaymentType.save');
+        return $this;
     }
 
 
@@ -143,17 +140,11 @@ class Payment_Type extends Core_Entity
      */
     public function delete()
     {
-        Core::notify([&$this], 'beforePaymentTypeDelete');
-
+        Core::notify([&$this], 'before.PaymentType.delete');
         if ($this->isDeletable() !== 1) {
             return;
         }
-
         parent::delete();
-
-        Core::notify([&$this], 'afterPaymentTypeDelete');
+        Core::notify([&$this], 'after.PaymentType.delete');
     }
-
-
-
 }

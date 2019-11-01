@@ -6,6 +6,8 @@
  * @date 26.07.2019 11:25
  */
 
+authOrOut();
+
 $breadcumbs[0] = new stdClass();
 $breadcumbs[0]->title = Core_Page_Show::instance()->Structure->getParent()->title();
 $breadcumbs[0]->href = '#';

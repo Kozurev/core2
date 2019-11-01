@@ -9,6 +9,7 @@
  * @version 20190818 - добавлена возможность указания нескольких инструментов одному преподу
  */
 
+authOrOut();
 
 Core::requireClass('User_Controller');
 Core::requireClass('Lid_Controller');

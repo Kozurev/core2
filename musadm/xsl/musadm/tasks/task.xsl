@@ -174,7 +174,7 @@
             </div>
 
             <div class="comment_body">
-                <p><xsl:value-of select="text" /></p>
+                <p><xsl:value-of disable-output-escaping="yes" select="text" /></p>
             </div>
         </div>
     </xsl:template>

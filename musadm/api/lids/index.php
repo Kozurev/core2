@@ -4,6 +4,7 @@
  *
  * @author BadWolf
  * @date 08.07.2019 15:24
+ * @version 20191027 - Лидам добавлено свойство "направление подготовки"
  */
 
 foreach ($_GET as $key => $param) {
@@ -87,10 +88,6 @@ if ($action === 'getList') {
         $stdLid->comments = [];
         foreach ($Lid->comments as $comment) {
             $stdComment = $comment->toStd();
-//            $CommentAuthor = User_Controller::factory($comment->authorId(), false);
-//            $stdComment->authorFio = !is_null($CommentAuthor)
-//                ?   $CommentAuthor->surname() . ' ' . $CommentAuthor->name()
-//                :   'Неизвестно';
             $commentDatetime = $comment->datetime();
             $commentDatetime = strtotime($commentDatetime);
             $commentDatetime = date('d.m.y H:i', $commentDatetime);
@@ -162,8 +159,6 @@ if ($action === 'getLid' || $action === 'getById') {
     $response->comments = [];
     foreach ($Comments as $Comment) {
         $stdComment = $Comment->toStd();
-//        $CommentAuthor = User_Controller::factory($Comment->authorId(), $isSubordinated);
-//        $stdComment->authorFio = $CommentAuthor->surname() . ' ' . $CommentAuthor->name();
         $commentDatetime = $Comment->datetime();
         $commentDatetime = strtotime($commentDatetime);
         $commentDatetime = date('d.m.y H:i', $commentDatetime);
@@ -172,9 +167,9 @@ if ($action === 'getLid' || $action === 'getById') {
     }
 
     //Подгрузка значений доп. свйоств
-    $properties = ['lid_source', 'lid_marker'];
+    $properties = ['lid_source', 'lid_marker', 'instrument'];
     foreach ($properties as $propTagName) {
-        $Property = Core::factory('Property')->getByTagName($propTagName);
+        $Property = Property_Controller::factoryByTag($propTagName);
         if (is_null($Property)) {
             die(REST::error(3, 'Невозможно получить значений доп. свйоства ' . $propTagName));
         }
@@ -248,11 +243,13 @@ if ($action === 'save') {
         $response->comments[] = $stdComment;
     }
 
+    $response->property_20 = [];
+    $response->property_50 = [];
+    $response->property_54 = [];
+
     //Сохранение источника лида
     $LidSourceProperty = Property_Controller::factoryByTag('lid_source');
     $lidSourceId = Core_Array::Post('property_50', (int)$LidSourceProperty->defaultValue(), PARAM_INT);
-    $response->property_50 = [];
-    $response->property_54 = [];
     if ($lidSourceId != $LidSourceProperty->defaultValue()) {
         if (is_null($id)) {
             $NewSourceVal = $LidSourceProperty->addNewValue($Lid, $lidSourceId);
@@ -291,6 +288,27 @@ if ($action === 'save') {
         $response->property_54[] = $LidMarkerProperty->makeDefaultValue($Lid)->toStd();
     }
     $response->property_54[0]->value = Property_Controller::factoryListValue($response->property_54[0]->value_id)->value();
+
+    //Сохранение направления подготовки
+    $LidInstrumentProperty = Property_Controller::factoryByTag('instrument');
+    $lidInstrumentId = Core_Array::Post('property_20', (int)$LidInstrumentProperty->defaultValue(), PARAM_INT);
+    if ($lidInstrumentId != $LidInstrumentProperty->defaultValue()) {
+        if (is_null($id)) {
+            $NewInstrumentVal = $LidInstrumentProperty->addNewValue($Lid, $lidInstrumentId);
+            $response->property_20[] = $NewInstrumentVal->toStd();
+        } else {
+            $ExistingLidInstrumentVal = $LidInstrumentProperty->getValues($Lid)[0];
+            $ExistingLidInstrumentVal->value($lidInstrumentId)->save();
+            $response->property_20[] = $ExistingLidInstrumentVal->toStd();
+        }
+    } else {
+        $ExistingLidInstrumentVal = $LidInstrumentProperty->getValues($Lid);
+        if (!empty($ExistingLidInstrumentVal[0]->getId())) {
+            $ExistingLidInstrumentVal[0]->delete();
+        }
+        $response->property_20[] = $LidInstrumentProperty->makeDefaultValue($Lid)->toStd();
+    }
+    $response->property_20[0]->value = Property_Controller::factoryListValue($response->property_20[0]->value_id)->value();
 
     exit(json_encode($response));
 }

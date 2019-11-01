@@ -239,13 +239,16 @@ class Lid_Status extends Core_Entity
 
     /**
      * @param null $obj
-     * @return $this|void
+     * @return $this|null
      */
     public function save($obj = null)
     {
-        Core::notify([&$this], 'beforeLidStatusSave');
-        parent::save();
-        Core::notify([&$this], 'afterLidStatusSave');
+        Core::notify([&$this], 'before.LidStatus.save');
+        if (empty(parent::save())) {
+            return null;
+        }
+        Core::notify([&$this], 'after.LidStatus.save');
+        return $this;
     }
 
 
@@ -255,9 +258,9 @@ class Lid_Status extends Core_Entity
      */
     public function delete($obj = null)
     {
-        Core::notify([&$this], 'beforeLidStatusDelete');
+        Core::notify([&$this], 'before.LidStatus.delete');
         parent::delete();
-        Core::notify([&$this], 'afterLidStatusDelete');
+        Core::notify([&$this], 'after.LidStatus.delete');
     }
 
 }

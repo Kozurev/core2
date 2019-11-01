@@ -9,6 +9,8 @@
  * @version 20190526
  */
 
+authOrOut();
+
 //Проверка прав доступа
 if (!Core_Access::instance()->hasCapability(Core_Access::STATISTIC_READ)) {
     Core_Page_Show::instance()->error(403);

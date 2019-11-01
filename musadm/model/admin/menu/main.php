@@ -43,11 +43,10 @@ class Admin_Menu_Main
             }
         }
 
-        try {
-            $UpdatingItem->save();
-        } catch (Exception $e) {
-            die($e->getMessage());
+        if (empty($UpdatingItem->save())) {
+            die($UpdatingItem->_getValidateErrorsStr());
         }
+
 
         /**
          * Обновление связей объекта с филиалом/филиалами

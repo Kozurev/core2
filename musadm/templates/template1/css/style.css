@@ -49,11 +49,17 @@ html, body {
 
 }
 
+.error {
+	font-size: 14px;
+	margin-left: 18px;
+	color: red;
+}
+
 #container {
 	position: fixed;
 	width: 340px;
-	height: 280px;
-	top: 50%;
+	min-height: 306px;
+	top: 45%;
 	left: 50%;
 	margin-top: -140px;
 	margin-left: -170px;

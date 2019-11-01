@@ -6,8 +6,6 @@
  * Time: 19:14
  */
 
-Core::requireClass('Controller');
-
 class Lid_Controller_Extended extends Controller
 {
     /**
@@ -61,6 +59,10 @@ class Lid_Controller_Extended extends Controller
 
 
 
+    /**
+     * Lid_Controller_Extended constructor.
+     * @param User|null $User
+     */
     public function __construct(User $User = null)
     {
         if (!is_null($User)) {
@@ -72,6 +74,7 @@ class Lid_Controller_Extended extends Controller
         $this->setQueryBuilder($Lid->queryBuilder());
         $this->getQueryBuilder()->orderBy('priority_id', 'DESC');
         $this->setXsl('musadm/lids/lids.xsl');
+        parent::__construct();
     }
 
 
@@ -219,6 +222,9 @@ class Lid_Controller_Extended extends Controller
             }
         }
 
+        //Пагинация
+        $this->paginateExecute();
+
         $this->foundObjects = $this->QueryBuilder->findAll();
         $this->countFoundObjects = count($this->foundObjects);
         foreach ($this->foundObjects as $Lid) {
@@ -274,6 +280,7 @@ class Lid_Controller_Extended extends Controller
         $priorities[2]->title = 'Высокий';
 
         $OutputXml
+            ->addEntity($this->paginate(), 'pagination')
             ->addSimpleEntity('wwwroot', $CFG->wwwroot)
             ->addEntities($this->getLids())
             ->addEntities(Core::factory('Schedule_Area')->getList())

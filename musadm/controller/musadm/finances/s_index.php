@@ -8,11 +8,9 @@
  * @version 20190526
  */
 
+authOrOut();
+
 $User = User::current();
-//$accessRules = ['groups' => [ROLE_DIRECTOR]];
-//if (!User::checkUserAccess($accessRules, $User)) {
-//    Core_Page_Show::instance()->error(403);
-//}
 
 $breadcumbs[0] = new stdClass();
 $breadcumbs[0]->title = Core_Page_Show::instance()->Structure->title();

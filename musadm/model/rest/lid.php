@@ -11,7 +11,7 @@ class Rest_Lid extends Rest_Controller
     public function __construct()
     {
         global $CFG;
-        $this->apiUrl = $CFG->wwwroot . '/api/lids/api.php';
+        $this->apiUrl = $CFG->wwwroot . '/api/lids';
     }
 
 

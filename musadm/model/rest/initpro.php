@@ -43,7 +43,7 @@ class Rest_Initpro
      *
      * @var string
      */
-    private static $callbackUrl = 'http://musicmetod.ru/musadmnew/api/initpro/api.php?action=checkCallback';
+    private static $callbackUrl = 'http://musicmetod.ru/musadm/api/initpro?action=checkCallback';
 
 
     /**

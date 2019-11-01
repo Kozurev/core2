@@ -118,11 +118,11 @@ class Event_Type extends Core_Entity
 
     /**
      * @param null $obj
-     * @return $this|void
+     * @return $this|null
      */
     public function save($obj = null)
     {
-        Core::notify([&$this], 'beforeEventTypeSave');
+        Core::notify([&$this], 'before.EventType.save');
 
         if ($this->name != '') {
             $Type = Core::factory('Event_Type')
@@ -140,9 +140,13 @@ class Event_Type extends Core_Entity
             }
         }
 
-        parent::save();
+        if (empty(parent::save())) {
+            return null;
+        }
 
-        Core::notify([&$this], 'afterEventTypeSave');
+        Core::notify([&$this], 'after.EventType.save');
+
+        return $this;
     }
 
 

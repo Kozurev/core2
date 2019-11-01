@@ -5,7 +5,7 @@
         <tr>
             <td><a href="{/root/wwwroot}/authorize?auth_as={id}"><xsl:value-of select="surname" /></a></td>
             <td><xsl:value-of select="name" /></td>
-            <td><xsl:value-of select="patronimyc" /></td>
+            <td><xsl:value-of select="patronymic" /></td>
             <td><xsl:value-of select="phone_number" /><br/></td>
             <td><xsl:value-of select="email" /><br/></td>
             <td><xsl:value-of select="property_value[property_id = 33]/value" /><br/></td>

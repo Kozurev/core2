@@ -8,10 +8,10 @@
  */
 
 //Пользователь под которым происходила изначальная авторизация
-$ParentUser = User::parentAuth();
+$ParentUser = User_Auth::parentAuth();
 
 //id директора, которому принадлежит пользователь
-$subordinated = User::current()->getDirector()->getId();
+$subordinated = User_Auth::current()->getDirector()->getId();
 
 //Указатель на авторизацию "под именем" клиента
 User::checkUserAccess(['groups' => [ROLE_MANAGER, ROLE_DIRECTOR]])
@@ -22,17 +22,18 @@ User::checkUserAccess(['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]])
     ?   $isDirector = 1
     :   $isDirector = 0;
 
-$Director = User::current()->getDirector();
+$Director = User_Auth::current()->getDirector();
 
 //id клиента под которым авторизован менеджер/директор
 $pageClientId = Core_Array::Get('userid', null, PARAM_INT);
 
-Core::requireClass( 'User_Controller');
+Core::requireClass('User_Controller');
 Core::requireClass('Property_Controller');
+Core::requireClass('User_Auth_Log');
 
 //Получение объекта пользователя клиента
 if (is_null($pageClientId)) {
-    $User = User::current();
+    $User = User_Auth::current();
 } else {
     $User = User_Controller::factory($pageClientId);
 }
@@ -53,6 +54,9 @@ if ($isAdmin) {
     $today = date('Y-m-d');
     $todayTime = strtotime($today);
 
+    //Дата последней авторизации
+    $lastEntryDate = User_Auth_Log::getLastDate($User);
+
     //Клиентские заметки
     $ClientNote = Property_Controller::factoryByTag('notes');
     $clientNote = $ClientNote->getValues($User)[0]->value();
@@ -60,10 +64,6 @@ if ($isAdmin) {
     //Поурочная оплата
     $PerLesson = Property_Controller::factoryByTag('per_lesson');
     $perLesson = $PerLesson->getValues($User)[0]->value();
-
-    //Дата последней авторизации
-    $LastEntry = Property_Controller::factoryByTag('last_entry');
-    $lastEntry = $LastEntry->getValues($User)[0]->value();
 
     //id лида, из которого был создан клиент
     $PrevLid = Property_Controller::factoryByTag('lid_before_client');
@@ -77,7 +77,8 @@ if ($isAdmin) {
 
     $AbsentPeriods = Core::factory('Schedule_Absent')
         ->queryBuilder()
-        ->where('client_id', '=', $User->getId())
+        ->where('object_id', '=', $User->getId())
+        ->where('type_id', '=', 1)
         ->where('date_to', '>=', $today)
         ->orderBy('date_from', 'ASC')
         ->findAll();
@@ -95,7 +96,7 @@ if ($isAdmin) {
 
     $OutputXml
         ->addSimpleEntity('note', $clientNote)
-        ->addSimpleEntity('entry', $lastEntry)
+        ->addSimpleEntity('entry', $lastEntryDate)
         ->addSimpleEntity('per_lesson', $perLesson)
         ->addSimpleEntity('prev_lid', $prevLid)
         ->addSimpleEntity('mediana_indiv', $medianaIndiv)
@@ -117,6 +118,7 @@ $apiTokenSber = $ApiTokenSber->getValues($Director)[0]->value();
 $OutputXml
     ->addEntity($User)
     ->addSimpleEntity('is_admin', $isAdmin)
+    ->addSimpleEntity('is_director', $isDirector)
     ->addSimpleEntity('api_token_sber', $apiTokenSber)
     ->addEntity($balance, 'property')
     ->addEntity($privateLessons, 'property')

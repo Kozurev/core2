@@ -147,11 +147,11 @@ class Certificate_Note extends Core_Entity
 
     /**
      * @param null $obj
-     * @return $this|void
+     * @return $this|null
      */
     public function save($obj = null)
     {
-        Core::notify([&$this], 'beforeCertificateNoteSave');
+        Core::notify([&$this], 'before.CertificateNote.save');
 
         if (is_null($this->date)) {
             $this->date = date('Y-m-d H:i:s');
@@ -163,8 +163,13 @@ class Certificate_Note extends Core_Entity
             }
         }
 
-        parent::save();
-        Core::notify([&$this], 'afterCertificateNoteSave');
+        if (empty(parent::save())) {
+            return null;
+        }
+
+        Core::notify([&$this], 'after.CertificateNote.save');
+
+        return $this;
     }
 
 
@@ -174,8 +179,8 @@ class Certificate_Note extends Core_Entity
      */
     public function delete($obj = null)
     {
-        Core::notify([&$this], 'beforeCertificateNoteDelete');
+        Core::notify([&$this], 'before.CertificateNote.delete');
         parent::delete();
-        Core::notify([&$this], 'afterCertificateNoteDelete');
+        Core::notify([&$this], 'after.CertificateNote.delete');
     }
 }

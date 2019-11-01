@@ -7,6 +7,8 @@
  * @version 20190403
  */
 
+authOrOut();
+
 $User = User::current();
 $accessRules = ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]];
 if (!User::checkUserAccess($accessRules, $User)) {

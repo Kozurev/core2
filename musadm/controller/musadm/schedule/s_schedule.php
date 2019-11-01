@@ -6,8 +6,11 @@
  * @version 20190628
  */
 Core::requireClass('User_Controller');
+Core::requireClass('User_Controller_Extended');
 Core::requireClass('Task_Controller');
 Core::requireClass('Schedule_Area_Controller');
+
+authOrOut();
 
 $User = User::current();
 $Director = $User->getDirector();
@@ -122,19 +125,13 @@ if ($action === 'getScheduleAbsentPopup') {
         Core_Page_Show::instance()->error(403);
     }
 
-    $clientId = Core_Array::Get('client_id', null, PARAM_INT);
-    $typeId =   Core_Array::Get('type_id', null, PARAM_INT);
+    $objectId = Core_Array::Get('objectId', null, PARAM_INT);
+    $typeId =   Core_Array::Get('typeId', null, PARAM_INT);
     $date =     Core_Array::Get('date', date('Y-m-d'), PARAM_DATE);
     $id =       Core_Array::Get('id', null, PARAM_INT);
 
-    if ((is_null($clientId) || is_null($typeId)) && is_null($id)) {
+    if ((is_null($objectId) || is_null($typeId)) && is_null($id)) {
         Core_Page_Show::instance()->error(404);
-    }
-    if (!is_null($clientId)) {
-        $Client = User_Controller::factory($clientId);
-        if (is_null($Client)) {
-            Core_Page_Show::instance()->error(404);
-        }
     }
 
     if (!is_null($id)) {
@@ -143,8 +140,21 @@ if ($action === 'getScheduleAbsentPopup') {
         $AbsentPeriod = Core::factory('Schedule_Absent');
     }
 
+    if (empty($id)) {
+        $AbsentObject = $typeId == 1
+            ?   User_Controller::factory($objectId)
+            :   Core::factory('Schedule_Group', $objectId);
+
+        if (empty($AbsentObject) && empty($id)) {
+            Core_Page_Show::instance()->error(404);
+        }
+    } else {
+        $AbsentObject = $AbsentPeriod->getObject();
+    }
+
     Core::factory('Core_Entity')
-        ->addSimpleEntity('client_id', $clientId)
+        ->addEntity($AbsentObject)
+        ->addSimpleEntity('object_id', $objectId)
         ->addSimpleEntity('type_id', $typeId)
         ->addSimpleEntity('date_from', $date)
         ->addEntity($AbsentPeriod, 'absent')
@@ -167,9 +177,12 @@ if ($action === 'deleteScheduleAbsent') {
     }
 
     Core::factory('Schedule_Absent');
-    $Client = User_Controller::factory($Absent->clientId());
+    $AbsentObj = $Absent->getObject();
     $outputJson = new stdClass();
-    $outputJson->fio = $Client->surname() . ' ' . $Client->name();
+    if ($Absent->typeId() == 1) {
+        $outputJson->fio = $AbsentObj->surname() . ' ' . $AbsentObj->name();
+    }
+    $outputJson->id = $absentId;
     $outputJson->dateFrom = refactorDateFormat($Absent->dateFrom());
     $outputJson->dateTo = refactorDateFormat($Absent->dateTo());
     $Absent->delete();
@@ -208,36 +221,44 @@ if ($action === 'getScheduleLessonPopup') {
         ?   $period = SCHEDULE_DELIMITER
         :   $period = '00:15:00';
 
-    $output = Core::factory('Core_Entity')
+    $output = new Core_Entity();
+    $output
         ->addSimpleEntity('class_id', $classId)
         ->addSimpleEntity('date', $date)
         ->addSimpleEntity('area_id', $areaId)
         ->addSimpleEntity('day_name', $dayName)
         ->addSimpleEntity('period', $period)
-        ->addSimpleEntity('lesson_type', $lessonType);
+        ->addSimpleEntity('lesson_type', $lessonType)
+        ->addEntities(
+            Core::factory('Schedule_Lesson_Type')->findAll()
+        );
 
-    Core::factory('User_Controller');
-    $UserController = new User_Controller(User::current());
-    $UserController->queryBuilder()->orderBy('surname', 'ASC');
-    $Users = $UserController
-        ->groupId([ROLE_TEACHER, ROLE_CLIENT])
-        ->isLimitedAreasAccess(true)
-        ->isWithAreaAssignments(false)
-        ->getUsers();
-
-    $Groups = Core::factory('Schedule_Group')
+    $TeachersController = new User_Controller_Extended(User::current());
+    $TeachersController->setGroup(ROLE_TEACHER);
+    $TeachersController->isWithComments(false);
+    $TeachersController->getQueryBuilder()
+        ->orderBy('surname', 'ASC');
+    $Teachers = $TeachersController->getUsers();
+    $TeachersAbsents = Core::factory('Schedule_Absent')
         ->queryBuilder()
-        ->where('subordinated', '=', $subordinated)
+        ->where('type_id', '=', 1)
+        ->where('date_from', '<=', $Date->format('Y-m-d'))
+        ->where('date_to', '>=', $Date->format('Y-m-d'))
+        ->whereIn('object_id', $TeachersController->getFoundObjectsIds())
         ->findAll();
 
-    $LessonTypes = Core::factory('Schedule_Lesson_Type')->findAll();
+    foreach ($TeachersAbsents as $AbsentPeriod) {
+        foreach ($Teachers as $teacherKey => $Teacher) {
+            if ($Teacher->getId() == $AbsentPeriod->objectId()) {
+                $Teacher->is_absent = 1;
+                break;
+            }
+        }
+    }
 
-    $output
-        ->addEntities($Users)
-        ->addEntities($Groups)
-        ->addEntities($LessonTypes);
+    $output->addEntities($Teachers);
 
-    Core::factory('Schedule_Lesson');
+    Core::requireClass('Schedule_Lesson');
     if ($lessonType == Schedule_Lesson::SCHEDULE_CURRENT) {
         $output->addSimpleEntity('schedule_type', 'актуальное');
     } elseif ($lessonType == Schedule_Lesson::SCHEDULE_MAIN) {
@@ -279,8 +300,10 @@ if ($action === 'teacherReport') {
         }
     }
 
-    $Lesson->makeReport($date, $attendance, $attendanceClients);
-    exit;
+    $Report = $Lesson->makeReport($date, $attendance, $attendanceClients);
+    !is_null($Report)
+        ?   exit(REST::status(REST::STATUS_SUCCESS, 'Отчет успешно отправлен'))
+        :   exit(REST::status(REST::STATUS_ERROR, 'Отчет уже существует'));
 }
 
 

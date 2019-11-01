@@ -3,7 +3,7 @@ class Task {
      * @returns {string}
      */
     static getApiLink () {
-        return root + '/api/task/api.php';
+        return root + '/api/task/index.php';
     };
 
 

@@ -71,13 +71,12 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
      * @param $object - объект для которого ищутся связанные с ним филлиалы
      * @param bool $isSubordinate - указатель на поиск только того филлиала,
      * который принадлежит той же организации что и текущий пользователь
-     * @throws Exception
-     * @return array
+     * @return array|null
      */
     public function getAreas($object, bool $isSubordinate = true)
     {
         if (!is_object($object)) {
-            throw new Exception('getAreas -> Передаваемый параметр должен быть объектом');
+            return null;
         }
 
         $Area = Core::factory('Schedule_Area');
@@ -86,7 +85,7 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
         if ($isSubordinate === true) {
             $User = User::current();
             if (is_null($User)) {
-                throw new Exception('Для поиска филлиала принадлежащего одной организации что и пользователь необходимо авторизоваться');
+                return null;
             }
 
             $Area->queryBuilder()->where('subordinated', '=', $User->getDirector()->getId());

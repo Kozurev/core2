@@ -1,5 +1,7 @@
 <?php
 /**
+ * Раздел расписания или личного кабинета преподавателя
+ *
  * @author BadWolf
  * @version 20190327
  * @version 20190418
@@ -8,6 +10,7 @@
  */
 
 Core::requireClass('User_Controller');
+Core::requireClass('Property_Controller');
 
 $userId = Core_Array::Get('userid', null, PARAM_INT);
 is_null($userId)
@@ -44,10 +47,6 @@ if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
         ->close()
         ->where('area_id', '=', $areaId)
         ->orderBy('time_from');
-
-//    if ($User->groupId() == ROLE_TEACHER) {
-//        $Lessons->where('teacher_id', '=', $User->getId());
-//    }
 
     $CurrentLessons = clone $Lessons;
     $CurrentLessons
@@ -193,7 +192,7 @@ if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
                     if ($MainLesson !== false) {
                         $checkClientAbsent = Core::factory('Schedule_Absent')
                             ->queryBuilder()
-                            ->where('client_id', '=', $MainLesson->clientId())
+                            ->where('object_id', '=', $MainLesson->clientId())
                             ->where('date_from', '<=', $date)
                             ->where('date_to', '>=', $date)
                             ->where('type_id', '=', $MainLesson->typeId())
@@ -338,6 +337,7 @@ if ($User->groupId() == ROLE_TEACHER) {
     $accessPaymentEdit =  Core_Access::instance()->hasCapability(Core_Access::PAYMENT_EDIT_TEACHER);
     $accessPaymentDelete= Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_TEACHER);
     $accessPaymentConfig= Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CONFIG);
+    $accessAbsentPeriod = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT);
 
     $month = getMonth($date);
     if (intval($month) < 10) {
@@ -598,16 +598,39 @@ if ($User->groupId() == ROLE_TEACHER) {
             ->show();
     }
 
+    //Периоды отсутствия преподавателя
+    if ($accessAbsentPeriod) {
+        $AbsentPeriods = Core::factory('Schedule_Absent')
+            ->queryBuilder()
+            ->where('type_id', '=', 1)
+            ->where('date_from', '>=', date('Y-m-d'))
+            ->where('object_id', '=', $User->getId())
+            ->findAll();
+
+        foreach ($AbsentPeriods as $Period) {
+            $Period->refactoredDateFrom = date('d.m.y', strtotime($Period->dateFrom()));
+            $Period->refactoredDateTo =   date('d.m.y', strtotime($Period->dateTo()));
+            $Period->refactoredTimeFrom = substr($Period->timeFrom(), 0, 5);
+            $Period->refactoredTimeTo =   substr($Period->timeTo(), 0, 5);
+        }
+
+        Core::factory('Core_Entity')
+            ->addEntity($User)
+            ->addEntities($AbsentPeriods)
+            ->addSimpleEntity('userId', $User->getId())
+            ->xsl('musadm/schedule/teacher_absent.xsl')
+            ->show();
+    }
+
     //Таблица с настройками тарифов преподавателя
-    //if (User::checkUserAccess(['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]], User::parentAuth())) {
     if ($accessPaymentConfig) {
         //Общие значения
         $Director = User::current()->getDirector();
 
-        $TeacherRateDefaultIndiv =      Core::factory('Property')->getByTagName('teacher_rate_indiv_default');
-        $TeacherRateDefaultGroup =      Core::factory('Property')->getByTagName('teacher_rate_group_default');
-        $TeacherRateDefaultConsult =    Core::factory('Property')->getByTagName('teacher_rate_consult_default');
-        $TeacherRateDefaultAbsent =     Core::factory('Property')->getByTagName('teacher_rate_absent_default');
+        $TeacherRateDefaultIndiv =      Property_Controller::factoryByTag('teacher_rate_indiv_default');
+        $TeacherRateDefaultGroup =      Property_Controller::factoryByTag('teacher_rate_group_default');
+        $TeacherRateDefaultConsult =    Property_Controller::factoryByTag('teacher_rate_consult_default');
+        $TeacherRateDefaultAbsent =     Property_Controller::factoryByTag('teacher_rate_absent_default');
 
         $teacherRateDefIndivValue =     $TeacherRateDefaultIndiv->getPropertyValues($Director)[0]->value();
         $teacherRateDefGroupValue =     $TeacherRateDefaultGroup->getPropertyValues($Director)[0]->value();
@@ -615,10 +638,10 @@ if ($User->groupId() == ROLE_TEACHER) {
         $teacherRateDefAbsentValue =    $TeacherRateDefaultAbsent->getPropertyValues($Director)[0]->value();
 
         //Индивидуальный или общий тариф у преподавателя
-        $IsTeacherRateDefaultIndiv =    Core::factory('Property')->getByTagName('is_teacher_rate_default_indiv');
-        $IsTeacherRateDefaultGroup =    Core::factory('Property')->getByTagName('is_teacher_rate_default_group');
-        $IsTeacherRateDefaultConsult =  Core::factory('Property')->getByTagName('is_teacher_rate_default_consult');
-        $IsTeacherRateDefaultAbsent =   Core::factory('Property')->getByTagName('is_teacher_rate_default_absent');
+        $IsTeacherRateDefaultIndiv =    Property_Controller::factoryByTag('is_teacher_rate_default_indiv');
+        $IsTeacherRateDefaultGroup =    Property_Controller::factoryByTag('is_teacher_rate_default_group');
+        $IsTeacherRateDefaultConsult =  Property_Controller::factoryByTag('is_teacher_rate_default_consult');
+        $IsTeacherRateDefaultAbsent =   Property_Controller::factoryByTag('is_teacher_rate_default_absent');
 
         $isTeacherRateDefIndivValue =   $IsTeacherRateDefaultIndiv->getPropertyValues($User)[0]->value();
         $isTeacherRateDefGroupValue =   $IsTeacherRateDefaultGroup->getPropertyValues($User)[0]->value();
@@ -626,10 +649,10 @@ if ($User->groupId() == ROLE_TEACHER) {
         $isTeacherRateDefAbsentValue =  $IsTeacherRateDefaultAbsent->getPropertyValues($User)[0]->value();
 
         //Значения индивидуальных тарифов преподавателя
-        $TeacherRateIndiv =     Core::factory('Property')->getByTagName('teacher_rate_indiv');
-        $TeacherRateGroup =     Core::factory('Property')->getByTagName('teacher_rate_group');
-        $TeacherRateConsult =   Core::factory('Property')->getByTagName('teacher_rate_consult');
-        $TeacherRateAbsent =    Core::factory('Property')->getByTagName('teacher_rate_absent');
+        $TeacherRateIndiv =         Property_Controller::factoryByTag('teacher_rate_indiv');
+        $TeacherRateGroup =         Property_Controller::factoryByTag('teacher_rate_group');
+        $TeacherRateConsult =       Property_Controller::factoryByTag('teacher_rate_consult');
+        $TeacherRateAbsent =        Property_Controller::factoryByTag('teacher_rate_absent');
 
         $teacherRateIndivValue =    $TeacherRateIndiv->getPropertyValues($User)[0]->value();
         $teacherRateGroupValue =    $TeacherRateGroup->getPropertyValues($User)[0]->value();

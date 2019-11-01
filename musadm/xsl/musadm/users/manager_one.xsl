@@ -10,7 +10,7 @@
                     <xsl:text> </xsl:text>
                     <xsl:value-of select="name" />
                     <xsl:text> </xsl:text>
-                    <xsl:value-of select="patronimyc" />
+                    <xsl:value-of select="patronymic" />
                 </a>
             </td>
             <td><xsl:value-of select="phone_number" /><br/></td>

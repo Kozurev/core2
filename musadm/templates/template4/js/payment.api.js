@@ -6,7 +6,7 @@ class Payment {
      * @returns {string}
      */
     static getApiLink () {
-        return root + '/api/payment/api.php';
+        return root + '/api/payment/index.php';
     };
 
 
