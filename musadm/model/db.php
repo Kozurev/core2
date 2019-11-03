@@ -24,6 +24,7 @@ class DB
 
             self::$_db = new PDO($pdoString, $connectionParams['user'], $connectionParams['pass']);
             self::$_db->query( "SET CHARSET ".$connectionParams['charset'] );
+            self::$_db->query( "SET NAMES ".$connectionParams['charset'] );
         }
 
         return self::$_db;

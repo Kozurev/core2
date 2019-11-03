@@ -20,13 +20,13 @@ is_object(Core_Page_Show::instance()->StructureItem)
     ?   $areaId = Core_Page_Show::instance()->StructureItem->getId()
     :   $areaId = 0;
 
-    if (User::checkUserAccess(['groups' => [ROLE_MANAGER]], $User)
-        || (User::checkUserAccess(['groups' => [ROLE_DIRECTOR]], $User) && $areaId > 0)
-    ) {
-        Core_Page_Show::instance()->css('/templates/template7/css/style.css');
-    }
+if (User::checkUserAccess(['groups' => [ROLE_MANAGER]], $User)
+    || (User::checkUserAccess(['groups' => [ROLE_DIRECTOR]], $User) && $areaId > 0)
+) {
+    Core_Page_Show::instance()->css('/templates/template7/css/style.css');
+}
 
-    if ($areaId > 0 || $pageUserId > 0 || $User->groupId() === ROLE_TEACHER) { ?>
+if ($areaId > 0 || $pageUserId > 0 || $User->groupId() === ROLE_TEACHER) { ?>
     <section>
         <div class="row calendar_small">
             <div>
@@ -67,4 +67,3 @@ is_object(Core_Page_Show::instance()->StructureItem)
 
 <input type="hidden" id="userid" value="<?=$User->getId()?>" />
 <input type="hidden" id="areaid" value="<?=$areaId?>" />
-
