@@ -107,60 +107,68 @@ $(function(){
             var areaId = Form.find('input[name=areaId]').val();
             var lessonType = Form.find('input[name=lessonType]').val();
             var typeId = Form.find('select[name=typeId]').val();
-
-            //Создание задачи с напоминанием
             var isCreateTask = $('input[name=is_create_task]');
-            if (isCreateTask.is(':checked')) {
-                $.ajax({
-                    type: 'GET',
-                    url: '',
-                    data: {
-                        action: 'create_schedule_task',
-                        date: date,
-                        clientId: clientId,
-                        areaId: areaId
-                    }
-                });
-            }
-            isCreateTask.remove();
 
-            //Если это индивидуальное занятие
-            if (typeId == 1 ) {
-                Schedule.checkAbsentPeriod({userId: clientId, date: date}, function(response){
-                    //Если есть существующий период отсутсвия
-                    if (response.isset == true) {
-                        //Постановка в основной график
-                        if (lessonType == 1) {
-                            if (confirm('В данное время у клиента существует активный период отсутсвия с '
-                                + response.period.dateFrom[1] + ' по ' + response.period.dateTo[1] + '. Хотите продолжить?')) {
-                                saveData('Main', function(response) { refreshSchedule(); });
-                            } else {
-                                loaderOff();
+
+            //Проверка преподавателя на отсутствие
+            Schedule.checkAbsentPeriod({
+                userId: teacherId,
+                date: date,
+                timeFrom: timeFrom,
+                timeTo: timeTo
+            }, function (response) {
+                if (response.isset == true) {
+                    alert('В указанное время преподаватель отсутствует');
+                    loaderOff();
+                } else {
+
+
+                    //Если это индивидуальное занятие
+                    if (typeId == 1) {
+                        Schedule.checkAbsentPeriod({userId: clientId, date: date}, function (response) {
+                            //Если есть существующий период отсутсвия
+                            if (response.isset == true) {
+                                //Постановка в основной график
+                                if (lessonType == 1) {
+                                    if (confirm('В данное время у клиента существует активный период отсутсвия с '
+                                        + response.period.dateFrom[1] + ' по ' + response.period.dateTo[1] + '. Хотите продолжить?')) {
+                                        saveData('Main', function (response) {
+                                            if (response == false)
+                                            {
+                                                addTask(isCreateTask,clientId,date,areaId);
+                                            }
+                                            refreshSchedule();
+                                        });
+                                    } else {
+                                        loaderOff();
+                                    }
+                                }
+                                //Постановка в актуальный график
+                                else {
+                                    alert('Постановка клиента в расписание на данную дату невозможна, так как у него имеется активный'
+                                        + ' период отсутствия с ' + response.period.dateFrom[1] + ' по ' + response.period.dateTo[1]);
+                                    loaderOff();
+                                }
                             }
-                        }
-                        //Постановка в актуальный график
-                        else {
-                            alert('Постановка клиента в расписание на данную дату невозможна, так как у него имеется активный'
-                                + ' период отсутствия с ' + response.period.dateFrom[1] + ' по ' + response.period.dateTo[1]);
-                            loaderOff();
-                        }
-                    }
-                });
-                }
-            else {
-                Schedule.checkAbsentPeriod({
-                    userId: teacherId,
-                    date: date,
-                    timeFrom: timeFrom,
-                    timeTo: timeTo}, function(response) {
-                    if (response.isset == true) {
-                        alert('В указанное время преподаватель отсутствует');
-                        loaderOff();
+                        });
                     } else {
-                        saveData('Main', function(response) { refreshSchedule(); });
+                        saveData('Main', function (response) {
+                            if (response == false && (typeId == 1 || typeId == 2))
+                            {
+                                addTask(isCreateTask,clientId,date,areaId);
+                            }
+                            refreshSchedule();
+                        });
                     }
-                });
-            }
+                    saveData('Main', function (response) {
+                        if (response == false && (typeId == 1 || typeId == 2))
+                        {
+                            addTask(isCreateTask,clientId,date,areaId);
+                        }
+                        refreshSchedule();
+                    });
+                }
+            });
 
         })
 
@@ -495,7 +503,22 @@ $(function(){
     $('.schedule_calendar').val(result);
 });
 
-
+// Создание задачи с напоминанием
+function addTask(isCreateTask,clientId,date,areaId) {
+    if (isCreateTask.is(':checked')) {
+        $.ajax({
+            type: 'GET',
+            url: '',
+            data: {
+                action: 'create_schedule_task',
+                date: date,
+                clientId: clientId,
+                areaId: areaId
+            }
+        });
+    }
+    isCreateTask.remove();
+}
 
 function refreshAreasTable() {
     $.ajax({

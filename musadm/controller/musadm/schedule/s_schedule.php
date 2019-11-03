@@ -539,7 +539,7 @@ if ($action === 'create_schedule_task') {
     $Task->date($date);
     $Task->associate($clientId);
     $Task->areaId($areaId);
-    Orm::Debug(true);
+//    Orm::Debug(true);
     $Task->save();
     $Task->addNote($taskNoteText);
 
