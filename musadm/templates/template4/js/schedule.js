@@ -150,8 +150,19 @@ $(function(){
                                     loaderOff();
                                 }
                             }
+                            else {
+                                saveData('Main', function (response) {
+                                    if (response == false)
+                                    {
+                                        addTask(isCreateTask,clientId,date,areaId);
+                                    }
+                                    refreshSchedule();
+                                });
+                            }
+
                         });
                     } else {
+                        //Сделал сразу заготовку для добавления задачи группе
                         saveData('Main', function (response) {
                             if (response == false && (typeId == 1 || typeId == 2))
                             {
@@ -160,13 +171,6 @@ $(function(){
                             refreshSchedule();
                         });
                     }
-                    saveData('Main', function (response) {
-                        if (response == false && (typeId == 1 || typeId == 2))
-                        {
-                            addTask(isCreateTask,clientId,date,areaId);
-                        }
-                        refreshSchedule();
-                    });
                 }
             });
 
