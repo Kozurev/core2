@@ -93,7 +93,7 @@ $(function(){
             getScheduleLessonPopup(classId, date, areaId, type);
         })
 
-        //Сохранение данных данятия
+        //Сохранение данных занятия
         .on("click", ".popop_schedule_lesson_submit", function(e) {
             e.preventDefault();
             loaderOn();
@@ -125,7 +125,7 @@ $(function(){
             isCreateTask.remove();
 
             //Если это индивидуальное занятие
-            if (typeId == 1) {
+            if (typeId == 1 ) {
                 Schedule.checkAbsentPeriod({userId: clientId, date: date}, function(response){
                     //Если есть существующий период отсутсвия
                     if (response.isset == true) {
@@ -144,24 +144,24 @@ $(function(){
                                 + ' период отсутствия с ' + response.period.dateFrom[1] + ' по ' + response.period.dateTo[1]);
                             loaderOff();
                         }
-                    } else {
-                        Schedule.checkAbsentPeriod({
-                            userId: teacherId,
-                            date: date,
-                            timeFrom: timeFrom,
-                            timeTo: timeTo}, function(response) {
-                            if (response.isset == true) {
-                                alert('В указанное время преподаватель отсутствует');
-                                loaderOff();
-                            } else {
-                                saveData('Main', function(response) { refreshSchedule(); });
-                            }
-                        });
                     }
                 });
-            } else {
-                saveData('Main', function(response) { refreshSchedule(); });
+                }
+            else {
+                Schedule.checkAbsentPeriod({
+                    userId: teacherId,
+                    date: date,
+                    timeFrom: timeFrom,
+                    timeTo: timeTo}, function(response) {
+                    if (response.isset == true) {
+                        alert('В указанное время преподаватель отсутствует');
+                        loaderOff();
+                    } else {
+                        saveData('Main', function(response) { refreshSchedule(); });
+                    }
+                });
             }
+
         })
 
         //Удаление занятия из основного графика
