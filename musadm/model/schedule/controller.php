@@ -372,7 +372,7 @@ class Schedule_Controller
                     echo "<span class='time'>" . refactorTimeFormat($Lesson->timeFrom()) . " - " . refactorTimeFormat($Lesson->timeTo()) . "</span>";
 
                     if (User_Controller::factory($this->userId)->groupId() == ROLE_CLIENT) {
-                        if ($Lesson->typeId() == 2) {
+                        if ($Lesson->typeId() == Schedule_Lesson::TYPE_GROUP) {
                             $teacherFIO = $Lesson->getGroup()->title();
                         } else {
                             $Teacher = $Lesson->getTeacher();
@@ -384,6 +384,19 @@ class Schedule_Controller
                         }
 
                         echo "<span class=\"teacher\"> $teacherFIO</span>";
+                    } else {
+                        $Client = $Lesson->getClient();
+                        if ($Lesson->typeId() == Schedule_Lesson::TYPE_GROUP) {
+                            $clientName = $Client->title();
+                        } elseif ($Lesson->typeId() == Schedule_Lesson::TYPE_INDIV) {
+                            $clientName = $Client->surname() . ' ' . $Client->name();
+                        } elseif ($Lesson->typeId() == Schedule_Lesson::TYPE_CONSULT && !empty($Lesson->clientId())) {
+                            $clientName = 'Консультация ' . $Client->surname() . ' ' . $Client->name();
+                        } else {
+                            $clientName = 'Неизвестно';
+                        }
+
+                        echo "<span class=\"client\"> $clientName</span>";
                     }
 
                     echo "<br/>";
