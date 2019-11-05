@@ -179,23 +179,6 @@
                                 </xsl:if>
 
                                 <tr>
-                                    <td>Статус</td>
-
-                                    <td colspan="2">
-                                        <textarea class="form-control" placeholder="Заметки" id="client_notes" data-userid="{user/id}" >
-                                            <xsl:choose>
-                                                <xsl:when test="note != ''">
-                                                    <xsl:value-of select="note" />
-                                                </xsl:when>
-                                                <xsl:otherwise>
-                                                    <xsl:text>&#x0A;</xsl:text>
-                                                </xsl:otherwise>
-                                            </xsl:choose>
-                                        </textarea>
-                                    </td>
-                                </tr>
-
-                                <tr>
                                     <td colspan="3">
                                         <div class="row buttons-panel center">
                                             <xsl:if test="/root/access_schedule_absent = 1">
@@ -217,7 +200,24 @@
                                     </td>
                                 </xsl:if>
                             </xsl:if>
+                            <xsl:if test="is_admin = 1">
+                                <tr>
+                                    <td>Статус</td>
 
+                                    <td colspan="2">
+                                        <textarea class="form-control" placeholder="Заметки" id="client_notes" data-userid="{user/id}" >
+                                            <xsl:choose>
+                                                <xsl:when test="note != ''">
+                                                    <xsl:value-of select="note" />
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xsl:text>&#x0A;</xsl:text>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
+                                        </textarea>
+                                    </td>
+                                </tr>
+                            </xsl:if>
                         </table>
                     </div>
                 </div>
