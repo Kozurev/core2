@@ -134,7 +134,15 @@
                                         </label>
                                     </td>
                                 </tr>
+                                <xsl:if test="entry != ''">
+                                    <tr>
+                                        <td>Последяя авторизация</td>
+                                        <td colspan="2"><xsl:value-of select="entry" /></td>
+                                    </tr>
+                                </xsl:if>
+                            </xsl:if>
 
+                            <xsl:if test="is_admin = 1">
                                 <xsl:if test="count(absent) > 0">
                                     <tr id="absent-row">
                                         <td>Периоды отсутствия</td>
@@ -170,29 +178,6 @@
                                         </td>
                                     </tr>
                                 </xsl:if>
-
-                                <xsl:if test="entry != ''">
-                                    <tr>
-                                        <td>Последяя авторизация</td>
-                                        <td colspan="2"><xsl:value-of select="entry" /></td>
-                                    </tr>
-                                </xsl:if>
-
-                                <tr>
-                                    <td colspan="3">
-                                        <div class="row buttons-panel center">
-                                            <xsl:if test="/root/access_schedule_absent = 1">
-                                                <div>
-                                                    <a class="btn btn-orange" onclick="getScheduleAbsentPopup({user/id}, 1, getCurrentDate(), '')">
-                                                        Добавить период отсутствия
-                                                    </a>
-                                                </div>
-                                            </xsl:if>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </xsl:if>
-                            <xsl:if test="is_admin = 1">
                                 <tr>
                                     <td>Статус</td>
 
@@ -218,6 +203,20 @@
                                         </a>
                                     </td>
                                 </xsl:if>
+
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="row buttons-panel center">
+                                            <xsl:if test="/root/access_schedule_absent = 1">
+                                                <div>
+                                                    <a class="btn btn-orange" onclick="getScheduleAbsentPopup({user/id}, 1, getCurrentDate(), '')">
+                                                        Добавить период отсутствия
+                                                    </a>
+                                                </div>
+                                            </xsl:if>
+                                        </div>
+                                    </td>
+                                </tr>
                             </xsl:if>
                         </table>
                     </div>
