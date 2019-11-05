@@ -329,15 +329,15 @@ $(function(){
         .on('click', '.send_report', function(e) {
             e.preventDefault();
             loaderOn();
-            var tr = $(this).parent().parent();
-            var lessonId = tr.find('input[name=lessonId]').val();
-            var date = tr.find('input[name=date]').val();
-            var typeId = tr.find('input[name=typeId]').val();
-            var attendance = tr.find('input[type=checkbox]');
-            var note = tr.find('input[name=note]');
-            var fileInput = tr.find('input[type=file]');
+            let tr = $(this).parent().parent();
+            let lessonId = tr.find('input[name=lessonId]').val();
+            let date = tr.find('input[name=date]').val();
+            let typeId = tr.find('input[name=typeId]').val();
+            let attendance = tr.find('input[type=checkbox]');
+            let note = tr.find('input[name=note]');
+            let fileInput = tr.find('input[type=file]');
 
-            var ajaxData = {
+            let ajaxData = {
                 action: 'teacherReport',
                 date: date,
                 lessonId: lessonId
@@ -368,9 +368,13 @@ $(function(){
                         if (typeId == 3 && note.lendth != 0 && note.val() != '') {
                             Lids.saveComment(0, note.data('lidid'), note.val(), function(response){
                                 if (checkResponseStatus(response)) {
-                                    FileManager.upload(0, 1, fileInput, 'Comment', response.id, function(file) {
+                                    if (fileInput.val() != '') {
+                                        FileManager.upload(0, 1, fileInput, 'Comment', response.id, function(file) {
+                                            refreshSchedule();
+                                        });
+                                    } else {
                                         refreshSchedule();
-                                    });
+                                    }
                                 }
                             });
                         } else {
