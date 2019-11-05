@@ -191,14 +191,6 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <xsl:if test="prev_lid != '0'">
-                                    <td colspan="3" class="center">
-                                        Создан из лида №
-                                        <a href="#" class="info-by-id" data-model="Lid" data-id="{prev_lid}">
-                                            <xsl:value-of select="prev_lid" />
-                                        </a>
-                                    </td>
-                                </xsl:if>
                             </xsl:if>
                             <xsl:if test="is_admin = 1">
                                 <tr>
@@ -217,6 +209,15 @@
                                         </textarea>
                                     </td>
                                 </tr>
+
+                                <xsl:if test="prev_lid != '0'">
+                                    <td colspan="3" class="center">
+                                        Создан из лида №
+                                        <a href="#" class="info-by-id" data-model="Lid" data-id="{prev_lid}">
+                                            <xsl:value-of select="prev_lid" />
+                                        </a>
+                                    </td>
+                                </xsl:if>
                             </xsl:if>
                         </table>
                     </div>
