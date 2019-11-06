@@ -27,12 +27,19 @@ $LidController->getQueryBuilder()
     ->orderBy('priority_id', 'DESC')
     ->orderBy('id', 'DESC');
 
-$LidController->isPaginate(true);
-$LidController->paginate()
-    ->setOnPage(25)
-    ->setCurrentPage(
-        Core_Array::Get('page', 1, PARAM_INT)
-    );
+if(isset($_GET['notPaginate'])){
+    $LidController->isPaginate(false);
+    unset($_GET['notPaginate']);
+}else{
+    $LidController->isPaginate(true);
+    $LidController->addSimpleEntity('paginate', true);
+    unset($_GET['paginate']);
+    $LidController->paginate()
+        ->setOnPage(25)
+        ->setCurrentPage(
+            Core_Array::Get('page', 1, PARAM_INT)
+        );
+}
 
 if ($areaId !== 0) {
     $LidController->appendFilter('area_id', $areaId, '=', Lid_Controller::FILTER_STRICT);
@@ -63,7 +70,7 @@ $lidsPropsIds = [
     'source' => 50,
     'marker' => 54
 ];
-$LidController->getQueryBuilder()->limit(10);
+$LidController->getQueryBuilder();
 $LidController
     ->periodFrom($periodFrom)
     ->periodTo($periodTo)

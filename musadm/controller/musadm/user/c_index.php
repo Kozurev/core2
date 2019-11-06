@@ -38,7 +38,16 @@ if ($groupId == ROLE_CLIENT) {
     $ClientController->paginate()->setCurrentPage(
         Core_Array::Get('page', 1, PARAM_INT)
     );
-    $ClientController->isPaginate(true);
+//    $ClientController->isPaginate(true);
+    if( isset($_GET['notPaginate'])){
+        $ClientController->isPaginate(false);
+        unset($_GET['notPaginate']);
+    }
+    else {
+        $ClientController->isPaginate(true);
+        $ClientController->addSimpleEntity('paginate', true);
+        unset($_GET['paginate']);
+    }
     if (isset($_GET['page'])) {
         unset($_GET['page']);
     }

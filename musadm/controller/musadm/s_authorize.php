@@ -29,7 +29,7 @@ if (!is_null(Core_Array::Post('do_auth', null, PARAM_STRING))) {
         $login = Core_Array::Post('login', '', PARAM_STRING);
         $password = Core_Array::Post('password', '', PARAM_STRING);
 
-        if (User_Auth::auth($login, $password, $rememberMe)){
+        if (User_Auth::authByLogPass($login, $password, $rememberMe)){
             $User = User_Auth::current();
             if (!is_null($back)) {
                 $backUrl = $back;
@@ -73,6 +73,32 @@ if (Core_Array::Get('auth_revert', false, PARAM_BOOL) !== false) {
     header('Location: ' . $url);
 }
 
+//Авторизация по токену
+//http://localhost/authorize?action=auth_by_token&auth_token=b9d6d77403ab560e3abbb8efa1a979b7fa4bb35bfe98f295f7
+if (Core_Array::Get('action', '', PARAM_STRING) == 'auth_by_token') {
+    $token = Core_Array::Get('auth_token', '', PARAM_STRING);
+    if(isset($token) && !empty($token)){
+        if (User_Auth::authByToken($token)){
+            $User = User_Auth::current();
+            if (!is_null($back)) {
+                $backUrl = $back;
+            } elseif ($User->groupId() == ROLE_TEACHER) {
+                $backUrl = $CFG->rootdir . '/schedule/';
+            } elseif ($User->groupId() == ROLE_MANAGER || $User->groupId() == ROLE_DIRECTOR || $User->groupId() == ROLE_ADMIN) {
+                $backUrl = $CFG->rootdir . '/';
+            } elseif ($User->groupId() == ROLE_CLIENT) {
+                $backUrl = $CFG->rootdir . '/balance';
+            }
+            header('Location: ' . $backUrl);
+        } else {
+            Core_Page_Show::instance()->setParam('auth-errors', 'Пользователь с таким токеном не существует');
+        }
+    } else {
+        Core_Page_Show::instance()->setParam('auth-errors', 'Токен не введен');
+
+    }
+
+}
 
 //Если пользователь уже авторизован
 if (!is_null($CurrentUser)) {
@@ -86,3 +112,4 @@ if (Core_Array::Get('ajax', false, PARAM_BOOL) === true){
     Core_Page_Show::instance()->execute();
     exit;
 }
+

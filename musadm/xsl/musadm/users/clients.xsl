@@ -54,10 +54,12 @@
                         Экспорт в Excel
                     </button>
                 </div>
+
             </div>
         </xsl:if>
 
         <xsl:if test="access_user_read_clients = 1">
+
             <section>
                 <ul class="pagination pagination-sm">
                     <!--Первая страница-->
@@ -115,6 +117,18 @@
 
                     <li class="page-item">
                         <a class="page-link" href="#" onclick="changeClientsPage({pagination/countPages})">Последняя</a>
+                    </li>
+                </ul>
+                <ul class="pagination pagination-sm">
+                    <li class="page-item">
+                        <xsl:choose>
+                            <xsl:when test="(paginate)">
+                                <a class="page-link" href="?notPaginate">Показать всех</a>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <a class="page-link" href="?paginate">Скрыть всех</a>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </li>
                 </ul>
                 <div class="table-responsive">

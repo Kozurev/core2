@@ -338,6 +338,7 @@ Core::attachObserver('before.ScheduleLesson.save', function($args) {
     $commentText = 'Консультация назначена на ' . date('d.m.Y', strtotime($Lesson->insertDate()));
     $commentText .= ' в ' . substr($Lesson->timeFrom(), 0, 5);
     $commentText .= ', преп. ' . $Lesson->getTeacher()->surname();
+    $commentText .= ', филиал ' .$Lesson->getArea()->title();
     $Lid->addComment($commentText);
 
     $newStatusId = Core::factory('Property')
@@ -744,7 +745,7 @@ Core::attachObserver('after.ScheduleAbsent.save', function($args) {
     }
     $periodUserId = $AbsentPeriod->objectId();
     $User = User_Controller::factory($periodUserId);
-    if ($User->groupId() != ROLE_TEACHER) {
+    if ($User->groupId() != ROLE_CLIENT) {
         return;
     }
 
@@ -782,4 +783,24 @@ Core::attachObserver('after.ScheduleAbsent.save', function($args) {
         }
     }
     $Task->addNote($taskComment);
+});
+
+
+/**
+ * Удаление занятий из актуального расписания при выставлении периода отсутсвия у клиента
+ */
+Core::attachObserver('before.ScheduleAbsent.save', function($args) {
+    $AbsentPeriod = $args[0];
+    $Results = Core::factory('Schedule_Lesson')
+        ->queryBuilder()
+        ->where('client_id', '=', $AbsentPeriod->objectId())
+        ->where('lesson_type', '=', Schedule_Lesson::SCHEDULE_CURRENT)
+        ->between('insert_date',$AbsentPeriod->dateFrom(),$AbsentPeriod->dateTo())
+        ->where('delete_date', 'is','NULL')
+        ->findAll();
+    foreach ($Results as $result)
+    {
+        $result->delete();
+    }
+    return;
 });

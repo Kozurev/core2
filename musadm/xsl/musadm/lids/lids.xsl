@@ -138,6 +138,18 @@
                     <a class="page-link" href="#" onclick="refreshLidTable({pagination/countPages})">Последняя</a>
                 </li>
             </ul>
+            <ul class="pagination pagination-sm">
+                <li class="page-item">
+                    <xsl:choose>
+                        <xsl:when test="(paginate)">
+                            <a class="page-link" href="?notPaginate">Показать всех</a>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <a class="page-link" href="?paginate">Скрыть всех</a>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </li>
+            </ul>
             <div id="cards-wrapper" class="cards-wrapper row">
                 <xsl:choose>
                     <xsl:when test="count(lid) != 0">

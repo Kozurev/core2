@@ -33,17 +33,39 @@ class User_Auth
 
 
     /**
-     * Авторизация пользователя
+     * Авторизация пользователя по токену
+     *
+     * @param string $token
+     * @return bool
+     */
+    public static function authByToken(string $token)
+    {
+        $User = new User();
+        $ExistingUser = $User->queryBuilder()
+            ->where('auth_token', '=', $token)
+            ->where('active', '=', 1)
+            ->find();
+        $cookieTime = 3600 * 24 * 30; //30 дней
+        setcookie(User_Auth::REMEMBER_TOKEN, '', 0 - time() - $cookieTime, '/'); //Удаление старой кукки
+        if (!is_null($ExistingUser)) {
+            return self::auth($ExistingUser);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Авторизация по логину и паролю
      *
      * @param string $login
      * @param string $pass
-     * @param bool $remember - указатель "Запомнить меня" при истинном значении создается файл кукки
+     * @param bool $remember
      * @return bool
      */
-    public static function auth(string $login, string $pass, bool $remember = false)
+    public static function authByLogPass(string $login, string $pass, bool $remember = false)
     {
         Core::notify(['login' => $login, 'password' => $pass, 'remember' => $remember], 'before.UserAuth.auth');
-
+//
         $User = new User();
         $ExistingUser = $User->queryBuilder()
             ->where('login', '=', $login)
@@ -52,6 +74,22 @@ class User_Auth
         $cookieTime = 3600 * 24 * 30; //30 дней
         setcookie(User_Auth::REMEMBER_TOKEN, '', 0 - time() - $cookieTime, '/'); //Удаление старой кукки
         if (!is_null($ExistingUser) && password_verify($pass, $ExistingUser->password())) {
+            self::auth($ExistingUser,$remember);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Авторизация пользователя
+     *
+     * @param User $ExistingUser
+     * @param bool $remember
+     * @return bool
+     */
+    public static function auth(User $ExistingUser,bool $remember = false )
+    {
             if ($remember === true) {
                 $cookieData = $ExistingUser->getAuthToken();
                 $cookieTime = 3600 * 24 * 30;
@@ -62,11 +100,8 @@ class User_Auth
             $_SESSION['core'][User_Auth::SESSION_USER] = serialize($ExistingUser);
 
             User_Auth_Log::create($ExistingUser);
-
             Core::notify([&$ExistingUser], 'after.UserAuth.auth');
-        } else {
-            return false;
-        }
+
         return true;
     }
 
@@ -205,8 +240,8 @@ class User_Auth
      */
     public static function authRevert()
     {
-        $userId = array_pop($_SESSION['core'][User_Auth::SESSION_PREV_IDS]);
 
+        $userId = array_pop($_SESSION['core'][User_Auth::SESSION_PREV_IDS]);
         if (is_null($userId)) {
             self::logout();
         } else {

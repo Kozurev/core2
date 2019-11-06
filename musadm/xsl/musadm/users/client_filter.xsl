@@ -8,7 +8,10 @@
                     <div class="col-lg-2">
                         <input type="text" name="surname" class="form-control" />
                     </div>
-
+                    <div class="col-lg-1"><h4>Имя</h4></div>
+                    <div class="col-lg-2">
+                        <input type="text" name="name" class="form-control" />
+                    </div>
                     <div class="col-lg-1"><h4>Телефон</h4></div>
                     <div class="col-lg-2">
                         <input type="text" name="phone_number" class="form-control" />
