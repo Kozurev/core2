@@ -83,8 +83,7 @@
                     <input class="form-control" type="time" name="timeTo" value="{absent/time_to}" />
                 </div>
             </xsl:if>
-
-            <xsl:if test="absent/id = '' and absent/type_id = 1">
+            <xsl:if test="absent/id != '' and absent/type_id = 1 and object/group_id = 5">
                 <div class="column">
                     <span>Напомнить администратору о выходе ученика</span>
                 </div>

@@ -745,7 +745,7 @@ Core::attachObserver('after.ScheduleAbsent.save', function($args) {
     }
     $periodUserId = $AbsentPeriod->objectId();
     $User = User_Controller::factory($periodUserId);
-    if ($User->groupId() != ROLE_CLIENT) {
+    if ($User->groupId() != ROLE_CLIENT && $User->groupId() != ROLE_TEACHER) {
         return;
     }
 
@@ -759,7 +759,7 @@ Core::attachObserver('after.ScheduleAbsent.save', function($args) {
         return;
     }
 
-    $taskComment = 'Преподаватель ' . $User->surname() . ' ' . $User->name() . '. Период отсутствия с '
+    $taskComment = ($User->groupId() == ROLE_TEACHER ? 'Преподаватель ' : 'Клиент ' ) . $User->surname() . ' ' . $User->name() . '. Период отсутствия с '
         . refactorDateFormat($AbsentPeriod->dateFrom()) . ' ' . refactorTimeFormat($AbsentPeriod->timeFrom())
         . ' по ' . refactorDateFormat($AbsentPeriod->dateTo()) . ' ' . refactorTimeFormat($AbsentPeriod->timeTo())
         . ' проверить расписание: ';
