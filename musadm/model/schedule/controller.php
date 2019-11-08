@@ -389,9 +389,9 @@ class Schedule_Controller
                         if ($Lesson->typeId() == Schedule_Lesson::TYPE_GROUP) {
                             $clientName = $Client->title();
                         } elseif ($Lesson->typeId() == Schedule_Lesson::TYPE_INDIV) {
-                            $clientName = $Client->surname() . ' ' . $Client->name();
+                            $clientName = $Client->surname();
                         } elseif ($Lesson->typeId() == Schedule_Lesson::TYPE_CONSULT && !empty($Lesson->clientId())) {
-                            $clientName = 'Консультация ' . $Client->surname() . ' ' . $Client->name();
+                            $clientName = 'Консультация';
                         } else {
                             $clientName = 'Неизвестно';
                         }
@@ -405,7 +405,9 @@ class Schedule_Controller
             }
 
             echo "</td>";
-            if( ($i + 1) % 7 == 0 )   echo "</tr>";
+            if (($i + 1) % 7 == 0) {
+                echo "</tr>";
+            }
         }
         echo "</table></div>";
         /**
