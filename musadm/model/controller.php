@@ -531,7 +531,7 @@ class Controller
                 $this->properties[] = $Property;
             }
         } elseif (is_bool($properties) && $properties === true) {
-            $this->properties = Core::factory('Property')->getPropertiesList($this->getObject());
+            $this->properties = Core::factory('Property')->getAllPropertiesList($this->getObject());
         }
 
         return $this;
