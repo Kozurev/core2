@@ -152,7 +152,7 @@ if ($action === 'getScheduleAbsentPopup') {
         $AbsentObject = $AbsentPeriod->getObject();
     }
     Core::factory('Core_Entity')
-        ->addEntity($AbsentObject,'object')
+        ->addEntity($AbsentObject, 'object')
         ->addSimpleEntity('object_id', $objectId)
         ->addSimpleEntity('type_id', $typeId)
         ->addSimpleEntity('date_from', $date)
