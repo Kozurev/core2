@@ -29,7 +29,7 @@ if (!is_null(Core_Array::Post('do_auth', null, PARAM_STRING))) {
         $login = Core_Array::Post('login', '', PARAM_STRING);
         $password = Core_Array::Post('password', '', PARAM_STRING);
 
-        if (User_Auth::authByLogPass($login, $password, $rememberMe)){
+        if (User_Auth::authByLogin($login, $password, $rememberMe)){
             $User = User_Auth::current();
             if (!is_null($back)) {
                 $backUrl = $back;

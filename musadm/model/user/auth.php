@@ -40,13 +40,14 @@ class User_Auth
      */
     public static function authByToken(string $token)
     {
+        Core::notify(['token' => $token], 'before.UserAuth.auth');
+
         $User = new User();
         $ExistingUser = $User->queryBuilder()
             ->where('auth_token', '=', $token)
             ->where('active', '=', 1)
             ->find();
-        $cookieTime = 3600 * 24 * 30; //30 дней
-        setcookie(User_Auth::REMEMBER_TOKEN, '', 0 - time() - $cookieTime, '/'); //Удаление старой кукки
+
         if (!is_null($ExistingUser)) {
             return self::auth($ExistingUser);
         } else {
@@ -62,17 +63,16 @@ class User_Auth
      * @param bool $remember
      * @return bool
      */
-    public static function authByLogPass(string $login, string $pass, bool $remember = false)
+    public static function authByLogin(string $login, string $pass, bool $remember = false)
     {
         Core::notify(['login' => $login, 'password' => $pass, 'remember' => $remember], 'before.UserAuth.auth');
-//
+
         $User = new User();
         $ExistingUser = $User->queryBuilder()
             ->where('login', '=', $login)
             ->where('active', '=', 1)
             ->find();
-        $cookieTime = 3600 * 24 * 30; //30 дней
-        setcookie(User_Auth::REMEMBER_TOKEN, '', 0 - time() - $cookieTime, '/'); //Удаление старой кукки
+
         if (!is_null($ExistingUser) && password_verify($pass, $ExistingUser->password())) {
             self::auth($ExistingUser,$remember);
         } else {
@@ -90,17 +90,20 @@ class User_Auth
      */
     public static function auth(User $ExistingUser,bool $remember = false )
     {
-            if ($remember === true) {
-                $cookieData = $ExistingUser->getAuthToken();
-                $cookieTime = 3600 * 24 * 30;
-                setcookie(User_Auth::REMEMBER_TOKEN, $cookieData, time() + $cookieTime, '/');
-            }
-            $_SESSION['core'][User_Auth::SESSION_ID] = $ExistingUser->getId();
-            $_SESSION['core'][User_Auth::SESSION_PREV_IDS] = [];
-            $_SESSION['core'][User_Auth::SESSION_USER] = serialize($ExistingUser);
+        $cookieTime = 3600 * 24 * 30; //30 дней
+        setcookie(User_Auth::REMEMBER_TOKEN, '', 0 - time() - $cookieTime, '/'); //Удаление старой кукки
 
-            User_Auth_Log::create($ExistingUser);
-            Core::notify([&$ExistingUser], 'after.UserAuth.auth');
+        if ($remember === true) {
+            $cookieData = $ExistingUser->getAuthToken();
+            $cookieTime = 3600 * 24 * 30;
+            setcookie(User_Auth::REMEMBER_TOKEN, $cookieData, time() + $cookieTime, '/');
+        }
+        $_SESSION['core'][User_Auth::SESSION_ID] = $ExistingUser->getId();
+        $_SESSION['core'][User_Auth::SESSION_PREV_IDS] = [];
+        $_SESSION['core'][User_Auth::SESSION_USER] = serialize($ExistingUser);
+
+        User_Auth_Log::create($ExistingUser);
+        Core::notify([&$ExistingUser], 'after.UserAuth.auth');
 
         return true;
     }
