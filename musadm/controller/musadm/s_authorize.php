@@ -77,6 +77,7 @@ if (Core_Array::Get('auth_revert', false, PARAM_BOOL) !== false) {
 //http://localhost/authorize?action=auth_by_token&auth_token=b9d6d77403ab560e3abbb8efa1a979b7fa4bb35bfe98f295f7
 if (Core_Array::Get('action', '', PARAM_STRING) == 'auth_by_token') {
     $token = Core_Array::Get('auth_token', '', PARAM_STRING);
+    $back = Core_Array::Get('back', null, PARAM_STRING);
     if(isset($token) && !empty($token)){
         if (User_Auth::authByToken($token)){
             $User = User_Auth::current();
