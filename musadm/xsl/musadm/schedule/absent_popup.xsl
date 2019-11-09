@@ -66,7 +66,7 @@
                 <input class="form-control" type="date" name="dateTo" value="{absent/date_to}" />
             </div>
 
-            <xsl:if test="user/group_id = 4">
+            <xsl:if test="object/group_id = 4">
                 <hr/>
                 <div class="column">
                     <span>Время "С"</span><span style="color:red" >*</span>
