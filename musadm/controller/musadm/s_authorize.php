@@ -111,3 +111,4 @@ if (Core_Array::Get('ajax', false, PARAM_BOOL) === true){
     exit;
 }
 
+//Тест куернке
