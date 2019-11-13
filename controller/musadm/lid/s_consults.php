@@ -15,7 +15,7 @@ $breadcumbs[1] = new stdClass();
 $breadcumbs[1]->title = Core_Page_Show::instance()->Structure->title();
 $breadcumbs[1]->active = 1;
 
-Core_Page_Show::instance()->setParam('body-class', 'body-blue');
+Core_Page_Show::instance()->setParam('body-class', 'body-purple');
 Core_Page_Show::instance()->setParam('title-first', 'КОНСУЛЬТАЦИИ');
 Core_Page_Show::instance()->setParam('title-second', 'ЛИДОВ');
 Core_Page_Show::instance()->setParam('breadcumbs', $breadcumbs);

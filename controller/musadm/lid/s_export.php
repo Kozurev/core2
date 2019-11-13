@@ -16,7 +16,7 @@ $breadcumbs[1]->title = Core_Page_Show::instance()->Structure->title();
 $breadcumbs[1]->active = 1;
 
 
-Core_Page_Show::instance()->setParam('body-class', 'body-blue');
+Core_Page_Show::instance()->setParam('body-class', 'body-purple');
 Core_Page_Show::instance()->setParam('title-first', 'ЭКСПОРТ');
 Core_Page_Show::instance()->setParam('title-second', 'ЛИДОВ');
 Core_Page_Show::instance()->setParam('breadcumbs', $breadcumbs);
@@ -38,20 +38,18 @@ if ($action === 'export') {
     $statusId =     Core_Array::Get('status_id', 0, PARAM_INT);
     $instrument =   Core_Array::Get('instrument', 0, PARAM_INT);
 
-    $defaultOptions =    ['surname', 'name', 'number', 'vk', 'control_date','area_id','status_id','source'];
-    $defaultProperties = [
-        'instrument' => 20,
-        'source' => 50,
-        'marker' => 54
-    ];
-    $options =           Core_Array::Get('options', $defaultOptions, PARAM_ARRAY);
-    $properties =        Core_Array::Get('properties', $defaultProperties, PARAM_ARRAY);
-    $area =              Core_Array::Get('area','',PARAM_STRING);
-    $status =            Core_Array::Get('status','',PARAM_STRING);
+    $options =           Core_Array::Get('options',  PARAM_ARRAY);
+    $properties =        Core_Array::Get('properties', PARAM_ARRAY);
+
+    if(is_string($options) && is_string($properties)){
+        $options =  ['surname', 'name', 'number', 'vk', 'control_date','area_id','status_id','source'];
+        $properties = [20, 50, 54];
+    }
 
     $LidController = new Lid_Controller_Extended(User_Auth::current());
     $LidController
         ->getQueryBuilder()
+        ->select('Lid.id')
         ->select($options);
     if ($areaId !== 0){
         $LidController->appendFilter('area_id',$areaId, '=', Controller::FILTER_STRICT);

@@ -16,7 +16,7 @@ $breadcumbs[1]->title = Core_Page_Show::instance()->Structure->title();
 $breadcumbs[1]->active = 1;
 
 
-Core_Page_Show::instance()->setParam('body-class', 'body-green');
+Core_Page_Show::instance()->setParam('body-class', 'body-purple');
 Core_Page_Show::instance()->setParam('title-first', 'НОВЫЕ');
 Core_Page_Show::instance()->setParam('title-second', 'ЛИДЫ');
 Core_Page_Show::instance()->setParam('breadcumbs', $breadcumbs);

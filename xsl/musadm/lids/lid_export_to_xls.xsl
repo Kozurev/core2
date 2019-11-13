@@ -13,7 +13,6 @@
     </xsl:template>
 
     <xsl:template match="lid">
-        <xsl:variable name="markerId" select="property_value[property_id = 54]/value_id" />
         <tr>
 
             <xsl:choose>
@@ -110,16 +109,29 @@
                 </xsl:otherwise>
             </xsl:choose>
 
+            <xsl:choose>
+                <xsl:when test="property_value[property_id = 54]/value_id = 0 ">
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:variable name="markerId" select="property_value[property_id = 54]/value_id" />
+                    <td>
+                        <xsl:value-of select="//property_list_values[id=$markerId]/value" />
+                    </td>
+                </xsl:otherwise>
+            </xsl:choose>
 
-            <td>
-<!--                <xsl:value-of select="//property_list_values[property_id = 20]/value" />-->
-            </td>
-            <td>
+            <xsl:choose>
+                <xsl:when test="property_value[property_id = 20]/value_id = 0 ">
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:variable name="instrumentId" select="property_value[property_id = 20]/value_id" />
+                    <td>
+                        <xsl:value-of select="//property_list_values[id=$instrumentId]/value" />
+                    </td>
+                </xsl:otherwise>
+            </xsl:choose>
 
-            </td>
-            <td>
-                <xsl:value-of select="//property_list_values[id=$markerId]/value" />
-            </td>
+
 
         </tr>
     </xsl:template>
