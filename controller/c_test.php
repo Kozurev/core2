@@ -20,6 +20,37 @@ Core::requireClass('Property_Controller');
 //unset($_SESSION['core'][User_Auth::SESSION_USER]);
 //unset($_SESSION['core'][User_Auth::SESSION_PREV_IDS]);
 
+
+//Добавление структуры "Экспорт"
+$Structure = new Structure();
+$Structure1 = clone $Structure;
+$Structure1
+    ->title('Экспорт лидов')
+    ->parentId(28)
+    ->path('export')
+    ->action('musadm/lid/export')
+    ->templateId(0)
+    ->description('Раздел для экспорта лидов по выбранным фильтрам в exel')
+    ->children_name('Structure_Item')
+    ->active(1)
+    ->menuId(1)
+    ->sorting(0)
+    ->save();
+
+$Structure2 = clone $Structure;
+$Structure2
+    ->title('Раздел новых лидов')
+    ->parentId(28)
+    ->path('new_lid')
+    ->action('musadm/lid/new_lid')
+    ->templateId(0)
+    ->description('Раздел для отображения новых лидов')
+    ->children_name('Structure_Item')
+    ->active(1)
+    ->menuId(1)
+    ->sorting(0)
+    ->save();
+
 exit;
 $limit = 50;
 $offset = Core_Array::Get('offset', 0, PARAM_INT);
@@ -70,33 +101,6 @@ if ($offset == 0) {
     $Orm->executeQuery('ALTER TABLE User CHANGE patronimyc patronymic varchar(255) NOT NULL DEFAULT \'\';');
     $Orm->executeQuery('ALTER TABLE User ADD auth_token varchar(50) DEFAULT \'\' NULL;');
 
-    //Добавление структуры "Экспорт"
-    $Structure = new Structure();
-    $Structure1 = clone $Structure;
-    $Structure1
-        ->title('Экспорт лидов')
-        ->parentId(28)
-        ->path('musadm/lid/export')
-        ->templateId(0)
-        ->description('Раздел для экспорта лидов по выбранным фильтрам в exel')
-        ->children_name('Structure_Item')
-        ->active(1)
-        ->menuId(1)
-        ->sorting(0)
-        ->save();
-
-    $Structure2 = clone $Structure;
-    $Structure2
-        ->title('Раздел новых лидов')
-        ->parentId(28)
-        ->path('musadm/lid/new_lid')
-        ->templateId(0)
-        ->description('Раздел для отображения новых лидов')
-        ->children_name('Structure_Item')
-        ->active(1)
-        ->menuId(1)
-        ->sorting(0)
-        ->save();
 
 
     $Type = new Event_Type();
