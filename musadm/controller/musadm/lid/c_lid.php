@@ -17,11 +17,12 @@ $areaId =       Core_Array::Get('area_id', 0, PARAM_INT);
 $statusId =     Core_Array::Get('status_id', 0, PARAM_INT);
 $phoneNumber =  Core_Array::Get('number', '', PARAM_STRING);
 $instrument =   Core_Array::Get('instrument', 0, PARAM_INT);
+$vk =           Core_Array::Get('vk', '', PARAM_STRING);
 
 Core::requireClass('Lid_Controller');
 Core::requireClass('Lid_Controller_Extended');
 
-$LidController = new Lid_Controller_Extended(User::current());
+$LidController = new Lid_Controller_Extended(User_Auth::current());
 $LidController->getQueryBuilder()
     ->clearOrderBy()
     ->orderBy('priority_id', 'DESC')
@@ -59,6 +60,11 @@ if ($phoneNumber != '') {
     $LidController->appendFilter('number', $phoneNumber, null, Lid_Controller::FILTER_NOT_STRICT);
     $LidController->addSimpleEntity('number', $phoneNumber);
 }
+if ($vk != '') {
+    $LidController->isEnabledPeriodControl(false);
+    $LidController->appendFilter('vk', trim($vk), null, Lid_Controller::FILTER_STRICT);
+    $LidController->addSimpleEntity('vk', $vk);
+}
 if ($instrument !== 0) {
     $LidController->appendAddFilter(20, '=', $instrument);
     $LidController->addSimpleEntity('instrument', $instrument);
@@ -70,7 +76,6 @@ $lidsPropsIds = [
     'source' => 50,
     'marker' => 54
 ];
-$LidController->getQueryBuilder();
 $LidController
     ->periodFrom($periodFrom)
     ->periodTo($periodTo)

@@ -343,6 +343,20 @@ function lidsExport(filterForm) {
     }
 }
 
+/**
+ * Функция экпорта лидов в excel из раздела "Экспорт"
+ *
+ * @param filterForm
+ */
+function lidsExportWithFilter(filterForm) {
+    var link = root + '/lids/export?action=export';
+    if (filterForm === undefined) {
+        window.location.href = link;
+    } else  {
+        window.location.href = link + '&' + filterForm.serialize();
+    }
+}
+
 
 /**
  * Формирование всплывающего окна создания/редактирования лида

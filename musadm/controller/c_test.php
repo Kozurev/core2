@@ -70,6 +70,34 @@ if ($offset == 0) {
     $Orm->executeQuery('ALTER TABLE User CHANGE patronimyc patronymic varchar(255) NOT NULL DEFAULT \'\';');
     $Orm->executeQuery('ALTER TABLE User ADD auth_token varchar(50) DEFAULT \'\' NULL;');
 
+    //Добавление структуры "Экспорт"
+    $Structure = new Structure();
+    $Structure1 = clone $Structure;
+    $Structure1
+        ->title('Экспорт лидов')
+        ->parentId(28)
+        ->path('musadm/lid/export')
+        ->templateId(0)
+        ->description('Раздел для экспорта лидов по выбранным фильтрам в exel')
+        ->children_name('Structure_Item')
+        ->active(1)
+        ->menuId(1)
+        ->sorting(0)
+        ->save();
+
+    $Structure2 = clone $Structure;
+    $Structure2
+        ->title('Раздел новых лидов')
+        ->parentId(28)
+        ->path('musadm/lid/new_lid')
+        ->templateId(0)
+        ->description('Раздел для отображения новых лидов')
+        ->children_name('Structure_Item')
+        ->active(1)
+        ->menuId(1)
+        ->sorting(0)
+        ->save();
+
 
     $Type = new Event_Type();
 

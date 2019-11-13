@@ -33,7 +33,9 @@
                         <div>
                             <input class="form-control" type="text" name="number" placeholder="Телефон" value="{/root/number}"/>
                         </div>
-
+                        <div>
+                            <input class="form-control" type="text" name="vk" placeholder="Ссылка vk" value="{/root/vk}"/>
+                        </div>
                         <div>
                             <select name="status_id" class="form-control">
                                 <option value="0">Статус</option>

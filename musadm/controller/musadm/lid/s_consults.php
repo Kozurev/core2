@@ -75,7 +75,7 @@ if ($action === 'export') {
     header('Content-Disposition: attachment; filename=consults.xls');
     $LidController = new Lid_Controller_Extended(User::current());
     $LidController->getQueryBuilder()
-        ->select([$lidsTableName . '.id', $lidsTableName . '.surname', $lidsTableName . '.name', $lidsTableName . '.number'])
+        ->select([$lidsTableName . '.id', $lidsTableName . '.surname', $lidsTableName . '.name', $lidsTableName . '.number',$lidsTableName . '.vk'])
         ->clearOrderBy()
         ->orderBy('priority_id', 'DESC')
         ->orderBy($lidsTableName . '.control_date', 'ASC');

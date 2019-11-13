@@ -192,7 +192,10 @@
                                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">Лиды<span class="caret"></span></a>
                                         <ul class="dropdown-menu">
                                             <li><a href="'.$CFG->rootdir.'/lids">Общий список</a></li>
-                                            <li><a href="'.$CFG->rootdir.'/lids/consults">Консультации</a></li>';
+                                            <li><a href="'.$CFG->rootdir.'/lids/consults">Консультации</a></li>
+                                            <li><a href="'.$CFG->rootdir.'/lids/export">Экспорт</a></li>
+                                            <li><a href="'.$CFG->rootdir.'/lids/new_lid">Новые лиды</a></li>';
+
                                     if ($accessLidStats) {
                                         echo '<li><a href="' . $CFG->rootdir . '/lids/statistic">Аналитика</a></li>';
                                     }
