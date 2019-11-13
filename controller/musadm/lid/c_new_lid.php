@@ -21,7 +21,6 @@ $vk =           Core_Array::Get('vk', '', PARAM_STRING);
 
 Core::requireClass('Lid_Controller');
 Core::requireClass('Lid_Controller_Extended');
-
 $LidController = new Lid_Controller_Extended(User_Auth::current());
 $LidController->getQueryBuilder()
     ->join(
@@ -29,9 +28,7 @@ $LidController->getQueryBuilder()
         'Lid_Comment_Assignment.object_id = Lid.id')
     ->groupBy('Lid.id')
     ->having('count(Lid_Comment_Assignment.id)','=',1)
-    ->clearOrderBy()
-    ->orderBy('priority_id', 'DESC')
-    ->orderBy('id', 'DESC');
+    ->orderBy('priority_id', 'DESC');
 
 if(isset($_GET['notPaginate'])){
     $LidController->isPaginate(false);
