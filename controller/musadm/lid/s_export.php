@@ -63,8 +63,8 @@ if ($action === 'export') {
     $LidController->isEnabledPeriodControl(true);
     $LidController->periodFrom($dateFrom)->periodTo($dateTo);
     $LidController->properties($properties);
-//    header('Content-type: application/vnd.ms-excel');
-//    header('Content-Disposition: attachment; filename=lid_export.xls');
+    header('Content-type: application/vnd.ms-excel');
+    header('Content-Disposition: attachment; filename=lid_export.xls');
     $LidController
         ->setXsl('musadm/lids/lid_export_to_xls.xsl')
         ->show();
