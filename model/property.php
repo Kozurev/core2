@@ -150,38 +150,6 @@ class Property extends Property_Model
 	}
 
 
-    /**
-     * Создание связи объекта со свойством
-     *
-     * @param $obj
-     * @return null
-     */
-	public function makeAssignment($obj)
-    {
-        if (empty($this->getId())) {
-            return null;
-        }
-
-        $tableName = 'Property_' . $this->type() . '_Assigment';
-        $Assignment = Core::factory($tableName)
-            ->queryBuilder()
-            ->where('object_id', '=', $obj->getId())
-            ->where('property_id', '=', $this->getId())
-            ->where('model_name', '=', $obj->getTableName())
-            ->find();
-
-        if (!is_null($Assignment)) {
-            return $Assignment;
-        }
-
-        $NewAssignment = Core::factory($tableName)
-            ->propertyId($this->getId())
-            ->objectId($obj->getId())
-            ->modelName($obj->getTableName());
-        return $NewAssignment->save();
-    }
-
-
 	/**
 	 * Удаление свойства из списка
      *

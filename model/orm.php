@@ -530,7 +530,7 @@ class Orm
             $val = 'NULL';
         } else {
             $val = '\'' . addslashes($value) . '\'';
-            //$val = htmlspecialchars($val);
+            $val = htmlspecialchars($val);
         }
         return $val;
     }

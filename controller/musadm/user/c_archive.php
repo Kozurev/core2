@@ -11,11 +11,8 @@ Core::requireClass('User_Controller_Extended');
 Core::requireClass('Schedule_Area_Controller');
 Core::requireClass('Schedule_Area_Assignment');
 
-$User = User_Auth::current();
-$UserController = new User_Controller_Extended($User);
-
-$UserController->getQueryBuilder()
-    ->forbiddenTags(['password', 'auth_token']);
+$User = User::current();
+$UserController = new User_Controller_Extended(User::current());
 
 //Пагинация
 $UserController->paginate()->setCurrentPage(
@@ -24,24 +21,6 @@ $UserController->paginate()->setCurrentPage(
 if (isset($_GET['page'])) {
     unset($_GET['page']);
 }
-
-$propertiesIds = [
-    4,  //Примечание пользователя
-    9,  //Ссылка вконтакте
-    12, //Баланс
-    13, //Кол-во индивидуальных занятий
-    14, //Кол-во групповых занятий
-    16, //Дополнительный телефон
-    17, //Длительность занятия
-    18, //Соглашение подписано
-    19, //Примечание (статус)
-    20, //Направление подготовки (инструмент)
-    28, //Год рождения
-    20, //Инструмент
-    28, //Год(дата) рождения
-    31  //Расписание занятий
-];
-$UserController->properties($propertiesIds);
 
 //Фильтры
 $ScheduleAssignment = new Schedule_Area_Assignment();
@@ -77,7 +56,7 @@ foreach ($_GET as $paramName => $values) {
 try {
     $UserController
         ->setActive(false)
-        //->properties(true)
+        ->properties(true)
         ->isShowCount(true)
         ->isPaginate(true)
         ->addSimpleEntity('table-type', User_Controller_Extended::TABLE_ARCHIVE)

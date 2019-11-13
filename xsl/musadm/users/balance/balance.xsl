@@ -134,15 +134,7 @@
                                         </label>
                                     </td>
                                 </tr>
-                                <xsl:if test="entry != ''">
-                                    <tr>
-                                        <td>Последяя авторизация</td>
-                                        <td colspan="2"><xsl:value-of select="entry" /></td>
-                                    </tr>
-                                </xsl:if>
-                            </xsl:if>
 
-                            <xsl:if test="is_admin = 1">
                                 <xsl:if test="count(absent) > 0">
                                     <tr id="absent-row">
                                         <td>Периоды отсутствия</td>
@@ -178,6 +170,14 @@
                                         </td>
                                     </tr>
                                 </xsl:if>
+
+                                <xsl:if test="entry != ''">
+                                    <tr>
+                                        <td>Последяя авторизация</td>
+                                        <td colspan="2"><xsl:value-of select="entry" /></td>
+                                    </tr>
+                                </xsl:if>
+
                                 <tr>
                                     <td>Статус</td>
 
@@ -195,15 +195,6 @@
                                     </td>
                                 </tr>
 
-                                <xsl:if test="prev_lid != '0'">
-                                    <td colspan="3" class="center">
-                                        Создан из лида №
-                                        <a href="#" class="info-by-id" data-model="Lid" data-id="{prev_lid}">
-                                            <xsl:value-of select="prev_lid" />
-                                        </a>
-                                    </td>
-                                </xsl:if>
-
                                 <tr>
                                     <td colspan="3">
                                         <div class="row buttons-panel center">
@@ -217,7 +208,16 @@
                                         </div>
                                     </td>
                                 </tr>
+                                <xsl:if test="prev_lid != '0'">
+                                    <td colspan="3" class="center">
+                                        Создан из лида №
+                                        <a href="#" class="info-by-id" data-model="Lid" data-id="{prev_lid}">
+                                            <xsl:value-of select="prev_lid" />
+                                        </a>
+                                    </td>
+                                </xsl:if>
                             </xsl:if>
+
                         </table>
                     </div>
                 </div>

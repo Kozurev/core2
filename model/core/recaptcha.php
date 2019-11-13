@@ -12,14 +12,14 @@ class Core_Recaptcha
      *
      * @var string
      */
-    private static $publicKey = '6LeHboEUAAAAANpaD0q2li1tOw4zjBpF5dXlQuup';
+    private static $publicKey = '6LdowcEUAAAAAF6iRw05QXJ4WuAxv_ef4GbTewvY';
 
     /**
      * Секретный ключ
      *
      * @var string
      */
-    private static $secretKey = '6LeHboEUAAAAAHrZgE0e-F0GVJomyJ3Kmz4tMHOv';
+    private static $secretKey = '6LdowcEUAAAAAF2wgPzwwT1gAk2R2j9evzVeP3ck';
 
     /**
      * Расшифровка кодов ошибок ответа Google

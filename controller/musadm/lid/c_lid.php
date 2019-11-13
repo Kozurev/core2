@@ -69,7 +69,7 @@ if ($instrument !== 0) {
     $LidController->appendAddFilter(20, '=', $instrument);
     $LidController->addSimpleEntity('instrument', $instrument);
 }
-
+$LidController->appendAddFilter('count(Comment.id)','=',1);
 
 $lidsPropsIds = [
     'instrument' => 20,
