@@ -22,9 +22,6 @@
             <td>
                 <xsl:value-of select="number" />
             </td>
-            <td>
-                <xsl:value-of select="vk" />
-            </td>
         </tr>
     </xsl:template>
 </xsl:stylesheet>
