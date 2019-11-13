@@ -25,7 +25,7 @@ $back = Core_Array::Get('back', $CFG->rootdir);
     ?>
 
     <div class="re">
-        <div class="g-recaptcha" data-sitekey="<?=Core_Recaptcha::getPublicKey()?>" style="text-align: center;"></div>
+        <div class="g-recaptcha" data-sitekey="<?=Core_Recaptcha::instance()->getPublicKey()?>" style="text-align: center;"></div>
     </div>
 
     <label for="remember">Запомнить меня</label>

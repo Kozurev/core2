@@ -19,8 +19,8 @@ $CurrentUser = User_Auth::current();
  * Авторизация при помощи логина/пароля
  */
 if (!is_null(Core_Array::Post('do_auth', null, PARAM_STRING))) {
-    if (!Core_Recaptcha::checkRequest()) {
-        Core_Page_Show::instance()->setParam('auth-errors', Core_Recaptcha::getErrorsStr());
+    if (!Core_Recaptcha::instance()->checkRequest()) {
+        Core_Page_Show::instance()->setParam('auth-errors', Core_Recaptcha::instance()->getErrorsStr());
     } else {
         //указатель для запоминания пользователя в системе
         $rememberMe = (bool)Core_Array::Post('remember', null, PARAM_STRING);

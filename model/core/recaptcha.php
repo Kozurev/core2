@@ -8,18 +8,25 @@
 class Core_Recaptcha
 {
     /**
+     * @var Core_Recaptcha
+     */
+    private static $_instance;
+
+
+    /**
      * Публичный HTML ключ
      *
      * @var string
      */
-    private static $publicKey = '6LdowcEUAAAAAF6iRw05QXJ4WuAxv_ef4GbTewvY';
+    private $publicKey;
 
     /**
      * Секретный ключ
      *
      * @var string
      */
-    private static $secretKey = '6LdowcEUAAAAAF2wgPzwwT1gAk2R2j9evzVeP3ck';
+    private $secretKey;
+
 
     /**
      * Расшифровка кодов ошибок ответа Google
@@ -35,16 +42,36 @@ class Core_Recaptcha
     ];
 
 
-    private static $errors = [];
+    private $errors = [];
 
+
+    private function __construct(string $secretKey, string $publicKey)
+    {
+        global $CFG;
+        $this->publicKey = $CFG->recaptcha->publicKey;
+        $this->secretKey = $CFG->recaptcha->secretKey;
+    }
+
+
+    /**
+     * @return Core_Recaptcha
+     */
+    public static function instance()
+    {
+        if (empty(self::$_instance)) {
+            global $CFG;
+            self::$_instance = new Core_Recaptcha($CFG->recaptcha->secretKey, $CFG->recaptcha->publicKey);
+        }
+        return self::$_instance;
+    }
 
 
     /**
      * @return string
      */
-    public static function getPublicKey()
+    public function getPublicKey()
     {
-        return self::$publicKey;
+        return $this->publicKey;
     }
 
 
@@ -53,10 +80,10 @@ class Core_Recaptcha
      *
      * @return string
      */
-    public static function getErrorsStr()
+    public function getErrorsStr()
     {
         $errorsMsg = '';
-        foreach (self::$errors as $error) {
+        foreach ($this->errors as $error) {
             $errorsMsg .= self::$errorCodesLang[$error] . PHP_EOL;
         }
         return $errorsMsg;
@@ -68,10 +95,10 @@ class Core_Recaptcha
      *
      * @return bool
      */
-    public static function checkRequest()
+    public function checkRequest()
     {
         $recaptchaRequest = Core_Array::Request('g-recaptcha-response', null, PARAM_STRING);
-        return self::isValid($recaptchaRequest);
+        return $this->isValid($recaptchaRequest);
     }
 
 
@@ -81,11 +108,11 @@ class Core_Recaptcha
      * @param $request
      * @return bool
      */
-    public static function isValid($request)
+    public function isValid($request)
     {
         $postData = http_build_query(
             [
-                'secret'    =>  self::$secretKey,
+                'secret'    =>  $this->secretKey,
                 'response'  =>  $request,
                 'remoteip'  =>  Core_Array::Server('REMOTE_ADDR', '', PARAM_STRING)
             ]
@@ -110,7 +137,7 @@ class Core_Recaptcha
         if ($response !== null && $response['success'] == true) {
             return true;
         } else {
-            self::$errors = $response['error-codes'];
+            $this->errors = $response['error-codes'];
             return false;
         }
     }
