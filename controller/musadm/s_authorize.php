@@ -110,5 +110,3 @@ if (Core_Array::Get('ajax', false, PARAM_BOOL) === true){
     Core_Page_Show::instance()->execute();
     exit;
 }
-
-//Тест куернке

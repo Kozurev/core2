@@ -12,13 +12,27 @@ global $CFG;
 Orm::Debug(false);
 $Orm = new Orm();
 
-Core::requireClass('Event_Type');
 Core::requireClass('Property');
 Core::requireClass('Property_Controller');
 
-//unset($_SESSION['core'][User_Auth::SESSION_ID]);
-//unset($_SESSION['core'][User_Auth::SESSION_USER]);
-//unset($_SESSION['core'][User_Auth::SESSION_PREV_IDS]);
+
+/**
+ * Рефакторинг связей объектов с доп. свойствами
+ */
+$GroupClient = Core::factory('User_Group', ROLE_CLIENT);
+$GroupTeacher = Core::factory('User_Group', ROLE_TEACHER);
+
+$Balance = Property_Controller::factoryByTag('balance');
+$IndivLessons = Property_Controller::factoryByTag('indiv_lessons');
+$GroupLessons = Property_Controller::factoryByTag('group_lessons');
+
+$Orm->executeQuery('DELETE FROM Property_Int_Assigment WHERE property_id in (12, 13, 14)');
+
+$Balance->makeAssignment($GroupClient);
+$IndivLessons->makeAssignment($GroupClient);
+$GroupLessons->makeAssignment($GroupClient);
+
+
 
 exit;
 $limit = 50;
