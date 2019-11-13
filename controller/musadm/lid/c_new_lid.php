@@ -24,6 +24,11 @@ Core::requireClass('Lid_Controller_Extended');
 
 $LidController = new Lid_Controller_Extended(User_Auth::current());
 $LidController->getQueryBuilder()
+    ->join(
+        ' Lid_Comment_Assignment ',
+        'Lid_Comment_Assignment.object_id = Lid.id')
+    ->groupBy('Lid.id')
+    ->having('count(Lid_Comment_Assignment.id)','=',1)
     ->clearOrderBy()
     ->orderBy('priority_id', 'DESC')
     ->orderBy('id', 'DESC');
