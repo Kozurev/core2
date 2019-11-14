@@ -27,7 +27,7 @@ $LidController->getQueryBuilder()
         ' Lid_Comment_Assignment ',
         'Lid_Comment_Assignment.object_id = Lid.id')
     ->groupBy('Lid.id')
-    ->having('count(Lid_Comment_Assignment.id)','=',1)
+    ->having('count(Lid_Comment_Assignment.id)','<=',1)
     ->orderBy('priority_id', 'DESC');
 
 if(isset($_GET['notPaginate'])){
