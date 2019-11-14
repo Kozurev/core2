@@ -46,8 +46,12 @@ if ($action === 'export') {
         $properties = [20, 50, 54];
     }
 
-    if(in_array('source', $options) and !(in_array(50 ,$properties)) and is_array($properties)){
-        array_push($properties,50);
+    if(in_array('source', $options)){
+        if(is_array($properties) and !(in_array(50 ,$properties))) {
+            array_push($properties, 50);
+        } else {
+            $properties = [50];
+        }
     }
 
     $LidController = new Lid_Controller_Extended(User_Auth::current());
