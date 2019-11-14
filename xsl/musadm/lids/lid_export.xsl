@@ -99,14 +99,13 @@
                                 <label for="source">Источник</label>
                             </div>
                             <div>
-                                <input type="checkbox" name="properties[]" id="instrument" value="20"/>
-                                <label for="instrument">Инструмент</label>
-                            </div>
-                            <div>
                                 <input type="checkbox" name="properties[]" id="marker" value="54"/>
                                 <label for="marker">Маркер</label>
                             </div>
-
+                            <div>
+                                <input type="checkbox" name="properties[]" id="instrument" value="20"/>
+                                <label for="instrument">Инструмент</label>
+                            </div>
                             </div>
                         </div>
                     </div>
