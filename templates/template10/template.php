@@ -126,7 +126,7 @@
                 <nav class="navbar navbar-inverse">
                     <div class="container-fluid">
                         <div class="navbar-header">
-                            <a class="navbar-brand" href="<?=$CFG->rootdir?>">Musicmetod</a>
+                            <a class="navbar-brand" href="<?=$CFG->rootdir?>">Musicmetod 123</a>
                         </div>
                         <ul class="nav navbar-nav">
                             <?php
