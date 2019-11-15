@@ -87,39 +87,41 @@
                                 </td>
                             </tr>
 
-                            <xsl:if test="is_director = 1">
-                                <tr>
-                                    <td>Значение медиан (индив/груп)</td>
-                                    <td>
-                                        <xsl:choose>
-                                            <xsl:when test="access_user_edit_lessons = 1">
-                                                <span>
-                                                    <span id="medianaIdiv" onclick="editClientRate({user/id}, 'client_rate_indiv', '#medianaIdiv')"
-                                                          title="Нажмите для корректировки медианы">
+                            <xsl:if test="is_admin = 1">
+                                <xsl:if test="is_director = 1">
+                                    <tr>
+                                        <td>Значение медиан (индив/груп)</td>
+                                        <td>
+                                            <xsl:choose>
+                                                <xsl:when test="access_user_edit_lessons = 1">
+                                                    <span>
+                                                        <span id="medianaIdiv" onclick="editClientRate({user/id}, 'client_rate_indiv', '#medianaIdiv')"
+                                                              title="Нажмите для корректировки медианы">
+                                                            <xsl:value-of select="mediana_indiv" />
+                                                        </span>
+                                                    </span>
+                                                    <xsl:text> / </xsl:text>
+                                                    <span>
+                                                        <span id="medianaGroup" onclick="editClientRate({user/id}, 'client_rate_group', '#medianaGroup')"
+                                                              title="Нажмите для корректировки медианы">
+                                                            <xsl:value-of select="mediana_group" />
+                                                        </span>
+                                                    </span>
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <span id="medianaIdiv">
                                                         <xsl:value-of select="mediana_indiv" />
                                                     </span>
-                                                </span>
-                                                <xsl:text> / </xsl:text>
-                                                <span>
-                                                    <span id="medianaGroup" onclick="editClientRate({user/id}, 'client_rate_group', '#medianaGroup')"
-                                                          title="Нажмите для корректировки медианы">
+                                                    <xsl:text> / </xsl:text>
+                                                    <span id="medianaGroup">
                                                         <xsl:value-of select="mediana_group" />
                                                     </span>
-                                                </span>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <span id="medianaIdiv">
-                                                    <xsl:value-of select="mediana_indiv" />
-                                                </span>
-                                                <xsl:text> / </xsl:text>
-                                                <span id="medianaGroup">
-                                                    <xsl:value-of select="mediana_group" />
-                                                </span>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </td>
-                                    <td></td>
-                                </tr>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </xsl:if>
 
                                 <tr>
                                     <td>Поурочно</td>
