@@ -25,12 +25,13 @@
             </xsl:choose>
 
             <xsl:choose>
-                <xsl:when test="//name != '' and name ">
+                <xsl:when test="//name != '' and name != '' ">
                     <td>
                         <xsl:value-of select="name" />
                     </td>
                 </xsl:when>
                 <xsl:otherwise>
+
                 </xsl:otherwise>
             </xsl:choose>
 

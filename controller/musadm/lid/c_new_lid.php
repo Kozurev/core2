@@ -23,12 +23,13 @@ Core::requireClass('Lid_Controller');
 Core::requireClass('Lid_Controller_Extended');
 $LidController = new Lid_Controller_Extended(User_Auth::current());
 $LidController->getQueryBuilder()
-    ->join(
+    ->leftJoin(
         ' Lid_Comment_Assignment ',
         'Lid_Comment_Assignment.object_id = Lid.id')
     ->groupBy('Lid.id')
-    ->having('count(Lid_Comment_Assignment.id)','=',1)
+    ->having('count(Lid_Comment_Assignment.id)','<=',1)
     ->orderBy('priority_id', 'DESC');
+
 
 if(isset($_GET['notPaginate'])){
     $LidController->isPaginate(false);

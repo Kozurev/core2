@@ -38,12 +38,20 @@ if ($action === 'export') {
     $statusId =     Core_Array::Get('status_id', 0, PARAM_INT);
     $instrument =   Core_Array::Get('instrument', 0, PARAM_INT);
 
-    $options =           Core_Array::Get('options',  PARAM_ARRAY);
-    $properties =        Core_Array::Get('properties', PARAM_ARRAY);
+    $options =           Core_Array::Get('options', '',  PARAM_ARRAY);
+    $properties =        Core_Array::Get('properties','', PARAM_ARRAY);
 
     if(is_string($options) && is_string($properties)){
         $options =  ['surname', 'name', 'number', 'vk', 'control_date','area_id','status_id','source'];
         $properties = [20, 50, 54];
+    }
+
+    if(in_array('source', $options)){
+        if(is_array($properties) and !(in_array(50 ,$properties))) {
+            array_push($properties, 50);
+        } else {
+            $properties = [50];
+        }
     }
 
     $LidController = new Lid_Controller_Extended(User_Auth::current());

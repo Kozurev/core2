@@ -93,11 +93,6 @@
                             </div>
                             <div>
                                 <div><h4>Свойтсва</h4></div>
-
-                            <div>
-                                <input type="checkbox" name="properties[]" id="source"  value="50"/>
-                                <label for="source">Источник</label>
-                            </div>
                             <div>
                                 <input type="checkbox" name="properties[]" id="marker" value="54"/>
                                 <label for="marker">Маркер</label>
