@@ -21,35 +21,20 @@ Core::requireClass('Property_Controller');
 //unset($_SESSION['core'][User_Auth::SESSION_PREV_IDS]);
 
 
-//Добавление структуры "Экспорт"
-$Structure = new Structure();
-$Structure1 = clone $Structure;
-$Structure1
-    ->title('Экспорт лидов')
-    ->parentId(28)
-    ->path('export')
-    ->action('musadm/lid/export')
-    ->templateId(0)
-    ->description('Раздел для экспорта лидов по выбранным фильтрам в exel')
-    ->children_name('Structure_Item')
+//Добавление структуры "Стоп-лист"
+$Property = new Property();
+$Property1 = clone $Property;
+$Property1
+    ->tag_name('teacher_stop_list')
+    ->title('Стоп-лист преподавателей')
+    ->description('Стоп-лист для преподавателей, запрещает преподавателю проводить консультации')
+    ->type(PARAM_BOOL)
+    ->multiple(0)
     ->active(1)
-    ->menuId(1)
+    ->dir(0)
     ->sorting(0)
     ->save();
 
-$Structure2 = clone $Structure;
-$Structure2
-    ->title('Раздел новых лидов')
-    ->parentId(28)
-    ->path('new_lid')
-    ->action('musadm/lid/new_lid')
-    ->templateId(0)
-    ->description('Раздел для отображения новых лидов')
-    ->children_name('Structure_Item')
-    ->active(1)
-    ->menuId(1)
-    ->sorting(0)
-    ->save();
 
 exit;
 $limit = 50;

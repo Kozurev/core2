@@ -95,6 +95,38 @@
 }
 
 
+.checkbox-label  {
+    left: 40px;
+    opacity: 1;
+}
+.checkbox.red {
+    position: absolute;
+    left: -5000px;
+}
+.checkbox.red + .checkbox-label .on {
+    color: #c80500;
+}
+.checkbox.red:checked + .checkbox-label {
+    background: #c80500;
+    box-shadow: 0 0 0 2px #c80500;
+}
+.checkbox.red:checked + .checkbox-label .on {
+    left: 50px;
+    opacity: 1;
+}
+.checkbox.red:checked + .checkbox-label .off {
+    right: 0px;
+    opacity: 0;
+}
+.checkbox.red:checked + .checkbox-label:before {
+    left: 20px;
+    box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2), 0 0 0 2px #c80500;
+}
+
+
+
+
+
 
 .radioBlack:before {
     border-color: black;

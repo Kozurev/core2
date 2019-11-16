@@ -212,3 +212,27 @@ function savePropertyValue(propName, value, modelName, modelId, func)
         }
     });
 }
+
+
+/**
+ * Проверка наличия дополнительного свойства
+ *
+ * @param propName   - tag_name дополнительного свойства
+ * @param modelName  - название объекта у которого ищется значение
+ * @param modelId    - id объекта у которого ищется значение
+ */
+function checkPropertyValue(propName, modelName, modelId,callback)
+{
+  $.ajax({
+        type: 'GET',
+        url: root + '/',
+        data: {
+            ajax: 1,
+            action: 'checkPropertyValue',
+            prop_name: propName,
+            model_name: modelName,
+            model_id: modelId
+        },
+        success: callback
+    });
+}

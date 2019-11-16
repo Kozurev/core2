@@ -38,6 +38,19 @@
                 <xsl:value-of select="property_value[property_id = 31]/value" />
             </td>
 
+            <td width="140px">
+                <span>
+                    <input class="checkbox red" id="checkbox{id}" type="checkbox" name="teacher_stop_list" data-user_id="{id}" >
+                        <xsl:if test="property_value[property_id = 59]/value = 1">
+                            <xsl:attribute name="checked">true</xsl:attribute>
+                        </xsl:if>
+                    </input>
+                    <label for="checkbox{id}" class="checkbox-label">
+                        <span class="off">Нет</span>
+                        <span class="on">Да</span>
+                    </label>
+                </span>
+            </td>
             <td>
                 <span data-areas="User_{id}"><xsl:apply-templates select="schedule_area_assignment" /></span>
             </td>

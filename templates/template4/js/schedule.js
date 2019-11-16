@@ -30,6 +30,13 @@ $(function(){
             getScheduleAbsentPopup(userId, typeId, date);
         })
 
+         //Занесение преподавателя в стоп-лист
+        .on('click', 'input[name=teacher_stop_list]', function() {
+            var userId = $(this).data('user_id');
+            var value = $(this).prop('checked');
+            savePropertyValue('teacher_stop_list', value, 'User', userId, loaderOff);
+        })
+
         //Сохранение данных периода отсутствия
         .on('click', '.popop_schedule_absent_submit', function(e) {
             e.preventDefault();
@@ -109,7 +116,6 @@ $(function(){
             var typeId = Form.find('select[name=typeId]').val();
             var isCreateTask = $('input[name=is_create_task]');
 
-
             //Проверка преподавателя на отсутствие
             Schedule.checkAbsentPeriod({
                 userId: teacherId,
@@ -162,14 +168,30 @@ $(function(){
 
                         });
                     } else {
-                        //Сделал сразу заготовку для добавления задачи группе
-                        saveData('Main', function (response) {
-                            if (response == false && (typeId == 1 || typeId == 2))
-                            {
-                                addTask(isCreateTask,clientId,date,areaId);
-                            }
-                            refreshSchedule();
-                        });
+                        if(typeId ==3){
+                            checkPropertyValue('teacher_stop_list','User',teacherId,
+                                function(data){
+                                if(data == true){
+                                    alert('Преподаватель в стоп листе, постановка консультации невозможна!!!');
+                                    loaderOff();
+                                } else {
+                                    saveData('Main', function (response) {
+                                        refreshSchedule();
+                                    });
+
+                                }
+                            });
+                        }
+                        else {
+                            //Сделал сразу заготовку для добавления задачи группе
+                            saveData('Main', function (response) {
+                                if (response == false && (typeId == 1 || typeId == 2))
+                                {
+                                    addTask(isCreateTask,clientId,date,areaId);
+                                }
+                                refreshSchedule();
+                            });
+                        }
                     }
                 }
             });
@@ -506,6 +528,7 @@ $(function(){
     var result = year + '-' + month + '-' + day;
     $('.schedule_calendar').val(result);
 });
+
 
 // Создание задачи с напоминанием
 function addTask(isCreateTask,clientId,date,areaId) {

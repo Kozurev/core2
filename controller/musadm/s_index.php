@@ -153,10 +153,51 @@ if ($action === 'savePropertyValue') {
     if (is_null($Object)) {
         Core_Page_Show::instance()->error(404);
     }
+    //Проверка , если доп.свойство типа boolean
+    if($propertyValue == 'true' or $propertyValue == 'false' ) {
+        $propertyValue = $propertyValue == 'true' ? true : false;
+    }
 
     $Value = $Property->getValues($Object)[0];
     $Value->value($propertyValue);
     $Value->save();
+    exit;
+}
+
+/**
+ * Обработчик для получения значения доп. свойства
+ */
+if ($action === 'checkPropertyValue') {
+    $propertyName = Core_Array::Get('prop_name', null, PARAM_STRING);
+    $modelId =      Core_Array::Get('model_id', null, PARAM_INT);
+    $modelName =    Core_Array::Get('model_name', null, PARAM_STRING);
+
+    $Object = Core::factory($modelName);
+    $Property = Property_Controller::factoryByTag($propertyName);
+
+    if (is_null($Property) || is_null($Object)) {
+        Core_Page_Show::instance()->error(404);
+    }
+
+    if (method_exists($Object, 'subordinated')) {
+        $Object->queryBuilder()
+            ->open()
+            ->where('subordinated', '=', $subordinated)
+            ->orWhere('subordinated', '=', 0)
+            ->close();
+    }
+
+    $Object = $Object->queryBuilder()
+        ->where('id', '=', $modelId)
+        ->find();
+
+    if (is_null($Object)) {
+        Core_Page_Show::instance()->error(404);
+    }
+
+
+    $Value = $Property->getValues($Object)[0];
+    echo $Value->value();
     exit;
 }
 
