@@ -42,7 +42,7 @@ if ($action === 'checkAbsentPeriod') {
     $date =     Core_Array::Get('date', '', PARAM_DATE);
     $timeFrom = Core_Array::Get('timeFrom', '00:00:00', PARAM_STRING);
     $timeTo =   Core_Array::Get('timeTo', '00:00:00', PARAM_STRING);
-
+    //$typeId =   Core_Array::Get();
     if (empty($date)) {
         die(REST::error(1, 'Не указан обязательный параметр date (дата)'));
     }
@@ -52,7 +52,6 @@ if ($action === 'checkAbsentPeriod') {
     if (strlen($timeTo) == 5) {
         $timeTo .= ':00';
     }
-
     $AbsentPeriod = Core::factory('Schedule_Absent')
         ->queryBuilder()
         ->where('object_id', '=', $userId)
@@ -60,31 +59,35 @@ if ($action === 'checkAbsentPeriod') {
         ->where('date_to', '>=', $date)
         ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
         ->find();
-
     $response = new stdClass();
+    $response->isset = false;
     if (!is_null($AbsentPeriod)) {
         //Если время выставляемого занятия подпадает под период отсутствия
-        if (
-            ($timeFrom == '00:00:00' && $timeTo == '00:00:00')
-            || ($AbsentPeriod->dateFrom() == $date && compareTime($timeTo, '>', $AbsentPeriod->timeFrom()))
-            || ($AbsentPeriod->dateTo() == $date && compareTime($timeFrom, '<', $AbsentPeriod->timeTo()))
-            || ($date != $AbsentPeriod->dateFrom() && $date != $AbsentPeriod->dateTo())
+        if ($AbsentPeriod->dateFrom() != $AbsentPeriod->dateTo()) {
+            if (
+                ($timeFrom == '00:00:00' && $timeTo == '00:00:00')
+                || ($AbsentPeriod->dateFrom() == $date && compareTime($timeTo, '>', $AbsentPeriod->timeFrom()))
+                || ($AbsentPeriod->dateTo() == $date && compareTime($timeFrom, '<', $AbsentPeriod->timeTo()))
+                || ($date != $AbsentPeriod->dateFrom() && $date != $AbsentPeriod->dateTo())
+            ) {
+                $response->isset = true;
+            }
+        } elseif (
+            isTimeInRange($timeFrom, $AbsentPeriod->timeFrom(), $AbsentPeriod->timeTo())
+            || isTimeInRange($timeTo, $AbsentPeriod->timeFrom(), $AbsentPeriod->timeTo())
         ) {
-            $isset = true;
-            $response->period = new stdClass();
-            $response->period->id = $AbsentPeriod->getId();
-            $response->period->clientId = $AbsentPeriod->objectId();
-            $response->period->dateFrom[0] = $AbsentPeriod->dateFrom();
-            $response->period->dateFrom[1] = refactorDateFormat($AbsentPeriod->dateFrom());
-            $response->period->dateTo[0] = $AbsentPeriod->dateTo();
-            $response->period->dateTo[1] = refactorDateFormat($AbsentPeriod->dateTo());
-        } else {
-            $isset = false;
+            $response->isset = true;
         }
-    } else {
-        $isset = false;
     }
-    $response->isset = $isset;
+    if ($response->isset == true) {
+        $response->period = new stdClass();
+        $response->period->id = $AbsentPeriod->getId();
+        $response->period->clientId = $AbsentPeriod->objectId();
+        $response->period->dateFrom[0] = $AbsentPeriod->dateFrom();
+        $response->period->dateFrom[1] = refactorDateFormat($AbsentPeriod->dateFrom());
+        $response->period->dateTo[0] = $AbsentPeriod->dateTo();
+        $response->period->dateTo[1] = refactorDateFormat($AbsentPeriod->dateTo());
+    }
     die(json_encode($response));
 }
 
