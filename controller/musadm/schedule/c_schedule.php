@@ -603,7 +603,7 @@ if ($User->groupId() == ROLE_TEACHER) {
         $AbsentPeriods = Core::factory('Schedule_Absent')
             ->queryBuilder()
             ->where('type_id', '=', 1)
-            ->where('date_from', '>=', date('Y-m-d'))
+            ->where('date_to', '>=', date('Y-m-d'))
             ->where('object_id', '=', $User->getId())
             ->findAll();
 
