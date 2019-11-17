@@ -32,8 +32,8 @@ $(function(){
 
          //Занесение преподавателя в стоп-лист
         .on('click', 'input[name=teacher_stop_list]', function() {
-            var userId = $(this).data('user_id');
-            var value = $(this).prop('checked');
+            let userId = $(this).data('user_id');
+            let value = $(this).prop('checked');
             savePropertyValue('teacher_stop_list', value, 'User', userId, loaderOff);
         })
 
@@ -60,7 +60,7 @@ $(function(){
 
             Schedule.saveAbsentPeriod(absentData, function (response) {
                 if (checkResponseStatus(response)) {
-                    var msg = 'Период отсутствия с ' + response.absent.refactoredDateFrom + ' ';
+                    let msg = 'Период отсутствия с ' + response.absent.refactoredDateFrom + ' ';
                     if (response.absent.refactoredTimeFrom != '00:00') {
                         msg += response.absent.refactoredTimeFrom;
                     }
@@ -86,17 +86,17 @@ $(function(){
 
         //Открытие всплывающего окна создания занятия
         .on('click', '.add_lesson', function() {
-            var date = $(this).data('date');
-            var lessonDate = new Date(date);
-            var currentDate = new Date(getCurrentDate());
+            let date = $(this).data('date');
+            let lessonDate = new Date(date);
+            let currentDate = new Date(getCurrentDate());
 
             if (lessonDate.valueOf() < currentDate.valueOf()) {
                 return false;
             }
 
-            var type = $(this).data('schedule_type');
-            var classId = $(this).data('class_id');
-            var areaId = $(this).data('area_id');
+            let type = $(this).data('schedule_type');
+            let classId = $(this).data('class_id');
+            let areaId = $(this).data('area_id');
             getScheduleLessonPopup(classId, date, areaId, type);
         })
 
@@ -105,16 +105,16 @@ $(function(){
             e.preventDefault();
             loaderOn();
 
-            var Form = $('#createData');
-            var clientId = Form.find('select[name=clientId]').val();
-            var teacherId = Form.find('select[name=teacherId]').val();
-            var date = Form.find('input[name=insertDate]').val();
-            var timeFrom = Form.find('input[name=timeFrom]').val();
-            var timeTo = Form.find('input[name=timeTo]').val();
-            var areaId = Form.find('input[name=areaId]').val();
-            var lessonType = Form.find('input[name=lessonType]').val();
-            var typeId = Form.find('select[name=typeId]').val();
-            var isCreateTask = $('input[name=is_create_task]');
+            let Form = $('#createData');
+            let clientId = Form.find('select[name=clientId]').val();
+            let teacherId = Form.find('select[name=teacherId]').val();
+            let date = Form.find('input[name=insertDate]').val();
+            let timeFrom = Form.find('input[name=timeFrom]').val();
+            let timeTo = Form.find('input[name=timeTo]').val();
+            let areaId = Form.find('input[name=areaId]').val();
+            let lessonType = Form.find('input[name=lessonType]').val();
+            let typeId = Form.find('select[name=typeId]').val();
+            let isCreateTask = $('input[name=is_create_task]');
 
             //Проверка преподавателя на отсутствие
             Schedule.checkAbsentPeriod({
@@ -127,8 +127,6 @@ $(function(){
                     alert('В указанное время преподаватель отсутствует');
                     loaderOff();
                 } else {
-
-
                     //Если это индивидуальное занятие
                     if (typeId == 1) {
                         Schedule.checkAbsentPeriod({userId: clientId, date: date}, function (response) {
@@ -139,8 +137,7 @@ $(function(){
                                     if (confirm('В данное время у клиента существует активный период отсутсвия с '
                                         + response.period.dateFrom[1] + ' по ' + response.period.dateTo[1] + '. Хотите продолжить?')) {
                                         saveData('Main', function (response) {
-                                            if (response == false)
-                                            {
+                                            if (response == false) {
                                                 addTask(isCreateTask,clientId,date,areaId);
                                             }
                                             refreshSchedule();
@@ -148,45 +145,36 @@ $(function(){
                                     } else {
                                         loaderOff();
                                     }
-                                }
-                                //Постановка в актуальный график
-                                else {
+                                } else { //Постановка в актуальный график
                                     alert('Постановка клиента в расписание на данную дату невозможна, так как у него имеется активный'
                                         + ' период отсутствия с ' + response.period.dateFrom[1] + ' по ' + response.period.dateTo[1]);
                                     loaderOff();
                                 }
-                            }
-                            else {
+                            } else {
                                 saveData('Main', function (response) {
-                                    if (response == false)
-                                    {
+                                    if (response == false) {
                                         addTask(isCreateTask,clientId,date,areaId);
                                     }
                                     refreshSchedule();
                                 });
                             }
-
                         });
                     } else {
                         if(typeId ==3){
-                            checkPropertyValue('teacher_stop_list','User',teacherId,
-                                function(data){
-                                if(data == true){
+                            checkPropertyValue('teacher_stop_list','User',teacherId, function(data) {
+                                if (data == true) {
                                     alert('Преподаватель в стоп листе, постановка консультации невозможна!!!');
                                     loaderOff();
                                 } else {
                                     saveData('Main', function (response) {
                                         refreshSchedule();
                                     });
-
                                 }
                             });
-                        }
-                        else {
+                        } else {
                             //Сделал сразу заготовку для добавления задачи группе
                             saveData('Main', function (response) {
-                                if (response == false && (typeId == 1 || typeId == 2))
-                                {
+                                if (response == false && (typeId == 1 || typeId == 2)) {
                                     addTask(isCreateTask,clientId,date,areaId);
                                 }
                                 refreshSchedule();
@@ -195,15 +183,14 @@ $(function(){
                     }
                 }
             });
-
         })
 
         //Удаление занятия из основного графика
         .on('click', '.schedule_delete_main', function(e) {
             e.preventDefault();
             loaderOn();
-            var lessonid = $(this).data('id');
-            var deletedate = $(this).data('date');
+            let lessonid = $(this).data('id');
+            let deletedate = $(this).data('date');
             markDeleted(lessonid, deletedate, refreshSchedule);
         })
 
@@ -211,8 +198,8 @@ $(function(){
         .on('click', '.schedule_today_absent', function(e) {
             e.preventDefault();
             loaderOn();
-            var lessonid = $(this).parent().parent().data('id');
-            var date = $(this).parent().parent().data('date');
+            let lessonid = $(this).parent().parent().data('id');
+            let date = $(this).parent().parent().data('date');
             markAbsent(lessonid, date, refreshSchedule);
             loaderOff();
         })
@@ -220,8 +207,8 @@ $(function(){
         //Открытие всплывающего окна для редактирования времени проведения занятия
         .on('click', '.schedule_update_time', function(e) {
             e.preventDefault();
-            var lessonid = $(this).parent().parent().data('id');
-            var date = $(this).parent().parent().data('date');
+            let lessonid = $(this).parent().parent().data('id');
+            let date = $(this).parent().parent().data('date');
             getScheduleChangeTimePopup(lessonid, date);
         })
 
@@ -229,10 +216,10 @@ $(function(){
         .on('click', '.popop_schedule_time_submit', function(e) {
             e.preventDefault();
             loaderOn();
-            var timeFrom = $('input[name=timeFrom]').val();
-            var timeTo = $('input[name=timeTo]').val();
-            var lessonId = $('input[name=lesson_id]').val();
-            var date = $('input[name=date]').val();
+            let timeFrom = $('input[name=timeFrom]').val();
+            let timeTo = $('input[name=timeTo]').val();
+            let lessonId = $('input[name=lesson_id]').val();
+            let date = $('input[name=date]').val();
             saveScheduleChangeTimePopup(lessonId, date, timeFrom, timeTo, refreshSchedule);
         })
 
@@ -242,8 +229,8 @@ $(function(){
          */
         .on('change', 'select[name=typeId]', function() {
             loaderOn();
-            var type = $(this).val();
-            var select = $('.clients');
+            let type = $(this).val();
+            let select = $('.clients');
 
             if (type != 0) {
                 select.show();
@@ -251,11 +238,11 @@ $(function(){
                 select.hide();
             }
 
-            var rememberRow = $('#createData').find('.remember');
+            let rememberRow = $('#createData').find('.remember');
 
             if (type == 3) {
-                var select = $('select[name=clientId]');
-                var selectBlock = select.parent();
+                let select = $('select[name=clientId]');
+                let selectBlock = select.parent();
                 select.remove();
                 selectBlock.append("<input type='number' name='clientId' class='form-control' placeholder='Номер лида' />");
                 $.each(rememberRow, function(index, value){
@@ -263,8 +250,8 @@ $(function(){
                 });
                 loaderOff();
             } else {
-                var input = $('input[name=clientId]');
-                var clientsList = $('#createData').find('select[name=clientId]');
+                let input = $('input[name=clientId]');
+                let clientsList = $('#createData').find('select[name=clientId]');
                 if (input.length > 0) {
                     var inputBlock = input.parent();
                     inputBlock.append("<select name='clientId' class='form-control valid' ></select>");
@@ -307,7 +294,7 @@ $(function(){
         .on('change', 'select[name=teacherId]', function(e){
             var lessonTyeId = $('select[name=typeId]').val();
             if (lessonTyeId == 1) {
-                var
+                let
                     clientsList = $('select[name=clientId]'),
                     selectedClient = clientsList.val(),
                     selectedTeacher = $('select[name=teacherId]').val();
@@ -351,15 +338,15 @@ $(function(){
         .on('click', '.send_report', function(e) {
             e.preventDefault();
             loaderOn();
-            var tr = $(this).parent().parent();
-            var lessonId = tr.find('input[name=lessonId]').val();
-            var date = tr.find('input[name=date]').val();
-            var typeId = tr.find('input[name=typeId]').val();
-            var attendance = tr.find('input[type=checkbox]');
-            var note = tr.find('input[name=note]');
-            var fileInput = tr.find('input[type=file]');
+            let tr = $(this).parent().parent();
+            let lessonId = tr.find('input[name=lessonId]').val();
+            let date = tr.find('input[name=date]').val();
+            let typeId = tr.find('input[name=typeId]').val();
+            let attendance = tr.find('input[type=checkbox]');
+            let note = tr.find('input[name=note]');
+            let fileInput = tr.find('input[type=file]');
 
-            var ajaxData = {
+            let ajaxData = {
                 action: 'teacherReport',
                 date: date,
                 lessonId: lessonId
@@ -367,7 +354,7 @@ $(function(){
 
             if (typeId == 2) {
                 $.each(attendance, function(key, input) {
-                    var name = $(input).attr('name');
+                    let name = $(input).attr('name');
                     if (name != 'group') {
                         ajaxData[name] = Number($(input).is(':checked'));
                     } else {
@@ -390,9 +377,13 @@ $(function(){
                         if (typeId == 3 && note.lendth != 0 && note.val() != '') {
                             Lids.saveComment(0, note.data('lidid'), note.val(), function(response){
                                 if (checkResponseStatus(response)) {
-                                    FileManager.upload(0, 1, fileInput, 'Comment', response.id, function(file) {
+                                    if (fileInput.val() != '') {
+                                        FileManager.upload(0, 1, fileInput, 'Comment', response.id, function(file) {
+                                            refreshSchedule();
+                                        });
+                                    } else {
                                         refreshSchedule();
-                                    });
+                                    }
                                 }
                             });
                         } else {
