@@ -8,7 +8,7 @@
                         <table class="table">
                             <xsl:choose>
                                 <xsl:when test="count(schedule_absent) = 0">
-                                    <h4 class="center">Предстоящих периодов отстствия не найдено</h4>
+                                    <h4 class="center">Предстоящих периодов отсутствия не найдено</h4>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:apply-templates select="schedule_absent" />
