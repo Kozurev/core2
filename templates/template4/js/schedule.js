@@ -162,7 +162,7 @@ $(function(){
                     } else {
                         if(typeId ==3){
                             checkPropertyValue('teacher_stop_list','User',teacherId, function(data) {
-                                if (data == true) {
+                                if (data == 1) {
                                     alert('Преподаватель в стоп листе, постановка консультации невозможна!!!');
                                     loaderOff();
                                 } else {
