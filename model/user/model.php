@@ -81,6 +81,13 @@ class User_Model extends Core_Entity
      */
 	protected $auth_token = '';
 
+    /**
+     * id для push уведомлений, полученный от Firebase
+     *
+     * @var string
+     */
+	protected $push_id;
+
 
     /**
      * @param int|null $groupId
@@ -281,6 +288,21 @@ class User_Model extends Core_Entity
 
 
     /**
+     * @param string|null $pushId
+     * @return $this|string
+     */
+    public function pushId(string $pushId = null)
+    {
+        if (is_null($pushId)) {
+            return $this->push_id;
+        } else {
+            $this->push_id = $pushId;
+            return $this;
+        }
+    }
+
+
+    /**
      * @return array
      */
     public function schema() : array
@@ -353,6 +375,11 @@ class User_Model extends Core_Entity
                 'required' => false,
                 'type' => PARAM_STRING,
                 'maxlength' => 50
+            ],
+            'push_id' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'maxlength' => 255
             ]
         ];
     }

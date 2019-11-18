@@ -14,6 +14,8 @@ class REST
     const STATUS_SUCCESS = 'success';
     const STATUS_ERROR = 'error';
 
+    const ERROR_UNAUTHORIZED = 'unauthorized';
+
 
     /**
      * @return Rest_User

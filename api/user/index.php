@@ -549,9 +549,9 @@ if ($action === 'get_user') {
     $response->error = null;
     $response->user = null;
 
-    $User = User::current();
+    $User = User_Auth::current();
     if (empty($User)) {
-        $response->error = 'invalid_auth';
+        $response->error = REST::ERROR_UNAUTHORIZED;
     } else {
         $response->user = $User->toStd();
         if (isset($response->user->password)) {
@@ -582,4 +582,35 @@ if ($action === 'get_user') {
     }
 
     exit(json_encode($response));
+}
+
+
+/**
+ * Сохранение идентификатора, полученного от сервиса рассылок Firebase
+ */
+if ($action === 'savePushId') {
+    $response = new stdClass();
+    $response->error = null;
+    $response->status = false;
+
+    $User = User_Auth::current();
+    if (empty($User)) {
+        $response->error = REST::ERROR_UNAUTHORIZED;
+        die(json_encode($response));
+    }
+
+    $pushId = Core_Array::Post('push_id', '', PARAM_STRING);
+    if (empty($pushId)) {
+        $response->error = 'empty_push_id';
+        die(json_encode($response));
+    }
+
+    $User->pushId($pushId);
+    if (empty($User->save())) {
+        $response->error = $User->_getValidateErrorsStr();
+        die(json_encode($response));
+    }
+
+    $response->status = true;
+    die(json_encode($response));
 }
