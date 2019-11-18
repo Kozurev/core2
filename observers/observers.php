@@ -745,7 +745,7 @@ Core::attachObserver('after.ScheduleAbsent.save', function($args) {
     }
     $periodUserId = $AbsentPeriod->objectId();
     $User = User_Controller::factory($periodUserId);
-    if ($User->groupId() != ROLE_CLIENT && $User->groupId() != ROLE_TEACHER) {
+    if ($User->groupId() != ROLE_TEACHER) {
         return;
     }
 
