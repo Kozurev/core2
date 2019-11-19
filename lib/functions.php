@@ -427,6 +427,19 @@ function isTime(string $str) : bool
 
 
 /**
+ *
+ * @date 19.11.2019 16:09
+ * @param $day
+ * @return bool
+ */
+function isDayName($day) : bool
+{
+    $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    return in_array($day, $days);
+}
+
+
+/**
  * Определяет, является ли строка датой и временем формата "Y-m-d H:i:s"
  *
  * @date 20.09.2019 18:14

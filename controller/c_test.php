@@ -12,20 +12,14 @@ global $CFG;
 Orm::Debug(false);
 $Orm = new Orm();
 
-Core::requireClass('Property');
 
-//Добавление структуры "Стоп-лист"
-$Property = new Property();
-$Property1 = clone $Property;
-$Property1
-    ->tag_name('teacher_stop_list')
-    ->title('Стоп-лист преподавателей')
-    ->description('Стоп-лист для преподавателей, запрещает преподавателю проводить консультации')
-    ->type(PARAM_BOOL)
-    ->multiple(0)
-    ->active(1)
-    ->dir(0)
-    ->sorting(0)
-    ->save();
-
-$Orm->executeQuery('ALTER TABLE User ADD push_id varchar(255) DEFAULT null NULL');
+$Orm->executeQuery('
+    CREATE TABLE Schedule_Teacher
+    (
+        id int PRIMARY KEY AUTO_INCREMENT,
+        teacher_id int,
+        day_name varchar(10),
+        time_from time,
+        time_to time
+    );
+');

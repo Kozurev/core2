@@ -679,6 +679,24 @@ if ($User->groupId() == ROLE_TEACHER) {
             ->addSimpleEntity('teacher_rate_type_absent', $absentRateType)
             ->xsl('musadm/finances/teacher_rate_config.xsl')
             ->show();
+
+        //График работы преподавателя
+        $MainSchedule = Core::factory('Schedule_Teacher')
+            ->queryBuilder()
+            ->where('teacher_id', '=', $User->getId())
+            ->orderBy('time_from')
+            ->findALl();
+
+        foreach ($MainSchedule as $time) {
+            $time->timeFrom = refactorTimeFormat($time->timeFrom());
+            $time->timeTo = refactorTimeFormat($time->timeTo());
+        }
+
+        Core::factory('Core_Entity')
+            ->addEntity($User)
+            ->addEntities($MainSchedule)
+            ->xsl('musadm/schedule/teacher_time.xsl')
+            ->show();
     }
 } else {
     /**

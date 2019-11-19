@@ -62,6 +62,10 @@ section {
     vertical-align: middle !important;
 }
 
+.black {
+    color: black !important;
+}
+
 .green {
     color: green;
 }
@@ -530,6 +534,26 @@ section {
 }
 
 
+.teacher-schedule-main .btn {
+    color: black !important;
+}
+
+.teacher-schedule-main .time {
+    height: 35px;
+}
+
+.teacher-schedule-main>tbody>tr>td {
+    vertical-align: middle !important;
+}
+
+.teacher-schedule-main .new-time-form {
+    display: none;
+    margin-top: 15px;
+}
+
+.teacher-schedule-main form div {
+    padding: 0 !important;
+}
 
 @media (min-width: 1200px) {
     .container {

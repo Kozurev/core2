@@ -86,4 +86,84 @@ class Schedule {
             }
         });
     }
+
+
+    /**
+     * Проверка на совпадение времени занятия с рабочим временем преподавателя
+     *
+     * @param data
+     * @param callback
+     */
+    static isInTeacherTime(data, callback) {
+        data.action = 'isInTeacherTime';
+        $.ajax({
+            type: 'POST',
+            url: Schedule.getApiLink(),
+            dataType: 'json',
+            data: data,
+            success: function (response) {
+                if (callback !== undefined) {
+                    callback(response);
+                }
+            },
+            error: function () {
+                notificationError('При проверке рабочего времени преподавателя произошла ошибка');
+                loaderOff();
+            }
+        });
+    }
+
+
+    /**
+     * Сохранение рабочего времени преподавателя
+     *
+     * @param data
+     * @param callback
+     */
+    static saveTeacherTime(data, callback) {
+        data.action = 'saveTeacherTime';
+        $.ajax({
+            type: 'POST',
+            url: Schedule.getApiLink(),
+            dataType: 'json',
+            data: data,
+            success: function (response) {
+                if (callback !== undefined) {
+                    callback(response);
+                }
+            },
+            error: function () {
+                notificationError('При сохранении рабочего времени преподавателя произошла ошибка');
+                loaderOff();
+            }
+        });
+    }
+
+
+    /**
+     * Удаление рабочего времени преподавателя
+     *
+     * @param id
+     * @param callback
+     */
+    static removeTeacherTime(id, callback) {
+        $.ajax({
+            type: 'POST',
+            url: Schedule.getApiLink(),
+            dataType: 'json',
+            data: {
+                action: 'removeTeacherTime',
+                id: id
+            },
+            success: function (response) {
+                if (callback !== undefined) {
+                    callback(response);
+                }
+            },
+            error: function () {
+                notificationError('При сохранении рабочего времени преподавателя произошла ошибка');
+                loaderOff();
+            }
+        });
+    }
 }

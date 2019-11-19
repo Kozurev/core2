@@ -6,6 +6,7 @@
  * @version 20191018
  */
 
+Core::requireClass('Schedule_Teacher');
 Core::requireClass('Schedule_Area');
 Core::requireClass('Schedule_Area_Assignment');
 Core::requireClass('Schedule_Lesson');
@@ -261,5 +262,147 @@ if ($action === 'get_nearest_lessons') {
 
     exit(json_encode($response));
 }
+
+
+if ($action === 'saveTeacherTime') {
+    $User = User_Auth::current();
+    if (is_null($User)) {
+        Core_Page_Show::instance()->error(403);
+    }
+    if (!User::checkUserAccess([ROLE_DIRECTOR, ROLE_MANAGER, ROLE_TEACHER], $User)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
+    $dayName =      Core_Array::Post('day_name', '', PARAM_STRING);
+    $teacherId =    Core_Array::Post('teacher_id', 0, PARAM_INT);
+    $timeFrom =     Core_Array::Post('time_from', '', PARAM_STRING);
+    $timeTo =       Core_Array::Post('time_to', '', PARAM_STRING);
+
+    if (empty($dayName)) {
+        die(REST::status(REST::STATUS_ERROR, 'Отсутствует обязательное значение параметра day_name'));
+    }
+    if (empty($timeFrom)) {
+        die(REST::status(REST::STATUS_ERROR, 'Отсутствует обязательное значение параметра time_from'));
+    }
+    if (empty($timeTo)) {
+        die(REST::status(REST::STATUS_ERROR, 'Отсутствует обязательное значение параметра time_to'));
+    }
+    if (empty($teacherId)) {
+        die(REST::status(REST::STATUS_ERROR, 'Отсутствует обязательное значение параметра teacher_id'));
+    }
+
+    if (!isDayName($dayName)) {
+        die(REST::status(REST::STATUS_ERROR, 'Параметр day_name не соответствует названию одному из дней недели'));
+    }
+
+    $TeacherTime = new Schedule_Teacher();
+    $TeacherTime->teacherId($teacherId);
+    $TeacherTime->dayName($dayName);
+    $TeacherTime->timeFrom($timeFrom);
+    $TeacherTime->timeTo($timeTo);
+
+    if (empty($TeacherTime->save())) {
+        die(REST::status(REST::STATUS_ERROR, $TeacherTime->_getValidateErrorsStr()));
+    }
+
+    $response = new stdClass();
+    $response->time = $TeacherTime->toStd();
+    $response->time->refactoredTimeFrom = refactorTimeFormat($TeacherTime->timeFrom());
+    $response->time->refactoredTimeTo = refactorTimeFormat($TeacherTime->timeTo());
+    die(json_encode($response));
+}
+
+
+/**
+ * Удаление рабочего времени преподавателя
+ */
+if ($action === 'removeTeacherTime') {
+    $User = User_Auth::current();
+    $Director = $User->getDirector();
+    if (is_null($User)) {
+        Core_Page_Show::instance()->error(403);
+    }
+    if (!User::checkUserAccess([ROLE_DIRECTOR, ROLE_MANAGER, ROLE_TEACHER], $User)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
+    $id = Core_Array::Post('id', 0, PARAM_INT);
+    $TeacherTime = new Schedule_Teacher();
+    $TeacherTime = $TeacherTime->queryBuilder()
+        ->where($TeacherTime->getTableName() . '.id', '=', $id)
+        ->join(
+            $User->getTableName() . ' AS u',
+            'u.id = ' . $TeacherTime->getTableName() . '.teacher_id AND u.subordinated = ' . $Director->getId()
+        )
+        ->find();
+
+    if (empty($id) || is_null($TeacherTime)) {
+        die(REST::status(REST::STATUS_ERROR, 'Временной промежуток с id ' . $id . ' не найден'));
+    }
+
+    $response = new stdClass();
+    $response->time = $TeacherTime->toStd();
+    $response->time->refactoredTimeFrom = refactorTimeFormat($TeacherTime->timeFrom());
+    $response->time->refactoredTimeTo = refactorTimeFormat($TeacherTime->timeTo());
+    $response->teacher = $TeacherTime->getTeacher()->toStd();
+
+    $TeacherTime->delete();
+
+    die(json_encode($response));
+}
+
+
+/**
+ * Проверка рабочего времени преподавателя
+ */
+if ($action === 'isInTeacherTime') {
+    $teacherId =    Core_Array::Post('teacher_id', 0, PARAM_INT);
+    $timeFrom =     Core_Array::Post('time_from', '', PARAM_STRING);
+    $timeTo =       Core_Array::Post('time_to', '', PARAM_STRING);
+    $dayName =      Core_Array::Post('day_name', '', PARAM_STRING);
+
+    if (empty($dayName)) {
+        die(REST::status(REST::STATUS_ERROR, 'Отсутствует обязательное значение параметра day_name'));
+    }
+    if (empty($timeFrom)) {
+        die(REST::status(REST::STATUS_ERROR, 'Отсутствует обязательное значение параметра time_from'));
+    }
+    if (empty($timeTo)) {
+        die(REST::status(REST::STATUS_ERROR, 'Отсутствует обязательное значение параметра time_to'));
+    }
+    if (empty($teacherId)) {
+        die(REST::status(REST::STATUS_ERROR, 'Отсутствует обязательное значение параметра teacher_id'));
+    }
+
+    if (!isDayName($dayName)) {
+        die(REST::status(REST::STATUS_ERROR, 'Параметр day_name не соответствует названию одному из дней недели'));
+    }
+
+    if (strlen($timeFrom) == 5) {
+        $timeFrom .= ':00';
+    }
+    if (strlen($timeTo) == 5) {
+        $timeTo .= ':00';
+    }
+
+    $response = new stdClass();
+    $response->time = null;
+
+    $TeacherScheduleTime = new Schedule_Teacher();
+    $TeacherScheduleTime = $TeacherScheduleTime->queryBuilder()
+        ->where('day_name', '=', $dayName)
+        ->where('teacher_id', '=', $teacherId)
+        ->where('time_from', '<=', $timeFrom)
+        ->where('time_to', '>=', $timeTo)
+        ->find();
+
+    if (!is_null($TeacherScheduleTime)) {
+        $response->time = $TeacherScheduleTime->toStd();
+    }
+
+    die(json_encode($response));
+}
+
+
 
 die(REST::status(REST::STATUS_ERROR, 'Отсутствует название действия'));

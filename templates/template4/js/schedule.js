@@ -114,73 +114,99 @@ $(function(){
             let areaId = Form.find('input[name=areaId]').val();
             let lessonType = Form.find('input[name=lessonType]').val();
             let typeId = Form.find('select[name=typeId]').val();
+            let dayName = Form.find('input[name=dayName]').val();
             let isCreateTask = $('input[name=is_create_task]');
 
-            //Проверка преподавателя на отсутствие
-            Schedule.checkAbsentPeriod({
-                userId: teacherId,
-                date: date,
-                timeFrom: timeFrom,
-                timeTo: timeTo
-            }, function (response) {
-                if (response.isset == true) {
-                    alert('В указанное время преподаватель отсутствует');
-                    loaderOff();
+            //Проверка на принадлежность занятия рабочему времени преподавателя
+            Schedule.isInTeacherTime({
+                teacher_id: teacherId,
+                day_name: dayName,
+                time_from: timeFrom,
+                time_to: timeTo
+            }, function(response) {
+                let
+                    isConfirmed = true,
+                    needConfirm = false;
+
+                if (response.time == null) {
+                    needConfirm = true;
+                }
+                if (needConfirm == true) {
+                    isConfirmed = confirm('Занятие выходит за рамки графика работы преподавателя, хотите продолжить?');
                 } else {
-                    //Если это индивидуальное занятие
-                    if (typeId == 1) {
-                        Schedule.checkAbsentPeriod({userId: clientId, date: date}, function (response) {
-                            //Если есть существующий период отсутсвия
-                            if (response.isset == true) {
-                                //Постановка в основной график
-                                if (lessonType == 1) {
-                                    if (confirm('В данное время у клиента существует активный период отсутсвия с '
-                                        + response.period.dateFrom[1] + ' по ' + response.period.dateTo[1] + '. Хотите продолжить?')) {
+                    isConfirmed = true;
+                }
+
+                if (isConfirmed == true) {
+                    //Проверка преподавателя на отсутствие
+                    Schedule.checkAbsentPeriod({
+                        userId: teacherId,
+                        date: date,
+                        timeFrom: timeFrom,
+                        timeTo: timeTo
+                    }, function (response) {
+                        if (response.isset == true) {
+                            alert('В указанное время преподаватель отсутствует');
+                            loaderOff();
+                        } else {
+                            //Если это индивидуальное занятие
+                            if (typeId == 1) {
+                                Schedule.checkAbsentPeriod({userId: clientId, date: date}, function (response) {
+                                    //Если есть существующий период отсутсвия
+                                    if (response.isset == true) {
+                                        //Постановка в основной график
+                                        if (lessonType == 1) {
+                                            if (confirm('В данное время у клиента существует активный период отсутсвия с '
+                                                    + response.period.dateFrom[1] + ' по ' + response.period.dateTo[1] + '. Хотите продолжить?')) {
+                                                saveData('Main', function (response) {
+                                                    if (response == false) {
+                                                        addTask(isCreateTask,clientId,date,areaId);
+                                                    }
+                                                    refreshSchedule();
+                                                });
+                                            } else {
+                                                loaderOff();
+                                            }
+                                        } else { //Постановка в актуальный график
+                                            alert('Постановка клиента в расписание на данную дату невозможна, так как у него имеется активный'
+                                                + ' период отсутствия с ' + response.period.dateFrom[1] + ' по ' + response.period.dateTo[1]);
+                                            loaderOff();
+                                        }
+                                    } else {
                                         saveData('Main', function (response) {
                                             if (response == false) {
                                                 addTask(isCreateTask,clientId,date,areaId);
                                             }
                                             refreshSchedule();
                                         });
-                                    } else {
-                                        loaderOff();
                                     }
-                                } else { //Постановка в актуальный график
-                                    alert('Постановка клиента в расписание на данную дату невозможна, так как у него имеется активный'
-                                        + ' период отсутствия с ' + response.period.dateFrom[1] + ' по ' + response.period.dateTo[1]);
-                                    loaderOff();
-                                }
-                            } else {
-                                saveData('Main', function (response) {
-                                    if (response == false) {
-                                        addTask(isCreateTask,clientId,date,areaId);
-                                    }
-                                    refreshSchedule();
                                 });
-                            }
-                        });
-                    } else {
-                        if(typeId ==3){
-                            checkPropertyValue('teacher_stop_list','User',teacherId, function(data) {
-                                if (data == 1) {
-                                    alert('Преподаватель в стоп листе, постановка консультации невозможна!!!');
-                                    loaderOff();
+                            } else {
+                                if (typeId == 3){
+                                    checkPropertyValue('teacher_stop_list','User',teacherId, function(data) {
+                                        if (data == 1) {
+                                            alert('Преподаватель в стоп листе, постановка консультации невозможна!!!');
+                                            loaderOff();
+                                        } else {
+                                            saveData('Main', function (response) {
+                                                refreshSchedule();
+                                            });
+                                        }
+                                    });
                                 } else {
+                                    //Сделал сразу заготовку для добавления задачи группе
                                     saveData('Main', function (response) {
+                                        if (response == false && (typeId == 1 || typeId == 2)) {
+                                            addTask(isCreateTask,clientId,date,areaId);
+                                        }
                                         refreshSchedule();
                                     });
                                 }
-                            });
-                        } else {
-                            //Сделал сразу заготовку для добавления задачи группе
-                            saveData('Main', function (response) {
-                                if (response == false && (typeId == 1 || typeId == 2)) {
-                                    addTask(isCreateTask,clientId,date,areaId);
-                                }
-                                refreshSchedule();
-                            });
+                            }
                         }
-                    }
+                    });
+                } else {
+                    loaderOff();
                 }
             });
         })
@@ -500,12 +526,42 @@ $(function(){
             loaderOn();
             var areaId = $(this).data('area_id');
             deleteItem('Schedule_Area', areaId, refreshAreasTable);
+        })
+
+        //Открытие или скрытие формы создания
+        .on('click', '.new-teacher-time', function(e) {
+            e.preventDefault();
+            let formBlock = $(this).parent().parent().find('.new-time-form');
+            if (formBlock.css('display') === 'none') {
+                formBlock.show();
+                $(this).text('-');
+            } else {
+                formBlock.hide();
+                $(this).text('+');
+            }
+        })
+
+        //Обработчик события сохранения нового рабочего времени преподавател
+        .on('click', '.teacher-time-save', function(e) {
+            e.preventDefault();
+            let form = $(this).parent().parent();
+            let data = {};
+            data.teacher_id = form.find('input[name=teacher_id]').val();
+            data.time_from = form.find('input[name=time_from]').val();
+            data.time_to = form.find('input[name=time_to]').val();
+            data.day_name = form.find('input[name=day_name]').val();
+
+            loaderOn();
+            Schedule.saveTeacherTime(data, function(response) {
+                if (checkResponseStatus(response)) {
+                    refreshSchedule();
+                }
+                loaderOff();
+            });
         });
 
 
-    /**
-     * Формирование текущей даты для календаря
-     */
+    //Формирование текущей даты для календаря
     var today = new Date();
     var day =   today.getDate();
     var month = today.getMonth() + 1;
@@ -880,5 +936,18 @@ function scheduleOnblurClassName(areaId, classId, newValue) {
             td.text(newValue);
             loaderOff();
         });
+    }
+}
+
+
+/**
+ * @param response
+ */
+function removeTeacherTimeCallback(response) {
+    if (checkResponseStatus(response)) {
+        $('.teacher-time-' + response.time.id).remove();
+        notificationSuccess('Рабочее время преподавателя ' + response.teacher.surname + ' ' + response.teacher.name
+            + ' с ' + response.time.refactoredTimeFrom + ' по ' + response.time.refactoredTimeTo + ' успешно удалено');
+        loaderOff();
     }
 }
