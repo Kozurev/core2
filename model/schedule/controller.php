@@ -394,6 +394,8 @@ class Schedule_Controller
                         echo "<span class=\"teacher\"> $clientFio</span>";
                     }
 
+                    //Тестовый комментарий, проверка аплоада при комите
+
                     echo "<br/>";
                     $lastAreaId = $Lesson->areaId();
                 }
