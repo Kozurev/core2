@@ -69,7 +69,7 @@
                             </label>
                             <xsl:if test="$isReported = 0 and $lidId > 0">
                                 <input type="text" class="form-control" placeholder="Примечание" name="note" data-lidid="{$lidId}"/>
-                                <br/><input type="file" name="lidCommentFile" />
+                                <br/><input type="file" accept="image/*;capture=camera" name="lidCommentFile" />
                             </xsl:if>
                         </xsl:when>
                         <xsl:otherwise>
