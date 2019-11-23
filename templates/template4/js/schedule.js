@@ -418,7 +418,7 @@ $(function(){
                     }
                 },
                 error: function(response) {
-                    notificationError('Произошла ошибка: ' + response);
+                    notificationError('Произошла ошибка: ' + response.message);
                     loaderOff();
                 }
             });
