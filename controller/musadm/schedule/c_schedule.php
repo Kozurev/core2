@@ -679,7 +679,9 @@ if ($User->groupId() == ROLE_TEACHER) {
             ->addSimpleEntity('teacher_rate_type_absent', $absentRateType)
             ->xsl('musadm/finances/teacher_rate_config.xsl')
             ->show();
+    }
 
+    if (User_Auth::current()->groupId() == ROLE_DIRECTOR) {
         //График работы преподавателя
         $MainSchedule = Core::factory('Schedule_Teacher')
             ->queryBuilder()
