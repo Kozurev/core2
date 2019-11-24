@@ -417,8 +417,8 @@ $(function(){
                         }
                     }
                 },
-                error: function(response) {
-                    notificationError('Произошла ошибка: ' + response.message);
+                error: function() {
+                    notificationError('При отправке отчета произошла ошибка. Обновите страницу и попробуйте снова');
                     loaderOff();
                 }
             });
