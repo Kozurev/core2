@@ -68,10 +68,10 @@
             </th>
             <th colspan="4">
                 <span>Выплачено: </span>
-                <p>Всего:<span class="month_total_pay"><xsl:value-of select="month_total_pay + month_additional_pay" /></span><br />
-                Премиальных:<span class="month_total_pay"><xsl:value-of select="month_additional_pay" /></span></p>
-                <span>Начислено премиальных: </span>
-               <span class="month_total_pay"><xsl:value-of select="month_additional_add" /></span>
+                <p>Всего:<span class="month_total_pay"><xsl:value-of select="month_total_pay + month_additional_pay" /></span><br /></p>
+<!--                Премиальных:<span class="month_total_pay"><xsl:value-of select="month_additional_pay" /></span></p>-->
+<!--                <span>Начислено премиальных: </span>-->
+<!--               <span class="month_total_pay"><xsl:value-of select="month_additional_add" /></span>-->
             </th>
         </tr>
 

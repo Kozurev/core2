@@ -249,6 +249,10 @@ section {
     background: url("../images/settings.svg");
     background-size: cover;
 }
+.calendar {
+    background: url("../images/calendar.png");
+    background-size: cover;
+}
 
 .arrow-left {
     background: url("../images/arrow-left.png");

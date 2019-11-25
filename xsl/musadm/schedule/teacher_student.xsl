@@ -18,7 +18,7 @@
                         <xsl:if test="is_admin =1">
                             <td>
 
-                                <a class="btn btn-green" onclick="addNewStudentToTeacher({//root/property_id},{//root/value_id})"> + </a>
+                                <a class="btn btn-green" onclick="addNewStudentToTeacher({//root/value_id})"> + </a>
                             </td>
                         </xsl:if>
                     </tr>

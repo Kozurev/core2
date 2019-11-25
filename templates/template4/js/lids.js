@@ -218,7 +218,7 @@ function getLidStatisticPopup(id) {
         type: 'GET',
         url: root + '/lids',
         data: {
-            action: 'getLidStatusPopup',
+            action: 'getLidStatisticPopup',
             id: id
         },
         success: function(response) {
@@ -227,7 +227,7 @@ function getLidStatisticPopup(id) {
         },
         error: function(response) {
             closePopup();
-            notificationError('Ошибка: редактируемый статус не существует либо принадлежит другой организации');
+            notificationError('Ошибка: Что то пошло не так');
             loaderOff();
         }
     });

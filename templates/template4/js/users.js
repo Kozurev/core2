@@ -203,7 +203,7 @@ $(function(){
                     var popupData = '<div class="popup-row-block cards-section section-lids text-center"></div>';
                     prependPopup(popupData, 80);
                     //$('.info-by-id')
-                    prependLidCard(lid, $('.section-lids'));
+                    prependLidCard(lid, $('.popup .section-lids'));
                     showPopup();
                     loaderOff();
                 });

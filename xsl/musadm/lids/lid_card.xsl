@@ -35,7 +35,9 @@
                             <a class="action comment" title="Добавить комментарий" onclick="makeLidCommentPopup(0, {id}, saveLidCommentCallback)"><input type="hidden" value="KOCTb|J|b" /></a>
                         </xsl:if>
                         <a class="action add_user" title="Создать пользователя" onclick="makeClientFromLidPopup({id})"><input type="hidden" value="KOCTb|J|b" /></a>
-
+                        <xsl:if test="/root/access_lid_edit = 1">
+                            <a class="action calendar"  onclick="getLidStatisticPopup({id})" title="События лида"><input type="hidden" value="KOCTb|J|b" /></a>
+                        </xsl:if>
                         <input type="date" class="form-control date_inp lid_date" onchange="Lids.changeDate({id}, this.value)">
                             <xsl:attribute name="value"><xsl:value-of select="control_date" /></xsl:attribute>
                             <xsl:if test="/root/access_lid_edit = 0">

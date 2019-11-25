@@ -161,27 +161,26 @@ if ($action === 'getLidStatisticPopup') {
     }
 
     $id = Core_Array::Get('id', 0, PARAM_INT);
-    if ($id !== 0) {
-        $Status = Core::factory('Lid_Status')
-            ->queryBuilder()
-            ->where('id', '=', $id)
-            ->where('subordinated', '=', $subordinated)
-            ->find();
 
-        if (is_null($Status)) {
-            Core_Page_Show::instance()->error(404);
-        }
-    } else {
-        $Status = Core::factory('Lid_Status');
+    $Events = Core::factory('Event');
+    $Events
+        ->queryBuilder()
+        ->where('type_id', '=', Event::LID_CHANGE_DATE)
+        ->where('data','like','%{"lid":{"id":"'.$id.'"%')
+        ->orderBy('time', 'DESC');
+
+    $Events = $Events->findAll();
+    foreach ($Events as $Event) {
+        $Event->date = date('d.m.Y H:i', $Event->time());
+        $Event->text = $Event->getTemplateString();
     }
 
     Core::factory('Core_Entity')
-        ->addEntity(User::current())
-        ->addEntity($Status)
-        ->addEntities(Lid_Status::getColors(), 'color')
-        ->xsl('musadm/lids/edit_lid_status_popup.xsl')
+        ->addEntities($Events)
+        ->xsl('musadm/users/events.xsl')
         ->show();
-    exit;
+exit;
+
 }
 //проверка прав доступа
 if (!$accessRead) {

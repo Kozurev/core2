@@ -184,7 +184,7 @@ $(function(){
                             } else {
                                 if (typeId == 3){
                                     checkPropertyValue('teacher_stop_list','User',teacherId, function(data) {
-                                        if (data == 1) {
+                                        if (data.value.value != 0 ) {
                                             alert('Преподаватель в стоп листе, постановка консультации невозможна!!!');
                                             loaderOff();
                                         } else {
@@ -950,4 +950,65 @@ function removeTeacherTimeCallback(response) {
             + ' с ' + response.time.refactoredTimeFrom + ' по ' + response.time.refactoredTimeTo + ' успешно удалено');
         loaderOff();
     }
+}
+
+function addNewStudentToTeacher(valueId) {
+
+
+    var popupData = $(
+        '<div align="center" class="row popup-row-block" id="accessGroupAssignments">' +
+        '<div class="col-lg-12">' +
+        '<h4>Добавить нового ученика</h4>' +
+        '</div>' +
+        '<div  class="col-lg-12 col-md-12 col-sm-12 col-xs-12">' +
+        '<div class="row">' +
+        '<div class="col-md-8">' +
+        '<input type="text" id="mainUserQuery" class="form-control" placeholder="Фамилия">' +
+        '</div>' +
+        '<div class="col-md-3">' +
+        '<a  class="btn btn-blue" onclick="' +
+        'User.getList({' +
+        'filter: {surname: $(\'#mainUserQuery\').val()},' +
+        'active: 1,' +
+        'select: [\'id\', \'surname\', \'name\', \'group_id\'],' +
+        'groups: [5],' +
+        'order: {group_id: \'ASC\', surname: \'ASC\'}' +
+        '}, function(users){ ' +
+        'var mainUserList = $(\'#mainUserList\'); mainUserList.empty();' +
+        '$.each(users, function(key, user){' +
+        'var option = \'<option value=\'+user.id+\'>\'+user.surname+ \' \' + user.name + \'</option>\';' +
+        'mainUserList.append(option);' +
+        '});' +
+        '})' +
+        '">Поиск</a>' +
+        '</div>' +
+        '</div>' +
+        '<div class="row">' +
+        '<select class="form-control" id="mainUserList" size="7"></select>' +
+        '</div>' +
+        '<div class="row text-center">' +
+        '<a class="btn btn-large btn-green" ' +
+        'onclick="savePropertyValue(\'teachers\','+valueId+',\'User\', $(\'#mainUserList\').val(),addTeachersStudentCallback)">Добавить</a>');
+
+    //Формирование общего списка пользователей
+    var mainUserList = popupData.find('#mainUserList');
+    User.getList(
+        {
+            active: 1,
+            select: ['id', 'surname', 'name', 'group_id'],
+            groups: [5],
+            order: {
+                group_id: 'ASC',
+                surname: 'ASC'
+            }
+        },
+        function(response) {
+            $.each(response, function(key, user){
+                mainUserList.append('<option value="'+user.id+'">' + user.surname + ' ' + user.name + '</option>');
+            });
+        }
+    );
+
+    showPopup(popupData);
+    return true;
 }
