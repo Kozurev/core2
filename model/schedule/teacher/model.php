@@ -109,11 +109,11 @@ class Schedule_Teacher_Model extends Core_Entity
             ],
             'time_from' => [
                 'required' => true,
-                'type' => PARAM_TIME
+                'type' => PARAM_STRING
             ],
             'time_to' => [
                 'required' => true,
-                'type' => PARAM_TIME
+                'type' => PARAM_STRING
             ],
         ];
     }
