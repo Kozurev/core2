@@ -364,7 +364,8 @@ function makePaymentPopup(paymentId, afterSaveAction) {
                     '<div class="column"><input type="date" name="datetime" class="form-control" value="'+payment.datetime+'"></div>';
 
                 //Воможность редактирования типа доступно только для кастомных плтежей
-                if (payment.typeId > 3 || payment.typeId == 0) {
+
+                if (types.forEach(element => (Object.values(element)).includes((payment.typeId).toString()))) {
                     popupData += '<div class="column"><span>Тип</span></div>';
                     popupData += '<div class="column"><select class="form-control" name="type" id="type">';
                     $.each(types, function(key, type) {

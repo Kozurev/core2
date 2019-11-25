@@ -38,6 +38,16 @@
         </script>
 
         <form name="createData" id="createData" action=".">
+            <xsl:if test="user/id = ''">
+                <hr style="margin: 10px 0px" />
+                <div class="column get_lid_data_row">
+                    <span>Данные из лида:</span>
+                </div>
+                <div class="column row get_lid_data_row">
+                    <div class="col-lg-6"><input type="number" class="form-control" id="lid_id" placeholder="Номер лида" /></div>
+                    <div class="col-lg-6"><a href="#" class="btn btn-primary" id="get_lid_data">Загрузить</a></div>
+                </div>
+            </xsl:if>
             <div class="column">
                 <span>Фамилия</span><span style="color:red" >*</span>
             </div>
@@ -167,18 +177,6 @@
                     <div class="tick"><input type="hidden" name="kostul"/></div>
                 </label>
             </div>
-
-            <xsl:if test="user/id = ''">
-                <hr style="margin: 10px 0px" />
-                <div class="column get_lid_data_row">
-                    <span>Данные из лида:</span>
-                </div>
-                <div class="column row get_lid_data_row">
-                    <div class="col-lg-6"><input type="number" class="form-control" id="lid_id" placeholder="Номер лида" /></div>
-                    <div class="col-lg-6"><a href="#" class="btn btn-primary" id="get_lid_data">Загрузить</a></div>
-                </div>
-            </xsl:if>
-
             <input type="hidden" name="id" value="{user/id}" />
             <input type="hidden" name="groupId" value="5" />
         </form>

@@ -12,14 +12,9 @@ global $CFG;
 Orm::Debug(false);
 $Orm = new Orm();
 
-
-$Orm->executeQuery('
-    CREATE TABLE Schedule_Teacher
-    (
-        id int PRIMARY KEY AUTO_INCREMENT,
-        teacher_id int,
-        day_name varchar(10),
-        time_from time,
-        time_to time
-    );
-');
+//Добавление премиальных платежей
+$NewPayment = Core::factory('Payment_Type');
+$NewPayment1 = clone $NewPayment;
+$NewPayment2 = clone $NewPayment;
+$NewPayment1->title('Начисление премиальных')->subordinated(0)->isDeletable(0)->save();
+$NewPayment2->title('Выплата премий')->subordinated(0)->isDeletable(0)->save();

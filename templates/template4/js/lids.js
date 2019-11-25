@@ -208,6 +208,32 @@ function getLidStatusPopup(id) {
 
 
 /**
+ * Открытие всплывающего окна событий,связанных с лидом
+ *
+ * @param id
+ */
+function getLidStatisticPopup(id) {
+    loaderOn();
+    $.ajax({
+        type: 'GET',
+        url: root + '/lids',
+        data: {
+            action: 'getLidStatusPopup',
+            id: id
+        },
+        success: function(response) {
+            showPopup(response);
+            loaderOff();
+        },
+        error: function(response) {
+            closePopup();
+            notificationError('Ошибка: редактируемый статус не существует либо принадлежит другой организации');
+            loaderOff();
+        }
+    });
+}
+
+/**
  * Создание/редактирование данных статуса лида
  *
  * @param id

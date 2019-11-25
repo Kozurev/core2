@@ -13,6 +13,8 @@ class Payment extends Payment_Model
     const TYPE_DEBIT = 2;
     const TYPE_TEACHER = 3;
     const TYPE_CASHBACK = 15;
+    const TYPE_BONUS_ADD = 16;
+    const TYPE_BONUS_PAY = 17;
 
     private $defaultUser;
 

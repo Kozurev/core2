@@ -8,7 +8,7 @@
  * @version 20190526
  * @version 20190811
  */
-
+Core::requireClass('Payment');
 Core::requireClass('User_Controller');
 Core::requireClass('Property_Controller');
 
@@ -17,6 +17,7 @@ is_null($userId)
     ?   $User = User::current()
     :   $User = User_Controller::factory($userId);
 $userId = $User->getId();
+
 
 
 $today = date('Y-m-d');
@@ -338,7 +339,6 @@ if ($User->groupId() == ROLE_TEACHER) {
     $accessPaymentDelete= Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_TEACHER);
     $accessPaymentConfig= Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CONFIG);
     $accessAbsentPeriod = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT);
-
     $month = getMonth($date);
     if (intval($month) < 10) {
         $month = '0' . $month;
@@ -488,7 +488,16 @@ if ($User->groupId() == ROLE_TEACHER) {
             ->select('sum(value) AS payed')
             ->from('Payment')
             ->where('user', '=', $User->getId())
-            ->where('type', '=', 3)
+            ->where('type', '=', Payment::TYPE_TEACHER)
+            ->where('datetime', '>=', $dateFrom)
+            ->where('datetime', '<=', $dateTo)
+            ->getQueryString();
+
+        $totalAdditionalPayedSql = Core::factory('Orm')
+            ->select('sum(value) AS payed')
+            ->from('Payment')
+            ->where('user', '=', $User->getId())
+            ->where('type', '=', Payment::TYPE_BONUS_PAY)
             ->where('datetime', '>=', $dateFrom)
             ->where('datetime', '<=', $dateTo)
             ->getQueryString();
@@ -500,6 +509,16 @@ if ($User->groupId() == ROLE_TEACHER) {
             ->where('date', '>=', $dateFrom)
             ->where('date', '<=', $dateTo)
             ->getQueryString();
+
+        $totalAdditionalHaveToPaySql = Core::factory('Orm')
+            ->select('sum(value) AS total')
+            ->from('Payment')
+            ->where('user', '=', $User->getId())
+            ->where('type', '=', Payment::TYPE_BONUS_ADD)
+            ->where('datetime', '>=', $dateFrom)
+            ->where('datetime', '<=', $dateTo)
+            ->getQueryString();
+
         $totalPayed = Core::factory('Orm')
             ->executeQuery($totalPayedSql)
             ->fetch();
@@ -508,18 +527,33 @@ if ($User->groupId() == ROLE_TEACHER) {
             ->executeQuery($totalHaveToPaySql)
             ->fetch();
 
+        $totalAdditionalPayed = Core::factory('Orm')
+            ->executeQuery($totalAdditionalPayedSql)
+            ->fetch();
+
+        $totalAdditionalHaveToPay = Core::factory('Orm')
+            ->executeQuery($totalAdditionalHaveToPaySql)
+            ->fetch();
         $totalPayed = Core_Array::getValue($totalPayed, 'payed', 0, PARAM_INT);
         $totalHaveToPay = Core_Array::getValue($totalHaveToPay, "total", 0, PARAM_INT);
+        $totalAdditionalPayed = Core_Array::getValue($totalAdditionalPayed, 'payed', 0, PARAM_INT);
+        $totalAdditionalHaveToPay = Core_Array::getValue($totalAdditionalHaveToPay, "total", 0, PARAM_INT);
         $debt = $totalHaveToPay - $totalPayed;
+        $debtAdditional = $totalAdditionalHaveToPay - $totalAdditionalPayed;
 
         //Формирование таблицы с выплатами>>
         $Payments = Core::factory('Payment')
             ->queryBuilder()
-            ->where('type', '=', 3)
+            ->addSelect('Payment_Type.title as payment_type')
+            ->whereIn('type', [Payment::TYPE_TEACHER,Payment::TYPE_BONUS_PAY,Payment::TYPE_BONUS_ADD])
+            ->join(
+                ' Payment_Type',
+                'Payment_Type.id = Payment.type')
             ->where('user', '=', $User->getId())
             ->orderBy('datetime', 'DESC')
             ->orderBy('id', 'DESC')
             ->findAll();
+
 
         $MonthesPayments = [];
         $prevMonth = 0;
@@ -562,11 +596,30 @@ if ($User->groupId() == ROLE_TEACHER) {
                     ->queryBuilder()
                     ->select('sum(value)', 'total')
                     ->where('user', '=', $User->getId())
-                    ->where('type', '=', 3)
+                    ->where('type', '=',Payment::TYPE_TEACHER)
                     ->where('datetime', '>=', $paymentMonthStart)
                     ->where('datetime', '<', $paymentNextMonthStart)
                     ->sum('value');
+                $monthAdditionalAdd = Core::factory('Payment')
+                    ->queryBuilder()
+                    ->select('sum(value)', 'total')
+                    ->where('user', '=', $User->getId())
+                    ->where('type', '=',Payment::TYPE_BONUS_ADD)
+                    ->where('datetime', '>=', $paymentMonthStart)
+                    ->where('datetime', '<', $paymentNextMonthStart)
+                    ->sum('value');
+                $monthAdditionalPayed = Core::factory('Payment')
+                    ->queryBuilder()
+                    ->select('sum(value)', 'total')
+                    ->where('user', '=', $User->getId())
+                    ->where('type', '=',Payment::TYPE_BONUS_PAY)
+                    ->where('datetime', '>=', $paymentMonthStart)
+                    ->where('datetime', '<', $paymentNextMonthStart)
+                    ->sum('value');
+
                 $MonthesPayments[$index]->addSimpleEntity('month_total_pay', $monthTotalPayed);
+                $MonthesPayments[$index]->addSimpleEntity('month_additional_pay', $monthAdditionalPayed);
+                $MonthesPayments[$index]->addSimpleEntity('month_additional_add', $monthAdditionalAdd);
             }
 
             $Payment->datetime(date('d.m.Y', strtotime($Payment->datetime())));
@@ -582,7 +635,6 @@ if ($User->groupId() == ROLE_TEACHER) {
         User::parentAuth()->groupId() === ROLE_DIRECTOR || User::parentAuth()->superuser() == 1
             ?   $isDirector = 1
             :   $isDirector = 0;
-
         Core::factory('Core_Entity')
             ->addEntities($MonthesPayments)
             ->addSimpleEntity('userid', $User->getId())
@@ -593,7 +645,9 @@ if ($User->groupId() == ROLE_TEACHER) {
             ->addSimpleEntity('access_payment_delete', (int)$accessPaymentDelete)
             ->addSimpleEntity('date', date('Y-m-d'))
             ->addSimpleEntity('debt', $debt)
+            ->addSimpleEntity('debtAdditional', $debtAdditional)
             ->addSimpleEntity('total-payed', $totalPayed)
+            ->addSimpleEntity('totalAdditionalPayed', $totalAdditionalPayed)
             ->xsl('musadm/finances/teacher_payments.xsl')
             ->show();
     }
@@ -694,11 +748,53 @@ if ($User->groupId() == ROLE_TEACHER) {
             $time->timeTo = refactorTimeFormat($time->timeTo());
         }
 
+        //Список учеников перподавателя
+        $Teacher = User_Controller::factory($userId);
+        $TeacherList = Core::factory('Property')->getByTagName('teachers');
+        $teacherFio = $Teacher->surname() . ' ' . $Teacher->name();
+        $TeacherProperty = Core::factory('Property_List_Values')
+            ->queryBuilder()
+            ->where('property_id', '=', $TeacherList->getId())
+            ->where('value', '=', $teacherFio)
+            ->find();
+
+        $RestUsers = REST::user();
+        $RestUsers->appendFilter('property_' . $TeacherList->getId(), $TeacherProperty->getId());
+        $UserList = (json_decode($RestUsers->getList()));
+
         Core::factory('Core_Entity')
             ->addEntity($User)
             ->addEntities($MainSchedule)
+            ->addEntities($UserList)
+            ->addSimpleEntity('property_id',$TeacherList->getId())
+            ->addSimpleEntity('value_id',$TeacherProperty->getId())
+            ->addSimpleEntity('is_admin',$isAdmin)
             ->xsl('musadm/schedule/teacher_time.xsl')
             ->show();
+    }
+    if($isAdmin == 0){
+        //Список учеников перподавателя
+        $Teacher = User_Controller::factory($userId);
+        $TeacherList = Core::factory('Property')->getByTagName('teachers');
+        $teacherFio = $Teacher->surname() . ' ' . $Teacher->name();
+        $TeacherProperty = Core::factory('Property_List_Values')
+            ->queryBuilder()
+            ->where('property_id', '=', $TeacherList->getId())
+            ->where('value', '=', $teacherFio)
+            ->find();
+
+        $RestUsers = REST::user();
+        $RestUsers->appendFilter('property_' . $TeacherList->getId(), $TeacherProperty->getId());
+        $UserList = (json_decode($RestUsers->getList()));
+
+        Core::factory('Core_Entity')
+            ->addEntity($User)
+            ->addEntities($UserList)
+            ->addSimpleEntity('property_id',$TeacherList->getId())
+            ->addSimpleEntity('value_id',$TeacherProperty->getId())
+            ->xsl('musadm/schedule/teacher_time.xsl')
+            ->show();
+
     }
 } else {
     /**
@@ -716,4 +812,5 @@ if ($User->groupId() == ROLE_TEACHER) {
             ->xsl('musadm/schedule/areas.xsl')
             ->show();
     }
+
 }

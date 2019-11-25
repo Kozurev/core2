@@ -45,6 +45,9 @@
                             Показать
                         </a>
                     </div>
+                    <div>
+                            <a class="btn btn-red" href="?show_completed">Показать завершенные</a>
+                    </div>
                 </div>
             </xsl:if>
 
@@ -73,7 +76,9 @@
         <section class="cards-section text-center tasks-section">
             <div id="cards-wrapper" class="cards-wrapper row">
                 <xsl:apply-templates select="task[done = 0]" />
-                <xsl:apply-templates select="task[done = 1]" />
+                <xsl:if test="show_completed = 1">
+                    <xsl:apply-templates select="task[done = 1]" />
+                </xsl:if>
             </div>
         </section>
     </xsl:template>

@@ -1,6 +1,6 @@
 <?php
 /**
- * Файл формирующий контент раздела лидов
+ * Файл формирующий контент раздела задач
  *
  * @author BadWolf
  * @date 16.05.2018 17:07
@@ -9,8 +9,8 @@
  */
 
 $today = date('Y-m-d');
-$from =     Core_Array::Get('date_from', null, PARAM_DATE);
-$to =       Core_Array::Get('date_to', null, PARAM_DATE);
+$from =     Core_Array::Get('date_from', $today, PARAM_DATE);
+$to =       Core_Array::Get('date_to', $today, PARAM_DATE);
 $areaId =   Core_Array::Get('areaId', 0, PARAM_INT);
 $taskId =   Core_Array::Get('taskId', 0, PARAM_INT);
 
@@ -19,6 +19,11 @@ $subordinated = $Director->getId();
 
 Core::factory('Task_Controller');
 $TaskController = new Task_Controller(User::current());
+
+if(isset($_GET['show_completed'])){
+    $TaskController->addSimpleEntity('show_completed', true);
+    unset($_GET['show_completed']);
+}
 
 if ($areaId !== 0) {
     $forArea = Core::factory('Schedule_Area', $areaId);

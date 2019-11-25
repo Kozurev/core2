@@ -193,6 +193,7 @@ function savePropertyValue(propName, value, modelName, modelId, func)
     $.ajax({
         type: 'GET',
         url: root + '/',
+        dataType:'json',
         data: {
             ajax: 1,
             action: 'savePropertyValue',
@@ -202,9 +203,6 @@ function savePropertyValue(propName, value, modelName, modelId, func)
             model_id: modelId
         },
         success: function(response) {
-            if(response != '') {
-                notificationError('Ошибка: ' + response);
-            }
             if(typeof func === 'function') {
                 func(response);
             }
@@ -226,6 +224,7 @@ function checkPropertyValue(propName, modelName, modelId,callback)
   $.ajax({
         type: 'GET',
         url: root + '/',
+        dataType:'json',
         data: {
             ajax: 1,
             action: 'checkPropertyValue',
@@ -233,6 +232,77 @@ function checkPropertyValue(propName, modelName, modelId,callback)
             model_name: modelName,
             model_id: modelId
         },
-        success: callback
+      success: function(response) {
+          if(typeof callback === 'function') {
+              callback(response);
+          }}
     });
+}
+
+/**
+ * Удаление дополнительного свойства
+ *
+ * @param propName   - tag_name дополнительного свойства
+ * @param modelName  - название объекта у которого ищется значение
+ * @param modelId    - id объекта у которого ищется значение
+ */
+function deleteProperty(propName, modelName, modelId,callback)
+{
+    $.ajax({
+        type: 'GET',
+        url: root + '/',
+        dataType:'json',
+        data: {
+            ajax: 1,
+            action: 'deleteProperty',
+            prop_name: propName,
+            model_name: modelName,
+            model_id: modelId
+        },
+        success: function(response) {
+            if(typeof callback === 'function') {
+                callback(response);
+            }
+            loaderOff();
+        }
+    });
+}
+
+
+/**
+ * Колбэк Удаление ученика у Учителя
+ *
+ * @param response
+
+ */
+function delTeachersStudentCallback(response)
+{
+
+    if (checkResponseStatus(response)){
+        notificationSuccess('Ученик удален успешно');
+        $('#'+response.object.id).remove();
+    } else {
+        notificationError('Ученик не удален!!!! Попробуйте еще раз');
+    }
+}
+/**
+ * Колюэк  Добавление ученика Учителю
+ *
+ * @param response
+ */
+function addTeachersStudentCallback(response)
+{
+
+    if (checkResponseStatus(response)){
+        notificationSuccess('Ученик добавлен к перподавателю успешно');
+        $('#student_table').find('tbody').append("<tr id="+response.object.id+">" +
+            "<td>"+response.object.surname+"</td>" +
+            "<td>"+response.object.name+"</td>" +
+            "<td>"+response.object.phone_number+"</td>" +
+            "<td><a class=\"btn btn-red\" id=\"del_student\" onclick=\"deleteProperty('"+response.property.tag_name+"','"+response.value.model_name+"',"+response.object.id+",delTeachersStudentCallback)\"> - </a></td></tr>");
+        closePopup();
+    } else {
+        notificationError('Ученик не добавлен!!!! Проверьте данные еще раз, возможно он уже есть у данного преподавателя');
+        closePopup();
+    }
 }

@@ -36,3 +36,4 @@ if ($action === 'getList') {
     }
     die(json_encode($response));
 }
+

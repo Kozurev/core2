@@ -152,7 +152,37 @@ if ($action === 'deleteLidStatus') {
     exit;
 }
 
+/**
+ * Открытие всплывающего окна событий,связанных с лидом
+ */
+if ($action === 'getLidStatisticPopup') {
+    if (!User::checkUserAccess(['groups' => [ROLE_DIRECTOR]])) {
+        Core_Page_Show::instance()->error(403);
+    }
 
+    $id = Core_Array::Get('id', 0, PARAM_INT);
+    if ($id !== 0) {
+        $Status = Core::factory('Lid_Status')
+            ->queryBuilder()
+            ->where('id', '=', $id)
+            ->where('subordinated', '=', $subordinated)
+            ->find();
+
+        if (is_null($Status)) {
+            Core_Page_Show::instance()->error(404);
+        }
+    } else {
+        $Status = Core::factory('Lid_Status');
+    }
+
+    Core::factory('Core_Entity')
+        ->addEntity(User::current())
+        ->addEntity($Status)
+        ->addEntities(Lid_Status::getColors(), 'color')
+        ->xsl('musadm/lids/edit_lid_status_popup.xsl')
+        ->show();
+    exit;
+}
 //проверка прав доступа
 if (!$accessRead) {
     Core_Page_Show::instance()->error(403);
