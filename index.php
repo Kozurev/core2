@@ -7,6 +7,8 @@ error_reporting(E_ALL);
 
 define('ROOT', dirname(__FILE__));
 
+require_once ROOT . '/vendor/autoload.php';
+
 //Файл для объявления общедоступных констант
 require_once ROOT . '/constants.php';
 
@@ -35,12 +37,12 @@ require_once ROOT . '/model/core/page/show.php';
 require_once ROOT . '/model/controller.php';
 require_once ROOT . '/includes.php';
 
-if ((empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off') && $_SERVER['REMOTE_ADDR'] != '127.0.0.1') {
-    $location = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-    header('HTTP/1.1 301 Moved Permanently');
-    header('Location: ' . $location);
-    exit;
-}
+//if ((empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off') && $_SERVER['REMOTE_ADDR'] != '127.0.0.1') {
+//    $location = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+//    header('HTTP/1.1 301 Moved Permanently');
+//    header('Location: ' . $location);
+//    exit;
+//}
 
 if (is_null(Core_Array::Session('core', null))) {
     $_SESSION['core'] = [];
