@@ -594,8 +594,8 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
             //Отправка пуш уведомления с напоминанием о занятиях
             if (!empty($Client->pushId())) {
                 $message = [
-                    'title' => 'Напоинаем',
-                    'body' => 'Остаток занятий на текущий момент: ' . $countLessons . '. Пополнить счет можно в личном кабинете'
+                    'title' => 'Остаток занятий на вашем балансе: ' . $countLessons,
+                    'body' => 'Узнать варианты оплаты очередного абонемента можно у администратора школы'
                 ];
                 Push::instance()->notification($message)->send($Client->pushId());
             }
