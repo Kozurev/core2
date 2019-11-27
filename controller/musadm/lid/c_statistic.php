@@ -132,18 +132,14 @@ $dateRow = $teacherId === 0
 //  B.Дата_прохождения = (
 //  SELECT MAX(Дата_прохождения)  FROM myTable  WHERE ID = B.ID
 //)
+$timeFrom = strtotime($dateFrom);
+$timeTo = strtotime($dateTo);
 if ($dateFrom == $dateTo) {
     $Count->where($dateRow, '=', $dateFrom);
     $CountFromSchedule->where('insert_date', '=', $dateFrom);
-    $CountFromComment->where('datetime', '=', $dateFrom)->groupBy('Lid.number');
-
 } else {
     $Count->between($dateRow,$dateFrom,$dateTo);
     $CountFromSchedule->between('insert_date', $dateFrom, $dateTo);
-    $CountFromComment->between('datetime',$dateFrom , $dateTo)->groupBy('Lid.number');
-
-
-
 }
 
 if ($teacherId !== 0) {
@@ -157,19 +153,14 @@ if ($teacherId !== 0) {
         $lessonTableName . ' AS lesson',
         'lesson.type_id = ' . Schedule_Lesson::TYPE_CONSULT . ' AND lesson.client_id = Lid.id AND lesson.teacher_id = ' . $teacherId
     );
-    $CountFromComment->join(
-          'Lid_Comment_Assignment AS comment_assignment',
-         ' comment_assignment.object_id = Lid.id ')->join('Comment AS com','com.id = comment_assignment.comment_id')
-        ->join(
-        $lessonTableName . ' AS lesson',
-        'lesson.type_id = ' . Schedule_Lesson::TYPE_CONSULT . ' AND lesson.client_id = Lid.id AND lesson.teacher_id = ' . $teacherId
-    );
+    $CountFromComment->join('Event','Event.type_id = '.Event::LID_CREATE.' ')->between('Event.time',$timeFrom,$timeTo)->groupBy('Lid.id');
+
+
+
 
 } else {
-    $CountFromComment->join(
-        'Lid_Comment_Assignment AS comment_assignment',
-        ' comment_assignment.object_id = Lid.id ')->join('Comment As com','com.id = comment_assignment.comment_id');
 
+    $CountFromComment->join('Event','Event.type_id = '.Event::LID_CREATE.' ')->between('Event.time',$timeFrom,$timeTo)->groupBy('Lid.id');
     $lessonTableName = Core::factory('Schedule_Lesson')->getTableName();
     $CountFromSchedule->join(
         $lessonTableName . ' AS lesson',
@@ -226,6 +217,9 @@ $Teachers = $TeachersController
 echo '<section class="section-bordered">';
 echo '<div class="row center-block">';
 echo '<div class=""></div>';
+Orm::Debug(true);
+$CountFromComment->findAll();
+Orm::Debug(false);
 $LidsOutput
     ->addSimpleEntity('total', $totalCount)
     ->addSimpleEntity('totalFromSchedule', $totalCountFromSchedule)

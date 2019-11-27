@@ -35,7 +35,7 @@
             </table>
         </div>
         <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
-            <h3 class="center">по расписания</h3>
+            <h3 class="center">по расписанию</h3>
 
             <table class="table table-bordered table-hover statistic_lids_table">
                 <tr>
