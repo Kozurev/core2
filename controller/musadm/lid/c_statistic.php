@@ -114,42 +114,106 @@ $LidsOutput = Core::factory('Core_Entity');
 $Count = Lid_Controller::factory()
     ->queryBuilder()
     ->where('subordinated', '=', $subordinated);
+$CountFromSchedule = Lid_Controller::factory()
+    ->queryBuilder()
+    ->where('subordinated', '=', $subordinated);
+$CountFromComment = Lid_Controller::factory()
+    ->queryBuilder()
+    ->where('subordinated', '=', $subordinated);
 
-//Если выборка идет только по лидпам то в условие попадает дата контроля лида
+//Если выборка идет только по лидам то в условие попадает дата контроля лида
 //а если выборка идет по консультациям преподавателя то в условии буддет дата отчета
 $dateRow = $teacherId === 0
     ?   'control_date'
     :   'rep.date';
-
+//SELECT B.*
+//FROM myTable B
+//WHERE
+//  B.Дата_прохождения = (
+//  SELECT MAX(Дата_прохождения)  FROM myTable  WHERE ID = B.ID
+//)
 if ($dateFrom == $dateTo) {
     $Count->where($dateRow, '=', $dateFrom);
+    $CountFromSchedule->where('insert_date', '=', $dateFrom);
+    $CountFromComment->where('datetime', '=', $dateFrom)->groupBy('Lid.number');
+
 } else {
-    $Count->where($dateRow, '>=', $dateFrom);
-    $Count->where($dateRow, '<=', $dateTo);
+    $Count->between($dateRow,$dateFrom,$dateTo);
+    $CountFromSchedule->between('insert_date', $dateFrom, $dateTo);
+    $CountFromComment->between('datetime',$dateFrom , $dateTo)->groupBy('Lid.number');
+
+
+
 }
 
 if ($teacherId !== 0) {
     $reportTableName = Core::factory('Schedule_Lesson_Report')->getTableName();
+    $lessonTableName = Core::factory('Schedule_Lesson')->getTableName();
     $Count->join(
         $reportTableName . ' AS rep',
         'rep.type_id = ' . Schedule_Lesson::TYPE_CONSULT . ' AND rep.client_id = Lid.id AND rep.teacher_id = ' . $teacherId
     );
-}
+    $CountFromSchedule->join(
+        $lessonTableName . ' AS lesson',
+        'lesson.type_id = ' . Schedule_Lesson::TYPE_CONSULT . ' AND lesson.client_id = Lid.id AND lesson.teacher_id = ' . $teacherId
+    );
+    $CountFromComment->join(
+          'Lid_Comment_Assignment AS comment_assignment',
+         ' comment_assignment.object_id = Lid.id ')->join('Comment AS com','com.id = comment_assignment.comment_id')
+        ->join(
+        $lessonTableName . ' AS lesson',
+        'lesson.type_id = ' . Schedule_Lesson::TYPE_CONSULT . ' AND lesson.client_id = Lid.id AND lesson.teacher_id = ' . $teacherId
+    );
 
+} else {
+    $CountFromComment->join(
+        'Lid_Comment_Assignment AS comment_assignment',
+        ' comment_assignment.object_id = Lid.id ')->join('Comment As com','com.id = comment_assignment.comment_id');
+
+    $lessonTableName = Core::factory('Schedule_Lesson')->getTableName();
+    $CountFromSchedule->join(
+        $lessonTableName . ' AS lesson',
+        'lesson.type_id = ' . Schedule_Lesson::TYPE_CONSULT . ' AND lesson.client_id = Lid.id'
+    );
+}
 $totalCount = $Count->getCount();
+$totalCountFromSchedule = $CountFromSchedule->getCount();
+$totalCountFromComment = $CountFromComment->getCount();
 if (count($Statuses) > 0) {
     foreach ($Statuses as $key => $status) {
         $CountWithStatus = clone $Count;
+        $CountWithStatusFromScheduler = clone $CountFromSchedule;
+        $CountWithStatusFromComment = clone $CountFromComment;
         $count = $CountWithStatus
+            ->where('status_id', '=', $status->getId())
+            ->getCount();
+        $countFromSchedule = $CountWithStatusFromScheduler
+            ->where('status_id', '=', $status->getId())
+            ->getCount();
+        $countFromComment = $CountWithStatusFromComment
             ->where('status_id', '=', $status->getId())
             ->getCount();
         $percents = $totalCount === 0
             ?   0
             :   round($count * 100 / $totalCount, 1);
+        $percentsFromSchedule = $totalCountFromSchedule === 0
+            ?   0
+            :   round($countFromSchedule * 100 / $totalCountFromSchedule, 1);
+        $percentsFromComment = $totalCountFromComment === 0
+            ?   0
+            :   round($countFromComment * 100 / $totalCountFromComment, 1);
         $outputStatus = clone $Statuses[$key];
         $outputStatus->addSimpleEntity('count', $count);
         $outputStatus->addSimpleEntity('percents', round($percents, 2));
+        $outputStatusSchedule = clone $Statuses[$key];
+        $outputStatusSchedule->addSimpleEntity('countSchedule', $countFromSchedule);
+        $outputStatusSchedule->addSimpleEntity('percentsSchedule', round($percentsFromSchedule, 2));
+        $outputStatusComment = clone $Statuses[$key];
+        $outputStatusComment->addSimpleEntity('countComment', $countFromComment);
+        $outputStatusComment->addSimpleEntity('percentsComment', round($percentsFromComment, 2));
         $LidsOutput->addEntity($outputStatus, 'status');
+        $LidsOutput->addEntity($outputStatusSchedule, 'statusSchedule');
+        $LidsOutput->addEntity($outputStatusComment, 'statusComment');
     }
 }
 
@@ -160,11 +224,12 @@ $Teachers = $TeachersController
     ->getUsers();
 
 echo '<section class="section-bordered">';
-echo '<h3 class="center">Общая сводка</h3>';
 echo '<div class="row center-block">';
-echo '<div class="col-lg-4"></div>';
+echo '<div class=""></div>';
 $LidsOutput
     ->addSimpleEntity('total', $totalCount)
+    ->addSimpleEntity('totalFromSchedule', $totalCountFromSchedule)
+    ->addSimpleEntity('totalFromComment', $totalCountFromComment)
     ->addSimpleEntity('selectedTeacherId', $teacherId)
     ->addEntities($Teachers)
     ->xsl('musadm/statistic/lids.xsl')
