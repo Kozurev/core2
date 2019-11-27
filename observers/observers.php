@@ -548,6 +548,8 @@ Core::attachObserver('after.LidStatus.delete', function($args) {
 Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
     Core::requireClass('Schedule_Lesson');
     Core::requireClass('Schedule_Group');
+    Core::requireClass('Task_Controller');
+    Core::requireClass('Push');
 
     $Report = $args[0];
     $Lesson = Core::factory('Schedule_Lesson', $Report->lessonId());
@@ -570,16 +572,15 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
         return;
     }
 
-    Core::factory('Task_Controller');
     $tomorrow = date('Y-m-d', strtotime('+1 day'));
 
     foreach ($Clients as $Client) {
         //Кол-во занятий клиента
         $ClientLessons = Core::factory('Property')->getByTagName($clientLessons);
         $countLessons = $ClientLessons->getPropertyValues($Client)[0]->value();
-        //Значения свойства клиента "поурочно"
-        $PerLesson = Core::factory('Property')->getByTagName('per_lesson');
-        $isPerLesson = (bool)$PerLesson->getPropertyValues($Client)[0]->value();
+        //Значения свойства клиента "поурочно" (более не актуально)
+        //$PerLesson = Core::factory('Property')->getByTagName('per_lesson');
+        //$isPerLesson = (bool)$PerLesson->getPropertyValues($Client)[0]->value();
         //Присутствие клиента на занятии
         $ClientAttendance = $Report->getClientAttendance($Client->getId());
         if (is_null($ClientAttendance)) {
@@ -589,7 +590,16 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
         }
 
         //Создание задачи с напоминанием о низком уровне баланса клиента
-        if ($countLessons <= 0.5 && $isPerLesson == false) {
+        if ($countLessons <= 0.5) {
+            //Отправка пуш уведомления с напоминанием о занятиях
+            if (!empty($Client->pushId())) {
+                $message = [
+                    'title' => 'Напоинаем',
+                    'body' => 'Остаток занятий на текущий момент: ' . $countLessons . '. Пополнить счет можно в личном кабинете'
+                ];
+                Push::instance()->notification($message)->send($Client->pushId());
+            }
+
             $isIssetTask = Task_Controller::factory()
                 ->queryBuilder()
                 ->where('associate', '=', $Client->getId())

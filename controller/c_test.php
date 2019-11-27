@@ -6,6 +6,44 @@
  * Time: 1:02
  */
 
+use Kreait\Firebase;
+use Kreait\Firebase\Messaging;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Factory;
+Core::requireClass('User_Controller');
+
+
+/*
+$User = User_Controller::factory(1226, false);
+
+$factory = (new Factory())->withServiceAccount(ROOT . '/firebase.json');
+$messaging = ($factory)->createMessaging();
+
+//Пример отправки одного уведомления на несколько устройств сразу
+$devicesTokens = [$User->pushId()];
+$notification = Firebase\Messaging\Notification::create('Title', 'Body');
+
+$message = CloudMessage::new()->withNotification($notification);
+$sendReport = $messaging->sendMulticast($message, $devicesTokens);
+
+echo 'Successful sends: '.$sendReport->successes()->count().PHP_EOL;
+echo 'Failed sends: '.$sendReport->failures()->count().PHP_EOL;
+
+if ($sendReport->hasFailures()) {
+    foreach ($sendReport->failures()->getItems() as $failure) {
+        echo $failure->error()->getMessage().PHP_EOL;
+    }
+}
+
+//Пример отправки уведомления одному пользователю
+$deviceToken = $User->pushId();
+$message = CloudMessage::withTarget('token', $deviceToken)->withNotification($notification);
+$messaging->send($message);
+*/
+
+
+exit;
+
 //$dbh = new mysqli("37.140.192.32:3306", "u4834_root", "n1omY2_1", "u4834955_core");
 //$dbh->query("SET NAMES utf8");
 global $CFG;
