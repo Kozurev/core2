@@ -258,76 +258,77 @@ Core::factory('Core_Entity')
     ->xsl('musadm/statistic/balance.xsl')
     ->show();
 
+//По просьбе убрана информация по лидам из статистики
 
-/**
- * Статистика по лидам
- */
-Core::requireClass('Lid_Controller');
-$LidsOutput = Core::factory('Core_Entity');
-$totalCount = Lid_Controller::factory()
-    ->queryBuilder()
-    ->where('subordinated', '=', $subordinated);
-
-if ($dateFrom == $dateTo) {
-    $totalCount->where('control_date', '=', $dateFrom);
-} else {
-    $totalCount->where('control_date', '>=', $dateFrom);
-    $totalCount->where('control_date', '<=', $dateTo);
-}
-
-if ($areaId !== 0) {
-    $totalCount->where('area_id', '=', $areaId);
-}
-
-$totalCount = $totalCount->getCount();
-$Statuses = Core::factory('Lid_Status')
-    ->queryBuilder()
-    ->where('subordinated', '=', $subordinated)
-    ->orderBy('id', 'DESC')
-	->findAll();
-
-	if (count($Statuses) > 0) {
-		foreach ($Statuses as $status) {
-			$queryString = Core::factory('Orm')
-				->select('count(Lid.id)', 'count')
-				->from('Lid')
-                ->where('subordinated', '=', $subordinated)
-				->where('status_id', '=', $status->getId());
-
-            if ($dateFrom == $dateTo) {
-                $queryString->where('control_date', '=', $dateFrom);
-            } else {
-                $queryString->where('control_date', '>=', $dateFrom);
-                $queryString->where( 'control_date', '<=', $dateTo );
-            }
-            if ($areaId !== 0) {
-                $queryString->where('area_id', '=', $areaId);
-            }
-
-            $queryString = $queryString->getQueryString();
-			$Result = Core::factory('Orm')->executeQuery($queryString);
-
-			if ($Result != false) {
-				$Result = $Result->fetch();
-				$count = $Result['count'];
-				$totalCount == 0
-                    ?   $percents = 0
-                    :   $percents = round($count * 100 / $totalCount, 1);
-			} else {
-				$count = 0;
-				$percents = 0;
-			}
-
-			$status->addSimpleEntity('count', $count);
-			$status->addSimpleEntity('percents', round($percents, 2));
-			$LidsOutput->addEntity($status, 'status');
-		}
-	}
-
-$LidsOutput
-    ->addSimpleEntity('total', $totalCount)
-    ->xsl('musadm/statistic/lids.xsl')
-    ->show();
+///**
+// * Статистика по лидам
+// */
+//Core::requireClass('Lid_Controller');
+//$LidsOutput = Core::factory('Core_Entity');
+//$totalCount = Lid_Controller::factory()
+//    ->queryBuilder()
+//    ->where('subordinated', '=', $subordinated);
+//
+//if ($dateFrom == $dateTo) {
+//    $totalCount->where('control_date', '=', $dateFrom);
+//} else {
+//    $totalCount->where('control_date', '>=', $dateFrom);
+//    $totalCount->where('control_date', '<=', $dateTo);
+//}
+//
+//if ($areaId !== 0) {
+//    $totalCount->where('area_id', '=', $areaId);
+//}
+//
+//$totalCount = $totalCount->getCount();
+//$Statuses = Core::factory('Lid_Status')
+//    ->queryBuilder()
+//    ->where('subordinated', '=', $subordinated)
+//    ->orderBy('id', 'DESC')
+//	->findAll();
+//
+//	if (count($Statuses) > 0) {
+//		foreach ($Statuses as $status) {
+//			$queryString = Core::factory('Orm')
+//				->select('count(Lid.id)', 'count')
+//				->from('Lid')
+//                ->where('subordinated', '=', $subordinated)
+//				->where('status_id', '=', $status->getId());
+//
+//            if ($dateFrom == $dateTo) {
+//                $queryString->where('control_date', '=', $dateFrom);
+//            } else {
+//                $queryString->where('control_date', '>=', $dateFrom);
+//                $queryString->where( 'control_date', '<=', $dateTo );
+//            }
+//            if ($areaId !== 0) {
+//                $queryString->where('area_id', '=', $areaId);
+//            }
+//
+//            $queryString = $queryString->getQueryString();
+//			$Result = Core::factory('Orm')->executeQuery($queryString);
+//
+//			if ($Result != false) {
+//				$Result = $Result->fetch();
+//				$count = $Result['count'];
+//				$totalCount == 0
+//                    ?   $percents = 0
+//                    :   $percents = round($count * 100 / $totalCount, 1);
+//			} else {
+//				$count = 0;
+//				$percents = 0;
+//			}
+//
+//			$status->addSimpleEntity('count', $count);
+//			$status->addSimpleEntity('percents', round($percents, 2));
+//			$LidsOutput->addEntity($status, 'status');
+//		}
+//	}
+//
+//$LidsOutput
+//    ->addSimpleEntity('total', $totalCount)
+//    ->xsl('musadm/statistic/lids.xsl')
+//    ->show();
 
 
 echo "<div class=\"col-lg-4 col-md-6 col-sm-6 col-xs-12\">";

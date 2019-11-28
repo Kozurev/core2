@@ -56,9 +56,9 @@
                 </tr>
                 <tr>
                     <td>Всего:</td>
-                    <td><xsl:value-of select="totalFromComment" /></td>
+                    <td><xsl:value-of select="totalFromDateControl" /></td>
                 </tr>
-                <xsl:apply-templates select="statusComment" />
+                <xsl:apply-templates select="statusDateControl" />
             </table>
         </div>
     </xsl:template>
@@ -82,11 +82,11 @@
         </tr>
     </xsl:template>
 
-    <xsl:template match="statusComment">
+    <xsl:template match="statusDateControl">
         <tr>
             <td><xsl:value-of select="title" /></td>
             <td>
-                <xsl:value-of select="statusComment" /> (<xsl:value-of select="percentsComment" />%)
+                <xsl:value-of select="countDateControl" /> (<xsl:value-of select="percentsDateControl" />%)
             </td>
         </tr>
     </xsl:template>
