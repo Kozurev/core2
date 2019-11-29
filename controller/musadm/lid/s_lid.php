@@ -156,7 +156,7 @@ if ($action === 'deleteLidStatus') {
  * Открытие всплывающего окна событий,связанных с лидом
  */
 if ($action === 'getLidStatisticPopup') {
-    if (!User::checkUserAccess(['groups' => [ROLE_DIRECTOR]])) {
+    if (!$accessRead) {
         Core_Page_Show::instance()->error(403);
     }
 
@@ -179,6 +179,7 @@ if ($action === 'getLidStatisticPopup') {
         ->addEntities($Events)
         ->xsl('musadm/users/events.xsl')
         ->show();
+
 exit;
 
 }

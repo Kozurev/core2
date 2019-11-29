@@ -23,8 +23,7 @@
                             <td><input name="summ" id="paymentVal" class="form-control" type="number" placeholder="Сумма" /></td>
                             <td>
                                 <select  name="payment" id="payment_type" class="form-control">
-                                <option value="" style="display:none">Тип платежа</option>
-                                <option value="3">Выплата преподавателю</option>
+                                <option selected="selected" value="3">Выплата преподавателю</option>
                                 <option value="16">Начисление премиальных</option>
                                 <option value="17">Выплата премии</option>
                                  </select>

@@ -35,7 +35,7 @@
             </table>
         </div>
         <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
-            <h3 class="center">по расписания</h3>
+            <h3 class="center">по расписанию</h3>
 
             <table class="table table-bordered table-hover statistic_lids_table">
                 <tr>
@@ -56,9 +56,9 @@
                 </tr>
                 <tr>
                     <td>Всего:</td>
-                    <td><xsl:value-of select="totalFromComment" /></td>
+                    <td><xsl:value-of select="totalFromDateControl" /></td>
                 </tr>
-                <xsl:apply-templates select="statusComment" />
+                <xsl:apply-templates select="statusDateControl" />
             </table>
         </div>
     </xsl:template>
@@ -82,11 +82,11 @@
         </tr>
     </xsl:template>
 
-    <xsl:template match="statusComment">
+    <xsl:template match="statusDateControl">
         <tr>
             <td><xsl:value-of select="title" /></td>
             <td>
-                <xsl:value-of select="statusComment" /> (<xsl:value-of select="percentsComment" />%)
+                <xsl:value-of select="countDateControl" /> (<xsl:value-of select="percentsDateControl" />%)
             </td>
         </tr>
     </xsl:template>
