@@ -89,6 +89,8 @@ class Core_Access
 
     const STATISTIC_READ = 'statistic_read';
 
+    const CRON = 'cron';
+
 
 
     /**

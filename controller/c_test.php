@@ -10,8 +10,39 @@ use Kreait\Firebase;
 use Kreait\Firebase\Messaging;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Factory;
+
+Orm::Debug(true);
+
+Core::requireClass('User');
 Core::requireClass('User_Controller');
 
+
+//$CronUser = (new User)
+//    ->surname('Планировщик задач')
+//    ->name('Cron')
+//    ->active(1)
+//    ->authToken(uniqidReal(User::getMaxAuthTokenLength()))
+//    ->login('Cron')
+//    ->password('cron')
+//    ->groupId(0);
+//$CronUser->save();
+//
+//$NewGroup = Core::factory('Core_Access_Group')
+//    ->title('Сторонние сервисы и приложения')
+//    ->parentId(0)
+//    ->description('Группа прав доступа не для пользователей системы, я для приложений и сторонних сервисов')
+//    ->subordinated(0)
+//    ->save()
+//    ->subordinated(0)
+//    ->save();
+//$NewGroup->appendUser($CronUser->getId());
+//
+//$Groups = Core::factory('Core_Access_Group')->findAll();
+//array_pop($Groups);
+//foreach ($Groups as $Group) {
+//    $Group->capabilityForbidden(Core_Access::CRON);
+//}
+//$NewGroup->capabilityAllow(Core_Access::CRON);
 
 /*
 $User = User_Controller::factory(1226, false);
