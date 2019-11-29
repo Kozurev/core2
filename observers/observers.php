@@ -788,7 +788,11 @@ Core::attachObserver('after.ScheduleAbsent.save', function($args) {
                 $Client = $Lesson->getClient();
                 $taskComment .= $Lesson->getArea()->title() . ' ';
                 $taskComment .= refactorTimeFormat($Lesson->timeFrom()) . ' - ' . refactorTimeFormat($Lesson->timeTo()) . ' ';
-                $taskComment .= $Client->surname() . ' ' . $Client->name() . '; ';
+                if ($Client instanceof User) {
+                    $taskComment .= $Client->surname() . ' ' . $Client->name() . '; ';
+                } elseif ($Client instanceof Schedule_Group) {
+                    $taskComment .= $Client->title() . '; ';
+                }
             }
         }
     }
