@@ -9,8 +9,8 @@
  */
 
 $today = date('Y-m-d');
-$from =     Core_Array::Get('date_from', $today, PARAM_DATE);
-$to =       Core_Array::Get('date_to', $today, PARAM_DATE);
+$from =     Core_Array::Get('date_from', null, PARAM_DATE);
+$to =       Core_Array::Get('date_to', null, PARAM_DATE);
 $areaId =   Core_Array::Get('areaId', 0, PARAM_INT);
 $taskId =   Core_Array::Get('taskId', 0, PARAM_INT);
 
