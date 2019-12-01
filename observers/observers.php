@@ -594,8 +594,8 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
             //Отправка пуш уведомления с напоминанием о занятиях
             if (!empty($Client->pushId())) {
                 $message = [
-                    'title' => 'Напоинаем',
-                    'body' => 'Остаток занятий на текущий момент: ' . $countLessons . '. Пополнить счет можно в личном кабинете'
+                    'title' => 'Остаток занятий на вашем балансе: ' . $countLessons,
+                    'body' => 'Узнать варианты оплаты очередного абонемента можно у администратора школы'
                 ];
                 Push::instance()->notification($message)->send($Client->pushId());
             }
@@ -788,7 +788,11 @@ Core::attachObserver('after.ScheduleAbsent.save', function($args) {
                 $Client = $Lesson->getClient();
                 $taskComment .= $Lesson->getArea()->title() . ' ';
                 $taskComment .= refactorTimeFormat($Lesson->timeFrom()) . ' - ' . refactorTimeFormat($Lesson->timeTo()) . ' ';
-                $taskComment .= $Client->surname() . ' ' . $Client->name() . '; ';
+                if ($Client instanceof User) {
+                    $taskComment .= $Client->surname() . ' ' . $Client->name() . '; ';
+                } elseif ($Client instanceof Schedule_Group) {
+                    $taskComment .= $Client->title() . '; ';
+                }
             }
         }
     }

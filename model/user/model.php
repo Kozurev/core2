@@ -350,7 +350,7 @@ class User_Model extends Core_Entity
             'group_id' => [
                 'required' => false,
                 'type' => PARAM_INT,
-                'minval' => 1
+                'minval' => 0
             ],
             'register_date' => [
                 'required' => true,

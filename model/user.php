@@ -88,21 +88,6 @@ class User extends User_Model
     }
 
 
-	/**
-	 * Авторизация пользователя
-     *
-     * @param string $login
-     * @param string $pass
-     * @param bool $remember - указатель "Запомнить меня" при истинном значении создается файл кукки
-     * @return bool
-     * @deprecated
-	 */
-	public static function authorize(string $login, string $pass, bool $remember = false)
-	{
-        return User_Auth::auth($login, $pass, $remember);
-	}
-
-
     /**
      * Статический аналог метода getCurrent для получение данных текущего авторизованного пользователя
      *
