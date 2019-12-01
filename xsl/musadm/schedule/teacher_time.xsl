@@ -3,7 +3,6 @@
     <xsl:template match="root">
         <section class="section-bordered">
             <div class="row">
-                <xsl:if test="is_admin = 1">
                     <div class="col-lg-5 col-sm-12 col-xs-12">
                         <h3>Основной график работы</h3>
                         <div class="table-responsive">
@@ -207,7 +206,6 @@
                             </table>
                         </div>
                     </div>
-                </xsl:if>
             <xsl:call-template name="teacher_student"/>
             </div>
         </section>

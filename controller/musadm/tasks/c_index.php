@@ -20,9 +20,9 @@ $subordinated = $Director->getId();
 Core::factory('Task_Controller');
 $TaskController = new Task_Controller(User::current());
 
-if(isset($_GET['show_completed'])){
+if(isset($_GET['showCompleted'])){
     $TaskController->addSimpleEntity('show_completed', true);
-    unset($_GET['show_completed']);
+    unset($_GET['showCompleted']);
 }
 
 if ($areaId !== 0) {

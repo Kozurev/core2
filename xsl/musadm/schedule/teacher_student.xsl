@@ -15,12 +15,10 @@
                         <td>
                             <span>Телефон</span>
                         </td>
-                        <xsl:if test="is_admin =1">
                             <td>
 
                                 <a class="btn btn-green" onclick="addNewStudentToTeacher({//root/value_id})"> + </a>
                             </td>
-                        </xsl:if>
                     </tr>
                     <xsl:apply-templates select="stdClass"/>
                 </table>
@@ -32,11 +30,9 @@
             <td><xsl:value-of select="surname"/></td>
             <td><xsl:value-of select="name"/></td>
             <td><xsl:value-of select="phone_number"/></td>
-            <xsl:if test="/root/is_admin =1">
                  <td>
                      <a class="btn btn-red" id="del_student" onclick="deleteProperty('teachers','User',{id},delTeachersStudentCallback)"> - </a>
                  </td>
-            </xsl:if>
         </tr>
     </xsl:template>
 </xsl:stylesheet>

@@ -153,7 +153,7 @@ function updateTaskArea(taskId, areaId) {
 }
 
 
-function refreshTasksTable(from, to, areaId, taskId) {
+function refreshTasksTable(from, to, areaId, taskId,showCompleted) {
     loaderOn();
     $.ajax({
         type: 'GET',
@@ -163,7 +163,8 @@ function refreshTasksTable(from, to, areaId, taskId) {
             date_from: from,
             date_to: to,
             areaId: areaId,
-            taskId: taskId
+            taskId: taskId,
+            showCompleted:showCompleted
         },
         success: function(response) {
             $('.tasks').html(response);

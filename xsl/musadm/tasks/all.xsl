@@ -45,9 +45,6 @@
                             Показать
                         </a>
                     </div>
-                    <div>
-                            <a class="btn btn-red" href="?show_completed">Показать завершенные</a>
-                    </div>
                 </div>
             </xsl:if>
 
@@ -81,6 +78,16 @@
                 </xsl:if>
             </div>
         </section>
+        <div class="center">
+            <a class="btn btn-red" onclick="refreshTasksTable(
+            $('input[name=date_from]').val(),
+            $('input[name=date_to]').val(),
+            $('select[name=area_id]').val(),
+            $('input[name=task_id]').val(),
+            true, )">
+                Показать завершенные
+            </a>
+        </div>
     </xsl:template>
 
 

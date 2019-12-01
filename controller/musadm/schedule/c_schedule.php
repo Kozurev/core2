@@ -735,7 +735,7 @@ if ($User->groupId() == ROLE_TEACHER) {
             ->show();
     }
 
-    if (User_Auth::current()->groupId() == ROLE_DIRECTOR) {
+    if (User_Auth::current()->groupId() == ROLE_DIRECTOR or User_Auth::current()->groupId() == ROLE_MANAGER ) {
         //График работы преподавателя
         $MainSchedule = Core::factory('Schedule_Teacher')
             ->queryBuilder()
@@ -760,6 +760,7 @@ if ($User->groupId() == ROLE_TEACHER) {
 
         $RestUsers = REST::user();
         $RestUsers->appendFilter('property_' . $TeacherList->getId(), $TeacherProperty->getId());
+        $RestUsers->appendFilter('active', 1);
         $UserList = (json_decode($RestUsers->getList()));
 
         Core::factory('Core_Entity')
@@ -767,35 +768,37 @@ if ($User->groupId() == ROLE_TEACHER) {
             ->addEntities($MainSchedule)
             ->addEntities($UserList)
             ->addSimpleEntity('property_id',$TeacherList->getId())
-            ->addSimpleEntity('value_id',$TeacherProperty->getId())
-            ->addSimpleEntity('is_admin',$isAdmin)
-            ->xsl('musadm/schedule/teacher_time.xsl')
-            ->show();
-    }
-    if($isAdmin == 0){
-        //Список учеников перподавателя
-        $Teacher = User_Controller::factory($userId);
-        $TeacherList = Core::factory('Property')->getByTagName('teachers');
-        $teacherFio = $Teacher->surname() . ' ' . $Teacher->name();
-        $TeacherProperty = Core::factory('Property_List_Values')
-            ->queryBuilder()
-            ->where('property_id', '=', $TeacherList->getId())
-            ->where('value', '=', $teacherFio)
-            ->find();
-
-        $RestUsers = REST::user();
-        $RestUsers->appendFilter('property_' . $TeacherList->getId(), $TeacherProperty->getId());
-        $UserList = (json_decode($RestUsers->getList()));
-
-        Core::factory('Core_Entity')
-            ->addEntity($User)
-            ->addEntities($UserList)
-            ->addSimpleEntity('property_id',$TeacherList->getId())
+            ->addSimpleEntity('user_group',User_Auth::current()->groupId())
             ->addSimpleEntity('value_id',$TeacherProperty->getId())
             ->xsl('musadm/schedule/teacher_time.xsl')
             ->show();
-
     }
+
+//    if($isAdmin == 0){
+//        //Список учеников перподавателя для преподавателя :: Скрыт по просьбе директора
+
+//        $Teacher = User_Controller::factory($userId);
+//        $TeacherList = Core::factory('Property')->getByTagName('teachers');
+//        $teacherFio = $Teacher->surname() . ' ' . $Teacher->name();
+//        $TeacherProperty = Core::factory('Property_List_Values')
+//            ->queryBuilder()
+//            ->where('property_id', '=', $TeacherList->getId())
+//            ->where('value', '=', $teacherFio)
+//            ->find();
+//
+//        $RestUsers = REST::user();
+//        $RestUsers->appendFilter('property_' . $TeacherList->getId(), $TeacherProperty->getId());
+//        $UserList = (json_decode($RestUsers->getList()));
+//
+//        Core::factory('Core_Entity')
+//            ->addEntity($User)
+//            ->addEntities($UserList)
+//            ->addSimpleEntity('property_id',$TeacherList->getId())
+//            ->addSimpleEntity('value_id',$TeacherProperty->getId())
+//            ->xsl('musadm/schedule/teacher_time.xsl')
+//            ->show();
+//
+//    }
 } else {
     /**
      * Формирование списка филлиалов
