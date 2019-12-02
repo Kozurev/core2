@@ -365,7 +365,8 @@ function makePaymentPopup(paymentId, afterSaveAction) {
 
                 //Воможность редактирования типа доступно только для кастомных плтежей
 
-                if (types.forEach(element => (Object.values(element)).includes((payment.typeId).toString()))) {
+                //if (types.forEach(element => (Object.values(element)).includes((payment.typeId).toString()))) {
+                if (payment.typeId > 3 && payment.typeId != 15 && payment.typeId != 16 && payment.typeId != 17 || payment.typeId == 0) {
                     popupData += '<div class="column"><span>Тип</span></div>';
                     popupData += '<div class="column"><select class="form-control" name="type" id="type">';
                     $.each(types, function(key, type) {
