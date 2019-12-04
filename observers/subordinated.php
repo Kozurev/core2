@@ -100,3 +100,19 @@ Core::attachObserver('before.CoreAccessGroup.insert', function($args) {
         $Group->subordinated($User->getId());
     }
 });
+
+
+Core::attachObserver('before.VkGroup.save', function($args) {
+    $group = $args[0];
+    if (empty($group->subordinated())) {
+        $user = User_Auth::current();
+        if (empty($user)) {
+            return;
+        }
+        $director = $user->getDirector();
+        if (empty($director)) {
+            return;
+        }
+        $group->subordinated($director->getId());
+    }
+});

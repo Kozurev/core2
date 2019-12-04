@@ -91,6 +91,8 @@ class Core_Access
 
     const CRON = 'cron';
 
+    const INTEGRATION_VK = 'integration_vk';
+    const INTEGRATION_SENLER = 'integration_senler';
 
 
     /**

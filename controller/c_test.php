@@ -6,15 +6,95 @@
  * Time: 1:02
  */
 
-use Kreait\Firebase;
-use Kreait\Firebase\Messaging;
-use Kreait\Firebase\Messaging\CloudMessage;
-use Kreait\Firebase\Factory;
 
 Orm::Debug(true);
 
 Core::requireClass('User');
 Core::requireClass('User_Controller');
+Core::requireClass('Property_Controller');
+
+
+Core::requireClass('Vk');
+
+
+$token = '1677ccea4ae8498645725db24832c0c657fec5c5bc61c50e554a42e33de809d0697b32df400b79cf7f316';
+//$token = '1677ccea40c657fec5c5bc61c50e554a42e33de809d0697b32df400b79cf7f316';
+//$link = 'public187038781';
+$link = 'kinolyapp';
+
+$vk = new VK($token);
+debug($vk->resolveScreenName($link));
+
+
+exit;
+
+Orm::execute('create table Vk_Group
+(
+	id int auto_increment,
+	title varchar(255) null,
+	link varchar(50) null,
+	vk_id varchar(15) null,
+	secret_key varchar(255) null,
+	subordinated int null,
+	constraint vk_group_pk
+		primary key (id)
+);');
+
+$StructureIntegration = Core::factory('Structure')
+    ->title('Интеграции')
+    ->description('Раздел для итеграции с различными сторонними сервисами')
+    ->parentId(0)
+    ->path('integration')
+    ->action('musadm/integration/index')
+    ->templateId(10)
+    ->menuId(0);
+$StructureIntegration->save();
+
+$StructureVk = Core::factory('Structure')
+    ->title('Вк')
+    ->description('Раздел настроек интеграции с контактом')
+    ->parentId($StructureIntegration->getId())
+    ->path('vk')
+    ->action('musadm/integration/vk')
+    ->menuId(0);
+$StructureVk->save();
+
+
+$StructureSenler = Core::factory('Structure')
+    ->title('Сенлер')
+    ->description('Раздел настроек интеграции с сервисом рассылок "Сенлер"')
+    ->parentId($StructureIntegration->getId())
+    ->path('senler')
+    ->action('musadm/integration/senler')
+    ->menuId(0);
+$StructureSenler->save();
+
+
+$IsEnable = Property_Controller::factory()
+    ->type(PARAM_BOOL)
+    ->title('Интеграция с сенлером')
+    ->description('Указатель на то включена ли интеграция с сервисом рассылок "Сенлер"')
+    ->tagName('integration_senler_enabled')
+    ->defaultValue('0')
+    ->active(1)
+    ->dir(0)
+    ->sorting(0);
+$IsEnable->save();
+
+
+$GroupDirector = Core::factory('Core_Access_Group', 1);
+$GroupManager = Core::factory('Core_Access_Group', 2);
+$GroupTeacher = Core::factory('Core_Access_Group', 3);
+$GroupClient = Core::factory('Core_Access_Group', 4);
+
+$GroupDirector->capabilityAllow('integration_vk');
+$GroupDirector->capabilityAllow('integration_senler');
+$GroupManager->capabilityForbidden('integration_vk');
+$GroupManager->capabilityForbidden('integration_senler');
+$GroupTeacher->capabilityForbidden('integration_vk');
+$GroupTeacher->capabilityForbidden('integration_senler');
+$GroupClient->capabilityForbidden('integration_vk');
+$GroupClient->capabilityForbidden('integration_senler');
 
 
 //$CronUser = (new User)
