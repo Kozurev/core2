@@ -130,8 +130,8 @@ $dateRow = $teacherId === 0
 //  B.Дата_прохождения = (
 //  SELECT MAX(Дата_прохождения)  FROM myTable  WHERE ID = B.ID
 //)
-$timeFrom = strtotime($dateFrom);
-$timeTo = strtotime($dateTo);
+$timeFrom = strtotime($dateFrom . "00:00:00");
+$timeTo = strtotime($dateTo . "23:59:00");
 if ($dateFrom == $dateTo) {
     $Count->where($dateRow, '=', $dateFrom);
     $CountFromSchedule->where('insert_date', '=', $dateFrom);
@@ -158,7 +158,6 @@ if ($teacherId !== 0) {
         ->between('Event.time',$timeFrom,$timeTo)
         ->orderBy('time', 'DESC');
 } else {
-
     $CountFromDateControl = Core::factory('Event');
     $CountFromDateControl
         ->queryBuilder()
