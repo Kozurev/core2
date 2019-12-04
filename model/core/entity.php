@@ -239,7 +239,7 @@ class Core_Entity extends Core_Entity_Model
 
 
     /**
-     * @return null|object
+     * @return null|mixed
      */
     public function find()
     {
