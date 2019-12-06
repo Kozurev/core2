@@ -350,7 +350,9 @@ $(function(){
                     User.getListByTeacherId(selectedTeacher, function (users) {
                         clientsList.append('<option value="0"> ... </option>');
                         $.each(users, function (key, user) {
-                            clientsList.append('<option value="' + user.id + '">' + user.surname + ' ' + user.name + '</option>');
+                            if (user.active == 1) {
+                                clientsList.append('<option value="' + user.id + '">' + user.surname + ' ' + user.name + '</option>');
+                            }
                         });
                         loaderOff();
                     });

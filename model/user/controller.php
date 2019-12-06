@@ -205,7 +205,7 @@ class User_Controller
         $this->User = $User;
         $this->UserQuery = Core::factory('User')
             ->queryBuilder()
-            ->select(['User.id', 'User.name', 'User.surname', 'phone_number', 'email', 'group_id', 'subordinated'])
+            ->select(['User.id', 'User.name', 'User.surname', 'active', 'phone_number', 'email', 'group_id', 'subordinated'])
             ->from(Core::factory('User')->getTableName());
         $this->UserQuery->groupBy('User.id');
     }
