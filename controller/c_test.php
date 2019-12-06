@@ -7,38 +7,51 @@
  */
 
 
-Orm::Debug(true);
+Orm::Debug(false);
 
 Core::requireClass('User');
 Core::requireClass('User_Controller');
 Core::requireClass('Property_Controller');
-
-
 Core::requireClass('Vk');
 
 
-$token = '1677ccea4ae8498645725db24832c0c657fec5c5bc61c50e554a42e33de809d0697b32df400b79cf7f316';
-//$token = '1677ccea40c657fec5c5bc61c50e554a42e33de809d0697b32df400b79cf7f316';
-//$link = 'public187038781';
-$link = 'kinolyapp';
+//$VkGroup = Core::factory('Vk_Group', 1);
+//
+//try {
+//    debug((new Senler($VkGroup))->getSubscriptions());
+//} catch (Exception $e) {
+//    die($e->getMessage());
+//}
 
-$vk = new VK($token);
-debug($vk->resolveScreenName($link));
 
 
 exit;
 
+Orm::execute('create table Senler_Settings_Model
+    (
+        id int auto_increment,
+        lid_status_id int unsigned null,
+        vk_group_id int unsigned null,
+        senler_subscription_id bigint unsigned null,
+        training_direction_id int unsigned null,
+        constraint Senler_Settings_Model_pk
+            primary key (id)
+    );
+');
+
 Orm::execute('create table Vk_Group
-(
-	id int auto_increment,
-	title varchar(255) null,
-	link varchar(50) null,
-	vk_id varchar(15) null,
-	secret_key varchar(255) null,
-	subordinated int null,
-	constraint vk_group_pk
-		primary key (id)
-);');
+    (
+        id int auto_increment,
+        title varchar(255) null,
+        link varchar(50) null,
+        vk_id varchar(15) null,
+        secret_key varchar(100) null,
+        secret_callback_key varchar(55) null,
+        subordinated int null,
+        constraint vk_group_pk
+            primary key (id)
+    );
+');
 
 $StructureIntegration = Core::factory('Structure')
     ->title('Интеграции')
