@@ -344,6 +344,7 @@ Core_Page_Show::instance()
     ->js('/templates/template4/js/initpro.api.js')
     ->js('/templates/template4/js/file.api.js')
     ->js('/templates/template4/js/vk.api.js')
+    ->js('/templates/template4/js/senler.api.js')
 
     ->js('/templates/template10/assets/js/main.js')
     ->js('/templates/template4/js/bootstrap.min.js')
@@ -367,6 +368,7 @@ Core_Page_Show::instance()
     ->js('/templates/template4/js/areas_assignments.js')
     ->js('/templates/template4/js/property_list.js')
     ->js('/templates/template4/js/vk.js')
+    ->js('/templates/template4/js/senler.js')
     ->js('/templates/template4/js/js.js');
 ?>
 

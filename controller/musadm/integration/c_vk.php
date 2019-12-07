@@ -12,8 +12,8 @@ $vkGroups = (new Vk_Group())
     ->findAll();
 
 foreach ($vkGroups as $group) {
-    $hiddenKey = substr($group->secretKey(), strlen($group->secretKey()) - 4);
-    $group->secretKey($hiddenKey);
+    $group->secretKey(Vk_Group::getHiddenKey($group->secretKey()));
+    $group->secretCallbackKey(Vk_Group::getHiddenKey($group->secretCallbackKey()));
 }
 
 (new Core_Entity())

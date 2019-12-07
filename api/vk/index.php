@@ -11,25 +11,20 @@ foreach ($_GET as $key => $param) {
 $action = Core_Array::Request('action', null, PARAM_STRING);
 
 
+if ($action === 'getGroup') {
+    exit(REST::status(REST::STATUS_ERROR, 'Ошибка'));
+}
+
+
 /**
  * Поиск группы по id
  */
-if ($action === 'getGroup') {
+if ($action === 'getGroups') {
      if (!Core_Access::instance()->hasCapability(Core_Access::INTEGRATION_VK)) {
          Core_Page_Show::instance()->error(403);
      }
 
-     $groupId = Core_Array::Get('id', 0, PARAM_INT);
-     if (empty($groupId) || $groupId < 0) {
-         exit(REST::status(REST::STATUS_ERROR, 'Не указан идентификатор группы'));
-     }
-     $group = Vk_Group_Controller::factory($groupId);
-     if (is_null($group)) {
-         exit(REST::status(REST::STATUS_ERROR, 'Группа не найдена'));
-     }
 
-     $group->secretKey($group->getHiddenKey());
-     exit(json_encode(['group' => $group->toStd()]));
 }
 
 
@@ -41,10 +36,11 @@ if ($action === 'saveVkGroup') {
         Core_Page_Show::instance()->error(403);
     }
 
-    $groupId =      Core_Array::Post('id', 0, PARAM_INT);
-    $title =        Core_Array::Post('title', '', PARAM_STRING);
-    $link =         Core_Array::Post('link', '', PARAM_STRING);
-    $secretKey =    Core_Array::Post('secret_key', '', PARAM_STRING);
+    $groupId =          Core_Array::Post('id', 0, PARAM_INT);
+    $title =            Core_Array::Post('title', '', PARAM_STRING);
+    $link =             Core_Array::Post('link', '', PARAM_STRING);
+    $secretKey =        Core_Array::Post('secret_key', '', PARAM_STRING);
+    $secretCallbackKey= Core_Array::Post('secret_callback_key', '', PARAM_STRING);
 
     $group = Vk_Group_Controller::factory($groupId);
     if (is_null($group)) {
@@ -53,8 +49,11 @@ if ($action === 'saveVkGroup') {
 
     $group->title($title);
     $group->link($link);
-    if (strlen($secretKey) > 15) {
+    if (strlen($secretKey) > 15 || empty($secretKey)) {
         $group->secretKey($secretKey);
+    }
+    if (strlen($secretCallbackKey) > 15 || empty($secretCallbackKey)) {
+        $group->secretCallbackKey($secretCallbackKey);
     }
 
     try {

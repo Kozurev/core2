@@ -1,6 +1,6 @@
 <?php
 
-class VK
+class VK extends Api
 {
     /**
      * Название параметра, отвечающего за указание версии API
@@ -25,17 +25,7 @@ class VK
     /**
      * Ссылка на страницу API Вконтакте
      */
-    const VK_API_HOST = 'https://api.vk.com/method';
-
-    /**
-     * Тип запроса к API вконтакте
-     */
-    const REQUEST_METHOD_GET = 'get';
-
-    /**
-     * Тип запроса к API вконтакте
-     */
-    const REQUEST_METHOD_POST = 'post';
+    const API_HOST = 'https://api.vk.com/method/';
 
     /**
      * Секретный ключ
@@ -50,15 +40,6 @@ class VK
      * @var string
      */
     private $apiVersion;
-
-    /**
-     * Список поддерживаемых методов
-     *
-     * @var array
-     */
-    private static $methods = [
-        self::METHOD_RESOLVE_SCREEN_NAME
-    ];
 
 
 
@@ -87,35 +68,7 @@ class VK
             self::PARAM_VERSION => $this->apiVersion,
             self::PARAM_ACCESS_TOKEN => $this->accessToken
         );
-        return self::getRequest(self::METHOD_RESOLVE_SCREEN_NAME, $requestParams);
+        return self::getRequest(self::API_HOST . self::METHOD_RESOLVE_SCREEN_NAME, $requestParams);
     }
-
-    /**
-     * @param string $method
-     * @param array $params
-     * @param string $requestMethod
-     * @return mixed
-     * @throws Exception
-     */
-    private static function getRequest(string $method, array $params = [], string $requestMethod = self::REQUEST_METHOD_GET)
-    {
-        $queryParams = http_build_query($params);
-        $apiUrl = self::VK_API_HOST . '/' . $method;
-
-        if ($requestMethod === self::REQUEST_METHOD_GET) {
-            return json_decode(file_get_contents($apiUrl .'?' . $queryParams));
-        } elseif ($requestMethod === self::REQUEST_METHOD_POST) {
-            return json_decode(file_get_contents($apiUrl, false, stream_context_create([
-                'http' => [
-                    'method' => 'POST',
-                    'header' => 'Content-Type: application/x-www-form-urlencoded',
-                    'content' => $queryParams
-                ]
-            ])));
-        } else {
-            throw new Exception('VK->getRequest - неопознанный тип запроса: ' . $requestMethod);
-        }
-    }
-
 
 }

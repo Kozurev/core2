@@ -56,10 +56,16 @@ class Vk_Group extends Vk_Group_Model
 
 
     /**
-     * @return false|string
+     * @param string $key
+     * @return string
      */
-    public function getHiddenKey() {
-        return '******' . substr($this->secretKey(), strlen($this->secretKey()) - 4);
+    public static function getHiddenKey(string $key) : string
+    {
+        if (empty($key)) {
+            return '';
+        } else {
+            return '******' . substr($key, strlen($key) - 4);
+        }
     }
 
 

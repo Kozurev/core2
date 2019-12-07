@@ -3,6 +3,10 @@
 global $CFG;
 authOrOut();
 
+$accessIntegrationVk = Core_Access::instance()->hasCapability(Core_Access::INTEGRATION_VK);
+if (!$accessIntegrationVk) {
+    Core_Page_Show::instance()->error(403);
+}
 
 $breadcumbs = [];
 $breadcumbs[0] = new stdClass();

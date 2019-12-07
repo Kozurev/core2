@@ -10,7 +10,7 @@ class Vk_Group_Controller
      * @param bool $isSubordinate
      * @return Vk_Group|null
      */
-    public static function factory(int $id = null, bool $isSubordinate = true)
+    public static function factory(int $id = 0, bool $isSubordinate = true)
     {
         $group = new Vk_Group();
 

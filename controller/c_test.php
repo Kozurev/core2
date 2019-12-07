@@ -7,12 +7,7 @@
  */
 
 
-Orm::Debug(false);
-
-Core::requireClass('User');
-Core::requireClass('User_Controller');
-Core::requireClass('Property_Controller');
-Core::requireClass('Vk');
+Orm::Debug(true);
 
 
 //$VkGroup = Core::factory('Vk_Group', 1);
@@ -22,12 +17,17 @@ Core::requireClass('Vk');
 //} catch (Exception $e) {
 //    die($e->getMessage());
 //}
-
-
+//
+//$subscriptionId = '549072';
+//try {
+//    debug((new Senler($VkGroup))->getSubscriptionById($subscriptionId));
+//} catch (Exception $e) {
+//    die($e->getMessage());
+//}
 
 exit;
 
-Orm::execute('create table Senler_Settings_Model
+Orm::execute('create table Senler_Settings
     (
         id int auto_increment,
         lid_status_id int unsigned null,

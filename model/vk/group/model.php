@@ -40,6 +40,11 @@ class Vk_Group_Model extends Core_Entity
     protected $secret_key = '';
 
     /**
+     * @var string
+     */
+    protected $secret_callback_key = '';
+
+    /**
      * @var int
      */
     protected $subordinated;
@@ -83,6 +88,20 @@ class Vk_Group_Model extends Core_Entity
             return $this->secret_key;
         } else {
             $this->secret_key = $secretKey;
+            return $this;
+        }
+    }
+
+    /**
+     * @param string|null $secretCallbackKey
+     * @return $this|string
+     */
+    public function secretCallbackKey(string $secretCallbackKey = null)
+    {
+        if (is_null($secretCallbackKey)) {
+            return $this->secret_callback_key;
+        } else {
+            $this->secret_callback_key = $secretCallbackKey;
             return $this;
         }
     }
@@ -143,7 +162,12 @@ class Vk_Group_Model extends Core_Entity
             'secret_key' => [
                 'required' => true,
                 'type' => PARAM_STRING,
-                'maxlength' => 255
+                'maxlength' => 100
+            ],
+            'secret_callback_key' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'maxlength' => 55
             ],
             'subordinated' => [
                 'required' => true,

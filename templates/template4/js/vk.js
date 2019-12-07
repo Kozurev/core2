@@ -15,8 +15,10 @@ function showVkGroupPopup(response) {
                 '<div class="column"><input type="text" name="title" class="form-control"></div>' +
                 '<div class="column"><span>Ссылка</span><span style="color:red"> *</span></div>' +
                 '<div class="column"><input type="text" name="link" class="form-control"></div>' +
-                '<div class="column"><span>Секретный ключ</span></div>' +
+                '<div class="column"><span>Ключ доступа</span></div>' +
                 '<div class="column"><input type="text" name="secret_key" class="form-control"></div>' +
+                '<div class="column"><span>Секретный ключ Callback API</span></div>' +
+                '<div class="column"><input type="text" name="secret_callback_key" class="form-control"></div>' +
                 '<input type="hidden" name="id">' +
             '</form>' +
         '</div>' +
@@ -33,6 +35,7 @@ function showVkGroupPopup(response) {
         popup.find('input[name=title]').val(group.title);
         popup.find('input[name=link]').val(group.link);
         popup.find('input[name=secret_key]').val(group.secret_key);
+        popup.find('input[name=secret_callback_key]').val(group.secret_callback_key);
     }
 
     showPopup();
@@ -51,6 +54,7 @@ function saveVkGroupForm(form) {
     groupData.title = form.find('input[name=title]').val();
     groupData.link = form.find('input[name=link]').val();
     groupData.secret_key = form.find('input[name=secret_key]').val();
+    groupData.secret_callback_key = form.find('input[name=secret_callback_key]').val();
     Vk.save(groupData, function(response) {
         if (checkResponseStatus(response)) {
             window.location.reload();
