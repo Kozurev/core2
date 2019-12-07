@@ -1,5 +1,7 @@
 <?php
 
+global $CFG;
+
 $director = User_Auth::current()->getDirector();
 
 $currentVkGroupId = Core_Array::Get('group_id', 0, PARAM_INT);
@@ -35,8 +37,8 @@ $vkGroups = (new Vk_Group())->queryBuilder()
     ->where('subordinated', '=', $director->getId())
     ->findAll();
 
-
 (new Core_Entity())
+    ->addSimpleEntity('wwwroot', $CFG->rootdir)
     ->addSimpleEntity('error', $error)
     ->addSimpleEntity('current_group_id', $currentVkGroupId)
     ->addEntity($group ?? null, 'current_group')
