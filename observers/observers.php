@@ -818,3 +818,48 @@ Core::attachObserver('before.ScheduleAbsent.save', function($args) {
     }
     return;
 });
+
+
+/**
+ * Подписка лида на одну из групп рассылок в сенлере
+ */
+Core::attachObserver('after.Lid.changeStatus', function($args) {
+    $lid = $args['Lid'];
+    $status = $args['new_status'];
+    $link = $lid->vk();
+
+    if (empty($link) || substr($link, 0, 14) != 'https://vk.com') {
+        return;
+    }
+
+    try {
+        $lidVkId = Vk_Group::getVkId($link);
+    } catch(Exception $e) {
+        return;
+    }
+
+    if ($lidVkId->type != 'user') {
+        return;
+    }
+
+    $lidInstrument = Property_Controller::factoryByTag('instrument')->getValues($lid)[0];
+    $groups = (new Vk_Group_Controller(User_Auth::current()))->getList();
+    foreach ($groups as $group) {
+        $setting = (new Senler_Settings())->queryBuilder()
+            ->where('lid_status_id', '=', $status->getId())
+            ->open()
+                ->where('training_direction_id', '=', $lidInstrument->value())
+                ->orWhere('training_direction_id', '=', 0)
+            ->close()
+            ->orderBy('training_direction_id', 'DESC')
+            ->find();
+
+        if (!is_null($setting)) {
+            $senler = new Senler($group);
+            $senler->subscribeRemove($lidVkId->object_id);
+            $senler->subscribe($lidVkId->object_id, $setting->senlerSubscriptionId());
+        }
+
+        return;
+    }
+});

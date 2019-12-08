@@ -1,9 +1,22 @@
 <?php
 
-Core::requireClass('Vk_Group');
-
-class Vk_Group_Controller
+class Vk_Group_Controller extends Controller
 {
+    /**
+     * Vk_Group_Controller constructor.
+     * @param User|null $user
+     */
+    public function __construct(User $user = null)
+    {
+        if (!is_null($user)) {
+            $this->setUser($user);
+        }
+        $group = new Vk_Group();
+        $this->setObject($group);
+        $this->setQueryBuilder($group->queryBuilder());
+        $this->isWithComments(false);
+        parent::__construct(['user' => &$user]);
+    }
 
     /**
      * @param int|null $id
@@ -37,6 +50,18 @@ class Vk_Group_Controller
         }
 
         return $group->find();
+    }
+
+    /**
+     * @return array
+     */
+    public function getList() : array
+    {
+        if ($this->isSubordinate()) {
+            $this->getQueryBuilder()->where('subordinated', '=', $this->getSubordinate());
+        }
+
+        return $this->getQueryBuilder()->findAll();
     }
 
 

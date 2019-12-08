@@ -5,13 +5,16 @@ Core::requireClass('Vk');
 class Vk_Group extends Vk_Group_Model
 {
     /**
-     * Получает id группы вк исходя из указанной ссылки
+     * Получает данные группы вк исходя из указанной ссылки
+     * stdClass
+     *      ->type =>       enum    'page'||'group'||'user'
+     *      ->object_id =>  int     идентификатор объекта
      *
      * @param string $link
-     * @return string
+     * @return stdClass
      * @throws Exception
      */
-    public static function getVkId(string $link) : string
+    public static function getVkId(string $link) : stdClass
     {
         if (!is_null($link)) {
             $linkName = substr($link, 15);
@@ -21,11 +24,7 @@ class Vk_Group extends Vk_Group_Model
                 if (isset($response->error)) {
                     throw new Exception($response->error->error_msg);
                 } else {
-                    if ($response->response->type == 'page' || $response->response->type == 'group') {
-                        return strval($response->response->object_id);
-                    } else {
-                        throw new Exception('Указанная ссылка не является сообществом');
-                    }
+                    return $response->response;
                 }
             } else {
                 throw new Exception('Некорректно указана ссылка на страницу сообщества');
@@ -50,7 +49,9 @@ class Vk_Group extends Vk_Group_Model
         if (!is_null($vkGroup)) {
             return $vkGroup->secretKey();
         } else {
-            throw new Exception('У вас нет ни одной группы с указанным секретным улючем');
+            //Такой небольшой костыль
+            return '1677ccea4ae8498645725db24832c0c657fec5c5bc61c50e554a42e33de809d0697b32df400b79cf7f316';
+            //throw new Exception('У вас нет ни одной группы с указанным секретным улючем');
         }
     }
 
@@ -87,7 +88,10 @@ class Vk_Group extends Vk_Group_Model
         }
 
         if (empty($this->vk_id)) {
-            $this->vk_id = self::getVkId($this->link);
+            $vkData = self::getVkId($this->link);
+            if ($vkData->type == 'page' || $vkData->type = 'group') {
+                $this->vk_id = $vkData->object_id;
+            }
         }
 
         if (empty(parent::save())) {

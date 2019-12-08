@@ -44,12 +44,12 @@ class Senler_Settings_Model extends Core_Entity
     }
 
     /**
-     * @param string|null $vkGroupId
+     * @param int|null $vkGroupId
      * @return $this|string
      */
-    public function vkGroupId(string $vkGroupId = null) {
+    public function vkGroupId(int $vkGroupId = null) {
         if (is_null($vkGroupId)) {
-            return $this->vk_group_id;
+            return intval($this->vk_group_id);
         } else {
             $this->vk_group_id = $vkGroupId;
             return $this;

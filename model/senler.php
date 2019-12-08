@@ -13,6 +13,21 @@ class Senler extends Api
     const METHOD_SUBSCRIPTIONS_GET = 'subscriptions/get';
 
     /**
+     * Название метода получения списка подписчиков
+     */
+    const METHOD_SUBSCRIBERS_GET = 'subscribers/get';
+
+    /**
+     * Название метода добавления пользователя в группу подписки
+     */
+    const METHOD_SUBSCRIBER_ADD = 'subscribers/add';
+
+    /**
+     * Название метода удаления пользователя из группы подписки
+     */
+    const METHOD_SUBSCRIBER_DELETE = 'subscribers/del';
+
+    /**
      * Обязательный параметр идентификатора группы ВК
      */
     const PARAM_VK_GROUP_ID = 'vk_group_id';
@@ -26,6 +41,16 @@ class Senler extends Api
      * Обязательный параметр из соли параметров и секретного ключа Callback API
      */
     const PARAM_HASH = 'hash';
+
+    /**
+     *
+     */
+    const PARAM_VK_USER_ID = 'vk_user_id';
+
+    /**
+     *
+     */
+    const PARAM_SUBSCRIPTION_ID = 'subscription_id';
 
     /**
      * Стандартно используемая версия API
@@ -110,22 +135,81 @@ class Senler extends Api
 
     /**
      * @param $id
-     * @return mixed
+     * @return stdClass|null
      * @throws Exception
      */
     public function getSubscriptionById($id)
     {
+        $subscription = $this->getSubscriptions([self::PARAM_VK_USER_ID => $id]);
+        return $subscription[0] ?? null;
+    }
+
+    /**
+     * @param array $params
+     * @return array|null
+     * @throws Exception
+     */
+    public function getSubscribers(array $params = []) : array
+    {
         $params[self::PARAM_VERSION_API] =  self::DEFAULT_API_VERSION;
         $params[self::PARAM_VK_GROUP_ID] =  $this->vkGroupId;
-        $params['subscription_id'] =        [$id];
         $params[self::PARAM_HASH] =         self::getHash($params, $this->secretCallbackKey);
 
-        $response = Api::getRequest(self::API_HOST . self::METHOD_SUBSCRIPTIONS_GET, $params, Api::REQUEST_METHOD_POST);
+        $response = Api::getRequest(self::API_HOST . self::METHOD_SUBSCRIBERS_GET, $params, Api::REQUEST_METHOD_POST);
         if ($response->success !== true) {
             throw new Exception($response->error_message);
         } else {
-            return $response->items[0] ?? null;
+            return $response->items;
         }
+    }
+
+    /**
+     * @param $id
+     * @return stdClass|null
+     * @throws Exception
+     */
+    public function getSubscriberById($id)
+    {
+        $subscriber = $this->getSubscribers([self::PARAM_VK_USER_ID => $id]);
+        return $subscriber[0] ?? null;
+    }
+
+    /**
+     * Добавление пользователя в группу подписки
+     *
+     * @param $vkUserId
+     * @param $subscriptionId
+     * @return mixed
+     * @throws Exception
+     */
+    public function subscribe($vkUserId, $subscriptionId = 0)
+    {
+        $params[self::PARAM_VERSION_API] =  self::DEFAULT_API_VERSION;
+        $params[self::PARAM_VK_GROUP_ID] =  $this->vkGroupId;
+        $params[self::PARAM_VK_USER_ID] =   $vkUserId;
+        $params[self::PARAM_SUBSCRIPTION_ID]=$subscriptionId;
+        $params[self::PARAM_HASH] =         self::getHash($params, $this->secretCallbackKey);
+
+        return Api::getRequest(self::API_HOST . self::METHOD_SUBSCRIBER_ADD, $params, Api::REQUEST_METHOD_POST);
+    }
+
+    /**
+     * Удаление пользователя из группы подписки илии всех групп сразу
+     *
+     * @param $vkUserId
+     * @param int $subscriptionId
+     * @return mixed
+     * @throws Exception
+     */
+    public function subscribeRemove($vkUserId, $subscriptionId = 0)
+    {
+        $params[self::PARAM_VERSION_API] =  self::DEFAULT_API_VERSION;
+        $params[self::PARAM_VK_GROUP_ID] =  $this->vkGroupId;
+        $params[self::PARAM_VK_USER_ID] =   $vkUserId;
+        $params[self::PARAM_SUBSCRIPTION_ID]=$subscriptionId;
+        $params[self::PARAM_HASH] =         self::getHash($params, $this->secretCallbackKey);
+
+        return Api::getRequest(self::API_HOST . self::METHOD_SUBSCRIBER_DELETE, $params, Api::REQUEST_METHOD_POST);
     }
 
     /**

@@ -24,6 +24,30 @@ Orm::Debug(true);
 //} catch (Exception $e) {
 //    die($e->getMessage());
 //}
+//
+//try {
+//    debug((new Senler($VkGroup))->getSubscriptionById('549072'), 1);
+//} catch (Exception $e) {
+//    die($e->getMessage());
+//}
+//
+//
+//$link = 'https://vk.com/id61778174';
+//debug(substr($link, 0, 14) == 'https://vk.com');
+
+//try {
+//    debug((new Senler($VkGroup))->getSubscriberById('61969158'));
+//} catch (Exception $e) {
+//    die($e->getMessage());
+//}
+
+
+//try {
+//    debug((new Senler($VkGroup))->subscribe('61778174', '549072'));
+//    //debug((new Senler($VkGroup))->subscribeRemove('61778174'));
+//} catch (Exception $e) {
+//    die($e->getMessage());
+//}
 
 exit;
 
