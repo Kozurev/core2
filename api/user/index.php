@@ -614,3 +614,19 @@ if ($action === 'savePushId') {
     $response->status = true;
     die(json_encode($response));
 }
+
+/**
+ * Добавление пользователя в спикок отвала
+ */
+if ($action === 'archiveUser') {
+
+    $userId = Core_Array::Get('userId', 0, PARAM_INT);
+    $reasonId = Core_Array::Get('reasonId', 0, PARAM_INT);
+    $dumpStart = Core_Array::Get('dumpStart', 0, PARAM_STRING);
+
+    if (is_null($userId) || is_null($reasonId)|| is_null($dumpStart)) {
+        die(REST::status(REST::STATUS_ERROR, 'Вы ввели не все данные!!!'));
+    }
+    $archive = new User_Activity();
+    $newArchive = $archive->userId($userId)->reasonId($reasonId)->dumpDateStart($dumpStart)->save();
+}

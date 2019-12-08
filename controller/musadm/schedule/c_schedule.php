@@ -758,15 +758,14 @@ if ($User->groupId() == ROLE_TEACHER) {
             ->where('value', '=', $teacherFio)
             ->find();
 
-        $RestUsers = REST::user();
-        $RestUsers->appendFilter('property_' . $TeacherList->getId(), $TeacherProperty->getId());
-        $RestUsers->appendFilter('active', 1);
-        $UserList = (json_decode($RestUsers->getList()));
-
+        $UserController =  new User_Controller_Extended(User_Auth::current());
+        $UserController->appendAddFilter($TeacherList->getId(),'=',$TeacherProperty->getId());
+        $Users = $UserController->getUsers();
+        
         Core::factory('Core_Entity')
             ->addEntity($User)
             ->addEntities($MainSchedule)
-            ->addEntities($UserList)
+            ->addEntities($Users,'clients')
             ->addSimpleEntity('property_id',$TeacherList->getId())
             ->addSimpleEntity('user_group',User_Auth::current()->groupId())
             ->addSimpleEntity('value_id',$TeacherProperty->getId())

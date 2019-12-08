@@ -24,7 +24,7 @@ $areaAsgmTable = Core::factory('Schedule_Area_Assignment')->getTableName();
 
 $Orm = new Orm();
 
-echo "<div class='row'>";
+
 
 
 //Статистика по балансу и урокам
@@ -331,7 +331,7 @@ Core::factory('Core_Entity')
 //    ->show();
 
 
-echo "<div class=\"col-lg-4 col-md-6 col-sm-6 col-xs-12\">";
+
 
 /**
  * Статистика по проведенным занятиям
@@ -502,4 +502,101 @@ Core::factory('Core_Entity')
     ->xsl('musadm/statistic/lessons_income.xsl')
     ->show();
 
-echo "</div></div>";
+
+
+
+/**
+ * Статистика по активным клиентам
+ */
+
+
+$userCount =  (new User())
+    ->queryBuilder()
+    ->where('group_id', '=', ROLE_CLIENT)
+    ->where('register_date','<=',$dateTo)
+    ->where('subordinated', '=', $subordinated)
+    ->where('active', '=', 1)
+    ->count();
+
+
+$reportTableName = Core::factory('Schedule_Lesson_Report')->getTableName();
+
+$userActiveCount =  (new User())
+    ->queryBuilder()
+    ->where('group_id', '=', ROLE_CLIENT)
+    ->where('subordinated', '=', $subordinated)
+    ->where('active', '=', 1)
+    ->where('register_date','<=',$dateTo)
+    ->join(
+        $reportTableName . ' AS rep',
+        'rep.client_id = User.id AND rep.attendance = 1 AND rep.date between "'.$dateFrom.'" AND "'.$dateTo.'" AND rep.type_id = 1'
+    )
+    ->groupBy('User.id')
+    ->findAll();
+Core::factory('Core_Entity')
+    ->addSimpleEntity('total_count', $userCount)
+    ->addSimpleEntity('active_count', count($userActiveCount))
+    ->xsl('musadm/statistic/active_clients.xsl')
+    ->show();
+
+
+
+/**
+ * Статистика по отвалу клиентов
+ */
+
+$userAllCount =  (new User())
+    ->queryBuilder()
+    ->where('group_id', '=', ROLE_CLIENT)
+    ->where('subordinated', '=', $subordinated)
+    ->where('register_date','<=',$dateTo)
+    ->where('active', '=', 1)
+    ->count();
+
+
+$PropertyList =  (new Property_List_Values())
+    ->queryBuilder()
+    ->where('property_id', '=', Event::CLIENT_ACTIVITY)
+    ->findAll();
+$userActivityList = [];
+foreach ($PropertyList as $property) {
+    $UserActivityCount =  (new User_Activity())
+        ->queryBuilder()
+        ->where('reason_id', '=', $property->id())
+        ->between('dump_date_start',$dateFrom,$dateTo)
+        ->count();
+    $property = $property->toStd();
+    $property->count = $UserActivityCount;
+    array_push($userActivityList,$property);
+
+}
+
+$countNewClient = (new User)
+    ->queryBuilder()
+    ->between('register_date',$dateFrom,$dateTo)
+    ->where('active', '=', 1)
+    ->count();
+
+$countLeaveClient = (new User_Activity)
+    ->queryBuilder()
+    ->select('count(id)')
+    ->between('dump_date_start',$dateFrom,$dateTo)
+    ->groupBy('user_id')
+    ->findAll();
+
+$countComebackClient = (new User_Activity)
+    ->queryBuilder()
+    ->select('count(id)')
+    ->between('dump_date_end',$dateFrom,$dateTo)
+    ->groupBy('user_id')
+    ->findAll();
+$percentLeaveClient =  (round(((count($countLeaveClient) / $userAllCount)*100),2)).'%';
+
+Core::factory('Core_Entity')
+    ->addSimpleEntity('count_new_client',$countNewClient)
+    ->addSimpleEntity('count_leave_client',count($countLeaveClient))
+    ->addSimpleEntity('count_comeback_client',count($countComebackClient))
+    ->addSimpleEntity('count_percent_client',$percentLeaveClient)
+    ->addEntities($userActivityList,'userActivityList')
+    ->xsl('musadm/statistic/archive_clients.xsl')
+    ->show();

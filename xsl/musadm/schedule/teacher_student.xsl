@@ -20,12 +20,12 @@
                                 <a class="btn btn-green" onclick="addNewStudentToTeacher({//root/value_id})"> + </a>
                             </td>
                     </tr>
-                    <xsl:apply-templates select="stdClass"/>
+                    <xsl:apply-templates select="clients"/>
                 </table>
             </div>
         </div>
     </xsl:template>
-    <xsl:template match="stdClass">
+    <xsl:template match="clients">
         <tr id="{id}">
             <td><xsl:value-of select="surname"/></td>
             <td><xsl:value-of select="name"/></td>

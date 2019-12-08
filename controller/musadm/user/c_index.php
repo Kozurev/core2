@@ -16,7 +16,6 @@ Core::requireClass('Schedule_Area_Assignment');
 
 $isDirector = intval(User::current()->groupId() == ROLE_DIRECTOR);
 $groupId = Core_Page_Show::instance()->StructureItem->getId();
-
 $ClientController = new User_Controller_Extended(User::current());
 
 if ($groupId == ROLE_CLIENT) {

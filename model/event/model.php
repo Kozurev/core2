@@ -25,6 +25,7 @@ class Event_Model extends Core_Entity
     const CLIENT_ARCHIVE =                  7;
     const CLIENT_UNARCHIVE =                8;
     const CLIENT_APPEND_COMMENT =           9;
+    const CLIENT_ACTIVITY=                  61;
 
     const PAYMENT_CHANGE_BALANCE =          11;
     const PAYMENT_HOST_COSTS =              12;

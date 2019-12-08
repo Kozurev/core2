@@ -40,6 +40,37 @@ $(function(){
                 refreshUserTable();
             });
         })
+        //Всплывающее окно с параметрами отвала
+        .on('click', '.user_activity', function(e) {
+            var userId = $(this).data('userid');
+            var userTr = $(this).parent().parent();
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1;
+
+            var yyyy = today.getFullYear();
+            if (dd < 10) {
+                dd = '0' + dd;
+            }
+            if (mm < 10) {
+                mm = '0' + mm;
+            }
+            var today = yyyy + '-' + mm + '-' + dd;
+            var popupData = $( "" +
+                "<form name=\"createData\" id=\"createData\" action=\".\" novalidate=\"novalidate\">" +
+                "<div class=\"col-md-8\"><h4>Дата отвала:</h4><input type=\"date\" class=\"form-control\" id=\"date\" name=\"date_from\" value="+today+"></div>" +
+                "<div class=\"col-md-8\"><h4>Причина:</h4><select class=\"form-control\" id=\"mainPropertyList\"></select></div>" +
+                "<button class=\"user_archive btn btn-default\" data-userid = "+userId+">В архив</button>" +
+                "</form>");
+            var mainPropertyList = popupData.find('#mainPropertyList');
+            PropertyList.getList(61,
+                function(response) {
+                    $.each(response, function(key, property){
+                        mainPropertyList.append('<option value="'+property.id+'">' + property.value + '</option>');
+                    });
+            });
+            showPopup(popupData);
+        })
         //Добавление пользователя в архив
         .on('click', '.user_archive', function(e) {
             e.preventDefault();
@@ -47,7 +78,15 @@ $(function(){
             if (agree != true) return;
             loaderOn();
             var userId = $(this).data('userid');
-            var userTr = $(this).parent().parent();
+            var userTr = $('#user_'+userId+'');
+            if (!userTr.length){
+                userTr = $(this).parent().parent();
+           }
+
+
+            if($('#mainPropertyList').val()!== undefined){
+                User.archiveUser(userId,$('#mainPropertyList').val(),$('#date').val());
+            }
             updateActive('User', userId, 'false', function(response) {
                 var
                     totalCountSpan =    $('#total-clients-count'),
@@ -57,6 +96,7 @@ $(function(){
                 totalCountSpan.text(totalCount - 1);
                 loaderOff();
             });
+            closePopup();
         })
         //"Разархивирование пользователя"
         .on('click', '.user_unarchive', function(e) {

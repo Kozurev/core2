@@ -96,8 +96,16 @@ Core::attachObserver('before.Lid.insert', function($args) {
 Core::attachObserver('before.CoreAccessGroup.insert', function($args) {
     $Group = $args[0];
     if (empty($Group->subordinated())) {
-        $User = User::current()->getDirector();
+        $User = User_Auth::current()->getDirector();
         $Group->subordinated($User->getId());
+    }
+});
+
+Core::attachObserver('before.UserActivity.insert', function($args) {
+    $UserActivity = $args[0];
+    if (empty($UserActivity->subordinated())) {
+        $User = User_Auth::current()->getDirector();
+        $UserActivity->subordinated($User->getId());
     }
 });
 

@@ -165,7 +165,7 @@
                     </xsl:if>
 
                     <xsl:if test="//access_user_archive_client = 1">
-                        <a class="action archive user_archive" data-userid="{id}" title="Переместить в архив"></a>
+                        <a class="action archive user_activity" data-userid="{id}" title="Переместить в архив"></a>
                     </xsl:if>
                 </td>
             </xsl:if>

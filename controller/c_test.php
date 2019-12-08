@@ -7,7 +7,12 @@
  */
 
 
-Orm::Debug(true);
+Orm::Debug(false);
+
+Core::requireClass('User');
+Core::requireClass('User_Controller');
+Core::requireClass('Property_Controller');
+Core::requireClass('Vk');
 
 
 //$VkGroup = Core::factory('Vk_Group', 1);
@@ -17,39 +22,33 @@ Orm::Debug(true);
 //} catch (Exception $e) {
 //    die($e->getMessage());
 //}
-//
-//$subscriptionId = '549072';
-//try {
-//    debug((new Senler($VkGroup))->getSubscriptionById($subscriptionId));
-//} catch (Exception $e) {
-//    die($e->getMessage());
-//}
-//
-//try {
-//    debug((new Senler($VkGroup))->getSubscriptionById('549072'), 1);
-//} catch (Exception $e) {
-//    die($e->getMessage());
-//}
-//
-//
-//$link = 'https://vk.com/id61778174';
-//debug(substr($link, 0, 14) == 'https://vk.com');
 
-//try {
-//    debug((new Senler($VkGroup))->getSubscriberById('61969158'));
-//} catch (Exception $e) {
-//    die($e->getMessage());
-//}
+Orm::execute('create table User_Activity
+    (
+        id int auto_increment,
+        user_id int unsigned null,
+        reason_id int unsigned null,
+        dump_date_start date  null,
+        dump_date_end date  null,
+        subordinated int unsigned null,
+        constraint User_Activity_pk
+            primary key (id)
+    );
+');
 
+$newProperty = Property_Controller::factory()
+    ->type('list')
+    ->title('Причины отвала клиента')
+    ->description('Список причин, по которым клиент ушел')
+    ->tagName('client_dump_reasons')
+    ->defaultValue('0')
+    ->active(1)
+    ->dir(0)
+    ->sorting(0);
+$newProperty->save();
 
-//try {
-//    debug((new Senler($VkGroup))->subscribe('61778174', '549072'));
-//    //debug((new Senler($VkGroup))->subscribeRemove('61778174'));
-//} catch (Exception $e) {
-//    die($e->getMessage());
-//}
+exit();
 
-exit;
 
 Orm::execute('create table Senler_Settings
     (
@@ -60,7 +59,7 @@ Orm::execute('create table Senler_Settings
         training_direction_id int unsigned null,
         constraint Senler_Settings_Model_pk
             primary key (id)
-    ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+    );
 ');
 
 Orm::execute('create table Vk_Group
@@ -74,7 +73,7 @@ Orm::execute('create table Vk_Group
         subordinated int null,
         constraint vk_group_pk
             primary key (id)
-    ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+    );
 ');
 
 $StructureIntegration = Core::factory('Structure')
