@@ -13,5 +13,9 @@ require_once ROOT . '/model/rest/controller.php';
 require_once ROOT . '/model/REST.php';
 require_once ROOT . '/lib/functions.php';
 require_once ROOT . '/lib/schedule_functions.php';
-Core::requireClass('Comment');
-Core::requireClass('Comment_Assignment');
+require_once ROOT . '/model/comment/model.php';
+require_once ROOT . '/model/comment.php';
+
+spl_autoload_register(function ($className) {
+    Core::requireClass($className);
+});

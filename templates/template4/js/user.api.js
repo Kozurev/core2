@@ -59,6 +59,27 @@ class User {
 
 
     /**
+     * Помещение пользователя  в список отвала
+     */
+    static archiveUser(userId, reasonId,dumpStart) {
+        $.ajax({
+            type: 'GET',
+            url: User.getApiLink(),
+            dataType: 'json',
+            data: {
+                action: 'archiveUser',
+                userId: userId,
+                reasonId:reasonId,
+                dumpStart:dumpStart
+
+            },
+            success: alert("Пользователь внесен в список!")
+
+        });
+    }
+
+
+    /**
      * Сохранение пользователя
      *
      * @param userData

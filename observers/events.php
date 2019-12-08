@@ -197,8 +197,16 @@ Core::attachObserver('before.User.deactivate', function($args) {
  */
 Core::attachObserver( 'before.User.activate', function($args) {
     $User = $args[0];
-    $UserFio = $User->surname() . ' ' . $User->name();
+    $archive = new User_Activity();
+    $findArchive = $archive->queryBuilder()
+        ->where('user_id','=',$User->getId())
+        ->where('dump_date_end','is',null)
+        ->find();
 
+    if(!is_null($findArchive)) {
+        $findArchive->dumpDateEnd(date('Y-m-d'))->save();
+    }
+    $UserFio = $User->surname() . ' ' . $User->name();
     $Event = new Event();
     $EventData = new stdClass();
     $EventData->User = $User;
@@ -208,6 +216,8 @@ Core::attachObserver( 'before.User.activate', function($args) {
         ->setData($EventData)
         ->save();
 });
+
+
 
 
 /**
@@ -436,6 +446,24 @@ Core::attachObserver('after.User.addComment', function($args) {
     $Event->userAssignmentId($userAssignmentId)
         ->userAssignmentFio($userAssignmentFio)
         ->typeId(Event::CLIENT_APPEND_COMMENT)
+        ->setData($EventData)
+        ->save();
+});
+
+/**
+ * Добавление комментария к пользователю в новом разделе
+ */
+Core::attachObserver('after.UserActivity.save', function($args) {
+    $Event = new Event();
+    $EventData = $args[0]->toStd();
+    $reason_name = Core::factory("Property_List_Values", $EventData->reason_id)->value();
+    $EventData->reason_name = $reason_name;
+    Core::requireClass('User_Controller');
+    $User = User_Controller::factory($EventData->user_id);
+    $userAssignmentFio = $User->surname() . ' ' . $User->name();
+    $Event->userAssignmentId($EventData->user_id)
+        ->userAssignmentFio($userAssignmentFio)
+        ->typeId(Event::CLIENT_ACTIVITY)
         ->setData($EventData)
         ->save();
 });

@@ -119,6 +119,10 @@ class Schedule_Controller_Extended
         do {
             $nearest = self::getNearestDay($nextDate, $Lessons);
 
+            if (empty($nearest)) {
+                break;
+            }
+
             if (isDate(strval($dateTo))) {
                 if (compareDate($nearest->date, '<=', $dateTo)) {
                     $Schedule[] = $nearest;

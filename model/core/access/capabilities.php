@@ -88,4 +88,7 @@ return [
     'statistic_read' => 'Просмотр статистики',
 
     'cron' => 'Доступ к скриптам крона',
+
+    'integration_vk' => 'Интеграция с ВК',
+    'integration_senler' => 'Интеграция с сервисом рассылок Senler',
 ];

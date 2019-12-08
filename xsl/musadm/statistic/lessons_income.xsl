@@ -2,7 +2,7 @@
 
     <xsl:template match="root">
         <div class='row'>
-            <div class='col-lg-12 col-md-12 col-sm-12'>
+            <div class='col-lg-4'>
                 <table class="table table-hover table-bordered">
                     <tr>
                         <th colspan="2">Доходы-расходы</th>

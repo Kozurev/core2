@@ -99,6 +99,8 @@
         $accessFinances =           Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_ALL);
         $accessTarifs =             Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_READ);
         $accessStatistic =          Core_Access::instance()->hasCapability(Core_Access::STATISTIC_READ);
+        $accessIntegrationVk =      Core_Access::instance()->hasCapability(Core_Access::INTEGRATION_VK);
+        $accessIntegrationSenler =  Core_Access::instance()->hasCapability(Core_Access::INTEGRATION_SENLER);
     ?>
 </head>
 
@@ -217,6 +219,20 @@
                                 echo '<li><a href="'.$CFG->rootdir.'/statistic">Статистика</a></li>';
                             }
 
+                            //Интеграции
+                            if ($accessIntegrationVk || $accessIntegrationSenler) {
+                                echo '<li class="dropdown">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Интеграция<span class="caret"></span></a>
+                                        <ul class="dropdown-menu">';
+                                if ($accessIntegrationVk) {
+                                    echo '<li><a href="' . $CFG->rootdir . '/integration/vk">ВК</a></li>';
+                                }
+                                if ($accessIntegrationSenler) {
+                                    echo '<li><a href="' . $CFG->rootdir . '/integration/senler">Senler</a></li>';
+                                }
+                                echo '</ul></li>';
+                            }
+
                             //Права доступа
                             if (User::checkUserAccess(['groups' => [ROLE_ADMIN]], User::parentAuth())) {
                                 echo '<li><a href="'.$CFG->rootdir.'/access">Права</a></li>';
@@ -327,6 +343,8 @@ Core_Page_Show::instance()
     ->js('/templates/template4/js/property_list.api.js')
     ->js('/templates/template4/js/initpro.api.js')
     ->js('/templates/template4/js/file.api.js')
+    ->js('/templates/template4/js/vk.api.js')
+    ->js('/templates/template4/js/senler.api.js')
 
     ->js('/templates/template10/assets/js/main.js')
     ->js('/templates/template4/js/bootstrap.min.js')
@@ -349,6 +367,8 @@ Core_Page_Show::instance()
     ->js('/templates/template4/js/statistic.js')
     ->js('/templates/template4/js/areas_assignments.js')
     ->js('/templates/template4/js/property_list.js')
+    ->js('/templates/template4/js/vk.js')
+    ->js('/templates/template4/js/senler.js')
     ->js('/templates/template4/js/js.js');
 ?>
 

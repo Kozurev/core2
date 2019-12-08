@@ -305,6 +305,63 @@ if (Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_CLIENT)) {
 
 //Новый раздел со списком событий
 if ($isAdmin === 1) {
+
+    //Считаем кол-во дней жизни за вычетом отвала
+    $allDays = (strtotime (strval(date('Y-m-d')))-strtotime (strval($User->registerDate())))/(60*60*24);
+    $absenceDays = 0;
+    $UserActivityList =  (new User_Activity())
+        ->queryBuilder()
+        ->where('user_id', '=', $User->id())
+        ->findAll();
+    foreach ($UserActivityList as $userActivity) {
+        $absenceDays +=   strtotime (strval($userActivity->dumpDateEnd()))-strtotime (strval($userActivity->dumpDateStart()));
+    }
+    $absenceDays = $absenceDays/(60*60*24);
+    $lifeDays = $allDays-$absenceDays;
+
+
+    //Считаем кол-во уроков , которые отходил
+    $countLessons = (new Schedule_Lesson_Report())
+        ->queryBuilder()
+        ->where('client_id','=',$User->id())
+        ->where('attendance','=',1)
+        ->count();
+    //Считаем кол-во денег, которые принес в систему
+    $money =0;
+    $moneyIn = (new Payment())
+        ->queryBuilder()
+        ->where('user','=',$User->id())
+        ->where('type','=',1)
+        ->findAll();
+  foreach ($moneyIn as $in) {
+      $money +=$in->value();
+  }
+    //Считаем кешбек
+    $cashBack =0;
+
+    $cash = (new Payment())
+        ->queryBuilder()
+        ->where('user','=',$User->id())
+        ->where('type','=',15)
+        ->findAll();
+
+    foreach ($cash as $in) {
+        $cashBack +=$in->value();
+    }
+
+
+    Core::factory('Core_Entity')
+        ->addSimpleEntity('life_days', $lifeDays)
+        ->addSimpleEntity('count_lesson', $countLessons)
+        ->addSimpleEntity('money', $money)
+        ->addSimpleEntity('cashBack', $cashBack)
+        ->xsl('musadm/users/balance/life_history.xsl')
+        ->show();
+
+
+
+
+
     $UserEvents = Core::factory('Event');
     $UserEvents->queryBuilder()
         ->where('user_assignment_id', '=', $User->getId())

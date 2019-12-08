@@ -214,8 +214,16 @@ if ($action === 'save') {
         ->controlDate(Core_Array::Post('controlDate', date('Y-m-d'), PARAM_DATE))
         ->source(Core_Array::Post('source', '', PARAM_STRING))
         ->areaId(Core_Array::Post('areaId', 0, PARAM_INT))
-        ->statusId(Core_Array::Post('statusId', 0, PARAM_INT))
+        //->statusId(Core_Array::Post('statusId', 0, PARAM_INT))
         ->priorityId(Core_Array::Post('priorityId', 1, PARAM_INT));
+
+    $statusId = Core_Array::Post('statusId', 0, PARAM_INT);
+    if (!empty($id) && $Lid->statusId() != $statusId) {
+        $Lid->changeStatus($statusId);
+    } else {
+        $Lid->statusId($statusId);
+    }
+
     $Lid->save();
 
     $response = $Lid->toStd();

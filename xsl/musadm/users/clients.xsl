@@ -22,6 +22,9 @@
                         </button>
                     </div>
                 </xsl:if>
+                <xsl:if test="is_director = 1">
+                <div><a class="btn btn-orange edit_property_list" data-prop-id="61">Причины отвала</a></div>
+                </xsl:if>
 
                 <xsl:if test="show-count-users = 1">
                     <div>
