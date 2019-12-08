@@ -60,7 +60,7 @@ Orm::execute('create table Senler_Settings
         training_direction_id int unsigned null,
         constraint Senler_Settings_Model_pk
             primary key (id)
-    );
+    ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 ');
 
 Orm::execute('create table Vk_Group
@@ -74,7 +74,7 @@ Orm::execute('create table Vk_Group
         subordinated int null,
         constraint vk_group_pk
             primary key (id)
-    );
+    ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 ');
 
 $StructureIntegration = Core::factory('Structure')
