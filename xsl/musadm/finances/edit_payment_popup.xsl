@@ -14,7 +14,8 @@
             <div class="column">
                 <input type="date" name="datetime" class="form-control" value="{payment/datetime}" />
             </div>
-            <xsl:if test="payment/type = 0 or payment/type > 3">
+            <xsl:value-of select="payment" />
+            <xsl:if test="payment/typeId = 0 or (payment/typeId > 3 and payment/typeId != 15 and payment/typeId != 16 and payment/typeId != 17)">
                 <div class="column">
                     <span>Тип</span>
                 </div>

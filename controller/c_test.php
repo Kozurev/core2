@@ -7,13 +7,14 @@
  */
 
 
-Orm::Debug(false);
+Orm::Debug(true);
 
 Core::requireClass('User');
 Core::requireClass('User_Controller');
 Core::requireClass('Property_Controller');
 Core::requireClass('Vk');
 
+exit;
 
 //$VkGroup = Core::factory('Vk_Group', 1);
 //
@@ -47,7 +48,7 @@ $newProperty = Property_Controller::factory()
     ->sorting(0);
 $newProperty->save();
 
-exit();
+//exit();
 
 
 Orm::execute('create table Senler_Settings
@@ -57,7 +58,7 @@ Orm::execute('create table Senler_Settings
         vk_group_id int unsigned null,
         senler_subscription_id bigint unsigned null,
         training_direction_id int unsigned null,
-        constraint Senler_Settings_Model_pk
+        constraint Senler_Settings_pk
             primary key (id)
     );
 ');
