@@ -21,7 +21,7 @@
                 </tr>
                 <tr>
                     <th>Причина отвала</th>
-                    <th>Колличество </th>
+                    <th>Количество </th>
                 </tr>
                 <xsl:apply-templates select="userActivityList"/>
             </table>
