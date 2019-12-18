@@ -553,21 +553,22 @@ $userAllCount =  (new User())
     ->where('active', '=', 1)
     ->count();
 
-
-$PropertyList =  (new Property_List_Values())
-    ->queryBuilder()
-    ->where('property_id', '=', Event::CLIENT_ACTIVITY)
-    ->findAll();
+$propertyDumpReason = Property_Controller::factoryByTag('client_dump_reasons');
+$reasons = $propertyDumpReason->getList();
+//$PropertyList =  (new Property_List_Values())
+//    ->queryBuilder()
+//    ->where('property_id', '=', Event::CLIENT_ACTIVITY)
+//    ->findAll();
 $userActivityList = [];
-foreach ($PropertyList as $property) {
+foreach ($reasons as $reason) {
     $UserActivityCount =  (new User_Activity())
         ->queryBuilder()
-        ->where('reason_id', '=', $property->id())
+        ->where('reason_id', '=', $reason->id())
         ->between('dump_date_start',$dateFrom,$dateTo)
         ->count();
-    $property = $property->toStd();
-    $property->count = $UserActivityCount;
-    array_push($userActivityList,$property);
+    $reason = $reason->toStd();
+    $reason->count = $UserActivityCount;
+    array_push($userActivityList, $reason);
 
 }
 
