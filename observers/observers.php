@@ -694,7 +694,7 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
 });
 
 
-Core::attachObserver('beforeTaskInsert', function($args) {
+Core::attachObserver('before.Task.insert', function($args) {
     $Task = $args[0];
 
     if ($Task->associate() > 0 && $Task->areaId() == 0) {
@@ -826,40 +826,9 @@ Core::attachObserver('before.ScheduleAbsent.save', function($args) {
 Core::attachObserver('after.Lid.changeStatus', function($args) {
     $lid = $args['Lid'];
     $status = $args['new_status'];
-    $link = $lid->vk();
+    Senler::setLidGroup($lid, $status);
+});
 
-    if (empty($link) || substr($link, 0, 14) != 'https://vk.com') {
-        return;
-    }
-
-    try {
-        $lidVkId = Vk_Group::getVkId($link);
-    } catch(Exception $e) {
-        return;
-    }
-
-    if ($lidVkId->type != 'user') {
-        return;
-    }
-
-    $lidInstrument = Property_Controller::factoryByTag('instrument')->getValues($lid)[0];
-    $groups = (new Vk_Group_Controller(User_Auth::current()))->getList();
-    foreach ($groups as $group) {
-        $setting = (new Senler_Settings())->queryBuilder()
-            ->where('lid_status_id', '=', $status->getId())
-            ->open()
-                ->where('training_direction_id', '=', $lidInstrument->value())
-                ->orWhere('training_direction_id', '=', 0)
-            ->close()
-            ->orderBy('training_direction_id', 'DESC')
-            ->find();
-
-        if (!is_null($setting)) {
-            $senler = new Senler($group);
-            $senler->subscribeRemove($lidVkId->object_id);
-            $senler->subscribe($lidVkId->object_id, $setting->senlerSubscriptionId());
-        }
-
-        return;
-    }
+Core::attachObserver('after.Lid.insert', function($args) {
+    Senler::setLidGroup($args[0]);
 });
