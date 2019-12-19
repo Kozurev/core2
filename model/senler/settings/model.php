@@ -28,6 +28,13 @@ class Senler_Settings_Model extends Core_Entity
      */
     protected $training_direction_id = 0;
 
+    /**
+     * id филлиала, для которого применяется настройка
+     *
+     * @var int
+     */
+    protected $area_id;
+
 
     /**
      * @param int|null $lidStatusId
@@ -80,6 +87,20 @@ class Senler_Settings_Model extends Core_Entity
             return intval($this->training_direction_id);
         } else {
             $this->training_direction_id = $trainingDetectionId;
+            return $this;
+        }
+    }
+
+    /**
+     * @param int|null $areaId
+     * @return $this|int
+     */
+    public function areaId(int $areaId = null)
+    {
+        if (is_null($areaId)) {
+            return intval($this->area_id);
+        } else {
+            $this->area_id = $areaId;
             return $this;
         }
     }

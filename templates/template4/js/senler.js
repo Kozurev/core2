@@ -16,8 +16,10 @@ function showSenlerSettingPopup(response) {
             '<form id="editSenlerSettingForm">' +
                 '<div class="column"><span>Статус лида</span><span style="color:red"> *</span></div>' +
                 '<div class="column"><select name="lid_status_id" class="form-control"></select></div>' +
-                '<div class="column"><span>Группа подпискм</span><span style="color:red"> *</span></div>' +
+                '<div class="column"><span>Группа подписки</span><span style="color:red"> *</span></div>' +
                 '<div class="column"><select name="senler_subscription_id" class="form-control"></select></div>' +
+                '<div class="column"><span>Филиал</span><span style="color:red"> *</span></div>' +
+                '<div class="column"><select name="area_id" class="form-control"></select></div>' +
                 '<div class="column"><span>Направление подготовки</span></div>' +
                 '<div class="column"><select name="training_direction_id" class="form-control"><option value="0">Все</option></select></div>' +
                 '<input type="hidden" name="vk_group_id" >' +
@@ -34,9 +36,11 @@ function showSenlerSettingPopup(response) {
         popup = $('.popup'),
         id =                        popup.find('input[name=id]'),
         vkGroupId =                 popup.find('input[name=vk_group_id]'),
+        areasSelect =               popup.find('select[name=area_id]'),
         lidStatusesSelect =         popup.find('select[name=lid_status_id]'),
         trainingDirectionSelect =   popup.find('select[name=training_direction_id]'),
         senlerSubscriptionIdSelect= popup.find('select[name=senler_subscription_id]'),
+        selectedAreaId =            0,
         selectedLidStatus =         0,
         selectedSubscriptionId =    0,
         selectedVkGroupId =         0,
@@ -44,6 +48,7 @@ function showSenlerSettingPopup(response) {
 
     if (typeof response == 'object') {
         id.val(response.id);
+        selectedAreaId = response.area_id;
         selectedVkGroupId = response.vk_group_id;
         selectedLidStatus = response.lid_status_id;
         selectedSubscriptionId = response.senler_subscription_id;
@@ -99,8 +104,20 @@ function showSenlerSettingPopup(response) {
                                 senlerSubscriptionIdSelect.append('<option value="' + subscription.subscription_id + '" ' + isSelected + '>' + subscription.name + '</option>');
                             });
 
-                            showPopup();
-                            loaderOff();
+                            Schedule.getAreasList({}, function(areas) {
+                                let isSelected = '';
+                                $.each(areas, function (key, area) {
+                                    if (area.id == selectedAreaId) {
+                                        isSelected = 'selected';
+                                    } else {
+                                        isSelected = '';
+                                    }
+                                    areasSelect.append('<option value="' + area.id + '" ' + isSelected + '>' + area.title + '</option>');
+                                });
+
+                                showPopup();
+                                loaderOff();
+                            });
                         }
                     });
                 }
@@ -121,11 +138,13 @@ function saveSenlerSettingFrom(form, callback) {
         data =                  {},
         id =                    form.find('input[name=id]'),
         vkGroupId =             form.find('input[name=vk_group_id]'),
+        areaId =                form.find('select[name=area_id]'),
         lidStatuses =           form.find('select[name=lid_status_id]'),
         trainingDirectionId =   form.find('select[name=training_direction_id]'),
         senlerSubscriptionId =  form.find('select[name=senler_subscription_id]');
 
     data.id =                       id.val();
+    data.area_id =                  areaId.val();
     data.vk_group_id =              vkGroupId.val();
     data.lid_status_id =            lidStatuses.val();
     data.training_direction_id =    trainingDirectionId.val();

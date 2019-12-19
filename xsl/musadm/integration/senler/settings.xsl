@@ -35,6 +35,7 @@
                             <table id="sortingTable" class="table table-striped">
                                 <thead>
                                     <tr class="header">
+                                        <th>Филиал</th>
                                         <th>Статус</th>
                                         <th>Группа подписки</th>
                                         <th>Инструмент</th>
@@ -54,9 +55,13 @@
 
     <xsl:template match="setting">
         <xsl:variable name="lidStatusId" select="lid_status_id" />
+        <xsl:variable name="areaId" select="area_id" />
         <xsl:variable name="subscriptionId" select="senler_subscription_id" />
         <xsl:variable name="trainingDirectionId" select="training_direction_id" />
         <tr>
+            <td>
+                <xsl:value-of select="//area[id = $areaId]/title" />
+            </td>
             <td>
                 <xsl:value-of select="//status[id = $lidStatusId]/title" />
             </td>

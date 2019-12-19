@@ -50,6 +50,7 @@ if ($action === 'saveSetting') {
     }
 
     $id =               Core_Array::Post('id', 0, PARAM_INT);
+    $areaId =           Core_Array::Post('area_id', 0, PARAM_INT);
     $vkGroupId =        Core_Array::Post('vk_group_id', 0, PARAM_INT);
     $lidStatusId =      Core_Array::Post('lid_status_id', 0, PARAM_INT);
     $instrumentId =     Core_Array::Post('training_direction_id', 0, PARAM_INT);
@@ -101,6 +102,7 @@ if ($action === 'saveSetting') {
     }
 
 
+    $setting->areaId($areaId);
     $setting->vkGroupId($vkGroupId);
     $setting->lidStatusId($lidStatusId);
     $setting->trainingDetectionId($instrumentId);

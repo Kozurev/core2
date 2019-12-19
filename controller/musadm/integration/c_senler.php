@@ -19,6 +19,7 @@ if (!empty($currentVkGroupId)) {
     }
 
     $lidStatuses =  (new Lid_Status())->getList();
+    $areas =        (new Schedule_Area())->getList();
     $instruments =  Property_Controller::factoryByTag('instrument')->getList();
     $settings =     (new Senler_Settings())->queryBuilder()
         ->where('vk_group_id', '=', $currentVkGroupId)
@@ -43,6 +44,7 @@ $vkGroups = (new Vk_Group())->queryBuilder()
     ->addSimpleEntity('current_group_id', $currentVkGroupId)
     ->addEntity($group ?? null, 'current_group')
     ->addEntities($vkGroups, 'groups')
+    ->addEntities($areas ?? [], 'area')
     ->addEntities($subscriptions ?? [], 'subscription')
     ->addEntities($settings ?? [], 'setting')
     ->addEntities($lidStatuses ?? [], 'status')

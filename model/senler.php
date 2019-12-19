@@ -242,22 +242,24 @@ class Senler extends Api
         $lidInstrument = Property_Controller::factoryByTag('instrument')->getValues($lid)[0];
         $groups = (new Vk_Group_Controller(User_Auth::current()))->getList();
         foreach ($groups as $group) {
+            // Orm::Debug(true);
             $setting = (new Senler_Settings())->queryBuilder()
+                ->where('vk_group_id', '=', $group->getId())
                 ->where('lid_status_id', '=', $status->getId())
                 ->open()
-                ->where('training_direction_id', '=', $lidInstrument->value())
-                ->orWhere('training_direction_id', '=', 0)
+                    ->where('training_direction_id', '=', $lidInstrument->value())
+                    ->orWhere('training_direction_id', '=', 0)
                 ->close()
+                ->where('area_id', '=', $lid->areaId())
                 ->orderBy('training_direction_id', 'DESC')
                 ->find();
-
+//debug($setting, 1);
             if (!is_null($setting)) {
                 $senler = new Senler($group);
                 $senler->subscribeRemove($lidVkId->object_id);
                 $senler->subscribe($lidVkId->object_id, $setting->senlerSubscriptionId());
+                break;
             }
-
-            return;
         }
     }
 
