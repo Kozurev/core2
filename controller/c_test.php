@@ -16,7 +16,6 @@ Core::requireClass('Vk');
 
 Orm::execute('alter table Senler_Settings add area_id int unsigned null;');
 
-
 exit;
 
 //$VkGroup = Core::factory('Vk_Group', 1);
