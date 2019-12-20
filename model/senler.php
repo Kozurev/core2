@@ -225,9 +225,13 @@ class Senler extends Api
 
         $link = $lid->vk();
 
-        if (empty($link) || substr($link, 0, 14) != 'https://vk.com') {
+        if (empty($link) || empty(explode('vk.com/', $link))) {
             return;
         }
+
+//        if (empty($link) || substr($link, 0, 14) != 'https://vk.com') {
+//            return;
+//        }
 
         try {
             $lidVkId = Vk_Group::getVkId($link);

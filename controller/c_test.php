@@ -15,9 +15,19 @@ Core::requireClass('Property_Controller');
 Core::requireClass('Vk');
 
 
-Orm::execute('alter table Senler_Settings add area_id int unsigned null;');
+$lid = Core::factory('Lid', 6637);
+
+try {
+    debug(Vk_Group::getVkId($lid->vk()), 1);
+} catch (Exception $e) {
+    echo $e->getMessage();
+}
+
+
 
 exit;
+
+Orm::execute('alter table Senler_Settings add area_id int unsigned null;');
 
 //$VkGroup = Core::factory('Vk_Group', 1);
 //

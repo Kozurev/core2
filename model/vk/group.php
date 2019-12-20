@@ -11,20 +11,25 @@ class Vk_Group extends Vk_Group_Model
      *      ->object_id =>  int     идентификатор объекта
      *
      * @param string $link
-     * @return stdClass
+     * @return stdClass|null
      * @throws Exception
      */
-    public static function getVkId(string $link) : stdClass
+    public static function getVkId(string $link)
     {
         if (!is_null($link)) {
-            $linkName = substr($link, 15);
+            //$linkName = substr($link, 15);
+            $linkName = explode('vk.com/', $link)[1];
             if (is_string($linkName)) {
                 $vk = new VK(self::getToken());
                 $response = $vk->resolveScreenName($linkName);
                 if (isset($response->error)) {
                     throw new Exception($response->error->error_msg);
                 } else {
-                    return $response->response;
+                    if (empty($response->response)) {
+                        return null;
+                    } else {
+                        return $response->response;
+                    }
                 }
             } else {
                 throw new Exception('Некорректно указана ссылка на страницу сообщества');
