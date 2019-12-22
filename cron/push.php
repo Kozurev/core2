@@ -26,7 +26,6 @@ $Lessons = Core::factory('Schedule_Lesson')
     ->select([
         $lessonTableName . '.time_from',
         'CONCAT(teacher.surname, \' \', teacher.name) AS teacher',
-        //'area.title AS area',
         'u.push_id',
         'u.id AS user_id'
     ])
@@ -39,9 +38,9 @@ $Lessons = Core::factory('Schedule_Lesson')
         ->close()
         ->open()
             ->orWhere('lesson_type', '=', Schedule_Lesson::SCHEDULE_MAIN)
-            ->where('insert_date', '>=', $tomorrowDate)
+            ->where('insert_date', '<=', $tomorrowDate)
             ->open()
-                ->where('delete_date', '<', $tomorrowDate)
+                ->where('delete_date', '>', $tomorrowDate)
                 ->orWhere('delete_date', 'is', 'NULL')
             ->close()
         ->close()
