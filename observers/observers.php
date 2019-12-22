@@ -595,7 +595,7 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
             if (!empty($Client->pushId())) {
                 $message = [
                     'title' => 'Остаток занятий на вашем балансе: ' . $countLessons,
-                    'body' => 'Узнать варианты оплаты очередного абонемента можно у администратора школы'
+                    'body' => 'Внести оплату легко, зайдите в приложение, нажмите кнопку "Пополнить", и после этого в личном кабинете сможете внести средства'
                 ];
                 Push::instance()->notification($message)->send($Client->pushId());
             }
