@@ -62,6 +62,10 @@ class Push
      */
     public function notification(array $data)
     {
+        if (!isset($data['sound'])) {
+            $data['sound'] = 'default';
+        }
+
         self::instance()->notification = Messaging\Notification::fromArray($data);
         return self::instance();
     }
