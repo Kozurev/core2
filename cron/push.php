@@ -7,6 +7,10 @@ if (!Core_Access::instance()->hasCapability(Core_Access::CRON)) {
     die('Access forbidden');
 }
 
+$logFile = ROOT . '/log/cron/' . date('Y-m-d H:i');
+$logData = '';
+$logCountNotifies = 0;
+
 $date = new DateTime(date('Y-m-d'));
 $date->modify('+1 day');
 $tomorrowDate = $date->format('Y-m-d');
@@ -44,17 +48,26 @@ $Lessons = Core::factory('Schedule_Lesson')
     ->close()
     ->join($userTableName . ' AS u', 'u.id = ' . $lessonTableName . '.client_id AND u.push_id IS NOT NULL')
     ->join($userTableName . ' AS teacher', $lessonTableName . '.teacher_id = teacher.id')
-    //->join($areaTableName . ' AS area', $lessonTableName . '.area_id = area.id')
     ->findAll();
 
 foreach ($Lessons as $Lesson) {
     try {
+        $logCountNotifies++;
         Push::instance()->notification([
             'title' => 'Напоминаем о предстоящем занятии',
             'body' => 'Ждем вас завтра в ' . refactorTimeFormat($Lesson->timeFrom()) . ', преподаватель ' . $Lesson->teacher
         ])->send($Lesson->push_id);
-    } catch (\Kreait\Firebase\Exception\Messaging\NotFound $e) {
-        echo $e->getMessage();
+    } catch (Kreait\Firebase\Exception\Messaging\NotFound $e) {
+        $logCountNotifies--;
+        $logData .= 'Ошибка: ' . $Lesson->user_id . ' ' . $e->getMessage() . PHP_EOL;
+    } catch (Kreait\Firebase\Exception\Messaging\InvalidMessage $e) {
+        $logCountNotifies--;
+        $logData .= 'Ошибка: ' . $Lesson->user_id . ' ' . $e->getMessage() . PHP_EOL;
     }
 }
+
+$log = fopen($logFile, 'w');
+fwrite($log, 'Всего оповещений отправлено: ' . $logCountNotifies . ' из ' . count($Lessons) . PHP_EOL);
+fwrite($log, $logData);
+fclose($log);
 
