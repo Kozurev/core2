@@ -218,9 +218,8 @@
                             if ($accessStatistic) {
                                 echo '<li><a href="'.$CFG->rootdir.'/statistic">Статистика</a></li>';
                             }
-
                             //Интеграции
-                            if ($accessIntegrationVk || $accessIntegrationSenler) {
+                            if ($accessIntegrationVk || $accessIntegrationSenler || User_Auth::current()->groupId() == ROLE_DIRECTOR) {
                                 echo '<li class="dropdown">
                                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">Интеграция<span class="caret"></span></a>
                                         <ul class="dropdown-menu">';
@@ -229,6 +228,9 @@
                                 }
                                 if ($accessIntegrationSenler) {
                                     echo '<li><a href="' . $CFG->rootdir . '/integration/senler">Senler</a></li>';
+                                }
+                                if (User_Auth::current()->groupId() == ROLE_DIRECTOR) {
+                                    echo '<li><a href="' . $CFG->rootdir . '/integration/my-calls">Мои звонки</a></li>';
                                 }
                                 echo '</ul></li>';
                             }
@@ -345,6 +347,7 @@ Core_Page_Show::instance()
     ->js('/templates/template4/js/file.api.js')
     ->js('/templates/template4/js/vk.api.js')
     ->js('/templates/template4/js/senler.api.js')
+    ->js('/templates/template4/js/myCalls.api.js')
 
     ->js('/templates/template10/assets/js/main.js')
     ->js('/templates/template4/js/bootstrap.min.js')
@@ -369,6 +372,7 @@ Core_Page_Show::instance()
     ->js('/templates/template4/js/property_list.js')
     ->js('/templates/template4/js/vk.js')
     ->js('/templates/template4/js/senler.js')
+    ->js('/templates/template4/js/myCalls.js')
     ->js('/templates/template4/js/js.js');
 ?>
 

@@ -185,8 +185,16 @@ if ($action === 'updateFormManager') {
         $Manager = User_Controller::factory();
     }
 
+    $propertiesIds = [62];
+    $propertiesValues = [];
+    foreach ($propertiesIds as $id) {
+        $property = Property_Controller::factory($id);
+        $propertiesValues = array_merge($propertiesValues, $property->getValues($Manager));
+    }
+
     $output
         ->addEntity($Manager)
+        ->addEntities($propertiesValues)
         ->xsl('musadm/users/edit_manager_popup.xsl')
         ->show();
 

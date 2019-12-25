@@ -38,4 +38,24 @@ class Api
             throw new Exception('Api->getRequest - неопознанный тип запроса: ' . $requestMethod);
         }
     }
+
+    /**
+     * @param string $link
+     * @param string $jsonData
+     * @return mixed
+     */
+    public static function getJsonRequest(string $link, string $jsonData)
+    {
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'POST',
+                'header' => [
+                    'Content-Type: application/json',
+                    'Content-Length: ' . strlen($jsonData)
+                ],
+                'content' => $jsonData
+            ]
+        ]);
+        return file_get_contents($link, false, $context);
+    }
 }

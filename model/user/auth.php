@@ -254,7 +254,7 @@ class User_Auth
     /**
      * Получение пользователя, под которым происходила самая первая рекурсивная авторизация
      *
-     * @return object|bool
+     * @return User
      */
     public static function parentAuth()
     {

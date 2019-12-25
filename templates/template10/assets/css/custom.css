@@ -188,6 +188,11 @@ section {
     background-size: cover;
 }
 
+.phone {
+    background: url("../images/phone.png");
+    background-size: cover;
+}
+
 .pay {
     background: url("../images/add_payment.png");
     background-size: cover;

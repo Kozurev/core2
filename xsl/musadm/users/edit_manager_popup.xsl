@@ -55,7 +55,12 @@
             <div class="column">
                 <input class="form-control masked-phone" type="text" value="{user/phone_number}" name="phoneNumber" />
             </div><hr/>
-
+            <div class="column">
+                <span>Email</span>
+            </div>
+            <div class="column">
+                <input class="form-control" type="text" value="{user/email}" name="email" />
+            </div><hr/>
             <div class="column">
                 <span>Логин</span><span style="color:red" >*</span>
             </div>
@@ -77,6 +82,12 @@
                 <input class="form-control" type="password" value="" name="pass2" />
             </div><hr/>
 
+            <div class="column">
+                <span>Авторизационный токен "Мои звонки"</span>
+            </div>
+            <div class="column">
+                <input class="form-control" type="text" value="{property_string[property_id = 62]/value}" name="property_62[]" />
+            </div><hr/>
 
             <input type="hidden" name="id" value="{user/id}" />
             <input type="hidden" name="groupId" value="2" />

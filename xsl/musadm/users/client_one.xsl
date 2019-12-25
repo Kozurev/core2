@@ -155,13 +155,23 @@
 
             <!--Действия-->
             <xsl:if test="//table-type = 'active'">
-                <td width="140px">
+                <td>
+                    <xsl:attribute name="width">
+                        <xsl:choose>
+                            <xsl:when test="/root/auth_user/email != '' and /root/my_calls_token != ''">120px</xsl:when>
+                            <xsl:otherwise>140px</xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
                     <xsl:if test="//access_payment_create_client = 1">
                         <a class="action add_payment" onclick="makeClientPaymentPopup(0, {id}, saveClientPaymentCallback)" title="Добавить платеж"></a>
                     </xsl:if>
 
                     <xsl:if test="//access_user_edit_client = 1">
                         <a class="action edit" onclick="getClientPopup({id})" title="Редактировать данные"></a>
+                    </xsl:if>
+
+                    <xsl:if test="/root/auth_user/email != '' and /root/my_calls_token != ''">
+                        <a class="action phone" onclick="MyCalls.makeCall({/root/auth_user/id}, '{phone_number}', checkResponseStatus)" title="Совершить звонок"></a>
                     </xsl:if>
 
                     <xsl:if test="//access_user_archive_client = 1">

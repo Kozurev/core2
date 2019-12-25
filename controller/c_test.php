@@ -7,23 +7,73 @@
  */
 
 
-Orm::Debug(true);
+//Orm::Debug(true);
 
 Core::requireClass('User');
 Core::requireClass('User_Controller');
 Core::requireClass('Property_Controller');
 Core::requireClass('Vk');
 
-
-$lid = Core::factory('Lid', 6637);
-
+$manager = Core::factory('User', 1123);
+$phoneNumber = '+79155758591';
 try {
-    debug(Vk_Group::getVkId($lid->vk()), 1);
+    $myCalls = new MyCalls($manager);
+    debug($myCalls->makeCall($phoneNumber), 1);
 } catch (Exception $e) {
-    echo $e->getMessage();
+    die($e->getMessage());
 }
 
 
+exit;
+
+$StructureMyCalls = Core::factory('Structure')
+    ->title('Мои звонки')
+    ->description('Раздел настроек интеграции с сервисом "Мои звонки"')
+    ->parentId(45)
+    ->path('my-calls')
+    ->action('musadm/integration/my_calls')
+    ->menuId(0);
+$StructureMyCalls->save();
+
+$apiToken = Property_Controller::factory()
+    ->type(PARAM_STRING)
+    ->title('API токен сервиса Мои звонки')
+    ->description('Авторизационный токен для менеджеров в сервисе "Мои звонки"')
+    ->tagName('my_calls_token')
+    ->defaultValue('')
+    ->active(1)
+    ->dir(0)
+    ->sorting(0);
+$apiToken->save();
+
+$apiUrl = Property_Controller::factory()
+    ->type(PARAM_STRING)
+    ->title('URL адрес для интеграции с API "Мои звонки"')
+    ->description('')
+    ->tagName('my_calls_url')
+    ->defaultValue('')
+    ->active(1)
+    ->dir(0)
+    ->sorting(0);
+$apiUrl->save();
+
+$groupDirector = Core::factory('User_Group', ROLE_DIRECTOR);
+$groupManager = Core::factory('User_Group', ROLE_MANAGER);
+
+(new Property())->addToPropertiesList($groupDirector, $apiUrl->getId());
+(new Property())->addToPropertiesList($groupDirector, $apiToken->getId());
+(new Property())->addToPropertiesList($groupManager, $apiToken->getId());
+
+$director = Core::factory('User', 516);
+$manager = Core::factory('User', 1123);
+$manager->email('creative27016@gmail.com');
+$manager->save();
+
+$url = Property_Controller::factoryByTag('my_calls_url');
+$token = Property_Controller::factoryByTag('my_calls_token');
+
+$url->addNewValue($director, 'musicmethod.moizvonki.ru');
+$token->addNewValue($manager, 'sxsoi418zp6r4igntm3d1txnns8xcph9');
 
 exit;
 
