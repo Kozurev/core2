@@ -63,7 +63,14 @@
                 <xsl:value-of select="//area[id = $areaId]/title" />
             </td>
             <td>
-                <xsl:value-of select="//status[id = $lidStatusId]/title" />
+                <xsl:choose>
+                    <xsl:when test="$lidStatusId != 0">
+                        <xsl:value-of select="//status[id = $lidStatusId]/title" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        Архивация пользователя
+                    </xsl:otherwise>
+                </xsl:choose>
             </td>
             <td>
                 <xsl:value-of select="//subscription[subscription_id = $subscriptionId]/name" />

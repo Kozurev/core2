@@ -1,3 +1,19 @@
+$(function() {
+    $(document).on('change', '#settingTypeSelect', function() {
+        let lidStatusesList = $('.lid_status_id');
+        let otherStatus = $('.other_status');
+
+        if ($(this).val() == 1) {
+            lidStatusesList.show();
+            otherStatus.hide();
+        } else {
+            lidStatusesList.hide();
+            lidStatusesList.find('select').val(0);
+            otherStatus.show();
+        }
+    });
+});
+
 /**
  * Формирование всплывающего окна для создания/редактирования настроек интеграции с сенлером
  *
@@ -14,8 +30,15 @@ function showSenlerSettingPopup(response) {
     let popupData =
         '<div class="popup-row-block">' +
             '<form id="editSenlerSettingForm">' +
-                '<div class="column"><span>Статус лида</span><span style="color:red"> *</span></div>' +
-                '<div class="column"><select name="lid_status_id" class="form-control"></select></div>' +
+                '<div class="column"><span>Тип</span></div>' +
+                '<div class="column"><select id="settingTypeSelect" name="type" class="form-control">' +
+                '<option value="1">Статус лида</option>' +
+                '<option value="2">Другое</option>' +
+                '</select></div>' +
+                '<div class="column lid_status_id"><span>Статус лида</span><span style="color:red"> *</span></div>' +
+                '<div class="column lid_status_id"><select name="lid_status_id" class="form-control"></select></div>' +
+                '<div class="column other_status" style="display: none"><span>Другое</span><span style="color:red"> *</span></div>' +
+                '<div class="column other_status" style="display: none"><select name="other_status" class="form-control"><option value="1">Архивация клиента</option></select></div>' +
                 '<div class="column"><span>Группа подписки</span><span style="color:red"> *</span></div>' +
                 '<div class="column"><select name="senler_subscription_id" class="form-control"></select></div>' +
                 '<div class="column"><span>Филиал</span><span style="color:red"> *</span></div>' +
@@ -35,6 +58,7 @@ function showSenlerSettingPopup(response) {
     var
         popup = $('.popup'),
         id =                        popup.find('input[name=id]'),
+        type =                      popup.find('select[name=type]'),
         vkGroupId =                 popup.find('input[name=vk_group_id]'),
         areasSelect =               popup.find('select[name=area_id]'),
         lidStatusesSelect =         popup.find('select[name=lid_status_id]'),
@@ -42,6 +66,7 @@ function showSenlerSettingPopup(response) {
         senlerSubscriptionIdSelect= popup.find('select[name=senler_subscription_id]'),
         selectedAreaId =            0,
         selectedLidStatus =         0,
+        selectedOtherStatus =       0,
         selectedSubscriptionId =    0,
         selectedVkGroupId =         0,
         selectedTrainingDirectionId=0;
@@ -51,10 +76,15 @@ function showSenlerSettingPopup(response) {
         selectedAreaId = response.area_id;
         selectedVkGroupId = response.vk_group_id;
         selectedLidStatus = response.lid_status_id;
+        selectedOtherStatus = response.other_status;
         selectedSubscriptionId = response.senler_subscription_id;
         selectedTrainingDirectionId = response.training_direction_id;
     } else {
         selectedVkGroupId = response;
+    }
+
+    if (selectedOtherStatus > 0) {
+        type.val(2);
     }
 
     vkGroupId.val(selectedVkGroupId);
@@ -65,6 +95,7 @@ function showSenlerSettingPopup(response) {
             loaderOff();
         } else {
             let isSelected = '';
+            lidStatusesSelect.append('<option value="0"> ... </option>');
             $.each(statuses, function (key, status) {
                 if (status.id == selectedLidStatus) {
                     isSelected = 'selected';
@@ -139,6 +170,7 @@ function saveSenlerSettingFrom(form, callback) {
         id =                    form.find('input[name=id]'),
         vkGroupId =             form.find('input[name=vk_group_id]'),
         areaId =                form.find('select[name=area_id]'),
+        otherStatus =           form.find('select[name=other_status]'),
         lidStatuses =           form.find('select[name=lid_status_id]'),
         trainingDirectionId =   form.find('select[name=training_direction_id]'),
         senlerSubscriptionId =  form.find('select[name=senler_subscription_id]');
@@ -147,6 +179,7 @@ function saveSenlerSettingFrom(form, callback) {
     data.area_id =                  areaId.val();
     data.vk_group_id =              vkGroupId.val();
     data.lid_status_id =            lidStatuses.val();
+    data.other_status =             otherStatus.val();
     data.training_direction_id =    trainingDirectionId.val();
     data.senler_subscription_id =   senlerSubscriptionId.val();
 

@@ -13,18 +13,9 @@ Core::requireClass('User');
 Core::requireClass('User_Controller');
 Core::requireClass('Property_Controller');
 Core::requireClass('Vk');
-
-$manager = Core::factory('User', 1123);
-$phoneNumber = '+79155758591';
-try {
-    $myCalls = new MyCalls($manager);
-    debug($myCalls->makeCall($phoneNumber), 1);
-} catch (Exception $e) {
-    die($e->getMessage());
-}
-
-
 exit;
+Orm::execute('alter table Senler_Settings alter column lid_status_id set default 0;
+                    alter table Senler_Settingsadd other_status int unsigned default 0;');
 
 $StructureMyCalls = Core::factory('Structure')
     ->title('Мои звонки')

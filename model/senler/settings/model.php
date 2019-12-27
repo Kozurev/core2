@@ -10,6 +10,13 @@ class Senler_Settings_Model extends Core_Entity
     protected $lid_status_id = 0;
 
     /**
+     * id другого статуса
+     *
+     * @var int
+     */
+    protected $other_status = 0;
+
+    /**
      * Идентиикатор группы из таблицы Vk_Group
      *
      * @var int
@@ -46,6 +53,20 @@ class Senler_Settings_Model extends Core_Entity
             return intval($this->lid_status_id);
         } else {
             $this->lid_status_id = $lidStatusId;
+            return $this;
+        }
+    }
+
+    /**
+     * @param int|null $otherStatus
+     * @return $this|int
+     */
+    public function otherStatus(int $otherStatus = null)
+    {
+        if (is_null($otherStatus)) {
+            return intval($this->other_status);
+        } else {
+            $this->other_status = $otherStatus;
             return $this;
         }
     }

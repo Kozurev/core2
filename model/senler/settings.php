@@ -4,6 +4,11 @@ class Senler_Settings extends Senler_Settings_Model
 {
 
     /**
+     * Значение other_status для архивации пользователя
+     */
+    const USER_STATUS_ARCHIVE = 1;
+
+    /**
      * @param int $id
      * @param bool $isSubordinate
      * @return Senler_Settings|null

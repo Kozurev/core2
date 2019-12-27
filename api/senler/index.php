@@ -53,15 +53,14 @@ if ($action === 'saveSetting') {
     $areaId =           Core_Array::Post('area_id', 0, PARAM_INT);
     $vkGroupId =        Core_Array::Post('vk_group_id', 0, PARAM_INT);
     $lidStatusId =      Core_Array::Post('lid_status_id', 0, PARAM_INT);
+    $otherStatus =      Core_Array::Post('other_status', 0, PARAM_INT);
     $instrumentId =     Core_Array::Post('training_direction_id', 0, PARAM_INT);
     $subscriptionId =   Core_Array::Post('senler_subscription_id', 0, PARAM_INT);
 
     if ($vkGroupId <= 0) {
         exit(REST::status(REST::STATUS_ERROR, 'Не указан обязательный параметр vk_group_id'));
     }
-    if ($lidStatusId <= 0) {
-        exit(REST::status(REST::STATUS_ERROR, 'Не указан обязательный параметр lid_status_id'));
-    }
+
     if ($subscriptionId <= 0) {
         exit(REST::status(REST::STATUS_ERROR, 'Не указан обязательный параметр senler_subscription_id'));
     }
@@ -97,16 +96,24 @@ if ($action === 'saveSetting') {
         ->where('id', '=', $lidStatusId)
         ->where('subordinated', '=', $director->getId())
         ->find();
-    if (is_null($lidStatus)) {
+    if (is_null($lidStatus) && $lidStatusId > 0) {
         exit(REST::status(REST::STATUS_ERROR, 'Статус лида с указанным id не найден'));
     }
 
 
     $setting->areaId($areaId);
     $setting->vkGroupId($vkGroupId);
-    $setting->lidStatusId($lidStatusId);
     $setting->trainingDetectionId($instrumentId);
     $setting->senlerSubscriptionId($subscriptionId);
+
+    if ($lidStatusId > 0) {
+        $setting->lidStatusId($lidStatusId);
+        $setting->otherStatus(0);
+    } else {
+        $setting->lidStatusId(0);
+        $setting->otherStatus($otherStatus);
+    }
+
     if (empty($setting->save())) {
         exit(REST::status(REST::STATUS_ERROR, $setting->_getValidateErrorsStr()));
     }

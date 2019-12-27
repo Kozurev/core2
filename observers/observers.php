@@ -832,3 +832,8 @@ Core::attachObserver('after.Lid.changeStatus', function($args) {
 Core::attachObserver('after.Lid.insert', function($args) {
     Senler::setLidGroup($args[0]);
 });
+
+Core::attachObserver('before.User.deactivate', function($args) {
+    $user = $args[0];
+    Senler::setUserGroup($user, Senler_Settings::USER_STATUS_ARCHIVE);
+});

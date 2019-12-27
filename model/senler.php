@@ -229,10 +229,6 @@ class Senler extends Api
             return;
         }
 
-//        if (empty($link) || substr($link, 0, 14) != 'https://vk.com') {
-//            return;
-//        }
-
         try {
             $lidVkId = Vk_Group::getVkId($link);
         } catch(Exception $e) {
@@ -246,7 +242,6 @@ class Senler extends Api
         $lidInstrument = Property_Controller::factoryByTag('instrument')->getValues($lid)[0];
         $groups = (new Vk_Group_Controller(User_Auth::current()))->getList();
         foreach ($groups as $group) {
-            // Orm::Debug(true);
             $setting = (new Senler_Settings())->queryBuilder()
                 ->where('vk_group_id', '=', $group->getId())
                 ->where('lid_status_id', '=', $status->getId())
@@ -257,11 +252,58 @@ class Senler extends Api
                 ->where('area_id', '=', $lid->areaId())
                 ->orderBy('training_direction_id', 'DESC')
                 ->find();
-//debug($setting, 1);
+
             if (!is_null($setting)) {
                 $senler = new Senler($group);
                 $senler->subscribeRemove($lidVkId->object_id);
                 $senler->subscribe($lidVkId->object_id, $setting->senlerSubscriptionId());
+                break;
+            }
+        }
+    }
+
+    /**
+     * @param User $user
+     * @param int $status
+     * @throws Exception
+     */
+    public static function setUserGroup(User $user, int $status)
+    {
+        $link = Property_Controller::factoryByTag('vk')->getValues($user)[0]->value();
+
+        if (empty($link) || empty(explode('vk.com/', $link))) {
+            return;
+        }
+
+        try {
+            $userVkId = Vk_Group::getVkId($link);
+        } catch(Exception $e) {
+            return;
+        }
+
+        if ($userVkId->type != 'user') {
+            return;
+        }
+
+        $userArea = (new Schedule_Area_Assignment())->getAreas($user)[0];
+        $userInstrument = Property_Controller::factoryByTag('instrument')->getValues($user)[0];
+        $groups = (new Vk_Group_Controller(User_Auth::current()))->getList();
+        foreach ($groups as $group) {
+            $setting = (new Senler_Settings())->queryBuilder()
+                ->where('vk_group_id', '=', $group->getId())
+                ->where('other_status', '=', Senler_Settings::USER_STATUS_ARCHIVE)
+                ->open()
+                    ->where('training_direction_id', '=', $userInstrument->value())
+                    ->orWhere('training_direction_id', '=', 0)
+                ->close()
+                ->where('area_id', '=', $userArea->getId())
+                ->orderBy('training_direction_id', 'DESC')
+                ->find();
+
+            if (!is_null($setting)) {
+                $senler = new Senler($group);
+                $senler->subscribeRemove($userVkId->object_id);
+                $senler->subscribe($userVkId->object_id, $setting->senlerSubscriptionId());
                 break;
             }
         }
