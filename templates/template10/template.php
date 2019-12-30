@@ -3,7 +3,7 @@
     Core::requireClass('Property_Controller');
     $SberToken = Property_Controller::factoryByTag('payment_sberbank_token');
     $sberTokenVal = $SberToken->getValues($Director)[0]->value();
-    Core_Page_Show::instance()->cacheVersion('20191118');
+    Core_Page_Show::instance()->cacheVersion(date('Ymd'));
 ?>
 <!DOCTYPE html>
 <html lang="en">
