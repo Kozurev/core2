@@ -598,7 +598,7 @@ function saveBalancePaymentCallback(payment) {
                 'onclick=\'makePaymentCommentPopup('+payment.id+', savePaymentCommentClient)\'' +
             '></a>' +
             '<a class=\'action edit\' title=\'Редактирование платежа\'' +
-                'onclick=\'makeClientPaymentPopup('+payment.id+', '+payment.user+', saveBalancePaymentCallback)\'' +
+                'onclick=\'makeClientPaymentPopup('+payment.id+', '+payment.userId+', saveBalancePaymentCallback)\'' +
             '></a>' +
             '<a class=\'action delete\' title=\'Удаление платежа\' ' +
                 'onclick=\'Payment.remove('+payment.id+', removeBalancePaymentCallback)\'' +
