@@ -24,6 +24,7 @@ $lessonTableName =  Core::factory('Schedule_Lesson')->getTableName();
 $Lessons = Core::factory('Schedule_Lesson')
     ->queryBuilder()
     ->select([
+        $lessonTableName . '.id',
         $lessonTableName . '.time_from',
         'CONCAT(teacher.surname, \' \', teacher.name) AS teacher',
         'u.push_id',
@@ -50,6 +51,10 @@ $Lessons = Core::factory('Schedule_Lesson')
     ->findAll();
 
 foreach ($Lessons as $Lesson) {
+    if ($Lesson->isAbsent($tomorrowDate)) {
+        continue;
+    }
+
     try {
         $logCountNotifies++;
         Push::instance()->notification([
