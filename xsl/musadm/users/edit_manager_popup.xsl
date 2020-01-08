@@ -82,12 +82,12 @@
                 <input class="form-control" type="password" value="" name="pass2" />
             </div><hr/>
 
-            <div class="column">
-                <span>Авторизационный токен "Мои звонки"</span>
-            </div>
-            <div class="column">
-                <input class="form-control" type="text" value="{property_string[property_id = 62]/value}" name="property_62[]" />
-            </div><hr/>
+            <!--<div class="column">-->
+                <!--<span>Авторизационный токен "Мои звонки"</span>-->
+            <!--</div>-->
+            <!--<div class="column">-->
+                <!--<input class="form-control" type="text" value="{property_string[property_id = 62]/value}" name="property_62[]" />-->
+            <!--</div><hr/>-->
 
             <input type="hidden" name="id" value="{user/id}" />
             <input type="hidden" name="groupId" value="2" />

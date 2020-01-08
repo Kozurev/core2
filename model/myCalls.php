@@ -56,14 +56,14 @@ class MyCalls extends Api
             throw new Exception('Указание email для совершения звонка обязательно');
         }
 
-        $this->apiToken = Property_Controller::factoryByTag('my_calls_token')->getValues($user)[0]->value();
-        if (empty($this->apiToken)) {
-            throw new Exception('Указание авторизацтонного токена для совершения звонка обязательно');
-        }
-
         $director = $user->getDirector();
         if (is_null($director)) {
             throw new Exception('Пользователь не принадлежит директору');
+        }
+
+        $this->apiToken = Property_Controller::factoryByTag('my_calls_token')->getValues($director)[0]->value();
+        if (empty($this->apiToken)) {
+            throw new Exception('Указание авторизацтонного токена для совершения звонка обязательно');
         }
 
         $this->apiUrl = Property_Controller::factoryByTag('my_calls_url')->getValues($director)[0]->value();

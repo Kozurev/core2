@@ -38,6 +38,9 @@
                         <xsl:if test="/root/access_lid_edit = 1">
                             <a class="action calendar"  onclick="getLidStatisticPopup({id})" title="События лида"><input type="hidden" value="KOCTb|J|b" /></a>
                         </xsl:if>
+                        <xsl:if test="//current_user/email != '' and //my_calls_token != ''">
+                            <a class="action phone" onclick="MyCalls.makeCall({//current_user/id}, '{number}', checkResponseStatus)" title="Совершить звонок"><input type="hidden" value="KOCTb|J|b" /></a>
+                        </xsl:if>
                         <input type="date" class="form-control date_inp lid_date" onchange="Lids.changeDate({id}, this.value)">
                             <xsl:attribute name="value"><xsl:value-of select="control_date" /></xsl:attribute>
                             <xsl:if test="/root/access_lid_edit = 0">

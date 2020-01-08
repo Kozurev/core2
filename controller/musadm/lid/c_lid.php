@@ -78,5 +78,7 @@ $LidController
     ->periodFrom($periodFrom)
     ->periodTo($periodTo)
     ->properties($lidsPropsIds)
+    ->addEntity(User_Auth::current(), 'current_user')
+    ->addSimpleEntity('my_calls_token', Property_Controller::factoryByTag('my_calls_token')->getValues(User_Auth::current()->getDirector())[0]->value())
     ->isWithAreasAssignments(true)
     ->show();

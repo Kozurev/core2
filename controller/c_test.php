@@ -7,12 +7,19 @@
  */
 
 
-//Orm::Debug(true);
+Orm::Debug(true);
+exit;
+Orm::execute('DELETE FROM Property_String WHERE property_id = 62');
+Orm::execute('DELETE FROM Property_String_Assigment WHERE property_id = 62 AND (model_name = "User" OR object_id = 2)');
 
-Core::requireClass('User');
-Core::requireClass('User_Controller');
-Core::requireClass('Property_Controller');
-Core::requireClass('Vk');
+//$manager = Core::factory('User', 1123);
+//$manager->email('creative27016@gmail.com');
+//$manager->save();
+
+$director = Core::factory('User', 516);
+$token = Property_Controller::factoryByTag('my_calls_token');
+$token->addNewValue($director, 'sxsoi418zp6r4igntm3d1txnns8xcph9');
+
 exit;
 Orm::execute('alter table Senler_Settings alter column lid_status_id set default 0;
                     alter table Senler_Settingsadd other_status int unsigned default 0;');

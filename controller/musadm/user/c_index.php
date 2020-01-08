@@ -65,7 +65,7 @@ $ClientController
     ->setGroup($groupId)
     ->isShowCount(true)
     ->addEntity(User_Auth::current(), 'auth_user')
-    ->addSimpleEntity('my_calls_token', Property_Controller::factoryByTag('my_calls_token')->getValues(User_Auth::current())[0]->value())
+    ->addSimpleEntity('my_calls_token', Property_Controller::factoryByTag('my_calls_token')->getValues(User_Auth::current()->getDirector())[0]->value())
     ->addSimpleEntity('page-theme-color', 'primary')
     ->addSimpleEntity('is_director', $isDirector)
     ->addSimpleEntity('table-type', User_Controller_Extended::TABLE_ACTIVE)

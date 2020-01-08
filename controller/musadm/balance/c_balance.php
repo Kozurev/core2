@@ -95,12 +95,15 @@ if ($isAdmin) {
     }
 
     $OutputXml
+        ->addEntity($User, 'client')
         ->addSimpleEntity('note', $clientNote)
         ->addSimpleEntity('entry', $lastEntryDate)
         ->addSimpleEntity('per_lesson', $perLesson)
         ->addSimpleEntity('prev_lid', $prevLid)
         ->addSimpleEntity('mediana_indiv', $medianaIndiv)
         ->addSimpleEntity('mediana_group', $medianaGroup)
+        ->addEntity(User_Auth::current(), 'current_user')
+        ->addSimpleEntity('my_calls_token', Property_Controller::factoryByTag('my_calls_token')->getValues(User_Auth::current()->getDirector())[0]->value())
         ->addEntities($AbsentPeriods, 'absent');
 }
 
@@ -307,25 +310,31 @@ if (Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_CLIENT)) {
 if ($isAdmin === 1) {
 
     //Считаем кол-во дней жизни за вычетом отвала
-    $allDays = (strtotime (strval(date('Y-m-d')))-strtotime (strval($User->registerDate())))/(60*60*24);
+    $allDays = (strtotime(date('Y-m-d')) - strtotime($User->registerDate())) / (60*60*24);
     $absenceDays = 0;
     $UserActivityList =  (new User_Activity())
         ->queryBuilder()
         ->where('user_id', '=', $User->id())
         ->findAll();
     foreach ($UserActivityList as $userActivity) {
-        $absenceDays +=   strtotime (strval($userActivity->dumpDateEnd()))-strtotime (strval($userActivity->dumpDateStart()));
+        $absenceDays += strtotime($userActivity->dumpDateEnd()) - strtotime($userActivity->dumpDateStart());
     }
-    $absenceDays = $absenceDays/(60*60*24);
-    $lifeDays = $allDays-$absenceDays;
-
+    $absenceDays = intval($absenceDays / (60*60*24));
+    $lifeDays = $allDays - $absenceDays;
 
     //Считаем кол-во уроков , которые отходил
-    $countLessons = (new Schedule_Lesson_Report())
-        ->queryBuilder()
-        ->where('client_id','=',$User->id())
-        ->where('attendance','=',1)
-        ->count();
+    $countLessons = 0;
+    foreach ($UserReports as $rep) {
+        if ($rep->attendance()) {
+            $countLessons++;
+        }
+    }
+//    $countLessons = (new Schedule_Lesson_Report())
+//        ->queryBuilder()
+//        ->where('client_id','=',$User->id())
+//        ->where('attendance','=',1)
+//        ->count();
+
     //Считаем кол-во денег, которые принес в систему
     $money =0;
     $moneyIn = (new Payment())
@@ -333,26 +342,25 @@ if ($isAdmin === 1) {
         ->where('user','=',$User->id())
         ->where('type','=',1)
         ->findAll();
-  foreach ($moneyIn as $in) {
-      $money +=$in->value();
-  }
+    foreach ($moneyIn as $in) {
+        $money +=$in->value();
+    }
+
     //Считаем кешбек
-    $cashBack =0;
+    $cashBack = 0;
 
     $cash = (new Payment())
         ->queryBuilder()
         ->where('user','=',$User->id())
         ->where('type','=',15)
         ->findAll();
-
     foreach ($cash as $in) {
-        $cashBack +=$in->value();
+        $cashBack += $in->value();
     }
-
 
     Core::factory('Core_Entity')
         ->addSimpleEntity('life_days', $lifeDays)
-        ->addSimpleEntity('count_lesson', $countLessons)
+        ->addSimpleEntity('count_lesson', count($UserReports))
         ->addSimpleEntity('money', $money)
         ->addSimpleEntity('cashBack', $cashBack)
         ->xsl('musadm/users/balance/life_history.xsl')
