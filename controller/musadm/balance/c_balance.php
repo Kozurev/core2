@@ -95,7 +95,7 @@ if ($isAdmin) {
     }
 
     $OutputXml
-        ->addEntity($User, 'client')
+        ->addEntity($User)
         ->addSimpleEntity('note', $clientNote)
         ->addSimpleEntity('entry', $lastEntryDate)
         ->addSimpleEntity('per_lesson', $perLesson)
@@ -421,7 +421,7 @@ if ($isAdmin === 1) {
     global $CFG;
     Core::factory('Core_Entity')
         ->addSimpleEntity('wwwroot', $CFG->rootdir)
-        ->addEntity($User, 'user')
+        ->addEntity($User)
         ->addEntities($UserEvents)
         ->addEntities($TasksPriorities)
         ->addEntities($Areas)

@@ -209,7 +209,7 @@
                                             </xsl:if>
 
                                             <xsl:if test="//current_user/email != '' and //my_calls_token != ''">
-                                                <a class="btn btn-orange" onclick="MyCalls.makeCall({//current_user/id}, '{client/phone_number}', checkResponseStatus)" title="Совершить звонок">
+                                                <a class="btn btn-orange" onclick="MyCalls.makeCall({//current_user/id}, '{user/phone_number}', checkResponseStatus)" title="Совершить звонок">
                                                     Позвонить
                                                 </a>
                                             </xsl:if>
