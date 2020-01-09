@@ -421,7 +421,7 @@ if ($isAdmin === 1) {
     global $CFG;
     Core::factory('Core_Entity')
         ->addSimpleEntity('wwwroot', $CFG->rootdir)
-        ->addEntity($User)
+        ->addEntity($User, 'user')
         ->addEntities($UserEvents)
         ->addEntities($TasksPriorities)
         ->addEntities($Areas)
