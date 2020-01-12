@@ -87,6 +87,62 @@
                                 </td>
                             </tr>
 
+                            <xsl:if test="count(absent) > 0">
+                                <tr id="absent-row">
+                                    <td>Периоды отсутствия</td>
+
+                                    <td colspan="2" class="periods">
+                                        <xsl:for-each select="absent">
+                                            <div class="row" data-period-id="{id}">
+                                                <div class="col-md-6">
+                                                    <xsl:variable name="periodClass">
+                                                        <xsl:choose>
+                                                            <xsl:when test="current = 1">
+                                                                green
+                                                            </xsl:when>
+                                                            <xsl:otherwise>
+                                                                default
+                                                            </xsl:otherwise>
+                                                        </xsl:choose>
+                                                    </xsl:variable>
+
+                                                    <span id="absent-from" class="{$periodClass}"><xsl:value-of select="date_from" /></span>
+                                                    <span class="{$periodClass}"> - </span>
+                                                    <span id="absent-to" class="{$periodClass}"><xsl:value-of select="date_to" /></span>
+                                                </div>
+
+                                                <xsl:if test="/root/access_schedule_absent = 1">
+                                                    <div class="col-md-6">
+                                                        <a class="action edit" onclick="getScheduleAbsentPopup('', '', '', {id})"><xsl:text>&#x0A;</xsl:text></a>
+                                                        <a class="action delete" onclick="deleteScheduleAbsent({id}, deleteAbsentClientCallback)"><xsl:text>&#x0A;</xsl:text></a>
+                                                    </div>
+                                                </xsl:if>
+                                            </div>
+                                        </xsl:for-each>
+                                    </td>
+                                </tr>
+                            </xsl:if>
+
+                            <tr>
+                                <td colspan="3">
+                                    <div class="row buttons-panel center">
+                                        <xsl:if test="/root/access_schedule_absent = 1">
+                                            <div>
+                                                <a class="btn btn-orange" onclick="getScheduleAbsentPopup({user/id}, 1, getCurrentDate(), '')">
+                                                    Добавить период отсутствия
+                                                </a>
+                                            </div>
+                                        </xsl:if>
+
+                                        <xsl:if test="//current_user/email != '' and //my_calls_token != ''">
+                                            <a class="btn btn-orange" onclick="MyCalls.makeCall({//current_user/id}, '{user/phone_number}', checkResponseStatus)" title="Совершить звонок">
+                                                Позвонить
+                                            </a>
+                                        </xsl:if>
+                                    </div>
+                                </td>
+                            </tr>
+
                             <xsl:if test="is_admin = 1">
                                 <xsl:if test="is_director = 1">
                                     <tr>
@@ -137,42 +193,6 @@
                                     </td>
                                 </tr>
 
-                                <xsl:if test="count(absent) > 0">
-                                    <tr id="absent-row">
-                                        <td>Периоды отсутствия</td>
-
-                                        <td colspan="2" class="periods">
-                                            <xsl:for-each select="absent">
-                                                <div class="row" data-period-id="{id}">
-                                                    <div class="col-md-6">
-                                                        <xsl:variable name="periodClass">
-                                                            <xsl:choose>
-                                                                <xsl:when test="current = 1">
-                                                                    green
-                                                                </xsl:when>
-                                                                <xsl:otherwise>
-                                                                    default
-                                                                </xsl:otherwise>
-                                                            </xsl:choose>
-                                                        </xsl:variable>
-
-                                                        <span id="absent-from" class="{$periodClass}"><xsl:value-of select="date_from" /></span>
-                                                        <span class="{$periodClass}"> - </span>
-                                                        <span id="absent-to" class="{$periodClass}"><xsl:value-of select="date_to" /></span>
-                                                    </div>
-
-                                                    <xsl:if test="/root/access_schedule_absent = 1">
-                                                        <div class="col-md-6">
-                                                            <a class="action edit" onclick="getScheduleAbsentPopup('', '', '', {id})"><xsl:text>&#x0A;</xsl:text></a>
-                                                            <a class="action delete" onclick="deleteScheduleAbsent({id}, deleteAbsentClientCallback)"><xsl:text>&#x0A;</xsl:text></a>
-                                                        </div>
-                                                    </xsl:if>
-                                                </div>
-                                            </xsl:for-each>
-                                        </td>
-                                    </tr>
-                                </xsl:if>
-
                                 <xsl:if test="entry != ''">
                                     <tr>
                                         <td>Последяя авторизация</td>
@@ -197,25 +217,6 @@
                                     </td>
                                 </tr>
 
-                                <tr>
-                                    <td colspan="3">
-                                        <div class="row buttons-panel center">
-                                            <xsl:if test="/root/access_schedule_absent = 1">
-                                                <div>
-                                                    <a class="btn btn-orange" onclick="getScheduleAbsentPopup({user/id}, 1, getCurrentDate(), '')">
-                                                        Добавить период отсутствия
-                                                    </a>
-                                                </div>
-                                            </xsl:if>
-
-                                            <xsl:if test="//current_user/email != '' and //my_calls_token != ''">
-                                                <a class="btn btn-orange" onclick="MyCalls.makeCall({//current_user/id}, '{user/phone_number}', checkResponseStatus)" title="Совершить звонок">
-                                                    Позвонить
-                                                </a>
-                                            </xsl:if>
-                                        </div>
-                                    </td>
-                                </tr>
                                 <xsl:if test="prev_lid != '0'">
                                     <td colspan="3" class="center">
                                         Создан из лида №

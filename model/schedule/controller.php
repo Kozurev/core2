@@ -394,7 +394,19 @@ class Schedule_Controller
                         echo "<span class=\"teacher\"> $clientFio</span>";
                     }
 
-                    //Тестовый комментарий, проверка аплоада при комите
+                    //Кнопка отмены занятия
+                    if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT)) {
+                        echo
+                        '<ul class="submenu">
+                            <li>
+                                <a href="#"></a>
+                                <ul class="dropdown" data-date="'.$table[$i]['date'].'" 
+                                        data-id="'.$Lesson->getId().'" data-type="'.$Lesson->typeId().'">
+                                    <li><a href="#" class="schedule_today_absent">Отсутствует сегодня</a></li>
+                                </ul>
+                            </li>
+                        </ul>';
+                    }
 
                     echo "<br/>";
                     $lastAreaId = $Lesson->areaId();

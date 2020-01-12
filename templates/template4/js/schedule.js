@@ -805,7 +805,7 @@ function markDeleted(lessonId, deleteDate, func) {
 function markAbsent(lessonId, date, func) {
     $.ajax({
         type: 'GET',
-        url: '',
+        url: root + '/schedule',
         data: {
             action: 'markAbsent',
             lessonid: lessonId,
