@@ -72,6 +72,66 @@
  * << Таблица
  */
 
+/**
+ * Выпадающее меню >
+ */
+ul {
+	margin-left: 0; /* Отступ слева в браузере IE и Opera */
+	padding-left: 0; /* Отступ слева в браузере Firefox, Safari, Chrome */
+}
+
+.dropdown {
+	position: absolute;
+	display: none;
+	z-index: 100;
+}
+
+.submenu {
+	position:relative;
+	display:inline-block;
+}
+
+.submenu li {
+	list-style-type: none;
+}
+
+.submenu > li > a {
+	display: inline-block;
+	height: 17px;
+	width: 17px;
+	background: url(../../template3/images/edit2.png) no-repeat;
+	background-size: 12px 12px;
+	background-color: white;
+	border-radius: 24px;
+	background-position-x: 3px;
+	background-position-y: 3px;
+	margin-left: 5px;
+}
+
+.submenu li:hover > ul {
+	display: block;
+	width: 176px;
+	right: -36px;
+}
+
+.submenu .dropdown li a {
+	display: block;
+	padding: 5px;
+	text-decoration: none;
+	color: #666;
+	border: 1px solid #ccc;
+	background-color: #f0f0f0;
+	border-bottom: none;
+}
+
+.submenu .dropdown li a:hover {
+	color: #ffe;
+	background-color: #5488af;
+}
+/**
+ * << Выпадающее меню
+ */
+
 
 
 @media(min-width: 1024px) {

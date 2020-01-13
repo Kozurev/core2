@@ -97,6 +97,30 @@ if ($accessAbsentPeriod || $accessScheduleCreate || $accessScheduleEdit) {
         }
     }
 
+    //Следующее занятие
+    $nearestLessons = Schedule_Controller_Extended::getSchedule($User, date('Y-m-d'), null, 1);
+    if (!empty($nearestLessons)) {
+        $nearestLessonXml = (new Core_Entity())->_entityName('nearest_lesson');
+        $nearestLessonXml->addSimpleEntity('date', refactorDateFormat($nearestLessons[0]->date));
+        $tomorrow = date('Y-m-d', strtotime(date('Y-m-d') . ' +1 day'));
+        if ($nearestLessons[0]->date > $tomorrow || ($nearestLessons[0]->date == $tomorrow && date('H:i:s') < '18:00:00')) {
+            $isCancellable = 1;
+        } else {
+            $isCancellable = 0;
+        }
+        $nearestLessonXml->addSimpleEntity('is_cancellable', $isCancellable);
+        foreach ($nearestLessons[0]->lessons as $lesson) {
+            $lessonStd = new stdClass();
+            $teacher = $lesson->getTeacher();
+            $lessonStd->id = $lesson->getId();
+            $lessonStd->teacher = $teacher->surname() . ' ' . $teacher->name();
+            $lessonStd->time_from = refactorTimeFormat($lesson->timeFrom());
+            $lessonStd->time_to = refactorTimeFormat($lesson->timeTo());
+            $nearestLessonXml->addEntity($lessonStd, 'lesson');
+        }
+        $OutputXml->addEntity($nearestLessonXml, 'nearest_lesson');
+    }
+
     $OutputXml
         ->addEntity($User)
         ->addSimpleEntity('note', $clientNote)

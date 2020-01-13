@@ -560,6 +560,16 @@ $(function(){
                 }
                 loaderOff();
             });
+        })
+
+        .on('click', '.user-schedule-btn', function(e) {
+            e.preventDefault();
+            let scheduleSection = $('.user-schedule');
+            if (scheduleSection.css('display') == 'none') {
+                scheduleSection.show('slow');
+            } else {
+                scheduleSection.hide('slow');
+            }
         });
 
 

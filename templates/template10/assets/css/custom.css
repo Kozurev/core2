@@ -624,6 +624,10 @@ ul {
  * << Выпадающее меню
  */
 
+.user-schedule {
+    display: none;
+}
+
 
 
 @media (min-width: 1200px) {

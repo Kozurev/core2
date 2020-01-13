@@ -395,7 +395,9 @@ class Schedule_Controller
                     }
 
                     //Кнопка отмены занятия
-                    if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT)) {
+                    $tomorrow = date('Y-m-d', strtotime(date('Y-m-d') . ' +1 day'));
+                    if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT)
+                        && ($table[$i]['date'] > $tomorrow || $table[$i]['date'] == $tomorrow && date('H:i:s') < '18:00:00')) {
                         echo
                         '<ul class="submenu">
                             <li>
