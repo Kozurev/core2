@@ -965,8 +965,6 @@ function removeTeacherTimeCallback(response) {
 }
 
 function addNewStudentToTeacher(valueId) {
-
-
     var popupData = $(
         '<div align="center" class="row popup-row-block" id="accessGroupAssignments">' +
         '<div class="col-lg-12">' +
@@ -1023,4 +1021,86 @@ function addNewStudentToTeacher(valueId) {
 
     showPopup(popupData);
     return true;
+}
+
+
+function makeClientLessonPopup(clientId) {
+    loaderOn();
+    $.ajax({
+        type: 'GET',
+        url: '/balance',
+        dataType: 'html',
+        data: {
+            action: 'makeClientLessonPopup',
+            clientId: clientId
+        },
+        success: function(response) {
+            showPopup(response);
+            loaderOff();
+        }
+    });
+}
+
+
+function teacherNearestFreeTimeCallback(response) {
+    loaderOn();
+    if(!checkResponseStatus(response)) {
+        loaderOff();
+        return false;
+    }
+
+    let $teacherTimeBlock = $('.teacherTime');
+    let $saveBtnRow = $('.saveBtnRow');
+
+    if (response.length == 0) {
+        $teacherTimeBlock.html('<p>На данную дату не удалось подобрать свободное время</p>');
+        $teacherTimeBlock.append('<p>Так как не удалось подобрать время занятия в автоматическом режиме - свяжитесь с менеджерами для получения более детальной информации</p>');
+        $saveBtnRow.hide();
+    } else {
+        $teacherTimeBlock.html('<p>Возможное время для постановки в график:</p>');
+        let $teacherTimeUl = $('<ul></ul>');
+        $.each(response, function(key, time) {
+            $teacherTimeUl.append('<li>' +
+                '<input type="radio" name="time" id="time_'+time.timeFrom+'" value="'+time.timeFrom+' '+time.timeTo+'">' +
+                '<label for="time_'+time.timeFrom+'">'+time.refactoredTimeFrom+' '+time.refactoredTimeTo+'</label></li>');
+        });
+        $teacherTimeBlock.append($teacherTimeUl);
+        $teacherTimeBlock.append('<p>Для подбора другого времени занятия необходимо связаться с менеджерами</p>');
+        $saveBtnRow.show();
+    }
+
+    loaderOff();
+}
+
+
+function saveClientLesson() {
+    let
+        $popup = $('.popup'),
+        time = $popup.find('input[name=time]:checked').val(),
+        data = {
+            typeId: 1,
+            lessonType: 2,
+            insertDate: $popup.find('input[name=date]').val(),
+            clientId: $popup.find('input[name=clientId]').val(),
+            teacherId: $popup.find('select[name=teacherId]').val(),
+            areaId: $popup.find('input[name=areaId]').val(),
+            timeFrom: time.split(' ')[0],
+            timeTo: time.split(' ')[1],
+            id: '',
+            modelName: 'Schedule_Lesson'
+        };
+
+    $.ajax({
+        type: 'GET',
+        url: root + '/admin?menuTab=Main&menuAction=updateAction&ajax=1',
+        data: data,
+        success: function(response) {
+            closePopup();
+            if(response != '0' && response != '') {
+                notificationError(response);
+            } else {
+                notificationSuccess('Вы успешно были поставлены в график');
+            }
+        }
+    });
 }

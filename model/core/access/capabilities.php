@@ -58,6 +58,7 @@ return [
     'area_create' => 'Создание филиала',
     'area_edit' => 'Изменение филиала',
     'area_delete' => 'Удаление филиала',
+    'area_multi_access' => 'Доступ ко всем фмлиалам',
 
     'payment_read_all' => 'Просмотр хозрасходов',
     'payment_read_client' => 'Просмотр платежей клиентов',
@@ -91,4 +92,5 @@ return [
 
     'integration_vk' => 'Интеграция с ВК',
     'integration_senler' => 'Интеграция с сервисом рассылок Senler',
+    'integration_my_calls' => 'Интеграция с сервисом "Мои звонки"',
 ];

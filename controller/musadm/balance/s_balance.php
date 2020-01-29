@@ -139,6 +139,40 @@ if ($action === 'edit_report_popup') {
 }
 
 
+/**
+ * Формирование всплывающего окна для самостоятельной постановки в график
+ */
+if ($action === 'makeClientLessonPopup') {
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_CREATE)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
+    $clientId = Core_Array::Get('clientId', 0, PARAM_INT);
+    $client = User_Controller::factory($clientId);
+
+    $clientController = new User_Controller_Extended($client);
+    $teachers = $clientController->getClientTeachers();
+
+    $areas = (new Schedule_Area_Assignment())->getAreas($client);
+    if (count($areas) != 1 || empty($teachers)) {
+        exit('Самостоятельная постановка в график невозможна');
+    }
+
+    $clientLessonDuration = Property_Controller::factoryByTag('lesson_time')->getValues($client)[0]->value();
+    $seconds = $clientLessonDuration * 60;
+    $clientLessonDuration = toTime($seconds);
+
+    (new Core_Entity())
+        ->addEntity($client, 'client')
+        ->addEntities($teachers, 'teacher')
+        ->addSimpleEntity('area_id', $areas[0]->getId())
+        ->addSimpleEntity('lesson_duration', $clientLessonDuration)
+        ->xsl('musadm/users/balance/new_client_lesson_popup.xsl')
+        ->show();
+    exit;
+}
+
+
 if (!Core_Access::instance()->hasCapability(Core_Access::USER_LC_CLIENT)) {
     Core_Page_Show::instance()->error(403);
 }

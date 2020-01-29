@@ -166,4 +166,36 @@ class Schedule {
             }
         });
     }
+
+
+    /**
+     * Поиск свободного врмемени преподавателя рядом с другими его занятиями
+     *
+     * @param teacherId
+     * @param date
+     * @param lessonDuration
+     * @param callback
+     */
+    static getNearestTeacherTime(teacherId, date, lessonDuration, callback) {
+        $.ajax({
+            type: 'GET',
+            url: Schedule.getApiLink(),
+            dataType: 'json',
+            data: {
+                action: 'getTeacherNearestTime',
+                teacherId: teacherId,
+                date: date,
+                lessonDuration: lessonDuration
+            },
+            success: function (response) {
+                if (callback !== undefined) {
+                    callback(response);
+                }
+            },
+            error: function () {
+                notificationError('При получении свободного времени преподавателя произошла ошибка');
+                loaderOff();
+            }
+        });
+    }
 }

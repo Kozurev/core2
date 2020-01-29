@@ -156,6 +156,7 @@ if ($action === 'getScheduleAbsentPopup') {
         ->addSimpleEntity('object_id', $objectId)
         ->addSimpleEntity('type_id', $typeId)
         ->addSimpleEntity('date_from', $date)
+        ->addSimpleEntity('taskCheckboxHide', intval(User_Auth::current()->groupId() == ROLE_CLIENT))
         ->addEntity($AbsentPeriod, 'absent')
         ->xsl('musadm/schedule/absent_popup.xsl')
         ->show();
@@ -216,8 +217,8 @@ if ($action === 'getScheduleLessonPopup') {
     $Date = new DateTime($date);
     $dayName = $Date->format('l');
     //Временной промежуток (временное значение одной ячейки)
-    defined('SCHEDULE_DELIMITER')
-        ?   $period = SCHEDULE_DELIMITER
+    defined('SCHEDULE_GAP')
+        ?   $period = SCHEDULE_GAP
         :   $period = '00:15:00';
 
     $output = new Core_Entity();

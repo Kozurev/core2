@@ -173,6 +173,69 @@ class User_Controller_Extended extends Controller
 
 
     /**
+     * Поиск преподавателей клиента
+     *
+     * @return array
+     */
+    public function getClientTeachers()
+    {
+        if (empty($this->getUser()) || $this->getUser()->groupId() !== ROLE_CLIENT) {
+            debug(empty($this->getUser()), 1);
+            debug($this->getUser()->groupId() !== ROLE_CLIENT, 1);
+            return [];
+        }
+
+        $teachersProperty = Property_Controller::factoryByTag('teachers');
+        $values = $teachersProperty->getValues($this->getUser());
+
+        if (empty($values)) {
+            return [];
+        }
+
+        $valuesIds = [];
+        foreach ($values as $value) {
+            $valuesIds[] = $value->value();
+        }
+        $propertyTeachers = (new Property_List_Values)
+            ->queryBuilder()
+            ->whereIn('id', $valuesIds)
+            ->findAll();
+
+        $teachers = [];
+        foreach ($propertyTeachers as $propertyTeacher) {
+            $teacher = (new User)->queryBuilder()
+                ->where('surname', '=', explode(' ', $propertyTeacher->value())[0])
+                ->where('name', '=', explode(' ', $propertyTeacher->value())[1])
+                ->find();
+            if (!empty($teacher)) {
+                $teachers[] = $teacher;
+            }
+        }
+
+        return $teachers;
+    }
+
+
+    /**
+     * @param string $date
+     * @return int|null
+     * @throws Exception
+     */
+    public function getTeacherClassId(string $date)
+    {
+        if (empty($this->getUser()) || $this->getUser()->groupId() !== ROLE_TEACHER) {
+            return null;
+        }
+        $teacherLessons = Schedule_Controller_Extended::getSchedule($this->getUser(), $date, $date);
+        if (empty($teacherLessons[0]->lessons)) {
+            return null;
+        } else {
+            return $teacherLessons[0]->lessons[0]->classId();
+        }
+    }
+
+
+    /**
      * @return array
      */
     public function getUsers()
@@ -194,10 +257,11 @@ class User_Controller_Extended extends Controller
         }
 
         $AreaAssignment = new Schedule_Area_Assignment();
+        $areasMultiAccess = Core_Access::instance()->hasCapability(Core_Access::AREA_MULTI_ACCESS, $this->getUser());
         $areasIds = [];
         if (!empty($this->areasIds)) {
             $areasIds = $this->areasIds;
-        } elseif ($this->getUser()->groupId() !== ROLE_DIRECTOR && $this->isLimitedAreasAccess() === true) {
+        } elseif ($areasMultiAccess === false && $this->isLimitedAreasAccess() === true) {
             $Areas = $AreaAssignment->getAreas($this->getUser());
             if (empty($Areas)) {
                 //TODO: надо что-то придмать как отлавливать ошибку, если пользователь не авторизован

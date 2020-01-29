@@ -101,7 +101,8 @@ if ($accessAbsentPeriod || $accessScheduleCreate || $accessScheduleEdit) {
     $nearestLessons = Schedule_Controller_Extended::getSchedule($User, date('Y-m-d'), null, 1);
     if (!empty($nearestLessons)) {
         $nearestLessonXml = (new Core_Entity())->_entityName('nearest_lesson');
-        $nearestLessonXml->addSimpleEntity('date', refactorDateFormat($nearestLessons[0]->date));
+        $nearestLessonXml->addSimpleEntity('date', $nearestLessons[0]->date);
+        $nearestLessonXml->addSimpleEntity('refactoredDate', refactorDateFormat($nearestLessons[0]->date));
         $tomorrow = date('Y-m-d', strtotime(date('Y-m-d') . ' +1 day'));
         if ($nearestLessons[0]->date > $tomorrow || ($nearestLessons[0]->date == $tomorrow && date('H:i:s') < '18:00:00')) {
             $isCancellable = 1;

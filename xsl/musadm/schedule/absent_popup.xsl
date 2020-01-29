@@ -83,12 +83,38 @@
                     <input class="form-control" type="time" name="timeTo" value="{absent/time_to}" />
                 </div>
             </xsl:if>
-            <xsl:if test="absent/id = '' and type_id = 1 and object/group_id = 5">
+
+            <xsl:variable name="checkboxEnable">
+                <xsl:choose>
+                    <xsl:when test="absent/id = '' and type_id = 1 and object/group_id = 5">1</xsl:when>
+                    <xsl:otherwise>0</xsl:otherwise>
+                </xsl:choose>
+            </xsl:variable>
+
+            <xsl:variable name="isHide">
+                <xsl:choose>
+                    <xsl:when test="absent/id = '' and type_id = 1 and object/group_id = 5 and taskCheckboxHide = 1">1</xsl:when>
+                    <xsl:otherwise>0</xsl:otherwise>
+                </xsl:choose>
+            </xsl:variable>
+
+            <xsl:if test="$checkboxEnable = 1">
                 <div class="column">
+                    <xsl:if test="$isHide = 1">
+                        <xsl:attribute name="style">display:none</xsl:attribute>
+                    </xsl:if>
                     <span>Напомнить администратору о выходе ученика</span>
                 </div>
                 <div class="column">
-                    <input type="checkbox" id="absent_add_task" />
+                    <xsl:if test="$isHide = 1">
+                        <xsl:attribute name="style">display:none</xsl:attribute>
+                    </xsl:if>
+                    <input type="checkbox" id="absent_add_task">
+                        <xsl:if test="$isHide = 1">
+                            <xsl:attribute name="checked">checked</xsl:attribute>
+                        </xsl:if>
+                        <!--hhh-->
+                    </input>
                 </div>
             </xsl:if>
 

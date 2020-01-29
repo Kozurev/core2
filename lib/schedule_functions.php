@@ -13,7 +13,7 @@ function array_pop_lesson($Lessons, $time, $classId)
         return false;
     }
 
-    $timeMax = addTime($time, SCHEDULE_DELIMITER);
+    $timeMax = addTime($time, SCHEDULE_GAP);
         
     foreach ($Lessons as $key => $lesson) {
         if (compareTime( $lesson->timeFrom(), '>=', $time)

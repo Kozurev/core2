@@ -711,6 +711,20 @@ class Core_Entity extends Core_Entity_Model
 
 
     /**
+     * @param int $id
+     * @return $this|null
+     */
+    public static function getById(int $id)
+    {
+        $calledClass = get_called_class();
+        return (new $calledClass)
+            ->queryBuilder()
+            ->where('id', '=', $id)
+            ->find();
+    }
+
+
+    /**
      * Указатель на наличие свойств $timecreated и $timemodified в таблице объекта
      * Если необходимо хранить значения даты создания и последнего сохранения объекта то данный метод необходимо
      * переопределить в модели объекта с возвращаемым логическим значнием - true

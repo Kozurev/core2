@@ -22,6 +22,7 @@
                             <th class="center">Дата продажи</th>
                             <th class="center">Действителен до</th>
                             <th class="center">Номер</th>
+                            <th class="center">Филиал</th>
                             <th class="center">Комментарии</th>
                             <th class="center">Действия</th>
                         </tr>
@@ -38,11 +39,13 @@
 
     <xsl:template match="certificate">
         <xsl:variable name="id" select="id" />
+        <xsl:variable name="areaId" select="area_id" />
         <tr>
             <td><xsl:value-of select="id" /></td>
             <td><xsl:value-of select="sell_date" /></td>
             <td><xsl:value-of select="active_to" /></td>
             <td><xsl:value-of select="number" /></td>
+            <td><xsl:value-of select="//schedule_area[id = $areaId]/title" /></td>
             <td>
                 <div class="comments">
                     <xsl:apply-templates select="/root/certificate_note[certificate_id = $id]" />

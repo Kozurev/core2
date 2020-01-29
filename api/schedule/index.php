@@ -404,5 +404,40 @@ if ($action === 'isInTeacherTime') {
 }
 
 
+/**
+ * Поиск свободного времени преподавателя рядом с другими занятиями
+ */
+if ($action === 'getTeacherNearestTime') {
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
+    $teacherId = Core_Array::Get('teacherId', 0, PARAM_INT);
+    $date = Core_Array::Get('date', '', PARAM_DATE);
+    $lessonDuration = Core_Array::Get('lessonDuration', '00:50:00', PARAM_TIME);
+
+    if (empty($teacherId)) {
+        exit(REST::status(REST::STATUS_ERROR, 'Не выбран преподаватель'));
+    }
+    if (empty($date)) {
+        exit(REST::status(REST::STATUS_ERROR, 'Не выбрана дата занятия'));
+    }
+
+    try {
+        $nearestTime = Schedule_Controller_Extended::getTeacherNearestFreeTime($teacherId, $date, $lessonDuration);
+    } catch (Exception $e) {
+        exit(REST::status(REST::STATUS_ERROR, $e->getMessage()));
+    }
+
+    $nearestTimeArr = [];
+    foreach ($nearestTime as $key => $time) {
+        $time->refactoredTimeFrom = refactorTimeFormat($time->timeFrom);
+        $time->refactoredTimeTo = refactorTimeFormat($time->timeTo);
+        $nearestTimeArr[] = $time;
+    }
+
+    die(json_encode($nearestTimeArr));
+}
+
 
 die(REST::status(REST::STATUS_ERROR, 'Отсутствует название действия'));

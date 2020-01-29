@@ -3,7 +3,8 @@
 global $CFG;
 authOrOut();
 
-if (User_Auth::current()->groupId() !== ROLE_DIRECTOR) {
+$accessIntegrationMyCalls = Core_Access::instance()->hasCapability(Core_Access::INTEGRATION_MY_CALLS);
+if (!$accessIntegrationMyCalls) {
     Core_Page_Show::instance()->error(403);
 }
 

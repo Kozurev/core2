@@ -49,6 +49,7 @@ if ($action === 'edit_popup') {
     Core::factory('Core_Entity')
         ->addSimpleEntity('is_new', $isNew)
         ->addEntity(Core::factory('Certificate', $id))
+        ->addEntities(Core::factory('Schedule_Area')->getList())
         ->xsl('musadm/certificates/new_certificate_popup.xsl')
         ->show();
     exit;
@@ -63,6 +64,7 @@ if ($action === 'saveCertificate') {
     $sellDate = Core_Array::Get('sellDate', date('Y-m-d'), PARAM_STRING);
     $activeTo = Core_Array::Get('activeTo', '', PARAM_STRING);
     $number =   Core_Array::Get('number', '000', PARAM_STRING);
+    $areaId =   Core_Array::Get('area_id', '0', PARAM_INT);
     $note =     Core_Array::Get('note', '', PARAM_STRING);
 
     if (($id == 0 && !$accessCreate) || ($id > 0 && !$accessEdit)) {
@@ -74,6 +76,7 @@ if ($action === 'saveCertificate') {
         ->sellDate($sellDate)
         ->activeTo($activeTo)
         ->number($number)
+        ->areaId($areaId)
         ->subordinated($subordinated);
     $oCertificate->save();
     if ($note != '') {

@@ -60,6 +60,7 @@ class Core_Access
     const AREA_CREATE = 'area_create';
     const AREA_EDIT = 'area_edit';
     const AREA_DELETE = 'area_delete';
+    const AREA_MULTI_ACCESS = 'area_multi_access';
 
     const PAYMENT_READ_ALL = 'payment_read_all';
     const PAYMENT_READ_CLIENT = 'payment_read_client';
@@ -93,6 +94,7 @@ class Core_Access
 
     const INTEGRATION_VK = 'integration_vk';
     const INTEGRATION_SENLER = 'integration_senler';
+    const INTEGRATION_MY_CALLS = 'integration_my_calls';
 
 
     /**

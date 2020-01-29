@@ -129,12 +129,12 @@ if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
 
 
     //Установка первоначальных значений
-    $timeStart = '09:00:00';    //Начальная отметка временного промежутка
-    $timeEnd = '22:00:00';      //Конечная отметка временного промежутка
+    $timeStart = SCHEDULE_TIME_START;   //Начальная отметка временного промежутка
+    $timeEnd = SCHEDULE_TIME_END;       //Конечная отметка временного промежутка
 
     //Временной промежуток (временное значение одной ячейки)
-    defined('SCHEDULE_DELIMITER')
-        ?   $period = SCHEDULE_DELIMITER
+    defined('SCHEDULE_GAP')
+        ?   $period = SCHEDULE_GAP
         :   $period = '00:15:00';
 
     $time = $timeStart;

@@ -60,3 +60,14 @@ define('MODEL_TASK_ID',         3);
 define('MODEL_PAYMENT_ID',      4);
 define('MODEL_COMMENT_ID',      5);
 define('MODEL_CERTIFICATE_ID',  6);
+
+
+/**
+ * Константы расписания
+ *
+ * @date 24.01.2020 01:22
+ */
+define('SCHEDULE_LESSON_INTERVAL', '00:10:00');
+define('SCHEDULE_GAP', '00:15:00');
+define('SCHEDULE_TIME_START', '09:00:00');
+define('SCHEDULE_TIME_END', '22:00:00');

@@ -5,7 +5,7 @@
  * @version 20190526
  */
 
-$User = User::current();
+$User = User_Auth::current();
 $subordinated = $User->getDirector()->getId();
 
 
@@ -23,7 +23,7 @@ $Certificates = Core::factory('Certificate')
     ->findAll();
 
 //Проверка на авторизованность под
-User::checkUserAccess(['groups' => [ROLE_DIRECTOR]]) || User::checkUserAccess(['groups' => [ROLE_DIRECTOR]], User::parentAuth())
+User::checkUserAccess(['groups' => [ROLE_DIRECTOR]]) || User::checkUserAccess(['groups' => [ROLE_DIRECTOR]], User_Auth::parentAuth())
     ? $isDirector = 1
     : $isDirector = 0;
 
@@ -38,13 +38,16 @@ foreach ($Notes as $Note) {
     $Note->date(refactorDateFormat($Note->date()));
 }
 
+$areas = Core::factory('Schedule_Area')->getList();
+
 Core::factory('Core_Entity')
     ->addSimpleEntity('is_director', $isDirector)
     ->addEntities($Certificates)
     ->addEntities($Notes)
-    ->addSimpleENtity('access_create', (int)$accessCreate)
-    ->addSimpleENtity('access_edit', (int)$accessEdit)
-    ->addSimpleENtity('access_delete', (int)$accessDelete)
-    ->addSimpleENtity('access_comment', (int)$accessComment)
+    ->addEntities($areas)
+    ->addSimpleEntity('access_create', (int)$accessCreate)
+    ->addSimpleEntity('access_edit', (int)$accessEdit)
+    ->addSimpleEntity('access_delete', (int)$accessDelete)
+    ->addSimpleEntity('access_comment', (int)$accessComment)
     ->xsl('musadm/certificates/certificates.xsl')
     ->show();

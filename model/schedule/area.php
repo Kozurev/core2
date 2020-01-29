@@ -19,7 +19,7 @@ class Schedule_Area extends Schedule_Area_Model
         if ($this->subordinated() > 0) {
             $subordinated = $this->subordinated();
         } else {
-            $AuthUser = User::current();
+            $AuthUser = User_Auth::current();
             if (is_null($AuthUser)) {
                 exit('Невозможно сформировать путь филиала так как не удается получить значение subordinated');
             }
@@ -48,7 +48,7 @@ class Schedule_Area extends Schedule_Area_Model
         $Areas = Schedule_Area_Controller::factory();
 
         if ($isSubordinate === true) {
-            $User = User::current();
+            $User = User_Auth::current();
 
             if (is_null($User)) {
                 return [];

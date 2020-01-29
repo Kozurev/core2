@@ -320,7 +320,7 @@ Core::attachObserver('before.Item.save', function($args) {
 /**
  * При выставлении консультации с указанием лида создается комментарий
  */
-Core::attachObserver('before.ScheduleLesson.save', function($args) {
+Core::attachObserver('before.ScheduleLesson.insert', function($args) {
     $Lesson = $args[0];
     $typeId = $Lesson->typeId();
     $clientId = $Lesson->clientId();
@@ -597,7 +597,12 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
                     'title' => 'Остаток занятий на вашем балансе: ' . $countLessons,
                     'body' => 'Внести оплату легко, зайдите в приложение, нажмите кнопку "Пополнить", и после этого в личном кабинете сможете внести средства'
                 ];
-                Push::instance()->notification($message)->send($Client->pushId());
+                try {
+                    Push::instance()->notification($message)->send($Client->pushId());
+                } catch (Exception $e) {
+                    $errorMessage = 'User ' . $Client->surname() . ' ' . $Client->name() . ' error: ' . $e->getMessage();
+                    Log::instance()->error(Log::TYPE_PUSH, $errorMessage);
+                }
             }
 
             $isIssetTask = Task_Controller::factory()
@@ -836,4 +841,29 @@ Core::attachObserver('after.Lid.insert', function($args) {
 Core::attachObserver('before.User.deactivate', function($args) {
     $user = $args[0];
     Senler::setUserGroup($user, Senler_Settings::USER_STATUS_ARCHIVE);
+});
+
+
+/**
+ * При сохранении занятия в актуальном графике автоматически выставляет
+ */
+Core::attachObserver('before.ScheduleLesson.save', function($args) {
+    $lesson = $args[0];
+    if ($lesson instanceof Schedule_Lesson && empty($lesson->getId())) {
+        // Автоматическое формирование значения названия дня недели
+        if (empty($lesson->dayName()) && $lesson->lessonType() == Schedule_Lesson::SCHEDULE_CURRENT && !empty($lesson->insertDate())) {
+            $lesson->dayName(date('l', strtotime($lesson->insertDate())));
+        }
+        // Автоматическое формирование класса занятия
+        if (empty($lesson->classId()) && !empty($lesson->teacherId())) {
+            $teacher = $lesson->getTeacher();
+            if (!empty($teacher) && !empty($teacher->getId())) {
+                $controller = new User_Controller_Extended($teacher);
+                $classId = $controller->getTeacherClassId($lesson->insertDate());
+                if (!empty($classId)) {
+                    $lesson->classId($classId);
+                }
+            }
+        }
+    }
 });

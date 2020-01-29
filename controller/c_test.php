@@ -8,6 +8,28 @@
 
 
 Orm::Debug(true);
+
+exit;
+
+Orm::execute('ALTER TABLE `Certificate` ADD COLUMN `area_id` INT NOT NULL AFTER `number`;');
+
+Core::factory('Constant', 7)->delete();
+
+$groupDirector = Core::factory('Core_Access_Group', 1);
+$groupManager = Core::factory('Core_Access_Group', 2);
+$groupTeacher = Core::factory('Core_Access_Group', 3);
+$groupClient = Core::factory('Core_Access_Group', 4);
+
+$groupDirector->capabilityAllow(Core_Access::INTEGRATION_MY_CALLS);
+$groupManager->capabilityForbidden(Core_Access::INTEGRATION_MY_CALLS);
+$groupTeacher->capabilityForbidden(Core_Access::INTEGRATION_MY_CALLS);
+$groupClient->capabilityForbidden(Core_Access::INTEGRATION_MY_CALLS);
+
+$groupDirector->capabilityAllow(Core_Access::AREA_MULTI_ACCESS);
+$groupManager->capabilityForbidden(Core_Access::AREA_MULTI_ACCESS);
+$groupTeacher->capabilityForbidden(Core_Access::AREA_MULTI_ACCESS);
+$groupClient->capabilityForbidden(Core_Access::AREA_MULTI_ACCESS);
+
 exit;
 Orm::execute('DELETE FROM Property_String WHERE property_id = 62');
 Orm::execute('DELETE FROM Property_String_Assigment WHERE property_id = 62 AND (model_name = "User" OR object_id = 2)');

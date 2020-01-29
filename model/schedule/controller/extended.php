@@ -199,4 +199,163 @@ class Schedule_Controller_Extended
         return $result;
     }
 
+
+    /**
+     * Поиск графика работы преподавателя
+     *
+     * @param int $teacherId
+     * @param string|null $date
+     * @return array
+     */
+    public static function getTeacherTime(int $teacherId, string $date = null)
+    {
+        $query = (new Schedule_Teacher())->queryBuilder()
+            ->where('teacher_id', '=', $teacherId)
+            ->orderBy('time_from');
+
+        if (!is_null($date) && isDate($date)) {
+            $dayName = date('l', strtotime($date));
+            $query->where('day_name', '=', $dayName);
+        }
+
+        return $query->findAll();
+    }
+
+
+    /**
+     * Поиск свободных промежутков времени преподавателя исходя из его расписания и графика работы
+     *
+     * @param array $teacherLessons     занятия преподавателя
+     * @param array $teacherSchedule    график работы преподавателя
+     * @return array
+     */
+    public static function getFreeTime(array $teacherLessons, array $teacherSchedule)
+    {
+        $timeFrom = SCHEDULE_TIME_START;
+
+        $freeTimeIntervals = [];
+        $freeTimeInterval = new stdClass();
+        $freeTimeInterval->timeFrom = null;
+        $freeTimeInterval->timeTo = null;
+
+        do {
+            $timeTo = addTime($timeFrom, SCHEDULE_GAP);
+
+            if (empty($freeTimeInterval->timeFrom)) {
+                $freeTimeInterval->timeFrom = $timeFrom;
+                $freeTimeInterval->timeTo = $timeFrom;
+            }
+
+            if (Schedule_Controller_Extended::isFreeTime($timeFrom, $timeTo, $teacherLessons, $teacherSchedule)) {
+                $freeTimeInterval->timeTo = addTime($freeTimeInterval->timeTo, SCHEDULE_GAP);
+            } else {
+                if ($freeTimeInterval->timeFrom != $freeTimeInterval->timeTo) {
+                    $freeTimeIntervals[] = clone $freeTimeInterval;
+                }
+
+                $freeTimeInterval->timeFrom = null;
+                $freeTimeInterval->timeTo = null;
+            }
+
+            $timeFrom = $timeTo;
+        } while ($timeTo < SCHEDULE_TIME_END);
+
+        if ($freeTimeInterval->timeFrom != $freeTimeInterval->timeTo) {
+            $freeTimeIntervals[] = clone $freeTimeInterval;
+        }
+
+        return $freeTimeIntervals;
+    }
+
+
+    /**
+     * Поиск свободного времени преподавателя только рядом с другими занятиями
+     *
+     * @param array $teacherLessons
+     * @param array $teacherSchedule
+     * @param string $clientLessonDuration
+     * @return array
+     */
+    public static function getNearestFreeTime(array $teacherLessons, array $teacherSchedule, string $clientLessonDuration)
+    {
+        $freeScheduleTime = [];
+        foreach ($teacherLessons as $lesson) {
+            $timeBefore = deductTime($lesson->timeFrom(), addTime($clientLessonDuration, SCHEDULE_LESSON_INTERVAL));
+            $timeAfter = addTime(addTime($lesson->timeTo(), SCHEDULE_LESSON_INTERVAL), $clientLessonDuration);
+            if (Schedule_Controller_Extended::isFreeTime($timeBefore, deductTime($lesson->timeFrom(), SCHEDULE_LESSON_INTERVAL), $teacherLessons, $teacherSchedule)) {
+                if (!isset($freeScheduleTime[$timeBefore])) {
+                    $freeScheduleTime[$timeBefore] = new stdClass();
+                    $freeScheduleTime[$timeBefore]->timeFrom = $timeBefore;
+                    $freeScheduleTime[$timeBefore]->timeTo = deductTime($lesson->timeFrom(), SCHEDULE_LESSON_INTERVAL);
+                }
+            }
+            if ($timeAfter == '19:30:00') {
+                debug(Schedule_Controller_Extended::isFreeTime(addTime($lesson->timeTo(), SCHEDULE_LESSON_INTERVAL), $timeAfter, $teacherLessons, $teacherSchedule), 1);
+            }
+            if (Schedule_Controller_Extended::isFreeTime(addTime($lesson->timeTo(), SCHEDULE_LESSON_INTERVAL), $timeAfter, $teacherLessons, $teacherSchedule)) {
+                $timeFrom = addTime($lesson->timeTo(), SCHEDULE_LESSON_INTERVAL);
+                if (!isset($freeScheduleTime[$timeFrom])) {
+                    $freeScheduleTime[$timeFrom] = new stdClass();
+                    $freeScheduleTime[$timeFrom]->timeFrom = $timeFrom;
+                    $freeScheduleTime[$timeFrom]->timeTo = $timeAfter;
+                }
+            }
+        }
+        return $freeScheduleTime;
+    }
+
+
+    /**
+     * Поиск свободного времени преподавателя только рядом с другими занятиями
+     *
+     * @param int $teacherId
+     * @param string $date
+     * @param string $lessonDuration
+     * @throws Exception
+     * @return array
+     */
+    public static function getTeacherNearestFreeTime(int $teacherId, string $date, string $lessonDuration = '00:50:00')
+    {
+        $teacher = User::getById($teacherId);
+        if (is_null($teacher)) {
+            return [];
+        }
+
+        $teacherLessons = self::getSchedule($teacher, $date, $date);
+        $teacherSchedule = self::getTeacherTime($teacher->getId(), $date);
+
+        if (empty($teacherSchedule) || empty($teacherLessons)) {
+            return [];
+        }
+
+        return self::getNearestFreeTime($teacherLessons[0]->lessons, $teacherSchedule, $lessonDuration);
+    }
+
+
+    /**
+     * Проверка на пересечение временного промежутка с графиком и расписанием преподавателя (в рамках одного дня)
+     *
+     * @param string $timeFrom  начало временного промежутка
+     * @param string $timeTo    конец временного промежутка
+     * @param array $lessons    занятия преподавателя
+     * @param array $schedule   график работы преподавателя
+     * @return bool
+     */
+    public static function isFreeTime(string $timeFrom, string $timeTo, array $lessons, array $schedule)
+    {
+        foreach ($lessons as $lesson) {
+            if (isTimeInRange($timeFrom, $lesson->timeFrom(), $lesson->timeTo(), true)
+                || isTimeInRange($timeTo, $lesson->timeFrom(), $lesson->timeTo(), false)) {
+                return false;
+            }
+        }
+        foreach ($schedule as $time) {
+            if (isTimeInRange($timeFrom, $time->timeFrom(), $time->timeTo(), true)
+                && isTimeInRange($timeTo, $time->timeFrom(), $time->timeTo(), true)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

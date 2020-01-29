@@ -608,6 +608,8 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
     public function save($obj = null)
     {
+        Core::notify([&$this], 'before.ScheduleLesson.save');
+
         if ($this->delete_date == '') {
             $this->delete_date = 'NULL';
         }
@@ -718,7 +720,6 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             }
         }
 
-        Core::notify([&$this], 'before.ScheduleLesson.save');
         if (empty(parent::save())) {
             return null;
         }

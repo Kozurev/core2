@@ -40,6 +40,14 @@ class Certificate extends Core_Entity
 
 
     /**
+     * id филиала, для которого действует сертификат
+     *
+     * @var int
+     */
+    protected $area_id = 0;
+
+
+    /**
      * id организации (директора), которому принадлежит сертификат
      *
      * @var int
@@ -87,6 +95,21 @@ class Certificate extends Core_Entity
             return $this->active_to;
         } else {
             $this->active_to = $activeTo;
+            return $this;
+        }
+    }
+
+
+    /**
+     * @param int|null $areaId
+     * @return $this|int
+     */
+    public function areaId(int $areaId = null)
+    {
+        if (is_null($areaId)) {
+            return intval($this->area_id);
+        } else {
+            $this->area_id = $areaId;
             return $this;
         }
     }
