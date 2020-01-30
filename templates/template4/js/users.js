@@ -63,6 +63,7 @@ $(function(){
                 "<button class=\"user_archive btn btn-default\" data-userid = "+userId+">В архив</button>" +
                 "</form>");
             var mainPropertyList = popupData.find('#mainPropertyList');
+            PropertyList.clearCache(60);
             PropertyList.getList(60,
                 function(response) {
                     $.each(response, function(key, property){
