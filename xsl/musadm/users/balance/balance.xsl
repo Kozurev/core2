@@ -129,7 +129,7 @@
 <!--                                <td></td>-->
                             </tr>
 
-                            <xsl:if test="/root/access_schedule_create = 1">
+                            <xsl:if test="/root/access_schedule_create = 1 and /root/current_user/group_id = 5">
                                 <tr>
                                     <td width="35%">
                                         Вы можете самостоятельно управлять своим графиком. Чтобы поставить новый урок, нажмите на кнопку. Программа подберет варианты свободного
