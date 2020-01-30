@@ -104,11 +104,12 @@ if ($accessAbsentPeriod || $accessScheduleCreate || $accessScheduleEdit) {
         $nearestLessonXml->addSimpleEntity('date', $nearestLessons[0]->date);
         $nearestLessonXml->addSimpleEntity('refactoredDate', refactorDateFormat($nearestLessons[0]->date));
         $tomorrow = date('Y-m-d', strtotime(date('Y-m-d') . ' +1 day'));
-        if ($nearestLessons[0]->date > $tomorrow || ($nearestLessons[0]->date == $tomorrow && date('H:i:s') < '18:00:00')) {
+        if ($nearestLessons[0]->date > $tomorrow || ($nearestLessons[0]->date == $tomorrow && date('H:i:s') < '13:00:00')) {
             $isCancellable = 1;
         } else {
             $isCancellable = 0;
         }
+        debug($isCancellable, 1);
         $nearestLessonXml->addSimpleEntity('is_cancellable', $isCancellable);
         foreach ($nearestLessons[0]->lessons as $lesson) {
             $lessonStd = new stdClass();

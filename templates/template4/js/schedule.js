@@ -1028,7 +1028,7 @@ function makeClientLessonPopup(clientId) {
     loaderOn();
     $.ajax({
         type: 'GET',
-        url: '/balance',
+        url: root + '/balance',
         dataType: 'html',
         data: {
             action: 'makeClientLessonPopup',
