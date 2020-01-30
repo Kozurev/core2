@@ -87,48 +87,50 @@
                                 </td>
                             </tr>
 
-<!--                            <xsl:if test="count(nearest_lesson) = 1">-->
+                            <tr>
+                                <td>
+                                    Следующее занятие
+                                </td>
+                                <td colspan="2">
+                                    <xsl:choose>
+                                        <xsl:when test="count(nearest_lesson) = 1">
+                                            <xsl:for-each select="nearest_lesson/lesson">
+                                                <p data-id="{id}" data-date="{/root/nearest_lesson/date}">
+                                                    <span>
+                                                        <xsl:value-of select="/root/nearest_lesson/refactoredDate" />
+                                                    </span>
+                                                    <xsl:text> </xsl:text>
+                                                    <span>
+                                                        <xsl:value-of select="time_from" /> - <xsl:value-of select="time_to" />
+                                                    </span>
+                                                    <br/>
+                                                    <span>
+                                                        <xsl:value-of select="teacher" />
+                                                    </span>
+                                                    <xsl:if test="/root/nearest_lesson/is_cancellable = 1 and /root/access_schedule_edit = 1">
+                                                        <span style="margin-left: 15px">
+                                                            <a class="btn btn-orange schedule_today_absent" href="#">Отменить занятие</a>
+                                                        </span>
+                                                    </xsl:if>
+                                                </p>
+                                            </xsl:for-each>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            Занятий не найдено
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </td>
+<!--                                <td></td>-->
+                            </tr>
+
+                            <xsl:if test="/root/access_schedule_create = 1">
                                 <tr>
-                                    <td>
-                                        Следующее занятие
-                                    </td>
-                                    <td>
-                                        <xsl:choose>
-                                            <xsl:when test="count(nearest_lesson) = 1">
-                                                <xsl:for-each select="nearest_lesson/lesson">
-                                                    <p data-id="{id}" data-date="{/root/nearest_lesson/date}">
-                                                        <span>
-                                                            <xsl:value-of select="/root/nearest_lesson/refactoredDate" />
-                                                        </span>
-                                                        <xsl:text> </xsl:text>
-                                                        <span>
-                                                            <xsl:value-of select="time_from" /> - <xsl:value-of select="time_to" />
-                                                        </span>
-                                                        <xsl:text> </xsl:text>
-                                                        <span>
-                                                            <xsl:value-of select="teacher" />
-                                                        </span>
-                                                        <xsl:if test="/root/nearest_lesson/is_cancellable = 1 and /root/access_schedule_absent = 1">
-                                                            <span style="margin-left: 15px">
-                                                                <a class="btn btn-orange schedule_today_absent" href="#">Отменить занятие</a>
-                                                            </span>
-                                                        </xsl:if>
-                                                    </p>
-                                                </xsl:for-each>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                Занятий не найдено
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </td>
-                                    <td>
-                                        <p><a class="btn btn-orange user-schedule-btn">Полное расписание</a></p>
-                                        <xsl:if test="/root/access_schedule_create = 1">
-                                            <p><a class="btn btn-orange" onclick="makeClientLessonPopup({user/id})">Добавить в график</a></p>
-                                        </xsl:if>
+                                    <td width="30%">Вы можете самостоятельно попробовать подобрать время следующего занятия</td>
+                                    <td colspan="2">
+                                        <a class="btn btn-orange" onclick="makeClientLessonPopup({user/id})">Добавить занятие</a>
                                     </td>
                                 </tr>
-<!--                            </xsl:if>-->
+                            </xsl:if>
 
                             <xsl:if test="count(absent) > 0">
                                 <tr id="absent-row">
@@ -169,6 +171,14 @@
                             <tr>
                                 <td colspan="3">
                                     <div class="row buttons-panel center">
+                                        <div>
+                                            <a class="btn btn-orange user-schedule-btn">Полное расписание</a>
+                                        </div>
+<!--                                        <xsl:if test="/root/access_schedule_create = 1">-->
+<!--                                            <div>-->
+<!--                                                <a class="btn btn-orange" onclick="makeClientLessonPopup({user/id})">Добавить в график</a>-->
+<!--                                            </div>-->
+<!--                                        </xsl:if>-->
                                         <xsl:if test="/root/access_schedule_absent = 1">
                                             <div>
                                                 <a class="btn btn-orange" onclick="getScheduleAbsentPopup({user/id}, 1, getCurrentDate(), '')">
@@ -176,11 +186,12 @@
                                                 </a>
                                             </div>
                                         </xsl:if>
-
                                         <xsl:if test="//current_user/email != '' and //my_calls_token != ''">
-                                            <a class="btn btn-orange" onclick="MyCalls.makeCall({//current_user/id}, '{user/phone_number}', checkResponseStatus)" title="Совершить звонок">
-                                                Позвонить
-                                            </a>
+                                            <div>
+                                                <a class="btn btn-orange" onclick="MyCalls.makeCall({//current_user/id}, '{user/phone_number}', checkResponseStatus)" title="Совершить звонок">
+                                                    Позвонить
+                                                </a>
+                                            </div>
                                         </xsl:if>
                                     </div>
                                 </td>

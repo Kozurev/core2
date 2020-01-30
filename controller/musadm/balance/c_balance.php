@@ -183,7 +183,12 @@ if ($User->groupId() == ROLE_CLIENT && Core_Access::instance()->hasCapability(Co
 
     <input type="hidden" id="userid" value="<?=$User->getId()?>" />
 
-    <section class="user-schedule section-bordered">
+    <section class="user-schedule section-bordered"
+    <?php
+    if (User_Auth::parentAuth()->groupId() == ROLE_CLIENT)
+        echo ' style="display:none"';
+    ?>
+    >
         <h3>Расписание занятий</h3>
         <div class="row">
             <div class="col-lg-6 col-md-6 col-sm-12">
