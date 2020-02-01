@@ -118,7 +118,6 @@ class Schedule_Controller_Extended
 
         do {
             $nearest = self::getNearestDay($nextDate, $Lessons);
-
             if (empty($nearest)) {
                 break;
             }
@@ -147,6 +146,7 @@ class Schedule_Controller_Extended
         } while (!$isEnough);
 
         Core::notify($observerArgs, 'after.ScheduleControllerExtended.getSchedule');
+        // debug($Schedule);
         return $Schedule;
     }
 
@@ -176,8 +176,7 @@ class Schedule_Controller_Extended
                     } elseif ($lesson->lessonType() == Schedule_Lesson::SCHEDULE_MAIN) {
                         if (!empty($lesson->deleteDate()) && compareDate($lesson->deleteDate(), '<=', $currentDate)) {
                             continue;
-                        }
-                        elseif (!$lesson->isAbsent($currentDate)) {
+                        } elseif ($lesson->insertDate() <= $currentDate && !$lesson->isAbsent($currentDate)) {
                             $result->date = $currentDate;
                             $cloned = clone $lesson;
                             $cloned->setRealTime($currentDate);
