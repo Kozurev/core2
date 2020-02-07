@@ -48,9 +48,8 @@ class Log
             mkdir($logTypeDir, 0777);
         }
 
-        $logFileName = fopen($logTypeDir . '/' . date('Y_m_d_H:i:s') . '.txt', 'w');
-        fwrite($logFileName, $logData);
-        fclose($logFileName);
+        $newFileStr = date('Y-m-d H:i:s') . ' ' . $logData;
+        file_put_contents($logTypeDir . '/log.txt', $newFileStr . PHP_EOL, FILE_APPEND);
     }
 
 }

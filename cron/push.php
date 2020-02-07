@@ -70,8 +70,9 @@ foreach ($Lessons as $Lesson) {
     }
 }
 
-$log = fopen($logFile, 'w');
-fwrite($log, 'Всего оповещений отправлено: ' . $logCountNotifies . ' из ' . count($Lessons) . PHP_EOL);
-fwrite($log, $logData);
-fclose($log);
+Log::instance()->debug(Log::TYPE_CRON, 'Всего оповещений отправлено: ' . $logCountNotifies . ' из ' . count($Lessons));
+//$log = fopen($logFile, 'w');
+//fwrite($log, 'Всего оповещений отправлено: ' . $logCountNotifies . ' из ' . count($Lessons) . PHP_EOL);
+//fwrite($log, $logData);
+//fclose($log);
 
