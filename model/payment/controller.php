@@ -6,8 +6,23 @@
  * Time: 23:21
  * Class Payment_Controller
  */
-class Payment_Controller
+class Payment_Controller extends Controller
 {
+    /**
+     *
+     *
+     * @var string
+     */
+    protected $dateFrom;
+
+    /**
+     *
+     *
+     * @var string
+     */
+    protected $dateTo;
+
+
     /**
      * @param int|null $id
      * @param bool $isWithComments
@@ -32,5 +47,10 @@ class Payment_Controller
         return $Payment;
     }
 
+
+    public function getPayments()
+    {
+
+    }
 
 }

@@ -196,12 +196,13 @@
                                                                 <a class="btn btn-orange schedule_today_absent" href="#">Отменить занятие</a>
                                                             </span>
                                                         </xsl:if>
-                                                        <xsl:if test="/root/nearest_lesson/is_cancellable = 0 and /root/access_schedule_edit = 1">
+                                                        <xsl:if test="/root/nearest_lesson/is_cancellable = 0 and /root/access_schedule_edit = 1 and /root/is_admin = 0">
                                                             <p>
                                                                 в автоматическом режиме можно отменить занятия не позднее чем, до 17-00 текущего дня.
                                                                 Позвоните администраторам и они всё урегулируют +79092012550
                                                             </p>
                                                         </xsl:if>
+                                                        <input type="hidden" />
                                                     </div>
                                                 </div>
                                                 <!--<span>-->

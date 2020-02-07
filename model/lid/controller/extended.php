@@ -222,6 +222,8 @@ class Lid_Controller_Extended extends Controller
             }
         }
 
+        $this->totalCountFoundObjects = $this->getQueryBuilder()->getCount();
+
         //Пагинация
         $this->paginateExecute();
 
@@ -255,7 +257,7 @@ class Lid_Controller_Extended extends Controller
     public function show($OutputXml = null)
     {
         global $CFG;
-        $OutputXml = Core::factory('Core_Entity');
+        $OutputXml = new Core_Entity();
 
         //Условие вывода панели с указанием периода
         $this->isShowPeriods === true
@@ -287,6 +289,7 @@ class Lid_Controller_Extended extends Controller
             ->addEntities(Core::factory('Lid_Status')->getList())
             ->addEntities($priorities, 'lid_priority')
             ->addEntities(Lid_Status::getColors(), 'color')
+            ->addSimpleEntity('countLids', $this->totalCountFoundObjects)
             ->addSimpleEntity('access_lid_create', (int)Core_Access::instance()->hasCapability(Core_Access::LID_CREATE))
             ->addSimpleEntity('access_lid_edit', (int)Core_Access::instance()->hasCapability(Core_Access::LID_EDIT))
             ->addSimpleEntity('access_lid_comment', (int)Core_Access::instance()->hasCapability(Core_Access::LID_APPEND_COMMENT));

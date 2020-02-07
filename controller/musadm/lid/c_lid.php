@@ -19,19 +19,16 @@ $phoneNumber =  Core_Array::Get('number', '', PARAM_STRING);
 $instrument =   Core_Array::Get('instrument', 0, PARAM_INT);
 $vk =           Core_Array::Get('vk', '', PARAM_STRING);
 
-Core::requireClass('Lid_Controller');
-Core::requireClass('Lid_Controller_Extended');
-
 $LidController = new Lid_Controller_Extended(User_Auth::current());
 $LidController->getQueryBuilder()
     ->clearOrderBy()
     ->orderBy('priority_id', 'DESC')
     ->orderBy('id', 'DESC');
 
-if(isset($_GET['notPaginate'])){
+if (isset($_GET['notPaginate'])){
     $LidController->isPaginate(false);
     unset($_GET['notPaginate']);
-}else{
+} else {
     $LidController->isPaginate(true);
     $LidController->addSimpleEntity('paginate', true);
     unset($_GET['paginate']);

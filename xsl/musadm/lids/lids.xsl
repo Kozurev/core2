@@ -76,6 +76,10 @@
                                 <a class="btn btn-purple" onclick="makeLidPopup(0)">Создать лида</a>
                             </div>
                         </xsl:if>
+
+                        <div>
+                            <span>Количество надйеных лидов: </span><xsl:value-of select="countLids" />
+                        </div>
                     </div>
                 </form>
             </xsl:if>

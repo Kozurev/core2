@@ -16,7 +16,6 @@ Core::requireClass('Property_Controller');
 Core::requireClass('Schedule_Area');
 
 $Payment = new Payment();
-$Area = new Schedule_Area();
 
 //основные права доступа
 $accessPaymentsRead = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_ALL);
@@ -56,15 +55,20 @@ $LessonTypes = Core::factory('Schedule_Lesson_Type')
     ->where('id', '<>', 3)
     ->findAll();
 
-//Типы платежей
+//Типы платежей и список филиалов
 try {
+    //Доступные филиалы
+    $areasAssignment = new Schedule_Area_Assignment();
+    $PaymentAreas = $areasAssignment->getAreas(User_Auth::current());
+    $areasIds = [];
+    foreach ($PaymentAreas as $area) {
+        $areasIds[] = $area->getId();
+    }
+
     $PaymentTypes = $Payment->getTypes(true, false);
 } catch (Exception $e) {
     die($e->getMessage());
 }
-
-//Доступные филиалы
-$PaymentAreas = $Area->getList();
 
 
 $Payments = new Payment();
@@ -113,11 +117,17 @@ if ($dateFrom == $dateTo) {
         ->where('datetime', '<=', $dateTo);
 }
 
+$multiAreasAccess = Core_Access::instance()->hasCapability(Core_Access::AREA_MULTI_ACCESS);
 if ($areaId !== 0) {
     $Payments->queryBuilder()->where('area_id', '=', $areaId);
     $income->where('area_id', '=', $areaId);
     $expenses->where('area_id', '=', $areaId);
     $cashBack->where('area_id', '=', $areaId);
+} elseif (!$multiAreasAccess) {
+    $Payments->queryBuilder()->whereIn('area_id', $areasIds);
+    $income->whereIn('area_id', $areasIds);
+    $expenses->whereIn('area_id', $areasIds);
+    $cashBack->whereIn('area_id', $areasIds);
 }
 
 $Payments = $Payments->findAll();
