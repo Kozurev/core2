@@ -217,7 +217,7 @@ class Event extends Event_Model
                 $num =  Core::factory('Certificate', $id)->number();
                 return "Сертификат 
                         <a href='#' class='info-by-id' data-model='Certificate' data-id='" . $id . "'>№$num</a>. "
-                        . $this->data()->Note->text();
+                        . $this->getData()->note->text;
                 break;
 
             default: return 'Шаблон формирования сообщения для события типа ' . $this->type_id . ' отсутствует.';
