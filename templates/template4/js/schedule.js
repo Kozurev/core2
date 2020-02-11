@@ -1100,6 +1100,7 @@ function saveClientLesson() {
                 notificationError(response);
             } else {
                 notificationSuccess('Вы успешно были поставлены в график');
+                refreshSchedule();
             }
         }
     });
