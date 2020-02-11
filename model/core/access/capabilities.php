@@ -41,7 +41,7 @@ return [
     'schedule_read' => 'Просмотр расписания',
     'schedule_read_user' => 'Просмотр индивидуального расписания',
     'schedule_create' => 'Создание занятия',
-    'schedule_edit' => 'Изменение занятия',
+    'schedule_edit' => 'Изменение занятия, отменя урока',
     'schedule_delete' => 'Удаление занятия',
     'schedule_absent' => 'Созздание периода отсутствия',
     'schedule_report_read' => 'Просмотр отчетов о проведенных занятий',
