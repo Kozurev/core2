@@ -180,8 +180,6 @@ class User_Controller_Extended extends Controller
     public function getClientTeachers()
     {
         if (empty($this->getUser()) || $this->getUser()->groupId() !== ROLE_CLIENT) {
-            debug(empty($this->getUser()), 1);
-            debug($this->getUser()->groupId() !== ROLE_CLIENT, 1);
             return [];
         }
 
@@ -206,6 +204,7 @@ class User_Controller_Extended extends Controller
             $teacher = (new User)->queryBuilder()
                 ->where('surname', '=', explode(' ', $propertyTeacher->value())[0])
                 ->where('name', '=', explode(' ', $propertyTeacher->value())[1])
+                ->where('group_id', '=', ROLE_TEACHER)
                 ->find();
             if (!empty($teacher)) {
                 $teachers[] = $teacher;
