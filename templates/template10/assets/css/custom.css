@@ -647,4 +647,9 @@ ul {
     .scrollTop {
         left: 90%;
     }
+
+    #message_box {
+        width: 98%;
+        right: 1%;
+    }
 }
