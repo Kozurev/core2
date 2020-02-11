@@ -9,8 +9,8 @@
 $action = Core_Array::Request('action', null, PARAM_STRING);
 
 
-$CurrentUser = User::current();
-if (is_null($CurrentUser) || $CurrentUser->groupId() !== ROLE_DIRECTOR) {
+$CurrentUser = User_Auth::current();
+if (is_null($CurrentUser) || ($CurrentUser->groupId() !== ROLE_DIRECTOR && $CurrentUser->groupId() !== ROLE_ADMIN)) {
     die(REST::error(0, 'Вы не авторизованы как директор'));
 }
 
