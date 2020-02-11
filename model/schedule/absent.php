@@ -48,10 +48,20 @@ class Schedule_Absent extends Schedule_Absent_Model
 
         //Ограничение по времени
         if (User_Auth::current()->groupId() == ROLE_CLIENT) {
-            $tomorrow = date('Y-m-d', strtotime(date('Y-m-d') . ' +1 day'));
+            $today = date('Y-m-d');
+            $tomorrow = date('Y-m-d', strtotime($today . ' +1 day'));
             $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')->getValues(User_Auth::current()->getDirector())[0]->value();
-            if ($this->dateFrom() < $tomorrow || ($this->dateFrom() == $tomorrow && date('H:i:s') >= $endDayTime)) {
-                $errorMsg = 'Дата начала периода отсутствия в данном случае не может быть ранее чем ' . date('d.m.Y', strtotime($tomorrow . ' +1 day'));
+            if ($this->dateFrom() < $tomorrow) {
+                $dateStart = $tomorrow;
+                if (date('H:i:s') >= $endDayTime) {
+                    $dateStart = date('d.m.y', strtotime($dateStart . ' +1 day'));
+                }
+            } elseif ($this->dateFrom() == $tomorrow && date('H:i:s') >= $endDayTime) {
+                $dateStart = date('d.m.y', strtotime($tomorrow . ' +1 day'));
+            }
+
+            if (isset($dateStart)) {
+                $errorMsg = 'Дата начала периода отсутствия в данном случае не может быть ранее чем ' . $dateStart;
                 Log::instance()->error(
                     'absent_period',
                     $errorMsg . '; Клиент: ' . User_Auth::current()->surname() . ' ' . User_Auth::current()->name()
