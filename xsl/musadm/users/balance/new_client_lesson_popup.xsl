@@ -2,16 +2,16 @@
 
     <xsl:template match="root">
         <div class="row">
-            <div class="col-md-2 center">
-                <span>Дата</span>
-            </div>
-            <div class="col-md-3">
+<!--            <div class="col-md-2 center">-->
+<!--                <span>Дата</span>-->
+<!--            </div>-->
+            <div class="col-md-6">
                 <input class="form-control" type="date" name="date" />
             </div>
-            <div class="col-md-3">
-                <span>Преподаватель</span>
-            </div>
-            <div class="col-md-3">
+<!--            <div class="col-md-3">-->
+<!--                <span>Преподаватель</span>-->
+<!--            </div>-->
+            <div class="col-md-6">
                 <select class="form-control" name="teacherId">
                     <xsl:for-each select="teacher">
                         <option value="{id}">
