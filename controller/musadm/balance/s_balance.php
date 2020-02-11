@@ -143,7 +143,7 @@ if ($action === 'edit_report_popup') {
  * Формирование всплывающего окна для самостоятельной постановки в график
  */
 if ($action === 'makeClientLessonPopup') {
-    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_CREATE)) {
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_CREATE) && !Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_LESSON_TIME)) {
         Core_Page_Show::instance()->error(403);
     }
 

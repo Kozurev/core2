@@ -40,6 +40,7 @@ if (is_null($pageClientId)) {
 
 $accessAbsentPeriod = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT);
 $accessScheduleCreate = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_CREATE);
+$accessScheduleLessonTime = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_LESSON_TIME);
 $accessScheduleEdit = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT);
 
 /**
@@ -53,7 +54,7 @@ if (is_null($User)) {
 $OutputXml = new Core_Entity();
 
 //Пользовательские примечания и дата последней авторизации
-if ($accessAbsentPeriod || $accessScheduleCreate || $accessScheduleEdit) {
+if ($accessAbsentPeriod || $accessScheduleEdit || $accessScheduleLessonTime) {
     $today = date('Y-m-d');
     $todayTime = strtotime($today);
 
@@ -135,7 +136,8 @@ if ($accessAbsentPeriod || $accessScheduleCreate || $accessScheduleEdit) {
         ->addSimpleEntity('my_calls_token', Property_Controller::factoryByTag('my_calls_token')->getValues(User_Auth::current()->getDirector())[0]->value())
         ->addEntities($AbsentPeriods, 'absent')
         ->addSimpleEntity('access_absent', intval($accessAbsentPeriod))
-        ->addSimpleEntity('access_schedule_create', intval($accessScheduleCreate))
+        // ->addSimpleEntity('access_schedule_create', intval($accessScheduleCreate))
+        ->addSimpleEntity('access_schedule_lesson_time', intval($accessScheduleLessonTime))
         ->addSimpleEntity('access_schedule_edit', intval($accessScheduleEdit));
 }
 

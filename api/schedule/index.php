@@ -408,9 +408,9 @@ if ($action === 'isInTeacherTime') {
  * Поиск свободного времени преподавателя рядом с другими занятиями
  */
 if ($action === 'getTeacherNearestTime') {
-//    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ)) {
-//        Core_Page_Show::instance()->error(403);
-//    }
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ) && !Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_LESSON_TIME)) {
+        Core_Page_Show::instance()->error(403);
+    }
 
     $teacherId = Core_Array::Get('teacherId', 0, PARAM_INT);
     $date = Core_Array::Get('date', '', PARAM_DATE);

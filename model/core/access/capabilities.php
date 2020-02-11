@@ -48,6 +48,7 @@ return [
     'schedule_report_create' => 'Создание отчета о проведенном занятии',
     'schedule_report_edit' => 'Редактирование отчета о проведенном занятии',
     'schedule_report_delete' => 'Удаление отчета о проведенном занятии',
+    'schedule_lesson_time' => 'Подбор времени занятия для самостоятельной постановки в график',
 
     'schedule_group_read' => 'Просмотр групп',
     'schedule_group_create' => 'Создание группы',

@@ -109,9 +109,10 @@
                                                         <span>
                                                             <xsl:value-of select="/root/nearest_lesson/refactoredDate" />
                                                         </span>
-                                                        <xsl:text> </xsl:text>
+                                                        <xsl:text> в </xsl:text>
                                                         <span>
-                                                            <xsl:value-of select="time_from" /> - <xsl:value-of select="time_to" />
+                                                            <xsl:value-of select="time_from" />
+<!--                                                            - <xsl:value-of select="time_to" />-->
                                                         </span>
                                                         <br/>
                                                         <span>
@@ -130,7 +131,7 @@
                                                             </button>
                                                         </span>
                                                         <xsl:if test="/root/nearest_lesson/is_cancellable = 0 and /root/access_schedule_edit = 1 and /root/is_admin = 0">
-                                                            <p>
+                                                            <p style="font-size: 10px; text-align: center;">
                                                                 в автоматическом режиме можно отменить занятия не позднее чем, до 17-00 текущего дня.
                                                                 Позвоните администраторам и они всё урегулируют +79092012550
                                                             </p>
@@ -159,7 +160,7 @@
                     </td>
                 </tr>
 
-                <xsl:if test="/root/access_schedule_create = 1 and /root/current_user/group_id = 5">
+                <xsl:if test="/root/access_schedule_lesson_time = 1 and /root/current_user/group_id = 5">
                     <tr>
                         <td>
                             <div class="row">

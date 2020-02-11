@@ -8,7 +8,27 @@
 
 
 Orm::Debug(true);
+
+$teacherId = 1892;
+$date = '2020-02-21';
+$lessonDuration = '00:50:00';
+$nearestTime = Schedule_Controller_Extended::getTeacherNearestFreeTime($teacherId, $date, $lessonDuration);
+
+debug($nearestTime);
+
 exit;
+$groupDirector = Core::factory('Core_Access_Group', 1);
+$groupManager = Core::factory('Core_Access_Group', 2);
+$groupTeacher = Core::factory('Core_Access_Group', 3);
+$groupClient = Core::factory('Core_Access_Group', 4);
+
+$groupDirector->capabilityAllow(Core_Access::SCHEDULE_LESSON_TIME);
+$groupManager->capabilityForbidden(Core_Access::SCHEDULE_LESSON_TIME);
+$groupTeacher->capabilityForbidden(Core_Access::SCHEDULE_LESSON_TIME);
+$groupClient->capabilityAllow(Core_Access::SCHEDULE_LESSON_TIME);
+$groupClient->capabilityForbidden(Core_Access::SCHEDULE_CREATE);
+
+
 $scheduleEditTimeEnd = Property_Controller::factory()
     ->type(PARAM_STRING)
     ->title('Крайнее время изменения расписания для клиента')

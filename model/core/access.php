@@ -50,6 +50,7 @@ class Core_Access
     const SCHEDULE_REPORT_CREATE = 'schedule_report_create';
     const SCHEDULE_REPORT_EDIT = 'schedule_report_edit';
     const SCHEDULE_REPORT_DELETE = 'schedule_report_delete';
+    const SCHEDULE_LESSON_TIME = 'schedule_lesson_time';
 
     const SCHEDULE_GROUP_READ = 'schedule_group_read';
     const SCHEDULE_GROUP_CREATE = 'schedule_group_create';
