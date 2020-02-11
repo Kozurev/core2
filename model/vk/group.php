@@ -12,18 +12,16 @@ class Vk_Group extends Vk_Group_Model
      *
      * @param string $link
      * @return stdClass|null
-     * @throws Exception
      */
     public static function getVkId(string $link)
     {
         if (!is_null($link)) {
-            //$linkName = substr($link, 15);
-            $linkName = explode('vk.com/', $link)[1];
+            $linkName = explode('vk.com/', $link)[1] ?? null;
             if (is_string($linkName)) {
                 $vk = new VK(self::getToken());
                 $response = $vk->resolveScreenName($linkName);
                 if (isset($response->error)) {
-                    throw new Exception($response->error->error_msg);
+                    return null;
                 } else {
                     if (empty($response->response)) {
                         return null;
@@ -32,17 +30,16 @@ class Vk_Group extends Vk_Group_Model
                     }
                 }
             } else {
-                throw new Exception('Некорректно указана ссылка на страницу сообщества');
+                return null;
             }
         } else {
-            throw new Exception('Для получения идентификатора сообщества необходимо указать ссылку на его страницу');
+            return null;
         }
     }
 
 
     /**
      * @return string
-     * @throws Exception
      */
     public static function getToken() : string
     {

@@ -6,7 +6,7 @@
                 <h3 style="color:red">Ошибка: <xsl:value-of select="error" /></h3>
             </xsl:when>
             <xsl:otherwise>
-                <section class="senler-settings">
+                <section class="senler-settings section-bordered">
                     <h4>Настройки интеграции</h4>
                     <div class="row">
                         <div class="col-md-4">
@@ -48,6 +48,48 @@
                             </table>
                         </div>
                     </xsl:if>
+                </section>
+
+                <section id="myCalls_section">
+                    <div class="row">
+                        <div class="col-md-5 col-sm-9">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h4>Идентификатор группы рассылок <br/> активности клиента</h4>
+                                </div>
+                                <div class="col-md-9">
+                                    <input class="form-control" id="senler_activity_group" value="{senler_activity_group}" />
+                                </div>
+                                <div class="col-md-3">
+                                    <a class="action save property_value_save" data-property-name="senler_activity_group" data-model-name="User" data-object-id="{director/id}"><input type="hidden" /></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-9">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h4>Основное сообщество</h4>
+                                </div>
+                                <div class="col-md-9">
+                                    <select class="form-control" id="vk_main_group">
+                                        <option value="">Укажите группу</option>
+                                        <xsl:for-each select="groups">
+                                            <option value="{id}">
+                                                <xsl:if test="id = /root/vk_main_group">
+                                                    <xsl:attribute name="selected">selected</xsl:attribute>
+                                                </xsl:if>
+                                                <xsl:value-of select="title" />
+                                            </option>
+                                        </xsl:for-each>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <a class="action save property_value_save" data-property-name="vk_main_group" data-model-name="User" data-object-id="{director/id}"><input type="hidden" /></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </section>
             </xsl:otherwise>
         </xsl:choose>

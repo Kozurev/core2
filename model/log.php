@@ -5,6 +5,7 @@ class Log
 {
     const TYPE_CRON = 'cron';
     const TYPE_PUSH = 'push';
+    const TYPE_SENLER = 'senler';
 
     protected static $_instance;
 

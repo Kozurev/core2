@@ -867,3 +867,49 @@ Core::attachObserver('before.ScheduleLesson.save', function($args) {
         }
     }
 });
+
+
+Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
+    $report = $args[0];
+    if ($report instanceof Schedule_Lesson_Report && $report->typeId() === Schedule_Lesson::TYPE_INDIV && $report->attendance() == 1) {
+        $client = $report->getClient();
+        $director = $client->getDirector();
+
+        $vkUserLink = Property_Controller::factoryByTag('vk')->getValues($client)[0]->value();
+        $vkUserIdResponse = Vk_Group::getVkId($vkUserLink);
+        if (empty($vkUserIdResponse) || $vkUserIdResponse->type !== 'user') {
+            return;
+        }
+        $vkUserId = $vkUserIdResponse->object_id;
+
+        $senlerActivity = Property_Controller::factoryByTag('senler_activity_group')->getValues($director)[0]->value();
+        $mainVkGroupId = Property_Controller::factoryByTag('vk_main_group')->getValues($director)[0]->value();
+
+        if (empty($senlerActivity) || empty($mainVkGroupId)) {
+            return;
+        }
+
+        $mainVkGroup = Core::factory('Vk_Group', $mainVkGroupId);
+        if (empty($mainVkGroup)) {
+            return;
+        }
+
+        $senler = new Senler($mainVkGroup);
+        $logMsg = 'Пользователь ' . $client->surname() . ' ' . $client->name() . '; vk: ' . $vkUserLink;
+        if ($senler->isSubscriber($vkUserId, $senlerActivity)) {
+            $result = $senler->subscribeRemove($vkUserId, $senlerActivity);
+            if ($result->success == true) {
+                Log::instance()->debug(Log::TYPE_SENLER, $logMsg . ' успешно отписан от группы рассылки #' . $senlerActivity . ' после посещения занятия');
+            } else {
+                Log::instance()->error(Log::TYPE_SENLER, $logMsg . ' ошибка отписки от группы рассылки #' . $senlerActivity . ' после посещения занятия: ' . $result->error_message);
+            }
+        } else {
+            $result = $senler->subscribe($vkUserId, $senlerActivity);
+            if ($result->success == true) {
+                Log::instance()->debug(Log::TYPE_SENLER, $logMsg . ' успешно подписан на группу рассылки #' . $senlerActivity . ' после посещения занятия');
+            } else {
+                Log::instance()->error(Log::TYPE_SENLER, $logMsg . ' ошибка подписки на группу рассылки #' . $senlerActivity . ' после посещения занятия: ' . $result->error_message);
+            }
+        }
+    }
+});

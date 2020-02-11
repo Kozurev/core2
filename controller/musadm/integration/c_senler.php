@@ -38,10 +38,18 @@ $vkGroups = (new Vk_Group())->queryBuilder()
     ->where('subordinated', '=', $director->getId())
     ->findAll();
 
+
+//Настройки группы "активности"
+$senlerActivityGroup = Property_Controller::factoryByTag('senler_activity_group')->getValues($director)[0]->value();
+$vkMainGroup = Property_Controller::factoryByTag('vk_main_group')->getValues($director)[0]->value();
+
 (new Core_Entity())
     ->addSimpleEntity('wwwroot', $CFG->rootdir)
     ->addSimpleEntity('error', $error)
     ->addSimpleEntity('current_group_id', $currentVkGroupId)
+    ->addSimpleEntity('senler_activity_group', $senlerActivityGroup)
+    ->addSimpleEntity('vk_main_group', $vkMainGroup)
+    ->addEntity($director, 'director')
     ->addEntity($group ?? null, 'current_group')
     ->addEntities($vkGroups, 'groups')
     ->addEntities($areas ?? [], 'area')

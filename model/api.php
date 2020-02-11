@@ -19,7 +19,6 @@ class Api
      * @param array $params
      * @param string $requestMethod
      * @return mixed
-     * @throws Exception
      */
     public static function getRequest(string $link, array $params = [], string $requestMethod = self::REQUEST_METHOD_GET)
     {
@@ -35,7 +34,8 @@ class Api
                 ]
             ])));
         } else {
-            throw new Exception('Api->getRequest - неопознанный тип запроса: ' . $requestMethod);
+            return null;
+            // throw new Exception('Api->getRequest - неопознанный тип запроса: ' . $requestMethod);
         }
     }
 

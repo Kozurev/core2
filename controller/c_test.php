@@ -9,13 +9,6 @@
 
 Orm::Debug(true);
 
-$teacherId = 1892;
-$date = '2020-02-21';
-$lessonDuration = '00:50:00';
-$nearestTime = Schedule_Controller_Extended::getTeacherNearestFreeTime($teacherId, $date, $lessonDuration);
-
-debug($nearestTime);
-
 exit;
 $groupDirector = Core::factory('Core_Access_Group', 1);
 $groupManager = Core::factory('Core_Access_Group', 2);
@@ -39,8 +32,34 @@ $scheduleEditTimeEnd = Property_Controller::factory()
     ->dir(0)
     ->sorting(0);
 $scheduleEditTimeEnd->save();
-
 Property_Controller::factory()->addToPropertiesList(Core::factory('User_Group', ROLE_DIRECTOR), $scheduleEditTimeEnd->getId());
+
+
+$bonusSenlerGroup = Property_Controller::factory()
+    ->type(PARAM_STRING)
+    ->title('Группа сенлера для подписки/отписки при посещении занятий')
+    ->description('Идентификатор группы подписки сенлера')
+    ->tagName('senler_activity_group')
+    ->defaultValue('')
+    ->active(1)
+    ->dir(0)
+    ->sorting(0);
+$bonusSenlerGroup->save();
+Property_Controller::factory()->addToPropertiesList(Core::factory('User_Group', ROLE_DIRECTOR), $bonusSenlerGroup->getId());
+
+
+$mainVkGroupId = Property_Controller::factory()
+    ->type(PARAM_STRING)
+    ->title('Главное сообщество')
+    ->description('Основная группа ВК для школы')
+    ->tagName('vk_main_group')
+    ->defaultValue('')
+    ->active(1)
+    ->dir(0)
+    ->sorting(0);
+$mainVkGroupId->save();
+Property_Controller::factory()->addToPropertiesList(Core::factory('User_Group', ROLE_DIRECTOR), $mainVkGroupId->getId());
+
 
 exit;
 

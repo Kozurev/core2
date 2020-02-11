@@ -59,7 +59,6 @@ class VK extends Api
     /**
      * @param $link
      * @return mixed
-     * @throws Exception
      */
     public function resolveScreenName($link)
     {

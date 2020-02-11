@@ -86,7 +86,6 @@ class Senler extends Api
     /**
      * Senler constructor.
      * @param Vk_Group $group
-     * @throws Exception
      */
     public function __construct(Vk_Group $group)
     {
@@ -99,15 +98,16 @@ class Senler extends Api
     /**
      * @param Vk_Group $group
      * @return bool
-     * @throws Exception
      */
     public static function isValidGroup(Vk_Group $group) : bool
     {
         if (empty($group->vkId())) {
-            throw new Exception(self::$errors['empty_required_param_vk_id']);
+            return false;
+            // throw new Exception(self::$errors['empty_required_param_vk_id']);
         }
         if (empty($group->secretCallbackKey())) {
-            throw new Exception(self::$errors['empty_required_param_vk_id']);
+            return false;
+            // throw new Exception(self::$errors['empty_required_param_vk_id']);
         }
         return true;
     }
@@ -116,8 +116,7 @@ class Senler extends Api
      * Формирование списка групп подписок в сенлере для определенного сообщества
      *
      * @param array $params
-     * @return array
-     * @throws Exception
+     * @return array|null
      */
     public function getSubscriptions(array $params = []) : array
     {
@@ -127,7 +126,8 @@ class Senler extends Api
 
         $response = Api::getRequest(self::API_HOST . self::METHOD_SUBSCRIPTIONS_GET, $params, Api::REQUEST_METHOD_POST);
         if ($response->success !== true) {
-            throw new Exception($response->error_message);
+            return null;
+            // throw new Exception($response->error_message);
         } else {
             return $response->items;
         }
@@ -136,7 +136,6 @@ class Senler extends Api
     /**
      * @param $id
      * @return stdClass|null
-     * @throws Exception
      */
     public function getSubscriptionById($id)
     {
@@ -147,7 +146,6 @@ class Senler extends Api
     /**
      * @param array $params
      * @return array|null
-     * @throws Exception
      */
     public function getSubscribers(array $params = []) : array
     {
@@ -157,7 +155,8 @@ class Senler extends Api
 
         $response = Api::getRequest(self::API_HOST . self::METHOD_SUBSCRIBERS_GET, $params, Api::REQUEST_METHOD_POST);
         if ($response->success !== true) {
-            throw new Exception($response->error_message);
+            return null;
+            // throw new Exception($response->error_message);
         } else {
             return $response->items;
         }
@@ -166,12 +165,31 @@ class Senler extends Api
     /**
      * @param $id
      * @return stdClass|null
-     * @throws Exception
      */
     public function getSubscriberById($id)
     {
         $subscriber = $this->getSubscribers([self::PARAM_VK_USER_ID => $id]);
         return $subscriber[0] ?? null;
+    }
+
+
+    public function isSubscriber($userId, $subscriptionId = null)
+    {
+        $subscriber = $this->getSubscriberById($userId);
+        if (empty($subscriber)) {
+            return false;
+        } elseif (is_null($subscriptionId)) {
+            return true;
+        }
+
+        $isSubscriber = false;
+        foreach ($subscriber->subscriptions as $subscription) {
+            if ($subscription->subscription_id == $subscriptionId) {
+                $isSubscriber = true;
+                break;
+            }
+        }
+        return $isSubscriber;
     }
 
     /**
@@ -180,7 +198,6 @@ class Senler extends Api
      * @param $vkUserId
      * @param $subscriptionId
      * @return mixed
-     * @throws Exception
      */
     public function subscribe($vkUserId, $subscriptionId = 0)
     {
@@ -199,7 +216,6 @@ class Senler extends Api
      * @param $vkUserId
      * @param int $subscriptionId
      * @return mixed
-     * @throws Exception
      */
     public function subscribeRemove($vkUserId, $subscriptionId = 0)
     {
@@ -215,7 +231,6 @@ class Senler extends Api
     /**
      * @param Lid $lid
      * @param Lid_Status|null $status
-     * @throws Exception
      */
     public static function setLidGroup(Lid $lid, Lid_Status $status = null)
     {
