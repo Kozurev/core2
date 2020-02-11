@@ -180,7 +180,7 @@ class Core_Entity extends Core_Entity_Model
             }
         } //end schema foreach
 
-        return empty($this->_getValidateErrors());
+        return empty($this->_getValidateErrors()) && empty($this->_getValidateErrorsStr());
     }
 
 
@@ -192,6 +192,15 @@ class Core_Entity extends Core_Entity_Model
     public function _setValidateError(string $property, string $errorType, array $errorData)
     {
         $this->_validateErrors[$property][$errorType] = $errorData;
+    }
+
+
+    /**
+     * @param string $string
+     */
+    public function _setValidateErrorStr(string $string)
+    {
+        $this->_validateErrorsStr[] = $string;
     }
 
 

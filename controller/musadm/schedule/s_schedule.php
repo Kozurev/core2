@@ -151,6 +151,19 @@ if ($action === 'getScheduleAbsentPopup') {
     } else {
         $AbsentObject = $AbsentPeriod->getObject();
     }
+
+    //Ограничение по времени
+    if (User_Auth::current()->groupId() == ROLE_CLIENT) {
+        $today = date('Y-m-d');
+        $tomorrow = date('Y-m-d', strtotime(date('Y-m-d') . ' +1 day'));
+        $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')->getValues(User_Auth::current()->getDirector())[0]->value();
+        if ($date <= $tomorrow && date('H:i:s') >= $endDayTime) {
+            $date = date('Y-m-d', strtotime($tomorrow . ' +1 day'));
+        } else {
+            $date = $tomorrow;
+        }
+    }
+
     Core::factory('Core_Entity')
         ->addEntity($AbsentObject,'object')
         ->addSimpleEntity('object_id', $objectId)

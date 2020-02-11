@@ -45,6 +45,22 @@ class Schedule_Absent extends Schedule_Absent_Model
     public function save($obj = null)
     {
         Core::notify([&$this], 'before.ScheduleAbsent.save');
+
+        //Ограничение по времени
+        if (User_Auth::current()->groupId() == ROLE_CLIENT) {
+            $tomorrow = date('Y-m-d', strtotime(date('Y-m-d') . ' +1 day'));
+            $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')->getValues(User_Auth::current()->getDirector())[0]->value();
+            if ($this->dateFrom() < $tomorrow || ($this->dateFrom() == $tomorrow && date('H:i:s') >= $endDayTime)) {
+                $errorMsg = 'Дата начала периода отсутствия в данном случае не может быть ранее чем ' . date('d.m.Y', strtotime($tomorrow . ' +1 day'));
+                Log::instance()->error(
+                    'absent_period',
+                    $errorMsg . '; Клиент: ' . User_Auth::current()->surname() . ' ' . User_Auth::current()->name()
+                    . '; дата начала: ' . $this->dateFrom() . ' дата завершения: ' . $this->dateTo());
+
+                $this->_setValidateErrorStr($errorMsg);
+            }
+        }
+
         if (empty(parent::save())) {
             return null;
         }

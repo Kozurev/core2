@@ -8,6 +8,19 @@
 
 
 Orm::Debug(true);
+exit;
+$scheduleEditTimeEnd = Property_Controller::factory()
+    ->type(PARAM_STRING)
+    ->title('Крайнее время изменения расписания для клиента')
+    ->description('Время, до которого клиент может отменять занятия или выставлять период отсутствия на завтрашний день')
+    ->tagName('schedule_edit_time_end')
+    ->defaultValue('17:00:00')
+    ->active(1)
+    ->dir(0)
+    ->sorting(0);
+$scheduleEditTimeEnd->save();
+
+Property_Controller::factory()->addToPropertiesList(Core::factory('User_Group', ROLE_DIRECTOR), $scheduleEditTimeEnd->getId());
 
 exit;
 
