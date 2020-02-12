@@ -160,7 +160,7 @@
                     </td>
                 </tr>
 
-                <xsl:if test="/root/access_schedule_lesson_time = 1 and /root/current_user/group_id = 5">
+                <xsl:if test="/root/access_schedule_lesson_time = 1">
                     <tr>
                         <td>
                             <div class="row">
