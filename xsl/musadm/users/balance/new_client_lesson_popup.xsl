@@ -23,7 +23,7 @@
                 </select>
             </div>
         </div>
-        <div class="row">
+        <div class="row" style="margin-top: 10px">
             <div class="col-md-12 center">
                 <button class="btn btn-primary"
                         onclick="Schedule.getNearestTeacherTime($('select[name=teacherId]').val(), $('input[name=date]').val(), '{lesson_duration}', teacherNearestFreeTimeCallback)">
@@ -31,12 +31,22 @@
                 </button>
             </div>
         </div>
-        <div class="row teacherTime center">
+        <div class="row teacherTime center" style="margin-top: 10px" >
 
         </div>
         <div class="row saveBtnRow" style="display:none">
             <div class="col-md-12">
                 <button class="btn btn-default" onclick="event.preventDefault; saveClientLesson()">Забронировать</button>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 10px">
+            <div class="col-md-12">
+                <span style="font-size: 13px">
+                    Вы можете самостоятельно управлять своим графиком. Чтобы поставить новый урок, нажмите на кнопку. Программа подберет варианты свободного
+                    времени преподавателя автоматически. Функция работает в тестовом режиме, поэтому если вы не нашли подходящего времени, то это совсем
+                    не значит, что нет вариантов. Свяжитесь с администраторами и с вами обговорят график более детально +79092012550
+                </span>
             </div>
         </div>
 
