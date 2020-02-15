@@ -424,6 +424,8 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->where('report_id', '=', $Report->getId())
             ->findAll();
 
+        Core::notify([$Report, $Attendances], 'before.ScheduleLesson.clearReports');
+
         //Удаление информации о посещаемости клиентов и восстановление списанных за отчет занятий
         foreach ($Attendances as $Attendance) {
             if ($Report->typeId() != self::TYPE_CONSULT) {
@@ -441,6 +443,8 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         }
 
         $Report->delete();
+
+        Core::notify([$Report, $Attendances], 'after.ScheduleLesson.clearReports');
     }
 
 

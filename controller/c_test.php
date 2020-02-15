@@ -10,6 +10,20 @@
 Orm::Debug(true);
 
 exit;
+
+$bonusRevertSenlerGroup = Property_Controller::factory()
+    ->type(PARAM_STRING)
+    ->title('Группа сенлера для подписки/отписки при удалении отчета')
+    ->description('Идентификатор группы подписки сенлера, на который подписывается и отписывается клиент при удалении отчета о проведеном занятии')
+    ->tagName('senler_activity_revert_group')
+    ->defaultValue('')
+    ->active(1)
+    ->dir(0)
+    ->sorting(0);
+$bonusRevertSenlerGroup->save();
+Property_Controller::factory()->addToPropertiesList(Core::factory('User_Group', ROLE_DIRECTOR), $bonusRevertSenlerGroup->getId());
+
+exit;
 $groupDirector = Core::factory('Core_Access_Group', 1);
 $groupManager = Core::factory('Core_Access_Group', 2);
 $groupTeacher = Core::factory('Core_Access_Group', 3);

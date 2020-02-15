@@ -16,16 +16,13 @@ $dateFrom = Core_Array::Get('date_from', $date, PARAM_DATE);
 $dateTo =   Core_Array::Get('date_to', $date, PARAM_DATE);
 $areaId =   Core_Array::Get('area_id', 0, PARAM_INT);
 
-$Director = User::current()->getDirector();
-$subordinated = $Director->getId();
-$userTableName = Core::factory('User')->getTableName();
-$areasTable = Core::factory('Schedule_Area')->getTableName();
-$areaAsgmTable = Core::factory('Schedule_Area_Assignment')->getTableName();
+$director = User_Auth::current()->getDirector();
+$subordinated = $director->getId();
+$userTableName = (new User())->getTableName();
+$areasTable = (new Schedule_Area())->getTableName();
+$areaAsgmTable = (new Schedule_Area_Assignment())->getTableName();
 
 $Orm = new Orm();
-
-
-
 
 //Статистика по балансу и урокам
 $totalBalanceQuery = clone $Orm->clearQuery()
@@ -47,12 +44,11 @@ if ($areaId !== 0) {
     );
 }
 
-$Result = Orm::execute($totalBalanceQuery->getQueryString());
-$Result = $Result->fetch();
-$Result['sum'] != null
-    ?   $sum = $Result['sum']
+$result = Orm::execute($totalBalanceQuery->getQueryString());
+$result = $result->fetch();
+$result['sum'] != null
+    ?   $sum = $result['sum']
     :   $sum = 0;
-
 
 //Кол-во оплаченных индивидуальных уроков
 $indivLessonsQuery = clone $Orm->clearQuery()
@@ -75,12 +71,11 @@ if ($areaId !== 0) {
     );
 }
 
-$Result = Orm::execute($indivLessonsQuery->getQueryString());
-$Result = $Result->fetch();
-$Result['sum'] != null
-    ?   $indiv_lessons_pos = $Result['sum']
+$result = Orm::execute($indivLessonsQuery->getQueryString());
+$result = $result->fetch();
+$result['sum'] != null
+    ?   $indiv_lessons_pos = $result['sum']
     :   $indiv_lessons_pos = 0;
-
 
 //Кол-во неоплаченных индивидуальных уроков
 $indivLessonsDebtQuery = clone $Orm->clearQuery()
@@ -103,12 +98,11 @@ if ($areaId !== 0) {
     );
 }
 
-$Result = Orm::execute($indivLessonsDebtQuery->getQueryString());
-$Result = $Result->fetch();
-$Result['sum'] != null
-    ?   $indiv_lessons_neg = $Result['sum']
+$result = Orm::execute($indivLessonsDebtQuery->getQueryString());
+$result = $result->fetch();
+$result['sum'] != null
+    ?   $indiv_lessons_neg = $result['sum']
     :   $indiv_lessons_neg = 0;
-
 
 //Кол-во оплаченных групповых уроков
 $groupLessonsQuery = clone $Orm->clearQuery()
@@ -131,12 +125,11 @@ if ($areaId !== 0) {
     );
 }
 
-$Result = Orm::execute($groupLessonsQuery->getQueryString());
-$Result = $Result->fetch();
-$Result['sum'] != null
-    ?   $group_lessons_pos = $Result['sum']
+$result = Orm::execute($groupLessonsQuery->getQueryString());
+$result = $result->fetch();
+$result['sum'] != null
+    ?   $group_lessons_pos = $result['sum']
     :   $group_lessons_pos = 0;
-
 
 //Кол-во неоплаченных груповых уроков
 $groupLessonsDebtQuery = clone $Orm->clearQuery()
@@ -158,12 +151,11 @@ if ($areaId !== 0) {
     );
 }
 
-$Result = Orm::execute($groupLessonsDebtQuery->getQueryString());
-$Result = $Result->fetch();
-$Result['sum'] != null
-    ?   $group_lessons_neg = $Result['sum']
+$result = Orm::execute($groupLessonsDebtQuery->getQueryString());
+$result = $result->fetch();
+$result['sum'] != null
+    ?   $group_lessons_neg = $result['sum']
     :   $group_lessons_neg = 0;
-
 
 //Средний возраст
 $birthYears = clone $Orm->clearQuery()
@@ -202,7 +194,6 @@ if ($formatYearsCount > 0) {
 } else {
     $avgAge = 0;
 }
-
 
 //Средняя медиана
 $avgIndivCost = clone $Orm->clearQuery()
@@ -245,8 +236,7 @@ $avgGroupCost = $avgGroupCost->find();
 $avgIndivCost = is_object($avgIndivCost) && !is_null($avgIndivCost->value) ? round($avgIndivCost->value, 0) : 0;
 $avgGroupCost = is_object($avgGroupCost) && !is_null($avgGroupCost->value) ? round($avgGroupCost->value, 0) : 0;
 
-
-Core::factory('Core_Entity')
+(new Core_Entity())
     ->addSimpleEntity('balance', $sum)
     ->addSimpleEntity('indiv_pos', $indiv_lessons_pos)
     ->addSimpleEntity('indiv_neg', $indiv_lessons_neg * -1)
@@ -258,93 +248,16 @@ Core::factory('Core_Entity')
     ->xsl('musadm/statistic/balance.xsl')
     ->show();
 
-//По просьбе убрана информация по лидам из статистики
-
-///**
-// * Статистика по лидам
-// */
-//Core::requireClass('Lid_Controller');
-//$LidsOutput = Core::factory('Core_Entity');
-//$totalCount = Lid_Controller::factory()
-//    ->queryBuilder()
-//    ->where('subordinated', '=', $subordinated);
-//
-//if ($dateFrom == $dateTo) {
-//    $totalCount->where('control_date', '=', $dateFrom);
-//} else {
-//    $totalCount->where('control_date', '>=', $dateFrom);
-//    $totalCount->where('control_date', '<=', $dateTo);
-//}
-//
-//if ($areaId !== 0) {
-//    $totalCount->where('area_id', '=', $areaId);
-//}
-//
-//$totalCount = $totalCount->getCount();
-//$Statuses = Core::factory('Lid_Status')
-//    ->queryBuilder()
-//    ->where('subordinated', '=', $subordinated)
-//    ->orderBy('id', 'DESC')
-//	->findAll();
-//
-//	if (count($Statuses) > 0) {
-//		foreach ($Statuses as $status) {
-//			$queryString = Core::factory('Orm')
-//				->select('count(Lid.id)', 'count')
-//				->from('Lid')
-//                ->where('subordinated', '=', $subordinated)
-//				->where('status_id', '=', $status->getId());
-//
-//            if ($dateFrom == $dateTo) {
-//                $queryString->where('control_date', '=', $dateFrom);
-//            } else {
-//                $queryString->where('control_date', '>=', $dateFrom);
-//                $queryString->where( 'control_date', '<=', $dateTo );
-//            }
-//            if ($areaId !== 0) {
-//                $queryString->where('area_id', '=', $areaId);
-//            }
-//
-//            $queryString = $queryString->getQueryString();
-//			$Result = Core::factory('Orm')->executeQuery($queryString);
-//
-//			if ($Result != false) {
-//				$Result = $Result->fetch();
-//				$count = $Result['count'];
-//				$totalCount == 0
-//                    ?   $percents = 0
-//                    :   $percents = round($count * 100 / $totalCount, 1);
-//			} else {
-//				$count = 0;
-//				$percents = 0;
-//			}
-//
-//			$status->addSimpleEntity('count', $count);
-//			$status->addSimpleEntity('percents', round($percents, 2));
-//			$LidsOutput->addEntity($status, 'status');
-//		}
-//	}
-//
-//$LidsOutput
-//    ->addSimpleEntity('total', $totalCount)
-//    ->xsl('musadm/statistic/lids.xsl')
-//    ->show();
-
-
-
 
 /**
  * Статистика по проведенным занятиям
  */
-Core::factory('Schedule_Lesson');
-$lessonReportsCount = Core::factory('Schedule_Lesson_Report')
-    ->queryBuilder()
+$lessonReportsCount = (new Schedule_Lesson_Report())->queryBuilder()
     ->where('Schedule_Lesson_Report.type_id', '<>', Schedule_Lesson::TYPE_CONSULT)
     ->leftJoin('User as u', 'u.id = teacher_id')
     ->where('u.subordinated', '=', $subordinated);
 
-$attendanceCount = Core::factory('Schedule_Lesson_Report')
-    ->queryBuilder()
+$attendanceCount = (new Schedule_Lesson_Report())->queryBuilder()
     ->where('Schedule_Lesson_Report.type_id', '<>', Schedule_Lesson::TYPE_CONSULT)
     ->where('attendance', '=', 1)
     ->join('User as u', 'u.id = teacher_id')
@@ -392,7 +305,7 @@ $countDaysInterval == 0
     ?   $lessonIndex = $attendanceCount
     :   $lessonIndex = round($attendanceCount / $countDaysInterval, 1);
 
-Core::factory('Core_Entity')
+(new Core_Entity())
     ->addSimpleEntity('day_index', $lessonIndex)
     ->addSimpleEntity('total_count', $lessonReportsCount)
     ->addSimpleEntity('attendance_count', $attendanceCount)
@@ -403,7 +316,7 @@ Core::factory('Core_Entity')
 /**
  * Статистика по выплатам преподавателям
  */
-$queryString = Core::factory('Orm')
+$queryString = (new Orm())
     ->select('sum(value)', 'sum')
     ->from('Payment')
     ->where('type', '=', 3)
@@ -426,15 +339,15 @@ if ($dateFrom == $dateTo) {
 }
 
 $queryString = $queryString->getQueryString();
-$Result = Core::factory('Orm')->executeQuery($queryString);
-$Result = $Result->fetch();
-if ($Result['sum'] == null) {
+$result = Orm::execute($queryString);
+$result = $result->fetch();
+if ($result['sum'] == null) {
     $sum = 0;
 } else {
-    $sum = $Result['sum'];
+    $sum = $result['sum'];
 }
 
-Core::factory('Core_Entity')
+(new Core_Entity())
     ->addSimpleEntity('total_sum', $sum)
     ->xsl('musadm/statistic/teacher_payments.xsl')
     ->show();
@@ -442,14 +355,12 @@ Core::factory('Core_Entity')
 /**
  * Статистика по доходам, расходам и прибыли
  */
-$finances = Core::factory('Schedule_Lesson_Report')
-    ->queryBuilder()
+$finances = (new Schedule_Lesson_Report())->queryBuilder()
     ->join('User AS u', 'teacher_id = u.id')
     ->where('u.subordinated', '=', $subordinated);
 
 //Хозрасходы
-$hostExpenses = Core::factory('Payment')
-    ->queryBuilder()
+$hostExpenses = (new Payment())->queryBuilder()
     ->select('sum(Payment.value)', 'value')
     ->join('Payment_Type as t', 'Payment.type = t.id')
     ->where('t.subordinated', '=', $subordinated)
@@ -494,7 +405,7 @@ if (is_null($hostExpenses)) {
     $hostExpenses = 0;
 }
 
-Core::factory('Core_Entity')
+(new Core_Entity())
     ->addSimpleEntity('income', $income)
     ->addSimpleEntity('expenses', $expenses)
     ->addSimpleEntity('profit', $profit)
@@ -502,27 +413,17 @@ Core::factory('Core_Entity')
     ->xsl('musadm/statistic/lessons_income.xsl')
     ->show();
 
-
-
-
 /**
  * Статистика по активным клиентам
  */
-
-
-$userCount =  (new User())
-    ->queryBuilder()
+$userCountQuery = (new User())->queryBuilder()
     ->where('group_id', '=', ROLE_CLIENT)
     ->where('register_date','<=',$dateTo)
     ->where('subordinated', '=', $subordinated)
-    ->where('active', '=', 1)
-    ->count();
+    ->where('active', '=', 1);
 
-
-$reportTableName = Core::factory('Schedule_Lesson_Report')->getTableName();
-
-$userActiveCount =  (new User())
-    ->queryBuilder()
+$reportTableName = (new Schedule_Lesson_Report())->getTableName();
+$userActiveCountQuery = (new User())->queryBuilder()
     ->where('group_id', '=', ROLE_CLIENT)
     ->where('subordinated', '=', $subordinated)
     ->where('active', '=', 1)
@@ -531,69 +432,94 @@ $userActiveCount =  (new User())
         $reportTableName . ' AS rep',
         'rep.client_id = User.id AND rep.attendance = 1 AND rep.date between "'.$dateFrom.'" AND "'.$dateTo.'" AND rep.type_id = 1'
     )
-    ->groupBy('User.id')
-    ->findAll();
-Core::factory('Core_Entity')
+    ->groupBy('User.id');
+
+if ($areaId !== 0) {
+    $userCountQuery->join(
+        'Schedule_Area_Assignment as saa',
+        'User.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+    );
+    $userActiveCountQuery->join(
+        'Schedule_Area_Assignment as saa',
+        'User.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+    );
+}
+
+$userCount = $userCountQuery->count();
+$userActiveCount = $userActiveCountQuery->findAll();
+
+(new Core_Entity())
     ->addSimpleEntity('total_count', $userCount)
     ->addSimpleEntity('active_count', count($userActiveCount))
     ->xsl('musadm/statistic/active_clients.xsl')
     ->show();
 
-
-
 /**
  * Статистика по отвалу клиентов
  */
-
-$userAllCount =  (new User())
-    ->queryBuilder()
-    ->where('group_id', '=', ROLE_CLIENT)
-    ->where('subordinated', '=', $subordinated)
-    ->where('register_date','<=',$dateTo)
-    ->where('active', '=', 1)
-    ->count();
+//$userAllCount =  (new User())->queryBuilder()
+//    ->where('group_id', '=', ROLE_CLIENT)
+//    ->where('subordinated', '=', $subordinated)
+//    ->where('register_date','<=',$dateTo)
+//    ->where('active', '=', 1)
+//    ->count();
 
 $propertyDumpReason = Property_Controller::factoryByTag('client_dump_reasons');
 $reasons = $propertyDumpReason->getList();
-//$PropertyList =  (new Property_List_Values())
-//    ->queryBuilder()
-//    ->where('property_id', '=', Event::CLIENT_ACTIVITY)
-//    ->findAll();
 $userActivityList = [];
 foreach ($reasons as $reason) {
-    $UserActivityCount =  (new User_Activity())
-        ->queryBuilder()
+    $userActivityCountQuery =  (new User_Activity())->queryBuilder()
         ->where('reason_id', '=', $reason->id())
-        ->between('dump_date_start',$dateFrom,$dateTo)
-        ->count();
-    $reason = $reason->toStd();
-    $reason->count = $UserActivityCount;
-    array_push($userActivityList, $reason);
+        ->between('dump_date_start',$dateFrom,$dateTo);
 
+    if ($areaId !== 0) {
+        $userActivityCountQuery->join(
+            'Schedule_Area_Assignment as saa',
+            'user_id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+        );
+    }
+
+    $userActivityCount = $userActivityCountQuery->count();
+    $reason = $reason->toStd();
+    $reason->count = $userActivityCount;
+    array_push($userActivityList, $reason);
 }
 
-$countNewClient = (new User)
-    ->queryBuilder()
+$countNewClientQuery = (new User)->queryBuilder()
     ->between('register_date',$dateFrom,$dateTo)
-    ->where('active', '=', 1)
-    ->count();
+    ->where('active', '=', 1);
 
-$countLeaveClient = (new User_Activity)
-    ->queryBuilder()
-    ->select('count(id)')
+$countLeaveClientQuery = (new User_Activity)->queryBuilder()
+    ->select('count(User_Activity.id)')
     ->between('dump_date_start',$dateFrom,$dateTo)
-    ->groupBy('user_id')
-    ->findAll();
+    ->groupBy('User_Activity.user_id');
 
-$countComebackClient = (new User_Activity)
-    ->queryBuilder()
-    ->select('count(id)')
+$countComebackClientQuery = (new User_Activity)->queryBuilder()
+    ->select('count(User_Activity.id)')
     ->between('dump_date_end',$dateFrom,$dateTo)
-    ->groupBy('user_id')
-    ->findAll();
-$percentLeaveClient =  (round(((count($countLeaveClient) / $userAllCount)*100),2)).'%';
+    ->groupBy('User_Activity.user_id');
 
-Core::factory('Core_Entity')
+if ($areaId !== 0) {
+    $countNewClientQuery->join(
+        'Schedule_Area_Assignment as saa',
+        'User.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+    );
+    $countLeaveClientQuery->join(
+        'Schedule_Area_Assignment as saa',
+        'user_id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+    );
+    $countComebackClientQuery->join(
+        'Schedule_Area_Assignment as saa',
+        'user_id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+    );
+}
+
+$countNewClient = $countNewClientQuery->count();
+$countLeaveClient = $countLeaveClientQuery->findAll();
+$countComebackClient = $countComebackClientQuery->findAll();
+$percentLeaveClient =  (round(((count($countLeaveClient) / $userCount)*100),2)).'%';
+
+(new Core_Entity())
     ->addSimpleEntity('count_new_client',$countNewClient)
     ->addSimpleEntity('count_leave_client',count($countLeaveClient))
     ->addSimpleEntity('count_comeback_client',count($countComebackClient))

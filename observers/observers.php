@@ -868,7 +868,9 @@ Core::attachObserver('before.ScheduleLesson.save', function($args) {
     }
 });
 
-
+/**
+ * Подписка/отписка клиента от группы сенлера при посещении занятия
+ */
 Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
     $report = $args[0];
     if ($report instanceof Schedule_Lesson_Report && $report->typeId() === Schedule_Lesson::TYPE_INDIV && $report->attendance() == 1) {
@@ -909,6 +911,54 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
                 Log::instance()->debug(Log::TYPE_SENLER, $logMsg . ' успешно подписан на группу рассылки #' . $senlerActivity . ' после посещения занятия');
             } else {
                 Log::instance()->error(Log::TYPE_SENLER, $logMsg . ' ошибка подписки на группу рассылки #' . $senlerActivity . ' после посещения занятия: ' . $result->error_message);
+            }
+        }
+    }
+});
+
+/**
+ * Подписка/отписка клиента от группы сенлера при удалении отчета о проведении занятия
+ */
+Core::attachObserver('after.ScheduleLesson.clearReports', function($args) {
+    $report = $args[0];
+    if ($report instanceof Schedule_Lesson_Report && $report->typeId() === Schedule_Lesson::TYPE_INDIV && $report->attendance() == 1) {
+        $client = $report->getClient();
+        $director = $client->getDirector();
+
+        $vkUserLink = Property_Controller::factoryByTag('vk')->getValues($client)[0]->value();
+        $vkUserIdResponse = Vk_Group::getVkId($vkUserLink);
+        if (empty($vkUserIdResponse) || $vkUserIdResponse->type !== 'user') {
+            return;
+        }
+        $vkUserId = $vkUserIdResponse->object_id;
+
+        $senlerActivityRevert = Property_Controller::factoryByTag('senler_activity_revert_group')->getValues($director)[0]->value();
+        $mainVkGroupId = Property_Controller::factoryByTag('vk_main_group')->getValues($director)[0]->value();
+
+        if (empty($senlerActivityRevert) || empty($mainVkGroupId)) {
+            return;
+        }
+
+        $mainVkGroup = Core::factory('Vk_Group', $mainVkGroupId);
+        if (empty($mainVkGroup)) {
+            return;
+        }
+
+        $senler = new Senler($mainVkGroup);
+        $logMsg = 'Пользователь ' . $client->surname() . ' ' . $client->name() . '; vk: ' . $vkUserLink;
+        if ($senler->isSubscriber($vkUserId, $senlerActivityRevert)) {
+            $result = $senler->subscribeRemove($vkUserId, $senlerActivityRevert);
+            if ($result->success == true) {
+                Log::instance()->debug(Log::TYPE_SENLER, $logMsg . ' успешно отписан от группы рассылки #' . $senlerActivityRevert . ' после удаления отчета');
+            } else {
+                Log::instance()->error(Log::TYPE_SENLER, $logMsg . ' ошибка отписки от группы рассылки #' . $senlerActivityRevert . ' после удаления отчета: ' . $result->error_message);
+            }
+        } else {
+            $result = $senler->subscribe($vkUserId, $senlerActivityRevert);
+            if ($result->success == true) {
+                Log::instance()->debug(Log::TYPE_SENLER, $logMsg . ' успешно подписан на группу рассылки #' . $senlerActivityRevert . ' после удаления отчета');
+            } else {
+                Log::instance()->error(Log::TYPE_SENLER, $logMsg . ' ошибка подписки на группу рассылки #' . $senlerActivityRevert . ' после удаления отчета: ' . $result->error_message);
             }
         }
     }

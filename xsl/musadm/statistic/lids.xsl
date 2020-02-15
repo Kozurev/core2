@@ -3,22 +3,42 @@
     <xsl:template match="root">
         <h2 class="center">Сортировка лидов</h2>
         <xsl:variable name="selectedTeacherId" select="selectedTeacherId" />
+        <xsl:variable name="selectedAreaId" select="selectedAreaId" />
         <xsl:if test="count(user) != 0">
-            <h4>Преподаватель:</h4>
-            <select style="width:50%"   class="form-control" id="lids_statistic_teacherId">
-                <option value="0"> ... </option>
-                <xsl:for-each select="user">
-                    <!--<xsl:variable name="id" select="id" />-->
-                    <option value="{id}">
-                        <xsl:if test="id = $selectedTeacherId">
-                            <xsl:attribute name="selected">selected</xsl:attribute>
-                        </xsl:if>
-                        <xsl:value-of select="surname" />
-                        <xsl:text> </xsl:text>
-                        <xsl:value-of select="name" />
-                    </option>
-                </xsl:for-each>
-            </select>
+            <div class="row">
+                <div class="col-md-4">
+                    <h4>Преподаватель:</h4>
+                    <select class="form-control" id="lids_statistic_teacherId">
+                        <option value="0"> ... </option>
+                        <xsl:for-each select="user">
+                            <!--<xsl:variable name="id" select="id" />-->
+                            <option value="{id}">
+                                <xsl:if test="id = $selectedTeacherId">
+                                    <xsl:attribute name="selected">selected</xsl:attribute>
+                                </xsl:if>
+                                <xsl:value-of select="surname" />
+                                <xsl:text> </xsl:text>
+                                <xsl:value-of select="name" />
+                            </option>
+                        </xsl:for-each>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <h4>Филиал:</h4>
+                    <select class="form-control" id="lids_statistic_areaId">
+                        <option value="0"> ... </option>
+                        <xsl:for-each select="schedule_area">
+                            <!--<xsl:variable name="id" select="id" />-->
+                            <option value="{id}">
+                                <xsl:if test="id = $selectedAreaId">
+                                    <xsl:attribute name="selected">selected</xsl:attribute>
+                                </xsl:if>
+                                <xsl:value-of select="title" />
+                            </option>
+                        </xsl:for-each>
+                    </select>
+                </div>
+            </div>
         </xsl:if>
 
         <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">

@@ -41,6 +41,7 @@ $vkGroups = (new Vk_Group())->queryBuilder()
 
 //Настройки группы "активности"
 $senlerActivityGroup = Property_Controller::factoryByTag('senler_activity_group')->getValues($director)[0]->value();
+$senlerActivityRevertGroup = Property_Controller::factoryByTag('senler_activity_revert_group')->getValues($director)[0]->value();
 $vkMainGroup = Property_Controller::factoryByTag('vk_main_group')->getValues($director)[0]->value();
 
 (new Core_Entity())
@@ -48,6 +49,7 @@ $vkMainGroup = Property_Controller::factoryByTag('vk_main_group')->getValues($di
     ->addSimpleEntity('error', $error)
     ->addSimpleEntity('current_group_id', $currentVkGroupId)
     ->addSimpleEntity('senler_activity_group', $senlerActivityGroup)
+    ->addSimpleEntity('senler_activity_revert_group', $senlerActivityRevertGroup)
     ->addSimpleEntity('vk_main_group', $vkMainGroup)
     ->addEntity($director, 'director')
     ->addEntity($group ?? null, 'current_group')

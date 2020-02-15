@@ -12,7 +12,7 @@
                 <td><xsl:value-of select="total_count" /> </td>
             </tr>
             <tr>
-                <td>Из них активных:</td>
+                <td>Из них стоят в расписании:</td>
                 <td><xsl:value-of select="active_count" /> </td>
             </tr>
         </table>

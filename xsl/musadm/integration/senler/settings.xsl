@@ -52,20 +52,6 @@
 
                 <section id="myCalls_section">
                     <div class="row">
-                        <div class="col-md-5 col-sm-9">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <h4>Идентификатор группы рассылок <br/> активности клиента</h4>
-                                </div>
-                                <div class="col-md-9">
-                                    <input class="form-control" id="senler_activity_group" value="{senler_activity_group}" />
-                                </div>
-                                <div class="col-md-3">
-                                    <a class="action save property_value_save" data-property-name="senler_activity_group" data-model-name="User" data-object-id="{director/id}"><input type="hidden" /></a>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="col-md-4 col-sm-9">
                             <div class="row">
                                 <div class="col-md-12">
@@ -86,6 +72,32 @@
                                 </div>
                                 <div class="col-md-3">
                                     <a class="action save property_value_save" data-property-name="vk_main_group" data-model-name="User" data-object-id="{director/id}"><input type="hidden" /></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-9">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h4>Идентификатор группы рассылок <br/> активности клиента</h4>
+                                </div>
+                                <div class="col-md-9">
+                                    <input class="form-control" id="senler_activity_group" value="{senler_activity_group}" />
+                                </div>
+                                <div class="col-md-3">
+                                    <a class="action save property_value_save" data-property-name="senler_activity_group" data-model-name="User" data-object-id="{director/id}"><input type="hidden" /></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-9">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h4>Идентификатор группы рассылок <br/> при удалении отчета</h4>
+                                </div>
+                                <div class="col-md-9">
+                                    <input class="form-control" id="senler_activity_revert_group" value="{senler_activity_revert_group}" />
+                                </div>
+                                <div class="col-md-3">
+                                    <a class="action save property_value_save" data-property-name="senler_activity_revert_group" data-model-name="User" data-object-id="{director/id}"><input type="hidden" /></a>
                                 </div>
                             </div>
                         </div>

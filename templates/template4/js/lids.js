@@ -314,6 +314,7 @@ $(function(){
             formData.append('markerId', $('#lid_statistic_markerId').val());
             formData.append('sourceId', $('#lid_statistic_sourceId').val());
             formData.append('teacherId', $('#lids_statistic_teacherId').val());
+            formData.append('areaId', $('#lids_statistic_areaId').val());
             //formData.append('action', 'refresh');
             $.ajax({
                 type: 'POST',

@@ -167,9 +167,9 @@ class Lid extends Lid_Model
      *
      * @return array Lid_Status
      */
-    public function getStatusList()
+    public static function getStatusList()
     {
-        $User = User::current();
+        $User = User_Auth::current();
         !is_null($User)
             ?   $subordinated = $User->getDirector()->getId()
             :   $subordinated = 0;

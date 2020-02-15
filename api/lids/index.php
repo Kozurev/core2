@@ -331,9 +331,8 @@ if ($action === 'getStatusList') {
         exit(REST::error(1, 'У Вас недостаточно прав для получение данной информации'));
     }
 
-    $Lid = new Lid();
     $response = [];
-    foreach ($Lid->getStatusList() as $Status) {
+    foreach (Lid::getStatusList() as $Status) {
         $response[] = $Status->toStd();
     }
     exit(json_encode($response));
