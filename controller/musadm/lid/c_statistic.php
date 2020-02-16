@@ -202,40 +202,43 @@ $Sources[] = Core::factory('Property_List_Values')
     ->setId(0);
 
 foreach ($sources as $source) {
-    $lidsController = new Lid_Controller_Extended();
-    $lidsController->isWithComments(false);
-    $lidsController->getQueryBuilder()->select(['id']);
-
-    if ($markerId === 0 && $sourceId !== 0 && $source->getId() !== $sourceId) {
-        continue;
-    }
-
-    $lidsController->appendAddFilter($sourceProp->getId(), '=', $source->getId());
-
-    if ($markerId !== 0) {
-        $lidsController->appendAddFilter($markerProp->getId(), '=', $markerId);
-    } else {
-        if ($dateFrom === $dateTo) {
-            $lidsController->appendFilter('control_date', $dateFrom, '=', Lid_Controller_Extended::FILTER_STRICT);
-        } else {
-            $lidsController->appendFilter('control_date', $dateFrom, '>=', Lid_Controller_Extended::FILTER_STRICT);
-            $lidsController->appendFilter('control_date', $dateTo, '<=', Lid_Controller_Extended::FILTER_STRICT);
-        }
-    }
-
-    $totalCount = count($lidsController->getLids());
-    $source->addSimpleEntity('total_count', $totalCount);
-
+    $sourceTotalCount = 0;
     foreach ($statuses as $status) {
+        $lidsController = new Lid_Controller_Extended();
+        $lidsController->isWithComments(false);
+        $lidsController->getQueryBuilder()->clearSelect()->select(['id']);
+
+        if ($markerId === 0 && $sourceId !== 0 && $source->getId() !== $sourceId) {
+            continue;
+        }
+
+        $lidsController->appendAddFilter($sourceProp->getId(), '=', $source->getId());
+
+        if ($markerId !== 0) {
+            $lidsController->appendAddFilter($markerProp->getId(), '=', $markerId);
+        } else {
+            if ($dateFrom === $dateTo) {
+                $lidsController->appendFilter('control_date', $dateFrom, '=', Lid_Controller_Extended::FILTER_STRICT);
+            } else {
+                $lidsController->appendFilter('control_date', $dateFrom, '>=', Lid_Controller_Extended::FILTER_STRICT);
+                $lidsController->appendFilter('control_date', $dateTo, '<=', Lid_Controller_Extended::FILTER_STRICT);
+            }
+        }
+
+        if ($areaId !== 0) {
+            $lidsController->setAreas([(new Schedule_Area())->setId($areaId)]);
+        }
+
         $statusCloned = clone $status;
-        $controllerCloned = clone $lidsController;
-        $controllerCloned->appendFilter('status_id', $status->getId(), '=', Lid_Controller_Extended::FILTER_STRICT);
-        $countWithStatus = count($controllerCloned->getLids());
+        $lidsController->appendFilter('status_id', $status->getId(), '=', Lid_Controller_Extended::FILTER_STRICT);
+        $countWithStatus = count($lidsController->getLids());
+        $sourceTotalCount += $countWithStatus;
         $statusCloned->addSimpleEntity('count_lids', $countWithStatus);
         $source->addEntity($statusCloned, 'status');
         $status->totalCount += $countWithStatus;
     }
 
+    $source->addSimpleEntity('total_count', $sourceTotalCount);
     $output->addEntity($source, 'source');
 }
 
@@ -243,5 +246,6 @@ $totalCount = 0;
 foreach ($statuses as $status) {
     $totalCount += $status->totalCount;
 }
+
 $output->addSimpleEntity('totalCount', $totalCount);
 $output->show();
