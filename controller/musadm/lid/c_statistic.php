@@ -98,7 +98,7 @@ if ($teacherId !== 0) {
 if ($areaId !== 0) {
     $countQuery->where('area_id', '=', $areaId);
     $countFromScheduleQuery->where('lesson.area_id', '=', $areaId);
-    $countFromDateControl->where('data', 'like', '%"area_id:"' . $areaId . '%');
+    $countFromDateControl->where('data', 'like', '%"area_id":' . $areaId . '%');
 }
 
 //Достаем Id лидов для получения актуального статуса по дате создания
