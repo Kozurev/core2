@@ -105,7 +105,7 @@ if ($areaId !== 0) {
 $lidsDateControl = [];
 foreach ($countFromDateControl->findAll() as $event) {
     if(is_object($event->getData())) {
-        array_push($LidsDateControl,($event->getData()->lid->id));
+        array_push($lidsDateControl,($event->getData()->lid->id));
     }
 }
 
