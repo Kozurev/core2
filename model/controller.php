@@ -679,12 +679,16 @@ class Controller
                     }
                 }
 
-                $NewObjectsIds = $NewQueryBuilder
-                    ->clearSelect()
-                    ->select($this->Object->getTableName() . '.id', 'id')
-                    ->leftJoin($propertyTableName . ' AS p', $joinConditions)
-                    ->whereIn($this->Object->getTableName() . '.id', $this->foundObjectsIds)
-                    ->findAll();
+                if (!empty($this->foundObjectsIds)) {
+                    $NewObjectsIds = $NewQueryBuilder
+                        ->clearSelect()
+                        ->select($this->Object->getTableName() . '.id', 'id')
+                        ->leftJoin($propertyTableName . ' AS p', $joinConditions)
+                        ->whereIn($this->Object->getTableName() . '.id', $this->foundObjectsIds)
+                        ->findAll();
+                } else {
+                    $NewObjectsIds = [];
+                }
 
                 $this->foundObjectsIds = [];
                 foreach ($NewObjectsIds as $obj) {
