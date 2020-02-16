@@ -565,10 +565,13 @@ function saveClientPaymentCallback(payment) {
  * @param payment
  */
 function saveBalancePaymentCallback(payment) {
-    if (payment.error != undefined) {
-        notificationError(payment.error.message);
+    if (!checkResponseStatus(payment)) {
         return false;
     }
+    // if (payment.error != undefined) {
+    //     notificationError(payment.error.message);
+    //     return false;
+    // }
 
     var balanceSpan = $('#balance');
     balanceSpan.text(payment.userBalance);
@@ -596,15 +599,16 @@ function saveBalancePaymentCallback(payment) {
             '<td class=\'center\'>' +
             '<a class=\'action comment\' title=\'Добавить комментарий\' ' +
                 'onclick=\'makePaymentCommentPopup('+payment.id+', savePaymentCommentClient)\'' +
-            '></a>' +
-            '<a class=\'action edit\' title=\'Редактирование платежа\'' +
-                'onclick=\'makeClientPaymentPopup('+payment.id+', '+payment.userId+', saveBalancePaymentCallback)\'' +
-            '></a>' +
-            '<a class=\'action delete\' title=\'Удаление платежа\' ' +
-                'onclick=\'Payment.remove('+payment.id+', removeBalancePaymentCallback)\'' +
-            '></a>' +
-            '</td>' +
-            '</tr>';
+            '></a>';
+            if (payment.accessEdit == true) {
+                paymentTr += '<a class=\'action edit\' title=\'Редактирование платежа\'' +
+                    'onclick=\'makeClientPaymentPopup('+payment.id+', '+payment.userId+', saveBalancePaymentCallback)\'></a>';
+            }
+            if (payment.accessDelete) {
+                paymentTr += '<a class=\'action delete\' title=\'Удаление платежа\' ' +
+                    'onclick=\'Payment.remove('+payment.id+', removeBalancePaymentCallback)\'></a>';
+            }
+        paymentTr += '</td></tr>';
         paymentsTable.prepend(paymentTr);
     } else {    //Если редактируется уже сущствующий платеж
         paymentTr.find('.date').text(payment.refactoredDatetime);

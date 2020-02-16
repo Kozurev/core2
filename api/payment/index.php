@@ -97,6 +97,18 @@ if ($action === 'getPayment') {
  * Пока что реализован функционал лишь для сохранения одного доп. комментария
  */
 if ($action === 'save') {
+    $accessCreateAll =      Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_ALL);
+    $accessCreateClient =   Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT);
+    $accessCreateTeacher =  Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_TEACHER);
+
+    $accessEditAll =        Core_Access::instance()->hasCapability(Core_Access::PAYMENT_EDIT_ALL);
+    $accessEditClient =     Core_Access::instance()->hasCapability(Core_Access::PAYMENT_EDIT_CLIENT);
+    $accessEditTeacher =    Core_Access::instance()->hasCapability(Core_Access::PAYMENT_EDIT_TEACHER);
+
+    $accessDeleteAll =      Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_ALL);
+    $accessDeleteClient =   Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_CLIENT);
+    $accessDeleteTeacher =  Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_TEACHER);
+
     $id =           Core_Array::Get('id', null, PARAM_INT);
     $typeId =       Core_Array::Get('typeId', 0, PARAM_INT);
     $date =         Core_Array::Get('date', date('Y-m-d'), PARAM_DATE);
@@ -105,6 +117,45 @@ if ($action === 'save') {
     $value =        Core_Array::Get('value', 0, PARAM_INT);
     $description =  Core_Array::Get('description', '', PARAM_STRING);
     $comment =      Core_Array::Get('comment', null, PARAM_STRING);
+
+    $hasAccess = false;
+    $hasAccessEdit = false;
+    $hasAccessDelete = false;
+    if (empty($id)) {
+        if (($typeId == Payment::TYPE_INCOME || $typeId == Payment::TYPE_DEBIT) && $accessCreateClient) {
+            $hasAccess = true;
+        } elseif ($typeId == Payment::TYPE_TEACHER && $accessCreateTeacher) {
+            $hasAccess = true;
+        } else {
+            $hasAccess = $accessCreateAll;
+        }
+    } else {
+        if (($typeId == Payment::TYPE_INCOME || $typeId == Payment::TYPE_DEBIT) && $accessEditClient) {
+            $hasAccess = true;
+        } elseif ($typeId == Payment::TYPE_TEACHER && $accessEditTeacher) {
+            $hasAccess = true;
+        } else {
+            $hasAccess = $accessEditAll;
+        }
+    }
+    if (($typeId == Payment::TYPE_INCOME || $typeId == Payment::TYPE_DEBIT) && $accessEditClient) {
+        $hasAccessEdit = true;
+    } elseif ($typeId == Payment::TYPE_TEACHER && $accessEditTeacher) {
+        $hasAccessEdit = true;
+    } else {
+        $hasAccessEdit = $accessEditAll;
+    }
+    if (($typeId == Payment::TYPE_INCOME || $typeId == Payment::TYPE_DEBIT) && $accessDeleteClient) {
+        $hasAccessDelete = true;
+    } elseif ($typeId == Payment::TYPE_TEACHER && $accessDeleteTeacher) {
+        $hasAccessDelete = true;
+    } else {
+        $hasAccessDelete = $accessDeleteAll;
+    }
+
+    if (!$hasAccess) {
+        Core_Page_Show::instance()->error(403);
+    }
 
     $Payment = Payment_Controller::factory($id);
     $Payment->type($typeId);
@@ -156,6 +207,8 @@ if ($action === 'save') {
     $response->areaId = $Payment->areaId();
     $response->comments = $Payment->comments;
     $response->userBalance = $newUserBalance;
+    $response->accessEdit = $hasAccessEdit;
+    $response->accessDelete = $hasAccessDelete;
     die(json_encode($response));
 }
 
@@ -166,10 +219,31 @@ if ($action === 'save') {
 if ($action === 'remove') {
     $paymentId = Core_Array::Get('paymentId', null, PARAM_INT);
     if (is_null($paymentId) || $paymentId <= 0) {
-        die(REST::error(1, 'Нееврно передан идентификатор платежа'));
+        die(REST::status(REST::STATUS_ERROR, 'Нееврно передан идентификатор платежа'));
     }
 
     $Payment = Payment_Controller::factory($paymentId);
+    if (is_null($Payment)) {
+        die(REST::status(REST::STATUS_ERROR, 'Платеж не найден'));
+    }
+
+    $accessDeleteAll =      Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_ALL);
+    $accessDeleteClient =   Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_CLIENT);
+    $accessDeleteTeacher =  Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_TEACHER);
+
+    $hasAccess = false;
+    if (($Payment->typeId() == Payment::TYPE_INCOME || $Payment->typeId() == Payment::TYPE_DEBIT) && $accessDeleteClient) {
+        $hasAccess = true;
+    } elseif ($Payment->typeId() == Payment::TYPE_TEACHER && $accessDeleteTeacher) {
+        $hasAccess = true;
+    } else {
+        $hasAccess = $accessDeleteAll;
+    }
+
+    if (!$hasAccess) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $Payment->delete();
 
     $response = $Payment->toStd();
