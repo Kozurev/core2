@@ -195,7 +195,7 @@ class Orm
 	public function count()
     {
         $beforeSelect = $this->select;
-        $this->select('count(' . $this->table . '.id)', 'count');
+        $this->clearSelect()->select('count(' . $this->table . '.id)', 'count');
         $query = $this->getQueryString();
         $result = DB::instance()->query($query);
 
