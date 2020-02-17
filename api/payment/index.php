@@ -152,6 +152,9 @@ if ($action === 'save') {
     } else {
         $hasAccessDelete = $accessDeleteAll;
     }
+    if (User_Auth::current()->getId() == $userId && $typeId == Payment::TYPE_INCOME) {
+        $hasAccess = true;
+    }
 
     if (!$hasAccess) {
         Core_Page_Show::instance()->error(403);
@@ -232,9 +235,9 @@ if ($action === 'remove') {
     $accessDeleteTeacher =  Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_TEACHER);
 
     $hasAccess = false;
-    if (($Payment->typeId() == Payment::TYPE_INCOME || $Payment->typeId() == Payment::TYPE_DEBIT) && $accessDeleteClient) {
+    if (($Payment->type() == Payment::TYPE_INCOME || $Payment->type() == Payment::TYPE_DEBIT) && $accessDeleteClient) {
         $hasAccess = true;
-    } elseif ($Payment->typeId() == Payment::TYPE_TEACHER && $accessDeleteTeacher) {
+    } elseif ($Payment->type() == Payment::TYPE_TEACHER && $accessDeleteTeacher) {
         $hasAccess = true;
     } else {
         $hasAccess = $accessDeleteAll;
