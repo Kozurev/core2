@@ -31,10 +31,10 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
     public function __construct()
     {
-        $this->defaultUser = Core::factory('User')->surname('Неизвестно');
-        $this->defaultGroup = Core::factory('Schedule_Group')->title('Неизвестно');
-        $this->defaultLid = Core::factory('Lid')->surname('Неизвестно');
-        $this->defaultArea = Core::factory('Schedule_Area')->title('Неизвестно');
+//        $this->defaultUser = Core::factory('User')->surname('Неизвестно');
+//        $this->defaultGroup = Core::factory('Schedule_Group')->title('Неизвестно');
+//        $this->defaultLid = Core::factory('Lid')->surname('Неизвестно');
+//        $this->defaultArea = Core::factory('Schedule_Area')->title('Неизвестно');
     }
 
 
@@ -45,7 +45,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      */
     public function getGroup()
     {
-        if ($this->type_id != 2 || $this->client_id == null || $this->client_id < 0) {
+        if (($this->type_id != Schedule_Lesson::TYPE_GROUP && $this->type_id != Schedule_Lesson::TYPE_GROUP_CONSULT) || $this->client_id == null || $this->client_id < 0) {
             return $this->defaultGroup;
         }
 
@@ -120,6 +120,17 @@ class Schedule_Lesson extends Schedule_Lesson_Model
                     return $Lid;
                 } else {
                     return $this->defaultLid;
+                }
+                break;
+            case self::TYPE_GROUP_CONSULT:
+                if ($this->client_id == null || $this->client_id < 0) {
+                    return $this->defaultGroup;
+                }
+                $Group = Core::factory('Schedule_Group', $this->client_id);
+                if (!is_null($Group)) {
+                    return $Group;
+                } else {
+                    return $this->defaultGroup;
                 }
                 break;
             default:
@@ -212,6 +223,10 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      */
     public function isAbsent(string $date) : bool
     {
+        if ($this->lessonType() == self::SCHEDULE_CURRENT) {
+            return false;
+        }
+
         $Absent = Core::factory('Schedule_Lesson_Absent')
             ->queryBuilder()
             ->where('date', '=', $date)
@@ -263,7 +278,6 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         }
 
         $Director = User_Auth::current()->getDirector();
-        Core::requireClass('User_Controller');
 
         if ($this->typeId() == self::TYPE_INDIV) {
             $clientLessons = 'indiv_lessons';
@@ -276,6 +290,10 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             $teacherRate = 'teacher_rate_group';
             $isTeacherDefaultRate = 'is_teacher_rate_default_group';
         } elseif ($this->typeId() == self::TYPE_CONSULT) {
+            $clientLessons = null;
+            $teacherRate = 'teacher_rate_consult';
+            $isTeacherDefaultRate = 'is_teacher_rate_default_consult';
+        } elseif ($this->typeId() == self::TYPE_GROUP_CONSULT) {
             $clientLessons = null;
             $teacherRate = 'teacher_rate_consult';
             $isTeacherDefaultRate = 'is_teacher_rate_default_consult';
@@ -330,6 +348,9 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         } elseif ($attendance == 0 && $this->typeId() == self::TYPE_CONSULT) {
             $absentRateValue = 0.0;
             $teacherAbsentValue = 0.0;
+        } elseif ($this->typeId() == self::TYPE_GROUP_CONSULT) {
+            $absentRateValue = 0.0;
+            $teacherAbsentValue = 0.0;
         }
 
         if ($attendance == 1) {
@@ -346,15 +367,20 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         //Создание отчета по каждому клиенту
         foreach ($attendanceClients as $clientId => $presence) {
             $clientId = intval($clientId);
-            $Client = User_Controller::factory($clientId);
 
-            if ($this->typeId() != self::TYPE_CONSULT) {
-                $ClientAttendanceInfo = Core::factory('Schedule_Lesson_Report_Attendance');
-                $ClientAttendanceInfo->attendance($presence);
-                $ClientAttendanceInfo->clientId($clientId);
+            if ($this->typeId() == Schedule_Lesson::TYPE_INDIV || $this->typeId() == Schedule_Lesson::TYPE_GROUP) {
+                $Client = User_Controller::factory($clientId);
+            } else {
+                $Client = Lid_Controller::factory($clientId);
             }
 
-            if ($this->typeId() != self::TYPE_CONSULT) {
+            // if ($this->typeId() != self::TYPE_CONSULT) {
+                $ClientAttendanceInfo = new Schedule_Lesson_Report_Attendance();
+                $ClientAttendanceInfo->attendance($presence);
+                $ClientAttendanceInfo->clientId($clientId);
+            // }
+
+            if ($this->typeId() != self::TYPE_CONSULT && $this->typeId() != self::TYPE_GROUP_CONSULT) {
                 //Корректировка баланса количества занятий клиента
                 $ClientCountLessons = $ClientLessons->getPropertyValues($Client)[0];
                 $clientCountLessons = floatval($ClientCountLessons->value());
@@ -428,7 +454,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
         //Удаление информации о посещаемости клиентов и восстановление списанных за отчет занятий
         foreach ($Attendances as $Attendance) {
-            if ($Report->typeId() != self::TYPE_CONSULT) {
+            if ($Report->typeId() != self::TYPE_CONSULT && $Report->typeId() != self::TYPE_GROUP_CONSULT) {
                 $Client = Core::factory('User', $Attendance->clientId());
                 if ($Report->typeId() == self::TYPE_INDIV) {
                     $ClientLessons = Core::factory('Property')->getByTagName('indiv_lessons');

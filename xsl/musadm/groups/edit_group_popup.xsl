@@ -53,6 +53,27 @@
             <hr/>
 
             <div class="column">
+                <span>Тип</span>
+            </div>
+            <div class="column">
+                <select class="form-control" name="type">
+                    <option value="1">
+                        <xsl:if test="schedule_group/type = 1">
+                            <xsl:attribute name="selected">selected</xsl:attribute>
+                        </xsl:if>
+                        Клиенты
+                    </option>
+                    <option value="2">
+                        <xsl:if test="schedule_group/type = 2">
+                            <xsl:attribute name="selected">selected</xsl:attribute>
+                        </xsl:if>
+                        Лиды
+                    </option>
+                </select>
+            </div>
+            <hr/>
+
+            <div class="column">
                 <span>Примечание</span>
             </div>
             <div class="column">

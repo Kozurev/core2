@@ -14,13 +14,15 @@
                                     <xsl:apply-templates select="schedule_absent" />
                                 </xsl:otherwise>
                             </xsl:choose>
-                            <tr>
-                                <td colspan="3" class="center">
-                                    <a style="width: auto" class="btn btn-green" onclick="getScheduleAbsentPopup({userId}, 1, getCurrentDate(), '')">
-                                        Создать период отсутствия
-                                    </a>
-                                </td>
-                            </tr>
+                            <xsl:if test="access_schedule_absent_create = 1">
+                                <tr>
+                                    <td colspan="3" class="center">
+                                        <a style="width: auto" class="btn btn-green" onclick="getScheduleAbsentPopup({userId}, 1, getCurrentDate(), '')">
+                                            Создать период отсутствия
+                                        </a>
+                                    </td>
+                                </tr>
+                            </xsl:if>
                         </table>
                     </div>
                 </div>
@@ -41,8 +43,13 @@
                 <xsl:value-of select="refactoredTimeTo" />
             </td>
             <td class="right">
-                <a class="action edit" onclick="getScheduleAbsentPopup('', '', '', {id})"></a>
-                <a class="action delete" onclick="deleteScheduleAbsent({id}, refreshSchedule)"></a>
+                <xsl:if test="/root/access_schedule_absent_edit">
+                    <a class="action edit" onclick="getScheduleAbsentPopup('', '', '', {id})"></a>
+                </xsl:if>
+
+                <xsl:if test="/root/access_schedule_absent_delete">
+                    <a class="action delete" onclick="deleteScheduleAbsent({id}, refreshSchedule)"></a>
+                </xsl:if>
             </td>
         </tr>
     </xsl:template>

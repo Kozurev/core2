@@ -38,10 +38,13 @@ if (is_null($pageClientId)) {
     $User = User_Controller::factory($pageClientId);
 }
 
-$accessAbsentPeriod = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT);
-$accessScheduleCreate = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_CREATE);
+$accessAbsentPeriodRead =   Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_READ);
+$accessAbsentPeriodCreate = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_CREATE);
+$accessAbsentPeriodEdit =   Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_EDIT);
+$accessAbsentPeriodDelete = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_DELETE);
+$accessScheduleCreate =     Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_CREATE);
 $accessScheduleLessonTime = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_LESSON_TIME);
-$accessScheduleEdit = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT);
+$accessScheduleEdit =       Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT);
 
 /**
  * Проверка на принадлежность клиента, под которым происходит авторизация,
@@ -54,7 +57,7 @@ if (is_null($User)) {
 $OutputXml = new Core_Entity();
 
 //Пользовательские примечания и дата последней авторизации
-if ($accessAbsentPeriod || $accessScheduleEdit || $accessScheduleLessonTime) {
+if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit || $accessScheduleLessonTime) {
     $today = date('Y-m-d');
     $todayTime = strtotime($today);
 
@@ -135,8 +138,10 @@ if ($accessAbsentPeriod || $accessScheduleEdit || $accessScheduleLessonTime) {
         ->addEntity(User_Auth::current(), 'current_user')
         ->addSimpleEntity('my_calls_token', Property_Controller::factoryByTag('my_calls_token')->getValues(User_Auth::current()->getDirector())[0]->value())
         ->addEntities($AbsentPeriods, 'absent')
-        ->addSimpleEntity('access_absent', intval($accessAbsentPeriod))
-        // ->addSimpleEntity('access_schedule_create', intval($accessScheduleCreate))
+        ->addSimpleEntity('access_absent_read', intval($accessAbsentPeriodRead))
+        ->addSimpleEntity('access_absent_create', intval($accessAbsentPeriodCreate))
+        ->addSimpleEntity('access_absent_edit', intval($accessAbsentPeriodEdit))
+        ->addSimpleEntity('access_absent_delete', intval($accessAbsentPeriodDelete))
         ->addSimpleEntity('access_schedule_lesson_time', intval($accessScheduleLessonTime))
         ->addSimpleEntity('access_schedule_edit', intval($accessScheduleEdit));
 }
@@ -169,10 +174,10 @@ $OutputXml
         'access_buy_tarif',
         (int)Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_BUY)
     )
-    ->addSimpleEntity(
-        'access_schedule_absent',
-        (int)Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT)
-    )
+    ->addSimpleEntity('access_schedule_absent_read', $accessAbsentPeriodRead)
+    ->addSimpleEntity('access_schedule_absent_create', $accessAbsentPeriodCreate)
+    ->addSimpleEntity('access_schedule_absent_edit', $accessAbsentPeriodEdit)
+    ->addSimpleEntity('access_schedule_absent_delete', $accessAbsentPeriodDelete)
     ->addSimpleEntity(
         'access_user_edit_lessons',
         (int)Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_LESSONS)

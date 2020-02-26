@@ -12,6 +12,7 @@ class Schedule_Lesson_Model extends Core_Entity
     const TYPE_INDIV = 1;
     const TYPE_GROUP = 2;
     const TYPE_CONSULT = 3;
+    const TYPE_GROUP_CONSULT = 4;
 
     const SCHEDULE_MAIN = 1;
     const SCHEDULE_CURRENT = 2;

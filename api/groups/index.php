@@ -7,8 +7,7 @@
 
 $action = Core_Array::Get('action', null, PARAM_STRING);
 
-Core::requireClass('Schedule_Group');
-$subordinated = User::current()->getDirector()->getId();
+$subordinated = User_Auth::current()->getDirector()->getId();
 
 
 if ($action === 'getList') {
@@ -17,21 +16,26 @@ if ($action === 'getList') {
     }
 
     $paramActive = Core_Array::Get('params/active', null, PARAM_BOOL);
+    $paramTypeId = Core_Array::Get('params/type', 0, PARAM_INT);
 
-    $ScheduleGroup = new Schedule_Group();
-    $ScheduleGroup->queryBuilder()
+    $scheduleGroup = new Schedule_Group();
+    $scheduleGroup->queryBuilder()
         ->where('subordinated', '=', $subordinated)
         ->orderBy('title');
 
     if (!is_null($paramActive)) {
-        $ScheduleGroup->queryBuilder()->where('active', '=', intval($paramActive));
+        $scheduleGroup->queryBuilder()->where('active', '=', intval($paramActive));
     }
 
-    $Groups = $ScheduleGroup->findAll();
+    if ($paramTypeId > 0) {
+        $scheduleGroup->queryBuilder()->where('type', '=', $paramTypeId);
+    }
+
+    $groups = $scheduleGroup->findAll();
 
     $response = [];
-    foreach ($Groups as $Group) {
-        $response[] = $Group->toStd();
+    foreach ($groups as $group) {
+        $response[] = $group->toStd();
     }
     exit(json_encode($response));
 }

@@ -86,7 +86,7 @@ class Schedule_Lesson_Report extends Schedule_Lesson_Report_Model
             return null;
         }
 
-        return Core::factory('Schedule_Lesson_Report_Attendance')
+        return (new Schedule_Lesson_Report_Attendance())
             ->queryBuilder()
             ->where('report_id', '=', $this->getId())
             ->where('client_id', '=', $clientId)

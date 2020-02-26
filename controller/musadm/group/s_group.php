@@ -51,22 +51,37 @@ if ($action === 'getGroupComposition') {
         Core_Page_Show::instance()->error(404);
     }
 
-    $Group = Core::factory('Schedule_Group', $groupId);
-    if (is_null($Group)) {
+    $group = Core::factory('Schedule_Group', $groupId);
+    if (is_null($group)) {
         Core_Page_Show::instance()->error(404);
     }
 
-    $Group->addEntities($Group->getClientList());
-    $UserController = new User_Controller(User::current());
-    $Users = $UserController
-        ->groupId(ROLE_CLIENT)
-        ->isWithAreaAssignments(false);
-    $Users->queryBuilder()
-        ->orderBy('surname', 'ASC')
-        ->orderBy('name', 'ASC');
-    Core::factory('Core_Entity')
-        ->addEntity($Group, 'group')
-        ->addEntities($Users->getUsers())
+    $groupItems = $group->getClientList();
+    $group->addEntities($groupItems);
+
+    if ($group->type() === Schedule_Group::TYPE_CLIENTS) {
+        $userController = new User_Controller(User_Auth::current());
+        $users = $userController
+            ->groupId(ROLE_CLIENT)
+            ->isWithAreaAssignments(false);
+        $users->queryBuilder()
+            ->orderBy('surname', 'ASC')
+            ->orderBy('name', 'ASC');
+        $users = $users->getUsers();
+    } elseif ($group->type() === Schedule_Group::TYPE_LIDS) {
+        $lidsIds = [];
+        foreach ($groupItems as $groupItem) {
+            $lidsIds[] = $groupItem->getId();
+        }
+        $lids = (new Lid())->queryBuilder()
+            ->whereIn('id', $lidsIds)
+            ->findAll();
+    }
+
+    (new Core_Entity())
+        ->addEntity($group, 'group')
+        ->addEntities($users ?? [])
+        ->addEntities($lids ?? [])
         ->xsl('musadm/groups/group_assignment.xsl')
         ->show();
     exit;
@@ -159,24 +174,31 @@ if ($action === 'groupCreateAssignments') {
         Core_Page_Show::instance()->error(403);
     }
 
-    $Group = Core::factory('Schedule_Group')
+    $group = Core::factory('Schedule_Group')
         ->queryBuilder()
         ->where('id', '=', $groupId)
         ->where('subordinated', '=', $subordinated)
         ->find();
 
-    if (is_null($Group)) {
+    if (is_null($group)) {
         Core_Page_Show::instance()->error(403);
     }
 
     $outputJson = [];
     foreach ($userIds as $id) {
-        $User = User_Controller::factory($id);
-        if (!is_null($User)) {
-            $Group->appendClient($User->getId());
+        if ($group->type() == Schedule_Group::TYPE_CLIENTS) {
+            $client = User_Controller::factory($id);
+        } else {
+            $client = Lid_Controller::factory($id);
+        }
+        if (!is_null($client)) {
+            $group->appendClient($client->getId());
             $jsonUser = new stdClass();
-            $jsonUser->id = $User->getId();
-            $jsonUser->fio = $User->surname() . ' ' . $User->name();
+            $jsonUser->id = $client->getId();
+            $jsonUser->fio = $client->surname() . ' ' . $client->name();
+            if ($group->type() === Schedule_Group::TYPE_LIDS) {
+                $jsonUser->fio .= ' ' . $client->number();
+            }
             $outputJson[] = $jsonUser;
         }
     }

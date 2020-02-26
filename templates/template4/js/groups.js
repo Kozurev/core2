@@ -37,12 +37,18 @@ $(function(){
                 existingAsgmIds.push($(user).val());
             });
 
-            $.each(selectedUsers, function (key, user) {
-                var userId = $(user).val();
-                if ($.inArray(userId, existingAsgmIds) === -1) {
-                    selectedUsersIds.push(userId);
+            if (selectedUsers.length > 0) {
+                $.each(selectedUsers, function (key, user) {
+                    var userId = $(user).val();
+                    if ($.inArray(userId, existingAsgmIds) === -1) {
+                        selectedUsersIds.push(userId);
+                    }
+                });
+            } else if (usersList.val() > 0) {
+                if ($.inArray(usersList.val(), existingAsgmIds) === -1) {
+                    selectedUsersIds.push(usersList.val());
                 }
-            });
+            }
 
             groupCreateAssignments(groupId, selectedUsersIds, function(response) {
                 $.each(response, function(key, user) {

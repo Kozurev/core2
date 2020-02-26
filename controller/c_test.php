@@ -9,6 +9,41 @@
 
 Orm::Debug(true);
 
+//$teacher = Core::factory('User', 1725);
+//$time = Schedule_Controller_Extended::getTeacherNearestFreeTime(1725, '2020-03-01');
+//debug($time);
+
+exit;
+
+$groupDirector = Core::factory('Core_Access_Group', 1);
+$groupManager = Core::factory('Core_Access_Group', 2);
+$groupTeacher = Core::factory('Core_Access_Group', 3);
+$groupClient = Core::factory('Core_Access_Group', 4);
+
+$groupDirector->capabilityAllow(Core_Access::SCHEDULE_ABSENT_READ);
+$groupManager->capabilityAllow(Core_Access::SCHEDULE_ABSENT_READ);
+$groupTeacher->capabilityAllow(Core_Access::SCHEDULE_ABSENT_READ);
+$groupClient->capabilityAllow(Core_Access::SCHEDULE_ABSENT_READ);
+
+$groupDirector->capabilityAllow(Core_Access::SCHEDULE_ABSENT_EDIT);
+$groupManager->capabilityAllow(Core_Access::SCHEDULE_ABSENT_EDIT);
+$groupTeacher->capabilityForbidden(Core_Access::SCHEDULE_ABSENT_EDIT);
+$groupClient->capabilityForbidden(Core_Access::SCHEDULE_ABSENT_EDIT);
+
+$groupDirector->capabilityAllow(Core_Access::SCHEDULE_ABSENT_DELETE);
+$groupManager->capabilityAllow(Core_Access::SCHEDULE_ABSENT_DELETE);
+$groupTeacher->capabilityForbidden(Core_Access::SCHEDULE_ABSENT_DELETE);
+$groupClient->capabilityForbidden(Core_Access::SCHEDULE_ABSENT_DELETE);
+
+Orm::execute('UPDATE Core_Access_Capability SET name = \'schedule_absent_create\' WHERE name = \'schedule_absent\'');
+
+Orm::execute('ALTER TABLE `musicmetod`.`Schedule_Group` 
+ADD COLUMN `type` INT NULL AFTER `active`;');
+Orm::execute('UPDATE Schedule_Group SET type = 1 WHERE id > 0');
+$lessonGroupConsultType = new Schedule_Lesson_Type();
+$lessonGroupConsultType->title('Групповая консультация');
+$lessonGroupConsultType->statistic(0);
+$lessonGroupConsultType->save();
 exit;
 
 $bonusRevertSenlerGroup = Property_Controller::factory()

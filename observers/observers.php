@@ -321,33 +321,38 @@ Core::attachObserver('before.Item.save', function($args) {
  * При выставлении консультации с указанием лида создается комментарий
  */
 Core::attachObserver('before.ScheduleLesson.insert', function($args) {
-    $Lesson = $args[0];
-    $typeId = $Lesson->typeId();
-    $clientId = $Lesson->clientId();
+    $lesson = $args[0];
+    $typeId = $lesson->typeId();
+    $clientId = $lesson->clientId();
 
-    if ($typeId != Schedule_Lesson::TYPE_CONSULT || $clientId == 0) {
+    if (($typeId != Schedule_Lesson::TYPE_CONSULT && $typeId != Schedule_Lesson::TYPE_GROUP_CONSULT) || $clientId == 0) {
         return;
     }
 
-    Core::requireClass('Lid_Controller');
-    $Lid = Lid_Controller::factory($clientId);
-    if (is_null($Lid)) {
-        die('Лида с номером ' . $clientId . ' не существует');
+    $client = $lesson->getClient();
+    if (empty($client) || empty($client->getId())) {
+        return;
+    }
+    if ($typeId == Schedule_Lesson::TYPE_CONSULT) {
+        $lids = [$client];
+    } else {
+        $lids = $client->getClientList();
     }
 
-    $commentText = 'Консультация назначена на ' . date('d.m.Y', strtotime($Lesson->insertDate()));
-    $commentText .= ' в ' . substr($Lesson->timeFrom(), 0, 5);
-    $commentText .= ', преп. ' . $Lesson->getTeacher()->surname();
-    $commentText .= ', филиал ' .$Lesson->getArea()->title();
-    $Lid->addComment($commentText);
-
-    $newStatusId = Core::factory('Property')
+    $newStatusId = (new Property())
         ->getByTagName('lid_status_consult')
-        ->getPropertyValues(User::current()->getDirector())[0]
+        ->getPropertyValues(User_Auth::current()->getDirector())[0]
         ->value();
 
-    if ($newStatusId != 0) {
-        $Lid->changeStatus($newStatusId);
+    $commentText = 'Консультация назначена на ' . date('d.m.Y', strtotime($lesson->insertDate()));
+    $commentText .= ' в ' . substr($lesson->timeFrom(), 0, 5);
+    $commentText .= ', преп. ' . $lesson->getTeacher()->surname();
+    $commentText .= ', филиал ' .$lesson->getArea()->title();
+    foreach ($lids as $lid) {
+        $lid->addComment($commentText);
+        if ($newStatusId != 0) {
+            $lid->changeStatus($newStatusId);
+        }
     }
 });
 
@@ -356,45 +361,53 @@ Core::attachObserver('before.ScheduleLesson.insert', function($args) {
  * Создание комментария у лида о проведенной консультации
  * и изменение статуса, если лид присутствовал
  */
-Core::attachObserver('after.ScheduleReport.save', function($args) {
-    $Report = $args[0];
-    Core::factory('Schedule_Lesson');
-
-    if ($Report->typeId() != Schedule_Lesson::TYPE_CONSULT || $Report->clientId() == 0) {
+Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
+    $report = $args[0];
+    if (($report->typeId() != Schedule_Lesson::TYPE_CONSULT && $report->typeId() != Schedule_Lesson::TYPE_GROUP_CONSULT) || $report->clientId() == 0) {
         return;
     }
 
     //Создание комментария
     $commentText = 'Консультация ';
-    $commentText .= date('d.m.Y', strtotime($Report->date()));
+    $commentText .= date('d.m.Y', strtotime($report->date()));
+    $lesson = Core::factory('Schedule_Lesson', $report->lessonId());
+    $commentText .= ' в ' . refactorTimeFormat($lesson->timeFrom()) . ' ' . refactorTimeFormat($lesson->timeTo());
+    $commentTextAttendance = $commentText . ' состоялась';
+    $commentTextAbsent = $commentText . ' не состаялась';
 
-    $Lesson = Core::factory('Schedule_Lesson', $Report->lessonId());
-    $commentText .= ' в ' . refactorTimeFormat($Lesson->timeFrom()) . ' ' . refactorTimeFormat($Lesson->timeTo());
-
-    $Report->attendance() == 1
-        ?   $commentText .= ' состоялась'
-        :   $commentText .= ' не состоялась';
-
-    $Lid = Core::factory('Lid', $Report->clientId());
-    if (is_null($Lid)) {
-        return;
+    $lessonClient = $lesson->getClient();
+    if ($report->typeId() == Schedule_Lesson::TYPE_CONSULT) {
+        $lids = [$lessonClient];
+    } else {
+        $lids = $lessonClient->getClientList();
     }
 
-    $Lid->addComment($commentText, false);
-
-    //Изменение статуса лида
     $propName = 'lid_status_consult_';
-    $Report->attendance() == 1
-        ?   $propName .= 'attended'
-        :   $propName .= 'absent';
-
-    $newStatusId = Core::factory('Property')
-        ->getByTagName($propName)
-        ->getPropertyValues(User::current()->getDirector())[0]
+    $propNameAttended = $propName . 'attended';
+    $propNameAbsent = $propName . 'absent';
+    $newStatusAttended = Property_Controller::factoryByTag($propNameAttended)
+        ->getPropertyValues(User_Auth::current()->getDirector())[0]
+        ->value();
+    $newStatusAbsent = Property_Controller::factoryByTag($propNameAbsent)
+        ->getPropertyValues(User_Auth::current()->getDirector())[0]
         ->value();
 
-    if ($newStatusId != 0) {
-        $Lid->changeStatus($newStatusId);
+    foreach ($lids as $lid) {
+        $lidAttendance = $report->getClientAttendance($lid->getId());
+        if (empty($lidAttendance)) {
+            continue;
+        }
+        if (!empty($lidAttendance->attendance())) {
+            $statusId = $newStatusAttended;
+            $comment = $commentTextAttendance;
+        } else {
+            $statusId = $newStatusAbsent;
+            $comment = $commentTextAbsent;
+        }
+        $lid->addComment($comment, false);
+        if ($statusId != 0) {
+            $lid->changeStatus($statusId);
+        }
     }
 });
 
@@ -404,7 +417,7 @@ Core::attachObserver('after.ScheduleReport.save', function($args) {
  */
 Core::attachObserver('before.Payment.insert', function($args) {
     $Payment = $args[0];
-    $User = User::parentAuth();
+    $User = User_Auth::parentAuth();
     if (!is_null($User)) {
         $Payment->authorId($User->getId());
         $Payment->authorFio($User->surname() . ' ' . $User->name());
@@ -417,13 +430,7 @@ Core::attachObserver('before.Payment.insert', function($args) {
  */
 Core::attachObserver('before.Payment.save', function($args) {
     $Payment = $args[0];
-
-    Core::requireClass('Property');
-    Core::requireClass('User_Controller');
-    Core::requireClass('Schedule_Area_Assignment');
-
     $Property = new Property();
-
     //Корректировка баланса клиента
     if ($Payment->type() == Payment::TYPE_INCOME
     || $Payment->type() == Payment::TYPE_DEBIT
@@ -434,7 +441,6 @@ Core::attachObserver('before.Payment.save', function($args) {
         } else {
             $difference = $Payment->value();
         }
-
         $Client = $Payment->getUser();
         if (!is_null($Client)) {
             $UserBalance = $Property->getByTagName('balance');
@@ -467,36 +473,30 @@ Core::attachObserver('before.Payment.save', function($args) {
  * удаление всех значений доп. свойств
  */
 Core::attachObserver('before.Payment.delete', function($args) {
-    $Payment = $args[0];
-
-    Core::requireClass('Property');
-    Core::requireClass('User_Controller');
-    Core::requireClass('Schedule_Area_Assignment');
-
-    $Property = new Property();
-
+    $payment = $args[0];
+    $property = new Property();
     //Корректировка баланса клиента
-    if ($Payment->type() == Payment::TYPE_INCOME
-    || $Payment->type() == Payment::TYPE_DEBIT
-    || $Payment->type() == Payment::TYPE_CASHBACK) {
-        $Client = $Payment->getUser();
-        if (!is_null($Client)) {
-            $UserBalance = $Property->getByTagName('balance');
-            $UserBalanceVal = $UserBalance->getPropertyValues($Client)[0];
-            $balanceOld =  floatval($UserBalanceVal->value());
-            $Payment->type() == Payment::TYPE_INCOME || $Payment->type() == Payment::TYPE_CASHBACK
-                ?   $balanceNew = $balanceOld - floatval($Payment->value())
-                :   $balanceNew = $balanceOld + floatval($Payment->value());
-            $UserBalanceVal->value($balanceNew)->save();
+    if ($payment->type() == Payment::TYPE_INCOME
+    || $payment->type() == Payment::TYPE_DEBIT
+    || $payment->type() == Payment::TYPE_CASHBACK) {
+        $client = $payment->getUser();
+        if (!is_null($client)) {
+            $userBalance = $property->getByTagName('balance');
+            $userBalanceVal = $userBalance->getPropertyValues($client)[0];
+            $balanceOld =  floatval($userBalanceVal->value());
+            $payment->type() == Payment::TYPE_INCOME || $payment->type() == Payment::TYPE_CASHBACK
+                ?   $balanceNew = $balanceOld - floatval($payment->value())
+                :   $balanceNew = $balanceOld + floatval($payment->value());
+            $userBalanceVal->value($balanceNew)->save();
         }
     }
 
     //Удаление связи с филлиалами
-    $AreasAssignments = new Schedule_Area_Assignment();
-    $AreasAssignments->clearAssignments($Payment);
+    $areasAssignments = new Schedule_Area_Assignment();
+    $areasAssignments->clearAssignments($payment);
 
     //Удаление всех доп. свойств
-    $Property->clearForObject($Payment);
+    $property->clearForObject($payment);
 });
 
 
@@ -505,18 +505,13 @@ Core::attachObserver('before.Payment.delete', function($args) {
  * в случае если для задачи не был заранее прикреплен филиал
  */
 Core::attachObserver('before.Task.save', function($args) {
-    $Task = $args[0];
-
-    if ($Task->areaId() == 0 && $Task->associate() > 0) {
-        $AssociateClient = Core::factory('User', $Task->associate());
-
-        if (!is_null($AssociateClient)) {
-            $Assignments = Core::factory('Schedule_Area_Assignment')
-                ->getAssignments($AssociateClient);
-
-            if (count($Assignments) > 0) {
-                Core::factory('Schedule_Area_Assignment')
-                    ->createAssignment($AssociateClient, $Assignments[0]->areaId());
+    $task = $args[0];
+    if ($task->areaId() == 0 && $task->associate() > 0) {
+        $associateClient = Core::factory('User', $task->associate());
+        if (!is_null($associateClient)) {
+            $assignments = (new Schedule_Area_Assignment())->getAssignments($associateClient);
+            if (count($assignments) > 0) {
+                (new Schedule_Area_Assignment())->createAssignment($associateClient, $assignments[0]->areaId());
             }
         }
     }
@@ -527,17 +522,14 @@ Core::attachObserver('before.Task.save', function($args) {
  * При удалении статуса лида все лиды имеющие этот статус приобретали статус '0'
  */
 Core::attachObserver('after.LidStatus.delete', function($args) {
-    $Status = $args[0];
-
-    $subordinated = User::current()->getDirector()->getId();
-    $Lids = Lid_Controller::factory()
-        ->queryBuilder()
+    $status = $args[0];
+    $subordinated = User_Auth::current()->getDirector()->getId();
+    $lids = (new Lid())->queryBuilder()
         ->where('subordinated', '=', $subordinated)
-        ->where('status_id', '=', $Status->getId())
+        ->where('status_id', '=', $status->getId())
         ->findAll();
-
-    foreach ($Lids as $Lid) {
-        $Lid->statusId(0)->save();
+    foreach ($lids as $lid) {
+        $lid->statusId(0)->save();
     }
 });
 

@@ -143,6 +143,7 @@ class Schedule_Controller
                 $ClientGroups = Core::factory('Schedule_Group_Assignment')
                     ->queryBuilder()
                     ->where('user_id', '=', $this->userId)
+                    ->join('Schedule_Group as sg', 'sg.id = Schedule_Group_Assignment.group_id AND sg.type = ' . Schedule_Lesson::TYPE_GROUP)
                     ->findAll();
 
                 $UserGroups = [];

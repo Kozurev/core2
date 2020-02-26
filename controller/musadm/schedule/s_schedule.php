@@ -121,14 +121,17 @@ if ($action == 'getScheduleAreaPopup') {
  */
 if ($action === 'getScheduleAbsentPopup') {
     //Проверка прав доступа
-    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT)) {
-        Core_Page_Show::instance()->error(403);
-    }
+    $accessCreate = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_CREATE);
+    $accessEdit = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_EDIT);
 
     $objectId = Core_Array::Get('objectId', null, PARAM_INT);
     $typeId =   Core_Array::Get('typeId', null, PARAM_INT);
     $date =     Core_Array::Get('date', date('Y-m-d'), PARAM_DATE);
     $id =       Core_Array::Get('id', null, PARAM_INT);
+
+    if ((empty($id) && !$accessCreate) || (!empty($id) && !$accessEdit)) {
+        Core_Page_Show::instance()->error(403);
+    }
 
     if ((is_null($objectId) || is_null($typeId)) && is_null($id)) {
         Core_Page_Show::instance()->error(404);
@@ -178,6 +181,10 @@ if ($action === 'getScheduleAbsentPopup') {
 
 //Удаление периода отсутствия
 if ($action === 'deleteScheduleAbsent') {
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_DELETE)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
     $absentId = Core_Array::Get('id', null, PARAM_INT);
 
     if (is_null($absentId)) {

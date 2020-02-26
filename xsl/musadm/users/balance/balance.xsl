@@ -112,32 +112,33 @@
                                                         <xsl:text> в </xsl:text>
                                                         <span>
                                                             <xsl:value-of select="time_from" />
-<!--                                                            - <xsl:value-of select="time_to" />-->
                                                         </span>
                                                         <br/>
                                                         <span>
                                                             <xsl:value-of select="teacher" />
                                                         </span>
                                                     </div>
-                                                    <div class="col-md-6">
-                                                        <span style="margin-left: 15px">
-                                                            <button class="btn btn-orange schedule_today_absent" href="#">
-                                                                <xsl:if test="/root/nearest_lesson/is_cancellable = 0 or /root/access_schedule_edit = 0">
-                                                                    <xsl:attribute name="disabled">
-                                                                        disabled
-                                                                    </xsl:attribute>
-                                                                </xsl:if>
-                                                                Отменить занятие
-                                                            </button>
-                                                        </span>
-                                                        <xsl:if test="/root/nearest_lesson/is_cancellable = 0 and /root/access_schedule_edit = 1 and /root/is_admin = 0">
-                                                            <p style="font-size: 10px; text-align: center;">
-                                                                в автоматическом режиме можно отменить занятия не позднее чем, до 17-00 текущего дня.
-                                                                Позвоните администраторам и они всё урегулируют +79092012550
-                                                            </p>
-                                                        </xsl:if>
-                                                        <input type="hidden" />
-                                                    </div>
+                                                    <xsl:if test="/root/access_schedule_edit = 1">
+                                                        <div class="col-md-6">
+                                                            <span style="margin-left: 15px">
+                                                                <button class="btn btn-orange schedule_today_absent" href="#">
+                                                                    <xsl:if test="/root/nearest_lesson/is_cancellable = 0">
+                                                                        <xsl:attribute name="disabled">
+                                                                            disabled
+                                                                        </xsl:attribute>
+                                                                    </xsl:if>
+                                                                    Отменить занятие
+                                                                </button>
+                                                            </span>
+                                                            <xsl:if test="/root/nearest_lesson/is_cancellable = 0 and /root/access_schedule_edit = 1 and /root/is_admin = 0">
+                                                                <p style="font-size: 10px; text-align: center;">
+                                                                    в автоматическом режиме можно отменить занятия не позднее чем, до 17-00 текущего дня.
+                                                                    Позвоните администраторам и они всё урегулируют +79092012550
+                                                                </p>
+                                                            </xsl:if>
+                                                            <input type="hidden" />
+                                                        </div>
+                                                    </xsl:if>
                                                 </div>
                                             </p>
                                         </xsl:for-each>
@@ -148,7 +149,7 @@
                                 </xsl:choose>
                             </div>
                             <div class="col-md-3">
-                                <xsl:if test="/root/access_schedule_absent = 1">
+                                <xsl:if test="/root/access_schedule_absent_create = 1">
                                     <div>
                                         <a class="btn btn-orange" onclick="getScheduleAbsentPopup({user/id}, 1, getCurrentDate(), '')">
                                             Период отсутствия
@@ -177,7 +178,7 @@
                     </tr>
                 </xsl:if>
 
-                <xsl:if test="count(absent) > 0">
+                <xsl:if test="count(absent) > 0 and /root/access_schedule_absent_read = 1">
                     <tr id="absent-row">
                         <td>
                             <div class="row">
@@ -201,13 +202,15 @@
                                                 <span class="{$periodClass}"> - </span>
                                                 <span id="absent-to" class="{$periodClass}"><xsl:value-of select="date_to" /></span>
                                             </div>
-
-                                            <xsl:if test="/root/access_schedule_absent = 1">
-                                                <div class="col-md-6">
+                                            <div class="col-md-6">
+                                                <xsl:if test="/root/access_schedule_absent_edit = 1">
                                                     <a class="action edit" onclick="getScheduleAbsentPopup('', '', '', {id})"><xsl:text>&#x0A;</xsl:text></a>
+                                                </xsl:if>
+
+                                                <xsl:if test="/root/access_schedule_absent_delete = 1">
                                                     <a class="action delete" onclick="deleteScheduleAbsent({id}, deleteAbsentClientCallback)"><xsl:text>&#x0A;</xsl:text></a>
-                                                </div>
-                                            </xsl:if>
+                                                </xsl:if>
+                                            </div>
                                         </div>
                                     </xsl:for-each>
                                 </div>

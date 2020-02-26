@@ -14,13 +14,9 @@ class Schedule_Absent extends Schedule_Absent_Model
      */
     public function getObject()
     {
-        Core::requireClass('Schedule_Lesson');
-        Core::requireClass('User_Controller');
-
         if (empty($this->objectId())) {
             return User_Controller::factory();
         }
-
         if ($this->typeId() == Schedule_Lesson::TYPE_GROUP) {
             return Core::factory('Schedule_Group', $this->objectId());
         } else {
@@ -58,6 +54,10 @@ class Schedule_Absent extends Schedule_Absent_Model
                 }
             } elseif ($this->dateFrom() == $tomorrow && date('H:i:s') >= $endDayTime) {
                 $dateStart = date('d.m.y', strtotime($tomorrow . ' +1 day'));
+            }
+
+            if ($dateStart == $tomorrow) {
+                $dateStart = refactorDateFormat($tomorrow);
             }
 
             if (isset($dateStart)) {

@@ -9,6 +9,9 @@
  */
 class Schedule_Group_Model extends Core_Entity
 {
+    const TYPE_CLIENTS =    1;
+    const TYPE_LIDS =       2;
+
     /**
      * @var int
      */
@@ -61,6 +64,12 @@ class Schedule_Group_Model extends Core_Entity
      * @var int
      */
     protected $active = 1;
+
+
+    /**
+     * @var int
+     */
+    protected $type = self::TYPE_CLIENTS;
 
 
     /**
@@ -160,6 +169,19 @@ class Schedule_Group_Model extends Core_Entity
         }
     }
 
+    /**
+     * @param int|null $type
+     * @return $this|int
+     */
+    public function type(int $type = null)
+    {
+        if (is_null($type)) {
+            return intval($this->type);
+        } else {
+            $this->type = $type;
+            return $this;
+        }
+    }
 
     /**
      * @return array

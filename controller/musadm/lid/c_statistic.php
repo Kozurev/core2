@@ -59,8 +59,8 @@ $dateRow = $teacherId === 0
     ?   'control_date'
     :   'rep.date';
 
-$timeFrom = strtotime($dateFrom . "00:00:00");
-$timeTo = strtotime($dateTo . "23:59:00");
+$timeFrom = strtotime($dateFrom . " 00:00:00");
+$timeTo = strtotime($dateTo . " 23:59:00");
 if ($dateFrom == $dateTo) {
     $countQuery->where($dateRow, '=', $dateFrom);
     $countFromScheduleQuery->where('insert_date', '=', $dateFrom);
@@ -174,7 +174,6 @@ $lidsOutput
     ->xsl('musadm/statistic/lids.xsl')
     ->show();
 echo '</div></section>';
-
 
 //Сводка по маркерам/источникам/преподам
 $markerId = Core_Array::Post('markerId', 0, PARAM_INT);

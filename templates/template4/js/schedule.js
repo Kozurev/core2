@@ -59,7 +59,7 @@ $(function(){
             }
 
             Schedule.saveAbsentPeriod(absentData, function (response) {
-                if (checkResponseStatus(response)) {
+                if (response.status == true) {
                     let msg = 'Период отсутствия с ' + response.absent.refactoredDateFrom + ' ';
                     if (response.absent.refactoredTimeFrom != '00:00') {
                         msg += response.absent.refactoredTimeFrom;
@@ -78,7 +78,15 @@ $(function(){
                         refreshUserTable();
                     }
                 } else {
-                    closePopup();
+                    let $popup = $('.popup');
+                    let $popupError = $popup.find('p.error');
+                    if ($popupError.length == 0) {
+                        $popup.append('<p class="error">'+response.message+'</p>');
+                    } else {
+                        $popupError.text(response.message);
+                    }
+
+                    //closePopup();
                     loaderOff();
                 }
             });
@@ -304,7 +312,8 @@ $(function(){
                         loaderOff();
                     });
                 } else {
-                    Group.getList({active: true}, function (groups) {
+                    let typeId = type == 2 ? 1 : 2;
+                    Group.getList({active: true, type: typeId}, function (groups) {
                         $.each(groups, function (key, group) {
                             clientsList.append('<option value="'+group.id+'">'+group.title+'</option>');
                         });
@@ -380,7 +389,7 @@ $(function(){
                 lessonId: lessonId
             };
 
-            if (typeId == 2) {
+            if (typeId == 2 || typeId == 4) {
                 $.each(attendance, function(key, input) {
                     let name = $(input).attr('name');
                     if (name != 'group') {
@@ -1090,18 +1099,27 @@ function saveClientLesson() {
             modelName: 'Schedule_Lesson'
         };
 
-    $.ajax({
-        type: 'GET',
-        url: root + '/admin?menuTab=Main&menuAction=updateAction&ajax=1',
-        data: data,
-        success: function(response) {
-            closePopup();
-            if(response != '0' && response != '') {
-                notificationError(response);
-            } else {
-                notificationSuccess('Вы успешно были поставлены в график');
-                refreshSchedule();
-            }
+    Schedule.checkAbsentPeriod({
+        userId: data.clientId,
+        date: data.insertDate
+    }, function(response) {
+        if (response.isset == false) {
+            $.ajax({
+                type: 'GET',
+                url: root + '/admin?menuTab=Main&menuAction=updateAction&ajax=1',
+                data: data,
+                success: function(response) {
+                    closePopup();
+                    if(response != '0' && response != '') {
+                        notificationError(response);
+                    } else {
+                        notificationSuccess('Вы успешно были поставлены в график');
+                        refreshSchedule();
+                    }
+                }
+            });
+        } else {
+            notificationError('Невозможно поставить занятие в график при активном периоде отсутствия');
         }
     });
 }

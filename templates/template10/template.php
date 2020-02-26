@@ -1,6 +1,5 @@
 <?php
     $Director = User::current()->getDirector();
-    Core::requireClass('Property_Controller');
     $SberToken = Property_Controller::factoryByTag('payment_sberbank_token');
     $sberTokenVal = $SberToken->getValues($Director)[0]->value();
     Core_Page_Show::instance()->cacheVersion(date('Ymd'));
@@ -51,13 +50,11 @@
         ->js('/templates/template10/assets/plugins/jquery.min.js');
 
         global $CFG;
-        Core::factory('User_Controller');
-        //$Director = User::current()->getDirector();
         $subordinated = $Director->getId();
         $pageUserId = Core_Array::Get('userid', null, PARAM_INT);
 
         is_null($pageUserId)
-            ?   $User = User::current()
+            ?   $User = User_Auth::current()
             :   $User = User_Controller::factory($pageUserId);
 
         if (is_null($pageUserId)) {
@@ -169,8 +166,11 @@
                                     if ($accessClients) {
                                         echo '<li><a href="'.$CFG->rootdir.'/user/client">Клиенты</a></li>';
                                     }
-                                    if ($accessTeachers || $accessManagers) {
-                                        echo '<li><a href="'.$CFG->rootdir.'/user/teacher" >Штат</a></li>';
+                                    if ($accessTeachers) {
+                                        echo '<li><a href="'.$CFG->rootdir.'/user/teacher">Преподаватели</a></li>';
+                                    }
+                                    if ($accessManagers) {
+                                        echo '<li><a href="'.$CFG->rootdir.'/user/manager">Менеджеры</a></li>';
                                     }
                                     if ($accessArchiveC || $accessArchiveT || $accessArchiveM) {
                                         echo '<li><a href="'.$CFG->rootdir.'/user/archive">Архив</a></li>';

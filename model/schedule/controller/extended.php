@@ -288,8 +288,10 @@ class Schedule_Controller_Extended
                     $freeScheduleTime[$timeBefore]->timeTo = deductTime($lesson->timeFrom(), SCHEDULE_LESSON_INTERVAL);
                 }
             }
-            if ($timeAfter == '19:30:00') {
-                debug(Schedule_Controller_Extended::isFreeTime(addTime($lesson->timeTo(), SCHEDULE_LESSON_INTERVAL), $timeAfter, $teacherLessons, $teacherSchedule), 1);
+            if ($timeBefore == '10:00:00') {
+                // debug([$timeBefore, deductTime($lesson->timeFrom(), SCHEDULE_LESSON_INTERVAL)]);
+                // debug($teacherLessons);
+                // debug(Schedule_Controller_Extended::isFreeTime($timeBefore, deductTime($lesson->timeFrom(), SCHEDULE_LESSON_INTERVAL), $teacherLessons, $teacherSchedule));
             }
             if (Schedule_Controller_Extended::isFreeTime(addTime($lesson->timeTo(), SCHEDULE_LESSON_INTERVAL), $timeAfter, $teacherLessons, $teacherSchedule)) {
                 $timeFrom = addTime($lesson->timeTo(), SCHEDULE_LESSON_INTERVAL);
@@ -343,8 +345,19 @@ class Schedule_Controller_Extended
     public static function isFreeTime(string $timeFrom, string $timeTo, array $lessons, array $schedule)
     {
         foreach ($lessons as $lesson) {
-            if (isTimeInRange($timeFrom, $lesson->timeFrom(), $lesson->timeTo(), true)
-                || isTimeInRange($timeTo, $lesson->timeFrom(), $lesson->timeTo(), false)) {
+//            if ($timeFrom == '10:00:00') {
+//                debug([
+//                    $timeFrom, $timeTo, $lesson->timeFrom(), $lesson->timeTo(),
+//                    isTimeInRange($timeFrom, $lesson->timeFrom(), $lesson->timeTo(), true),
+//                    isTimeInRange($timeTo, $lesson->timeFrom(), $lesson->timeTo(), false),
+//                    isTimeInRange($lesson->timeFrom(), $timeFrom, $timeTo, true),
+//                    isTimeInRange($lesson->timeTo(), $timeFrom, $timeTo, true)
+//                ], 1);
+//            }
+            if (   isTimeInRange($timeFrom, $lesson->timeFrom(), $lesson->timeTo(), true)
+                || isTimeInRange($timeTo, $lesson->timeFrom(), $lesson->timeTo(), false)
+                || isTimeInRange($lesson->timeFrom(), $timeFrom, $timeTo, true)
+                || isTimeInRange($lesson->timeTo(), $timeFrom, $timeTo, true)) {
                 return false;
             }
         }

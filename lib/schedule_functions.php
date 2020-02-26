@@ -59,10 +59,6 @@ function updateLastLessonTime($Lesson, &$maxTime, $time, $period)
  */
 function getLessonData($Lesson)
 {
-    Core::requireClass('Property_Controller');
-    Core::requireClass('Schedule_Lesson');
-    Core::requireClass('Lid_Controller');
-
     $output = [
         'client'    =>  '',
         'teacher'   =>  '',
@@ -136,6 +132,26 @@ function getLessonData($Lesson)
                     $output['client'] .= ' ' . $Lid->number();
                 }
             }
+        }
+    } elseif ($Lesson->typeId() == Schedule_Lesson::TYPE_GROUP_CONSULT) {
+        $group = $Lesson->getGroup();
+        if ($Lesson->teacherId() == 0) {
+            $teacher = $group->getTeacher();
+        } else {
+            $teacher = $Lesson->getTeacher();
+        }
+
+        if (empty($teacher)) {
+            $output['teacher'] = 'Неизвестен';
+        } else {
+            $output['teacher'] = $teacher->surname() . ' ' . $teacher->name();
+        }
+
+        if (empty($group)) {
+            $output['client'] = 'Неизвестен';
+        } else {
+            $output['client'] = $group->title();
+            $output['client_status'] = 'group';
         }
     }
 

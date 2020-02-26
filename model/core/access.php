@@ -45,7 +45,10 @@ class Core_Access
     const SCHEDULE_CREATE = 'schedule_create';
     const SCHEDULE_EDIT = 'schedule_edit';
     const SCHEDULE_DELETE = 'schedule_delete';
-    const SCHEDULE_ABSENT = 'schedule_absent';
+    const SCHEDULE_ABSENT_READ = 'schedule_absent_read';
+    const SCHEDULE_ABSENT_CREATE = 'schedule_absent_create';
+    const SCHEDULE_ABSENT_EDIT = 'schedule_absent_edit';
+    const SCHEDULE_ABSENT_DELETE = 'schedule_absent_delete';
     const SCHEDULE_REPORT_READ = 'schedule_report_read';
     const SCHEDULE_REPORT_CREATE = 'schedule_report_create';
     const SCHEDULE_REPORT_EDIT = 'schedule_report_edit';
@@ -298,7 +301,9 @@ class Core_Access
         $Group1->capabilityAllow(self::SCHEDULE_CREATE);
         $Group1->capabilityAllow(self::SCHEDULE_EDIT);
         $Group1->capabilityAllow(self::SCHEDULE_DELETE);
-        $Group1->capabilityAllow(self::SCHEDULE_ABSENT);
+        $Group1->capabilityAllow(self::SCHEDULE_ABSENT_CREATE);
+        $Group1->capabilityAllow(self::SCHEDULE_ABSENT_EDIT);
+        $Group1->capabilityAllow(self::SCHEDULE_ABSENT_DELETE);
 
         $Group1->capabilityAllow(self::SCHEDULE_REPORT_READ);
         $Group1->capabilityAllow(self::SCHEDULE_REPORT_CREATE);

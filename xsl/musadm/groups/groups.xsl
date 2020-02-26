@@ -45,14 +45,30 @@
             </td>
             <td><xsl:value-of select="duration" /></td>
             <td width="200px">
-                <xsl:for-each select="user[id != $teacher]" >
-                    <a href="{/root/wwwroot}/balance/?userid={id}">
-                        <xsl:value-of select="surname" />
-                        <xsl:text> </xsl:text>
-                        <xsl:value-of select="name" />
-                    </a>
-                    <br/>
-                </xsl:for-each>
+                <xsl:choose>
+                    <xsl:when test="type = 1">
+                        <xsl:for-each select="user[id != $teacher]" >
+                            <a href="{/root/wwwroot}/balance/?userid={id}">
+                                <xsl:value-of select="surname" />
+                                <xsl:text> </xsl:text>
+                                <xsl:value-of select="name" />
+                            </a>
+                            <br/>
+                        </xsl:for-each>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:for-each select="lid" >
+                            <a href="#" class="info-by-id" data-model="Lid" data-id="{id}">
+                                <xsl:value-of select="surname" />
+                                <xsl:text> </xsl:text>
+                                <xsl:value-of select="name" />
+                                <xsl:text> </xsl:text>
+                                <xsl:value-of select="number" />
+                            </a>
+                            <br/>
+                        </xsl:for-each>
+                    </xsl:otherwise>
+                </xsl:choose>
             </td>
 
             <td><xsl:value-of select="note" /></td>

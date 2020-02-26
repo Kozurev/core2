@@ -7,18 +7,19 @@
  * @version 20190311
  * @version 20190405
  * @version 20190410
+ * @version 20200224
  */
 
-//Core::factory('User_Controller');
-Core::requireClass('User_Controller_Extended');
-Core::requireClass('Schedule_Area_Controller');
-Core::requireClass('Schedule_Area_Assignment');
 
-$isDirector = intval(User::current()->groupId() == ROLE_DIRECTOR);
+$isDirector = intval(User_Auth::current()->groupId() == ROLE_DIRECTOR);
 $groupId = Core_Page_Show::instance()->StructureItem->getId();
-$ClientController = new User_Controller_Extended(User::current());
+$ClientController = new User_Controller_Extended(User_Auth::current());
 
 if ($groupId == ROLE_CLIENT) {
+    if (!Core_Access::instance()->hasCapability(Core_Access::USER_READ_CLIENTS)) {
+        Core_Page_Show::instance()->error(404);
+    }
+
     $xsl = 'musadm/users/clients.xsl';
     $propertiesIds = [
         4,  //Примечание пользователя
@@ -37,12 +38,11 @@ if ($groupId == ROLE_CLIENT) {
     $ClientController->paginate()->setCurrentPage(
         Core_Array::Get('page', 1, PARAM_INT)
     );
-//    $ClientController->isPaginate(true);
-    if( isset($_GET['notPaginate'])){
+
+    if (isset($_GET['notPaginate'])) {
         $ClientController->isPaginate(false);
         unset($_GET['notPaginate']);
-    }
-    else {
+    } else {
         $ClientController->isPaginate(true);
         $ClientController->addSimpleEntity('paginate', true);
         unset($_GET['paginate']);
@@ -51,13 +51,26 @@ if ($groupId == ROLE_CLIENT) {
         unset($_GET['page']);
     }
 } elseif ($groupId == ROLE_TEACHER) {
+    if (!Core_Access::instance()->hasCapability(Core_Access::USER_READ_TEACHERS)) {
+        Core_Page_Show::instance()->error(404);
+    }
+
     $xsl = 'musadm/users/teachers.xsl';
     $propertiesIds = [
         20, //Инструмент
         28, //Год(дата) рождения
-        31,  //Расписание занятий
+        31, //Расписание занятий
         59 //Стоп-лист преподавателей
     ];
+} elseif ($groupId == ROLE_MANAGER) {
+    if (!Core_Access::instance()->hasCapability(Core_Access::USER_READ_MANAGERS)) {
+        Core_Page_Show::instance()->error(404);
+    }
+
+    $xsl = 'musadm/users/managers.xsl';
+    $propertiesIds = [];
+} else {
+    Core_Page_Show::instance()->error(404);
 }
 
 $ClientController
@@ -192,12 +205,12 @@ $ClientController->show();
 Core::detachObserver('before.UserControllerExtended.show');
 
 //Список менеджеров для директора
-if ($groupId == ROLE_TEACHER && Core_Access::instance()->hasCapability(Core_Access::USER_READ_MANAGERS)) {
-    $TeacherController = new User_Controller(User::current());
-    $TeacherController
-        ->properties(true)
-        ->groupId(2)
-        ->addSimpleEntity('page-theme-color', 'primary')
-        ->xsl('musadm/users/managers.xsl')
-        ->show();
-}
+//if ($groupId == ROLE_MANAGER && Core_Access::instance()->hasCapability(Core_Access::USER_READ_MANAGERS)) {
+//    $TeacherController = new User_Controller(User_Auth::current());
+//    $TeacherController
+//        ->properties(true)
+//        ->groupId(2)
+//        ->addSimpleEntity('page-theme-color', 'primary')
+//        ->xsl('musadm/users/managers.xsl')
+//        ->show();
+//}

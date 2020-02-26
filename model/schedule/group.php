@@ -21,12 +21,19 @@ class Schedule_Group extends Schedule_Group_Model
             return [];
         }
 
-        return Core::factory('User')
-            ->queryBuilder()
-            ->join('Schedule_Group_Assignment AS ass', 'ass.user_id = User.id AND ass.group_id = ' . $this->id)
-            ->where('User.group_id', '=', ROLE_CLIENT)
-            ->orderBy('User.surname')
-            ->findAll();
+        if ($this->type() == self::TYPE_CLIENTS) {
+            return Core::factory('User')
+                ->queryBuilder()
+                ->join('Schedule_Group_Assignment AS ass', 'ass.user_id = User.id AND ass.group_id = ' . $this->id)
+                ->where('User.group_id', '=', ROLE_CLIENT)
+                ->orderBy('User.surname')
+                ->findAll();
+        } else {
+            return Core::factory('Lid')
+                ->queryBuilder()
+                ->join('Schedule_Group_Assignment AS ass', 'ass.user_id = Lid.id AND ass.group_id = ' . $this->id)
+                ->findAll();
+        }
     }
 
 

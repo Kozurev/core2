@@ -32,7 +32,7 @@ if (User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]], $User)
     $accessCreate = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_CREATE);
     $accessEdit =   Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT);
     $accessDelete = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_DELETE);
-    $accessAbsent = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT);
+    $accessAbsent = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_CREATE);
 
     $Area = Core_Page_Show::instance()->StructureItem;
     $areaId = $Area->getId();
@@ -338,7 +338,11 @@ if ($User->groupId() == ROLE_TEACHER) {
     $accessPaymentEdit =  Core_Access::instance()->hasCapability(Core_Access::PAYMENT_EDIT_TEACHER);
     $accessPaymentDelete= Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_TEACHER);
     $accessPaymentConfig= Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CONFIG);
-    $accessAbsentPeriod = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT);
+    $accessAbsentRead =   Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_READ);
+    $accessAbsentCreate = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_CREATE);
+    $accessAbsentEdit =   Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_EDIT);
+    $accessAbsentDelete = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_DELETE);
+
     $month = getMonth($date);
     if (intval($month) < 10) {
         $month = '0' . $month;
@@ -627,12 +631,12 @@ if ($User->groupId() == ROLE_TEACHER) {
         }
 
         //Проверка на авторизованность под видом текущего пользователя
-        User::isAuthAs()
+        User_Auth::isAuthAs()
             ?   $isAdmin = 1
             :   $isAdmin = 0;
 
         //Проверка на авторизованность директора ? администратора под видом преподавателя
-        User::parentAuth()->groupId() === ROLE_DIRECTOR || User::parentAuth()->superuser() == 1
+        User_Auth::parentAuth()->groupId() === ROLE_DIRECTOR || User_Auth::parentAuth()->superuser() == 1
             ?   $isDirector = 1
             :   $isDirector = 0;
         Core::factory('Core_Entity')
@@ -653,7 +657,7 @@ if ($User->groupId() == ROLE_TEACHER) {
     }
 
     //Периоды отсутствия преподавателя
-    if ($accessAbsentPeriod) {
+    if ($accessAbsentRead) {
         $AbsentPeriods = Core::factory('Schedule_Absent')
             ->queryBuilder()
             ->where('type_id', '=', 1)
@@ -672,6 +676,9 @@ if ($User->groupId() == ROLE_TEACHER) {
             ->addEntity($User)
             ->addEntities($AbsentPeriods)
             ->addSimpleEntity('userId', $User->getId())
+            ->addSimpleEntity('access_absent_create', intval($accessAbsentCreate))
+            ->addSimpleEntity('access_absent_edit', intval($accessAbsentEdit))
+            ->addSimpleEntity('access_absent_delete', intval($accessAbsentDelete))
             ->xsl('musadm/schedule/teacher_absent.xsl')
             ->show();
     }
