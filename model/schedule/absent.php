@@ -47,6 +47,7 @@ class Schedule_Absent extends Schedule_Absent_Model
             $today = date('Y-m-d');
             $tomorrow = date('Y-m-d', strtotime($today . ' +1 day'));
             $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')->getValues(User_Auth::current()->getDirector())[0]->value();
+
             if ($this->dateFrom() < $tomorrow) {
                 $dateStart = $tomorrow;
                 if (date('H:i:s') >= $endDayTime) {
@@ -56,7 +57,7 @@ class Schedule_Absent extends Schedule_Absent_Model
                 $dateStart = date('d.m.y', strtotime($tomorrow . ' +1 day'));
             }
 
-            if ($dateStart == $tomorrow) {
+            if ($dateStart ?? '' == $tomorrow) {
                 $dateStart = refactorDateFormat($tomorrow);
             }
 

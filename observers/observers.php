@@ -320,7 +320,7 @@ Core::attachObserver('before.Item.save', function($args) {
 /**
  * При выставлении консультации с указанием лида создается комментарий
  */
-Core::attachObserver('before.ScheduleLesson.insert', function($args) {
+Core::attachObserver('before.ScheduleLesson.save', function($args) {
     $lesson = $args[0];
     $typeId = $lesson->typeId();
     $clientId = $lesson->clientId();
@@ -344,8 +344,10 @@ Core::attachObserver('before.ScheduleLesson.insert', function($args) {
         ->getPropertyValues(User_Auth::current()->getDirector())[0]
         ->value();
 
-    $commentText = 'Консультация назначена на ' . date('d.m.Y', strtotime($lesson->insertDate()));
-    $commentText .= ' в ' . substr($lesson->timeFrom(), 0, 5);
+    $commentText = empty($lesson->getId())
+        ?   'Консультация назначена на ' . date('d.m.Y', strtotime($lesson->insertDate())) . ' в '
+        :   'Время проведение консультации изменилось на ';
+    $commentText .= substr($lesson->timeFrom(), 0, 5);
     $commentText .= ', преп. ' . $lesson->getTeacher()->surname();
     $commentText .= ', филиал ' .$lesson->getArea()->title();
     foreach ($lids as $lid) {

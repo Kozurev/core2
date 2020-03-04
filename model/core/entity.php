@@ -463,12 +463,13 @@ class Core_Entity extends Core_Entity_Model
     /**
      * Метод преобразования объекта в объект класса stdClass со значением всех свойств, объявленных в модели
      *
+     * @param array $forbiddenProps
      * @return stdClass
      */
-    public function toStd()
+    public function toStd(array $forbiddenProps = [])
     {
         $std = new stdClass();
-        $forbiddenProps = ['childrenObjects', 'aEntityVars', '_validateErrors', '_validateErrorsStr'];
+        $forbiddenProps = array_merge($forbiddenProps, ['childrenObjects', 'aEntityVars', '_validateErrors', '_validateErrorsStr']);
         foreach(get_object_vars($this) as $var => $value) {
             if (!in_array($var, $forbiddenProps)) {
                 $std->$var = $value;

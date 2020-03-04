@@ -198,4 +198,26 @@ class Schedule {
             }
         });
     }
+
+
+    static getTeacherSchedule(teacherId, callback) {
+        $.ajax({
+            type: 'GET',
+            url: Schedule.getApiLink(),
+            dataType: 'json',
+            data: {
+                action: 'getTeacherSchedule',
+                teacherId: teacherId
+            },
+            success: function (response) {
+                if (callback !== undefined) {
+                    callback(response);
+                }
+            },
+            error: function () {
+                notificationError('При получении расписания преподавателя произошла ошибка');
+                loaderOff();
+            }
+        });
+    }
 }

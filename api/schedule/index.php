@@ -416,6 +416,14 @@ if ($action === 'getTeacherNearestTime') {
     $date = Core_Array::Get('date', '', PARAM_DATE);
     $lessonDuration = Core_Array::Get('lessonDuration', '00:50:00', PARAM_TIME);
 
+    $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')->getValues(User_Auth::current()->getDirector())[0]->value();
+    $today = date('Y-m-d');
+    $tomorrow = date('Y-m-d', strtotime('+1 day'));
+    $currentTime = date('H:i:s');
+    if ($date <= $today || ($date == $tomorrow && $currentTime <= $endDayTime)) {
+        exit(json_encode([]));
+    }
+
     if (empty($teacherId)) {
         exit(REST::status(REST::STATUS_ERROR, 'Не выбран преподаватель'));
     }
@@ -437,6 +445,41 @@ if ($action === 'getTeacherNearestTime') {
     }
 
     die(json_encode($nearestTimeArr));
+}
+
+
+/**
+ * График работы преподавателя
+ */
+if ($action == 'getTeacherSchedule') {
+    $teacherId = Core_Array::Get('teacherId', 0, PARAM_INT);
+    $teacher = User_Controller::factory($teacherId, false);
+
+    if (empty($teacher)) {
+        exit(REST::status(REST::STATUS_ERROR, 'Преподаватель не найден'));
+    }
+
+    $teacherSchedule = Schedule_Controller_Extended::getTeacherTime($teacherId);
+
+    $schedule = [];
+    foreach ($teacherSchedule as $time) {
+        if (!isset($schedule[$time->dayName()])) {
+            $schedule[$time->dayName()] = new stdClass();
+            $schedule[$time->dayName()]->dayName = getDayName($time->dayName());
+            $schedule[$time->dayName()]->times = [];
+        }
+        $timeStd = new stdClass();
+        $timeStd->timeFrom = $time->timeFrom();
+        $timeStd->refactoredTimeFrom = refactorTimeFormat($time->timeFrom());
+        $timeStd->timeTo = $time->timeFrom();
+        $timeStd->refactoredTimeTo = refactorTimeFormat($time->timeTo());
+        $schedule[$time->dayName()]->times[] = $timeStd;
+    }
+
+    $response = new stdClass();
+    $response->teacher = $teacher->toStd(User::getHiddenProps());
+    $response->schedule = $schedule;
+    exit(json_encode($response));
 }
 
 

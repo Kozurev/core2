@@ -59,7 +59,7 @@ $(function(){
             }
 
             Schedule.saveAbsentPeriod(absentData, function (response) {
-                if (response.status == true) {
+                if (response.status != false) {
                     let msg = 'Период отсутствия с ' + response.absent.refactoredDateFrom + ' ';
                     if (response.absent.refactoredTimeFrom != '00:00') {
                         msg += response.absent.refactoredTimeFrom;
@@ -579,6 +579,21 @@ $(function(){
             } else {
                 scheduleSection.hide('slow');
             }
+        })
+        .on('change', '#clientLessonPopupTeacherId', function() {
+            loaderOn();
+            Schedule.getTeacherSchedule($(this).val(), function (response) {
+                let $row = $('#teacherScheduleRow');
+                $row.empty()
+                $.each(response.schedule, function (key, day) {
+                    let rowDay = day.dayName + ':';
+                    $.each(day.times, function (key, time) {
+                        rowDay += ' ' + time.refactoredTimeFrom + ' - ' + time.refactoredTimeTo + ';';
+                    });
+                    $row.append('<div class="col-md-6">'+rowDay+'</div>');
+                });
+                loaderOff();
+            });
         });
 
 
@@ -588,7 +603,7 @@ $(function(){
     var month = today.getMonth() + 1;
     var year =  today.getFullYear();
 
-    $(".day_name").text( days[today.getDay()] );
+    $(".day_name").text(days[today.getDay()]);
 
     if (day < 10)    day = '0' + day;
     if (month < 10)  month = '0' + month;
@@ -1045,6 +1060,7 @@ function makeClientLessonPopup(clientId) {
         },
         success: function(response) {
             showPopup(response);
+            $('#clientLessonPopupTeacherId').trigger('change');
             loaderOff();
         }
     });

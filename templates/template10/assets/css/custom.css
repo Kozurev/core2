@@ -307,6 +307,9 @@ section {
 .schedule .group {
     background-color: lightblue !important;
 }
+.schedule .lids_group {
+    background-color: #e0b2f3 !important;
+}
 .schedule .positive {
     background-color: rgba(120, 252, 90, 0.7) !important;
 }

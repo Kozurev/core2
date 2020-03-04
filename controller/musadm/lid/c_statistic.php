@@ -52,6 +52,8 @@ $countQuery = (new Lid)->queryBuilder()
     ->where('subordinated', '=', $subordinated);
 $countFromScheduleQuery = (new Lid)->queryBuilder()
     ->where('subordinated', '=', $subordinated);
+$countFromDateControl = (new Event())->queryBuilder()
+    ->where('type_id', '=', Event::LID_CREATE);
 
 //Если выборка идет только по лидам то в условие попадает дата контроля лида
 //а если выборка идет по консультациям преподавателя то в условии буддет дата отчета
@@ -68,6 +70,9 @@ if ($dateFrom == $dateTo) {
     $countQuery->between($dateRow,$dateFrom,$dateTo);
     $countFromScheduleQuery->between('insert_date', $dateFrom, $dateTo);
 }
+$countFromDateControl
+    ->between('Event.time', strtotime($timeFrom), strtotime($timeTo))
+    ->orderBy('time', 'DESC');
 
 if ($teacherId !== 0) {
     $reportTableName = Core::factory('Schedule_Lesson_Report')->getTableName();
@@ -80,15 +85,7 @@ if ($teacherId !== 0) {
         $lessonTableName . ' AS lesson',
         'lesson.type_id = ' . Schedule_Lesson::TYPE_CONSULT . ' AND lesson.client_id = Lid.id AND lesson.teacher_id = ' . $teacherId
     );
-    $countFromDateControl = (new Event())->queryBuilder()
-        ->where('type_id', '=', Event::LID_CREATE)
-        ->between('Event.time',$timeFrom,$timeTo)
-        ->orderBy('time', 'DESC');
 } else {
-    $countFromDateControl = (new Event())->queryBuilder()
-        ->where('type_id', '=', Event::LID_CREATE)
-        ->between('Event.time',$timeFrom,$timeTo)
-        ->orderBy('time', 'DESC');
     $lessonTableName = Core::factory('Schedule_Lesson')->getTableName();
     $countFromScheduleQuery->join(
         $lessonTableName . ' AS lesson',

@@ -183,7 +183,7 @@
                         <td>
                             <div class="row">
                                 <div class="col-md-4">Периоды отсутствия</div>
-                                <div class="periods col-md-3">
+                                <div class="periods col-md-8">
                                     <xsl:for-each select="absent">
                                         <div class="row" data-period-id="{id}">
                                             <div class="col-md-6">

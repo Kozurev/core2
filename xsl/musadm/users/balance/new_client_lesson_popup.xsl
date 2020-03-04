@@ -6,7 +6,7 @@
                 <input class="form-control" type="date" name="date" />
             </div>
             <div class="col-md-6">
-                <select class="form-control" name="teacherId">
+                <select class="form-control" name="teacherId" id="clientLessonPopupTeacherId">
                     <xsl:for-each select="teacher">
                         <option value="{id}">
                             <xsl:value-of select="surname" />
@@ -33,6 +33,13 @@
             <div class="col-md-12">
                 <button class="btn btn-default" onclick="event.preventDefault; saveClientLesson()">Забронировать</button>
             </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">График преподавателя:</div>
+        </div>
+        <div class="row" id="teacherScheduleRow" style="margin-top: 0">
+
         </div>
 
         <div class="row" style="margin-top: 10px">

@@ -14,13 +14,25 @@ $dateFormat = 'Y-m-d';
 $date = date($dateFormat);
 $dateFrom = Core_Array::Get('date_from', $date, PARAM_DATE);
 $dateTo =   Core_Array::Get('date_to', $date, PARAM_DATE);
-$areaId =   Core_Array::Get('area_id', 0, PARAM_INT);
+$areaIds =   Core_Array::Get('area_id', [], PARAM_ARRAY);
 
 $director = User_Auth::current()->getDirector();
 $subordinated = $director->getId();
 $userTableName = (new User())->getTableName();
 $areasTable = (new Schedule_Area())->getTableName();
 $areaAsgmTable = (new Schedule_Area_Assignment())->getTableName();
+
+if (empty($areaIds)) {
+    if (Core_Access::instance()->hasCapability(Core_Access::AREA_MULTI_ACCESS)) {
+        $areas = (new Schedule_Area())->getList();
+    } else {
+        $areas = (new Schedule_Area_Assignment())->getAreas(User_Auth::current());
+    }
+
+    foreach ($areas as $area) {
+        $areaIds[] = $area->getId();
+    }
+}
 
 $Orm = new Orm();
 
@@ -35,14 +47,11 @@ $totalBalanceQuery = clone $Orm->clearQuery()
                     u.group_id = ' . ROLE_CLIENT
     )
     ->where('p.model_name', '=', 'User')
-    ->where('p.property_id', '=', 12);
-
-if ($areaId !== 0) {
-    $totalBalanceQuery->join(
+    ->where('p.property_id', '=', 12)
+    ->join(
         $areaAsgmTable.' as saa',
-        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
     );
-}
 
 $result = Orm::execute($totalBalanceQuery->getQueryString());
 $result = $result->fetch();
@@ -62,14 +71,11 @@ $indivLessonsQuery = clone $Orm->clearQuery()
     )
     ->where('p.model_name', '=', 'User')
     ->where('p.property_id', '=', 13)
-    ->where('value', '>', 0);
-
-if ($areaId !== 0) {
-    $indivLessonsQuery->join(
+    ->where('value', '>', 0)
+    ->join(
         $areaAsgmTable.' as saa',
-        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
     );
-}
 
 $result = Orm::execute($indivLessonsQuery->getQueryString());
 $result = $result->fetch();
@@ -89,14 +95,12 @@ $indivLessonsDebtQuery = clone $Orm->clearQuery()
     )
     ->where('p.model_name', '=', 'User')
     ->where('p.property_id', '=', 13)
-    ->where('value', '<', 0);
-
-if ($areaId !== 0) {
-    $indivLessonsDebtQuery->join(
+    ->where('value', '<', 0)
+    ->join(
         $areaAsgmTable.' as saa',
-        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
     );
-}
+
 
 $result = Orm::execute($indivLessonsDebtQuery->getQueryString());
 $result = $result->fetch();
@@ -116,14 +120,12 @@ $groupLessonsQuery = clone $Orm->clearQuery()
     )
     ->where('p.model_name', '=', 'User')
     ->where('p.property_id', '=', 14)
-    ->where('value', '>', 0);
-
-if ($areaId !== 0) {
-    $groupLessonsQuery->join(
+    ->where('value', '>', 0)
+    ->join(
         $areaAsgmTable.' as saa',
-        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
     );
-}
+
 
 $result = Orm::execute($groupLessonsQuery->getQueryString());
 $result = $result->fetch();
@@ -142,14 +144,11 @@ $groupLessonsDebtQuery = clone $Orm->clearQuery()
                     u.group_id = ' . ROLE_CLIENT
     )
     ->where('property_id', '=', 14)
-    ->where('value', '<', 0);
-
-if ($areaId !== 0) {
-    $groupLessonsDebtQuery->join(
+    ->where('value', '<', 0)
+    ->join(
         $areaAsgmTable.' as saa',
-        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
     );
-}
 
 $result = Orm::execute($groupLessonsDebtQuery->getQueryString());
 $result = $result->fetch();
@@ -168,14 +167,12 @@ $birthYears = clone $Orm->clearQuery()
                     u.group_id = ' . ROLE_CLIENT
     )
     ->where('property_id', '=', 28)
-    ->where('value', '<>', '');
-
-if ($areaId !== 0) {
-    $birthYears->join(
+    ->where('value', '<>', '')
+    ->join(
         $areaAsgmTable.' as saa',
-        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
     );
-}
+
 
 $birthYears = $birthYears->findAll();
 
@@ -206,7 +203,11 @@ $avgIndivCost = clone $Orm->clearQuery()
                     u.group_id = ' . ROLE_CLIENT
     )
     ->where('property_id', '=', 42)
-    ->where('value', '>', 0);
+    ->where('value', '>', 0)
+    ->join(
+        $areaAsgmTable.' as saa',
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
+    );
 
 $avgGroupCost = clone $Orm->clearQuery()
     ->select('avg(value)', 'value')
@@ -218,18 +219,12 @@ $avgGroupCost = clone $Orm->clearQuery()
                     u.group_id = ' . ROLE_CLIENT
     )
     ->where('property_id', '=', 43)
-    ->where('value', '>', 0);
+    ->where('value', '>', 0)
+    ->join(
+        $areaAsgmTable.' as saa',
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
+    );
 
-if ($areaId !== 0) {
-    $avgIndivCost->join(
-        $areaAsgmTable.' as saa',
-        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
-    );
-    $avgGroupCost->join(
-        $areaAsgmTable.' as saa',
-        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
-    );
-}
 
 $avgIndivCost = $avgIndivCost->find();
 $avgGroupCost = $avgGroupCost->find();
@@ -255,13 +250,21 @@ $avgGroupCost = is_object($avgGroupCost) && !is_null($avgGroupCost->value) ? rou
 $lessonReportsCount = (new Schedule_Lesson_Report())->queryBuilder()
     ->where('Schedule_Lesson_Report.type_id', '<>', Schedule_Lesson::TYPE_CONSULT)
     ->leftJoin('User as u', 'u.id = teacher_id')
-    ->where('u.subordinated', '=', $subordinated);
+    ->where('u.subordinated', '=', $subordinated)
+    ->join(
+        'Schedule_Lesson as lesson',
+        'lesson.id = lesson_id AND lesson.area_id in (' . implode(', ', $areaIds) . ')'
+    );
 
 $attendanceCount = (new Schedule_Lesson_Report())->queryBuilder()
     ->where('Schedule_Lesson_Report.type_id', '<>', Schedule_Lesson::TYPE_CONSULT)
     ->where('attendance', '=', 1)
     ->join('User as u', 'u.id = teacher_id')
-    ->where('u.subordinated', '=', $subordinated);
+    ->where('u.subordinated', '=', $subordinated)
+    ->join(
+        'Schedule_Lesson as lesson',
+        'lesson.id = lesson_id AND lesson.area_id in (' . implode(', ', $areaIds) . ')'
+    );
 
 if ($dateFrom == $dateTo) {
     $lessonReportsCount->where('date', '=', $dateFrom);
@@ -273,16 +276,6 @@ if ($dateFrom == $dateTo) {
     $attendanceCount->where('date', '<=', $dateTo);
 }
 
-if ($areaId !== 0) {
-    $lessonReportsCount->join(
-        'Schedule_Lesson as lesson',
-        'lesson.id = lesson_id AND lesson.area_id = ' . $areaId
-    );
-    $attendanceCount->join(
-        'Schedule_Lesson as lesson',
-        'lesson.id = lesson_id AND lesson.area_id = ' . $areaId
-    );
-}
 
 $lessonReportsCount = $lessonReportsCount->getCount();
 $attendanceCount = $attendanceCount->getCount();
@@ -320,16 +313,12 @@ $queryString = (new Orm())
     ->select('sum(value)', 'sum')
     ->from('Payment')
     ->where('type', '=', 3)
-    ->where('Payment.subordinated', '=', $subordinated);
-
-if ($areaId !== 0) {
-    $queryString
-        ->join('User as u', 'Payment.user = u.id')
-        ->join(
-            'Schedule_Area_Assignment as saa',
-            'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
-        );
-}
+    ->where('Payment.subordinated', '=', $subordinated)
+    ->join('User as u', 'Payment.user = u.id')
+    ->join(
+        'Schedule_Area_Assignment as saa',
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
+    );
 
 if ($dateFrom == $dateTo) {
     $queryString->where('datetime', '=', $dateFrom);
@@ -357,22 +346,19 @@ if ($result['sum'] == null) {
  */
 $finances = (new Schedule_Lesson_Report())->queryBuilder()
     ->join('User AS u', 'teacher_id = u.id')
-    ->where('u.subordinated', '=', $subordinated);
+    ->where('u.subordinated', '=', $subordinated)
+    ->join(
+        'Schedule_Lesson as lesson',
+        'lesson.id = lesson_id AND lesson.area_id in (' . implode(', ', $areaIds) . ')'
+    );
 
 //Хозрасходы
 $hostExpenses = (new Payment())->queryBuilder()
     ->select('sum(Payment.value)', 'value')
     ->join('Payment_Type as t', 'Payment.type = t.id')
     ->where('t.subordinated', '=', $subordinated)
-    ->where('Payment.subordinated', '=', $subordinated);
-
-if ($areaId !== 0) {
-    $finances->join(
-        'Schedule_Lesson as lesson',
-        'lesson.id = lesson_id AND lesson.area_id = ' . $areaId
-    );
-    $hostExpenses->where('area_id', '=', $areaId);
-}
+    ->where('Payment.subordinated', '=', $subordinated)
+    ->whereIn('area_id', $areaIds);
 
 if ($dateFrom == $dateTo) {
     $finances->where('date', '=', $dateFrom);
@@ -420,7 +406,11 @@ $userCountQuery = (new User())->queryBuilder()
     ->where('group_id', '=', ROLE_CLIENT)
     ->where('register_date','<=',$dateTo)
     ->where('subordinated', '=', $subordinated)
-    ->where('active', '=', 1);
+    ->where('active', '=', 1)
+    ->join(
+    'Schedule_Area_Assignment as saa',
+    'User.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
+    );
 
 $reportTableName = (new Schedule_Lesson_Report())->getTableName();
 $userActiveCountQuery = (new User())->queryBuilder()
@@ -432,18 +422,12 @@ $userActiveCountQuery = (new User())->queryBuilder()
         $reportTableName . ' AS rep',
         'rep.client_id = User.id AND rep.attendance = 1 AND rep.date between "'.$dateFrom.'" AND "'.$dateTo.'" AND rep.type_id = 1'
     )
+    ->join(
+        'Schedule_Area_Assignment as saa',
+        'User.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
+    )
     ->groupBy('User.id');
 
-if ($areaId !== 0) {
-    $userCountQuery->join(
-        'Schedule_Area_Assignment as saa',
-        'User.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
-    );
-    $userActiveCountQuery->join(
-        'Schedule_Area_Assignment as saa',
-        'User.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
-    );
-}
 
 $userCount = $userCountQuery->count();
 $userActiveCount = $userActiveCountQuery->findAll();
@@ -457,27 +441,17 @@ $userActiveCount = $userActiveCountQuery->findAll();
 /**
  * Статистика по отвалу клиентов
  */
-//$userAllCount =  (new User())->queryBuilder()
-//    ->where('group_id', '=', ROLE_CLIENT)
-//    ->where('subordinated', '=', $subordinated)
-//    ->where('register_date','<=',$dateTo)
-//    ->where('active', '=', 1)
-//    ->count();
-
 $propertyDumpReason = Property_Controller::factoryByTag('client_dump_reasons');
 $reasons = $propertyDumpReason->getList();
 $userActivityList = [];
 foreach ($reasons as $reason) {
     $userActivityCountQuery =  (new User_Activity())->queryBuilder()
         ->where('reason_id', '=', $reason->id())
-        ->between('dump_date_start',$dateFrom,$dateTo);
-
-    if ($areaId !== 0) {
-        $userActivityCountQuery->join(
+        ->between('dump_date_start',$dateFrom,$dateTo)
+        ->join(
             'Schedule_Area_Assignment as saa',
-            'user_id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+            'user_id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
         );
-    }
 
     $userActivityCount = $userActivityCountQuery->count();
     $reason = $reason->toStd();
@@ -487,32 +461,29 @@ foreach ($reasons as $reason) {
 
 $countNewClientQuery = (new User)->queryBuilder()
     ->between('register_date',$dateFrom,$dateTo)
-    ->where('active', '=', 1);
+    ->where('active', '=', 1)
+    ->join(
+        'Schedule_Area_Assignment as saa',
+        'User.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
+    );
 
 $countLeaveClientQuery = (new User_Activity)->queryBuilder()
     ->select('count(User_Activity.id)')
     ->between('dump_date_start',$dateFrom,$dateTo)
-    ->groupBy('User_Activity.user_id');
+    ->groupBy('User_Activity.user_id')
+    ->join(
+        'Schedule_Area_Assignment as saa',
+        'user_id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
+    );
 
 $countComebackClientQuery = (new User_Activity)->queryBuilder()
     ->select('count(User_Activity.id)')
     ->between('dump_date_end',$dateFrom,$dateTo)
-    ->groupBy('User_Activity.user_id');
-
-if ($areaId !== 0) {
-    $countNewClientQuery->join(
+    ->groupBy('User_Activity.user_id')
+    ->join(
         'Schedule_Area_Assignment as saa',
-        'User.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
+        'user_id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
     );
-    $countLeaveClientQuery->join(
-        'Schedule_Area_Assignment as saa',
-        'user_id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
-    );
-    $countComebackClientQuery->join(
-        'Schedule_Area_Assignment as saa',
-        'user_id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id = ' . $areaId
-    );
-}
 
 $countNewClient = $countNewClientQuery->count();
 $countLeaveClient = $countLeaveClientQuery->findAll();

@@ -9,10 +9,13 @@ $(function() {
 
             var
                 from =  $('.finances-calendar').find('input[name=date_from]').val(),
-                to =    $('.finances-calendar').find('input[name=date_to]').val(),
-                areaId= $('#statistic-areas-select').val();
+                to =    $('.finances-calendar').find('input[name=date_to]').val();
+            let areasIds = [];
+            $.each($('input[name="statistic_area_ids[]"]:checked'), function(key, input) {
+                areasIds.push($(input).val());
+            });
 
-            showStatistic(from, to, areaId, function(response) {
+            showStatistic(from, to, areasIds, function(response) {
                 $('.statistic').html(response);
                 loaderOff();
             });

@@ -80,7 +80,7 @@ function getLessonData($Lesson)
             $output['teacher'] = $Teacher->surname() . ' ' . $Teacher->name();
         }
 
-        if ($Group == false) {
+        if (empty($Group)) {
             $output['client'] = 'Неизвестен';
         } else {
             $output['client'] = $Group->title();
@@ -151,7 +151,7 @@ function getLessonData($Lesson)
             $output['client'] = 'Неизвестен';
         } else {
             $output['client'] = $group->title();
-            $output['client_status'] = 'group';
+            $output['client_status'] = 'lids_group';
         }
     }
 

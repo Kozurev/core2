@@ -14,6 +14,23 @@ class User extends User_Model
 {
 
     /**
+     * Список скрываемых свйойств при отобржаении объекта либо при передаче его данных на клиент
+     *
+     * @var array
+     */
+    private static $hidden = ['password', 'auth_token', 'push_id'];
+
+
+    /**
+     * @return array
+     */
+    public static function getHiddenProps() : array
+    {
+        return self::$hidden;
+    }
+
+
+    /**
      * Возвращает объект группы, которой принадлежит пользователь.
      * Также служит для ассоциации групп пользователей с доп. свойствами в админ меню
      *

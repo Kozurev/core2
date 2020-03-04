@@ -18,7 +18,7 @@
     <link href='https://fonts.googleapis.com/css?family=Bitter' rel='stylesheet'>
 
     <script src="https://www.google.com/recaptcha/api.js?hl=ru"></script>
-
+    <script src="//code-ya.jivosite.com/widget/3jETSm66Mk" async></script>
 
     <?php
     Core_Page_Show::instance()
@@ -142,7 +142,7 @@
                                         <ul class="dropdown-menu">
                                             <?php
                                             $Areas = Core::factory('Schedule_Area_Assignment')
-                                                ->getAreas(User::parentAuth(), true);
+                                                ->getAreas(User_Auth::parentAuth(), true);
                                             foreach ($Areas as $area) {
                                                 $href = $CFG->rootdir . '/schedule/' . $area->path();
                                                 echo "<li><a href='" . $href . "'>";

@@ -24,7 +24,32 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <xsl:apply-templates select="schedule_group" />
+                        <tr>
+                            <th colspan="6">Клиентские группы</th>
+                        </tr>
+                        <xsl:choose>
+                            <xsl:when test="count(schedule_group[type = 1]) = 0">
+                                <tr>
+                                    <td colspan="6">Клиентских групп не найдено</td>
+                                </tr>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:apply-templates select="schedule_group[type = 1]" />
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <tr>
+                            <th colspan="6">Группы лидов</th>
+                        </tr>
+                        <xsl:choose>
+                            <xsl:when test="count(schedule_group[type = 2]) = 0">
+                                <tr>
+                                    <td colspan="6">Групп лидов не найдено</td>
+                                </tr>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:apply-templates select="schedule_group[type = 2]" />
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </tbody>
                 </table>
             </div>

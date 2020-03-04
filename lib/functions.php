@@ -353,6 +353,26 @@ function getMonthName($date)
 
 
 /**
+ * Получения названия дня недели
+ *
+ * @param $day
+ * @return mixed|string
+ */
+function getDayName($day) {
+    $days = [
+        'Monday' => 'Понедельник',
+        'Tuesday' => 'Вторник',
+        'Wednesday' => 'Среда',
+        'Thursday' => 'Пятница',
+        'Friday' => 'Пятница',
+        'Saturday' => 'Суббота',
+        'Sunday' => 'Воскресенье'
+    ];
+    return $days[$day] ?? '';
+}
+
+
+/**
  * Преобразование строки русских символов в английские
  *
  * @param string $str - исходная строка
