@@ -363,7 +363,7 @@ function getDayName($day) {
         'Monday' => 'Понедельник',
         'Tuesday' => 'Вторник',
         'Wednesday' => 'Среда',
-        'Thursday' => 'Пятница',
+        'Thursday' => 'Четверг',
         'Friday' => 'Пятница',
         'Saturday' => 'Суббота',
         'Sunday' => 'Воскресенье'
