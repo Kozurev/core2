@@ -13,7 +13,7 @@ Orm::Debug(true);
 //$time = Schedule_Controller_Extended::getTeacherNearestFreeTime(1725, '2020-03-01');
 //debug($time);
 
-
+exit;
 
 $groupDirector = Core::factory('Core_Access_Group', 1);
 $groupManager = Core::factory('Core_Access_Group', 2);
