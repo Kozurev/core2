@@ -13,7 +13,7 @@ Orm::Debug(true);
 //$time = Schedule_Controller_Extended::getTeacherNearestFreeTime(1725, '2020-03-01');
 //debug($time);
 
-exit;
+
 
 $groupDirector = Core::factory('Core_Access_Group', 1);
 $groupManager = Core::factory('Core_Access_Group', 2);
@@ -37,7 +37,7 @@ $groupClient->capabilityForbidden(Core_Access::SCHEDULE_ABSENT_DELETE);
 
 Orm::execute('UPDATE Core_Access_Capability SET name = \'schedule_absent_create\' WHERE name = \'schedule_absent\'');
 
-Orm::execute('ALTER TABLE `musicmetod`.`Schedule_Group` 
+Orm::execute('ALTER TABLE `Schedule_Group` 
 ADD COLUMN `type` INT NULL AFTER `active`;');
 Orm::execute('UPDATE Schedule_Group SET type = 1 WHERE id > 0');
 $lessonGroupConsultType = new Schedule_Lesson_Type();
