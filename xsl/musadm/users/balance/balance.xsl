@@ -103,23 +103,23 @@
                                 <xsl:choose>
                                     <xsl:when test="count(nearest_lesson) = 1">
                                         <xsl:for-each select="nearest_lesson/lesson">
-                                            <p data-id="{id}" data-date="{/root/nearest_lesson/date}">
-                                                <div class="row">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <span>
+                                                        <xsl:value-of select="/root/nearest_lesson/refactoredDate" />
+                                                    </span>
+                                                    <xsl:text> в </xsl:text>
+                                                    <span>
+                                                        <xsl:value-of select="time_from" />
+                                                    </span>
+                                                    <br/>
+                                                    <span>
+                                                        <xsl:value-of select="teacher" />
+                                                    </span>
+                                                </div>
+                                                <xsl:if test="/root/access_schedule_edit = 1">
                                                     <div class="col-md-6">
-                                                        <span>
-                                                            <xsl:value-of select="/root/nearest_lesson/refactoredDate" />
-                                                        </span>
-                                                        <xsl:text> в </xsl:text>
-                                                        <span>
-                                                            <xsl:value-of select="time_from" />
-                                                        </span>
-                                                        <br/>
-                                                        <span>
-                                                            <xsl:value-of select="teacher" />
-                                                        </span>
-                                                    </div>
-                                                    <xsl:if test="/root/access_schedule_edit = 1">
-                                                        <div class="col-md-6">
+                                                        <p data-id="{id}" data-date="{/root/nearest_lesson/date}">
                                                             <span style="margin-left: 15px">
                                                                 <button class="btn btn-orange schedule_today_absent" href="#">
                                                                     <xsl:if test="/root/nearest_lesson/is_cancellable = 0">
@@ -130,17 +130,18 @@
                                                                     Отменить занятие
                                                                 </button>
                                                             </span>
+
                                                             <xsl:if test="/root/nearest_lesson/is_cancellable = 0 and /root/access_schedule_edit = 1 and /root/is_admin = 0">
                                                                 <p style="font-size: 10px; text-align: center;">
                                                                     в автоматическом режиме можно отменить занятия не позднее чем, до 17-00 текущего дня.
                                                                     Позвоните администраторам и они всё урегулируют +79092012550
                                                                 </p>
                                                             </xsl:if>
-                                                            <input type="hidden" />
-                                                        </div>
-                                                    </xsl:if>
-                                                </div>
-                                            </p>
+                                                        </p>
+                                                        <input type="hidden" />
+                                                    </div>
+                                                </xsl:if>
+                                            </div>
                                         </xsl:for-each>
                                     </xsl:when>
                                     <xsl:otherwise>
