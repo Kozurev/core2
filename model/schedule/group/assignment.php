@@ -32,6 +32,17 @@ class Schedule_Group_Assignment extends Core_Entity
 
 
     /**
+     * Связи типов группы и типов клиентов
+     *
+     * @var array
+     */
+    private static $typesAliases = [
+        Schedule_Group::TYPE_CLIENTS => User::class,
+        Schedule_Group::TYPE_LIDS => Lid::class
+    ];
+
+
+    /**
      * @param int|null $groupId
      * @return $this|int
      */
@@ -58,6 +69,56 @@ class Schedule_Group_Assignment extends Core_Entity
             $this->user_id = $userId;
             return $this;
         }
+    }
+
+
+    /**
+     * @param int $typeId
+     * @return string
+     */
+    public static function getAlias(int $typeId)
+    {
+        return self::$typesAliases[$typeId] ?? '';
+    }
+
+
+    /**
+     * @return Schedule_Group|null
+     */
+    public function getGroup()
+    {
+        if (empty($this->group_id)) {
+            return null;
+        } else {
+            return Core::factory('Schedule_Group', $this->group_id);
+        }
+    }
+
+
+    /**
+     * @return mixed|null
+     */
+    public function getObject()
+    {
+        if (empty($this->user_id)) {
+            return null;
+        }
+        $group = $this->getGroup();
+        if (empty($group)) {
+            return null;
+        }
+        return self::makeObject();
+    }
+
+
+    /**
+     * @param int $objectId
+     * @param int $groupType
+     * @return User|Lid|null
+     */
+    public static function getObjectById(int $objectId = 0, int $groupType = 0)
+    {
+        return Core::factory(self::getAlias($groupType), $objectId);
     }
 
 

@@ -1,5 +1,5 @@
 <?php
-    $Director = User::current()->getDirector();
+    $Director = User_Auth::current()->getDirector();
     $SberToken = Property_Controller::factoryByTag('payment_sberbank_token');
     $sberTokenVal = $SberToken->getValues($Director)[0]->value();
     Core_Page_Show::instance()->cacheVersion(date('Ymd'));
@@ -18,7 +18,12 @@
     <link href='https://fonts.googleapis.com/css?family=Bitter' rel='stylesheet'>
 
     <script src="https://www.google.com/recaptcha/api.js?hl=ru"></script>
-    <script src="//code-ya.jivosite.com/widget/3jETSm66Mk" async></script>
+
+    <?php
+    if (User_Auth::current()->groupId() == ROLE_CLIENT) {
+        echo '<script src="//code-ya.jivosite.com/widget/3jETSm66Mk" async></script>';
+    }
+    ?>
 
     <?php
     Core_Page_Show::instance()

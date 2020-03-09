@@ -220,25 +220,25 @@ if ($action === 'groupDeleteAssignments') {
         Core_Page_Show::instance()->error(403);
     }
 
-    $Group = Core::factory('Schedule_Group')
+    $group = Core::factory('Schedule_Group')
         ->queryBuilder()
         ->where('id', '=', $groupId)
         ->where('subordinated', '=', $subordinated)
         ->find();
 
-    if (is_null($Group)) {
+    if (is_null($group)) {
         Core_Page_Show::instance()->error(403);
     }
 
     $outputJson = [];
 
     foreach ($userIds as $id) {
-        $User = User_Controller::factory($id);
-        if (!is_null($User)) {
-            $Group->removeClient($User->getId());
+        $client = Schedule_Group_Assignment::getObjectById($id, $group->type());
+        if (!is_null($client)) {
+            $group->removeClient($id);
             $jsonUser = new stdClass();
-            $jsonUser->id = $User->getId();
-            $jsonUser->fio = $User->surname() . ' ' . $User->name();
+            $jsonUser->id = $client->getId();
+            $jsonUser->fio = $client->surname() . ' ' . $client->name();
             $outputJson[] = $jsonUser;
         }
     }

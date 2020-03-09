@@ -28,8 +28,7 @@
 
             <td>
                 <xsl:for-each select="property_value[property_id = 20]">
-                    <xsl:variable name="instrumentId" select="value_id" />
-                    <xsl:value-of select="/root/user_group[id = $groupId]/property[tag_name = 'instrument']/values/item[id = $instrumentId]/value" />
+                    <xsl:value-of select="value" />
                     <br/>
                 </xsl:for-each>
             </td>
@@ -52,7 +51,7 @@
                 </span>
             </td>
             <td>
-                <span data-areas="User_{id}"><xsl:apply-templates select="schedule_area_assignment" /></span>
+                <span data-areas="User_{id}" class="teacher_areas"><xsl:apply-templates select="schedule_area_assignment" /></span>
             </td>
 
             <td width="140px">

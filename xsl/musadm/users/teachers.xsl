@@ -5,6 +5,15 @@
     <xsl:include href="teacher_one.xsl" />
 
     <xsl:template match="root">
+
+        <style>
+            .teacher_areas {
+                display: inline-block;
+                max-height: 80px;
+                overflow-y: auto;
+            }
+        </style>
+
         <section class="section-bordered">
             <h4>Список преподавателей</h4>
 
@@ -41,7 +50,7 @@
                                 <th>Инструмент</th>
                                 <th>График для занятий</th>
                                 <th>Стоп-лист</th>
-                                <th>Филиал</th>
+                                <th width="185px">Филиал</th>
                                 <th>Действия</th>
                             </tr>
                         </thead>
