@@ -396,10 +396,12 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
 
     foreach ($lids as $lid) {
         $lidAttendance = $report->getClientAttendance($lid->getId());
-        if (empty($lidAttendance)) {
-            continue;
+        if (!empty($lidAttendance)) {
+            $attendance = $lidAttendance->attendance();
+        } else {
+            $attendance = $report->attendance();
         }
-        if (!empty($lidAttendance->attendance())) {
+        if (!empty($attendance)) {
             $statusId = $newStatusAttended;
             $comment = $commentTextAttendance;
         } else {
