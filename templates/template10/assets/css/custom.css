@@ -540,7 +540,7 @@ section {
     background: url('../images/arrow-top.png');
     background-size: 100% 100%;
     position: fixed;
-    bottom: 15px;
+    bottom: 50px;
     left: 95%;
 }
 

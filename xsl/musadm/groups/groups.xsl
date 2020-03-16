@@ -11,6 +11,69 @@
                 </xsl:if>
             </div>
 
+            <div class="row">
+                <div class="col-md-12">
+                    <ul class="pagination pagination-sm">
+                        <!--Первая страница-->
+                        <li class="page-item">
+                            <a class="page-link" href="#" onclick="event.preventDefault(); refreshGroupTable(1)">Первая</a>
+                        </li>
+
+                        <!--Указатель на предыдущую страницу-->
+                        <li class="page-item">
+                            <xsl:if test="pagination/currentPage = 1">
+                                <xsl:attribute name="class">
+                                    page-item disabled
+                                </xsl:attribute>
+                            </xsl:if>
+                            <a class="page-link" href="#" onclick="event.preventDefault(); refreshGroupTable({pagination/prevPage})">
+                                <span aria-hidden="true">←</span>
+                            </a>
+                        </li>
+                        <!--Предыдущая страница-->
+                        <xsl:if test="pagination/prevPage != 0">
+                            <li class="page-item">
+                                <a class="page-link" href="#" onclick="event.preventDefault(); refreshGroupTable({pagination/prevPage})">
+                                    <xsl:value-of select="pagination/prevPage" />
+                                </a>
+                            </li>
+                        </xsl:if>
+
+                        <!--Текущая страница-->
+                        <li class="page-item active">
+                            <a class="page-link" href="#" onclick="event.preventDefault(); refreshGroupTable({pagination/currentPage})">
+                                <xsl:value-of select="pagination/currentPage" />
+                            </a>
+                        </li>
+
+                        <!--Следующая страница-->
+                        <xsl:if test="pagination/nextPage != 0">
+                            <li class="page-item">
+                                <a class="page-link" href="#" onclick="event.preventDefault(); refreshGroupTable({pagination/nextPage})">
+                                    <xsl:value-of select="pagination/nextPage" />
+                                </a>
+                            </li>
+                        </xsl:if>
+
+                        <!--Указатель на следующую страницу-->
+                        <li class="page-item">
+                            <xsl:if test="pagination/currentPage = pagination/countPages">
+                                <xsl:attribute name="class">
+                                    page-item disabled
+                                </xsl:attribute>
+                            </xsl:if>
+                            <a class="page-link" href="#" onclick="event.preventDefault(); refreshGroupTable({pagination/nextPage})">
+                                <span aria-hidden="true">→</span>
+                            </a>
+                        </li>
+
+                        <li class="page-item">
+                            <a class="page-link" href="#" onclick="event.preventDefault(); refreshGroupTable({pagination/countPages})">Последняя</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
             <div class="table-responsive">
                 <table id="sortingTable" class="table table-striped">
                     <thead>
@@ -24,32 +87,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <th colspan="6">Клиентские группы</th>
-                        </tr>
-                        <xsl:choose>
-                            <xsl:when test="count(schedule_group[type = 1]) = 0">
-                                <tr>
-                                    <td colspan="6">Клиентских групп не найдено</td>
-                                </tr>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:apply-templates select="schedule_group[type = 1]" />
-                            </xsl:otherwise>
-                        </xsl:choose>
-                        <tr>
-                            <th colspan="6">Группы лидов</th>
-                        </tr>
-                        <xsl:choose>
-                            <xsl:when test="count(schedule_group[type = 2]) = 0">
-                                <tr>
-                                    <td colspan="6">Групп лидов не найдено</td>
-                                </tr>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:apply-templates select="schedule_group[type = 2]" />
-                            </xsl:otherwise>
-                        </xsl:choose>
+                        <xsl:apply-templates select="schedule_group" />
                     </tbody>
                 </table>
             </div>

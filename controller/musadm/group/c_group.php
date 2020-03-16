@@ -8,30 +8,45 @@
  */
 
 global $CFG;
-$User = User::current();
+$User = User_Auth::current();
 $subordinated = $User->getDirector()->getId();
 
-$groups = Core::factory('Schedule_Group')
-    ->queryBuilder()
-    ->where('active', '=', 1)
-    ->where('subordinated', '=', $subordinated)
-    ->findAll();
-
-$output = Core::factory('Core_Entity');
-foreach ($groups as $group) {
-    $group->addEntity($group->getTeacher());
-    $group->addEntities($group->getClientList());
+if (Core_Page_Show::instance()->Structure->path() == 'clients') {
+    $type = Schedule_Group::TYPE_CLIENTS;
+} else {
+    $type = Schedule_Group::TYPE_LIDS;
 }
 
-$accessCreate = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_GROUP_CREATE);
-$accessEdit =   Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_GROUP_EDIT);
-$accessDelete = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_GROUP_DELETE);
+$page = Core_Array::Request('page', 1, PARAM_INT);
 
-$output
-    ->addEntities($groups)
-    ->addSimpleEntity('wwwroot', $CFG->rootdir)
-    ->addSimpleEntity('access_group_create', (int)$accessCreate)
-    ->addSimpleEntity('access_group_edit', (int)$accessEdit)
-    ->addSimpleEntity('access_group_delete', (int)$accessDelete)
-    ->xsl('musadm/groups/groups.xsl')
+$groupsController = new Schedule_Group_Controller(User_Auth::current());
+$groupsController->getQueryBuilder()->where('type', '=', $type);
+$groupsController->paginate()->setCurrentPage($page);
+
+$groupsController
+    ->setXsl('musadm/groups/groups.xsl')
     ->show();
+
+//$groups = Core::factory('Schedule_Group')
+//    ->queryBuilder()
+//    ->where('active', '=', 1)
+//    ->where('subordinated', '=', $subordinated)
+//    ->where('type', '=', $typeId)
+//    ->findAll();
+
+//$output = Core::factory('Core_Entity');
+//foreach ($groups as $group) {
+//    $group->addEntity($group->getTeacher());
+//    $group->addEntities($group->getClientList());
+//}
+//
+//
+//
+//$output
+//    ->addEntities($groups)
+//    ->addSimpleEntity('wwwroot', $CFG->rootdir)
+//    ->addSimpleEntity('access_group_create', (int)$accessCreate)
+//    ->addSimpleEntity('access_group_edit', (int)$accessEdit)
+//    ->addSimpleEntity('access_group_delete', (int)$accessDelete)
+//    ->xsl('musadm/groups/groups.xsl')
+//    ->show();

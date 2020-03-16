@@ -10,16 +10,29 @@
 // });
 
 $(function() {
-    $(document).on('click', '.property_value_save', function(e) {
-        e.preventDefault();
-        loaderOn();
-        let
-            propName = $(this).data('property-name'),
-            modelName = $(this).data('model-name'),
-            objectId = $(this).data('object-id');
-        savePropertyValue(propName, $('#' + propName).val(), modelName, objectId, function(response) {
-            notificationSuccess('Данные успешно сохранены');
-            loaderOff();
+    $(document)
+        .on('click', '.property_value_save', function(e) {
+            e.preventDefault();
+            loaderOn();
+            let
+                propName = $(this).data('property-name'),
+                modelName = $(this).data('model-name'),
+                objectId = $(this).data('object-id');
+            savePropertyValue(propName, $('#' + propName).val(), modelName, objectId, function(response) {
+                notificationSuccess('Данные успешно сохранены');
+                loaderOff();
+            });
+        })
+        .on('change', '.property_value_checkbox', function() {
+            loaderOn();
+            let
+                propName = $(this).data('property-name'),
+                modelName = $(this).data('model-name'),
+                objectId = $(this).data('object-id'),
+                value = $(this).is(':checked');
+            savePropertyValue(propName, Number(value), modelName, objectId, function(response) {
+                notificationSuccess('Данные успешно сохранены');
+                loaderOff();
+            });
         });
-    });
 });

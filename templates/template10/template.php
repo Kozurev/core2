@@ -20,7 +20,9 @@
     <script src="https://www.google.com/recaptcha/api.js?hl=ru"></script>
 
     <?php
-    if (User_Auth::current()->groupId() == ROLE_CLIENT) {
+    $jivoActive = Property_Controller::factoryByTag('jivo_active')->getValues($Director)[0]->value();
+    $jivoScript = Property_Controller::factoryByTag('jivo_script')->getValues($Director)[0]->value();
+    if (User_Auth::current()->groupId() == ROLE_CLIENT && $jivoActive && !empty($jivoScript)) {
         echo '<script src="//code-ya.jivosite.com/widget/3jETSm66Mk" async></script>';
     }
     ?>
@@ -185,7 +187,15 @@
 
                             //Группы
                             if ($accessGroups) {
-                                echo '<li><a href="'.$CFG->rootdir.'/groups">Группы</a></li>';
+                                echo '<li class="dropdown">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                        Группы <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu">';
+                                echo '<li><a href="'.$CFG->rootdir.'/groups/clients">Клиенты</a></li>';
+                                echo '<li><a href="'.$CFG->rootdir.'/groups/lids">Лиды</a></li>';
+                                echo '</ul></li>';
+                                // echo '<li><a href="'.$CFG->rootdir.'/groups">Группы</a></li>';
                             }
 
                             //Задачи
@@ -236,6 +246,9 @@
                                 }
                                 if (User_Auth::current()->groupId() == ROLE_DIRECTOR) {
                                     echo '<li><a href="' . $CFG->rootdir . '/integration/my-calls">Мои звонки</a></li>';
+                                }
+                                if (User_Auth::current()->groupId() == ROLE_DIRECTOR) {
+                                    echo '<li><a href="' . $CFG->rootdir . '/integration/jivosite">JivoSite</a></li>';
                                 }
                                 echo '</ul></li>';
                             }

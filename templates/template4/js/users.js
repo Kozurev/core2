@@ -809,16 +809,16 @@ function makeClientTr(data) {
     }
     //Год рождения
     td1.append('<span class="user__birth"></span>');
-    if (add.prop_28.values[0].value != '') {
+    if (add.prop_28 !== undefined && add.prop_28.values[0].value != '') {
         td1.find('.user__birth').text(add.prop_28.values[0].value+' г.р.');
     }
     //Поурочная оплата
     td1.append('<span class="add__32"></span>');
-    if (add.prop_32.values[0].value == '1') {
+    if (add.prop_32 !== undefined && add.prop_32.values[0].value == '1') {
         td1.find('.add__32').append('<div class="notes">«Поурочно»</div>');
     }
     //Примечание
-    if (add.prop_19.values[0].value != '') {
+    if (add.prop_19 != undefined && add.prop_19.values[0].value != '') {
         td1.append('<span class="add__19"><div class="notes">'+add.prop_19.values[0].value+'</div></span>');
     }
 

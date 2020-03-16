@@ -13,6 +13,71 @@ Orm::Debug(true);
 //$time = Schedule_Controller_Extended::getTeacherNearestFreeTime(1725, '2020-03-01');
 //debug($time);
 
+Orm::Debug(true);
+debug(!User::isUnique('etwthrwht', 'email'), 1);
+
+exit;
+
+(new Structure())
+    ->title('JivoSite')
+    ->description('Настройка интеграции с JivoSite')
+    ->parentId(45)
+    ->path('jivosite')
+    ->action('musadm/integration/jivo')
+    ->templateId(0)
+    ->sorting(10)
+    ->save();
+
+$jivoActive = Property_Controller::factory()
+    ->type(PARAM_BOOL)
+    ->title('Скрипт для интеграции JivoSite')
+    ->description('')
+    ->tagName('jivo_active')
+    ->defaultValue('')
+    ->active(1)
+    ->dir(0)
+    ->sorting(0);
+$jivoActive->save();
+
+$jivoScript = Property_Controller::factory()
+    ->type(PARAM_STRING)
+    ->title('Скрипт для интеграции JivoSite')
+    ->description('')
+    ->tagName('jivo_script')
+    ->defaultValue('')
+    ->active(1)
+    ->dir(0)
+    ->sorting(0);
+$jivoScript->save();
+
+Property_Controller::factory()->addToPropertiesList(
+    Core::factory('User_Group', ROLE_DIRECTOR),
+    $jivoActive->getId()
+);
+
+Property_Controller::factory()->addToPropertiesList(
+    Core::factory('User_Group', ROLE_DIRECTOR),
+    $jivoScript->getId()
+);
+
+(new Structure())
+    ->title('Группы клиентов')
+    ->parentId(22)
+    ->path('clients')
+    ->action('musadm/group/group')
+    ->templateId(0)
+    ->sorting(10)
+    ->save();
+
+(new Structure())
+    ->title('Группы лидов')
+    ->parentId(22)
+    ->path('lids')
+    ->action('musadm/group/group')
+    ->templateId(0)
+    ->sorting(10)
+    ->save();
+
 exit;
 
 $groupDirector = Core::factory('Core_Access_Group', 1);

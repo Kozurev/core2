@@ -155,13 +155,18 @@ function groupSearchClient(surname, callBack) {
 }
 
 
-function refreshGroupTable() {
+function refreshGroupTable(page) {
+    if (page === undefined) {
+        page = 1;
+    }
     $.ajax({
         type: 'GET',
-        url: root + '/groups',
+        // url: root + '/groups',
+        url: '',
         async: false,
         data: {
             action: 'refreshGroupTable',
+            page: page
         },
         success: function(response) {
             $('.page').html(response);
@@ -178,7 +183,7 @@ function refreshGroupTable() {
 function getGroupPopup(groupId) {
     $.ajax({
         type: "GET",
-        url: "groups",
+        url: "",
         data: {
             action: "updateForm",
             group_id: groupId

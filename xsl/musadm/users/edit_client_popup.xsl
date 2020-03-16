@@ -70,6 +70,13 @@
             </div>
                 <hr/>
             <div class="column">
+                <span>Email</span>
+            </div>
+            <div class="column">
+                <input class="form-control" type="text" value="{user/email}" name="email"  />
+            </div>
+                <hr/>
+            <div class="column">
                 <span>Логин</span><span style="color:red" >*</span>
             </div>
             <div class="column">

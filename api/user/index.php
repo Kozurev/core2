@@ -115,6 +115,7 @@ if ($action === 'save') {
     $name = Core_Array::Post('name', '', PARAM_STRING);
     $groupId = Core_Array::Post('groupId', null, PARAM_INT);
     $patronymic = Core_Array::Post('patronymic', '', PARAM_STRING);
+    $email = Core_Array::Post('email', '', PARAM_STRING);
     $phone = Core_Array::Post('phoneNumber', '', PARAM_STRING);
     $login = Core_Array::Post('login', null, PARAM_STRING);
     $pass1 = Core_Array::Post('pass1', '', PARAM_STRING);
@@ -128,9 +129,9 @@ if ($action === 'save') {
         die(REST::error(1, 'Пароли не совпадают'));
     }
 
-    if (empty($id) && (empty($pass1) || empty($pass2))) {
-        die(REST::error(2, 'При создании пользователя поле "пароль" обязательно для заполнения'));
-    }
+//    if (empty($id) && (empty($pass1) || empty($pass2))) {
+//        die(REST::error(2, 'При создании пользователя поле "пароль" обязательно для заполнения'));
+//    }
 
     //Проверка на дубликацию логина
     $loginExists = Core::factory('User')
@@ -154,16 +155,15 @@ if ($action === 'save') {
     $User->surname($surname);
     $User->name($name);
     $User->patronymic($patronymic);
+    $User->email($email);
     $User->groupId($groupId);
     $User->phoneNumber($phone);
     $User->login($login);
     if (!empty($pass1)) {
         $User->password($pass1);
     }
-    try {
-        $User->save();
-    } catch (Exception $e) {
-        die(REST::error(5, $e->getMessage()));
+    if (!$User->save()) {
+        exit(REST::error(5, $User->_getValidateErrorsStr()));
     }
 
 
@@ -337,6 +337,7 @@ if ($action === 'save') {
     $output->access->user_edit_client = Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_CLIENT);
     $output->access->user_archive_client = Core_Access::instance()->hasCapability(Core_Access::USER_ARCHIVE_CLIENT);
 
+    //debug($output);exit;
     die(json_encode($output));
 }
 

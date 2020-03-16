@@ -8,7 +8,6 @@
  * Class User
  */
 
-Core::requireClass('User_Auth');
 
 class User extends User_Model
 {
@@ -57,9 +56,39 @@ class User extends User_Model
             ->queryBuilder()
 			->where('login', '=', $login)
 			->find();
-	
+
 		return !is_null($User);
 	}
+
+
+    /**
+     * Проверка пользователя на уникальность
+     *
+     * @param string $uniqueVal
+     * @param string $uniqueField
+     * @return bool
+     */
+	public static function isUnique(string $uniqueVal, string $uniqueField = 'login')
+    {
+        $user = (new self)
+            ->queryBuilder()
+            ->where($uniqueField, '=', $uniqueVal)
+            ->find();
+        return is_null($user);
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getFio()
+    {
+        $fio = $this->surname() . ' ' . $this->name();
+        if (!empty($this->patronymic())) {
+            $fio .= ' ' . $this->patronymic();
+        }
+        return $fio;
+    }
 
 
 	/**

@@ -41,7 +41,7 @@ class User_Model extends Core_Entity
     /**
      * @var string
      */
-	protected $password;
+	protected $password = '';
 
     /**
      * id группы пользователей
@@ -342,11 +342,11 @@ class User_Model extends Core_Entity
                 'type' => PARAM_STRING,
                 'maxlength' => 255
             ],
-            'password' => [
-                'required' => true,
-                'type' => PARAM_STRING,
-                'maxlength' => 255
-            ],
+//            'password' => [
+//                'required' => true,
+//                'type' => PARAM_STRING,
+//                'maxlength' => 255
+//            ],
             'group_id' => [
                 'required' => false,
                 'type' => PARAM_INT,
