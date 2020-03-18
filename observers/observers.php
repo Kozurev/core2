@@ -960,34 +960,34 @@ Core::attachObserver('after.ScheduleLesson.clearReports', function($args) {
     }
 });
 
+/**
+ * При создании пользователя
+ * Если создается пользователь с указанным email - автоматически форимруется пароль
+ */
 Core::attachObserver('before.User.save', function ($args) {
     $user = $args[0];
-
-    if ($user instanceof User && empty($user->getId())) {
-        //Orm::Debug(true);
-        if (!empty($user->email()) && !User::isUnique($user->email(), 'email')) {
-            $user->_setValidateErrorStr('Польователь с таким email уже существует');
-            return;
+    if ($user instanceof User && empty($user->getId()) && !empty($user->email()) && $user->groupId() === ROLE_CLIENT) {
+        global $CFG;
+        if (empty($user->password())) {
+            $password = uniqidReal(8);
+            $user->password($password);
         }
 
-        if (!empty($user->email()) && $user->groupId() === ROLE_CLIENT) {
-            global $CFG;
-            if (empty($user->password())) {
-                $password = uniqidReal(8);
-                $user->password($password);
-            }
-            $subject = 'Регистрация Musicmmetod';
-            $message = '<h2>Здравствуйте ' . $user->getFio() . '</h2>';
-            $message .= 'Для входа в личный кабинет перейдите по ссылке: ';
-            if (isset($password)) {
-                $message .= '<a href="'.$CFG->wwwroot.'">Musicmetod</a>';
-                $message .= 'Данные для входа: <br>email: ' . $user->email() . '<br>Пароль: ' . $password;
-            } else {
-                $authToken = uniqidReal($this->getMaxAuthTokenLength());
-                $user->authToken($authToken);
-                $message .= '<a href="'. $CFG->wwwroot .'?action=auth_by_token&auth_token='.$authToken.'">Личный кбинет</a>';
-            }
-            mail($user->email(), $subject, $message);
-        }
+        $headers  = 'MIME-Version: 1.0' . "\r\n";
+        $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+        $subject = 'Регистрация Musicmmetod';
+        $message = (new Core_Entity())
+            ->addEntity($user)
+            ->addSimpleEntity('auth_link', htmlspecialchars(mapping('auth', [
+                'action' => 'auth_by_token',
+                'auth_token' => $user->authToken()
+            ])))
+            ->addSimpleEntity('password', $password ?? '')
+            ->addSimpleEntity('wwwroot', $CFG->wwwroot)
+            ->addSimpleEntity('service_name', 'Musicmetod')
+            ->xsl('musadm/mail/new_user.xsl')
+            ->show(false);
+        debug($message);
+        mail($user->email(), $subject, $message, $headers);
     }
 });

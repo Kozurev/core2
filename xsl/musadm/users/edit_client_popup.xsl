@@ -8,7 +8,6 @@
                         surname:    {required: true, maxlength: 255},
                         name:       {required: true, maxlength: 255},
                         //phoneNumber:{required: true, maxlength: 255},
-                        login:      {required: true, maxlength: 255},
                         <xsl:if test="count(user/id) = 0">
                             password: {required: true, maxlength: 255}
                         </xsl:if>
@@ -19,10 +18,6 @@
                             maxlength: "Длина значения не должна превышать 255 символов"
                         },
                         name: {
-                            required: "Это поле обязательноое к заполнению",
-                            maxlength: "Длина значения не должна превышать 255 символов"
-                        },
-                        login: {
                             required: "Это поле обязательноое к заполнению",
                             maxlength: "Длина значения не должна превышать 255 символов"
                         },
@@ -77,7 +72,7 @@
             </div>
                 <hr/>
             <div class="column">
-                <span>Логин</span><span style="color:red" >*</span>
+                <span>Логин</span>
             </div>
             <div class="column">
                 <input class="form-control" type="text" value="{user/login}" name="login" />

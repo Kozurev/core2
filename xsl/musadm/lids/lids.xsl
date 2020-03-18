@@ -65,6 +65,20 @@
                                 </xsl:for-each>
                             </select>
                         </div>
+                        <div>
+                            <select name="source" class="form-control">
+                                <option value="0">Источник</option>
+                                <xsl:for-each select="//property[tag_name='lid_source']/values/property_list_values">
+                                    <xsl:variable name="id" select="id" />
+                                    <option value="{id}">
+                                        <xsl:if test="$id = /root/source">
+                                            <xsl:attribute name="selected">selected</xsl:attribute>
+                                        </xsl:if>
+                                        <xsl:value-of select="value" />
+                                    </option>
+                                </xsl:for-each>
+                            </select>
+                        </div>
                     </div>
                     <div class="row buttons-panel center">
                         <div>

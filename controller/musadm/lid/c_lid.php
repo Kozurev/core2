@@ -17,6 +17,7 @@ $areaId =       Core_Array::Get('area_id', 0, PARAM_INT);
 $statusId =     Core_Array::Get('status_id', 0, PARAM_INT);
 $phoneNumber =  Core_Array::Get('number', '', PARAM_STRING);
 $instrument =   Core_Array::Get('instrument', 0, PARAM_INT);
+$source =       Core_Array::Get('source', 0, PARAM_INT);
 $vk =           Core_Array::Get('vk', '', PARAM_STRING);
 
 $LidController = new Lid_Controller_Extended(User_Auth::current());
@@ -65,6 +66,10 @@ if ($vk != '') {
 if ($instrument !== 0) {
     $LidController->appendAddFilter(20, '=', $instrument);
     $LidController->addSimpleEntity('instrument', $instrument);
+}
+if ($source !== 0) {
+    $LidController->appendAddFilter(50, '=', $source);
+    $LidController->addSimpleEntity('source', $source);
 }
 $lidsPropsIds = [
     'instrument' => 20,

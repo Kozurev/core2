@@ -226,7 +226,6 @@ class Lid_Controller_Extended extends Controller
 
         //Пагинация
         $this->paginateExecute();
-
         $this->foundObjects = $this->QueryBuilder->findAll();
         $this->countFoundObjects = count($this->foundObjects);
         foreach ($this->foundObjects as $Lid) {
@@ -235,6 +234,7 @@ class Lid_Controller_Extended extends Controller
 
         //Фильтрация по значениям доп.свйотв
         $this->addFilterExecute();
+
 
         //Подгрузка значений доп. свойств
         $this->addPropValues();

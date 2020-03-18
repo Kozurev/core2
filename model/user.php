@@ -103,15 +103,24 @@ class User extends User_Model
             $this->register_date = date('Y-m-d');
         }
 
-        Core::notify([&$this], 'before.User.save');
-
-        if (empty($this->authToken())) {
-            $this->authToken(uniqidReal($this->getMaxAuthTokenLength()));
+        if (empty($this->id)) {
+            if (!empty($this->login)) {
+                if (!self::isUnique($this->login)) {
+                    $this->_setValidateErrorStr('Пользователь с таким логином уже существует');
+                    return null;
+                }
+            }
+            if (!self::isUnique($this->email, 'email')) {
+                $this->_setValidateErrorStr('Пользователь с таким email уже существует');
+                return null;
+            }
         }
 
-		if (empty($this->id) && $this->isUserExists($this->login)) {
-			return $this;
-		}
+        if (empty($this->authToken())) {
+            $this->authToken(uniqidReal(self::getMaxAuthTokenLength()));
+        }
+
+        Core::notify([&$this], 'before.User.save');
 
 		if (empty(parent::save())) {
 		    return null;

@@ -129,20 +129,6 @@ if ($action === 'save') {
         die(REST::error(1, 'Пароли не совпадают'));
     }
 
-//    if (empty($id) && (empty($pass1) || empty($pass2))) {
-//        die(REST::error(2, 'При создании пользователя поле "пароль" обязательно для заполнения'));
-//    }
-
-    //Проверка на дубликацию логина
-    $loginExists = Core::factory('User')
-        ->queryBuilder()
-        ->where('login', '=', $login)
-        ->where('id', '<>', $id)
-        ->getCount();
-    if ($loginExists) {
-        die(REST::error(3, 'Логин ' . $login . ' уже существует'));
-    }
-
     $User = Core::factory('User', $id);
     if (is_null($User)) {
         die(REST::error(4, 'Пользователь с id ' . $id . ' не найден'));

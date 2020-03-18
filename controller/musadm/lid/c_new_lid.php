@@ -7,6 +7,7 @@
  * @version 2019-03-24
  * @version 2019-07-26
  * @version 2019-08-05
+ * @version 2020-03-18
  */
 
 $today =        date('Y-m-d');
@@ -19,31 +20,26 @@ $phoneNumber =  Core_Array::Get('number', '', PARAM_STRING);
 $instrument =   Core_Array::Get('instrument', 0, PARAM_INT);
 $vk =           Core_Array::Get('vk', '', PARAM_STRING);
 
-Core::requireClass('Lid_Controller');
-Core::requireClass('Lid_Controller_Extended');
 $LidController = new Lid_Controller_Extended(User_Auth::current());
 $LidController->getQueryBuilder()
-    ->leftJoin(
-        ' Lid_Comment_Assignment ',
-        'Lid_Comment_Assignment.object_id = Lid.id')
+    ->leftJoin('Lid_Comment_Assignment', 'Lid_Comment_Assignment.object_id = Lid.id')
     ->groupBy('Lid.id')
     ->having('count(Lid_Comment_Assignment.id)','<=',1)
     ->orderBy('priority_id', 'DESC');
 
-
-if(isset($_GET['notPaginate'])){
+if (!empty(Core_Array::Get('notPaginate', 0, PARAM_INT))) {
     $LidController->isPaginate(false);
-    unset($_GET['notPaginate']);
-}else{
+} else {
     $LidController->isPaginate(true);
     $LidController->addSimpleEntity('paginate', true);
-    unset($_GET['paginate']);
     $LidController->paginate()
         ->setOnPage(25)
         ->setCurrentPage(
             Core_Array::Get('page', 1, PARAM_INT)
         );
 }
+unset($_GET['notPaginate']);
+unset($_GET['paginate']);
 
 if ($areaId !== 0) {
     $LidController->appendFilter('area_id', $areaId, '=', Lid_Controller::FILTER_STRICT);
@@ -73,7 +69,6 @@ if ($instrument !== 0) {
     $LidController->addSimpleEntity('instrument', $instrument);
 }
 
-
 $lidsPropsIds = [
     'instrument' => 20,
     'source' => 50,
@@ -84,4 +79,6 @@ $LidController
     ->periodTo($periodTo)
     ->properties($lidsPropsIds)
     ->isWithAreasAssignments(true)
+    ->addEntity(User_Auth::current(), 'current_user')
+    ->addSimpleEntity('my_calls_token', Property_Controller::factoryByTag('my_calls_token')->getValues(User_Auth::current()->getDirector())[0]->value())
     ->show();

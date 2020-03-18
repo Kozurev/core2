@@ -13,8 +13,6 @@ Orm::Debug(true);
 //$time = Schedule_Controller_Extended::getTeacherNearestFreeTime(1725, '2020-03-01');
 //debug($time);
 
-Orm::Debug(true);
-debug(!User::isUnique('etwthrwht', 'email'), 1);
 
 exit;
 

@@ -703,6 +703,7 @@ class Controller
             }
         }
         $this->foundObjects = array_values($this->foundObjects);
+        $this->totalCountFoundObjects = count($this->foundObjectsIds);
 
         if ($this->isPaginate() === true) {
             $this->paginate()->setTotalCount(count($this->foundObjects));

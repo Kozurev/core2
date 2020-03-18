@@ -65,16 +65,18 @@ class User_Auth
     public static function authByLogPass(string $login, string $pass, bool $remember = false)
     {
         Core::notify(['login' => $login, 'password' => $pass, 'remember' => $remember], 'before.UserAuth.auth');
-//
-        $User = new User();
-        $ExistingUser = $User->queryBuilder()
-            ->where('login', '=', $login)
+
+        $existingUser = (new User)->queryBuilder()
+            ->open()
+                ->where('login', '=', $login)
+                ->orWhere('email', '=', $login)
+            ->close()
             ->where('active', '=', 1)
             ->find();
         $cookieTime = 3600 * 24 * 30; //30 дней
         setcookie(User_Auth::REMEMBER_TOKEN, '', 0 - time() - $cookieTime, '/'); //Удаление старой кукки
-        if (!is_null($ExistingUser) && password_verify($pass, $ExistingUser->password())) {
-            self::auth($ExistingUser,$remember);
+        if (!is_null($existingUser) && password_verify($pass, $existingUser->password())) {
+            self::auth($existingUser, $remember);
         } else {
             return false;
         }

@@ -9,8 +9,6 @@
  */
 
 global $CFG;
-Core::requireClass('Core_Recaptcha');
-Core::requireClass('User_Controller');
 $User = User_Controller::factory();
 $CurrentUser = User_Auth::current();
 
@@ -95,7 +93,6 @@ if (Core_Array::Get('action', '', PARAM_STRING) == 'auth_by_token') {
         Core_Page_Show::instance()->setParam('auth-errors', 'Токен не введен');
 
     }
-
 }
 
 //Если пользователь уже авторизован
