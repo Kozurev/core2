@@ -973,8 +973,6 @@ Core::attachObserver('before.User.save', function ($args) {
             $user->password($password);
         }
 
-        $headers  = 'MIME-Version: 1.0' . "\r\n";
-        $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
         $subject = 'Регистрация Musicmmetod';
         $message = (new Core_Entity())
             ->addEntity($user)
@@ -988,6 +986,10 @@ Core::attachObserver('before.User.save', function ($args) {
             ->xsl('musadm/mail/new_user.xsl')
             ->show(false);
 
-        mail($user->email(), $subject, $message, $headers);
+        $mail = \Model\Mail::factory();
+        $mail->addAddress($user->email(), $user->getFio());
+        $mail->Subject = $subject;
+        $mail->msgHTML($message);
+        $mail->send();
     }
 });

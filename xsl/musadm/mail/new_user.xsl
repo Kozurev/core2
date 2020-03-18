@@ -8,7 +8,11 @@
                 </title>
             </head>
             <body>
-                <h1>Здравствуйте <xsl:value-of select="user/surname" /> <xsl:value-of select="user/name" /></h1>
+                <h1>Здравствуйте
+                    <xsl:value-of select="user/surname" />
+                    <xsl:text> </xsl:text>
+                    <xsl:value-of select="user/name" />
+                </h1>
                 <p>Вы были зарегистрированы в сервисе <a href="{wwwroot}" target="_blank"><xsl:value-of select="service_name" /></a></p>
                 <p>
                     <xsl:choose>
