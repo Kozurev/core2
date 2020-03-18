@@ -987,7 +987,7 @@ Core::attachObserver('before.User.save', function ($args) {
             ->addSimpleEntity('service_name', 'Musicmetod')
             ->xsl('musadm/mail/new_user.xsl')
             ->show(false);
-        debug($message);
+
         mail($user->email(), $subject, $message, $headers);
     }
 });
