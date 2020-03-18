@@ -7,6 +7,7 @@
  * @version 2019-05-21
  * @version 2019-07-15
  * @version 2019-08-03
+ * @version 2020-03-19
  */
 
 require_once ROOT . '/model/rest/controller.php';
@@ -17,5 +18,9 @@ require_once ROOT . '/model/comment/model.php';
 require_once ROOT . '/model/comment.php';
 
 spl_autoload_register(function ($className) {
-    Core::requireClass($className);
+    $classSegments = explode('\\', $className);
+    if ($classSegments[0] == 'Model') {
+        unset($classSegments[0]);
+    }
+    Core::requireClass(implode('_', $classSegments));
 });

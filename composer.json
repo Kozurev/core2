@@ -1,6 +1,7 @@
 {
    "require": {
      "kreait/firebase-php": "^4.35",
-      "vkcom/vk-php-sdk": "^5.101"
+      "vkcom/vk-php-sdk": "^5.101",
+      "phpmailer/phpmailer": "^6.1"
    }
 }
