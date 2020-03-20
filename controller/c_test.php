@@ -13,10 +13,6 @@ Orm::Debug(true);
 //$time = Schedule_Controller_Extended::getTeacherNearestFreeTime(1725, '2020-03-01');
 //debug($time);
 
-use Model\Mail;
-
-$mail = Mail::factory();
-
 exit;
 
 (new Structure())
