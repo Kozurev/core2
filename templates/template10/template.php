@@ -23,7 +23,7 @@
     $jivoActive = Property_Controller::factoryByTag('jivo_active')->getValues($Director)[0]->value();
     $jivoScript = Property_Controller::factoryByTag('jivo_script')->getValues($Director)[0]->value();
     if (User_Auth::current()->groupId() == ROLE_CLIENT && $jivoActive && !empty($jivoScript)) {
-        echo '<script src="//code-ya.jivosite.com/widget/3jETSm66Mk" async></script>';
+        echo '<script src="'.$jivoScript.'" async></script>';
     }
     ?>
 
