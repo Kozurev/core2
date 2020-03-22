@@ -973,7 +973,7 @@ Core::attachObserver('before.User.save', function ($args) {
             $user->password($password);
         }
 
-        $subject = 'Регистрация Musicmmetod';
+        $subject = 'Регистрация Musicmetod';
         $message = (new Core_Entity())
             ->addEntity($user)
             ->addSimpleEntity('auth_link', htmlspecialchars(mapping('auth', [
