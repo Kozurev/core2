@@ -13,8 +13,8 @@
                         </xsl:if>
                     </input>
                     <label for="jivo_active" class="checkbox-label">
-                        <span class="off">Акивен</span>
-                        <span class="on">Отключен</span>
+                        <span class="off">Отключен</span>
+                        <span class="on">Активен</span>
                     </label>
                 </div>
                 <div class="col-md-6 col-sm-9">
