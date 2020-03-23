@@ -128,12 +128,18 @@ class Core_Access
 
 
     /**
+     * @var Core_Access_Cache
+     */
+    private $cache;
+
+
+    /**
      * @return Core_Access
      */
     public static function instance()
     {
         if (is_null(self::$_instance)) {
-            self::$_instance = new Core_Access(User::current());
+            self::$_instance = new Core_Access(User_Auth::current());
         }
         return self::$_instance;
     }
@@ -148,6 +154,7 @@ class Core_Access
         $this->User = $User;
         $this->AccessGroup = self::getUserGroup($this->User);
         $this->capabilities = include 'access/capabilities.php';
+        $this->cache = new Core_Access_Cache();
     }
 
 
@@ -187,10 +194,18 @@ class Core_Access
             $AccessGroup = $this->AccessGroup;
         }
 
+        if (!is_null($this->getUser()) && !is_null($this->cache->get($this->getUser()->getId(), $capability))) {
+            return $this->cache->get($this->getUser()->getId(), $capability);
+        }
+
         if (is_null($AccessGroup)) {
             return false;
         } else {
-            return $AccessGroup->hasCapability($capability);
+            $access = $AccessGroup->hasCapability($capability);
+            if (!is_null($this->getUser())) {
+                $this->cache->put($this->getUser()->getId(), $capability, $access);
+            }
+            return $access;
         }
     }
 
