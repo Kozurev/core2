@@ -70,6 +70,9 @@ class User extends User_Model
      */
 	public static function isUnique(string $uniqueVal, string $uniqueField = 'login')
     {
+        if (empty($uniqueVal)) {
+            return true;
+        }
         $user = (new self)
             ->queryBuilder()
             ->where($uniqueField, '=', $uniqueVal)
