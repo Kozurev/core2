@@ -5,14 +5,10 @@
  * @version 20190526
  * @version 20190628
  */
-Core::requireClass('User_Controller');
-Core::requireClass('User_Controller_Extended');
-Core::requireClass('Task_Controller');
-Core::requireClass('Schedule_Area_Controller');
 
 authOrOut();
 
-$User = User::current();
+$User = User_Auth::current();
 $Director = $User->getDirector();
 $subordinated = $Director->getId();
 

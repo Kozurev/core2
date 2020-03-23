@@ -130,7 +130,6 @@ class Schedule_Controller
     public function getLessons()
     {
         $Lessons = Core::factory('Schedule_Lesson');
-        Core::factory('User_Controller');
 
         //Поиск по роли пользователя
         if ($this->userId) {
@@ -151,16 +150,14 @@ class Schedule_Controller
                     $UserGroups[] = $group->groupId();
                 }
 
-                $Lessons
-                    ->queryBuilder()
+                $Lessons->queryBuilder()
                     ->open()
                     ->where('client_id', '=', $this->userId)
                     ->where('type_id', '=', 1)
                     ->where('type_id', '<>', 3);
 
                 if (count($UserGroups) > 0) {
-                    $Lessons
-                        ->queryBuilder()
+                    $Lessons->queryBuilder()
                         ->open()
                             ->orWhereIn('client_id', $UserGroups)
                             ->where('type_id', '=', 2)
@@ -197,8 +194,7 @@ class Schedule_Controller
         if ($this->periodFrom && $this->periodTo) {
             $this->unsetDate();
 
-            $Lessons
-                ->queryBuilder()
+            $Lessons->queryBuilder()
                 ->open()
                     ->open()
                         ->where('insert_date', '>=', $this->periodFrom)
@@ -227,6 +223,101 @@ class Schedule_Controller
         return $Lessons;
     }
 
+
+    public function printCalendar2($weeksCount = 2)
+    {
+        $today = date('Y-m-d');
+        $weeksStart = self::getNearestDateByName($this->date);
+        $weeksEnd = date('Y-m-d', strtotime($weeksStart . ' +' . $weeksCount . ' week'));
+
+        $user = User_Controller::factory($this->userId);
+        $schedule = Schedule_Controller_Extended::getSchedule($user, $weeksStart, $weeksEnd);
+
+        echo "<div class='table-responsive'><table class='table table-bordered' style='margin-top: 20px'>";
+        echo "<tr class='header'>
+                <th>Понедельник</th>
+                <th>Вторник</th>
+                <th>Среда</th>
+                <th>Четверг</th>
+                <th>Пятница</th>
+                <th>Суббота</th>
+                <th>Воскресенье</th>
+            </tr>";
+
+        $date = $weeksStart;
+        while ($date != $weeksEnd) {
+            $day = self::getDayFromSchedule($date, $schedule);
+
+            $dayName = date('l', strtotime($date));
+            if ($dayName == 'Monday') {
+                echo '<tr>';
+            }
+            echo '<td style="'.($date == $today ? 'background-color: #75c181' : '').'">';
+            echo "<span class='date'>" . refactorDateFormat($date, '.', 'short') . "</span>";
+
+            if (!is_null($day)) {
+                $prevAreaId = 0;
+                foreach ($day->lessons as $i => $lesson) {
+                    if ($lesson->areaId() !== $prevAreaId) {
+                        echo '<hr/><b><span class="area">'.$lesson->getArea()->title().'</span></b><hr/>';
+                        $prevAreaId = $lesson->areaId();
+                    }
+                    echo '<span class="time">'.refactorTimeFormat($lesson->timeFrom()). ' - ' . refactorTimeFormat($lesson->timeTo()) . '</span>';
+                    if ($user->groupId() == ROLE_CLIENT) {
+                        $teacher = $lesson->getTeacher();
+                        $fio = $teacher->surname() . ' ' . $teacher->name();
+                    } else {
+                        $client = $lesson->getClient();
+                        $fio = '';
+                        if (!empty($client)) {
+                            if ($client instanceof User) {
+                                $fio = $client->surname();
+                            } elseif ($client instanceof Schedule_Group) {
+                                $fio = $client->title();
+                            } elseif ($client instanceof Lid) {
+                                $fio = 'Консультация ' . $client->number();
+                            }
+                        }
+                    }
+                    echo '<span class="teacher"> ' . $fio . '</span>';
+                    echo '<br/>';
+                }
+            }
+
+            echo '</td>';
+            if ($dayName == 'Sunday') {
+                echo '</tr>';
+            }
+
+            $date = date('Y-m-d', strtotime($date . ' +1 day'));
+        }
+    }
+
+    public static function getDayFromSchedule($date, $schedule)
+    {
+        foreach ($schedule as $day) {
+            if ($day->date == $date) {
+                return $day;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Поиск даты начала недели
+     *
+     * @param string $date
+     * @param string $nearestDayName
+     * @return false|string
+     */
+    public static function getNearestDateByName(string $date, string $nearestDayName = 'Monday')
+    {
+        while (date('l', strtotime($date)) != $nearestDayName) {
+            $date = date('Y-m-d', strtotime($date . ' -1 day'));
+        }
+        return $date;
+    }
 
 
     public function printCalendar()
@@ -287,7 +378,7 @@ class Schedule_Controller
                 $day = '0' . $day;
             }
             $date = $this->calendarYear . '-' . $this->calendarMonth . '-' . $day;
-            $lessons = $this->getLessonsFromArray( $Lessons, $date );
+            $lessons = $this->getLessonsFromArray($Lessons, $date);
 
             $table[$index]['date'] = $date;
             $table[$index]['lessons'] = $lessons;
@@ -295,7 +386,7 @@ class Schedule_Controller
         }
 
         //Дни следующего месяца
-        if ( intval($this->calendarMonth) == 12) {
+        if (intval($this->calendarMonth) == 12) {
             $nextMonth = '01';
             $nextYear = $this->calendarYear + 1;
         } else {
@@ -307,7 +398,7 @@ class Schedule_Controller
         }
 
         $rest = 43 - $countDays - $firstDayNumber;
-        if ( $rest < 0 ) {
+        if ($rest < 0) {
             $rest = 7 + $rest;
         }
 
@@ -421,12 +512,6 @@ class Schedule_Controller
             if( ($i + 1) % 7 == 0 )   echo "</tr>";
         }
         echo "</table></div>";
-        /**
-         * <<Конец
-         * Вывод содержимого таблицы
-         */
-
-
     }
 
 

@@ -8,16 +8,12 @@
  * @version 20190526
  * @version 20190811
  */
-Core::requireClass('Payment');
-Core::requireClass('User_Controller');
-Core::requireClass('Property_Controller');
 
 $userId = Core_Array::Get('userid', null, PARAM_INT);
 is_null($userId)
-    ?   $User = User::current()
+    ?   $User = User_Auth::current()
     :   $User = User_Controller::factory($userId);
 $userId = $User->getId();
-
 
 
 $today = date('Y-m-d');
@@ -351,17 +347,18 @@ if ($User->groupId() == ROLE_TEACHER) {
 
     if ($accessScheduleRead) {
         echo '<section class="section-bordered">';
-        Core::factory('Schedule_Controller')
+        (new Schedule_Controller)
             ->userId($userId)
-            ->setCalendarPeriod($month, $year)
-            ->printCalendar();
+            ->setDate($date)
+            //->setCalendarPeriod($month, $year)
+            ->printCalendar2();
         echo '</section>';
     }
 
     echo '<section class="section-bordered">';
 
     if ($accessReportRead) {
-        $TeacherLessons = Core::factory('Schedule_Controller')
+        $TeacherLessons = (new Schedule_Controller())
             ->userId($userId)
             ->unsetPeriod()
             ->setDate($date)
