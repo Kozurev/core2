@@ -109,9 +109,8 @@ foreach ($countFromDateControl->findAll() as $event) {
 
 $totalCount = $countQuery->getCount();
 $totalCountFromSchedule = $countFromScheduleQuery->getCount();
-Orm::Debug(true);
 $totalCountFromDateControl = $countFromDateControl->getCount();
-Orm::Debug(false);
+
 if (count($statuses) > 0) {
     foreach ($statuses as $key => $status) {
         $countWithStatus = clone $countQuery;
