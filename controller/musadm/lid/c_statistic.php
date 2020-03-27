@@ -63,15 +63,16 @@ $dateRow = $teacherId === 0
 
 $timeFrom = strtotime($dateFrom . " 00:00:00");
 $timeTo = strtotime($dateTo . " 23:59:00");
+
 if ($dateFrom == $dateTo) {
     $countQuery->where($dateRow, '=', $dateFrom);
     $countFromScheduleQuery->where('insert_date', '=', $dateFrom);
 } else {
-    $countQuery->between($dateRow,$dateFrom,$dateTo);
+    $countQuery->between($dateRow, $dateFrom, $dateTo);
     $countFromScheduleQuery->between('insert_date', $dateFrom, $dateTo);
 }
 $countFromDateControl
-    ->between('Event.time', strtotime($timeFrom), strtotime($timeTo))
+    ->between('Event.time', $timeFrom, $timeTo)
     ->orderBy('time', 'DESC');
 
 if ($teacherId !== 0) {
@@ -108,8 +109,9 @@ foreach ($countFromDateControl->findAll() as $event) {
 
 $totalCount = $countQuery->getCount();
 $totalCountFromSchedule = $countFromScheduleQuery->getCount();
+Orm::Debug(true);
 $totalCountFromDateControl = $countFromDateControl->getCount();
-
+Orm::Debug(false);
 if (count($statuses) > 0) {
     foreach ($statuses as $key => $status) {
         $countWithStatus = clone $countQuery;
