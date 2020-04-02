@@ -21,7 +21,7 @@ exit;
     ->parentId(0)
     ->path('lk')
     ->action('musadm/teacher/index')
-    ->templateId(10)
+    ->templateId(7)
     ->sorting(10)
     ->save();
 
