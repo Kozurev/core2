@@ -218,7 +218,7 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                         }
                     }
 
-                    if ($lessonTime >= $currentTime && !(!$accessDelete && !$accessAbsent)) {
+                    if ($lessonTime >= $currentTime && !(!$accessDelete && !$accessAbsent) && $isVisibleData) {
                         echo "<ul class=\"submenu\">
                         <li>
                             <a href=\"#\"></a>
@@ -271,7 +271,7 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                         }
                     }
 
-                    if (!$CurrentLesson->isReported($date) && $accessEdit) {
+                    if (!$CurrentLesson->isReported($date) && $accessEdit && $isVisibleData) {
                         echo "<ul class=\"submenu\">
                         <li>
                             <a href=\"#\"></a>
