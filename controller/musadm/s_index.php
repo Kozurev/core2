@@ -10,8 +10,7 @@
 
 authOrOut();
 
-$User = User::current();
-$access = ['groups' => [ROLE_ADMIN, ROLE_MANAGER, ROLE_DIRECTOR]];
+$User = User_Auth::current();
 
 $host  = Core_Array::Server('HTTP_HOST', '', PARAM_STRING);
 $uri   = rtrim(dirname(Core_Array::Server('PHP_SELF', '', PARAM_STRING)), '/\\');
@@ -21,9 +20,6 @@ Core_Page_Show::instance()->setParam('title-first', 'ГЛАВНАЯ');
 Core_Page_Show::instance()->setParam('title-second', 'СТРАНИЦА');
 
 if (Core_Array::Get('ajax', null, PARAM_STRING) === null) {
-    if (!User::checkUserAccess($access, $User)) {
-        header("Location: http://$host$uri/authorize?back=/$uri");
-    }
     if ($User->groupId() == ROLE_DIRECTOR) {
         header("Location: http://$host$uri/user/client");
     }
@@ -31,7 +27,7 @@ if (Core_Array::Get('ajax', null, PARAM_STRING) === null) {
         header("Location: http://$host$uri/balance");
     }
     if ($User->groupId() == ROLE_TEACHER) {
-        header("Location: http://$host$uri/schedule");
+        header("Location: http://$host$uri/lk");
     }
 }
 
@@ -40,11 +36,6 @@ $action = Core_Array::Get('action', null, PARAM_STRING);
 
 $Director = $User->getDirector();
 $subordinated = $Director->getId();
-
-Core::factory('User_Controller');
-Core::factory('Lid_Controller');
-Core::factory('Task_Controller');
-Core::factory('Property_Controller');
 
 
 /**

@@ -242,7 +242,7 @@
                 </tr>
 
                 <xsl:if test="is_admin = 1">
-                    <xsl:if test="is_director = 1">
+<!--                    <xsl:if test="is_director = 1">-->
                         <tr>
                             <td>
                                 <div class="row">
@@ -278,7 +278,7 @@
                                 </div>
                             </td>
                         </tr>
-                    </xsl:if>
+<!--                    </xsl:if>-->
 
                     <tr>
                         <td>

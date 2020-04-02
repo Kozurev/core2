@@ -7,10 +7,10 @@
  */
 
 $pageUserId = Core_Array::Get('userid', null, PARAM_INT);
-$subordinated = User::current()->getDirector()->getId();
+$subordinated = User_Auth::current()->getDirector()->getId();
 
 if (is_null($pageUserId)) {
-    $User = User::current();
+    $User = User_Auth::current();
 } else {
     Core::factory('User_Controller');
     $User = User_Controller::factory($pageUserId);
@@ -20,9 +20,7 @@ is_object(Core_Page_Show::instance()->StructureItem)
     ?   $areaId = Core_Page_Show::instance()->StructureItem->getId()
     :   $areaId = 0;
 
-if (User::checkUserAccess(['groups' => [ROLE_MANAGER]], $User)
-    || (User::checkUserAccess(['groups' => [ROLE_DIRECTOR]], $User) && $areaId > 0)
-) {
+if ($areaId > 0) {
     Core_Page_Show::instance()->css('/templates/template7/css/style.css');
 }
 
@@ -36,7 +34,7 @@ if ($areaId > 0 || $pageUserId > 0 || $User->groupId() === ROLE_TEACHER) { ?>
                 <span class="day_name"></span>
             </div>
             <?php
-            if ($User->groupId() === ROLE_TEACHER) {
+            if (User_Auth::parentAuth()->groupId() === ROLE_TEACHER) {
                 ?>
                 <div>
                     <a class="btn btn-green" onclick="makeTeacherTaskPopup(<?=$User->getId()?>)">Написать администратору</a>

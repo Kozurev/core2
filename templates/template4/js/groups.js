@@ -156,7 +156,7 @@ function groupSearchClient(surname, callBack) {
 
 
 function refreshGroupTable(page) {
-    if (page === undefined) {
+    if (page === undefined || page < 1) {
         page = 1;
     }
     $.ajax({

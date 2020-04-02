@@ -20,20 +20,8 @@ if (!is_null($pageUserId)) {
     $Teacher = $User;
 }
 
-$isTeacherPage = !is_null($Teacher) && $Teacher->groupId() == ROLE_TEACHER && is_null(Core_Page_Show::instance()->StructureItem);
-
 //Личный кабинет преподавателя
-if ($isTeacherPage == true) {
-    if (is_null($Teacher)) {
-        Core_Page_Show::instance()->error(404);
-    }
-    if (!Core_Access::instance()->hasCapability(Core_Access::USER_LC_TEACHER)) {
-        Core_Page_Show::instance()->error(403);
-    }
-
-    $teacherFio = $Teacher->surname() . ' ' . $Teacher->name();
-    Core_Page_Show::instance()->title = $teacherFio . ' | Личный кабинет';
-} elseif (!is_null(Core_Page_Show::instance()->StructureItem)) {
+if (!is_null(Core_Page_Show::instance()->StructureItem)) {
     Core_Page_Show::instance()->title = 'Расписание | ' . Core_Page_Show::instance()->StructureItem->title();
 } else {
     Core_Page_Show::instance()->title = 'Расписание';
@@ -42,12 +30,6 @@ if ($isTeacherPage == true) {
 
 $action = Core_Array::Get('action', null, PARAM_STRING);
 
-
-
-if (!$isTeacherPage && is_null(Core_Page_Show::instance()->StructureItem)
-    && !Core_Access::instance()->hasCapability(Core_Access::AREA_READ) && is_null($action)) {
-    Core_Page_Show::instance()->error(403);
-}
 
 $breadcumbs[0] = new stdClass();
 $breadcumbs[0]->title = Core_Page_Show::instance()->Structure->title();
@@ -239,6 +221,7 @@ if ($action === 'getScheduleLessonPopup') {
 
     $output = new Core_Entity();
     $output
+        ->addEntity(User_Auth::current(), 'current_user')
         ->addSimpleEntity('class_id', $classId)
         ->addSimpleEntity('date', $date)
         ->addSimpleEntity('area_id', $areaId)
@@ -249,32 +232,34 @@ if ($action === 'getScheduleLessonPopup') {
             Core::factory('Schedule_Lesson_Type')->findAll()
         );
 
-    $TeachersController = new User_Controller_Extended(User::current());
-    $TeachersController->setGroup(ROLE_TEACHER);
-    $TeachersController->isWithComments(false);
-    $TeachersController->getQueryBuilder()
-        ->orderBy('surname', 'ASC');
-    $Teachers = $TeachersController->getUsers();
-    $TeachersAbsents = Core::factory('Schedule_Absent')
-        ->queryBuilder()
-        ->where('type_id', '=', 1)
-        ->where('date_from', '<=', $Date->format('Y-m-d'))
-        ->where('date_to', '>=', $Date->format('Y-m-d'))
-        ->whereIn('object_id', $TeachersController->getFoundObjectsIds())
-        ->findAll();
+    if (User_Auth::current()->groupId() !== ROLE_TEACHER) {
+        $TeachersController = new User_Controller_Extended(User::current());
+        $TeachersController->setGroup(ROLE_TEACHER);
+        $TeachersController->isWithComments(false);
+        $TeachersController->getQueryBuilder()
+            ->orderBy('surname', 'ASC');
+        $Teachers = $TeachersController->getUsers();
 
-    foreach ($TeachersAbsents as $AbsentPeriod) {
-        foreach ($Teachers as $teacherKey => $Teacher) {
-            if ($Teacher->getId() == $AbsentPeriod->objectId()) {
-                $Teacher->is_absent = 1;
-                break;
+        $TeachersAbsents = Core::factory('Schedule_Absent')
+            ->queryBuilder()
+            ->where('type_id', '=', 1)
+            ->where('date_from', '<=', $Date->format('Y-m-d'))
+            ->where('date_to', '>=', $Date->format('Y-m-d'))
+            ->whereIn('object_id', $TeachersController->getFoundObjectsIds())
+            ->findAll();
+        foreach ($TeachersAbsents as $AbsentPeriod) {
+            foreach ($Teachers as $teacherKey => $Teacher) {
+                if ($Teacher->getId() == $AbsentPeriod->objectId()) {
+                    $Teacher->is_absent = 1;
+                    break;
+                }
             }
         }
+        $output->addEntities($Teachers);
+    } else {
+        $output->addSimpleEntity('teacher_id', User_Auth::current()->getId());
     }
 
-    $output->addEntities($Teachers);
-
-    Core::requireClass('Schedule_Lesson');
     if ($lessonType == Schedule_Lesson::SCHEDULE_CURRENT) {
         $output->addSimpleEntity('schedule_type', 'актуальное');
     } elseif ($lessonType == Schedule_Lesson::SCHEDULE_MAIN) {
@@ -602,12 +587,9 @@ if ($action === 'saveClassName') {
     exit(json_encode($Room));
 }
 
-
-//проверка прав доступа
-if (!$isTeacherPage && !Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ)) {
+if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ)) {
     Core_Page_Show::instance()->error(403);
 }
-
 
 if ($action === 'getSchedule') {
     $this->execute();

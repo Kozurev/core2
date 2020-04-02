@@ -84,7 +84,7 @@
             <input type="hidden" name="modelName" value="Schedule_Group" />
             <!--<input type="hidden" name="action" value="saveGroup" />-->
 
-            <button class="btn btn-default" onclick="saveData('Main', refreshGroupTable)">Сохранить</button>
+            <button class="btn btn-default" onclick="loaderOn(); saveData('Main', refreshGroupTable)">Сохранить</button>
         </form>
     </xsl:template>
 

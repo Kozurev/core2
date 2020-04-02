@@ -422,7 +422,6 @@ if ($isAdmin === 1) {
     $UserEvents = $UserEvents->findAll();
 
     //Поиск задачь, связанных с пользователем
-    Core::factory('Task_Controller');
     $TaskController = new Task_Controller($User);
     $Tasks = $TaskController
         ->isPeriodControl(false)
@@ -463,7 +462,7 @@ if ($isAdmin === 1) {
     }
 
     global $CFG;
-    Core::factory('Core_Entity')
+    (new Core_Entity)
         ->addSimpleEntity('wwwroot', $CFG->rootdir)
         ->addEntity($User)
         ->addEntities($UserEvents)

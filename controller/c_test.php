@@ -16,6 +16,19 @@ Orm::Debug(true);
 exit;
 
 (new Structure())
+    ->title('Личный кабинет преподавателя')
+    ->description('Личный кабинет преподаавателя')
+    ->parentId(0)
+    ->path('lk')
+    ->action('musadm/teacher/index')
+    ->templateId(10)
+    ->sorting(10)
+    ->save();
+
+
+exit;
+
+(new Structure())
     ->title('JivoSite')
     ->description('Настройка интеграции с JivoSite')
     ->parentId(45)

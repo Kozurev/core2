@@ -10,7 +10,7 @@
 
         <tr>
             <td>
-                <a href="{/root/wwwroot}/schedule/?userid={id}">
+                <a href="{/root/wwwroot}/lk?userid={id}">
                     <xsl:value-of select="surname" />
                     <xsl:text> </xsl:text>
                     <xsl:value-of select="name" />

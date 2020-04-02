@@ -100,7 +100,7 @@
         <tr>
             <td><xsl:value-of select="title" /></td>
             <td>
-                <a href="{/root/wwwroot}/schedule/?userid={$teacher}">
+                <a href="{/root/wwwroot}/lk?userid={$teacher}">
                     <xsl:value-of select="user[id = $teacher]/surname" />
                     <xsl:text> </xsl:text>
                     <xsl:value-of select="user[id = $teacher]/name" />

@@ -8,16 +8,17 @@
  * @version 20190412
  * @version 20190427
  * @version 20190526
+ * @version 20200401
  */
 
 global $CFG;
-$User = User::current();
+$User = User_Auth::current();
 Core_Page_Show::instance()->css('/templates/template6/css/style.css');
 Core::factory('User_Controller');
 
 //Список директоров
 if (User::checkUserAccess(['groups' => [ROLE_ADMIN]], $User )) {
-    $DirectorController = new User_Controller(User::current());
+    $DirectorController = new User_Controller(User_Auth::current());
     $DirectorController
         ->properties([29, 30, 33])
         ->groupId(6)
@@ -35,77 +36,6 @@ if (User::checkUserAccess(['groups' => [ROLE_ADMIN]], $User )) {
 
 //Страница для менеджера
 if (User::checkUserAccess(['groups' => [ROLE_MANAGER]], $User)) {
-//    $accessClientsRead = Core_Access::instance()->hasCapability(Core_Access::USER_READ_CLIENTS);
-//    $accessLidRead =     Core_Access::instance()->hasCapability(Core_Access::LID_READ);
-//    $accessLidCreate =   Core_Access::instance()->hasCapability(Core_Access::LID_CREATE);
-//    $accessLidEdit =     Core_Access::instance()->hasCapability(Core_Access::LID_EDIT);
-//    $accessLidComment =  Core_Access::instance()->hasCapability(Core_Access::LID_APPEND_COMMENT);
-//    $accessTaskRead =    Core_Access::instance()->hasCapability(Core_Access::TASK_READ);
-//    $accessTaskCreate =  Core_Access::instance()->hasCapability(Core_Access::TASK_CREATE);
-//    $accessTaskEdit =    Core_Access::instance()->hasCapability(Core_Access::TASK_EDIT);
-//    $accessTaskComment = Core_Access::instance()->hasCapability(Core_Access::TASK_APPEND_COMMENT);
-//
-//    $Director = $User->getDirector();
-//    $subordinated = $Director->getId();
-//
-//    //Формирование столбца лидов
-//    Core::factory('Lid_Controller');
-//    $LidController = new Lid_Controller($User);
-//    $LidController->isShowPeriods(false);
-//    $LidController->isEnableCommonLids(false);
-//    $LidController->isWithAreasAssignments(true);
-//
-//    //Формирование столбца Задач
-//    Core::factory('Task_Controller');
-//    $TaskController = new Task_Controller(User::current());
-//    $TaskController
-//        ->isWithAreasAssignments(true)
-//        ->isShowPeriods(false)
-//        ->isSubordinate(true)
-//        ->isLimitedAreasAccess(true)
-//        ->addSimpleEntity('taskAfterAction', 'tasks');
-    ?>
-
-<!--    <div class="dynamic-fixed-row">-->
-<!--        --><?php
-//        if ($accessClientsRead) {
-//            Core::factory('Core_Entity')
-//                ->addSimpleEntity(
-//                        'access_user_create_client',
-//                    (int)Core_Access::instance()->hasCapability(Core_Access::USER_CREATE_CLIENT)
-//                )
-//                ->xsl('musadm/users/search-form.xsl')
-//                ->show();
-//        }
-//        ?>
-<!--    </div>-->
-<!---->
-<!--    <section class="section-bordered">-->
-<!--        <div class="row">-->
-<!--            --><?php
-//            if ($accessLidRead) {
-//                ?>
-<!--                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 lids">-->
-<!--                    --><?//$LidController->show();?>
-<!--                </div>-->
-<!--                --><?php
-//            }
-//            ?>
-<!---->
-<!--            --><?php
-//            if ($accessTaskRead) {
-//                ?>
-<!--                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 tasks">-->
-<!--                    --><?//$TaskController->show();?>
-<!--                </div>-->
-<!--                --><?php
-//            }
-//            ?>
-<!--        </div>-->
-<!--    </section>-->
-
-
-    <?php
     //Список действий менеджера
     $LIMIT_STEP = 25;    //Лимит кол-ва отображаемых/подгружаемых событий
     $limit = Core_Array::Get('limit', $LIMIT_STEP);
@@ -145,7 +75,7 @@ if (User::checkUserAccess(['groups' => [ROLE_MANAGER]], $User)) {
     global $CFG;
 
     echo "<div class='events'>";
-    Core::factory('Core_Entity')
+    (new Core_Entity())
         ->addEntity($User)
         ->addEntities($Events)
         ->addSimpleEntity('limit', $limit += $LIMIT_STEP)
@@ -155,6 +85,4 @@ if (User::checkUserAccess(['groups' => [ROLE_MANAGER]], $User)) {
         ->xsl('musadm/users/events.xsl')
         ->show();
     echo "</div>";
-
-
 }

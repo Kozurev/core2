@@ -319,6 +319,9 @@ section {
 .schedule .neutral {
     background-color: rgba(240, 237, 234, 0.7) !important;
 }
+.schedule .disabled {
+    background-color: #969696 !important;
+}
 /**
  *  <<Конец 
  *  Подсветка пользователей
@@ -402,7 +405,7 @@ section {
     display: inline-block;
 }
 
-.schedule .teacher_payments_block {
+.teacher_payments_block {
     overflow-y: scroll;
     max-height: 470px;
 }

@@ -30,25 +30,32 @@
 
             <input type="hidden" value="{//timestep}" id="timestep" />
 
-            <div class="column">
-                <span>Учитель</span><span style="color:red" >*</span>
-            </div>
-            <div class="column">
-                <select class="form-control" name="teacherId">
-                    <option value="0">...</option>
-                    <xsl:for-each select="user">
-                        <option value="{id}">
-                            <xsl:if test="is_absent = 1">
-                                <xsl:attribute name="style">color:red</xsl:attribute>
-                            </xsl:if>
-                            <xsl:value-of select="surname" />
-                            <xsl:text> </xsl:text>
-                            <xsl:value-of select="name" />
-                        </option>
-                    </xsl:for-each>
-                </select>
-            </div>
-            <hr/>
+            <xsl:choose>
+                <xsl:when test="teacher_id != ''">
+                    <input type="hidden" name="teacher_id" value="{current_user/id}" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <div class="column">
+                        <span>Учитель</span><span style="color:red" >*</span>
+                    </div>
+                    <div class="column">
+                        <select class="form-control" name="teacherId">
+                            <option value="0">...</option>
+                            <xsl:for-each select="user">
+                                <option value="{id}">
+                                    <xsl:if test="is_absent = 1">
+                                        <xsl:attribute name="style">color:red</xsl:attribute>
+                                    </xsl:if>
+                                    <xsl:value-of select="surname" />
+                                    <xsl:text> </xsl:text>
+                                    <xsl:value-of select="name" />
+                                </option>
+                            </xsl:for-each>
+                        </select>
+                    </div>
+                    <hr/>
+                </xsl:otherwise>
+            </xsl:choose>
 
             <div class="column">
                 <span>Тип урока</span>
@@ -90,7 +97,7 @@
             </div>
             <hr/>
 
-            <xsl:if test="lesson_type = 2">
+            <xsl:if test="lesson_type = 2 and teacher_id = ''">
                 <div class="column remember">
                     <span>Обсудить после урока следующий день занятий</span>
                 </div>
@@ -101,6 +108,7 @@
             </xsl:if>
 
 
+            <input type="hidden" name="user_group_id" value="{current_user/group_id}" />
             <input type="hidden" name="id" value="" />
             <input type="hidden" name="classId" value="{class_id}" />
             <input type="hidden" name="insertDate" value="{date}" />

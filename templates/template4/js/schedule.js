@@ -12,9 +12,9 @@ $(function(){
         .on('change', '.schedule_calendar', function() {
             loaderOn();
             let
-                date = $('.schedule_calendar').val(),
+                date = $(this).val(),
                 userid = $('#userid').val(),
-                newDate = new Date($('.schedule_calendar').val()),
+                newDate = new Date($(this).val()),
                 dayName = days[newDate.getDay()];
             $('.day_name').text(dayName);
             getSchedule(userid, date, loaderOff);
@@ -299,18 +299,26 @@ $(function(){
 
                 clientsList.empty();
                 if (type == 1) {
-                    User.getList({
-                        select: ['id', 'surname', 'name'],
-                        active: true,
-                        groups: [5],
-                        order: { surname: 'ASC' }
-                    }, function(users) {
+                    var callback = function(users) {
                         clientsList.append('<option value="0"> ... </option>');
                         $.each(users, function(key, user) {
-                            clientsList.append('<option value="'+user.id+'">'+user.surname + ' ' + user.name +'</option>');
+                            if (user.active == 1) {
+                                clientsList.append('<option value="'+user.id+'">'+user.surname + ' ' + user.name +'</option>');
+                            }
                         });
                         loaderOff();
-                    });
+                    };
+
+                    if ($('input[name=user_group_id]').val() == 4) {
+                        User.getListByTeacherId($('input[name=teacher_id]').val(), callback);
+                    } else {
+                        User.getList({
+                            select: ['id', 'surname', 'name'],
+                            active: true,
+                            groups: [5],
+                            order: { surname: 'ASC' }
+                        }, callback);
+                    }
                 } else {
                     let typeId = type == 2 ? 1 : 2;
                     Group.getList({active: true, type: typeId}, function (groups) {
@@ -405,7 +413,7 @@ $(function(){
             //Отправка данных о проведенном занятии
             $.ajax({
                 type: 'GET',
-                url: '',
+                url: root + '/schedule',
                 data: ajaxData,
                 dataType: 'json',
                 success: function(response) {
@@ -713,7 +721,6 @@ function getSchedule(userId, date, func) {
     $.ajax({
         type: 'GET',
         url: '',
-        async: false,
         data: {
             action: 'getSchedule',
             userid: userId,
@@ -721,7 +728,9 @@ function getSchedule(userId, date, func) {
         },
         success: function(response) {
             $('.schedule').html(response);
-            func();
+            if (typeof func === 'function') {
+                func();
+            }
             loaderOff();
         }
     });
