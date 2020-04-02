@@ -32,7 +32,7 @@
 
             <xsl:choose>
                 <xsl:when test="teacher_id != ''">
-                    <input type="hidden" name="teacher_id" value="{current_user/id}" />
+                    <input type="hidden" name="teacherId" value="{current_user/id}" />
                 </xsl:when>
                 <xsl:otherwise>
                     <div class="column">

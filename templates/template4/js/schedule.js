@@ -310,7 +310,7 @@ $(function(){
                     };
 
                     if ($('input[name=user_group_id]').val() == 4) {
-                        User.getListByTeacherId($('input[name=teacher_id]').val(), callback);
+                        User.getListByTeacherId($('input[name=teacherId]').val(), callback);
                     } else {
                         User.getList({
                             select: ['id', 'surname', 'name'],
