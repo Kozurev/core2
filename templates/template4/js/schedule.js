@@ -455,7 +455,7 @@ $(function(){
 
             $.ajax({
                 type: 'GET',
-                url: '',
+                url: root + '/schedule',
                 data: {
                     action: 'deleteReport',
                     lesson_id: lessonId,
