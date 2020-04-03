@@ -297,18 +297,20 @@ $(function(){
                     $(value).show();
                 });
 
+
+                var callback = function(users) {
+                    let clientsList = $('#createData').find('select[name=clientId]');
+                    clientsList.append('<option value="0"> ... </option>');
+                    $.each(users, function(key, user) {
+                        if (user.active == 1 || user.active == undefined) {
+                            clientsList.append('<option value="'+user.id+'">'+user.surname + ' ' + user.name +'</option>');
+                        }
+                    });
+                    loaderOff();
+                };
+
                 clientsList.empty();
                 if (type == 1) {
-                    var callback = function(users) {
-                        clientsList.append('<option value="0"> ... </option>');
-                        $.each(users, function(key, user) {
-                            if (user.active == 1) {
-                                clientsList.append('<option value="'+user.id+'">'+user.surname + ' ' + user.name +'</option>');
-                            }
-                        });
-                        loaderOff();
-                    };
-
                     if ($('input[name=user_group_id]').val() == 4) {
                         User.getListByTeacherId($('input[name=teacherId]').val(), callback);
                     } else {
