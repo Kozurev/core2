@@ -97,7 +97,8 @@
             </div>
             <hr/>
 
-            <xsl:if test="lesson_type = 2 and teacher_id = ''">
+            <xsl:value-of select="teacher_id" />
+            <xsl:if test="lesson_type = 2">
                 <div class="column remember">
                     <span>Обсудить после урока следующий день занятий</span>
                 </div>
