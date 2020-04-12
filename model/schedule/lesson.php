@@ -31,10 +31,10 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
     public function __construct()
     {
-//        $this->defaultUser = Core::factory('User')->surname('Неизвестно');
-//        $this->defaultGroup = Core::factory('Schedule_Group')->title('Неизвестно');
-//        $this->defaultLid = Core::factory('Lid')->surname('Неизвестно');
-//        $this->defaultArea = Core::factory('Schedule_Area')->title('Неизвестно');
+        $this->defaultUser = Core::factory('User')->surname('Неизвестно');
+        $this->defaultGroup = Core::factory('Schedule_Group')->title('Неизвестно');
+        $this->defaultLid = Core::factory('Lid')->surname('Неизвестно');
+        $this->defaultArea = Core::factory('Schedule_Area')->title('Неизвестно');
     }
 
 

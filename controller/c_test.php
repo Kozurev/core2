@@ -12,6 +12,8 @@ Orm::Debug(true);
 //$teacher = Core::factory('User', 1725);
 //$time = Schedule_Controller_Extended::getTeacherNearestFreeTime(1725, '2020-03-01');
 //debug($time);
+exit;
+Orm::execute('alter table Schedule_Lesson add is_online tinyint unsigned default 0 null');
 
 exit;
 

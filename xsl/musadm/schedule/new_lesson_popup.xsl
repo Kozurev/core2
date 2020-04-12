@@ -108,6 +108,14 @@
                 <hr/>
             </xsl:if>
 
+            <div class="column">
+                <span>Онлайн</span>
+            </div>
+            <div class="column">
+                <input class="form-control" name="isOnline" type="checkbox" value="1" />
+            </div>
+            <hr/>
+
 
             <input type="hidden" name="user_group_id" value="{current_user/group_id}" />
             <input type="hidden" name="id" value="" />

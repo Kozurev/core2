@@ -280,6 +280,9 @@ class Schedule_Controller
                         }
                     }
                     echo '<span class="teacher"> ' . $fio . '</span>';
+                    if ($lesson->isOnline()) {
+                        echo ' (Онлайн)';
+                    }
                     echo '<br/>';
                 }
             }
@@ -484,6 +487,9 @@ class Schedule_Controller
                             $clientFio = 'Консультация';
                         }
                         echo "<span class=\"teacher\"> $clientFio</span>";
+                    }
+                    if ($Lesson->isOnline()) {
+                        echo ' (Онлайн)';
                     }
 
                     //Кнопка отмены занятия

@@ -118,6 +118,14 @@ class Schedule_Lesson_Model extends Core_Entity
 
 
     /**
+     * Указатель на то онлайн это занятие или нет, привет от короновируса)
+     *
+     * @var int
+     */
+    protected $is_online = 0;
+
+
+    /**
      * @param string|null $insertDate
      * @return $this|string
      */
@@ -283,6 +291,21 @@ class Schedule_Lesson_Model extends Core_Entity
 
 
     /**
+     * @param int|null $isOnline
+     * @return $this|int
+     */
+    public function isOnline(int $isOnline = null)
+    {
+        if (is_null($isOnline)) {
+            return intval($this->is_online);
+        } else {
+            $this->is_online = $isOnline;
+            return $this;
+        }
+    }
+
+
+    /**
      * @return array
      */
     public function schema() : array
@@ -350,6 +373,10 @@ class Schedule_Lesson_Model extends Core_Entity
                 'required' => true,
                 'type' => PARAM_INT,
                 'minval' => 1
+            ],
+            'is_online' => [
+                'required' => false,
+                'type' => PARAM_BOOL
             ]
         ];
     }

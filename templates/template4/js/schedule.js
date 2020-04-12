@@ -124,6 +124,7 @@ $(function(){
             let typeId = Form.find('select[name=typeId]').val();
             let dayName = Form.find('input[name=dayName]').val();
             let isCreateTask = $('input[name=is_create_task]');
+            let isOnline = Form.find('input[name=is_online]').val();
 
             //Проверка на принадлежность занятия рабочему времени преподавателя
             Schedule.isInTeacherTime({
