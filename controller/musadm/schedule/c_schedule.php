@@ -240,6 +240,10 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                         </li>
                     </ul>";
                     }
+
+                    if ($MainLesson->isOnline()) {
+                        echo '<hr><b><span>Онлайн</span></b>';
+                    }
                     echo "</td>";
                 }
             }
@@ -284,11 +288,14 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                         echo "data-id='" . $dataId . "' ";
                         echo "data-type='" . $CurrentLesson->lessonType() . "'>";
                         echo "
-                                <li><a href=\"#\" class='schedule_today_absent'>Отсутствует сегодня</a></li>
-                                <li><a href=\"#\" class='schedule_update_time'>Изменить на сегодня время</a></li>
-                            </ul>
-                        </li>
-                    </ul>";
+                                    <li><a href=\"#\" class='schedule_today_absent'>Отсутствует сегодня</a></li>
+                                    <li><a href=\"#\" class='schedule_update_time'>Изменить на сегодня время</a></li>
+                                </ul>
+                            </li>
+                        </ul>";
+                        if ($CurrentLesson->isOnline()) {
+                            echo '<hr><b><span>Онлайн</span></b>';
+                        }
                         echo "</td>";
                     }
                 } else {
