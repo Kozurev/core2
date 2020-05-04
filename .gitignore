@@ -1,0 +1,6 @@
+.idea/
+upload/
+config/config.php
+config/dbcon.php
+firebase.json
+xml.xml
