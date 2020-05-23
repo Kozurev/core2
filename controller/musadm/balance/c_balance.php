@@ -247,7 +247,6 @@ if ($User->groupId() == ROLE_CLIENT && Core_Access::instance()->hasCapability(Co
 
 //Блок статистики посещаемости
 if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ)) {
-    Core::factory('Schedule_Lesson');
     $UserReports = Core::factory('Schedule_Lesson_Report');
     $UserReports
         ->queryBuilder()

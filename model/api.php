@@ -2,15 +2,7 @@
 
 class Api
 {
-
-    /**
-     * Тип запроса к API вконтакте
-     */
     const REQUEST_METHOD_GET = 'get';
-
-    /**
-     * Тип запроса к API вконтакте
-     */
     const REQUEST_METHOD_POST = 'post';
 
 

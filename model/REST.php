@@ -16,6 +16,29 @@ class REST
 
     const ERROR_UNAUTHORIZED = 'unauthorized';
 
+    const ERROR_CODE_EMPTY = 0;     //Ошибки отсутствуют
+    const ERROR_CODE_AUTH = 1;      //Пользователь не авторизован
+    const ERROR_CODE_ACCESS = 2;    //Недостаточно прав
+    const ERROR_CODE_NOT_FOUND = 3; //Объект не найден
+
+    /**
+     * @var string[]
+     */
+    private static $messagess = [
+        self::ERROR_CODE_EMPTY => 'Ок',
+        self::ERROR_CODE_AUTH => 'Пользователь не авторизован',
+        self::ERROR_CODE_ACCESS => 'Недостаточно прав',
+        self::ERROR_CODE_NOT_FOUND => 'Искомый объект не найден',
+    ];
+
+    /**
+     * @param int $errorCode
+     * @return string
+     */
+    public static function getErrorMessage(int $errorCode) : string
+    {
+        return self::$messagess[$errorCode] ?? '';
+    }
 
     /**
      * @return Rest_User
@@ -79,6 +102,7 @@ class REST
     {
         $error = new stdClass();
         $error->code = $num;
+        $error->error = $num;
         $error->message = $message;
         return json_encode(['error' => $error]);
     }
@@ -89,11 +113,13 @@ class REST
      *
      * @param string $status
      * @param string $message
+     * @param int|null $errorCode
      * @return string
      */
-    public static function status(string $status, string $message) : string
+    public static function status(string $status, string $message, int $errorCode = null) : string
     {
         $output = new stdClass();
+        $output->error = $errorCode;
         $output->message = $message;
 
         if ($status === self::STATUS_SUCCESS) {
@@ -105,5 +131,18 @@ class REST
         }
 
         return json_encode($output);
+    }
+
+    /**
+     * @param int $errorCode
+     * @param string $message
+     * @return string
+     */
+    public static function responseError(int $errorCode, string $message = '') : string
+    {
+        $response = new stdClass();
+        $response->error = $errorCode;
+        $response->message = !empty($message) ? $message : self::getErrorMessage($errorCode);
+        return json_encode($response);
     }
 }

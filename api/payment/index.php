@@ -326,3 +326,55 @@ if ($action === 'getCustomTypesList') {
     }
     die(json_encode($response));
 }
+
+/**
+ *
+ */
+if ($action === 'get_client_payments') {
+    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_CLIENT)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
+    $userId = User_Auth::current()->groupId() === ROLE_CLIENT
+        ?   User_Auth::current()->getId()
+        :   Core_Array::Get('user_id', 0, PARAM_INT);
+
+    $paymentsQuery = (new Payment())->queryBuilder()
+        ->where('user', '=', $userId);
+
+    //Пагинация
+    $page = Core_Array::Get('pagination/page', 1, PARAM_INT);
+    $perPage = Core_Array::Get('pagination/perpage', 10, PARAM_INT);
+
+    $totalCount = $paymentsQuery->getCount();
+    $pagination = new Pagination();
+    $pagination->setCurrentPage($page);
+    $pagination->setOnPage($perPage);
+    $pagination->setTotalCount($totalCount);
+
+    $sortRow = Core_Array::Get('sort/field', 'id', PARAM_STRING);
+    $sortOrder = Core_Array::Get('sort/sort', 'desc', PARAM_STRING);
+
+    $payments = $paymentsQuery
+        ->limit($pagination->getLimit())
+        ->offset($pagination->getOffset())
+        ->orderBy($sortRow, $sortOrder)
+        ->findAll();
+
+    $paymentsStd = [];
+    foreach ($payments as $payment) {
+        $payment->refactored_date = date('d.m.y', strtotime($payment->datetime()));
+        $paymentsStd[] = $payment->toStd();
+    }
+
+    $response = [];
+    $response['pagination'] = [
+        'page' => $page,
+        'pages' => $pagination->getCountPages(),
+        'perpage' => $perPage,
+        'total' => $totalCount
+    ];
+    $response['data'] = $paymentsStd;
+
+    die(json_encode($response));
+}

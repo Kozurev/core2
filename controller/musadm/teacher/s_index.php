@@ -6,9 +6,20 @@ if (!Core_Access::instance()->hasCapability(Core_Access::USER_LC_TEACHER)) {
 }
 
 $user = User_Auth::current();
-$teacherFio = $user->surname() . ' ' . $user->name();
-Core_Page_Show::instance()->title = $teacherFio . ' | Личный кабинет';
+//$teacherFio = $user->surname() . ' ' . $user->name();
+//Core_Page_Show::instance()->title = $teacherFio . ' | Личный кабинет';
+$teacherId = Core_Array::Get('userid', null, PARAM_INT);
+if (is_null($teacherId)) {
+    $pageUserFio = $User->surname() . ' ' . $User->name();
+} else {
+    $teacher = User_Controller::factory($teacherId);
+    if (is_null($teacher)) {
+        Core_Page_Show::instance()->error(403);
+    }
+    $pageUserFio = $teacher->surname() . ' ' . $teacher->name();
+}
 
+Core_Page_Show::instance()->title = $pageUserFio . ' | Личный кабинет';
 
 $breadcumbs[0] = new stdClass();
 $breadcumbs[0]->title = Core_Page_Show::instance()->Structure->title();

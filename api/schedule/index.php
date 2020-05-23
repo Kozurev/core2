@@ -4,16 +4,8 @@
  * @date 14.06.2019 18:34
  * @version 20190626
  * @version 20191018
+ * @version 20200522
  */
-
-Core::requireClass('Schedule_Teacher');
-Core::requireClass('Schedule_Area');
-Core::requireClass('Schedule_Area_Assignment');
-Core::requireClass('Schedule_Lesson');
-Core::requireClass('Schedule_Absent');
-Core::requireClass('Schedule_Controller');
-Core::requireClass('Schedule_Controller_Extended');
-Core::requireClass('User_Controller');
 
 
 foreach ($_GET as $key => $param) {
@@ -220,7 +212,7 @@ if ($action === 'get_nearest_lessons') {
     $response->nearest->date = null;
     $response->nearest->lessons = [];
 
-    $User = User::current();
+    $User = User_Auth::current();
 
     if (empty($User)) {
         $response->error = 'invalid_auth';
@@ -247,6 +239,8 @@ if ($action === 'get_nearest_lessons') {
                 $stdLesson->area = $Area->toStd();
                 $stdLesson->teacher = $Teacher->toStd();
                 $stdLesson->client = $Client->toStd();
+                $stdLesson->refactored_time_from = refactorTimeFormat($lesson->timeFrom());
+                $stdLesson->refactored_time_to = refactorTimeFormat($lesson->timeTo());
 
                 unset($stdLesson->teacher->password);
                 unset($stdLesson->teacher->auth_token);
@@ -482,5 +476,143 @@ if ($action == 'getTeacherSchedule') {
     exit(json_encode($response));
 }
 
+if ($action === 'get_client_reports') {
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
+    $userId = User_Auth::current()->groupId() === ROLE_CLIENT
+        ?   User_Auth::current()->getId()
+        :   Core_Array::Get('user_id', 0, PARAM_INT);
+
+    $sortRow = Core_Array::Get('sort/field', 'id', PARAM_STRING);
+    $sortOrder = Core_Array::Get('sort/sort', 'desc', PARAM_STRING);
+
+    $userReportsQuery = (new Schedule_Lesson_Report())
+        ->queryBuilder()
+        ->orderBy($sortRow, $sortOrder);
+
+    $clientGroups = (new Schedule_Group_Assignment())
+        ->queryBuilder()
+        ->where('user_id', '=', $userId)
+        ->findAll();
+    $userGroups = [];
+    foreach ($clientGroups as $group) {
+        $userGroups[] = $group->groupId();
+    }
+    if (count($userGroups) > 0) {
+        $userReportsQuery
+            ->open()
+            ->where('client_id', '=', $userId)
+            ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
+            ->close()
+            ->open()
+            ->orWhereIn('client_id', $userGroups)
+            ->where('type_id', '=', Schedule_Lesson::TYPE_GROUP)
+            ->close();
+    } else {
+        $userReportsQuery
+            ->where('client_id', '=', $userId)
+            ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV);
+    }
+
+    //Пагинация
+    $page = Core_Array::Get('pagination/page', 1, PARAM_INT);
+    $perPage = Core_Array::Get('pagination/perpage', 10, PARAM_INT);
+
+    $totalCount = $userReportsQuery->getCount();
+    $pagination = new Pagination();
+    $pagination->setCurrentPage($page);
+    $pagination->setOnPage($perPage);
+    $pagination->setTotalCount($totalCount);
+
+    $userReports = $userReportsQuery
+        ->limit($pagination->getLimit())
+        ->offset($pagination->getOffset())
+        ->findAll();
+
+    $userReportsStd = [];
+    $teachers = [];
+    foreach ($userReports as $report) {
+        $report->refactored_date = date('d.m.y', strtotime($report->date()));
+        $teacher = isset($teachers[$report->teacherId()])
+            ?   $teachers[$report->teacherId()]
+            :   $report->getTeacher();
+        $report->teacher_fio = $teacher->surname() . ' ' . $teacher->name();
+        $userReportsStd[] = $report->toStd();
+    }
+
+    $response = [];
+    $response['pagination'] = [
+        'page' => $page,
+        'pages' => $pagination->getCountPages(),
+        'perpage' => $perPage,
+        'total' => $totalCount
+    ];
+    $response['data'] = $userReportsStd;
+
+    die(json_encode($response));
+}
+
+/**
+ * Формирование расписания клиентов
+ *
+ * @INPUT_GET:  date_start  Дата начала
+ *
+ * @OUTPUT:     json
+ *
+ * @OUTPUT_DATA: array of stdClass      список пользователей в виде объектов с их основными полями
+ */
+if ($action === 'get_client_schedule') {
+    $response = new stdClass();
+    $response->error = null;
+    $response->message = '';
+
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ)) {
+        exit(REST::responseError(REST::ERROR_CODE_ACCESS));
+    }
+    if (is_null(User_Auth::current())) {
+        exit(REST::responseError(REST::ERROR_CODE_AUTH));
+    }
+
+    $userId = User_Auth::current()->groupId() === ROLE_CLIENT
+        ?   User_Auth::current()->getId()
+        :   Core_Array::Get('user_id', 0, PARAM_INT);
+
+    $user = User_Controller::factory($userId, false);
+    if (is_null($user)) {
+        Core_Page_Show::instance()->error(404);
+    }
+
+    $dateStart = Core_Array::Get('date_start', date('Y-m-d'), PARAM_DATE);
+    $dateEnd = Core_Array::Get('date_end', date('Y-m-d'), PARAM_DATE);
+
+    try {
+        $schedule = Schedule_Controller_Extended::getSchedule($user, $dateStart, $dateEnd);
+    } catch (Exception $e) {
+        exit(REST::responseError(REST::ERROR_CODE_EMPTY, $e->getMessage()));
+    }
+
+    $teachers = [];
+    $areas = [];
+    foreach ($schedule as $day) {
+        $day->refactored_date = refactorDateFormat($day->date);
+        foreach ($day->lessons as $key => $lesson) {
+            if (!isset($teachers[$lesson->teacherId()])) {
+                $teachers[$lesson->teacherId()] = $lesson->getTeacher();
+            }
+            if (!isset($areas[$lesson->areaId()])) {
+                $areas[$lesson->areaId()] = $lesson->getArea();
+            }
+            $lesson->area = $areas[$lesson->areaId()]->title();
+            $lesson->teacher = $teachers[$lesson->teacherId()]->getFio();
+            $lesson->refactored_time_from = refactorTimeFormat($lesson->timeFrom());
+            $lesson->refactored_time_to = refactorTimeFormat($lesson->timeTo());
+            $day->lessons[$key] = $lesson->toStd();
+        }
+    }
+
+    exit(json_encode($schedule));
+}
 
 die(REST::status(REST::STATUS_ERROR, 'Отсутствует название действия'));

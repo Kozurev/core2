@@ -26,8 +26,7 @@ if (Core_Array::Get('ajax', 0) == 1) {
     exit;
 }
 
-Core::requireClass('User_Controller');
-$User = User::current();
+$User = User_Auth::current();
 
 if (is_null($User)) {
     Core_Page_Show::instance()->error(403);

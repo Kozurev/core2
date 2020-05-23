@@ -27,50 +27,50 @@ $action = Core_Array::Request('action', null, PARAM_STRING);
  *
  * @OUTPUT_DATA: array of stdClass      список тарифов в виде объектов со всеми их свойствами
  */
-if ($action === 'getList') {
+if ($action === 'getList' || $action === 'get_list') {
     $params = Core_Array::Get('params', [], PARAM_ARRAY);
     $limit = Core_Array::getValue($params, 'limit', null, PARAM_INT);
     $offset = Core_Array::getValue($params, 'offset', null, PARAM_INT);
     $order = Core_Array::getValue($params, 'order', null, PARAM_ARRAY);
 
-    $TarifsQuery = Core::factory('Payment_Tarif')->queryBuilder();
+    $tarifsQuery = Core::factory('Payment_Tarif')->queryBuilder();
 
     //TODO: пока что проверка прав доступа осуществляется именно вот так, надо бы потом поменять
-    $CurrentUser = User::current();
-    if (is_null($CurrentUser) || $CurrentUser->groupId() == ROLE_CLIENT) {
-        $TarifsQuery->where('access', '=', 1);
+    $currentUser = User_Auth::current();
+    if (is_null($currentUser) || $currentUser->groupId() == ROLE_CLIENT) {
+        $tarifsQuery->where('access', '=', 1);
     }
 
-    if (!is_null($CurrentUser)) {
-        $TarifsQuery->where('subordinated', '=', $CurrentUser->getDirector()->getId());
+    if (!is_null($currentUser)) {
+        $tarifsQuery->where('subordinated', '=', $currentUser->getDirector()->getId());
     }
 
     if (!is_null($limit)) {
-        $TarifsQuery->limit($limit);
+        $tarifsQuery->limit($limit);
     }
 
     if (!is_null($offset)) {
-        $TarifsQuery->offset($offset);
+        $tarifsQuery->offset($offset);
     }
 
     if (!is_null($order)) {
-        $TarifsQuery->orderBy(
+        $tarifsQuery->orderBy(
             Core_Array::getValue($order, 'field', 'id', PARAM_STRING),
             Core_Array::getValue($order, 'order', 'ASC', PARAM_STRING)
         );
     }
 
-    $Tarifs = $TarifsQuery->findAll();
+    $tarifs = $tarifsQuery->findAll();
     $response = [];
-    foreach ($Tarifs as $Tarif) {
-        $TarifStd = new stdClass();
-        $TarifStd->id = $Tarif->getId();
-        $TarifStd->title = $Tarif->title();
-        $TarifStd->price = $Tarif->price();
-        $TarifStd->countIndiv = $Tarif->countIndiv();
-        $TarifStd->countGroup = $Tarif->countGroup();
-        $TarifStd->access = $Tarif->access();
-        $response[] = $TarifStd;
+    foreach ($tarifs as $Tarif) {
+        $tarifStd = new stdClass();
+        $tarifStd->id = $Tarif->getId();
+        $tarifStd->title = $Tarif->title();
+        $tarifStd->price = $Tarif->price();
+        $tarifStd->countIndiv = $Tarif->countIndiv();
+        $tarifStd->countGroup = $Tarif->countGroup();
+        $tarifStd->access = $Tarif->access();
+        $response[] = $tarifStd;
     }
 
     die(json_encode($response));
@@ -80,14 +80,25 @@ if ($action === 'getList') {
 /**
  * Покупка клиента
  */
-if ($action === 'buyForClient') {
+if ($action === 'buyForClient' || $action === 'buy_tarif') {
     //Проверка прав доступа
     if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_BUY)) {
-        Core_Page_Show::instance()->error(403);
+        if ($action === 'buyForClient') {
+            Core_Page_Show::instance()->error(403);
+        } else {
+            exit(REST::responseError(REST::ERROR_CODE_ACCESS));
+        }
     }
 
     $clientId = Core_Array::Get('userId', null, PARAM_INT);
     $tarifId =  Core_Array::Get('tarifId', null, PARAM_INT);
+    if (is_null($tarifId)) {
+        $tarifId = Core_Array::Get('tarif_id', null, PARAM_INT);
+    }
+
+    if (is_null($clientId) && !is_null(User_Auth::current()) && User_Auth::current()->groupId() == ROLE_CLIENT) {
+        $clientId = User_Auth::current()->getId();
+    }
 
     $response = [];
 
@@ -169,4 +180,28 @@ if ($action === 'buyForClient') {
     $response['user']->countGroup = $CountGroupLessons->value();
 
     die(json_encode($response));
+}
+
+/**
+ * Поиск тарифа по id
+ */
+if ($action === 'get_rate_by_id') {
+    $tarifId = Core_Array::Get('tarif_id', 0, PARAM_INT);
+
+    $tarifQuery = (new Payment_Tarif)->queryBuilder()
+        ->where('id', '=', $tarifId);
+
+    //TODO: пока что проверка прав доступа осуществляется именно вот так, надо бы потом поменять
+    $currentUser = User_Auth::current();
+    if (is_null($currentUser) || $currentUser->groupId() == ROLE_CLIENT) {
+        $tarifQuery->where('access', '=', 1);
+    }
+
+    $tarif = $tarifQuery->find();
+
+    if (is_null($tarif)) {
+        exit(REST::responseError(REST::ERROR_CODE_NOT_FOUND));
+    }
+
+    die(json_encode($tarif->toStd()));
 }
