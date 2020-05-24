@@ -10,7 +10,7 @@ $user = User_Auth::current();
 //Core_Page_Show::instance()->title = $teacherFio . ' | Личный кабинет';
 $teacherId = Core_Array::Get('userid', null, PARAM_INT);
 if (is_null($teacherId)) {
-    $pageUserFio = $User->surname() . ' ' . $User->name();
+    $pageUserFio = $user->surname() . ' ' . $user->name();
 } else {
     $teacher = User_Controller::factory($teacherId);
     if (is_null($teacher)) {
