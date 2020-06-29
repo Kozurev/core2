@@ -9,9 +9,6 @@
 
 Orm::Debug(true);
 
-//$teacher = Core::factory('User', 1725);
-//$time = Schedule_Controller_Extended::getTeacherNearestFreeTime(1725, '2020-03-01');
-//debug($time);
 
 exit;
 
@@ -20,12 +17,32 @@ ALTER TABLE payment
   MODIFY COLUMN status tinyint DEFAULT 0 AFTER type;
   UPDATE Payment SET status = 1 where 1');
 
-(new Structure())
+$pay = (new Structure())
     ->title('Создание платежа')
     ->description('Создание запроса на оплату')
     ->parentId(0)
     ->path('pay')
     ->action('musadm/pay/pay')
+    ->templateId(10)
+    ->sorting(0)
+    ->save();
+
+(new Structure())
+    ->title('Платеж успешно совершен')
+    ->description('Платеж успешно совершен')
+    ->parentId($pay->getId())
+    ->path('success')
+    ->action('musadm/pay/success')
+    ->templateId(10)
+    ->sorting(0)
+    ->save();
+
+(new Structure())
+    ->title('Платеж отклонен')
+    ->description('Платеж отклонен')
+    ->parentId($pay->getId())
+    ->path('error')
+    ->action('musadm/pay/error')
     ->templateId(10)
     ->sorting(0)
     ->save();
