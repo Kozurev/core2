@@ -420,6 +420,7 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
  * Задание начения author_id и author_fio для
  */
 Core::attachObserver('before.Payment.insert', function($args) {
+    /** @var Payment $Payment */
     $Payment = $args[0];
     $User = User_Auth::parentAuth();
     if (!is_null($User)) {
@@ -433,12 +434,16 @@ Core::attachObserver('before.Payment.insert', function($args) {
  * Корректировка баланса клиента при сохранении/редактировании платежа типа начисление/списание
  */
 Core::attachObserver('before.Payment.save', function($args) {
+    /** @var Payment $Payment */
     $Payment = $args[0];
     $Property = new Property();
+
     //Корректировка баланса клиента
-    if ($Payment->type() == Payment::TYPE_INCOME
-    || $Payment->type() == Payment::TYPE_DEBIT
-    || $Payment->type() == Payment::TYPE_CASHBACK) {
+    if ($Payment->isStatusSuccess() &&
+        ($Payment->type() == Payment::TYPE_INCOME
+        || $Payment->type() == Payment::TYPE_DEBIT
+        || $Payment->type() == Payment::TYPE_CASHBACK)) {
+
         if ($Payment->getId() > 0) {
             $OldPayment = Core::factory('Payment', $Payment->getId());
             $difference = $Payment->value() - $OldPayment->value();
@@ -448,6 +453,7 @@ Core::attachObserver('before.Payment.save', function($args) {
         $Client = $Payment->getUser();
         if (!is_null($Client)) {
             $UserBalance = $Property->getByTagName('balance');
+            /** @var Property_Int $UserBalanceVal */
             $UserBalanceVal = $UserBalance->getPropertyValues($Client)[0];
             $balanceOld =  floatval($UserBalanceVal->value());
             $Payment->type() == Payment::TYPE_INCOME || $Payment->type() == Payment::TYPE_CASHBACK
@@ -462,6 +468,7 @@ Core::attachObserver('before.Payment.save', function($args) {
         $PaymentUser = $Payment->getUser();
         if (!is_null($PaymentUser)) {
             $AreasAssignments = new Schedule_Area_Assignment();
+            /** @var Schedule_Area[] $UserAreas */
             $UserAreas = $AreasAssignments->getAreas($PaymentUser, true);
             if (count($UserAreas) == 1) {
                 $Payment->areaId($UserAreas[0]->getId());

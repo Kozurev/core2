@@ -32,6 +32,14 @@ class Payment_Model extends Core_Entity
 
 
     /**
+     * Статус платежа
+     *
+     * @var int
+     */
+    protected $status = 1;
+
+
+    /**
      * Дата совершения платежа
      *
      * @var string
@@ -113,6 +121,21 @@ class Payment_Model extends Core_Entity
             return intval($this->type);
         } else {
             $this->type = $typeId;
+            return $this;
+        }
+    }
+
+
+    /**
+     * @param int|null $status
+     * @return $this|int
+     */
+    public function status(int $status = null)
+    {
+        if (is_null($status)) {
+            return intval($this->status);
+        } else {
+            $this->status = $status;
             return $this;
         }
     }

@@ -12,6 +12,24 @@ Orm::Debug(true);
 //$teacher = Core::factory('User', 1725);
 //$time = Schedule_Controller_Extended::getTeacherNearestFreeTime(1725, '2020-03-01');
 //debug($time);
+
+exit;
+
+Orm::execute('ALTER TABLE payment ADD status tinyint DEFAULT 0 NULL;
+ALTER TABLE payment
+  MODIFY COLUMN status tinyint DEFAULT 0 AFTER type;
+  UPDATE Payment SET status = 1 where 1');
+
+(new Structure())
+    ->title('Создание платежа')
+    ->description('Создание запроса на оплату')
+    ->parentId(0)
+    ->path('pay')
+    ->action('musadm/pay/pay')
+    ->templateId(10)
+    ->sorting(0)
+    ->save();
+
 exit;
 Orm::execute('alter table Schedule_Lesson add is_online tinyint unsigned default 0 null');
 
@@ -27,6 +45,25 @@ exit;
     ->sorting(10)
     ->save();
 
+(new Structure())
+    ->title('Платеж успешно совершен')
+    ->description('Страница обработки успепшного платежа')
+    ->parentId(53)
+    ->path('success')
+    ->action('musadm/pay/success')
+    ->templateId(10)
+    ->sorting(0)
+    ->save();
+
+(new Structure())
+    ->title('Платеж отклонен')
+    ->description('Страница обработки неуспепшного платежа')
+    ->parentId(53)
+    ->path('error')
+    ->action('musadm/pay/error')
+    ->templateId(10)
+    ->sorting(0)
+    ->save();
 
 exit;
 

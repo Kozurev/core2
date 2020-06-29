@@ -16,7 +16,7 @@ class Api
     {
         $queryParams = http_build_query($params);
         if ($requestMethod === self::REQUEST_METHOD_GET) {
-            return json_decode(file_get_contents($link .'?' . $queryParams));
+                return json_decode(file_get_contents($link .'?' . $queryParams));
         } elseif ($requestMethod === self::REQUEST_METHOD_POST) {
             return json_decode(file_get_contents($link, false, stream_context_create([
                 'http' => [

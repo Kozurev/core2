@@ -16,6 +16,10 @@ class Payment extends Payment_Model
     const TYPE_BONUS_ADD = 16;
     const TYPE_BONUS_PAY = 17;
 
+    const STATUS_PENDING = 0;
+    const STATUS_SUCCESS = 1;
+    const STATUS_ERROR = 2;
+
     private $defaultUser;
 
     public function __construct()
@@ -23,6 +27,40 @@ class Payment extends Payment_Model
         $this->defaultUser = Core::factory('User')->surname('Расходы')->name('Организации');
     }
 
+    public function isStatusError() : bool
+    {
+        return $this->status() === self::STATUS_ERROR;
+    }
+
+    public function isStatusSuccess() : bool
+    {
+        return $this->status() === self::STATUS_SUCCESS;
+    }
+
+    public function isStatusPending() : bool
+    {
+        return $this->status() === self::STATUS_PENDING;
+    }
+
+    public function setStatusPending()
+    {
+        $this->setStatus(self::STATUS_PENDING);
+    }
+
+    public function setStatusSuccess()
+    {
+        $this->setStatus(self::STATUS_SUCCESS);
+    }
+
+    public function setStatusError()
+    {
+        $this->setStatus(self::STATUS_ERROR);
+    }
+
+    public function setStatus(int $status)
+    {
+        $this->status($status)->save();
+    }
 
     /**
      * Геттер для объекта пользователя к которому привязан платеж

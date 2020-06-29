@@ -378,3 +378,39 @@ if ($action === 'get_client_payments') {
 
     die(json_encode($response));
 }
+
+
+/**
+ * Регистрация платежа в эквайринге
+ */
+if ($action === 'registerOrder') {
+    $amount = Core_Array::Request('amount', 0, PARAM_INT);
+    $userId = Core_Array::Request('userId', 0, PARAM_INT);
+    $description = Core_Array::Request('description', 'Самостоятельное пополнение баланса клиентом', PARAM_STRING);
+
+    $payment = new Payment();
+    $payment->user($userId);
+    $payment->value($amount / 100);
+    $payment->description($description);
+    $payment->type(Payment::TYPE_INCOME);
+    $payment->status(Payment::STATUS_PENDING);
+    $payment->save();
+
+    $sberbak = Sberbank::instance();
+    $sberbak->setAmount($amount);
+    $sberbak->setUserId($userId);
+    $sberbak->setDescription($description);
+    $sberbak->setOrderNumber($payment->getId());
+    $response = $sberbak->registerOrder();
+
+    if (empty($response->errorCode ?? null)) {
+        $tmpData = [
+            'paymentId' => $payment->getId(),
+            'successUrl' => Core_Array::Request('successUrl', '', PARAM_STRING),
+            'errorUrl' => Core_Array::Request('errorUrl', '', PARAM_STRING)
+        ];
+        Temp::put($response->orderId, $tmpData);
+    }
+
+    exit(json_encode($response));
+}
