@@ -25,8 +25,8 @@ class Sberbank
     private $amount;
     private $userId;
     private $description;
-    private $successUrl = 'http://musadm/pay/success';
-    private $errorUrl = 'http://musadm/pay/error';
+    private $successUrl;
+    private $errorUrl;
 
     private static $testUrl = 'https://3dsec.sberbank.ru/payment/rest/';
     private static $realUrl = 'https://securepayments.sberbank.ru/payment/rest';
@@ -34,14 +34,14 @@ class Sberbank
     public static function instance()
     {
         $token = Property_Controller::factoryByTag('payment_sberbank_token')->getValues(User_Auth::current()->getDirector())[0]->value();
-        //$token = 'b2lfie9m3d140omec4psm0qjet'; //Боевой
-        //$token = 'pqjg1i2mjl9qjdbmvg5rcok1n9'; //Тестовый
         return new self($token);
     }
 
     private function __construct(string $token)
     {
         $this->token = $token;
+        $this->successUrl = mapping('deposit_success');
+        $this->errorUrl = mapping('deposit_error');
     }
 
     /**

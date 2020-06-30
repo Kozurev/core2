@@ -516,7 +516,9 @@ function mapping(string $route, $params = []) : string
     global $CFG;
 
     $mapping = [
-        'auth' => 'authorize'
+        'auth' => 'authorize',
+        'deposit_success' => 'pay/success',
+        'deposit_error' => 'pay/error',
     ];
 
     $getParams = !empty($params)
