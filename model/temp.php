@@ -32,7 +32,7 @@ class Temp
         if (!file_exists($file)) {
             return null;
         } else {
-            return json_decode($file);
+            return json_decode(file_get_contents($file));
         }
     }
 

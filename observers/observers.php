@@ -445,8 +445,13 @@ Core::attachObserver('before.Payment.save', function($args) {
         || $Payment->type() == Payment::TYPE_CASHBACK)) {
 
         if ($Payment->getId() > 0) {
+            /** @var Payment $OldPayment */
             $OldPayment = Core::factory('Payment', $Payment->getId());
-            $difference = $Payment->value() - $OldPayment->value();
+            if ($OldPayment->status() !== Payment::STATUS_SUCCESS && $Payment->isStatusSuccess()) {
+                $difference = $Payment->value();
+            } else {
+                $difference = $Payment->value() - $OldPayment->value();
+            }
         } else {
             $difference = $Payment->value();
         }

@@ -33,15 +33,23 @@ class Sberbank
 
     public static function instance()
     {
-        //$token = Property_Controller::factoryByTag('payment_sberbank_token')->getValues(User_Auth::current()->getDirector())[0]->value();
-        //$token = 'b2lfie9m3d140omec4psm0qjet';
-        $token = 'pqjg1i2mjl9qjdbmvg5rcok1n9';
+        $token = Property_Controller::factoryByTag('payment_sberbank_token')->getValues(User_Auth::current()->getDirector())[0]->value();
+        //$token = 'b2lfie9m3d140omec4psm0qjet'; //Боевой
+        //$token = 'pqjg1i2mjl9qjdbmvg5rcok1n9'; //Тестовый
         return new self($token);
     }
 
     private function __construct(string $token)
     {
         $this->token = $token;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTestMode() : bool
+    {
+        return $this->isTestMode;
     }
 
     public function setOrderNumber(int $orderNumber)
@@ -64,6 +72,9 @@ class Sberbank
         $this->description = $description;
     }
 
+    /**
+     * @return mixed|null
+     */
     public function registerOrder()
     {
         $params = [
@@ -77,9 +88,13 @@ class Sberbank
         return Api::getRequest($this->getUrl(self::ACTION_REGISTER_ORDER), $params);
     }
 
+    /**
+     * @param string $action
+     * @return string
+     */
     public function getUrl(string $action) : string
     {
-        if ($this->isTestMode) {
+        if ($this->isTestMode()) {
             $url = self::$testUrl;
         } else {
             $url = self::$realUrl;

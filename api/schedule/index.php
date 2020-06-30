@@ -534,11 +534,20 @@ if ($action === 'get_client_reports') {
     $userReportsStd = [];
     $teachers = [];
     foreach ($userReports as $report) {
+        /** @var Schedule_Lesson_Report $report */
         $report->refactored_date = date('d.m.y', strtotime($report->date()));
         $teacher = isset($teachers[$report->teacherId()])
             ?   $teachers[$report->teacherId()]
             :   $report->getTeacher();
         $report->teacher_fio = $teacher->surname() . ' ' . $teacher->name();
+
+        $lesson = $report->getLesson();
+        if (!is_null($lesson)) {
+            $lesson->setRealTime($report->date());
+            $report->lesson_time_from = refactorTimeFormat($lesson->timeFrom());
+            $report->lesson_time_to = refactorTimeFormat($lesson->timeTo());
+        }
+
         $userReportsStd[] = $report->toStd();
     }
 

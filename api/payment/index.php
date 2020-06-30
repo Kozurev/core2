@@ -11,13 +11,7 @@ foreach ($_GET as $key => $param) {
     }
 }
 
-
 $action = Core_Array::Request('action', null, PARAM_STRING);
-
-
-Core::requireClass('Property');
-Core::requireClass('Payment');
-Core::requireClass('Payment_Controller');
 
 
 /**
@@ -385,8 +379,13 @@ if ($action === 'get_client_payments') {
  */
 if ($action === 'registerOrder') {
     $amount = Core_Array::Request('amount', 0, PARAM_INT);
-    $userId = Core_Array::Request('userId', 0, PARAM_INT);
-    $description = Core_Array::Request('description', 'Самостоятельное пополнение баланса клиентом', PARAM_STRING);
+    $description = Core_Array::Request('description', 'Оплата музыкального обучения', PARAM_STRING);
+
+    $user = User_Auth::current();
+    if (is_null($user)) {
+        Core_Page_Show::instance()->error(403);
+    }
+    $userId = $user->getId();
 
     $payment = new Payment();
     $payment->user($userId);
