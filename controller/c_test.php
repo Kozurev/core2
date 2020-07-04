@@ -12,8 +12,8 @@ Orm::Debug(true);
 
 exit;
 
-Orm::execute('ALTER TABLE payment ADD status tinyint DEFAULT 0 NULL;
-ALTER TABLE payment
+Orm::execute('ALTER TABLE Payment ADD status tinyint DEFAULT 0 NULL;
+ALTER TABLE Payment
   MODIFY COLUMN status tinyint DEFAULT 0 AFTER type;
   UPDATE Payment SET status = 1 where 1');
 
