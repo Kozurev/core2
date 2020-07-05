@@ -48,16 +48,16 @@ class User extends User_Model
 	/**
 	 * Проверка для избежания создания пользователей с одинаковыми логинами
      *
+     * @param string $login
 	 * @return bool
 	 */
 	public function isUserExists(string $login) : bool
 	{
-		$User = Core::factory('User')
+		$user = (new self)
             ->queryBuilder()
 			->where('login', '=', $login)
 			->find();
-
-		return !is_null($User);
+		return !is_null($user);
 	}
 
 
@@ -164,7 +164,7 @@ class User extends User_Model
      * @deprecated
 	 */
 	static public function disauthorize()
-	{	
+	{
 		User_Auth::logout();
 	}
 
@@ -276,16 +276,15 @@ class User extends User_Model
      */
     public function addComment(string $text, int $authorId = null, string $date = null)
     {
-        Core::requireClass('Comment');
         Core::notify([&$this], 'before.User.addComment');
 
-        $NewComment = Comment::create($this, $text, $authorId, $date);
-        if (is_null($NewComment)) {
+        $newComment = Comment::create($this, $text, $authorId, $date);
+        if (is_null($newComment)) {
             return null;
         }
 
-        Core::notify([&$NewComment, &$this], 'after.User.addComment');
-        return $NewComment;
+        Core::notify([&$newComment, &$this], 'after.User.addComment');
+        return $newComment;
     }
 
 
@@ -297,13 +296,12 @@ class User extends User_Model
      */
     public function getOrganizationName()
     {
-        Core::requireClass('Property_Controller');
-        $Director = $this->getDirector();
-        if ($Director->groupId() !== ROLE_DIRECTOR) {
+        $director = $this->getDirector();
+        if ($director->groupId() !== ROLE_DIRECTOR) {
             return '';
         } else {
-            $Property = Property_Controller::factoryByTag('organization');
-            $organization = $Property->getPropertyValues($Director)[0]->value();
+            $property = Property_Controller::factoryByTag('organization');
+            $organization = $property->getPropertyValues($director)[0]->value();
             return $organization;
         }
     }
@@ -312,31 +310,31 @@ class User extends User_Model
     /**
      * Проверка на принадлежность объекта и пользователя одному и тому же директору
      *
-     * @param $Object
-     * @param User|null $User
+     * @param $object
+     * @param User|null $user
      * @return bool
      */
-    public static function isSubordinate($Object, User $User = null)
+    public static function isSubordinate($object, User $user = null)
     {
-        if (is_null($User)) {
-            $User = User_Auth::current();
+        if (is_null($user)) {
+            $user = User_Auth::current();
         }
-        if (is_null($User)) {
+        if (is_null($user)) {
             return false;
         }
-        if ($User->groupId() === 1) {
+        if ($user->groupId() === ROLE_ADMIN) {
             return true;
         }
-        if (!is_object($Object)) {
+        if (!is_object($object)) {
             return false;
         }
-        if (!method_exists($Object, 'subordinated')) {
+        if (!method_exists($object, 'subordinated')) {
             return true;
         }
-        if ($User->getId() > 0 && $User->groupId() == ROLE_DIRECTOR && $Object->subordinated() == $User->getId()) {
+        if ($user->getId() > 0 && $user->groupId() == ROLE_DIRECTOR && $object->subordinated() == $user->getId()) {
             return true;
         }
-        if ($User->subordinated() == $Object->subordinated()) {
+        if ($user->subordinated() == $object->subordinated()) {
             return true;
         }
         return false;

@@ -536,11 +536,11 @@ if ($action === 'get_user') {
     $response->error = null;
     $response->user = null;
 
-    $User = User_Auth::current();
-    if (empty($User)) {
+    $user = User_Auth::current();
+    if (empty($user)) {
         $response->error = REST::ERROR_UNAUTHORIZED;
     } else {
-        $response->user = $User->toStd();
+        $response->user = $user->toStd();
         if (isset($response->user->password)) {
             unset($response->user->password);
         }
@@ -551,21 +551,23 @@ if ($action === 'get_user') {
             unset($response->user->superuser);
         }
 
-        if ($User->groupId() == ROLE_CLIENT) {
-            $Vk =           Property_Controller::factoryByTag('vk');
-            $Balance =      Property_Controller::factoryByTag('balance');
-            $LessonsIndiv = Property_Controller::factoryByTag('indiv_lessons');
-            $LessonsGroup = Property_Controller::factoryByTag('group_lessons');
-            $AddPhone =     Property_Controller::factoryByTag('add_phone');
+        if ($user->groupId() == ROLE_CLIENT) {
+            $vk =           Property_Controller::factoryByTag('vk');
+            $balance =      Property_Controller::factoryByTag('balance');
+            $lessonsIndiv = Property_Controller::factoryByTag('indiv_lessons');
+            $lessonsGroup = Property_Controller::factoryByTag('group_lessons');
+            $addPhone =     Property_Controller::factoryByTag('add_phone');
+            $lessonDuration=Property_Controller::factoryByTag('lesson_time');
 
-            $response->user->vk = $Vk->getValues($User)[0]->value();
-            $response->user->additional_phone_number = $AddPhone->getValues($User)[0]->value();
+            $response->user->vk = $vk->getValues($user)[0]->value();
+            $response->user->additional_phone_number = $addPhone->getValues($user)[0]->value();
             $response->user->balance = new stdClass();
-            $response->user->balance->amount = $Balance->getValues($User)[0]->value();
-            $response->user->balance->lessons_indiv = $LessonsIndiv->getValues($User)[0]->value();
-            $response->user->balance->lessons_group = $LessonsGroup->getValues($User)[0]->value();
+            $response->user->balance->amount = $balance->getValues($user)[0]->value();
+            $response->user->balance->lessons_indiv = $lessonsIndiv->getValues($user)[0]->value();
+            $response->user->balance->lessons_group = $lessonsGroup->getValues($user)[0]->value();
+            $response->user->lessonDuration = $lessonDuration->getValues($user)[0]->value();
         }
-        //TODO: надо бы потом добавить подгрузку доп. свойств и для дрги групп
+        //TODO: надо бы потом добавить подгрузку доп. свойств и для дргих групп
     }
 
     exit(json_encode($response));
@@ -606,7 +608,6 @@ if ($action === 'savePushId') {
  * Добавление пользователя в спикок отвала
  */
 if ($action === 'archiveUser') {
-
     $userId = Core_Array::Get('userId', 0, PARAM_INT);
     $reasonId = Core_Array::Get('reasonId', 0, PARAM_INT);
     $dumpStart = Core_Array::Get('dumpStart', 0, PARAM_STRING);
@@ -616,4 +617,42 @@ if ($action === 'archiveUser') {
     }
     $archive = new User_Activity();
     $newArchive = $archive->userId($userId)->reasonId($reasonId)->dumpDateStart($dumpStart)->save();
+}
+
+
+if ($action === 'getClientTeachers') {
+    if (is_null(User_Auth::current())) {
+        exit(REST::status(REST::STATUS_ERROR, 'Пользователь не авторизован'));
+    }
+
+    $clientId = Core_Array::Get('userId', 0, PARAM_INT);
+
+    if (Core_Access::instance()->hasCapability(Core_Access::USER_READ_TEACHERS) && !empty($clientId)) {
+        $client = User_Controller::factory($clientId);
+    } elseif (User_Auth::current()->groupId() === ROLE_CLIENT) {
+        $client = User_Auth::current();
+    } else {
+        $client = null;
+    }
+
+    if (is_null($client)) {
+        exit(REST::status(REST::STATUS_ERROR, 'Клиент с указанным id не найден'));
+    }
+
+    $controller = new User_Controller_Extended($client);
+    $teachersStd = [];
+    /** @var User $teacher */
+    foreach ($controller->getClientTeachers() as $teacher) {
+        $teacherStd = $teacher->toStd();
+        unset($teacherStd->password);
+        unset($teacherStd->auth_token);
+        unset($teacherStd->push_id);
+        $teachersStd[] = $teacherStd;
+    }
+
+    exit(json_encode([
+        'status' => true,
+        'teachers' => $teachersStd
+    ]));
+
 }

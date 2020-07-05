@@ -403,12 +403,15 @@ if ($action === 'isInTeacherTime') {
  */
 if ($action === 'getTeacherNearestTime') {
     if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ) && !Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_LESSON_TIME)) {
-        Core_Page_Show::instance()->error(403);
+        exit(REST::status(REST::STATUS_ERROR, 'Недостаточно прав для подбора времени занятий', REST::ERROR_CODE_ACCESS));
     }
 
     $teacherId = Core_Array::Get('teacherId', 0, PARAM_INT);
     $date = Core_Array::Get('date', '', PARAM_DATE);
     $lessonDuration = Core_Array::Get('lessonDuration', '00:50:00', PARAM_TIME);
+    if (is_numeric($lessonDuration)) {
+        $lessonDuration = toTime(intval($lessonDuration) * 60);
+    }
 
     $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')->getValues(User_Auth::current()->getDirector())[0]->value();
     $today = date('Y-m-d');
@@ -471,6 +474,7 @@ if ($action == 'getTeacherSchedule') {
     }
 
     $response = new stdClass();
+    $response->status = true;
     $response->teacher = $teacher->toStd(User::getHiddenProps());
     $response->schedule = $schedule;
     exit(json_encode($response));
