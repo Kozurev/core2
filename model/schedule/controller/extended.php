@@ -278,12 +278,15 @@ class Schedule_Controller_Extended
     public static function getNearestFreeTime(array $teacherLessons, array $teacherSchedule, string $clientLessonDuration)
     {
         $freeScheduleTime = [];
+        /** @var Schedule_Lesson $lesson */
         foreach ($teacherLessons as $lesson) {
             $timeBefore = deductTime($lesson->timeFrom(), addTime($clientLessonDuration, SCHEDULE_LESSON_INTERVAL));
             $timeAfter = addTime(addTime($lesson->timeTo(), SCHEDULE_LESSON_INTERVAL), $clientLessonDuration);
             if (Schedule_Controller_Extended::isFreeTime($timeBefore, deductTime($lesson->timeFrom(), SCHEDULE_LESSON_INTERVAL), $teacherLessons, $teacherSchedule)) {
                 if (!isset($freeScheduleTime[$timeBefore])) {
                     $freeScheduleTime[$timeBefore] = new stdClass();
+                    $freeScheduleTime[$timeBefore]->area_id = $lesson->areaId();
+                    $freeScheduleTime[$timeBefore]->class_id = $lesson->classId();
                     $freeScheduleTime[$timeBefore]->timeFrom = $timeBefore;
                     $freeScheduleTime[$timeBefore]->timeTo = deductTime($lesson->timeFrom(), SCHEDULE_LESSON_INTERVAL);
                 }
@@ -292,6 +295,8 @@ class Schedule_Controller_Extended
                 $timeFrom = addTime($lesson->timeTo(), SCHEDULE_LESSON_INTERVAL);
                 if (!isset($freeScheduleTime[$timeFrom])) {
                     $freeScheduleTime[$timeFrom] = new stdClass();
+                    $freeScheduleTime[$timeFrom]->area_id = $lesson->areaId();
+                    $freeScheduleTime[$timeFrom]->class_id = $lesson->classId();
                     $freeScheduleTime[$timeFrom]->timeFrom = $timeFrom;
                     $freeScheduleTime[$timeFrom]->timeTo = $timeAfter;
                 }
@@ -324,7 +329,12 @@ class Schedule_Controller_Extended
             return [];
         }
 
-        return self::getNearestFreeTime($teacherLessons[0]->lessons, $teacherSchedule, $lessonDuration);
+        $nearest = self::getNearestFreeTime($teacherLessons[0]->lessons, $teacherSchedule, $lessonDuration);
+        foreach ($nearest as $time) {
+            $time->date = $date;
+        }
+
+        return $nearest;
     }
 
 

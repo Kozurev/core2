@@ -434,10 +434,20 @@ if ($action === 'getTeacherNearestTime') {
         exit(REST::status(REST::STATUS_ERROR, $e->getMessage()));
     }
 
+    /** @var Schedule_Area[] $areas */
+    $areas = [];
     $nearestTimeArr = [];
     foreach ($nearestTime as $key => $time) {
+        if (!isset($areas[$time->area_id])) {
+            $areas[$time->area_id] = Core::factory('Schedule_Area', $time->area_id);
+        }
+        $area = $areas[$time->area_id];
         $time->refactoredTimeFrom = refactorTimeFormat($time->timeFrom);
         $time->refactoredTimeTo = refactorTimeFormat($time->timeTo);
+        if (!is_null($area)) {
+            $time->area = $area->title();
+            $time->class = $area->getClassName($time->class_id, 'Класс №' . $time->class_id);
+        }
         $nearestTimeArr[] = $time;
     }
 
@@ -626,6 +636,45 @@ if ($action === 'get_client_schedule') {
     }
 
     exit(json_encode($schedule));
+}
+
+/**
+ * Постановка в график
+ */
+if ($action === 'saveLesson') {
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_CREATE)) {
+        exit(REST::status(REST::STATUS_ERROR, 'Недостаточно прав для создания занятия', REST::ERROR_CODE_ACCESS));
+    }
+
+    $scheduleType = Core_Array::Post('scheduleType', 0, PARAM_INT);
+    $typeId =       Core_Array::Post('typeId', 0, PARAM_INT);
+    $insertDate =   Core_Array::Post('insertDate', '', PARAM_DATE);
+    $clientId =     Core_Array::Post('clientId', 0, PARAM_INT);
+    $teacherId =    Core_Array::Post('teacherId', 0, PARAM_INT);
+    $areaId =       Core_Array::Post('areaId', 0, PARAM_INT);
+    $classId =      Core_Array::Post('classId', 0, PARAM_INT);
+    $timeFrom =     Core_Array::Post('timeFrom', '', PARAM_TIME);
+    $timeTo =       Core_Array::Post('timeTo', '', PARAM_TIME);
+
+    $lesson = (new Schedule_Lesson())
+        ->lessonType($scheduleType)
+        ->typeId($typeId)
+        ->insertDate($insertDate)
+        ->clientId($clientId)
+        ->teacherId($teacherId)
+        ->areaId($areaId)
+        ->timeFrom($timeFrom)
+        ->timeTo($timeTo);
+
+    try {
+        if (is_null($lesson->save())) {
+            exit(REST::status(REST::STATUS_ERROR, $lesson->_getValidateErrorsStr()));
+        }
+    } catch (Exception $e) {
+        exit(REST::status(REST::STATUS_ERROR, $e->getMessage()));
+    }
+
+    exit(REST::status(REST::STATUS_SUCCESS, ''));
 }
 
 die(REST::status(REST::STATUS_ERROR, 'Отсутствует название действия'));

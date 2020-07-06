@@ -635,19 +635,14 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         Core::notify([&$this], 'after.ScheduleLesson.delete');
     }
 
-
-    public function save($obj = null)
+    /**
+     * @return bool
+     */
+    public function _validateModel(): bool
     {
-        Core::notify([&$this], 'before.ScheduleLesson.save');
-
-        if ($this->delete_date == '') {
-            $this->delete_date = 'NULL';
-        }
-
         if (!$this->teacher_id) {
-            exit ('Невозможно сохранить занятие не указав преподавателя');
+            $this->_setValidateErrorStr('Невозможно сохранить занятие не указав преподавателя');
         }
-
 
         if (strlen($this->time_from) == 5) {
             $this->time_from .= ':00';
@@ -656,25 +651,41 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             $this->time_to .= ':00';
         }
 
-        if (compareTime($this->time_from, '>=', $this->time_to)) {
-            exit('Время начала занятия должно быть строго меньше времени окончания');
+        if (!in_array($this->typeId(), [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_GROUP, Schedule_Lesson::TYPE_CONSULT, Schedule_Lesson::TYPE_GROUP_CONSULT])) {
+            $this->_setValidateErrorStr('Неверно указан тип занятия');
+        }
+
+        if (!in_array($this->lessonType(), [Schedule_Lesson::SCHEDULE_MAIN, Schedule_Lesson::SCHEDULE_CURRENT])) {
+            $this->_setValidateErrorStr('Неверно указан тип графика занятия');
+        }
+
+        $area = Schedule_Area_Controller::factory($this->areaId());
+        if (is_null($area)) {
+            $this->_setValidateErrorStr('Неверно указан филиал занятия');
+        }
+
+        if ($this->time_from >= $this->time_to) {
+            $this->_setValidateErrorStr('Время начала занятия должно быть строго меньше времени окончания');
         }
 
         if ($this->type_id == self::TYPE_CONSULT && $this->client_id != 0) {
-            $Director = User::current()->getDirector();
-
-            $isLidIsset = Core::factory('Lid')
+            $director = User_Auth::current()->getDirector();
+            $isLidIsset = (new Lid)
                 ->queryBuilder()
                 ->where('id', '=', $this->client_id)
-                ->where('subordinated', '=', $Director->getId())
-                ->getCount();
+                ->where('subordinated', '=', $director->getId())
+                ->count();
 
             if ($isLidIsset == 0) {
-                exit('Лид под номером ' . $this->client_id . ' не найден');
+                $this->_setValidateErrorStr('Лид под номером ' . $this->client_id . ' не найден');
             }
         }
 
-        $Modifies = Core::factory('Schedule_Lesson_TimeModified')
+        if (!empty($this->_getValidateErrors())) {
+            return false;
+        }
+
+        $modifies = (new Schedule_Lesson_TimeModified)
             ->queryBuilder()
             ->open()
                 ->open()
@@ -699,14 +710,14 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->close()
             ->findAll();
 
-        foreach ($Modifies as $modify) {
-            $Lesson = Core::factory('Schedule_Lesson', $modify->lessonId());
-            if (!$Lesson->isAbsent($this->insert_date)) {
-                exit('Добавление невозможно по причине пересечения с другим занятием 1');
+        foreach ($modifies as $modify) {
+            $lesson = Core::factory('Schedule_Lesson', $modify->lessonId());
+            if (!$lesson->isAbsent($this->insert_date)) {
+                $this->_setValidateErrorStr('Добавление невозможно по причине пересечения с другим занятием');
             }
         }
 
-        $Lessons = Core::factory('Schedule_Lesson')
+        $lessons = (new Schedule_Lesson)
             ->queryBuilder()
             ->where('id', '<>', $this->getId())
             ->where('area_id', '=', $this->area_id)
@@ -738,21 +749,42 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->close()
             ->findAll();
 
-        foreach ($Lessons as $Lesson) {
-            if ($this->lesson_type == self::SCHEDULE_MAIN && $Lesson->lessonType() == self::SCHEDULE_MAIN) {
-                exit('Добавление невозможно по причине пересечения с другим занятием 2');
+        foreach ($lessons as $lesson) {
+            if ($this->lesson_type == self::SCHEDULE_MAIN && $lesson->lessonType() == self::SCHEDULE_MAIN) {
+                $this->_setValidateErrorStr('Добавление невозможно по причине пересечения с другим занятием');
             }
 
-            if ($Lesson->lessonType() == self::SCHEDULE_MAIN && !$Lesson->isAbsent($this->insert_date)) {
-                if (!$Lesson->isTimeModified($this->insert_date)) {
-                    exit('Добавление невозможно по причине пересечения с другим занятием 3');
+            if ($lesson->lessonType() == self::SCHEDULE_MAIN && !$lesson->isAbsent($this->insert_date)) {
+                if (!$lesson->isTimeModified($this->insert_date)) {
+                    $this->_setValidateErrorStr('Добавление невозможно по причине пересечения с другим занятием');
                 }
             }
+        }
+
+        if (!empty($this->_getValidateErrors())) {
+            return false;
+        }
+
+        return parent::_validateModel();
+    }
+
+    /**
+     * @param null $obj
+     * @return $this|Schedule_Lesson|null
+     * @throws Exception
+     */
+    public function save($obj = null)
+    {
+        Core::notify([&$this], 'before.ScheduleLesson.save');
+
+        if ($this->delete_date == '') {
+            $this->delete_date = 'NULL';
         }
 
         if (empty(parent::save())) {
             return null;
         }
+
         Core::notify([&$this], 'after.ScheduleLesson.save');
         return $this;
     }
