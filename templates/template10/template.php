@@ -149,7 +149,7 @@
                                         <ul class="dropdown-menu">
                                             <?php
                                             $Areas = Core::factory('Schedule_Area_Assignment')
-                                                ->getAreas(User_Auth::parentAuth(), true);
+                                                ->getAreas(User_Auth::current(), true);
                                             foreach ($Areas as $area) {
                                                 $href = $CFG->rootdir . '/schedule/' . $area->path();
                                                 echo "<li><a href='" . $href . "'>";

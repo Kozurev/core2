@@ -68,6 +68,7 @@ class Schedule_Group_Controller extends Controller
         }
         $this->setObject((new Schedule_Group));
         $this->setQueryBuilder((new Schedule_Group)->queryBuilder());
+        $this->getQueryBuilder()->where('active', '=', 1);
         $this->getQueryBuilder()->orderBy($this->getObject()->getTableName() . '.id', 'DESC');
         $this->isPaginate(true);
         parent::__construct(['user' => &$User]);

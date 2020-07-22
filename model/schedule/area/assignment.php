@@ -83,7 +83,7 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
         $Area->queryBuilder()->orderBy('sorting', 'ASC');
 
         if ($isSubordinate === true) {
-            $User = User::current();
+            $User = User_Auth::current();
             if (is_null($User)) {
                 return null;
             }
@@ -93,7 +93,7 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
 
         //Исключительный случай: если объект является пользователем который имеет роль директора в системе
         //то ему по умолчанию доступен список всех филиалов, принадлежащих его организации
-        if (get_class($object) === 'User' && $object->groupId() === ROLE_DIRECTOR) {
+        if (get_class($object) === 'User' && ($object->groupId() === ROLE_DIRECTOR || $object->groupId() == ROLE_ADMIN)) {
             return Core::factory('Schedule_Area')->getList(true, false);
         }
 
