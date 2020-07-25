@@ -75,7 +75,7 @@ class Temp
     {
         $file = self::getAbsolutePath($fileName);
         if (file_exists($file)) {
-            unset($file);
+            unlink($file);
         }
     }
 
