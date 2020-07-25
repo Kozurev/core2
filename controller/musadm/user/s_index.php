@@ -11,17 +11,10 @@
 
 authOrOut();
 
-Core::requireClass('User_Controller');
-Core::requireClass('Lid_Controller');
-Core::requireClass('Schedule_Area_Controller');
-Core::requireClass('Property_Controller');
-
-
-$User = User::current();
+$User = User_Auth::current();
 $Director = $User->getDirector();
 $subordinated = $Director->getId();
 $action = Core_Array::Get('action', null, PARAM_STRING);
-
 
 //Форма редактирования клиента
 if ($action === 'updateFormClient') {
@@ -288,8 +281,7 @@ if ($action === 'export') {
     User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]]);
     header('Content-type: application/vnd.ms-excel');
     header('Content-Disposition: attachment; filename=demo.xls');
-    Core::factory('User_Controller');
-    $ClientController = new User_Controller(User::current());
+    $ClientController = new User_Controller(User_Auth::current());
     $ClientController->properties([16]);
     $ClientController->isSubordinate(true);
     $ClientController->isWithAreaAssignments(true);

@@ -233,10 +233,16 @@ $(function(){
         .on('click', '.schedule_today_absent', function(e) {
             e.preventDefault();
             loaderOn();
-            let lessonid = $(this).parent().parent().data('id');
+            let lessonId = $(this).parent().parent().data('id');
+            let clientId = $(this).parent().parent().data('client');
             let date = $(this).parent().parent().data('date');
-            markAbsent(lessonid, date, refreshSchedule);
-            loaderOff();
+            markAbsent(lessonId, clientId, date, function(response) {
+                if (response.error !== undefined) {
+                    notificationError(response.message);
+                } else {
+                    refreshSchedule();
+                }
+            });
         })
 
         //Открытие всплывающего окна для редактирования времени проведения занятия
@@ -848,17 +854,27 @@ function markDeleted(lessonId, deleteDate, func) {
     });
 }
 
-function markAbsent(lessonId, date, func) {
+/**
+ * Отмена занятия
+ *
+ * @param lessonId
+ * @param clientId
+ * @param date
+ * @param func
+ */
+function markAbsent(lessonId, clientId, date, func) {
     $.ajax({
-        type: 'GET',
-        url: root + '/schedule',
+        type: 'POST',
+        url: root + '/api/schedule/index.php',
+        dataType: 'json',
         data: {
             action: 'markAbsent',
-            lessonid: lessonId,
+            lessonId: lessonId,
+            clientId: clientId,
             date: date
         },
         success: function(response) {
-            func();
+            func(response);
         }
     });
 }

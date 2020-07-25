@@ -33,3 +33,8 @@ $CFG->smtp->host = '';
 $CFG->smtp->port = 0;
 $CFG->smtp->username = '';
 $CFG->smtp->password = '';
+
+$CFG->initpro = new stdClass();
+$CFG->initpro->login = '';
+$CFG->initpro->password = '';
+$CFG->initpro->groupCode = '';

@@ -186,10 +186,11 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
 
     /**
-     * Установка разового отсутствия занятия
+     * Установка разового отсутствия занятия или его полное удаления с графика
      *
      * @param $date - дата отсутствия
-     * @return $this
+     * @return $this|Schedule_Lesson_Absent
+     * @throws Exception
      */
     public function setAbsent($date)
     {
@@ -203,15 +204,14 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ];
             Core::notify($observerArgs, 'before.ScheduleLesson.setAbsent');
 
-            Core::factory('Schedule_Lesson_Absent')
+            $absent = (new Schedule_Lesson_Absent)
                 ->date($date)
-                ->lessonId($this->id)
-                ->save();
+                ->lessonId($this->id);
+            $absent->save();
+            return $absent;
         } else {
-            exit('У занятия отсутствует указатель на тип графика либо указан неверно');
+            throw new Exception('У занятия неизвестный тип расписания');
         }
-
-        return $this;
     }
 
 

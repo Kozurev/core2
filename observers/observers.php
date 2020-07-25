@@ -1005,3 +1005,28 @@ Core::attachObserver('before.User.save', function ($args) {
         $mail->send();
     }
 });
+
+/**
+ * Начисление кэшбэка после депозита
+ */
+Core::attachObserver('after.user.deposit', function($args) {
+    /** @var Payment $payment */
+    $payment = $args['payment'];
+    $client = $payment->getUser();
+
+    $cashBack = Property_Controller::factoryByTag('payment_cashback');
+    $director = $client->getDirector();
+    $cashBack = $cashBack->getValues($director)[0]->value();
+
+    if ($cashBack > 0) {
+        $bonuses = intval($payment->value() * ($cashBack / 100));
+        if ($bonuses > 0) {
+            $cashBackPayment = new Payment();
+            $cashBackPayment->description('Начисление бонусов');
+            $cashBackPayment->value($bonuses);
+            $cashBackPayment->type(Payment::TYPE_CASHBACK);
+            $cashBackPayment->user($payment->user());
+            $cashBackPayment->save();
+        }
+    }
+});

@@ -677,4 +677,56 @@ if ($action === 'saveLesson') {
     exit(REST::status(REST::STATUS_SUCCESS, ''));
 }
 
-die(REST::status(REST::STATUS_ERROR, 'Отсутствует название действия'));
+
+/**
+ * Отсутствие занятия
+ */
+if ($action === 'markAbsent') {
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT)) {
+        exit(REST::status(REST::STATUS_ERROR, 'Недостаточно прав для отмены занятия', REST::ERROR_CODE_ACCESS));
+    }
+
+    $lessonId = Core_Array::Post('lessonId', 0, PARAM_INT);
+    $clientId = Core_Array::Post('clientId', User_Auth::current()->getId());
+    $date =     Core_Array::Post('date', '', PARAM_DATE);
+
+    try {
+        if ($lessonId === 0 || $date === '') {
+            throw new Exception('Отсутствует один из обязательных параметров');
+        }
+
+        /** @var Schedule_Lesson $lesson */
+        $lesson = (new Schedule_Lesson)
+            ->queryBuilder()
+            ->where('id', '=', $lessonId)
+            ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
+            ->where('client_id', '=', $clientId)
+            ->find();
+
+        if (is_null($lesson)) {
+            throw new Exception('Занятия не существует');
+        }
+
+        $tomorrow = date('Y-m-d', strtotime(date('Y-m-d') . ' +1 day'));
+        $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')
+            ->getValues(User_Auth::current()->getDirector())[0]->value();
+        if ($date > $tomorrow || ($date == $tomorrow && date('H:i:s') < $endDayTime)) {
+            $absent = $lesson->setAbsent($date);
+            $response = [
+                'lesson' => $lesson->toStd()
+            ];
+            if ($absent instanceof Schedule_Lesson_Absent) {
+                $response = [
+                    'absent' => $absent->toStd()
+                ];
+            }
+            exit(json_encode($response));
+        } else {
+            throw new Exception('В данное время отмена занятия в автоматическом режиме недоступна. Для отмены свяжитесь с менеджером');
+        }
+    } catch (Exception $e) {
+        exit(REST::status(REST::STATUS_ERROR, $e->getMessage(), REST::ERROR_CODE_CUSTOM));
+    }
+}
+
+die(REST::status(REST::STATUS_ERROR, 'Отсутствует название действия', REST::ERROR_CODE_CUSTOM));

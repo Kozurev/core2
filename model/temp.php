@@ -42,7 +42,7 @@ class Temp
      * @param string $fileName
      * @return mixed|null
      */
-    public static function getEndRemove(string $fileName)
+    public static function getAndRemove(string $fileName)
     {
         $data = self::get($fileName);
         self::remove($fileName);

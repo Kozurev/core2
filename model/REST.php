@@ -20,6 +20,7 @@ class REST
     const ERROR_CODE_AUTH = 1;      //Пользователь не авторизован
     const ERROR_CODE_ACCESS = 2;    //Недостаточно прав
     const ERROR_CODE_NOT_FOUND = 3; //Объект не найден
+    const ERROR_CODE_CUSTOM = 999;  //Кастомная ошибка
 
     /**
      * @var string[]

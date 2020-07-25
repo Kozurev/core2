@@ -119,7 +119,7 @@
                                                 </div>
                                                 <xsl:if test="/root/access_schedule_edit = 1">
                                                     <div class="col-md-6">
-                                                        <p data-id="{id}" data-date="{/root/nearest_lesson/date}">
+                                                        <p data-id="{id}" data-client="{/root/user/id}" data-date="{/root/nearest_lesson/date}">
                                                             <span style="margin-left: 15px">
                                                                 <button class="btn btn-orange schedule_today_absent" href="#">
                                                                     <xsl:if test="/root/nearest_lesson/is_cancellable = 0">
