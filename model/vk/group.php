@@ -87,11 +87,15 @@ class Vk_Group extends Vk_Group_Model
                 self::VALID_REQUIRED,
                 ['valid' => true, 'current' => false]
             );
+            return null;
         }
 
         if (empty($this->vk_id)) {
             $vkData = self::getVkId($this->link);
-            if ($vkData->type == 'page' || $vkData->type = 'group') {
+            if (is_null($vkData)) {
+                $this->_setValidateErrorStr(get_class($this) . '->save: неверно указана ссылка на сообщество');
+                return null;
+            } elseif ($vkData->type == 'page' || $vkData->type = 'group') {
                 $this->vk_id = $vkData->object_id;
             }
         }
