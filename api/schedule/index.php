@@ -696,12 +696,16 @@ if ($action === 'markAbsent') {
         }
 
         /** @var Schedule_Lesson $lesson */
-        $lesson = (new Schedule_Lesson)
-            ->queryBuilder()
-            ->where('id', '=', $lessonId)
-            ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
-            ->where('client_id', '=', $clientId)
-            ->find();
+        if (User_Auth::current()->groupId() == ROLE_CLIENT) {
+            $lesson = (new Schedule_Lesson)
+                ->queryBuilder()
+                ->where('id', '=', $lessonId)
+                ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
+                ->where('client_id', '=', $clientId)
+                ->find();
+        } else {
+            $lesson = Core::factory('Schedule_lesson', $lessonId);
+        }
 
         if (is_null($lesson)) {
             throw new Exception('Занятия не существует');
