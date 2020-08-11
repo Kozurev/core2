@@ -15,7 +15,7 @@ class VK extends Api
     /**
      * Используемая версия API по умолчанию
      */
-    const DEFAULT_API_VERSION = '5.5';
+    const DEFAULT_API_VERSION = '5.122';
 
     /**
      * Метод для преобразования ссылки в id страницы
