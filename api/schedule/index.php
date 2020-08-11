@@ -711,26 +711,30 @@ if ($action === 'markAbsent') {
             throw new Exception('Занятия не существует');
         }
 
-        $tomorrow = date('Y-m-d', strtotime(date('Y-m-d') . ' +1 day'));
-        $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')
-            ->getValues(User_Auth::current()->getDirector())[0]->value();
-        if ($date > $tomorrow || ($date == $tomorrow && date('H:i:s') < $endDayTime)) {
-            $absent = $lesson->setAbsent($date);
-            $response = [
-                'lesson' => $lesson->toStd()
-            ];
-            if ($absent instanceof Schedule_Lesson_Absent) {
-                $response = [
-                    'absent' => $absent->toStd()
-                ];
+        $response = [
+            'lesson' => $lesson->toStd()
+        ];
+
+        if (!User_Auth::current()->isManagementStaff()) {
+            $tomorrow = date('Y-m-d', strtotime(date('Y-m-d') . ' +1 day'));
+            $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')
+                ->getValues(User_Auth::current()->getDirector())[0]->value();
+            if (!($date > $tomorrow || ($date == $tomorrow && date('H:i:s') < $endDayTime))) {
+                throw new Exception('В данное время отмена занятия в автоматическом режиме недоступна. Для отмены свяжитесь с менеджером');
             }
-            exit(json_encode($response));
-        } else {
-            throw new Exception('В данное время отмена занятия в автоматическом режиме недоступна. Для отмены свяжитесь с менеджером');
+        }
+
+        $absent = $lesson->setAbsent($date);
+        if ($absent instanceof Schedule_Lesson_Absent) {
+            $response = [
+                'absent' => $absent->toStd()
+            ];
         }
     } catch (Exception $e) {
         exit(REST::status(REST::STATUS_ERROR, $e->getMessage(), REST::ERROR_CODE_CUSTOM));
     }
+
+    exit(json_encode($response));
 }
 
 die(REST::status(REST::STATUS_ERROR, 'Отсутствует название действия', REST::ERROR_CODE_CUSTOM));
