@@ -357,40 +357,13 @@ if ($action === 'markDeleted') {
         Core_Page_Show::instance()->error(404);
     }
 
-    $lesson->markDeleted($deleteDate);
+    try {
+        $lesson->markDeleted($deleteDate);
+    } catch (Exception $e) {
+        echo $e->getMessage();
+    }
     exit;
 }
-
-
-///**
-// * Отсутствие занятия
-// */
-//if ($action === 'markAbsent') {
-//    //проверка прав доступа
-//    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT)) {
-//        Core_Page_Show::instance()->error(403);
-//    }
-//
-//    $lessonId = Core_Array::Get('lessonid', 0, PARAM_INT);
-//    $date =     Core_Array::Get('date', '', PARAM_STRING);
-//
-//    if ($lessonId === 0 || $date === '') {
-//        Core_Page_Show::instance()->error(404);
-//    }
-//
-//    $Lesson = Core::factory('Schedule_Lesson', $lessonId);
-//    if (is_null($Lesson)) {
-//        Core_Page_Show::instance()->error(404);
-//    }
-//
-//    $Area = Schedule_Area_Controller::factory($Lesson->areaId());
-//    if (is_null($Area)) {
-//        Core_Page_Show::instance()->error(404);
-//    }
-//
-//    $Lesson->setAbsent($date);
-//    exit;
-//}
 
 
 /**

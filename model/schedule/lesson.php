@@ -158,6 +158,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
      *
      * @param $date - дата удаления
      * @return $this
+     * @throws Exception
      */
     public function markDeleted($date)
     {
@@ -172,13 +173,13 @@ class Schedule_Lesson extends Schedule_Lesson_Model
                 $this->delete();
             } else {
                 $this->delete_date = $date;
-                parent::save();
+                $this->save();
             }
             return $this;
         } elseif ($this->lesson_type == self::SCHEDULE_CURRENT) { //Актуальный график
             parent::delete();
         } else {
-            exit('У занятия отсутствует указатель на тип графика либо указан неверно');
+            throw new Exception('У занятия отсутствует указатель на тип графика либо указан неверно');
         }
 
         return $this;
@@ -563,7 +564,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
                         ->save();
                 }
             } else {
-                Core::factory('Schedule_Lesson_TimeModified')
+                (new Schedule_Lesson_TimeModified)
                     ->timeFrom($timeFrom)
                     ->timeTo($timeTo)
                     ->date($date)
@@ -590,7 +591,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             return false;
         }
 
-        $modified = Core::factory('Schedule_Lesson_TimeModified')
+        $modified = (new Schedule_Lesson_TimeModified)
             ->queryBuilder()
             ->where('lesson_id', '=', $this->id)
             ->where('date', '=', $date)
@@ -685,78 +686,80 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             return false;
         }
 
-        $modifies = (new Schedule_Lesson_TimeModified)
-            ->queryBuilder()
-            ->open()
+        if (empty($this->delete_date)) {
+            $modifies = (new Schedule_Lesson_TimeModified)
+                ->queryBuilder()
                 ->open()
-                    ->between('Schedule_Lesson_TimeModified.time_from', $this->time_from, $this->time_to)
-                    ->where('Schedule_Lesson_TimeModified.time_from', '<>', $this->time_to)
+                    ->open()
+                        ->between('Schedule_Lesson_TimeModified.time_from', $this->time_from, $this->time_to)
+                        ->where('Schedule_Lesson_TimeModified.time_from', '<>', $this->time_to)
+                    ->close()
+                    ->open()
+                        ->between('Schedule_Lesson_TimeModified.time_to', $this->time_from, $this->time_to, 'OR')
+                        ->where('Schedule_Lesson_TimeModified.time_to', '<>', $this->time_from)
+                    ->close()
                 ->close()
+                ->where('date', '=', $this->insert_date)
+                ->join('Schedule_Lesson AS sl', 'lesson_id = sl.id')
+                ->where('sl.id', '<>', $this->id)
+                ->where('day_name', '=', $this->day_name)
+                ->where('class_id', '=', $this->class_id)
+                ->where('area_id', '=', $this->area_id)
+                ->where('insert_date', '<=', $this->insert_date)
                 ->open()
-                    ->between('Schedule_Lesson_TimeModified.time_to', $this->time_from, $this->time_to, 'OR')
-                    ->where('Schedule_Lesson_TimeModified.time_to', '<>', $this->time_from)
+                    ->where('delete_date', '>', $this->insert_date)
+                    ->orWhere('delete_date', 'IS', 'NULL')
                 ->close()
-            ->close()
-            ->where('date', '=', $this->insert_date)
-            ->join('Schedule_Lesson AS sl', 'lesson_id = sl.id')
-            ->where('sl.id', '<>', $this->id)
-            ->where('day_name', '=', $this->day_name)
-            ->where('class_id', '=', $this->class_id)
-            ->where('area_id', '=', $this->area_id)
-            ->where('insert_date', '<=', $this->insert_date)
-            ->open()
-                ->where('delete_date', '>', $this->insert_date)
-                ->orWhere('delete_date', 'IS', 'NULL')
-            ->close()
-            ->findAll();
+                ->findAll();
 
-        foreach ($modifies as $modify) {
-            $lesson = Core::factory('Schedule_Lesson', $modify->lessonId());
-            if (!$lesson->isAbsent($this->insert_date)) {
-                $this->_setValidateErrorStr('Добавление невозможно по причине пересечения с другим занятием');
-            }
-        }
-
-        $lessons = (new Schedule_Lesson)
-            ->queryBuilder()
-            ->where('id', '<>', $this->getId())
-            ->where('area_id', '=', $this->area_id)
-            ->where('class_id', '=', $this->class_id)
-            ->open()
-                ->open()
-                    ->where('insert_date', '<=', $this->insert_date)
-                    ->where('lesson_type', '=', self::SCHEDULE_MAIN)
-                    ->where('day_name', '=', $this->day_name)
-                ->close()
-                ->open()
-                    ->orWhere('lesson_type', '=', self::SCHEDULE_CURRENT)
-                    ->where('insert_date', '=', $this->insert_date)
-                ->close()
-            ->close()
-            ->open()
-                ->where('delete_date', '>', $this->insert_date)
-                ->orWhere('delete_date', 'IS', 'NULL')
-            ->close()
-            ->open()
-                ->open()
-                    ->between('time_from', $this->time_from, $this->time_to)
-                    ->where('time_from', '<>', $this->time_to)
-                ->close()
-                ->open()
-                    ->between('time_to', $this->time_from, $this->time_to, 'OR')
-                    ->where('time_to', '<>', $this->time_from)
-                ->close()
-            ->close()
-            ->findAll();
-
-        foreach ($lessons as $lesson) {
-            if ($this->lesson_type == self::SCHEDULE_MAIN && $lesson->lessonType() == self::SCHEDULE_MAIN) {
-                $this->_setValidateErrorStr('Добавление невозможно по причине пересечения с другим занятием');
+            foreach ($modifies as $modify) {
+                $lesson = Core::factory('Schedule_Lesson', $modify->lessonId());
+                if (!$lesson->isAbsent($this->insert_date)) {
+                    $this->_setValidateErrorStr('Добавление невозможно по причине пересечения с другим занятием 1');
+                }
             }
 
-            if ($lesson->lessonType() == self::SCHEDULE_MAIN && !$lesson->isAbsent($this->insert_date)) {
-                if (!$lesson->isTimeModified($this->insert_date)) {
-                    $this->_setValidateErrorStr('Добавление невозможно по причине пересечения с другим занятием');
+            $lessons = (new Schedule_Lesson)
+                ->queryBuilder()
+                ->where('id', '<>', $this->getId())
+                ->where('area_id', '=', $this->area_id)
+                ->where('class_id', '=', $this->class_id)
+                ->open()
+                    ->open()
+                        ->where('insert_date', '<=', $this->insert_date)
+                        ->where('lesson_type', '=', self::SCHEDULE_MAIN)
+                        ->where('day_name', '=', $this->day_name)
+                    ->close()
+                    ->open()
+                        ->orWhere('lesson_type', '=', self::SCHEDULE_CURRENT)
+                        ->where('insert_date', '=', $this->insert_date)
+                    ->close()
+                ->close()
+                ->open()
+                    ->where('delete_date', '>', $this->insert_date)
+                    ->orWhere('delete_date', 'IS', 'NULL')
+                ->close()
+                ->open()
+                    ->open()
+                        ->between('time_from', $this->time_from, $this->time_to)
+                        ->where('time_from', '<>', $this->time_to)
+                    ->close()
+                    ->open()
+                        ->between('time_to', $this->time_from, $this->time_to, 'OR')
+                        ->where('time_to', '<>', $this->time_from)
+                    ->close()
+                ->close()
+                ->findAll();
+
+            foreach ($lessons as $lesson) {
+                if ($this->lesson_type == self::SCHEDULE_MAIN && $lesson->lessonType() == self::SCHEDULE_MAIN) {
+                    $this->_setValidateErrorStr('Добавление невозможно по причине пересечения с другим занятием 2');
+                }
+
+                if ($lesson->lessonType() == self::SCHEDULE_MAIN && !$lesson->isAbsent($this->insert_date)) {
+                    if (!$lesson->isTimeModified($this->insert_date)) {
+                        $this->_setValidateErrorStr('Добавление невозможно по причине пересечения с другим занятием 3');
+                    }
                 }
             }
         }
