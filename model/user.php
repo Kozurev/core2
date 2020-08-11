@@ -314,7 +314,7 @@ class User extends User_Model
      * @param User|null $user
      * @return bool
      */
-    public static function isSubordinate($object, User $user = null)
+    public static function isSubordinate($object, User $user = null) : bool
     {
         if (is_null($user)) {
             $user = User_Auth::current();
@@ -354,9 +354,9 @@ class User extends User_Model
     /**
      * Геттер для авторизационного токена пользователя
      *
-     * @return $this|string
+     * @return string
      */
-    public function getAuthToken()
+    public function getAuthToken() : string
     {
         if (empty($this->authToken())) {
             $this->createAuthToken();
@@ -368,9 +368,18 @@ class User extends User_Model
     /**
      * @return int
      */
-    public static function getMaxAuthTokenLength()
+    public static function getMaxAuthTokenLength() : int
     {
         return 50;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isManagementStaff() : bool
+    {
+        return in_array($this->groupId(), [ROLE_ADMIN, ROLE_DIRECTOR, ROLE_MANAGER]);
     }
 
 }

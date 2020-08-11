@@ -31,10 +31,10 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
     public function __construct()
     {
-        $this->defaultUser = Core::factory('User')->surname('Неизвестно');
-        $this->defaultGroup = Core::factory('Schedule_Group')->title('Неизвестно');
-        $this->defaultLid = Core::factory('Lid')->surname('Неизвестно');
-        $this->defaultArea = Core::factory('Schedule_Area')->title('Неизвестно');
+//        $this->defaultUser = Core::factory('User')->surname('Неизвестно');
+//        $this->defaultGroup = Core::factory('Schedule_Group')->title('Неизвестно');
+//        $this->defaultLid = Core::factory('Lid')->surname('Неизвестно');
+//        $this->defaultArea = Core::factory('Schedule_Area')->title('Неизвестно');
     }
 
 
@@ -227,13 +227,13 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             return false;
         }
 
-        $Absent = Core::factory('Schedule_Lesson_Absent')
+        $absent = (new Schedule_Lesson_Absent)
             ->queryBuilder()
             ->where('date', '=', $date)
             ->where('lesson_id', '=', $this->id)
             ->find();
 
-        $ClientAbsent = Core::factory('Schedule_Absent')
+        $clientAbsent = (new Schedule_Absent)
             ->queryBuilder()
             ->where('object_id', '=', $this->client_id)
             ->where('date_from', '<=', $date)
@@ -241,7 +241,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             ->where('type_id', '=', $this->type_id)
             ->find();
 
-        if (is_null($Absent) && is_null($ClientAbsent)) {
+        if (is_null($absent) && is_null($clientAbsent)) {
             return false;
         } else {
             return true;
