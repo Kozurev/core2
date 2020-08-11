@@ -346,17 +346,18 @@ if ($action === 'markDeleted') {
         Core_Page_Show::instance()->error(404);
     }
 
-    $Lesson = Core::factory('Schedule_Lesson', $lessonId);
-    if (is_null($Lesson)) {
+    /** @var Schedule_Lesson $lesson */
+    $lesson = Core::factory('Schedule_Lesson', $lessonId);
+    if (is_null($lesson)) {
         Core_Page_Show::instance()->error(404);
     }
 
-    $Area = Schedule_Area_Controller::factory($Lesson->areaId());
-    if (is_null($Area)) {
+    $area = Schedule_Area_Controller::factory($lesson->areaId());
+    if (is_null($area)) {
         Core_Page_Show::instance()->error(404);
     }
 
-    $Lesson->markDeleted($deleteDate);
+    $lesson->markDeleted($deleteDate);
     exit;
 }
 
