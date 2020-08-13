@@ -417,7 +417,7 @@ if ($action === 'getTeacherNearestTime') {
     $today = date('Y-m-d');
     $tomorrow = date('Y-m-d', strtotime('+1 day'));
     $currentTime = date('H:i:s');
-    if ($date <= $today || ($date == $tomorrow && $currentTime <= $endDayTime)) {
+    if ($date <= $today || ($date == $tomorrow && $currentTime >= $endDayTime)) {
         exit(json_encode([]));
     }
 

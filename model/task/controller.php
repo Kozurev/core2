@@ -430,20 +430,22 @@ class Task_Controller
         }
 
         //Поиск комментариев для всех найденных задач
-        $Notes = Core::factory('Task_Note')
-            ->queryBuilder()
-            ->addSelect(['usr.name AS name', 'usr.surname AS surname'])
-            ->whereIn('task_id', $tasksIds)
-            ->leftJoin('User AS usr', 'author_id = usr.id')
-            ->orderBy('date', 'DESC')
-            ->findAll();
+        if (count($tasksIds) > 0) {
+            $Notes = Core::factory('Task_Note')
+                ->queryBuilder()
+                ->addSelect(['usr.name AS name', 'usr.surname AS surname'])
+                ->whereIn('task_id', $tasksIds)
+                ->leftJoin('User AS usr', 'author_id = usr.id')
+                ->orderBy('date', 'DESC')
+                ->findAll();
 
-        foreach ($Notes as $Note) {
-            $createNoteTime = strtotime($Note->date());
-            date('H:i', $createNoteTime) == '00:00'
-                ?   $dateFormat = 'd.m.y'
-                :   $dateFormat = 'd.m.y H:i';
-            $Note->date(date($dateFormat, $createNoteTime));
+            foreach ($Notes as $Note) {
+                $createNoteTime = strtotime($Note->date());
+                date('H:i', $createNoteTime) == '00:00'
+                    ?   $dateFormat = 'd.m.y'
+                    :   $dateFormat = 'd.m.y H:i';
+                $Note->date(date($dateFormat, $createNoteTime));
+            }
         }
 
         //Поиск пользователей (клиентов) с которыми связана задача
