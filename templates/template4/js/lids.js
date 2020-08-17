@@ -571,7 +571,14 @@ function prependLidCard(lid, block) {
 
                         style = lid.vk == '' ? 'style="display:none"' : '';
                         card += '<p class="intro" '+style+'><span>ВК: </span><span class="vk">'+lid.vk+'</span></p>';
-        card +=
+
+                        card +=
+                            '<a class="action edit" onclick="makeLidPopup('+lid.id+')" title="Редактировать лида"></a>' +
+                            '<a class="action comment" title="Добавить комментарий" onclick="makeLidCommentPopup(0, '+lid.id+', saveLidCommentCallback)"></a>' +
+                            '<a class="action add_user" title="Создать пользователя" onclick="makeClientFromLidPopup('+lid.id+')"></a>' +
+                            '<a class="action calendar" onclick="getLidStatisticPopup('+lid.id+')" title="События лида"></a>';
+
+                        card +=
                         '<input type="date" class="form-control date_inp lid_date" onchange="Lids.changeDate('+lid.id+', this.value)" value="'+lid.control_date+'">' +
                         '<select name="status" class="form-control lid_status" onchange="Lids.changeStatus('+lid.id+', this.value, changeLidStatusCallback)">' +
                             '<option value="0"> ... </option>' +
@@ -595,12 +602,7 @@ function prependLidCard(lid, block) {
                             }
                         }
                         card += '<p class="intro" '+style+'><span>Источник: </span><span class="source">'+source+'</span></p>';
-
-        card +=
-                        '<a class="action edit" onclick="makeLidPopup('+lid.id+')" title="Редактировать лида"></a>' +
-                        '<a class="action comment" title="Добавить комментарий" onclick="makeLidCommentPopup(0, '+lid.id+', saveLidCommentCallback)"></a>' +
-                        '<a class="action add_user" title="Создать пользователя" onclick="makeClientFromLidPopup('+lid.id+')"></a>' +
-                    '</div>' +
+                    card += '</div>' +
                     '<div class="col-sm-9 col-xs-12 comments-column">' +
                         '<div class="comments">';
                             $.each(lid.comments, function(key, comment){
