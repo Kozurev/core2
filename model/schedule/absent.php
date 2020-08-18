@@ -57,10 +57,6 @@ class Schedule_Absent extends Schedule_Absent_Model
                 $dateStart = date('d.m.y', strtotime($tomorrow . ' +1 day'));
             }
 
-            if ($dateStart ?? '' == $tomorrow) {
-                $dateStart = refactorDateFormat($tomorrow);
-            }
-
             if (isset($dateStart)) {
                 $errorMsg = 'Дата начала периода отсутствия в данном случае не может быть ранее чем ' . $dateStart;
                 Log::instance()->error(

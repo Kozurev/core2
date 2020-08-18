@@ -528,3 +528,26 @@ function mapping(string $route, $params = []) : string
 
     return $CFG->wwwroot . '/' . $mapping[$route] . $getParams ?? '';
 }
+
+/**
+ * Проверка времени для каких-либо действий в расписании
+ *
+ * @param User $user
+ * @param string|null $date
+ * @return bool
+ */
+function checkTimeForScheduleActions(User $user, string $date = null) : bool
+{
+    if ($user->groupId() == ROLE_CLIENT || $user->groupId() == ROLE_TEACHER) {
+        $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')
+            ->getValues(User_Auth::current()->getDirector())[0]->value();
+
+        $today = date('Y-m-d');
+        $tomorrow = date('Y-m-d', strtotime('+1 day'));
+        $currentTime = date('H:i:s');
+        if ($date <= $today || ($date == $tomorrow && $currentTime >= $endDayTime)) {
+            return false;
+        }
+    }
+    return true;
+}

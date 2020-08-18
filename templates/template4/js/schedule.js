@@ -47,19 +47,19 @@ $(function(){
                 absentData = {};
 
             absentData.id = form.find('input[name=id]').val();
-            absentData.objectId = form.find('input[name=objectId]').val();
-            absentData.dateFrom = form.find('input[name=dateFrom]').val();
-            absentData.dateTo = form.find('input[name=dateTo]').val();
-            absentData.timeFrom = form.find('input[name=timeFrom]').val();
-            absentData.timeTo = form.find('input[name=timeTo]').val();
-            absentData.typeId = form.find('input[name=typeId]').val();
-
-            if ($('#absent_add_task').is(':checked')) {
-                addAbsentTask(absentData.dateTo, absentData.objectId);
-            }
+            absentData.object_id = form.find('input[name=object_id]').val();
+            absentData.date_from = form.find('input[name=date_from]').val();
+            absentData.date_to = form.find('input[name=date_to]').val();
+            absentData.time_from = form.find('input[name=time_from]').val();
+            absentData.time_to = form.find('input[name=time_to]').val();
+            absentData.type_id = form.find('input[name=type_id]').val();
 
             Schedule.saveAbsentPeriod(absentData, function (response) {
-                if (response.status != false) {
+                if (response.status !== false) {
+                    if ($('#absent_add_task').is(':checked')) {
+                        addAbsentTask(absentData.dateTo, absentData.objectId);
+                    }
+
                     let msg = 'Период отсутствия с ' + response.absent.refactoredDateFrom + ' ';
                     if (response.absent.refactoredTimeFrom != '00:00') {
                         msg += response.absent.refactoredTimeFrom;
@@ -86,7 +86,6 @@ $(function(){
                         $popupError.text(response.message);
                     }
 
-                    //closePopup();
                     loaderOff();
                 }
             });
@@ -782,8 +781,8 @@ function getScheduleAbsentPopup(objectId, typeId, date, id) {
 function deleteScheduleAbsent(id, callback) {
     loaderOn();
     $.ajax({
-        type: 'GET',
-        url: root + '/schedule',
+        type: 'POST',
+        url: root + '/api/schedule/index.php',
         dataType: 'json',
         data: {
             action: 'deleteScheduleAbsent',
@@ -1132,15 +1131,13 @@ function saveClientLesson() {
         time = $popup.find('input[name=time]:checked').val(),
         data = {
             typeId: 1,
-            lessonType: 2,
+            scheduleType: 2,
             insertDate: $popup.find('input[name=date]').val(),
             clientId: $popup.find('input[name=clientId]').val(),
             teacherId: $popup.find('select[name=teacherId]').val(),
             areaId: $popup.find('input[name=areaId]').val(),
             timeFrom: time.split(' ')[0],
-            timeTo: time.split(' ')[1],
-            id: '',
-            modelName: 'Schedule_Lesson'
+            timeTo: time.split(' ')[1]
         };
 
     Schedule.checkAbsentPeriod({
@@ -1149,13 +1146,13 @@ function saveClientLesson() {
     }, function(response) {
         if (response.isset == false) {
             $.ajax({
-                type: 'GET',
-                url: root + '/admin?menuTab=Main&menuAction=updateAction&ajax=1',
+                type: 'POST',
+                url: root + '/api/schedule/index.php',
                 data: data,
                 success: function(response) {
                     closePopup();
-                    if(response != '0' && response != '') {
-                        notificationError(response);
+                    if(response.message !== undefined) {
+                        notificationError(response.message);
                     } else {
                         notificationSuccess('Вы успешно были поставлены в график');
                         refreshSchedule();

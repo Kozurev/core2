@@ -157,35 +157,6 @@ if ($action === 'getScheduleAbsentPopup') {
     exit;
 }
 
-//Удаление периода отсутствия
-if ($action === 'deleteScheduleAbsent') {
-    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_DELETE)) {
-        Core_Page_Show::instance()->error(403);
-    }
-
-    $absentId = Core_Array::Get('id', null, PARAM_INT);
-
-    if (is_null($absentId)) {
-        Core_Page_Show::instance()->error(404);
-    }
-
-    $Absent = Core::factory('Schedule_Absent', $absentId);
-    if (is_null($Absent)) {
-        Core_Page_Show::instance()->error(404);
-    }
-
-    Core::factory('Schedule_Absent');
-    $AbsentObj = $Absent->getObject();
-    $outputJson = new stdClass();
-    if ($Absent->typeId() == 1) {
-        $outputJson->fio = $AbsentObj->surname() . ' ' . $AbsentObj->name();
-    }
-    $outputJson->id = $absentId;
-    $outputJson->dateFrom = refactorDateFormat($Absent->dateFrom());
-    $outputJson->dateTo = refactorDateFormat($Absent->dateTo());
-    $Absent->delete();
-    exit(json_encode($outputJson));
-}
 
 /**
  * Вывод формы для всплывающего окна создания занятия

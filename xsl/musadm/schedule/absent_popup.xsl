@@ -56,14 +56,14 @@
                 <span>Период "С" (включительно)</span><span style="color:red" >*</span>
             </div>
             <div class="column">
-                <input class="form-control" type="date" name="dateFrom" value="{$date_from}" />
+                <input class="form-control" type="date" name="date_from" value="{$date_from}" />
             </div>
             <hr/>
             <div class="column">
                 <span>Период "По (включительно)"</span><span style="color:red" >*</span>
             </div>
             <div class="column">
-                <input class="form-control" type="date" name="dateTo" value="{absent/date_to}" />
+                <input class="form-control" type="date" name="date_to" value="{absent/date_to}" />
             </div>
 
             <xsl:if test="object/group_id = 4">
@@ -72,7 +72,7 @@
                     <span>Время "С"</span><span style="color:red" >*</span>
                 </div>
                 <div class="column">
-                    <input class="form-control" type="time" name="timeFrom" value="{absent/time_from}" />
+                    <input class="form-control" type="time" name="time_from" value="{absent/time_from}" />
                 </div>
 
                 <hr/>
@@ -80,7 +80,7 @@
                     <span>Время "По"</span><span style="color:red" >*</span>
                 </div>
                 <div class="column">
-                    <input class="form-control" type="time" name="timeTo" value="{absent/time_to}" />
+                    <input class="form-control" type="time" name="time_to" value="{absent/time_to}" />
                 </div>
             </xsl:if>
 
@@ -119,9 +119,9 @@
             </xsl:if>
 
             <input type="hidden" name="id" value="{absent/id}" />
-            <input type="hidden" value="{$objectId}" name="objectId" />
-            <input type="hidden" value="{$typeId}" name="typeId" />
-            <input type="hidden" value="Schedule_Absent" name="modelName" />
+            <input type="hidden" value="{$objectId}" name="object_id" />
+            <input type="hidden" value="{$typeId}" name="type_id" />
+<!--            <input type="hidden" value="Schedule_Absent" name="modelName" />-->
 
             <button class="popop_schedule_absent_submit btn btn-default">Сохранить</button>
         </form>

@@ -104,7 +104,7 @@ if ($action === 'getAreasList') {
     if ($isRelated === true) {
         $AreaAssignment = new Schedule_Area_Assignment();
         try {
-            $Areas = $AreaAssignment->getAreas(User::current());
+            $Areas = $AreaAssignment->getAreas(User_Auth::current());
         } catch (Exception $e) {
             die(REST::error(2, $e->getMessage()));
         }
@@ -121,18 +121,77 @@ if ($action === 'getAreasList') {
     exit(json_encode($response));
 }
 
+/**
+ * Получение списка периодов отсутствия
+ */
+if ($action === 'getAbsentPeriods') {
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_READ)) {
+        exit(REST::responseError(REST::ERROR_CODE_ACCESS));
+    }
+
+    $id =       Core_Array::get('id', null, PARAM_INT);
+    $objectId = Core_Array::get('object_id', null, PARAM_INT);
+    $typeId =   Core_Array::get('type_id', null, PARAM_INT);
+    $dateFrom = Core_Array::get('date_from', null, PARAM_DATE);
+    $dateTo =   Core_Array::get('date_to', null, PARAM_DATE);
+
+    $user = User_Auth::current();
+    $query = Schedule_Absent::query();
+
+    if (!$user->isManagementStaff()) {
+        $query->where('object_id', '=', $user->getId())
+            ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV);
+    } else {
+        if (!is_null($id)) {
+            $query->where('id', '=', $id);
+        }
+        if (!is_null($typeId)) {
+            $query->where('type_id', '=', $typeId);
+        }
+        if (!is_null($objectId)) {
+            $query->where('object_id', '=', $objectId);
+        }
+    }
+    if (!is_null($dateFrom)) {
+        $query->where('date_from', '>=', $dateFrom);
+    }
+    if (!is_null($dateTo)) {
+        $query->where('date_to', '<=', $dateTo);
+    }
+
+    //Пагинация
+    $pagination = new Pagination($query, $_GET);
+    die(json_encode($pagination->execute()));
+}
+
 
 /**
  * Сохранение периода отсутствия
  */
 if ($action === 'saveAbsentPeriod') {
     $id =       Core_Array::Post('id', 0, PARAM_INT);
-    $typeId =   Core_Array::Post('typeId', 0, PARAM_INT);
-    $objectId = Core_Array::Post('objectId', null, PARAM_INT);
-    $dateFrom = Core_Array::Post('dateFrom', null, PARAM_DATE);
-    $dateTo =   Core_Array::Post('dateTo', null, PARAM_DATE);
-    $timeFrom = Core_Array::Post('timeFrom', '00:00:00', PARAM_STRING);
-    $timeTo =   Core_Array::Post('timeTo', '00:00:00', PARAM_STRING);
+    $typeId =   Core_Array::Post('type_id', 0, PARAM_INT);
+    $objectId = Core_Array::Post('object_id', null, PARAM_INT);
+    $dateFrom = Core_Array::Post('date_from', null, PARAM_DATE);
+    $dateTo =   Core_Array::Post('date_to', null, PARAM_DATE);
+    $timeFrom = Core_Array::Post('time_from', '00:00:00', PARAM_STRING);
+    $timeTo =   Core_Array::Post('time_to', '00:00:00', PARAM_STRING);
+
+    $user = User_Auth::current();
+    $capability = empty($id)
+        ?   Core_Access::SCHEDULE_ABSENT_CREATE
+        :   Core_Access::SCHEDULE_ABSENT_EDIT;
+
+    if (!Core_Access::instance()->hasCapability($capability)) {
+        exit(REST::responseError(REST::ERROR_CODE_ACCESS));
+    }
+
+    if ($user->groupId() === ROLE_CLIENT) {
+        $typeId = Schedule_Lesson::TYPE_INDIV;
+        $objectId = $user->getId();
+    } elseif ($user->groupId() == ROLE_TEACHER) {
+        $objectId = $user->getId();
+    }
 
     //Проверка наличия всех необходимых значений
     if (empty($typeId)) {
@@ -152,21 +211,22 @@ if ($action === 'saveAbsentPeriod') {
         $timeTo .= ':00';
     }
 
-    $AbsentPeriod = Core::factory('Schedule_Absent', $id);
-    if (is_null($AbsentPeriod)) {
+    /** @var Schedule_Absent $absentPeriod */
+    $absentPeriod = Core::factory('Schedule_Absent', $id);
+    if (is_null($absentPeriod)) {
         die(REST::status(REST::STATUS_ERROR, 'Период отсутствия с id ' . $id . ' отсутствует'));
     }
 
     //Проверка на существования объекта, для которого создавется период отсутствия
     if ($typeId === 1) {
-        $AbsentObject = User_Controller::factory($objectId);
+        $absentObject = User_Controller::factory($objectId);
     } elseif ($typeId === 2) {
-        $AbsentObject = Core::factory('Schedule_Group', $objectId);
+        $absentObject = Core::factory('Schedule_Group', $objectId);
     } else {
         die(REST::status(REST::STATUS_ERROR, 'Неизвестны тип периода отсутствия'));
     }
 
-    if (is_null($AbsentObject)) {
+    if (is_null($absentObject)) {
         die(REST::status(REST::STATUS_ERROR, 'Отсутствует объект периода отсутствия'));
     }
 
@@ -179,24 +239,65 @@ if ($action === 'saveAbsentPeriod') {
         die(REST::status(REST::STATUS_ERROR, 'Время окончания периода отсутствия не может быть меньше чем время начала'));
     }
 
-    $AbsentPeriod->typeId($typeId);
-    $AbsentPeriod->objectId($objectId);
-    $AbsentPeriod->dateFrom($dateFrom);
-    $AbsentPeriod->dateTo($dateTo);
-    $AbsentPeriod->timeFrom($timeFrom);
-    $AbsentPeriod->timeTo($timeTo);
+    $absentPeriod->typeId($typeId);
+    $absentPeriod->objectId($objectId);
+    $absentPeriod->dateFrom($dateFrom);
+    $absentPeriod->dateTo($dateTo);
+    $absentPeriod->timeFrom($timeFrom);
+    $absentPeriod->timeTo($timeTo);
 
-    if (empty($AbsentPeriod->save())) {
-        exit(REST::status(REST::STATUS_ERROR, 'Ошибка: ' . $AbsentPeriod->_getValidateErrorsStr()));
+    if (empty($absentPeriod->save())) {
+        exit(REST::status(REST::STATUS_ERROR, 'Ошибка: ' . $absentPeriod->_getValidateErrorsStr()));
     }
 
     $response = new stdClass();
-    $response->absent = $AbsentPeriod->toStd();
-    $response->absent->refactoredDateFrom = date('d.m.y', strtotime($AbsentPeriod->dateFrom()));
-    $response->absent->refactoredDateTo = date('d.m.y', strtotime($AbsentPeriod->dateTo()));
-    $response->absent->refactoredTimeFrom = substr($AbsentPeriod->timeFrom(), 0, 5);
-    $response->absent->refactoredTimeTo = substr($AbsentPeriod->timeTo(), 0, 5);
+    $response->absent = $absentPeriod->toStd();
+    $response->absent->refactoredDateFrom = date('d.m.y', strtotime($absentPeriod->dateFrom()));
+    $response->absent->refactoredDateTo = date('d.m.y', strtotime($absentPeriod->dateTo()));
+    $response->absent->refactoredTimeFrom = substr($absentPeriod->timeFrom(), 0, 5);
+    $response->absent->refactoredTimeTo = substr($absentPeriod->timeTo(), 0, 5);
     exit(json_encode($response));
+}
+
+
+/**
+ * Удаление периода отсутствия
+ */
+if ($action === 'deleteScheduleAbsent') {
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_DELETE)) {
+        exit(REST::responseError(REST::ERROR_CODE_ACCESS));
+    }
+
+    $absentId = Core_Array::Post('id', null, PARAM_INT);
+    if (is_null($absentId)) {
+        exit(REST::responseError(REST::ERROR_CODE_CUSTOM, 'Не указан обязательный параметр: id'));
+    }
+
+    $user = User_Auth::current();
+
+    $absentQuery = Schedule_Absent::query()
+        ->where('id', '=', $absentId);
+    if (!$user->isManagementStaff()) {
+        $absentQuery->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
+            ->where('object_id', '=', $user->getId());
+    }
+
+    /** @var Schedule_Absent $absent */
+    $absent = $absentQuery->find();
+    if (is_null($absent)) {
+        exit(REST::responseError(REST::ERROR_CODE_NOT_FOUND, 'Период отсутствия с указанным id не найден'));
+    }
+
+    $absentObj = $absent->getObject();
+    $outputJson = new stdClass();
+    if ($absent->typeId() == 1) {
+        $outputJson->fio = $absentObj->getFio();
+    }
+    $outputJson->id = $absentId;
+    $outputJson->dateFrom = refactorDateFormat($absent->dateFrom());
+    $outputJson->dateTo = refactorDateFormat($absent->dateTo());
+    $absent->delete();
+    exit(json_encode($outputJson));
 }
 
 
@@ -655,6 +756,18 @@ if ($action === 'saveLesson') {
     $classId =      Core_Array::Post('classId', 0, PARAM_INT);
     $timeFrom =     Core_Array::Post('timeFrom', '', PARAM_TIME);
     $timeTo =       Core_Array::Post('timeTo', '', PARAM_TIME);
+
+    $user = User_Auth::current();
+    if ($user->groupId() == ROLE_CLIENT) {
+        $clientId = $user->getId();
+    } elseif ($user->groupId() == ROLE_TEACHER) {
+        $teacherId = $user->getId();
+    }
+
+    //Ограничение по времени
+    if (!checkTimeForScheduleActions($user, $insertDate)) {
+        exit(REST::responseError(REST::ERROR_CODE_TIME));
+    }
 
     $lesson = (new Schedule_Lesson())
         ->lessonType($scheduleType)

@@ -27,10 +27,6 @@ $Director = User_Auth::current()->getDirector();
 //id клиента под которым авторизован менеджер/директор
 $pageClientId = Core_Array::Get('userid', null, PARAM_INT);
 
-Core::requireClass('User_Controller');
-Core::requireClass('Property_Controller');
-Core::requireClass('User_Auth_Log');
-
 //Получение объекта пользователя клиента
 if (is_null($pageClientId)) {
     $User = User_Auth::current();
@@ -244,11 +240,9 @@ if ($User->groupId() == ROLE_CLIENT && Core_Access::instance()->hasCapability(Co
     <?php
 }
 
-
 //Блок статистики посещаемости
 if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ)) {
-    $UserReports = Core::factory('Schedule_Lesson_Report');
-    $UserReports
+    $UserReports = (new Schedule_Lesson_Report)
         ->queryBuilder()
         ->select(['Schedule_Lesson_Report.id', 'attendance', 'date', 'lesson_id', 'client_id',
             'surname', 'name', 'client_rate', 'teacher_rate', 'total_rate', 'type_id'])
@@ -265,17 +259,16 @@ if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ)) {
     }
     if (count($UserGroups) > 0) {
         $UserReports
-            ->queryBuilder()
             ->open()
-            ->where('client_id', '=', $User->getId())
-            ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
+                ->where('client_id', '=', $User->getId())
+                ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
             ->close()
             ->open()
-            ->orWhereIn('client_id', $UserGroups)
-            ->where('type_id', '=', Schedule_Lesson::TYPE_GROUP)
+                ->orWhereIn('client_id', $UserGroups)
+                ->where('type_id', '=', Schedule_Lesson::TYPE_GROUP)
             ->close();
     } else {
-        $UserReports->queryBuilder()
+        $UserReports
             ->where('client_id', '=', $User->getId())
             ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV);
     }
@@ -307,7 +300,7 @@ if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ)) {
         }
     }
 
-    Core::factory('Core_Entity')
+    (new Core_Entity())
         ->addEntities($UserReports)
         ->addSimpleEntity('is_director', $isDirector)
         ->addSimpleEntity(
@@ -351,7 +344,6 @@ if (Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_CLIENT)) {
 
 //Новый раздел со списком событий
 if ($isAdmin === 1) {
-
     //Считаем кол-во дней жизни за вычетом отвала
     $allDays = (strtotime(date('Y-m-d')) - strtotime($User->registerDate())) / (60*60*24);
     $absenceDays = 0;
@@ -372,11 +364,6 @@ if ($isAdmin === 1) {
             $countLessons++;
         }
     }
-//    $countLessons = (new Schedule_Lesson_Report())
-//        ->queryBuilder()
-//        ->where('client_id','=',$User->id())
-//        ->where('attendance','=',1)
-//        ->count();
 
     //Считаем кол-во денег, которые принес в систему
     $money =0;
@@ -409,12 +396,7 @@ if ($isAdmin === 1) {
         ->xsl('musadm/users/balance/life_history.xsl')
         ->show();
 
-
-
-
-
-    $UserEvents = Core::factory('Event');
-    $UserEvents->queryBuilder()
+    $UserEvents = (new Event)->queryBuilder()
         ->where('user_assignment_id', '=', $User->getId())
         ->whereIn('type_id', [2, 3, 4, 5, 7, 8, 9, 27, 29])
         ->orderBy('time', 'DESC');

@@ -5,113 +5,112 @@
  *
  * @version 20190422
  * @version 20190811 - добавлен метод sum и изменено название метода getCount в count
+ * @version 20200818 - добавлен метод toString и table
  * Class Orm
  */
 class Orm 
 {
-
-    /**
-     * Формируемая строка SQL-запроса
-     *
-     * @var string
-     */
-	//protected $queryString = '';
-
-
     /**
      * Объект с которым связан конструктор запроса по умолчанию
      *
-     * @var object | null
+     * @var mixed|null
      */
     private $object;
-
-
 
     /**
      * Название таблицы для объекта к которому привязан конструктор
      *
-     * @var string | null
+     * @var string|null
      */
-    private $table;
-
+    private ?string $table = null;
 
     /**
      * Название класса к которому приводятся результаты запроса
      *
-     * @var string
+     * @var string|null
      */
-    private $class;
-
+    private ?string $class = null;
 
     /**
      * Список названий столбцов таблицы из которых берутся значения
      *
      * @var array
      */
-    private $select = [];
-
+    private array $select = [];
 
     /**
      * Дополнительный список названий столбцов таблицы из которых беруться значения
      *
      * @var array
      */
-    private $addSelecting = [];
-
+    private array $addSelecting = [];
 
     /**
      * Список запрещенных к выборке столбцов
      *
      * @var array
      */
-    private $forbiddenTags = [];
-
+    private array $forbiddenTags = [];
 
     /**
      * Список названий таблиц из которых производится выборка
      *
      * @var array
      */
-    private $from = [];
-
+    private array $from = [];
 
     /**
      * Строка с условиями выборки
      *
      * @var string
      */
-    private $where = '';
-
+    private string $where = '';
 
     /**
      * Массив параметров задающих сортировку выборки
      *
      * @var array
      */
-    private $order = [];
-
+    private array $order = [];
 
     /**
      * Параметр устанавливающий максимальное количество выбираемых строк
      *
-     * @var int
+     * @var int|null
      */
-    private $limit;
-
+    private ?int $limit = null;
 
     /**
      * Присоединяемые таблицы различными вариантами операторов JOIN
      *
      * @var array
      */
-    private $join = [];
+    private array $join = [];
 
-    private $having;
-    private $groupBy = [];
-    private $offset;
-    private $open = 0;
-    private $close = 0;
+    /**
+     * @var string
+     */
+    private string $having = '';
 
+    /**
+     * @var array
+     */
+    private array $groupBy = [];
+
+    /**
+     * @var int|null
+     */
+    private ?int $offset = null;
+
+    /**
+     * @var int
+     */
+    private int $open = 0;
+
+    /**
+     * @var int
+     */
+    private int $close = 0;
 
     /**
      * Orm constructor.
@@ -126,17 +125,31 @@ class Orm
         }
     }
 
+    /**
+     * @return string
+     */
+    public function __toString() : string
+    {
+        return '';
+    }
 
     /**
      * Переключатель режима отладки SQL-запросов
      *
      * @param bool $switch - указатель
      */
-    public static function Debug($switch)
+    public static function debug($switch)
     {
         $_SESSION['core']['SQL_DEBUG'] = $switch;
     }
 
+    /**
+     * @param string $table
+     */
+    public function table(string $table)
+    {
+        $this->table = $table;
+    }
 
     /**
      * Проверка на включенность отладки
@@ -148,7 +161,6 @@ class Orm
         return Core_Array::getValue($_SESSION['core'], 'SQL_DEBUG', false) === true;
     }
 
-
     /**
      * Открытие скобки в строке SQL запроса
      *
@@ -159,7 +171,6 @@ class Orm
         $this->open++;
         return $this;
     }
-
 
     /**
      * Закрытие скобки в строке SQL запроса
@@ -174,8 +185,6 @@ class Orm
         return $this;
     }
 
-
-
 	/**
 	 * Аналог метода count() для нормальной работы старого кода
      *
@@ -185,7 +194,6 @@ class Orm
 	{
 	    return $this->count();
 	}
-
 
     /**
      * Возвращает количество записей в таблице, удовлетворяющих заданным условиям
@@ -213,7 +221,6 @@ class Orm
         }
     }
 
-
     /**
      * Вычисление суммы значений поля по заданным условиям
      *
@@ -239,7 +246,6 @@ class Orm
             return floatval($result['sum']);
         }
     }
-
 
 	/**
 	 * Метод для добавления/сохранения объектов
@@ -315,7 +321,6 @@ class Orm
         Core::notify([&$obj], 'after.' . $eventObjectName . '.' . $eventType);
 		return $obj;
 	}
-
 
     /**
      * Метод для формирования строки запроса
@@ -414,7 +419,7 @@ class Orm
             }
         }
 
-        if ($this->having != '') {
+        if (!empty($this->having)) {
             $queryString .= ' HAVING ' . $this->having;
         }
 
@@ -434,17 +439,16 @@ class Orm
             }
         }
 
-        if ($this->limit != '') {
+        if (!is_null($this->limit)) {
             $queryString .= ' LIMIT ' . $this->limit;
         }
 
-        if ($this->offset != '') {
+        if (!is_null($this->offset)) {
             $queryString .= ' OFFSET ' . $this->offset;
         }
 
         return $queryString;
     }
-
 
     /**
      * Метод для выполнения sql запроса
@@ -461,7 +465,6 @@ class Orm
         return $result;
     }
 
-
     /**
      * Статический аналог метода executeQuery
      *
@@ -477,7 +480,6 @@ class Orm
         return $result;
     }
 
-
     /**
      * Установления значений по умолчанию для свойств учавствующих в формировании запроса
      *
@@ -492,15 +494,14 @@ class Orm
         $this->from = [];
         $this->order = [];
         $this->groupBy = [];
-        $this->limit = '';
+        $this->limit = null;
         $this->join = [];
         $this->having = '';
-        $this->offset = '';
+        $this->offset = null;
         $this->open = 0;
         $this->close = 0;
         return $this;
     }
-
 
     /**
      * Очистка заданного порядка сортировки
@@ -513,7 +514,6 @@ class Orm
         return $this;
     }
 
-
     /**
      * Обертывание значения в одинарные ковычки
      *
@@ -522,7 +522,7 @@ class Orm
      * @param $value
      * @return string
      */
-    public function parseValue($value)
+    public static function parseValue($value)
     {
         if (is_object($value) && $value->type == 'unchanged') {
             $val = $value->val;
@@ -530,11 +530,9 @@ class Orm
             $val = 'NULL';
         } else {
             $val = '\'' . addslashes($value) . '\'';
-            //$val = htmlspecialchars($val);
         }
         return $val;
     }
-
 
     /**
      * Удаление Объекта из базы данных
@@ -550,7 +548,6 @@ class Orm
         }
     }
 
-
 	/**
 	 * Метод указывающий название таблицы и параметры, которые из неё будут выбираться.
 	 * Если параметры не заданы тогда выбираются все столбцы таблицы.
@@ -560,7 +557,7 @@ class Orm
 	 * @return self
 	 */
 	public function select($aParams, $as = null)
-	{
+    {
         if (is_array($aParams) && count($aParams) > 0) {
             foreach ($aParams as $row) {
                 $this->select[] = $row;
@@ -572,9 +569,8 @@ class Orm
             }
             $this->select[] = $select;
         }
-		return $this;
-	}
-
+        return $this;
+    }
 
     /**
      * Запрещенные для выборки (в SELECT) значения
@@ -591,7 +587,6 @@ class Orm
         }
         return $this;
     }
-
 
     /**
      * Дополнительные поля для выборки
@@ -618,7 +613,6 @@ class Orm
         return $this;
     }
 
-
     /**
      * Очистка списка выбираемых полей
      *
@@ -629,7 +623,6 @@ class Orm
         $this->select = [];
         return $this;
     }
-
 
 	/**
 	 * Метод указывающий список таблиц из которых делается выборка
@@ -653,7 +646,6 @@ class Orm
 		}
 		return $this;
 	}
-
 
 	/**
 	 * Метод задающий условия выборки данных
@@ -695,14 +687,11 @@ class Orm
         }
 
         $this->where .= $row . ' ' . $operation . ' ';
-        $this->where .= $this->parseValue($value) . ' ';
+        $this->where .= self::parseValue($value) . ' ';
         return $this;
 	}
 
-
     /**
-     *
-     *
      * @param $row
      * @param $condition
      * @param $value
@@ -722,14 +711,11 @@ class Orm
         }
 
         $this->where .= $row . ' ' . $condition . ' ';
-        $this->where .= $this->parseValue($value) . ' ';
+        $this->where .= self::parseValue($value) . ' ';
         return $this;
     }
 
-
     /**
-     *
-     *
      * @param $row
      * @param $values
      * @return self
@@ -750,20 +736,16 @@ class Orm
             $this->open = 0;
         }
 
-        $this->where .= $row . ' in(';
-        for ($i = 0; $i < count($values); $i++) {
-            $i == 0
-                ?   $this->where .= $this->parseValue($values[$i])
-                :   $this->where .= ', ' . $this->parseValue($values[$i]);
+        foreach ($values as $i => $value) {
+            $values[$i] = self::parseValue($value);
         }
+        $this->where .= $row . ' in(';
+        $this->where .= implode(', ', $values);
         $this->where .= ') ';
         return $this;
     }
 
-
     /**
-     *
-     *
      * @param $row
      * @param $values
      * @return self
@@ -784,16 +766,14 @@ class Orm
             $this->open = 0;
         }
 
-        $this->where .= $row . ' in(';
-        for ($i = 0; $i < count($values); $i++) {
-            $i == 0
-                ?   $this->where .= $this->parseValue($values[$i])
-                :   $this->where .= ', ' . $this->parseValue($values[$i]);
+        foreach ($values as $i => $value) {
+            $values[$i] = self::parseValue($value);
         }
+        $this->where .= $row . ' in(';
+        $this->where .= implode(', ', $values);
         $this->where .= ') ';
         return $this;
     }
-
 
     /**
      * Реализация оператора BETWEEN
@@ -823,8 +803,6 @@ class Orm
         return $this;
     }
 
-
-
     /**
 	 * Метод задающий сортировку выборки
      *
@@ -844,7 +822,6 @@ class Orm
 		return $this;
 	}
 
-
 	/**
 	 * Метод задающий количество выбираемых строк из базы данных
      *
@@ -860,7 +837,6 @@ class Orm
 		return $this;
 	}
 
-
     /**
      * Реализация оператора OFFSET - отступ
      *
@@ -874,7 +850,6 @@ class Orm
         }
         return $this;
     }
-
 
 	/**
 	 * Метод для объединения таблиц INNER JOIN
@@ -893,7 +868,6 @@ class Orm
 		return $this;
 	}
 
-
     /**
      * Метод для объеденения таблиц LEFT JOIN
      *
@@ -911,7 +885,6 @@ class Orm
         return $this;
     }
 
-
     /**
      * @param $table
      * @param $conditions
@@ -927,7 +900,6 @@ class Orm
         return $this;
     }
 
-
     /**
      * Реализация оператора HAVING
      *
@@ -939,13 +911,12 @@ class Orm
     public function having($row, $operation, $value)
     {
         if ($this->having != '') {
-            $this->having .= ' and ' . $row . ' ' . $operation . ' ' . $this->parseValue($value);
+            $this->having .= ' and ' . $row . ' ' . $operation . ' ' . self::parseValue($value);
         } else {
-            $this->having = $row . ' ' . $operation . ' ' . $this->parseValue($value);
+            $this->having = $row . ' ' . $operation . ' ' . self::parseValue($value);
         }
         return $this;
     }
-
 
     /**
      * Метод для группировки выбираемых строк из базы данных
@@ -958,7 +929,6 @@ class Orm
         $this->groupBy[] = $row;
         return $this;
     }
-
 
 	/**
 	 * Поиск записей в базе данных
@@ -986,7 +956,6 @@ class Orm
         $result->setFetchMode(PDO::FETCH_CLASS, $fetchClass);
         return $result->fetchAll();
 	}
-
 
 	/**
 	 * Выполняет запрос поиска одной записи в таблице и возвращает его в виде объекта класса

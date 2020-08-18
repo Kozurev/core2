@@ -135,8 +135,6 @@ class User_Auth
      */
     public static function current()
     {
-        Core::requireClass('User_Auth_Log');
-
         //Переданный авторизационный токен через $_GET или $_POST
         $authToken = Core_Array::Request('token', '', PARAM_STRING);
         if (!empty($authToken)) {

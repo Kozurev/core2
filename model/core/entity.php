@@ -239,6 +239,16 @@ class Core_Entity extends Core_Entity_Model
 
 
     /**
+     * @return Orm
+     */
+    public static function query() : Orm
+    {
+        $class = get_called_class();
+        return new Orm((new $class));
+    }
+
+
+    /**
      * @return array
      */
     public function findAll() : array

@@ -20,6 +20,7 @@ class REST
     const ERROR_CODE_AUTH = 1;      //Пользователь не авторизован
     const ERROR_CODE_ACCESS = 2;    //Недостаточно прав
     const ERROR_CODE_NOT_FOUND = 3; //Объект не найден
+    const ERROR_CODE_TIME = 4;      //Неподходящее время
     const ERROR_CODE_CUSTOM = 999;  //Кастомная ошибка
 
     /**
@@ -30,6 +31,7 @@ class REST
         self::ERROR_CODE_AUTH => 'Пользователь не авторизован',
         self::ERROR_CODE_ACCESS => 'Недостаточно прав',
         self::ERROR_CODE_NOT_FOUND => 'Искомый объект не найден',
+        self::ERROR_CODE_TIME => 'В данный момент действие недоступно'
     ];
 
     /**
@@ -144,6 +146,7 @@ class REST
         $response = new stdClass();
         $response->error = $errorCode;
         $response->message = !empty($message) ? $message : self::getErrorMessage($errorCode);
+        $response->status = false;
         return json_encode($response);
     }
 }
