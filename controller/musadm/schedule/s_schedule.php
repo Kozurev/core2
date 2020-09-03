@@ -446,19 +446,12 @@ if ($action === 'addAbsentTask') {
         Core_Page_Show::instance()->error(404);
     }
 
-    $Client = User_Controller::factory($clientId);
-    if (is_null($Client)) {
+    $client = User_Controller::factory($clientId);
+    if (is_null($client)) {
         Core_Page_Show::instance()->error(404);
     }
 
-    $Task = Task_Controller::factory()
-        ->associate($clientId)
-        ->date($dateTo)
-        ->save();
-
-    $clientFio = $Client->surname() . ' ' . $Client->name();
-    $text = $clientFio . ', отсутствовал. Уточнить насчет дальнейшего графика.';
-    $Task->addNote($text);
+    Task::addClientReminderTask($client, $dateTo);
 
     exit;
 }

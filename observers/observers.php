@@ -1030,3 +1030,18 @@ Core::attachObserver('after.user.deposit', function($args) {
         }
     }
 });
+
+/**
+ * Создание задачи с напоминанием о выходе ученика
+ * если ученик сам себе создает период отсутствия
+ */
+Core::attachObserver('after.ScheduleAbsent.save', function($args) {
+    /** @var Schedule_Absent $absent */
+    $absent = $args[0];
+
+    $user = User_Auth::current();
+    if ($user instanceof User && $user->groupId() == ROLE_CLIENT && $absent->typeId() == Schedule_Lesson::TYPE_INDIV) {
+        $client = $absent->getClient();
+        Task::addClientReminderTask($client, $absent->dateTo());
+    }
+});

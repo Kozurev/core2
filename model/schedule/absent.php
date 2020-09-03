@@ -40,8 +40,6 @@ class Schedule_Absent extends Schedule_Absent_Model
      */
     public function save($obj = null)
     {
-        Core::notify([&$this], 'before.ScheduleAbsent.save');
-
         //Ограничение по времени
         if (User_Auth::current()->groupId() == ROLE_CLIENT) {
             $today = date('Y-m-d');
@@ -68,6 +66,7 @@ class Schedule_Absent extends Schedule_Absent_Model
             }
         }
 
+        Core::notify([&$this], 'before.ScheduleAbsent.save');
         if (empty(parent::save())) {
             return null;
         }

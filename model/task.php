@@ -9,11 +9,9 @@
  */
 class Task extends Task_Model
 {
-
     const PRIORITY_NORMAl = 1;  //Обычный приоритет
     const PRIORITY_MEDIUM = 2;  //Средний приоритет
     const PRIORITY_HIGH = 3;    //Высокий приоритет
-
 
     /**
      * Поиск комментариев задачи
@@ -26,13 +24,11 @@ class Task extends Task_Model
             return [];
         }
 
-        return Core::factory('Task_Note')
-            ->queryBuilder()
+        return Task_Note::query()
             ->where('task_id', '=', $this->getId())
             ->orderBy('date', 'DESC')
             ->findAll();
     }
-
 
     /**
      * Геттер для текста комментария при закрытии задачи
@@ -44,7 +40,6 @@ class Task extends Task_Model
         return 'Задача закрыта';
     }
 
-
     /**
      * Геттер для текста комментария при восстановлении задачи для доработки
      *
@@ -54,7 +49,6 @@ class Task extends Task_Model
     {
         return 'Задача восстановлена на доработку';
     }
-
 
     /**
      * Добавление комментария к задаче
@@ -66,32 +60,30 @@ class Task extends Task_Model
      */
     public function addNote(string $text, int $authorId = null, string $date = null)
     {
-        $Note = Core::factory('Task_Note');
+        $note = new Task_Note();
 
         if (is_null($authorId)) {
-            if (is_null(User::current())) {
-                $Note->authorId(0);
+            if (is_null(User_Auth::current())) {
+                $note->authorId(0);
             } else {
-                $Note->authorId(User::parentAuth()->getId());
+                $note->authorId(User_Auth::parentAuth()->getId());
             }
         } else {
-            $Note->authorId($authorId);
+            $note->authorId($authorId);
         }
 
         if (is_null($date)) {
-            $Note->date(date('Y-m-d H:i:s'));
+            $note->date(date('Y-m-d H:i:s'));
         } else {
-            $Note->date($date);
+            $note->date($date);
         }
 
-        $Note
-            ->taskId($this->id)
+        $note->taskId($this->id)
             ->text($text)
             ->save();
 
         return $this;
     }
-
 
     /**
      * Пометка завершения задачи
@@ -106,15 +98,13 @@ class Task extends Task_Model
 
         Core::notify([&$this], 'before.Task.markAsDone');
 
-        $this
-            ->doneDate(date('Y-m-d'))
+        $this->doneDate(date('Y-m-d'))
             ->done(1)
             ->save();
 
         $this->addNote($this->doneComment());
         return $this;
     }
-
 
     /**
      * Возвращение задачи на выполнение
@@ -134,6 +124,20 @@ class Task extends Task_Model
         return $this;
     }
 
+    /**
+     * @param User $client
+     * @param string $date
+     */
+    public static function addClientReminderTask(User $client, string $date)
+    {
+        $task = Task_Controller::factory()
+            ->associate($client->getId())
+            ->date($date)
+            ->save();
+
+        $text = $client->getFio() . ', отсутствовал. Уточнить насчет дальнейшего графика.';
+        $task->addNote($text);
+    }
 
     /**
      * @return false|int
@@ -142,7 +146,6 @@ class Task extends Task_Model
     {
         return strtotime($this->date);
     }
-
 
     /**
      * @param null $obj
@@ -164,7 +167,6 @@ class Task extends Task_Model
         return $this;
     }
 
-
     /**
      * @param null $obj
      * @return $this|void
@@ -173,8 +175,9 @@ class Task extends Task_Model
     {
         Core::notify([&$this], 'before.Task.delete');
 
-        foreach ($this->getNotes() as $Note) {
-            $Note->delete();
+        (new Property())->clearForObject($this);
+        foreach ($this->getNotes() as $note) {
+            $note->delete();
         }
 
         parent::delete();
