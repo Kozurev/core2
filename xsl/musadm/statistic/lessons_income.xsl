@@ -2,10 +2,14 @@
 
     <xsl:template match="root">
         <div class='row'>
-            <div class='col-lg-4'>
+<!--            <div class='col-lg-4'>-->
                 <table class="table table-hover table-bordered">
                     <tr>
                         <th colspan="2">Доходы-расходы</th>
+                    </tr>
+                    <tr>
+                        <td>Поступления за период:</td>
+                        <td><xsl:value-of select="deposits" /></td>
                     </tr>
                     <tr>
                         <td>Выручка от занятий</td>
@@ -29,7 +33,7 @@
                     </tr>
                 </table>
             </div>
-        </div>
+<!--        </div>-->
     </xsl:template>
 
 </xsl:stylesheet>

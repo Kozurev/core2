@@ -10,11 +10,6 @@
  * @version 20190626
  */
 
-Core::requireClass('Orm');
-Core::requireClass('Payment');
-Core::requireClass('Property_Controller');
-Core::requireClass('Schedule_Area');
-
 $Payment = new Payment();
 
 //основные права доступа
@@ -40,7 +35,7 @@ $date = date($dateFormat);
 $dateFrom = Core_Array::Get('date_from', $date, PARAM_DATE);
 $dateTo =   Core_Array::Get('date_to', $date, PARAM_DATE);
 $areaId =   Core_Array::Get('area_id', 0, PARAM_INT);
-$Director = User::current()->getDirector();
+$Director = User_Auth::current()->getDirector();
 $subordinated = $Director->getId();
 
 //Тарифы
@@ -82,6 +77,7 @@ $income = new Orm();
 $income->select('sum(value)', 'value')
     ->from('Payment')
     ->where('type', '=', Payment::TYPE_INCOME)
+    ->where('status', '=', Payment::STATUS_SUCCESS)
     ->where('subordinated', '=', $subordinated);
 
 //Общая сумма расходов

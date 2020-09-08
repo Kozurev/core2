@@ -16,7 +16,9 @@
             <td><xsl:value-of select="phone_number" /><br/></td>
 
             <td>
-                <span data-areas="User_{id}"><xsl:apply-templates select="schedule_area_assignment" /></span>
+                <span data-areas="User_{id}" style="display: block;max-height: 80px;overflow-y: auto;">
+                    <xsl:apply-templates select="schedule_area_assignment" />
+                </span>
             </td>
 
             <td width="140px" class="right">

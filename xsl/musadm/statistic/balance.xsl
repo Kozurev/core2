@@ -1,7 +1,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <div class="col-lg-4">
+<!--        <div class="col-lg-4">-->
             <!--<h3>Баланс и кол-во занятий</h3>-->
             <table class="table table-hover table-bordered statistic_lessons_table">
                 <tr>
@@ -40,7 +40,7 @@
                     <td><xsl:value-of select="avgAge" /></td>
                 </tr>
             </table>
-        </div>
+<!--        </div>-->
     </xsl:template>
 
 

@@ -1,7 +1,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <div class="col-lg-4">
+<!--        <div class="col-lg-4">-->
             <!--<h3>Занятия</h3>-->
             <table class="table table-bordered table-hover statistic_lessons_table">
                 <tr>
@@ -37,7 +37,7 @@
                     </td>
                 </tr>
             </table>
-        </div>
+<!--        </div>-->
     </xsl:template>
 
 

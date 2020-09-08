@@ -231,6 +231,9 @@ $avgGroupCost = $avgGroupCost->find();
 $avgIndivCost = is_object($avgIndivCost) && !is_null($avgIndivCost->value) ? round($avgIndivCost->value, 0) : 0;
 $avgGroupCost = is_object($avgGroupCost) && !is_null($avgGroupCost->value) ? round($avgGroupCost->value, 0) : 0;
 
+//echo '<div class="row">';
+echo '<div class="col-lg-4">';
+
 (new Core_Entity())
     ->addSimpleEntity('balance', $sum)
     ->addSimpleEntity('indiv_pos', $indiv_lessons_pos)
@@ -242,7 +245,6 @@ $avgGroupCost = is_object($avgGroupCost) && !is_null($avgGroupCost->value) ? rou
     ->addSimpleEntity('avgGroupMediana', $avgGroupCost)
     ->xsl('musadm/statistic/balance.xsl')
     ->show();
-
 
 /**
  * Статистика по проведенным занятиям
@@ -306,98 +308,10 @@ $countDaysInterval == 0
     ->xsl('musadm/statistic/lessons.xsl')
     ->show();
 
-/**
- * Статистика по выплатам преподавателям
- */
-$queryString = (new Orm())
-    ->select('sum(value)', 'sum')
-    ->from('Payment')
-    ->where('type', '=', 3)
-    ->where('Payment.subordinated', '=', $subordinated)
-    ->join('User as u', 'Payment.user = u.id')
-    ->join(
-        'Schedule_Area_Assignment as saa',
-        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
-    );
+echo '</div>';
 
-if ($dateFrom == $dateTo) {
-    $queryString->where('datetime', '=', $dateFrom);
-} else {
-    $queryString->where('datetime', '>=', $dateFrom);
-    $queryString->where('datetime', '<=', $dateTo);
-}
 
-$queryString = $queryString->getQueryString();
-$result = Orm::execute($queryString);
-$result = $result->fetch();
-if ($result['sum'] == null) {
-    $sum = 0;
-} else {
-    $sum = $result['sum'];
-}
-
-(new Core_Entity())
-    ->addSimpleEntity('total_sum', $sum)
-    ->xsl('musadm/statistic/teacher_payments.xsl')
-    ->show();
-
-/**
- * Статистика по доходам, расходам и прибыли
- */
-$finances = (new Schedule_Lesson_Report())->queryBuilder()
-    ->join('User AS u', 'teacher_id = u.id')
-    ->where('u.subordinated', '=', $subordinated)
-    ->join(
-        'Schedule_Lesson as lesson',
-        'lesson.id = lesson_id AND lesson.area_id in (' . implode(', ', $areaIds) . ')'
-    );
-
-//Хозрасходы
-$hostExpenses = (new Payment())->queryBuilder()
-    ->select('sum(Payment.value)', 'value')
-    ->join('Payment_Type as t', 'Payment.type = t.id')
-    ->where('t.subordinated', '=', $subordinated)
-    ->where('Payment.subordinated', '=', $subordinated)
-    ->whereIn('area_id', $areaIds);
-
-if ($dateFrom == $dateTo) {
-    $finances->where('date', '=', $dateFrom);
-    $hostExpenses->where('datetime', '=', $dateFrom);
-} else {
-    $finances->where('date', '>=', $dateFrom);
-    $finances->where('date', '<=', $dateTo);
-    $hostExpenses->where('datetime', '>=', $dateFrom);
-    $hostExpenses->where('datetime', '<=', $dateTo);
-}
-
-$income =   clone $finances->select('sum(client_rate)', 'value');
-$expenses = clone $finances->select('sum(teacher_rate)', 'value');
-$profit =   clone $finances->select('sum(total_rate)', 'value');
-$income =   $income->find()->value;
-$expenses = $expenses->find()->value;
-$profit =   $profit->find()->value;
-$hostExpenses = $hostExpenses->find()->value();
-
-if (is_null($income)) {
-    $income = 0;
-}
-if (is_null($expenses)) {
-    $expenses = 0;
-}
-if (is_null($profit)) {
-    $profit = 0;
-}
-if (is_null($hostExpenses)) {
-    $hostExpenses = 0;
-}
-
-(new Core_Entity())
-    ->addSimpleEntity('income', $income)
-    ->addSimpleEntity('expenses', $expenses)
-    ->addSimpleEntity('profit', $profit)
-    ->addSimpleEntity('host_expenses', $hostExpenses)
-    ->xsl('musadm/statistic/lessons_income.xsl')
-    ->show();
+echo '<div class="col-lg-4">';
 
 /**
  * Статистика по активным клиентам
@@ -408,8 +322,8 @@ $userCountQuery = (new User())->queryBuilder()
     ->where('subordinated', '=', $subordinated)
     ->where('active', '=', 1)
     ->join(
-    'Schedule_Area_Assignment as saa',
-    'User.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
+        'Schedule_Area_Assignment as saa',
+        'User.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
     );
 
 $reportTableName = (new Schedule_Lesson_Report())->getTableName();
@@ -498,3 +412,117 @@ $percentLeaveClient =  (round(((count($countLeaveClient) / $userCount)*100),2)).
     ->addEntities($userActivityList,'userActivityList')
     ->xsl('musadm/statistic/archive_clients.xsl')
     ->show();
+
+echo '</div>';
+
+echo '<div class="col-lg-4">';
+
+/**
+ * Статистика по выплатам преподавателям
+ */
+$queryString = (new Orm())
+    ->select('sum(value)', 'sum')
+    ->from('Payment')
+    ->where('Payment.subordinated', '=', $subordinated)
+    ->join('User as u', 'Payment.user = u.id')
+    ->join(
+        'Schedule_Area_Assignment as saa',
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
+    );
+
+if ($dateFrom == $dateTo) {
+    $queryString->where('datetime', '=', $dateFrom);
+} else {
+    $queryString->where('datetime', '>=', $dateFrom);
+    $queryString->where('datetime', '<=', $dateTo);
+}
+
+$salaryQuery = (clone $queryString)->where('type', '=', Payment::TYPE_TEACHER);
+$bonusesQuery = (clone $queryString)->where('type', '=', Payment::TYPE_BONUS_PAY);
+
+$salary = Orm::execute($salaryQuery->getQueryString())->fetch();
+$bonuses = Orm::execute($bonusesQuery->getQueryString())->fetch();
+$salary = intval($salary['sum'] ?? 0);
+$bonuses = intval($bonuses['sum'] ?? 0);
+
+(new Core_Entity())
+    ->addSimpleEntity('salary', $salary)
+    ->addSimpleEntity('bonuses', $bonuses)
+    ->xsl('musadm/statistic/teacher_payments.xsl')
+    ->show();
+
+echo '</div>';
+
+echo '<div class="col-lg-4">';
+
+/**
+ * Статистика по доходам, расходам и прибыли
+ */
+$finances = Schedule_Lesson_Report::query()
+    ->join('User AS u', 'teacher_id = u.id')
+    ->where('u.subordinated', '=', $subordinated)
+    ->join(
+        'Schedule_Lesson as lesson',
+        'lesson.id = lesson_id AND lesson.area_id in (' . implode(', ', $areaIds) . ')'
+    );
+
+//Хозрасходы
+$hostExpenses = Payment::query()
+    ->select('sum(Payment.value)', 'value')
+    ->join('Payment_Type as t', 'Payment.type = t.id')
+    ->where('t.subordinated', '=', $subordinated)
+    ->where('t.is_deletable', '=', 1)
+    ->where('Payment.subordinated', '=', $subordinated)
+    ->whereIn('area_id', $areaIds);
+
+$deposits = Payment::query()
+    ->where('type', '=', Payment::TYPE_INCOME)
+    ->where('subordinated', '=', $subordinated)
+    ->where('status', '=', Payment::STATUS_SUCCESS)
+    ->whereIn('area_id', $areaIds);
+
+if ($dateFrom == $dateTo) {
+    $finances->where('date', '=', $dateFrom);
+    $hostExpenses->where('datetime', '=', $dateFrom);
+    $deposits->where('datetime', '=', $dateFrom);
+} else {
+    $finances->where('date', '>=', $dateFrom);
+    $finances->where('date', '<=', $dateTo);
+    $hostExpenses->where('datetime', '>=', $dateFrom);
+    $hostExpenses->where('datetime', '<=', $dateTo);
+    $deposits->where('datetime', '>=', $dateFrom);
+    $deposits->where('datetime', '<=', $dateTo);
+}
+
+$income =   (clone $finances)->select('sum(client_rate)', 'value');
+$expenses = (clone $finances)->select('sum(teacher_rate)', 'value');
+$profit =   (clone $finances)->select('sum(total_rate)', 'value');
+$income =   $income->find()->value;
+$expenses = $expenses->find()->value;
+$profit =   $profit->find()->value;
+$hostExpenses = $hostExpenses->find()->value();
+$deposits = (int)$deposits->sum('value');
+
+if (is_null($income)) {
+    $income = 0;
+}
+if (is_null($expenses)) {
+    $expenses = 0;
+}
+if (is_null($profit)) {
+    $profit = 0;
+}
+if (is_null($hostExpenses)) {
+    $hostExpenses = 0;
+}
+
+(new Core_Entity())
+    ->addSimpleEntity('income', $income)
+    ->addSimpleEntity('expenses', $expenses)
+    ->addSimpleEntity('profit', $profit)
+    ->addSimpleEntity('deposits', $deposits)
+    ->addSimpleEntity('host_expenses', $hostExpenses)
+    ->xsl('musadm/statistic/lessons_income.xsl')
+    ->show();
+
+echo '</div>';
