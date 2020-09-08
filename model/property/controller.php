@@ -43,6 +43,15 @@ class Property_Controller
             return null;
         }
 
+        if (is_null(self::$properties)) {
+            self::$properties = Property::query()->get();
+        }
+        if (is_null($type) && !is_null($id)) {
+            return self::$properties->filter(function(Property $property) use ($id) {
+                return $property->getId() == $id;
+            })->first();
+        }
+
         is_null($type)
             ?   $className = 'Property'
             :   $className = 'Property_' . $type;

@@ -526,7 +526,7 @@ class Controller
                 $this->properties = [];
             }
             foreach ($properties as $propId) {
-                $Property = Core::factory('Property', $propId);
+                $Property = Property_Controller::factory($propId);
                 if (!is_null($Property)) {
                     $this->properties[] = $Property;
                 }
@@ -535,7 +535,7 @@ class Controller
             if (!is_array($this->properties)) {
                 $this->properties = [];
             }
-            $Property = Core::factory('Property', $properties);
+            $Property = Property_Controller::factory($properties);
             if (!is_null($Property)) {
                 $this->properties[] = $Property;
             }
