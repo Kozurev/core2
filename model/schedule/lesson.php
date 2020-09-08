@@ -5,6 +5,10 @@
  * @author: Kozurev Egor
  * @date 24.04.2018 19:57
  * @version 20190403
+ *
+ * @method static Schedule_Lesson|null find(int $id)
+ *
+ * Class Schedule_Lesson
  */
 class Schedule_Lesson extends Schedule_Lesson_Model
 {

@@ -201,16 +201,4 @@ Core::attachObserver('before.UserControllerExtended.show', function($args) {
 
 $ClientController->show();
 
-
 Core::detachObserver('before.UserControllerExtended.show');
-
-//Список менеджеров для директора
-//if ($groupId == ROLE_MANAGER && Core_Access::instance()->hasCapability(Core_Access::USER_READ_MANAGERS)) {
-//    $TeacherController = new User_Controller(User_Auth::current());
-//    $TeacherController
-//        ->properties(true)
-//        ->groupId(2)
-//        ->addSimpleEntity('page-theme-color', 'primary')
-//        ->xsl('musadm/users/managers.xsl')
-//        ->show();
-//}

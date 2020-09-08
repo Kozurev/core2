@@ -1,4 +1,7 @@
 <?php
+
+use Tightenco\Collect\Support\Collection;
+
 /**
  * Класс-контроллер для работы с доп. свойствами
  *
@@ -10,6 +13,7 @@
  */
 class Property_Controller
 {
+    protected static ?Collection $properties = null;
 
     //Возможные типы доп. свойств для параметра $type метода factory
     const TYPE_INT =    'Int';
@@ -19,7 +23,7 @@ class Property_Controller
     const TYPE_LIST =   'List';
 
     //Список возможных типов доп. свойств
-    private static $types = [
+    private static array $types = [
         self::TYPE_INT,
         self::TYPE_STRING,
         self::TYPE_BOOL,
@@ -59,7 +63,12 @@ class Property_Controller
      */
     public static function factoryByTag(string $tagName)
     {
-        return Core::factory('Property')->getByTagName($tagName);
+        if (is_null(self::$properties)) {
+            self::$properties = Property::query()->get();
+        }
+        return self::$properties->filter(function(Property $property) use ($tagName) {
+            return $property->tagName() == $tagName;
+        })->first();
     }
 
 
@@ -81,7 +90,7 @@ class Property_Controller
             ->where('id', '=', $id);
 
         if ($isSubordinate === true) {
-            $AuthUser = User::current();
+            $AuthUser = User_Auth::current();
             if (is_null($AuthUser)) {
                 return null;
             }

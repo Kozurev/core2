@@ -5,6 +5,9 @@
  * @author BadWolf
  * @date 24.04.2018 19:59
  * @version 20190304
+ *
+ * @method static Schedule_Group|null find(int $id)
+ *
  * Class Schedule_Group
  */
 class Schedule_Group extends Schedule_Group_Model

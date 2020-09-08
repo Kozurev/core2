@@ -14,14 +14,12 @@ class Schedule_Room_Model extends Core_Entity
      */
     protected $id;
 
-
     /**
      * Название класса в филиале
      *
      * @var string
      */
     protected $title = '';
-
 
     /**
      * id филиала, которому принадлежит класс
@@ -30,14 +28,12 @@ class Schedule_Room_Model extends Core_Entity
      */
     protected $area_id = 0;
 
-
     /**
      * Порядковый номер класса
      *
      * @var int
      */
     protected $class_id = 0;
-
 
     /**
      * @param string|null $title
@@ -53,7 +49,6 @@ class Schedule_Room_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param int|null $areaId
      * @return $this|int
@@ -68,7 +63,6 @@ class Schedule_Room_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param int|null $classId
      * @return $this|int
@@ -82,7 +76,6 @@ class Schedule_Room_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @return array

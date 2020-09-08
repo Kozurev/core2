@@ -5,10 +5,11 @@
  * @author BadWolf
  * @version 20191020
  * @version 20191027 - методы, связанные с авторизацией, вынесены теперь в отдельный класс
+ *
+ * @method static User|null find(int $id)
+ *
  * Class User
  */
-
-
 class User extends User_Model
 {
 

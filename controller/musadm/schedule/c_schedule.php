@@ -7,22 +7,22 @@
  * @version 20190418
  * @version 20190526
  * @version 20190811
+ * @version 20200908 - оптимизация sql запросов
  */
 
 $userId = Core_Array::Get('userid', null, PARAM_INT);
 is_null($userId)
-    ?   $User = User_Auth::current()
-    :   $User = User_Controller::factory($userId);
-$userId = $User->getId();
-
+    ?   $user = User_Auth::current()
+    :   $user = User_Controller::factory($userId);
+$userId = $user->getId();
 
 $today = date('Y-m-d');
 $date = Core_Array::Get('date', $today, PARAM_STRING);
 
-$isTeacher = $User->groupId() == ROLE_TEACHER;
+$isTeacher = $user->groupId() == ROLE_TEACHER;
 
 //Формирование таблицы расписания для менеджеров
-if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGER]], $User)
+if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGER]], $user)
     && is_object(Core_Page_Show::instance()->StructureItem)
 ) {
     //права доступа
@@ -31,14 +31,14 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
     $accessDelete = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_DELETE);
     $accessAbsent = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_CREATE);
 
-    $Area = Core_Page_Show::instance()->StructureItem;
-    $areaId = $Area->getId();
+    /** @var Schedule_Area $area */
+    $area = Core_Page_Show::instance()->StructureItem;
+    $areaId = $area->getId();
 
-    $Date = new DateTime($date);
-    $dayName = $Date->format('l');
+    $dateTime = new DateTime($date);
+    $dayName = $dateTime->format('l');
 
-    $Lessons = Core::factory('Schedule_Lesson')
-        ->queryBuilder()
+    $lessons = Schedule_Lesson::query()
         ->open()
             ->where('delete_date', '>', $date)
             ->orWhere('delete_date', 'IS', 'NULL')
@@ -46,61 +46,88 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
         ->where('area_id', '=', $areaId)
         ->orderBy('time_from');
 
-    $CurrentLessons = clone $Lessons;
-    $CurrentLessons
+    $currentLessons = (clone $lessons)
         ->where('insert_date', '=', $date)
         ->where('lesson_type', '=', Schedule_Lesson::SCHEDULE_CURRENT);
 
-    $Lessons
+    $lessons
         ->where('insert_date', '<=', $date)
         ->where('day_name', '=', $dayName)
         ->where('lesson_type', '=', Schedule_Lesson::SCHEDULE_MAIN);
 
-    $Lessons = $Lessons->findAll();
-    $CurrentLessons = $CurrentLessons->findAll();
+    $lessons = $lessons->findAll();
+    $currentLessons = $currentLessons->findAll();
 
-    foreach ($Lessons as $key => $Lesson) {
-        if ($Lesson->isAbsent($date)) {
+    //Все id отмененных занятий на стекущую дату
+    $lessonsAbsents = (new Orm())
+        ->select('lesson_id')
+        ->from((new Schedule_Lesson_Absent())->getTableName())
+        ->join((new Schedule_Lesson())->getTableName() . ' l', 'l.id = lesson_id and l.area_id = ' . $areaId)
+        ->where('date', '=', $date)
+        ->get();
+
+    //все периоды отсутствия на текущую дату
+    $clientsAbsents = Schedule_Absent::query()
+        ->select(['object_id', 'type_id', 'date_from', 'date_to'])
+        ->where('date_from', '<=', $date)
+        ->where('date_to', '>=', $date)
+        ->get();
+
+    //все изменения по времени на текущую дату
+    $timeModifies = Schedule_Lesson_TimeModified::query()
+        ->join((new Schedule_Lesson())->getTableName() . ' as l', 'l.id = lesson_id and l.area_id = ' . $areaId)
+        ->where('date', '=', $date)
+        ->findAll(true);
+
+    //Все отправленные отчеты по занятиям
+    $reports = Schedule_Lesson_Report::query()
+        ->select('lesson_id')
+        ->join((new Schedule_Lesson())->getTableName() . ' l', 'l.id = lesson_id and l.area_id = ' . $areaId)
+        ->where('date', '=', $date)
+        ->findAll(true);
+
+    /**
+     * @var int $key
+     * @var Schedule_Lesson $lesson
+     */
+    foreach ($lessons as $key => $lesson) {
+        if (isLessonAbsent($lesson, $lessonsAbsents, $clientsAbsents)) {
             continue;
         }
 
         //Если у занятия изменено время на текущую дату то необходимо установить актуальное время
         //и добавить его в список занятий текущего расписания
-        if ($Lesson->isTimeModified($date)) {
-            $Modify = Core::factory('Schedule_Lesson_TimeModified')
-                ->queryBuilder()
-                ->where('lesson_id', '=', $Lesson->getId())
-                ->where('date', '=', $date)
-                ->find();
+        if (isset($timeModifies[$lesson->getId()])) {
+            $modify = $timeModifies[$lesson->getId()];
 
-            $NewCurrentLesson = Core::factory('Schedule_Lesson')
-                ->timeFrom($Modify->timeFrom())
-                ->timeTo($Modify->timeTo())
-                ->classId($Lesson->classId())
-                ->areaId($Lesson->areaId())
-                ->teacherId($Lesson->teacherId())
-                ->clientId($Lesson->clientId())
-                ->lessonType($Lesson->lessonType())
-                ->typeId($Lesson->typeId());
-            $NewCurrentLesson->oldid = $Lesson->getId();
-            $CurrentLessons[] = $NewCurrentLesson;
+            $newCurrentLesson = (new Schedule_Lesson)
+                ->timeFrom($modify->timeFrom())
+                ->timeTo($modify->timeTo())
+                ->classId($lesson->classId())
+                ->areaId($lesson->areaId())
+                ->teacherId($lesson->teacherId())
+                ->clientId($lesson->clientId())
+                ->lessonType($lesson->lessonType())
+                ->typeId($lesson->typeId());
+            $newCurrentLesson->oldid = $lesson->getId();
+            $currentLessons[] = $newCurrentLesson;
         } else {
-            $CurrentLessons[] = $Lesson;
+            $currentLessons[] = $lesson;
         }
     }
 
 
     echo "<div class='table-responsive'><table class='table table-bordered manager_table'>";
     echo "<tr>";
-    for ($i = 1; $i <= $Area->countClasses(); $i++) {
-        $className = $Area->getClassName($i, 'Класс ' . $i);
+    for ($i = 1; $i <= $area->countClasses(); $i++) {
+        $className = $area->getClassName($i, 'Класс ' . $i);
         echo "<th colspan='3' class='schedule_class' 
-            onclick='scheduleEditClassName(" . $Area->getId() . ", " . $i . ", this)'>$className</th>";
+            onclick='scheduleEditClassName(" . $area->getId() . ", " . $i . ", this)'>$className</th>";
     }
     echo "</tr>";
 
     echo "<tr>";
-    for ($i = 1; $i <= $Area->countClasses(); $i++) {
+    for ($i = 1; $i <= $area->countClasses(); $i++) {
         echo "<th>Время</th>";
 
         $thClass = $accessCreate ? 'add_lesson' : '';
@@ -137,13 +164,13 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
     $time = $timeStart;
     $maxLessonTime = [];
 
-    $LessonDate = new DateTime($date);
-    $CurrentDate = new DateTime($today);
-    $lessonTime = $LessonDate->format('U');
-    $currentTime = $CurrentDate->format('U');
+    $lessonDate = new DateTime($date);
+    $currentDate = new DateTime($today);
+    $lessonTime = $lessonDate->format('U');
+    $currentTime = $currentDate->format('U');
 
     for ($i = 0; $i <= 1; $i++) {
-        for ($class = 1; $class <= $Area->countClasses(); $class++) {
+        for ($class = 1; $class <= $area->countClasses(); $class++) {
             $maxLessonTime[$i][$class] = '00:00:00';
         }
     }
@@ -152,7 +179,7 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
     while (!compareTime($time, '>=', addTime($timeEnd, $period))) {
         echo '<tr>';
 
-        for ($class = 1; $class <= $Area->countClasses(); $class++) {
+        for ($class = 1; $class <= $area->countClasses(); $class++) {
             if (!compareTime($time, '>=', $maxLessonTime[0][$class])
                 && !compareTime($time, '>=', $maxLessonTime[1][$class])
             ) {
@@ -165,13 +192,13 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                 echo '<th>' . refactorTimeFormat($time) . '</th>';
             } else {
                 //Урок из основного расписания
-                $MainLesson = array_pop_lesson($Lessons, $time, $class);
+                $mainLesson = array_pop_lesson($lessons, $time, $class);
 
-                if ($MainLesson === false) {
+                if ($mainLesson === false) {
                     echo '<th>' . refactorTimeFormat($time) . '</th>';
                     echo '<td class="clear"></td>';
                 } else {
-                    $minutes = deductTime($MainLesson->timeTo(), $time);
+                    $minutes = deductTime($mainLesson->timeTo(), $time);
                     $rowspan = divTime($minutes, $period, '/');
 
                     if (divTime($minutes, $period, '%')) {
@@ -179,7 +206,6 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                     }
 
                     $tmpTime = $time;
-
                     for ($i = 0; $i < $rowspan; $i++) {
                         $tmpTime = addTime($tmpTime, $period);
                     }
@@ -187,34 +213,28 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                     $maxLessonTime[0][$class] = $tmpTime;
 
                     //Проверка периода отсутствия
-                    if ($MainLesson !== false) {
-                        $checkClientAbsent = Core::factory('Schedule_Absent')
-                            ->queryBuilder()
-                            ->where('object_id', '=', $MainLesson->clientId())
-                            ->where('date_from', '<=', $date)
-                            ->where('date_to', '>=', $date)
-                            ->where('type_id', '=', $MainLesson->typeId())
-                            ->find();
-                    }
+                    $checkClientAbsent = $clientsAbsents->where('type_id', '=', $mainLesson->typeId())
+                        ->where('object_id', '=', $mainLesson->clientId())
+                        ->first();
 
                     //Получение информации об уроке (учитель, клиент, цвет фона)
-                    $MainLessonData = getLessonData($MainLesson);
-                    $isVisibleData = !$isTeacher || $MainLesson->teacherId() == $userId;
+                    $mainLessonData = getLessonData($mainLesson);
+                    $isVisibleData = !$isTeacher || $mainLesson->teacherId() == $userId;
 
                     echo '<th>' . refactorTimeFormat($time) . '</th>';
-                    echo "<td class='" . ($isVisibleData ? $MainLessonData['client_status'] : 'disabled') . "' rowspan='" . $rowspan . "'>";
+                    echo "<td class='" . ($isVisibleData ? $mainLessonData['client_status'] : 'disabled') . "' rowspan='" . $rowspan . "'>";
 
                     if ($isVisibleData) {
                         if ($checkClientAbsent == true) {
                             echo "<span><b>Отсутствует <br> с " . refactorDateFormat($checkClientAbsent->dateFrom(), ".", 'short') . "
                                 по " . refactorDateFormat($checkClientAbsent->dateTo(), ".", 'short') . "</b></span><hr>";
-                        } elseif ($MainLesson->isAbsent($date)) {
+                        } elseif ($lessonsAbsents->contains('lesson_id', $mainLesson->getId())) {
                             echo '<span><b>Отсутствует сегодня</b></span><hr>';
                         }
 
-                        echo "<span class='client'>" . $MainLessonData['client'] . "</span>";
-                        if ($User->getId() != $MainLesson->teacherId()) {
-                            echo "<hr><span class='teacher'>преп. " . $MainLessonData['teacher'] . "</span>";
+                        echo "<span class='client'>" . $mainLessonData['client'] . "</span>";
+                        if ($user->getId() != $mainLesson->teacherId()) {
+                            echo "<hr><span class='teacher'>преп. " . $mainLessonData['teacher'] . "</span>";
                         }
                     }
 
@@ -223,14 +243,14 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                         <li>
                             <a href=\"#\"></a>
                             <ul class=\"dropdown\"";
-                        echo "data-clientid='" . $MainLesson->clientId() . "' data-typeid='" . $MainLesson->typeId() . "'";
-                        echo " data-lessonid='" . $MainLesson->getId() . "'>";
+                        echo "data-clientid='" . $mainLesson->clientId() . "' data-typeid='" . $mainLesson->typeId() . "'";
+                        echo " data-lessonid='" . $mainLesson->getId() . "'>";
                         if ($accessAbsent) {
                             echo "<li><a href=\"#\" class='schedule_absent'>Временно отсутствует</a></li>";
                         }
                         if ($accessDelete) {
                             echo "<li>
-                                <a href=\"#\" class='schedule_delete_main' data-date='" . $date . "' data-id='" . $MainLesson->getId() . "'>
+                                <a href=\"#\" class='schedule_delete_main' data-date='" . $date . "' data-id='" . $mainLesson->getId() . "'>
                                     Удалить из основного графика
                                 </a>
                             </li>";
@@ -241,7 +261,7 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                     </ul>";
                     }
 
-                    if ($MainLesson->isOnline()) {
+                    if ($mainLesson->isOnline()) {
                         echo '<hr><b><span>Онлайн</span></b>';
                     }
                     echo "</td>";
@@ -251,49 +271,45 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
             //Текущее расписание
             if (compareTime($time, '>=', $maxLessonTime[1][$class])) {
                 //Урок из текущего расписания
-                $CurrentLesson = array_pop_lesson($CurrentLessons, $time, $class);
-
+                $currentLesson = array_pop_lesson($currentLessons, $time, $class);
                 //Текущий урок
-                if ($CurrentLesson !== false) {
+                if ($currentLesson !== false) {
                     //Поиск высоты ячейки (значение тэга rowspan) и обновление $maxLessonTime
-                    $rowspan = updateLastLessonTime($CurrentLesson, $maxLessonTime[1][$class], $time, $period);
+                    $rowspan = updateLastLessonTime($currentLesson, $maxLessonTime[1][$class], $time, $period);
                     //Получение информации об текущем уроке (учитель, клиент, цвет фона)
-                    $CurrentLessonData = getLessonData($CurrentLesson);
-
-                    $isVisibleData = !$isTeacher || $CurrentLesson->teacherId() == $userId;
-
-                    echo "<td class='" . ($isVisibleData ? $CurrentLessonData["client_status"] : 'disabled') . "' rowspan='" . $rowspan . "'>";
-
+                    $currentLessonData = getLessonData($currentLesson);
+                    $isVisibleData = !$isTeacher || $currentLesson->teacherId() == $userId;
+                    echo "<td class='" . ($isVisibleData ? $currentLessonData["client_status"] : 'disabled') . "' rowspan='" . $rowspan . "'>";
                     if ($isVisibleData) {
                         if (isset($CurrentLesson->oldid)) {
                             echo "<span><b>Временно</b></span><hr>";
                         }
-                        echo "<span class='client'>" . $CurrentLessonData['client'] . "</span>";
+                        echo "<span class='client'>" . $currentLessonData['client'] . "</span>";
 
-                        if ($User->getId() !== $CurrentLesson->teacherId()) {
-                            echo "<hr><span class='teacher'>преп. " . $CurrentLessonData['teacher'] . "</span>";
+                        if ($user->getId() !== $currentLesson->teacherId()) {
+                            echo "<hr><span class='teacher'>преп. " . $currentLessonData['teacher'] . "</span>";
                         }
                     }
 
-                    if (!$CurrentLesson->isReported($date) && $accessEdit && $isVisibleData) {
+                    if (!isset($reports[$currentLesson->getId()]) && $accessEdit && $isVisibleData) {
                         echo "<ul class=\"submenu\">
                         <li>
                             <a href=\"#\"></a>
-                            <ul class=\"dropdown\" data-userid='" . $User->getId() . "' data-date='" . $date . "' ";
+                            <ul class=\"dropdown\" data-userid='" . $user->getId() . "' data-date='" . $date . "' ";
 
-                        isset($CurrentLesson->oldid)
-                            ?   $dataId = $CurrentLesson->oldid
-                            :   $dataId = $CurrentLesson->getId();
+                        isset($currentLesson->oldid)
+                            ?   $dataId = $currentLesson->oldid
+                            :   $dataId = $currentLesson->getId();
 
                         echo "data-id='" . $dataId . "' ";
-                        echo "data-type='" . $CurrentLesson->lessonType() . "'>";
+                        echo "data-type='" . $currentLesson->lessonType() . "'>";
                         echo "
                                     <li><a href=\"#\" class='schedule_today_absent'>Отсутствует сегодня</a></li>
                                     <li><a href=\"#\" class='schedule_update_time'>Изменить на сегодня время</a></li>
                                 </ul>
                             </li>
                         </ul>";
-                        if ($CurrentLesson->isOnline()) {
+                        if ($currentLesson->isOnline()) {
                             echo '<hr><b><span>Онлайн</span></b>';
                         }
                         echo "</td>";
@@ -303,8 +319,8 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                 }
             }
 
-            $CurrentLesson = false;
-            $MainLesson = false;
+            $currentLesson = false;
+            $mainLesson = false;
             $rowspan = 0;
             $checkClientAbsent = false;
         }
@@ -314,7 +330,7 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
     }
 
     echo "<tr>";
-    for ($i = 1; $i <= $Area->countClasses(); $i++) {
+    for ($i = 1; $i <= $area->countClasses(); $i++) {
         echo "<th>Время</th>";
         echo "<th class='".$thClass."' 
             title='Добавить занятие в основной график'
@@ -336,10 +352,10 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
     echo "</tr>";
 
     echo "<tr>";
-    for ($i = 1; $i <= $Area->countClasses(); $i++) {
-        $className = $Area->getClassName($i, 'Класс ' . $i);
+    for ($i = 1; $i <= $area->countClasses(); $i++) {
+        $className = $area->getClassName($i, 'Класс ' . $i);
         echo "<th colspan='3' class='schedule_class' 
-            onclick='scheduleEditClassName(" . $Area->getId() . ", " . $i . ", this)'>$className</th>";
+            onclick='scheduleEditClassName(" . $area->getId() . ", " . $i . ", this)'>$className</th>";
     }
     echo "</tr>";
     echo '</table></div>';
@@ -351,9 +367,9 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
  */
 if (Core_Access::instance()->hasCapability(Core_Access::AREA_READ) && !Core_Page_Show::instance()->StructureItem) {
     global $CFG;
-    $Areas = Schedule_Area_Controller::factory()->getList(true, false);
-    Core::factory('Core_Entity')
-        ->addEntities($Areas)
+    $areas = Schedule_Area_Controller::factory()->getList(true, false);
+    (new Core_Entity)
+        ->addEntities($areas)
         ->addSimpleEntity('wwwroot', $CFG->rootdir)
         ->addSimpleEntity('access_area_create', (int)Core_Access::instance()->hasCapability(Core_Access::AREA_CREATE))
         ->addSimpleEntity('access_area_edit', (int)Core_Access::instance()->hasCapability(Core_Access::AREA_EDIT))

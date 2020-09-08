@@ -4,6 +4,11 @@
  */
 class Constant extends Constant_Model
 {
+    const TYPE_INT = 1;
+    const TYPE_FLOAT = 2;
+    const TYPE_BOOL = 3;
+    const TYPE_STRING = 4;
+
     /**
      * @return Constant_Dir|null
      */
@@ -24,29 +29,24 @@ class Constant extends Constant_Model
 	*/
 	public static function setAllConstants()
 	{
-		$Constants = Core::factory('Constant');
-		$Constants = $Constants->queryBuilder()
+		$constants = self::query()
             ->where('active', '=', 1)
 			->findAll();
 
-		foreach ($Constants as $const) {
+		/** @var Constant $const */
+        foreach ($constants as $const) {
             $constName = $const->name();
             $val = $const->value();
-            $ValueType = Core::factory('Constant_Type', $const->valueType());
 
-            if (is_null($ValueType)) {
-                exit ('Тип константы с id ' . $const->valueType() . ' не найдена');
-            }
-
-            switch ($ValueType->title())
+            switch ($const->valueType())
             {
-                case PARAM_BOOL:
+                case self::TYPE_BOOL:
                     define($constName, boolval($val));
                     break;
-                case PARAM_INT:
+                case self::TYPE_INT:
                     define($constName, intval($val));
                     break;
-                case PARAM_FLOAT:
+                case self::TYPE_FLOAT:
                     define($constName, floatval($val));
                     break;
                 default:

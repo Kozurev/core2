@@ -6,8 +6,10 @@
  * @date: 13.04.2018 13:52
  * @version 20190326
  * @version 20190414
+ * @version 20200908 - добавлен новый файл наблюдателей
  */
 
+require_once 'database.php';
 require_once 'subordinated.php';
 require_once 'events.php';
 
@@ -16,13 +18,13 @@ require_once 'events.php';
  * Добавление ФИО преподавателя в список дополнительного свойства "Преподаватель"
  */
 Core::attachObserver('before.User.insert', function($args) {
-    $User = $args[0];
+    $user = $args[0];
 
-    $Director = User::current()->getDirector();
-    $subordinated = $Director->getId();
+    $director = User_Auth::current()->getDirector();
+    $subordinated = $director->getId();
 
-    if ($User->groupId() == ROLE_TEACHER) {
-        $teacherFullName = $User->surname() . ' ' . $User->name();
+    if ($user->groupId() == ROLE_TEACHER) {
+        $teacherFullName = $user->surname() . ' ' . $user->name();
         Core::factory('Property_List_Values')
             ->propertyId(21)
             ->value($teacherFullName)
@@ -32,20 +34,19 @@ Core::attachObserver('before.User.insert', function($args) {
 
     //TODO: добавить обработчик ещё и для редактирования учетной записи преподавателя. Если измениться его имя или фамилия то элемент списка свойства 'преподаватели' не изменится
 
-    if ($User->groupId() != ROLE_DIRECTOR && $User->groupId() != ROLE_ADMIN) {
-        $User->subordinated($subordinated);
+    if ($user->groupId() != ROLE_DIRECTOR && $user->groupId() != ROLE_ADMIN) {
+        $user->subordinated($subordinated);
     }
 });
 
 
 Core::attachObserver('before.User.activate', function($args) {
-    $User = $args[0];
+    $user = $args[0];
+    $director = User_Auth::current()->getDirector();
+    $subordinated = $director->getId();
 
-    $Director = User::current()->getDirector();
-    $subordinated = $Director->getId();
-
-    if ($User->groupId() == ROLE_TEACHER) {
-        $teacherFullName = $User->surname() . ' ' . $User->name();
+    if ($user->groupId() == ROLE_TEACHER) {
+        $teacherFullName = $user->surname() . ' ' . $user->name();
         Core::factory('Property_List_Values')
             ->propertyId(21)
             ->value($teacherFullName)
@@ -59,18 +60,18 @@ Core::attachObserver('before.User.activate', function($args) {
  * Удаление пункта списка дополнительного свойства "Преподаватель"
  */
 Core::attachObserver('before.User.delete', function($args) {
-    $User = $args[0];
+    $user = $args[0];
 
-    if ($User->groupId() == ROLE_TEACHER) {
-        $Director = User::current()->getDirector();
-        $subordinated = $Director->getId();
+    if ($user->groupId() == ROLE_TEACHER) {
+        $director = User_Auth::current()->getDirector();
+        $subordinated = $director->getId();
 
         $listValue = Core::factory('Property_List_Values')
             ->queryBuilder()
             ->where('property_id', '=', 21)
             ->where('subordinated', '=', $subordinated)
-            ->where('value', 'like', '%' . $User->name() . '%')
-            ->where('value', 'like', '%' . $User->surname() . '%')
+            ->where('value', 'like', '%' . $user->name() . '%')
+            ->where('value', 'like', '%' . $user->surname() . '%')
             ->find();
 
         if (!is_null($listValue)) {
@@ -78,23 +79,22 @@ Core::attachObserver('before.User.delete', function($args) {
         }
     }
 
-    Core::factory('Property')->clearForObject($User);
+    Property::purgeForObject($user);
 });
 
 
 Core::attachObserver('before.User.deactivate', function($args) {
-    $User = $args[0];
-
-    if ($User->groupId() == ROLE_TEACHER) {
-        $Director = User::current()->getDirector();
-        $subordinated = $Director->getId();
+    $user = $args[0];
+    if ($user->groupId() == ROLE_TEACHER) {
+        $director = User_Auth::current()->getDirector();
+        $subordinated = $director->getId();
 
         $listValue = Core::factory('Property_List_Values')
             ->queryBuilder()
             ->where('property_id', '=', 21)
             ->where('subordinated', '=', $subordinated)
-            ->where('value', 'like', '%' . $User->name() . '%')
-            ->where('value', 'like', '%' . $User->surname() . '%')
+            ->where('value', 'like', '%' . $user->name() . '%')
+            ->where('value', 'like', '%' . $user->surname() . '%')
             ->find();
 
         if (!is_null($listValue)) {
@@ -109,21 +109,19 @@ Core::attachObserver('before.User.deactivate', function($args) {
  * Создание элемента списка "Студия"
  */
 Core::attachObserver( 'before.ScheduleArea.save', function( $args ) {
-    $Area = $args[0];
-
-    $Director = User::current()->getDirector();
-    $subordinated = $Director->getId();
-    $Area->renderPath();    //Формирование уникального пути
+    $area = $args[0];
+    $director = User_Auth::current()->getDirector();
+    $subordinated = $director->getId();
+    $area->renderPath();    //Формирование уникального пути
 
     //Проверка на существование филиала с таким же путем
-    $ExistsArea = Core::factory('Schedule_Area')
-        ->queryBuilder()
-        ->where('id', '<>', $Area->getId())
-        ->where('path', '=', $Area->path())
+    $existsArea = Schedule_Area::query()
+        ->where('id', '<>', $area->getId())
+        ->where('path', '=', $area->path())
         ->where('subordinated', '=', $subordinated);
 
-    if ($ExistsArea->getCount() > 0) {
-        exit('Сохранение невозможно, так как уже существует филлиал с названием: "' . $Area->title() . '"');
+    if ($existsArea->count() > 0) {
+        throw new Exception('Сохранение невозможно, так как уже существует филлиал с названием: "' . $area->title() . '"');
     }
 });
 
@@ -132,15 +130,13 @@ Core::attachObserver( 'before.ScheduleArea.save', function( $args ) {
  * Удаление всех связей с удаляемым элементом списка доп. свойства
  */
 Core::attachObserver('before.PropertyListValues.delete', function($args) {
-    $PropertyListValue = $args[0];
-
-    $PropertyLists = Core::factory('Property_List')
-        ->queryBuilder()
-        ->where('property_id', '=', $PropertyListValue->propertyId())
-        ->where('value_id', '=', $PropertyListValue->getId())
+    $propertyListValue = $args[0];
+    $propertyLists = Property_List::query()
+        ->where('property_id', '=', $propertyListValue->propertyId())
+        ->where('value_id', '=', $propertyListValue->getId())
         ->findAll();
 
-    foreach ($PropertyLists as $val) {
+    foreach ($propertyLists as $val) {
         $val->delete();
     }
 });
@@ -150,26 +146,24 @@ Core::attachObserver('before.PropertyListValues.delete', function($args) {
  * Удаление всех занятий и связей с группами, принадлежащие этому пользователю
  */
 Core::attachObserver('before.User.delete', function($args) {
-    $User = $args[0];
+    $user = $args[0];
 
     //Удаление принадлежности к группам
-    $GroupsAssignments = Core::factory('Schedule_Group_Assignment')
-        ->queryBuilder()
-        ->where('user_id', '=', $User->getId())
+    $groupsAssignments = Schedule_Group_Assignment::query()
+        ->where('user_id', '=', $user->getId())
         ->findAll();
 
-    foreach ($GroupsAssignments as $Assignment) {
-        $Assignment->delete();
+    foreach ($groupsAssignments as $assignment) {
+        $assignment->delete();
     }
 
     //Если пользователь был учителем одной из групп необходимо откорректировать свойство teacher_id
-    $Groups = Core::factory('Schedule_Group')
-        ->queryBuilder()
-        ->where('teacher_id', '=', $User->getId())
+    $groups = Schedule_Group::query()
+        ->where('teacher_id', '=', $user->getId())
         ->findAll();
 
-    foreach ($Groups as $Group) {
-        $Group->teacherId(0)->save();
+    foreach ($groups as $group) {
+        $group->teacherId(0)->save();
     }
 });
 
@@ -178,9 +172,9 @@ Core::attachObserver('before.User.delete', function($args) {
  * Рекурсивное удаление вложенных макетов и диекторий при удалении директории
  */
 Core::attachObserver('before.TemplateDir.delete', function($args) {
-    $ChildrenTemplates = $args[0]->getChildren();
-    foreach ($ChildrenTemplates as $ChildTemplate) {
-        $ChildTemplate->delete();
+    $childrenTemplatesDirs = $args[0]->getChildren();
+    foreach ($childrenTemplatesDirs as $childTemplateDir) {
+        $childTemplateDir->delete();
     }
 });
 
@@ -188,10 +182,10 @@ Core::attachObserver('before.TemplateDir.delete', function($args) {
 /**
  * Рекурсивное удаление вложенных макетов при удалении макета
  */
-Core::attachObserver('beforeTemplateDelete', function($args) {
-    $ChildrenTemplates = $args[0]->getChildren();
-    foreach ($ChildrenTemplates as $ChildTemplate) {
-        $ChildTemplate->delete();
+Core::attachObserver('before.Template.Delete', function($args) {
+    $childrenTemplates = $args[0]->getChildren();
+    foreach ($childrenTemplates as $childTemplate) {
+        $childTemplate->delete();
     }
 });
 
@@ -200,8 +194,8 @@ Core::attachObserver('beforeTemplateDelete', function($args) {
  * Удаление всех связей и значений доп. свойств при удалении объекта структуры
  */
 Core::attachObserver('before.Structure.delete', function($args) {
-    $Structure = $args[0];
-    Core::factory('Property')->clearForObject($Structure);
+    $structure = $args[0];
+    Property::purgeForObject($structure);
 });
 
 
@@ -210,7 +204,7 @@ Core::attachObserver('before.Structure.delete', function($args) {
  */
 Core::attachObserver('before.Item.delete', function($args) {
     $Structure = $args[0];
-    Core::factory('Property')->clearForObject($Structure);
+    Property::purgeForObject($Structure);
 });
 
 
@@ -220,19 +214,17 @@ Core::attachObserver('before.Item.delete', function($args) {
 Core::attachObserver('before.Structure.delete', function($args) {
     $id = $args[0]->getId();
 
-    $ChildrenItems = Core::factory('Structure_Item')
-        ->queryBuilder()
+    $childrenItems = Structure_Item::query()
         ->where('parent_id', '=', $id)
         ->findAll();
 
-    $ChildrenStructures = Core::factory('Structure')
-        ->queryBuilder()
+    $childrenStructures = Structure::query()
         ->where('parent_id', '=', $id)
         ->findAll();
 
-    $Children = array_merge($ChildrenItems, $ChildrenStructures);
-    foreach ($Children as $Child) {
-        $Child->delete();
+    $children = array_merge($childrenItems, $childrenStructures);
+    foreach ($children as $child) {
+        $child->delete();
     }
 });
 
@@ -241,38 +233,35 @@ Core::attachObserver('before.Structure.delete', function($args) {
  * Проверка на совпадение пути структуры для избежания дублирования пути
  */
 Core::attachObserver('before.Structure.save', function($args) {
-    $Structure = $args[0];
+    $structure = $args[0];
 
-    $RootStructure = Core::factory('Structure')
-        ->queryBuilder()
+    $rootStructure = Structure::query()
         ->where('path', '=', '')
         ->find();
 
-    $ParentId[] = $Structure->parentId();
+    $parentId[] = $structure->parentId();
 
-    $CoincidingStructures = Core::factory('Structure')
-        ->queryBuilder()
-        ->where('path', '=', $Structure->path())
-        ->where('id', '<>', $Structure->getId());
+    $coincidingStructures = Structure::query()
+        ->where('path', '=', $structure->path())
+        ->where('id', '<>', $structure->getId());
 
-    $CoincidingItems = Core::factory('Structure_Item')
-        ->queryBuilder()
-        ->where('path', '=', $Structure->getId());
+    $coincidingItems = Structure_Item::query()
+        ->where('path', '=', $structure->getId());
 
-    if ($Structure->parentId() == 0) {
-        $ParentId[] = $RootStructure->getId();
+    if ($structure->parentId() == 0) {
+        $parentId[] = $rootStructure->getId();
     }
 
-    $countCoincidingStructures = $CoincidingStructures
-        ->whereIn('parent_id', $ParentId)
+    $countCoincidingStructures = $coincidingStructures
+        ->whereIn('parent_id', $parentId)
         ->getCount();
 
-    $countCoincidingItems = $CoincidingItems
-        ->whereIn('parent_id', $ParentId)
+    $countCoincidingItems = $coincidingItems
+        ->whereIn('parent_id', $parentId)
         ->getCount();
 
     if ($countCoincidingItems > 0 || $countCoincidingStructures > 0) {
-        exit('Дублирование путей');
+        throw new Exception('Дублирование путей');
     }
 });
 
@@ -281,38 +270,35 @@ Core::attachObserver('before.Structure.save', function($args) {
  * Проверка на совпадение пути элемента структуры для избежания дублирования пути
  */
 Core::attachObserver('before.Item.save', function($args) {
-    $Structure = $args[0];
+    $structure = $args[0];
 
-    $RootStructure = Core::factory('Structure')
-        ->queryBuilder()
+    $rootStructure = Structure::query()
         ->where('path', '=', '')
         ->find();
 
-    $ParentId[] = $Structure->parentId();
+    $parentId[] = $structure->parentId();
 
-    $CoincidingStructures = Core::factory('Structure')
-        ->queryBuilder()
-        ->where('path', '=', $Structure->path());
+    $coincidingStructures = Structure::query()
+        ->where('path', '=', $structure->path());
 
-    $CoincidingItems = Core::factory('Structure_Item')
-        ->queryBuilder()
-        ->where('path', '=', $Structure->getId())
-        ->where('id', '<>', $Structure->getId());
+    $coincidingItems = Structure_Item::query()
+        ->where('path', '=', $structure->getId())
+        ->where('id', '<>', $structure->getId());
 
-    if ($Structure->parentId() == 0) {
-        $ParentId[] = $RootStructure->getId();
+    if ($structure->parentId() == 0) {
+        $parentId[] = $rootStructure->getId();
     }
 
-    $countCoincidingStructures = $CoincidingStructures
-        ->whereIn('parent_id', $ParentId)
+    $countCoincidingStructures = $coincidingStructures
+        ->whereIn('parent_id', $parentId)
         ->getCount();
 
-    $countCoincidingItems = $CoincidingItems
-        ->whereIn('parent_id', $ParentId)
+    $countCoincidingItems = $coincidingItems
+        ->whereIn('parent_id', $parentId)
         ->getCount();
 
     if ($countCoincidingItems > 0 || $countCoincidingStructures > 0) {
-        exit('Дублирование путей');
+        throw new Exception('Дублирование путей');
     }
 });
 
@@ -421,11 +407,11 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
  */
 Core::attachObserver('before.Payment.insert', function($args) {
     /** @var Payment $Payment */
-    $Payment = $args[0];
-    $User = User_Auth::parentAuth();
-    if (!is_null($User)) {
-        $Payment->authorId($User->getId());
-        $Payment->authorFio($User->surname() . ' ' . $User->name());
+    $payment = $args[0];
+    $user = User_Auth::parentAuth();
+    if (!is_null($user)) {
+        $payment->authorId($user->getId());
+        $payment->authorFio($user->getFio());
     }
 });
 
@@ -435,48 +421,48 @@ Core::attachObserver('before.Payment.insert', function($args) {
  */
 Core::attachObserver('before.Payment.save', function($args) {
     /** @var Payment $Payment */
-    $Payment = $args[0];
-    $Property = new Property();
+    $payment = $args[0];
+    //$property = new Property();
 
     //Корректировка баланса клиента
-    if ($Payment->isStatusSuccess() &&
-        ($Payment->type() == Payment::TYPE_INCOME
-        || $Payment->type() == Payment::TYPE_DEBIT
-        || $Payment->type() == Payment::TYPE_CASHBACK)) {
+    if ($payment->isStatusSuccess() &&
+        ($payment->type() == Payment::TYPE_INCOME
+        || $payment->type() == Payment::TYPE_DEBIT
+        || $payment->type() == Payment::TYPE_CASHBACK)) {
 
-        if ($Payment->getId() > 0) {
+        if ($payment->getId() > 0) {
             /** @var Payment $OldPayment */
-            $OldPayment = Core::factory('Payment', $Payment->getId());
-            if ($OldPayment->status() !== Payment::STATUS_SUCCESS && $Payment->isStatusSuccess()) {
-                $difference = $Payment->value();
+            $oldPayment = Core::factory('Payment', $payment->getId());
+            if ($oldPayment->status() !== Payment::STATUS_SUCCESS && $payment->isStatusSuccess()) {
+                $difference = $payment->value();
             } else {
-                $difference = $Payment->value() - $OldPayment->value();
+                $difference = $payment->value() - $oldPayment->value();
             }
         } else {
-            $difference = $Payment->value();
+            $difference = $payment->value();
         }
-        $Client = $Payment->getUser();
-        if (!is_null($Client)) {
-            $UserBalance = $Property->getByTagName('balance');
-            /** @var Property_Int $UserBalanceVal */
-            $UserBalanceVal = $UserBalance->getPropertyValues($Client)[0];
-            $balanceOld =  floatval($UserBalanceVal->value());
-            $Payment->type() == Payment::TYPE_INCOME || $Payment->type() == Payment::TYPE_CASHBACK
+        $client = $payment->getUser();
+        if (!is_null($client)) {
+            $userBalance = Property_Controller::factoryByTag('balance');
+            /** @var Property_Int $userBalanceVal */
+            $userBalanceVal = $userBalance->getPropertyValues($client)[0];
+            $balanceOld =  floatval($userBalanceVal->value());
+            $payment->type() == Payment::TYPE_INCOME || $payment->type() == Payment::TYPE_CASHBACK
                 ?   $balanceNew = $balanceOld + floatval($difference)
                 :   $balanceNew = $balanceOld - floatval($difference);
-            $UserBalanceVal->value($balanceNew)->save();
+            $userBalanceVal->value($balanceNew)->save();
         }
     }
 
     //Автоматическое создание связи платежа с филиалом
-    if ($Payment->areaId() == 0) {
-        $PaymentUser = $Payment->getUser();
-        if (!is_null($PaymentUser)) {
-            $AreasAssignments = new Schedule_Area_Assignment();
-            /** @var Schedule_Area[] $UserAreas */
-            $UserAreas = $AreasAssignments->getAreas($PaymentUser, true);
-            if (count($UserAreas) == 1) {
-                $Payment->areaId($UserAreas[0]->getId());
+    if ($payment->areaId() == 0) {
+        $paymentUser = $payment->getUser();
+        if (!is_null($paymentUser)) {
+            $areasAssignments = new Schedule_Area_Assignment();
+            /** @var Schedule_Area[] $userAreas */
+            $userAreas = $areasAssignments->getAreas($paymentUser, true);
+            if (count($userAreas) == 1) {
+                $payment->areaId($userAreas[0]->getId());
             }
         }
     }
@@ -512,7 +498,7 @@ Core::attachObserver('before.Payment.delete', function($args) {
     $areasAssignments->clearAssignments($payment);
 
     //Удаление всех доп. свойств
-    $property->clearForObject($payment);
+    Property::purgeForObject($payment);
 });
 
 
@@ -554,83 +540,79 @@ Core::attachObserver('after.LidStatus.delete', function($args) {
  * Создание задачи с напоминанием о низком уровне баланса занятий клиента
  */
 Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
-    Core::requireClass('Schedule_Lesson');
-    Core::requireClass('Schedule_Group');
-    Core::requireClass('Task_Controller');
-    Core::requireClass('Push');
-
-    $Report = $args[0];
-    $Lesson = Core::factory('Schedule_Lesson', $Report->lessonId());
+    /** @var Schedule_Lesson_Report $report */
+    $report = $args[0];
+    /** @var Schedule_Lesson $lesson */
+    $lesson = Schedule_Lesson::find($report->lessonId());
 
     /**
      * Проверка остатка занятий у клиента
      * и создание задачи в случае если их осталось менее заданного значения
      */
-    if ($Report->typeId() == Schedule_Lesson::TYPE_INDIV) {
+    if ($report->typeId() == Schedule_Lesson::TYPE_INDIV) {
         $clientLessons = 'indiv_lessons';
-        $Clients = [Core::factory('User', $Report->clientId())];
-    } elseif ($Report->typeId() == Schedule_Lesson::TYPE_GROUP) {
+        $clients = [User::find($report->clientId())];
+    } elseif ($report->typeId() == Schedule_Lesson::TYPE_GROUP) {
         $clientLessons = 'group_lessons';
-        $Group = Core::factory('Schedule_Group', $Report->clientId());
-        if (is_null($Group)) {
+
+        $group = Schedule_Group::find($report->clientId());
+        if (is_null($group)) {
             return;
         }
-        $Clients = $Group->getClientList();
+        $clients = $group->getClientList();
     } else {
         return;
     }
 
     $tomorrow = date('Y-m-d', strtotime('+1 day'));
 
-    foreach ($Clients as $Client) {
+    /** @var User $client */
+    foreach ($clients as $client) {
         //Кол-во занятий клиента
-        $ClientLessons = Core::factory('Property')->getByTagName($clientLessons);
-        $countLessons = $ClientLessons->getPropertyValues($Client)[0]->value();
-        //Значения свойства клиента "поурочно" (более не актуально)
-        //$PerLesson = Core::factory('Property')->getByTagName('per_lesson');
-        //$isPerLesson = (bool)$PerLesson->getPropertyValues($Client)[0]->value();
+        $clientLessons = Property_Controller::factoryByTag($clientLessons);
+        $countLessons = $clientLessons->getPropertyValues($client)[0]->value();
         //Присутствие клиента на занятии
-        $ClientAttendance = $Report->getClientAttendance($Client->getId());
-        if (is_null($ClientAttendance)) {
+        $clientAttendance = $report->getClientAttendance($client->getId());
+        if (is_null($clientAttendance)) {
             $attendance = false;
         } else {
-            $attendance = boolval($ClientAttendance->attendance());
+            $attendance = boolval($clientAttendance->attendance());
         }
 
         //Создание задачи с напоминанием о низком уровне баланса клиента
         if ($countLessons <= 0.5) {
             //Отправка пуш уведомления с напоминанием о занятиях
-            if (!empty($Client->pushId())) {
+            if (!empty($client->pushId())) {
                 $message = [
                     'title' => 'Остаток занятий на вашем балансе: ' . $countLessons,
                     'body' => 'Внести оплату легко, зайдите в приложение, нажмите кнопку "Пополнить", и после этого в личном кабинете сможете внести средства'
                 ];
                 try {
-                    Push::instance()->notification($message)->send($Client->pushId());
+                    Push::instance()->notification($message)->send($client->pushId());
                 } catch (Exception $e) {
-                    $errorMessage = 'User ' . $Client->surname() . ' ' . $Client->name() . ' error: ' . $e->getMessage();
+                    $errorMessage = 'User ' . $client->getFio() . ' error: ' . $e->getMessage();
                     Log::instance()->error(Log::TYPE_PUSH, $errorMessage);
                 }
             }
 
             $isIssetTask = Task_Controller::factory()
                 ->queryBuilder()
-                ->where('associate', '=', $Client->getId())
+                ->where('associate', '=', $client->getId())
                 ->where('done', '=', 0)
                 ->where('type', '=', 1)
                 ->find();
 
             //Если не существет подобной незакрытой задачи
             if (is_null($isIssetTask)) {
-                $Task = Task_Controller::factory()
+                $task = Task_Controller::factory()
                     ->date($tomorrow)
-                    ->areaId($Lesson->areaId())
+                    ->areaId($lesson->areaId())
                     ->type(1)
-                    ->associate($Client->getId())
+                    ->associate($client->getId())
                     ->save();
 
-                $taskNoteText = $Client->surname() . ' ' . $Client->name() . '. Проверить баланс. Напомнить клиенту про оплату.';
-                $Task->addNote($taskNoteText, 0, date('Y-m-d'));
+                $taskNoteText = $client->getFio() . '. Проверить баланс. Напомнить клиенту про оплату.';
+                $task->addNote($taskNoteText, 0, date('Y-m-d'));
             }
         }
 
@@ -639,42 +621,40 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
          * и создание задачи с напоминание о звонке
          */
         if ($attendance == false) {
-            $ClientGroups = Schedule_Group::getClientGroups($Client);
+            $clientGroups = Schedule_Group::getClientGroups($client);
             $clientGroupsIds = [];
-            foreach ($ClientGroups as $Group) {
-                $clientGroupsIds[] = $Group->getId();
+            foreach ($clientGroups as $group) {
+                $clientGroupsIds[] = $group->getId();
             }
 
-            $LastClientReport = Core::factory('Schedule_Lesson_Report');
-            $LastClientReport
-                ->queryBuilder()
-                ->where('id', '<>', $Report->getId())
+            $lastClientReport = Schedule_Lesson_Report::query()
+                ->where('id', '<>', $report->getId())
                 ->open()
                     ->open()
-                        ->where('client_id', '=', $Client->getId())
+                        ->where('client_id', '=', $client->getId())
                         ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
                     ->close();
 
             if (count($clientGroupsIds) > 0) {
-                $LastClientReport->queryBuilder()
+                $lastClientReport
                     ->open()
                         ->orWhereIn('client_id', $clientGroupsIds)
                         ->where('type_id', '=', Schedule_Lesson::TYPE_GROUP)
                     ->close();
             }
 
-            $LastClientReport = $LastClientReport->queryBuilder()
+            $lastClientReport = $lastClientReport
                 ->close()
                 ->orderBy('date', 'DESC')
                 ->find();
 
-            if (is_null($LastClientReport)) {
+            if (is_null($lastClientReport)) {
                 $isPrevLessonAbsent = false;
             } else {
-                $LastReportAttendance = $LastClientReport->getClientAttendance($Client->getId());
-                if (is_null($LastReportAttendance)) {
+                $lastReportAttendance = $lastClientReport->getClientAttendance($client->getId());
+                if (is_null($lastReportAttendance)) {
                     $isPrevLessonAbsent = false;
-                } elseif ($LastReportAttendance->attendance() == 1) {
+                } elseif ($lastReportAttendance->attendance() == 1) {
                     $isPrevLessonAbsent = false;
                 } else {
                     $isPrevLessonAbsent = true;
@@ -682,23 +662,22 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
             }
 
             if ($isPrevLessonAbsent) {
-                $isIssetTask = Core::factory('Task')
-                    ->queryBuilder()
-                    ->where('associate', '=', $Client->getId())
+                $isIssetTask = Task::query()
+                    ->where('associate', '=', $client->getId())
                     ->where('done', '=', 0)
                     ->where('type', '=', 2)
                     ->find();
 
                 if (is_null($isIssetTask)) {
-                    $Task = Task_Controller::factory()
+                    $task = Task_Controller::factory()
                         ->date($tomorrow)
                         ->type(2)
-                        ->areaId($Lesson->areaId())
-                        ->associate($Client->getId())
+                        ->areaId($lesson->areaId())
+                        ->associate($client->getId())
                         ->save();
 
-                    $taskNoteText = $Client->surname() . ' ' . $Client->name() . ' пропустил(а) два урока подряд. Необходимо связаться.';
-                    $Task->addNote($taskNoteText, 0, date('Y-m-d'));
+                    $taskNoteText = $client->getFio() . ' пропустил(а) два урока подряд. Необходимо связаться.';
+                    $task->addNote($taskNoteText, 0, date('Y-m-d'));
                 }
             }
         }
@@ -708,14 +687,15 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
 
 
 Core::attachObserver('before.Task.insert', function($args) {
-    $Task = $args[0];
+    /** @var Task $task */
+    $task = $args[0];
 
-    if ($Task->associate() > 0 && $Task->areaId() == 0) {
-        $Client = Core::factory('User', $Task->associate());
-        $ClientAreas = Core::factory('Schedule_Area_Assignment')->getAreas($Client, false);
-        if (count($ClientAreas) == 1) {
-            $Area = $ClientAreas[0];
-            $Task->areaId($Area->getId());
+    if ($task->associate() > 0 && $task->areaId() == 0) {
+        $client = User::find($task->associate());
+        $clientAreas = (new Schedule_Area_Assignment)->getAreas($client, false);
+        if (count($clientAreas) == 1) {
+            $area = $clientAreas[0];
+            $task->areaId($area->getId());
         }
     }
 });
@@ -723,8 +703,6 @@ Core::attachObserver('before.Task.insert', function($args) {
 
 /**
  * Причисление пользователя к какой-либо группе прав доступа при создании
- *
- * TODO:
  */
 Core::attachObserver('after.User.insert', function($args){
     switch ($args[0]->groupId())
@@ -748,9 +726,9 @@ Core::attachObserver('after.User.insert', function($args){
         default: $accessGroupId = 0;
     }
 
-    $Group = Core::factory('Core_Access_Group', $accessGroupId);
-    if (!is_null($Group)) {
-        $Group->appendUser($args[0]->getId());
+    $group = Core::factory('Core_Access_Group', $accessGroupId);
+    if (!is_null($group)) {
+        $group->appendUser($args[0]->getId());
     }
 });
 
@@ -759,57 +737,54 @@ Core::attachObserver('after.User.insert', function($args){
  * Создание задачи при выставлении периода отсутствия преподаватея
  */
 Core::attachObserver('after.ScheduleAbsent.save', function($args) {
-    Core::requireClass('Schedule_Lesson');
-    Core::requireClass('Schedule_Controller_Extended');
-
-    $AbsentPeriod = $args[0];
-    if ($AbsentPeriod->typeId() != 1) {
+    $absentPeriod = $args[0];
+    if ($absentPeriod->typeId() != 1) {
         return;
     }
-    $periodUserId = $AbsentPeriod->objectId();
-    $User = User_Controller::factory($periodUserId);
-    if ($User->groupId() != ROLE_TEACHER) {
+    $periodUserId = $absentPeriod->objectId();
+    $user = User_Controller::factory($periodUserId);
+    if ($user->groupId() != ROLE_TEACHER) {
         return;
     }
 
-    $Task = Core::factory('Task');
-    $Task->priorityId(Task::PRIORITY_HIGH);
-    $UserAreas = Core::factory('Schedule_Area_Assignment')->getAreas($User);
-    if (count($UserAreas) == 1) {
-        $Task->areaId($UserAreas[0]->getId());
+    $task = Core::factory('Task');
+    $task->priorityId(Task::PRIORITY_HIGH);
+    $userAreas = (new Schedule_Area_Assignment)->getAreas($user);
+    if (count($userAreas) == 1) {
+        $task->areaId($userAreas[0]->getId());
     }
-    if (!$Task->save()) {
+    if (!$task->save()) {
         return;
     }
 
-    $taskComment = ($User->groupId() == ROLE_TEACHER ? 'Преподаватель ' : 'Клиент ' ) . $User->surname() . ' ' . $User->name() . '. Период отсутствия с '
-        . refactorDateFormat($AbsentPeriod->dateFrom()) . ' ' . refactorTimeFormat($AbsentPeriod->timeFrom())
-        . ' по ' . refactorDateFormat($AbsentPeriod->dateTo()) . ' ' . refactorTimeFormat($AbsentPeriod->timeTo())
+    $taskComment = ($user->groupId() == ROLE_TEACHER ? 'Преподаватель ' : 'Клиент ' ) . $user->getFio() . '. Период отсутствия с '
+        . refactorDateFormat($absentPeriod->dateFrom()) . ' ' . refactorTimeFormat($absentPeriod->timeFrom())
+        . ' по ' . refactorDateFormat($absentPeriod->dateTo()) . ' ' . refactorTimeFormat($absentPeriod->timeTo())
         . ' проверить расписание: ';
 
-    $teacherSchedule = Schedule_Controller_Extended::getSchedule($User, $AbsentPeriod->dateFrom(), $AbsentPeriod->dateTo());
+    $teacherSchedule = Schedule_Controller_Extended::getSchedule($user, $absentPeriod->dateFrom(), $absentPeriod->dateTo());
     if (count($teacherSchedule) > 0) {
         foreach ($teacherSchedule as $day) {
             $taskComment .= refactorDateFormat($day->date) . ' ';
-            foreach ($day->lessons as $Lesson) {
+            foreach ($day->lessons as $lesson) {
                 //Проверка на то что занятие подпадает под время периода отсутствия
-                if ((compareDate($day->date, '==', $AbsentPeriod->dateFrom()) && compareTime($Lesson->timeTo(), '<=', $AbsentPeriod->timeFrom()))
-                    || (compareDate($day->date, '==', $AbsentPeriod->dateTo()) && compareTime($Lesson->timeFrom(), '>=', $AbsentPeriod->timeTo()))) {
+                if ((compareDate($day->date, '==', $absentPeriod->dateFrom()) && compareTime($lesson->timeTo(), '<=', $absentPeriod->timeFrom()))
+                    || (compareDate($day->date, '==', $absentPeriod->dateTo()) && compareTime($lesson->timeFrom(), '>=', $absentPeriod->timeTo()))) {
                     continue;
                 }
 
-                $Client = $Lesson->getClient();
-                $taskComment .= $Lesson->getArea()->title() . ' ';
-                $taskComment .= refactorTimeFormat($Lesson->timeFrom()) . ' - ' . refactorTimeFormat($Lesson->timeTo()) . ' ';
-                if ($Client instanceof User) {
-                    $taskComment .= $Client->surname() . ' ' . $Client->name() . '; ';
-                } elseif ($Client instanceof Schedule_Group) {
-                    $taskComment .= $Client->title() . '; ';
+                $client = $lesson->getClient();
+                $taskComment .= $lesson->getArea()->title() . ' ';
+                $taskComment .= refactorTimeFormat($lesson->timeFrom()) . ' - ' . refactorTimeFormat($lesson->timeTo()) . ' ';
+                if ($client instanceof User) {
+                    $taskComment .= $client->getFio() . '; ';
+                } elseif ($client instanceof Schedule_Group) {
+                    $taskComment .= $client->title() . '; ';
                 }
             }
         }
     }
-    $Task->addNote($taskComment);
+    $task->addNote($taskComment);
 });
 
 
@@ -817,19 +792,23 @@ Core::attachObserver('after.ScheduleAbsent.save', function($args) {
  * Удаление занятий из актуального расписания при выставлении периода отсутсвия у клиента
  */
 Core::attachObserver('before.ScheduleAbsent.save', function($args) {
-    $AbsentPeriod = $args[0];
-    $Results = Core::factory('Schedule_Lesson')
-        ->queryBuilder()
-        ->where('client_id', '=', $AbsentPeriod->objectId())
-        ->where('lesson_type', '=', Schedule_Lesson::SCHEDULE_CURRENT)
-        ->between('insert_date',$AbsentPeriod->dateFrom(),$AbsentPeriod->dateTo())
-        ->where('delete_date', 'is','NULL')
-        ->findAll();
-    foreach ($Results as $result)
-    {
-        $result->delete();
+    /** @var Schedule_Absent $absentPeriod */
+    $absentPeriod = $args[0];
+    if ($absentPeriod->typeId() != Schedule_Lesson::TYPE_INDIV) {
+        return;
     }
-    return;
+    $user = $absentPeriod->getClient();
+    if ($user instanceof User && $user->groupId() == ROLE_CLIENT) {
+        $results = Schedule_Lesson::query()
+            ->where('client_id', '=', $absentPeriod->objectId())
+            ->where('lesson_type', '=', Schedule_Lesson::SCHEDULE_CURRENT)
+            ->between('insert_date',$absentPeriod->dateFrom(), $absentPeriod->dateTo())
+            ->where('delete_date', 'is','NULL')
+            ->findAll();
+        foreach ($results as $result) {
+            $result->delete();
+        }
+    }
 });
 
 

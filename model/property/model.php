@@ -12,7 +12,6 @@ class Property_Model extends Core_Entity
      */
 	protected $id;
 
-
     /**
      * Уникальное название свойства
      *
@@ -84,7 +83,6 @@ class Property_Model extends Core_Entity
      */
     protected $default_value = 0;
 
-
     /**
      * @param string|null $defaultValue
      * @return $this|int
@@ -105,7 +103,6 @@ class Property_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param int|null $active
      * @return $this|int
@@ -121,7 +118,6 @@ class Property_Model extends Core_Entity
         }
 		return $this;
 	}
-
 
     /**
      * @param int|null $multiple
@@ -139,7 +135,6 @@ class Property_Model extends Core_Entity
         return $this;
     }
 
-
     /**
      * @param int|null $dir
      * @return $this|int
@@ -153,7 +148,6 @@ class Property_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @param string|null $title
@@ -169,7 +163,6 @@ class Property_Model extends Core_Entity
         }
 	}
 
-
     /**
      * @param string|null $tagName
      * @return $this|string
@@ -184,7 +177,6 @@ class Property_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param string|null $tagName
      * @return Property_Model|string
@@ -193,7 +185,6 @@ class Property_Model extends Core_Entity
     {
         return $this->tagName($tagName);
     }
-
 
     /**
      * @param string|null $description
@@ -209,7 +200,6 @@ class Property_Model extends Core_Entity
         }
 	}
 
-
     /**
      * @param string|null $type
      * @return $this|int
@@ -223,7 +213,6 @@ class Property_Model extends Core_Entity
             return $this;
         }
 	}
-
 
     /**
      * @param int|null $sorting
@@ -239,15 +228,13 @@ class Property_Model extends Core_Entity
         }
     }
 
-
     /**
      * @return array
      */
-    public function getPropertyTypes() : array
+    public static function getPropertyTypes() : array
     {
         return ['Int', 'String', 'Text', 'List', 'Bool'];
     }
-
 
     /**
      * @return array

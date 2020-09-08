@@ -8,28 +8,51 @@
  */
 class Schedule_Area extends Schedule_Area_Model
 {
+    /**
+     * @var array|null
+     */
+    public ?array $rooms = null;
+
+    /**
+     * @return array
+     */
+    public function getRooms() : array
+    {
+        if (is_null($this->rooms)) {
+            $rooms = Schedule_Room::query()
+                ->where('area_id', '=', $this->getId())
+                ->findAll();
+
+            $this->rooms = [];
+            /** @var Schedule_Room $room */
+            foreach ($rooms as $room) {
+                $this->rooms[$room->getId()] = $room;
+            }
+        }
+        return $this->rooms;
+    }
 
     /**
      * Генератор свойства path (url путь к филиалу) на основе названия и идентификатора
      *
      * @return $this
+     * @throws Exception
      */
     public function renderPath()
     {
         if ($this->subordinated() > 0) {
             $subordinated = $this->subordinated();
         } else {
-            $AuthUser = User_Auth::current();
-            if (is_null($AuthUser)) {
-                exit('Невозможно сформировать путь филиала так как не удается получить значение subordinated');
+            $authUser = User_Auth::current();
+            if (is_null($authUser)) {
+                throw new Exception('Невозможно сформировать путь филиала так как не удается получить значение subordinated');
             }
-            $subordinated = $AuthUser->getDirector()->getId();
+            $subordinated = $authUser->getDirector()->getId();
         }
 
         $this->path = translite($this->title()) . '-' . $subordinated;
         return $this;
     }
-
 
     /**
      * Поиск списка активных филиалов той же организации что и авторизованный пользователь
@@ -44,31 +67,25 @@ class Schedule_Area extends Schedule_Area_Model
      */
     public function getList(bool $isSubordinate = true, bool $isActive = true) : array
     {
-        Core::factory( 'Schedule_Area_Controller' );
-        $Areas = Schedule_Area_Controller::factory();
+        $areas = Schedule_Area::query();
 
         if ($isSubordinate === true) {
-            $User = User_Auth::current();
-
-            if (is_null($User)) {
+            $user = User_Auth::current();
+            if (is_null($user)) {
                 return [];
             }
-
-            $Areas->queryBuilder()
-                ->where('subordinated', '=', $User->getDirector()->getId());
+            $areas->where('subordinated', '=', $user->getDirector()->getId());
         }
 
         if ($isActive === true) {
-            $Areas->queryBuilder()
-                ->where('active', '=', 1);
+            $areas->where('active', '=', 1);
         }
 
-        return $Areas->queryBuilder()
+        return $areas
             ->orderBy('sorting')
             ->orderBy('title')
             ->findAll();
     }
-
 
     /**
      * Это реально ебаное волшебство. Я не помню зачем я добавлял кастомное свойство oldTitle
@@ -88,7 +105,6 @@ class Schedule_Area extends Schedule_Area_Model
         }
     }
 
-
     /**
      * @param int $classId
      * @return Schedule_Room|null
@@ -99,14 +115,11 @@ class Schedule_Area extends Schedule_Area_Model
             return null;
         }
 
-        return Core::factory('Schedule_Room')
-            ->queryBuilder()
-            ->clearQuery()
+        return Schedule_Room::query()
             ->where('class_id', '=', $classId)
             ->where('area_id', '=', $this->id)
             ->find();
     }
-
 
     /**
      * @param int $classId
@@ -115,15 +128,8 @@ class Schedule_Area extends Schedule_Area_Model
      */
     public function getClassName(int $classId, string $default) : string
     {
-        $Room = $this->getClass($classId);
-
-        if (is_null($Room)) {
-            return $default;
-        } else {
-            return $Room->title();
-        }
+        return $this->getRooms()[$classId] ?? $default;
     }
-
 
     /**
      * @param int $classId
@@ -144,7 +150,6 @@ class Schedule_Area extends Schedule_Area_Model
         return $Room;
     }
 
-
     /**
      * @param null $obj
      * @return $this|null
@@ -161,7 +166,6 @@ class Schedule_Area extends Schedule_Area_Model
         Core::notify([&$this], 'after.ScheduleArea.save');
         return $this;
     }
-
 
     /**
      * @param null $obj

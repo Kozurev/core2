@@ -7,6 +7,12 @@
  * @version 2019-07-22
  */
 
+/**
+ * @param $Lessons
+ * @param $time
+ * @param $classId
+ * @return false|Schedule_Lesson
+ */
 function array_pop_lesson($Lessons, $time, $classId)
 {
     if (!is_array($Lessons)) {
@@ -54,50 +60,55 @@ function updateLastLessonTime($Lesson, &$maxTime, $time, $period)
 /**
  * Получение данных о занятии
  *
- * @param $Lesson
+ * @param $lesson
  * @return array
  */
-function getLessonData($Lesson)
+function getLessonData($lesson)
 {
+    if (isset($_SESSION['core']['lesson_data'][$lesson->getId()])) {
+        return $_SESSION['core']['lesson_data'][$lesson->getId()];
+    }
+
     $output = [
         'client'    =>  '',
         'teacher'   =>  '',
         'client_status' =>  '',
     ];
 
-    if ($Lesson->typeId() == Schedule_Lesson::TYPE_GROUP) {
-        $Group = $Lesson->getGroup();
-
-        if ($Lesson->teacherId() == 0) {
-            $Teacher = $Group->getTeacher();
+    /** @var User $teacher */
+    if ($lesson->typeId() == Schedule_Lesson::TYPE_GROUP) {
+        $group = $lesson->getGroup();
+        if ($lesson->teacherId() == 0) {
+            $group = $lesson->getGroup();
+            $teacher = $group->getTeacher();
         } else {
-            $Teacher = $Lesson->getTeacher();
+            $teacher = $lesson->getTeacher();
         }
 
-        if ($Teacher == false) {
+        if (empty($teacher)) {
             $output['teacher'] = 'Неизвестен';
         } else {
-            $output['teacher'] = $Teacher->surname() . ' ' . $Teacher->name();
+            $output['teacher'] = $teacher->getFio();
         }
 
-        if (empty($Group)) {
+        if (empty($group)) {
             $output['client'] = 'Неизвестен';
         } else {
-            $output['client'] = $Group->title();
+            $output['client'] = $group->title();
             $output['client_status'] = 'group';
         }
-    } elseif ($Lesson->typeId() == Schedule_Lesson::TYPE_INDIV) {
-        $Teacher = $Lesson->getTeacher();
-        $Client = $Lesson->getClient();
+    } elseif ($lesson->typeId() == Schedule_Lesson::TYPE_INDIV) {
+        $teacher = $lesson->getTeacher();
+        $client = $lesson->getClient();
 
-        $output['teacher'] = $Teacher->surname() . ' ' . $Teacher->name();
-        $output["client"] = $Client->surname() . ' ' . $Client->name();
+        $output['teacher'] = $teacher->getFio();
+        $output["client"] = $client->getFio();
 
-        if (!$Client->getId()) {
+        if (!$client->getId()) {
             $output['client_status'] = 'neutral';
         } else {
-            $countPrivateLessons = Property_Controller::factoryByTag('indiv_lessons')->getValues($Client)[0]->value();
-            $countGroupLessons = Property_Controller::factoryByTag('group_lessons')->getValues($Client)[0]->value();
+            $countPrivateLessons = Property_Controller::factoryByTag('indiv_lessons')->getValues($client)[0]->value();
+            $countGroupLessons = Property_Controller::factoryByTag('group_lessons')->getValues($client)[0]->value();
 
             if ($countGroupLessons < 0 || $countPrivateLessons < 0) {
                 $output['client_status'] = 'negative';
@@ -107,44 +118,44 @@ function getLessonData($Lesson)
                 $output['client_status'] = 'neutral';
             }
 
-            $vk = Property_Controller::factoryByTag('vk')->getValues($Client)[0]->value();
+            $vk = Property_Controller::factoryByTag('vk')->getValues($client)[0]->value();
             if ($vk != '') {
                 $output['client_status'] .= ' vk';
             }
         }
-    } elseif ($Lesson->typeId() == Schedule_Lesson::TYPE_CONSULT) {
-        $Teacher = $Lesson->getTeacher();
-        $output['teacher'] = $Teacher->surname() . ' ' . $Teacher->name();
+    } elseif ($lesson->typeId() == Schedule_Lesson::TYPE_CONSULT) {
+        $teacher = $lesson->getTeacher();
+        $output['teacher'] = $teacher->getFio();
         $output['client'] = 'Консультация';
         $output['client_status'] = 'neutral';
 
-        if ($Lesson->clientId() != 0) {
-            $output['client'] .= ' ' . $Lesson->clientId();
-            $Lid = Lid_Controller::factory($Lesson->clientId());
-            if (!is_null($Lid)) {
-                if (!empty($Lid->surname())) {
-                    $output['client'] .= ' ' . $Lid->surname();
+        if ($lesson->clientId() != 0) {
+            $output['client'] .= ' ' . $lesson->clientId();
+            $lid = Lid_Controller::factory($lesson->clientId());
+            if (!is_null($lid)) {
+                if (!empty($lid->surname())) {
+                    $output['client'] .= ' ' . $lid->surname();
                 }
-                if (!empty($Lid->name())) {
-                    $output['client'] .= ' ' . $Lid->name();
+                if (!empty($lid->name())) {
+                    $output['client'] .= ' ' . $lid->name();
                 }
-                if (!empty($Lid->number())) {
-                    $output['client'] .= ' ' . $Lid->number();
+                if (!empty($lid->number())) {
+                    $output['client'] .= ' ' . $lid->number();
                 }
             }
         }
-    } elseif ($Lesson->typeId() == Schedule_Lesson::TYPE_GROUP_CONSULT) {
-        $group = $Lesson->getGroup();
-        if ($Lesson->teacherId() == 0) {
+    } elseif ($lesson->typeId() == Schedule_Lesson::TYPE_GROUP_CONSULT) {
+        $group = $lesson->getGroup();
+        if ($lesson->teacherId() == 0) {
             $teacher = $group->getTeacher();
         } else {
-            $teacher = $Lesson->getTeacher();
+            $teacher = $lesson->getTeacher();
         }
 
         if (empty($teacher)) {
             $output['teacher'] = 'Неизвестен';
         } else {
-            $output['teacher'] = $teacher->surname() . ' ' . $teacher->name();
+            $output['teacher'] = $teacher->getFio();
         }
 
         if (empty($group)) {
@@ -155,6 +166,7 @@ function getLessonData($Lesson)
         }
     }
 
+    $_SESSION['core']['lesson_data'][$lesson->getId()] = $output;
     return $output;
 }
 
@@ -290,8 +302,15 @@ function getLessons($date, $userId = 0)
     return $CurrentLessons;
 }
 
-
-
+use Tightenco\Collect\Support\Collection;
+function isLessonAbsent(Schedule_Lesson $lesson, Collection $lessonsAbsents, Collection $usersAbsents) : bool
+{
+    return $lessonsAbsents->contains('lesson_id', $lesson->getId())
+        || $usersAbsents->contains(function($absent) use ($lesson) {
+            /** @var Schedule_Absent $absent */
+            return $absent->typeId() == $lesson->typeId() && $absent->objectId() == $lesson->clientId();
+        });
+}
 
 
 

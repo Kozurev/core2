@@ -20,29 +20,12 @@ require_once ROOT . '/model/core/array.php';
 
 
 //Подключение обязательных биьлиотек
-require_once ROOT . '/model/orm.php';
-//require_once ROOT . '/model/core.php';
+//require_once ROOT . '/model/orm.php';
 require_once ROOT . '/model/core/entity/model.php';
 require_once ROOT . '/model/core/entity.php';
-require_once ROOT . '/model/user/auth.php';
 require_once ROOT . '/observers/observers.php';
-require_once ROOT . '/model/user/model.php';
-require_once ROOT . '/model/user.php';
-require_once ROOT . '/model/core/access.php';
-require_once ROOT . '/model/property/assigment/model.php';
-require_once ROOT . '/model/property/assigment.php';
-require_once ROOT . '/model/constant/model.php';
-require_once ROOT . '/model/constant.php';
-require_once ROOT . '/model/core/page/show.php';
 require_once ROOT . '/model/controller.php';
 require_once ROOT . '/includes.php';
-
-//if ((empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off') && $_SERVER['REMOTE_ADDR'] != '127.0.0.1') {
-//    $location = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-//    header('HTTP/1.1 301 Moved Permanently');
-//    header('Location: ' . $location);
-//    exit;
-//}
 
 if (is_null(Core_Array::Session('core', null))) {
     $_SESSION['core'] = [];
@@ -58,10 +41,10 @@ define('TEST_MODE_PAGE', false);
 define('TEST_MODE_FACTORY', false);
 
 //Выключение отладки SQL-запросов
-Orm::Debug(false);
+Orm::debug(false);
 
 //Объявление констант
-Constant::setAllConstants();
+//Constant::setAllConstants();
 
 //Создание страницы
 Core_Page_Show::instance()->createPage();

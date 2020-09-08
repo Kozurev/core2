@@ -83,31 +83,44 @@ class Property extends Property_Model
      *
 	 * @param $obj - объект, свойства которого бутуд возвращены
 	 * @return array
+     * @deprecated
 	 */
 	public function getPropertiesList($obj)
 	{
-	    if (!is_object($obj) || !method_exists($obj, 'getId')) {
+	    return self::getProperties($obj);
+	}
+
+
+    /**
+     * Метод возвращает список свойств объекта
+     *
+     * @param $object - объект, свойства которого бутуд возвращены
+     * @return array
+     */
+	public static function getProperties($object) : array
+    {
+        if (!is_object($object) || !method_exists($object, 'getId')) {
             return [];
         }
 
-	    $types = $this->getPropertyTypes();
-        $Properties = [];
+        $types = self::getPropertyTypes();
+        $properties = [];
 
         foreach ($types as $type) {
             $tableName = 'Property_' . $type . '_Assigment';
-            $TypeProperties = Core::factory($tableName)
+            $typeProperties = Core::factory($tableName)
                 ->queryBuilder()
-                ->where('object_id', '=', $obj->getId())
-                ->where('model_name', '=', $obj->getTableName())
+                ->where('object_id', '=', $object->getId())
+                ->where('model_name', '=', $object->getTableName())
                 ->findAll();
 
-            foreach ($TypeProperties as $PropertyAssignment) {
-                $Properties[] = Core::factory('Property', $PropertyAssignment->property_id());
+            foreach ($typeProperties as $propertyAssignment) {
+                $properties[] = Core::factory('Property', $propertyAssignment->property_id());
             }
         }
 
-		return $Properties;
-	}
+        return $properties;
+    }
 
 
 	/**
@@ -278,34 +291,40 @@ class Property extends Property_Model
 
     /**
      * @param $obj
-     * @return $this|null
+     * @return void
      */
-    public function clearForObject($obj)
+    public function clearForObject($obj) : void
     {
-        if (!is_object($obj) || !method_exists($obj, 'getId')) {
-            return null;
+        self::purgeForObject($obj);
+    }
+
+    /**
+     * @param $object
+     */
+    public static function purgeForObject($object) : void
+    {
+        if (!is_object($object) || !method_exists($object, 'getId')) {
+            return;
         }
 
-        foreach ($this->getPropertiesList($obj) as $prop) {
-            $Values = $prop->getPropertyValues($obj);
-            foreach ($Values as $Value) {
-                $Value->delete();
+        foreach (self::getProperties($object) as $prop) {
+            $values = $prop->getPropertyValues($object);
+            foreach ($values as $value) {
+                $value->delete();
             }
         }
 
-        foreach ($this->getPropertyTypes() as $type) {
+        foreach (self::getPropertyTypes() as $type) {
             $tableName = 'Property_' . $type . '_Assigment';
-            $Assignments = Core::factory($tableName)
+            $assignments = Core::factory($tableName)
                 ->queryBuilder()
-                ->where('model_name', '=', $obj->getTableName())
-                ->where('object_id', '=', $obj->getId())
+                ->where('model_name', '=', $object->getTableName())
+                ->where('object_id', '=', $object->getId())
                 ->findAll();
-            foreach ($Assignments as $Assignment) {
-                $Assignment->delete();
+            foreach ($assignments as $assignment) {
+                $assignment->delete();
             }
         }
-
-        return $this;
     }
 
 
@@ -377,7 +396,7 @@ class Property extends Property_Model
         $List = Core::factory('Property_List_Values');
 
         if ($isSubordinate === true) {
-            $User = User::current();
+            $User = User_Auth::current();
             if (is_null($User)) {
                 return [];
             }

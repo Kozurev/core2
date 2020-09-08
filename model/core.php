@@ -51,7 +51,18 @@ class Core
     static public function notify($args, $action)
     {
         foreach (Core::$observers as $name => $observers) {
-            if ($name == $action) {
+            $isNameMatch = $name == $action;
+            if (!$isNameMatch) {
+                $segments = explode('*', $name);
+                $isNameMatch = true;
+                foreach ($segments as $segment) {
+                    if (!empty($segment) && strpos($action, $segment) === false) {
+                        $isNameMatch = false;
+                        break;
+                    }
+                }
+            }
+            if ($isNameMatch) {
                 foreach ($observers as $function) {
                     $function($args);
                 }

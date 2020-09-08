@@ -7,9 +7,6 @@
  */
 
 
-Orm::Debug(true);
-
-
 exit;
 
 Orm::execute('ALTER TABLE Payment ADD status tinyint DEFAULT 0 NULL;

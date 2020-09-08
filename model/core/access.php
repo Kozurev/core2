@@ -100,37 +100,32 @@ class Core_Access
     const INTEGRATION_SENLER = 'integration_senler';
     const INTEGRATION_MY_CALLS = 'integration_my_calls';
 
-
     /**
-     * @var Core_Access
+     * @var Core_Access|null
      */
-    private static $_instance;
-
+    private static ?Core_Access $_instance = null;
 
     /**
      * @var User|null
      */
-    private $User;
-
+    private ?User $user;
 
     /**
      * @var Core_Access_Group|null
      */
-    private $AccessGroup;
-
+    private ?Core_Access_Group $accessGroup;
 
     /**
      * Список всех возможных возможностей
      *
      * @var array
      */
-    public $capabilities;
-
+    public array $capabilities = [];
 
     /**
-     * @var Core_Access_Cache
+     * @var Core_Access_Cache|null
      */
-    private $cache;
+    private ?Core_Access_Cache $cache;
 
 
     /**
@@ -147,32 +142,38 @@ class Core_Access
 
     /**
      * Core_Access constructor.
-     * @param User|null $User
+     * @param User|null $user
      */
-    private function __construct(User $User = null)
+    private function __construct(User $user = null)
     {
-        $this->User = $User;
-        $this->AccessGroup = self::getUserGroup($this->User);
+        $this->user = $user;
         $this->capabilities = include 'access/capabilities.php';
-        $this->cache = new Core_Access_Cache();
+        if (!is_null($user)) {
+            $this->accessGroup = self::getUserGroup($user);
+        }
+        if (!is_null($this->accessGroup)) {
+            $this->cache = new Core_Access_Cache($user, $this->accessGroup->getAllCapabilities());
+        } else {
+            $this->cache = new Core_Access_Cache();
+        }
     }
 
 
     /**
      * @return null|User
      */
-    public function getUser()
+    public function getUser() : ?User
     {
-        return $this->User;
+        return $this->user;
     }
 
 
     /**
      * @return Core_Access_Group|null
      */
-    public function getAccessGroup()
+    public function getAccessGroup() : ?Core_Access_Group
     {
-        return $this->AccessGroup;
+        return $this->accessGroup;
     }
 
 
@@ -180,28 +181,28 @@ class Core_Access
      * Проверка наличие возмоности пользователя совершить то или иное действие
      *
      * @param string $capability
-     * @param User|null $User
+     * @param User|null $user
      * @return bool
      */
-    public function hasCapability(string $capability, User $User = null) : bool
+    public function hasCapability(string $capability, User $user = null) : bool
     {
-        if ((is_null($User) || empty($User->getId())) && (is_null($this->User) || empty($this->User->getId()))) {
+        if ((is_null($user) || empty($user->getId())) && (is_null($this->user) || empty($this->user->getId()))) {
             return false;
         }
-        if (!is_null($User)) {
-            $AccessGroup = self::getUserGroup($User);
+        if (!is_null($user)) {
+            $accessGroup = self::getUserGroup($user);
         } else {
-            $AccessGroup = $this->AccessGroup;
+            $accessGroup = $this->accessGroup;
         }
 
         if (!is_null($this->getUser()) && !is_null($this->cache->get($this->getUser()->getId(), $capability))) {
             return $this->cache->get($this->getUser()->getId(), $capability);
         }
 
-        if (is_null($AccessGroup)) {
+        if (is_null($accessGroup)) {
             return false;
         } else {
-            $access = $AccessGroup->hasCapability($capability);
+            $access = $accessGroup->hasCapability($capability);
             if (!is_null($this->getUser())) {
                 $this->cache->put($this->getUser()->getId(), $capability, $access);
             }
@@ -213,438 +214,18 @@ class Core_Access
     /**
      * Поиск группы прав доаступа, которой принадлежит пользователь
      *
-     * @param User|null $User
+     * @param User|null $user
      * @return Core_Access_Group|null
      */
-    public static function getUserGroup(User $User = null)
+    public static function getUserGroup(User $user = null)
     {
-        if (is_null($User)) {
+        if (is_null($user)) {
             return null;
         }
-        return Core::factory('Core_Access_Group')
-            ->queryBuilder()
+        return Core_Access_Group::query()
             ->join(
                 'Core_Access_Group_Assignment as caga',
-                'caga.user_id = ' . $User->getId() . ' AND Core_Access_Group.id = caga.group_id')
+                'caga.user_id = ' . $user->getId() . ' AND Core_Access_Group.id = caga.group_id')
             ->find();
-    }
-
-
-    public function install()
-    {
-        $Orm = new Orm();
-        $Orm->executeQuery('DROP TABLE IF EXISTS Access_Action');
-        $Orm->executeQuery('DROP TABLE IF EXISTS Core_Access_Group');
-        $Orm->executeQuery('DROP TABLE IF EXISTS Core_Access_Group_Assignment');
-        $Orm->executeQuery('DROP TABLE IF EXISTS Core_Access_Capability');
-
-        $Orm->executeQuery('
-            CREATE TABLE Core_Access_Group
-            (
-                id int PRIMARY KEY AUTO_INCREMENT,
-                parent_id int,
-                title VARCHAR(255),
-                description text,
-                subordinated int
-            );
-        ');
-        $Orm->executeQuery('
-            CREATE TABLE Core_Access_Group_Assignment
-            (
-                id int PRIMARY KEY AUTO_INCREMENT,
-                group_id int,
-                user_id int
-            );
-        ');
-        $Orm->executeQuery('
-            CREATE TABLE Core_Access_Capability
-            (
-                id int PRIMARY KEY AUTO_INCREMENT,
-                group_id int,
-                name VARCHAR(255),
-                access smallint
-            );
-        ');
-
-        Core::factory('User_Controller');
-        Core::factory('Core_Access_Group');
-
-        //Директор
-        $Group1 = new Core_Access_Group();
-        $Group1->title('Директор');
-        $Group1->save();
-
-        $Directors = new User_Controller(User::current());
-        $Directors->groupId(ROLE_DIRECTOR);
-        $Directors->properties(false);
-        $Directors->isWithAreaAssignments(false);
-        $Directors->isSubordinate(false);
-        $Directors->active(null);
-        foreach ($Directors->getUsers() as $User) {
-            $Group1->appendUser($User->getId());
-        }
-
-        $Group1->capabilityAllow(self::USER_READ_CLIENTS);
-        $Group1->capabilityAllow(self::USER_READ_TEACHERS);
-        $Group1->capabilityAllow(self::USER_READ_MANAGERS);
-        $Group1->capabilityAllow(self::USER_CREATE_CLIENT);
-        $Group1->capabilityAllow(self::USER_CREATE_TEACHER);
-        $Group1->capabilityAllow(self::USER_CREATE_MANAGER);
-        $Group1->capabilityAllow(self::USER_EDIT_CLIENT);
-        $Group1->capabilityAllow(self::USER_EDIT_TEACHER);
-        $Group1->capabilityAllow(self::USER_EDIT_MANAGER);
-        $Group1->capabilityAllow(self::USER_ARCHIVE_CLIENT);
-        $Group1->capabilityAllow(self::USER_ARCHIVE_TEACHER);
-        $Group1->capabilityAllow(self::USER_ARCHIVE_MANAGER);
-        $Group1->capabilityAllow(self::USER_DELETE);
-        $Group1->capabilityAllow(self::USER_EDIT_LESSONS);
-        $Group1->capabilityAllow(self::USER_APPEND_COMMENT);
-
-        $Group1->capabilityAllow(self::TASK_READ);
-        $Group1->capabilityAllow(self::TASK_CREATE);
-        $Group1->capabilityAllow(self::TASK_EDIT);
-        $Group1->capabilityAllow(self::TASK_DELETE);
-        $Group1->capabilityAllow(self::TASK_APPEND_COMMENT);
-
-        $Group1->capabilityAllow(self::LID_READ);
-        $Group1->capabilityAllow(self::LID_CREATE);
-        $Group1->capabilityAllow(self::LID_EDIT);
-        $Group1->capabilityAllow(self::LID_DELETE);
-        $Group1->capabilityAllow(self::LID_APPEND_COMMENT);
-
-        $Group1->capabilityAllow(self::SCHEDULE_READ);
-        $Group1->capabilityAllow(self::SCHEDULE_CREATE);
-        $Group1->capabilityAllow(self::SCHEDULE_EDIT);
-        $Group1->capabilityAllow(self::SCHEDULE_DELETE);
-        $Group1->capabilityAllow(self::SCHEDULE_ABSENT_CREATE);
-        $Group1->capabilityAllow(self::SCHEDULE_ABSENT_EDIT);
-        $Group1->capabilityAllow(self::SCHEDULE_ABSENT_DELETE);
-
-        $Group1->capabilityAllow(self::SCHEDULE_REPORT_READ);
-        $Group1->capabilityAllow(self::SCHEDULE_REPORT_CREATE);
-        $Group1->capabilityAllow(self::SCHEDULE_REPORT_EDIT);
-        $Group1->capabilityAllow(self::SCHEDULE_REPORT_DELETE);
-
-        $Group1->capabilityAllow(self::SCHEDULE_GROUP_READ);
-        $Group1->capabilityAllow(self::SCHEDULE_GROUP_CREATE);
-        $Group1->capabilityAllow(self::SCHEDULE_GROUP_EDIT);
-        $Group1->capabilityAllow(self::SCHEDULE_GROUP_DELETE);
-
-        $Group1->capabilityAllow(self::AREA_READ);
-        $Group1->capabilityAllow(self::AREA_CREATE);
-        $Group1->capabilityAllow(self::AREA_EDIT);
-        $Group1->capabilityAllow(self::AREA_DELETE);
-
-        $Group1->capabilityAllow(self::PAYMENT_READ_ALL);
-        $Group1->capabilityAllow(self::PAYMENT_READ_CLIENT);
-        $Group1->capabilityAllow(self::PAYMENT_READ_TEACHER);
-        $Group1->capabilityAllow(self::PAYMENT_CREATE_ALL);
-        $Group1->capabilityAllow(self::PAYMENT_CREATE_CLIENT);
-        $Group1->capabilityAllow(self::PAYMENT_CREATE_TEACHER);
-        $Group1->capabilityAllow(self::PAYMENT_EDIT_ALL);
-        $Group1->capabilityAllow(self::PAYMENT_EDIT_CLIENT);
-        $Group1->capabilityAllow(self::PAYMENT_EDIT_TEACHER);
-        $Group1->capabilityAllow(self::PAYMENT_DELETE_ALL);
-        $Group1->capabilityAllow(self::PAYMENT_DELETE_CLIENT);
-        $Group1->capabilityAllow(self::PAYMENT_DELETE_TEACHER);
-        $Group1->capabilityAllow(self::PAYMENT_CONFIG);
-
-        $Group1->capabilityAllow(self::PAYMENT_TARIF_READ);
-        $Group1->capabilityAllow(self::PAYMENT_TARIF_CREATE);
-        $Group1->capabilityAllow(self::PAYMENT_TARIF_EDIT);
-        $Group1->capabilityAllow(self::PAYMENT_TARIF_DELETE);
-        $Group1->capabilityAllow(self::PAYMENT_TARIF_BUY);
-
-        $Group1->capabilityAllow(self::CERTIFICATE_READ);
-        $Group1->capabilityAllow(self::CERTIFICATE_CREATE);
-        $Group1->capabilityAllow(self::CERTIFICATE_EDIT);
-        $Group1->capabilityAllow(self::CERTIFICATE_DELETE);
-        $Group1->capabilityAllow(self::CERTIFICATE_APPEND_COMMENT);
-
-        $Group1->capabilityAllow(self::STATISTIC_READ);
-
-
-        //Менеджер
-        $Group1 = new Core_Access_Group();
-        $Group1->title('Менеджер');
-        $Group1->description('Описание: Менеджер');
-        $Group1->save();
-
-        $Managers = new User_Controller(User::current());
-        $Managers->groupId(ROLE_MANAGER);
-        $Managers->properties(false);
-        $Managers->isWithAreaAssignments(false);
-        $Managers->isSubordinate(false);
-        $Managers->active(null);
-        foreach ($Managers->getUsers() as $User) {
-            $Group1->appendUser($User->getId());
-        }
-
-        $Group1->capabilityAllow(self::USER_READ_CLIENTS);
-        $Group1->capabilityAllow(self::USER_READ_TEACHERS);
-        $Group1->capabilityForbidden(self::USER_READ_MANAGERS);
-        $Group1->capabilityAllow(self::USER_CREATE_CLIENT);
-        $Group1->capabilityAllow(self::USER_CREATE_TEACHER);
-        $Group1->capabilityForbidden(self::USER_CREATE_MANAGER);
-        $Group1->capabilityAllow(self::USER_EDIT_CLIENT);
-        $Group1->capabilityAllow(self::USER_EDIT_TEACHER);
-        $Group1->capabilityAllow(self::USER_EDIT_MANAGER);
-        $Group1->capabilityAllow(self::USER_ARCHIVE_CLIENT);
-        $Group1->capabilityAllow(self::USER_ARCHIVE_TEACHER);
-        $Group1->capabilityForbidden(self::USER_ARCHIVE_MANAGER);
-        $Group1->capabilityAllow(self::USER_DELETE);
-        $Group1->capabilityAllow(self::USER_EDIT_LESSONS);
-        $Group1->capabilityAllow(self::USER_APPEND_COMMENT);
-
-        $Group1->capabilityAllow(self::TASK_READ);
-        $Group1->capabilityAllow(self::TASK_CREATE);
-        $Group1->capabilityAllow(self::TASK_EDIT);
-        $Group1->capabilityAllow(self::TASK_DELETE);
-        $Group1->capabilityAllow(self::TASK_APPEND_COMMENT);
-
-        $Group1->capabilityAllow(self::LID_READ);
-        $Group1->capabilityAllow(self::LID_CREATE);
-        $Group1->capabilityAllow(self::LID_EDIT);
-        $Group1->capabilityAllow(self::LID_DELETE);
-        $Group1->capabilityAllow(self::LID_APPEND_COMMENT);
-
-        $Group1->capabilityAllow(self::SCHEDULE_READ);
-        $Group1->capabilityAllow(self::SCHEDULE_CREATE);
-        $Group1->capabilityAllow(self::SCHEDULE_EDIT);
-        $Group1->capabilityAllow(self::SCHEDULE_DELETE);
-        $Group1->capabilityAllow(self::SCHEDULE_ABSENT);
-
-        $Group1->capabilityAllow(self::SCHEDULE_REPORT_READ);
-        $Group1->capabilityAllow(self::SCHEDULE_REPORT_CREATE);
-        $Group1->capabilityForbidden(self::SCHEDULE_REPORT_EDIT);
-        $Group1->capabilityAllow(self::SCHEDULE_REPORT_DELETE);
-
-        $Group1->capabilityAllow(self::SCHEDULE_GROUP_READ);
-        $Group1->capabilityAllow(self::SCHEDULE_GROUP_CREATE);
-        $Group1->capabilityAllow(self::SCHEDULE_GROUP_EDIT);
-        $Group1->capabilityAllow(self::SCHEDULE_GROUP_DELETE);
-
-        $Group1->capabilityForbidden(self::AREA_READ);
-        $Group1->capabilityForbidden(self::AREA_CREATE);
-        $Group1->capabilityForbidden(self::AREA_EDIT);
-        $Group1->capabilityForbidden(self::AREA_DELETE);
-
-        $Group1->capabilityForbidden(self::PAYMENT_READ_ALL);
-        $Group1->capabilityAllow(self::PAYMENT_READ_CLIENT);
-        $Group1->capabilityAllow(self::PAYMENT_READ_TEACHER);
-        $Group1->capabilityForbidden(self::PAYMENT_CREATE_ALL);
-        $Group1->capabilityAllow(self::PAYMENT_CREATE_CLIENT);
-        $Group1->capabilityAllow(self::PAYMENT_CREATE_TEACHER);
-        $Group1->capabilityForbidden(self::PAYMENT_EDIT_ALL);
-        $Group1->capabilityAllow(self::PAYMENT_EDIT_CLIENT);
-        $Group1->capabilityAllow(self::PAYMENT_EDIT_TEACHER);
-        $Group1->capabilityForbidden(self::PAYMENT_DELETE_ALL);
-        $Group1->capabilityAllow(self::PAYMENT_DELETE_CLIENT);
-        $Group1->capabilityAllow(self::PAYMENT_DELETE_TEACHER);
-        $Group1->capabilityForbidden(self::PAYMENT_CONFIG);
-
-        $Group1->capabilityForbidden(self::PAYMENT_TARIF_READ);
-        $Group1->capabilityForbidden(self::PAYMENT_TARIF_CREATE);
-        $Group1->capabilityForbidden(self::PAYMENT_TARIF_EDIT);
-        $Group1->capabilityForbidden(self::PAYMENT_TARIF_DELETE);
-        $Group1->capabilityAllow(self::PAYMENT_TARIF_BUY);
-
-        $Group1->capabilityAllow(self::CERTIFICATE_READ);
-        $Group1->capabilityAllow(self::CERTIFICATE_CREATE);
-        $Group1->capabilityAllow(self::CERTIFICATE_EDIT);
-        $Group1->capabilityAllow(self::CERTIFICATE_DELETE);
-        $Group1->capabilityAllow(self::CERTIFICATE_APPEND_COMMENT);
-
-        $Group1->capabilityForbidden(self::STATISTIC_READ);
-
-
-        //Преподаватель
-        $Group1 = new Core_Access_Group();
-        $Group1->title('Преподаватель');
-        $Group1->description('Описание: Преподаватель');
-        $Group1->save();
-
-        $Teachers = new User_Controller(User::current());
-        $Teachers->groupId(ROLE_TEACHER);
-        $Teachers->properties(false);
-        $Teachers->isWithAreaAssignments(false);
-        $Teachers->isSubordinate(false);
-        $Teachers->active(null);
-        foreach ($Teachers->getUsers() as $User) {
-            $Group1->appendUser($User->getId());
-        }
-
-        $Group1->capabilityForbidden(self::USER_READ_CLIENTS);
-        $Group1->capabilityForbidden(self::USER_READ_TEACHERS);
-        $Group1->capabilityForbidden(self::USER_READ_MANAGERS);
-        $Group1->capabilityForbidden(self::USER_CREATE_CLIENT);
-        $Group1->capabilityForbidden(self::USER_CREATE_TEACHER);
-        $Group1->capabilityForbidden(self::USER_CREATE_MANAGER);
-        $Group1->capabilityForbidden(self::USER_EDIT_CLIENT);
-        $Group1->capabilityForbidden(self::USER_EDIT_TEACHER);
-        $Group1->capabilityForbidden(self::USER_EDIT_MANAGER);
-        $Group1->capabilityForbidden(self::USER_ARCHIVE_CLIENT);
-        $Group1->capabilityForbidden(self::USER_ARCHIVE_TEACHER);
-        $Group1->capabilityForbidden(self::USER_ARCHIVE_MANAGER);
-        $Group1->capabilityForbidden(self::USER_DELETE);
-        $Group1->capabilityForbidden(self::USER_EDIT_LESSONS);
-        $Group1->capabilityForbidden(self::USER_APPEND_COMMENT);
-
-        $Group1->capabilityForbidden(self::TASK_READ);
-        $Group1->capabilityAllow(self::TASK_CREATE);
-        $Group1->capabilityForbidden(self::TASK_EDIT);
-        $Group1->capabilityForbidden(self::TASK_DELETE);
-        $Group1->capabilityAllow(self::TASK_APPEND_COMMENT);
-
-        $Group1->capabilityForbidden(self::LID_READ);
-        $Group1->capabilityForbidden(self::LID_CREATE);
-        $Group1->capabilityForbidden(self::LID_EDIT);
-        $Group1->capabilityForbidden(self::LID_DELETE);
-        $Group1->capabilityForbidden(self::LID_APPEND_COMMENT);
-
-        $Group1->capabilityAllow(self::SCHEDULE_READ);
-        $Group1->capabilityForbidden(self::SCHEDULE_CREATE);
-        $Group1->capabilityForbidden(self::SCHEDULE_EDIT);
-        $Group1->capabilityForbidden(self::SCHEDULE_DELETE);
-        $Group1->capabilityForbidden(self::SCHEDULE_ABSENT);
-
-        $Group1->capabilityAllow(self::SCHEDULE_REPORT_READ);
-        $Group1->capabilityAllow(self::SCHEDULE_REPORT_CREATE);
-        $Group1->capabilityForbidden(self::SCHEDULE_REPORT_EDIT);
-        $Group1->capabilityAllow(self::SCHEDULE_REPORT_DELETE);
-
-        $Group1->capabilityForbidden(self::SCHEDULE_GROUP_READ);
-        $Group1->capabilityForbidden(self::SCHEDULE_GROUP_CREATE);
-        $Group1->capabilityForbidden(self::SCHEDULE_GROUP_EDIT);
-        $Group1->capabilityForbidden(self::SCHEDULE_GROUP_DELETE);
-
-        $Group1->capabilityForbidden(self::AREA_READ);
-        $Group1->capabilityForbidden(self::AREA_CREATE);
-        $Group1->capabilityForbidden(self::AREA_EDIT);
-        $Group1->capabilityForbidden(self::AREA_DELETE);
-
-        $Group1->capabilityForbidden(self::PAYMENT_READ_ALL);
-        $Group1->capabilityForbidden(self::PAYMENT_READ_CLIENT);
-        $Group1->capabilityAllow(self::PAYMENT_READ_TEACHER);
-        $Group1->capabilityForbidden(self::PAYMENT_CREATE_ALL);
-        $Group1->capabilityForbidden(self::PAYMENT_CREATE_CLIENT);
-        $Group1->capabilityForbidden(self::PAYMENT_CREATE_TEACHER);
-        $Group1->capabilityForbidden(self::PAYMENT_EDIT_ALL);
-        $Group1->capabilityForbidden(self::PAYMENT_EDIT_CLIENT);
-        $Group1->capabilityForbidden(self::PAYMENT_EDIT_TEACHER);
-        $Group1->capabilityForbidden(self::PAYMENT_DELETE_ALL);
-        $Group1->capabilityForbidden(self::PAYMENT_DELETE_CLIENT);
-        $Group1->capabilityForbidden(self::PAYMENT_DELETE_TEACHER);
-        $Group1->capabilityForbidden(self::PAYMENT_CONFIG);
-
-        $Group1->capabilityForbidden(self::PAYMENT_TARIF_READ);
-        $Group1->capabilityForbidden(self::PAYMENT_TARIF_CREATE);
-        $Group1->capabilityForbidden(self::PAYMENT_TARIF_EDIT);
-        $Group1->capabilityForbidden(self::PAYMENT_TARIF_DELETE);
-        $Group1->capabilityForbidden(self::PAYMENT_TARIF_BUY);
-
-        $Group1->capabilityForbidden(self::CERTIFICATE_READ);
-        $Group1->capabilityForbidden(self::CERTIFICATE_CREATE);
-        $Group1->capabilityForbidden(self::CERTIFICATE_EDIT);
-        $Group1->capabilityForbidden(self::CERTIFICATE_DELETE);
-        $Group1->capabilityForbidden(self::CERTIFICATE_APPEND_COMMENT);
-
-        $Group1->capabilityAllow(self::STATISTIC_READ);
-
-
-        //Клиент
-        $Group1 = new Core_Access_Group();
-        $Group1->title('Клиент');
-        $Group1->description('Описание: Клиент');
-        $Group1->save();
-
-        $Clients = new User_Controller(User::current());
-        $Clients->groupId(ROLE_CLIENT);
-        $Clients->properties(false);
-        $Clients->isWithAreaAssignments(false);
-        $Clients->isSubordinate(false);
-        $Clients->active(null);
-        foreach ($Clients->getUsers() as $User) {
-            $Group1->appendUser($User->getId());
-        }
-
-        $Group1->capabilityForbidden(self::USER_READ_CLIENTS);
-        $Group1->capabilityForbidden(self::USER_READ_TEACHERS);
-        $Group1->capabilityForbidden(self::USER_READ_MANAGERS);
-        $Group1->capabilityForbidden(self::USER_CREATE_CLIENT);
-        $Group1->capabilityForbidden(self::USER_CREATE_TEACHER);
-        $Group1->capabilityForbidden(self::USER_CREATE_MANAGER);
-        $Group1->capabilityForbidden(self::USER_EDIT_CLIENT);
-        $Group1->capabilityForbidden(self::USER_EDIT_TEACHER);
-        $Group1->capabilityForbidden(self::USER_EDIT_MANAGER);
-        $Group1->capabilityForbidden(self::USER_ARCHIVE_CLIENT);
-        $Group1->capabilityForbidden(self::USER_ARCHIVE_TEACHER);
-        $Group1->capabilityForbidden(self::USER_ARCHIVE_MANAGER);
-        $Group1->capabilityForbidden(self::USER_DELETE);
-        $Group1->capabilityForbidden(self::USER_EDIT_LESSONS);
-        $Group1->capabilityForbidden(self::USER_APPEND_COMMENT);
-
-        $Group1->capabilityForbidden(self::TASK_READ);
-        $Group1->capabilityForbidden(self::TASK_CREATE);
-        $Group1->capabilityForbidden(self::TASK_EDIT);
-        $Group1->capabilityForbidden(self::TASK_DELETE);
-        $Group1->capabilityForbidden(self::TASK_APPEND_COMMENT);
-
-        $Group1->capabilityForbidden(self::LID_READ);
-        $Group1->capabilityForbidden(self::LID_CREATE);
-        $Group1->capabilityForbidden(self::LID_EDIT);
-        $Group1->capabilityForbidden(self::LID_DELETE);
-        $Group1->capabilityForbidden(self::LID_APPEND_COMMENT);
-
-        $Group1->capabilityAllow(self::SCHEDULE_READ);
-        $Group1->capabilityForbidden(self::SCHEDULE_CREATE);
-        $Group1->capabilityForbidden(self::SCHEDULE_EDIT);
-        $Group1->capabilityForbidden(self::SCHEDULE_DELETE);
-        $Group1->capabilityForbidden(self::SCHEDULE_ABSENT);
-
-        $Group1->capabilityAllow(self::SCHEDULE_REPORT_READ);
-        $Group1->capabilityForbidden(self::SCHEDULE_REPORT_CREATE);
-        $Group1->capabilityForbidden(self::SCHEDULE_REPORT_EDIT);
-        $Group1->capabilityForbidden(self::SCHEDULE_REPORT_DELETE);
-
-        $Group1->capabilityForbidden(self::SCHEDULE_GROUP_READ);
-        $Group1->capabilityForbidden(self::SCHEDULE_GROUP_CREATE);
-        $Group1->capabilityForbidden(self::SCHEDULE_GROUP_EDIT);
-        $Group1->capabilityForbidden(self::SCHEDULE_GROUP_DELETE);
-
-        $Group1->capabilityForbidden(self::AREA_READ);
-        $Group1->capabilityForbidden(self::AREA_CREATE);
-        $Group1->capabilityForbidden(self::AREA_EDIT);
-        $Group1->capabilityForbidden(self::AREA_DELETE);
-
-        $Group1->capabilityForbidden(self::PAYMENT_READ_ALL);
-        $Group1->capabilityAllow(self::PAYMENT_READ_CLIENT);
-        $Group1->capabilityForbidden(self::PAYMENT_READ_TEACHER);
-        $Group1->capabilityForbidden(self::PAYMENT_CREATE_ALL);
-        $Group1->capabilityForbidden(self::PAYMENT_CREATE_CLIENT);
-        $Group1->capabilityForbidden(self::PAYMENT_CREATE_TEACHER);
-        $Group1->capabilityForbidden(self::PAYMENT_EDIT_ALL);
-        $Group1->capabilityForbidden(self::PAYMENT_EDIT_CLIENT);
-        $Group1->capabilityForbidden(self::PAYMENT_EDIT_TEACHER);
-        $Group1->capabilityForbidden(self::PAYMENT_DELETE_ALL);
-        $Group1->capabilityForbidden(self::PAYMENT_DELETE_CLIENT);
-        $Group1->capabilityForbidden(self::PAYMENT_DELETE_TEACHER);
-        $Group1->capabilityForbidden(self::PAYMENT_CONFIG);
-
-        $Group1->capabilityForbidden(self::PAYMENT_TARIF_READ);
-        $Group1->capabilityForbidden(self::PAYMENT_TARIF_CREATE);
-        $Group1->capabilityForbidden(self::PAYMENT_TARIF_EDIT);
-        $Group1->capabilityForbidden(self::PAYMENT_TARIF_DELETE);
-        $Group1->capabilityAllow(self::PAYMENT_TARIF_BUY);
-
-        $Group1->capabilityForbidden(self::CERTIFICATE_READ);
-        $Group1->capabilityForbidden(self::CERTIFICATE_CREATE);
-        $Group1->capabilityForbidden(self::CERTIFICATE_EDIT);
-        $Group1->capabilityForbidden(self::CERTIFICATE_DELETE);
-        $Group1->capabilityForbidden(self::CERTIFICATE_APPEND_COMMENT);
-
-        $Group1->capabilityForbidden(self::STATISTIC_READ);
-
-        $Orm->executeQuery('UPDATE Access_Group SET subordinated = 0 WHERE 1');
     }
 }

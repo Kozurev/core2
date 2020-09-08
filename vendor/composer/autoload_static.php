@@ -14,9 +14,13 @@ class ComposerStaticInit0aa97b73fde75fe2e2bc6f4365582c13
         '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
+        '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         '27592325262b385204a263c2ab632d6e' => __DIR__ . '/..' . '/kreait/clock/src/Clock.php',
         'b067bc7112e384b61c701452d53a14a8' => __DIR__ . '/..' . '/mtdowling/jmespath.php/src/JmesPath.php',
         'f7c6080b46f9fe41a46a657439674576' => __DIR__ . '/..' . '/kreait/firebase-php/src/Firebase.php',
+        'fe62ba7e10580d903cc46d808b5961a4' => __DIR__ . '/..' . '/tightenco/collect/src/Collect/Support/helpers.php',
+        'caf31cc6ec7cf2241cb6f12c226c3846' => __DIR__ . '/..' . '/tightenco/collect/src/Collect/Support/alias.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -28,11 +32,17 @@ class ComposerStaticInit0aa97b73fde75fe2e2bc6f4365582c13
         array (
             'VK\\' => 3,
         ),
+        'T' => 
+        array (
+            'Tightenco\\Collect\\' => 18,
+        ),
         'S' => 
         array (
+            'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Polyfill\\Php72\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Intl\\Idn\\' => 26,
+            'Symfony\\Component\\VarDumper\\' => 28,
             'Superbalist\\Flysystem\\GoogleStorage\\' => 36,
         ),
         'R' => 
@@ -95,6 +105,14 @@ class ComposerStaticInit0aa97b73fde75fe2e2bc6f4365582c13
         array (
             0 => __DIR__ . '/..' . '/vkcom/vk-php-sdk/src/VK',
         ),
+        'Tightenco\\Collect\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/tightenco/collect/src/Collect',
+        ),
+        'Symfony\\Polyfill\\Php80\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
+        ),
         'Symfony\\Polyfill\\Php72\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php72',
@@ -106,6 +124,10 @@ class ComposerStaticInit0aa97b73fde75fe2e2bc6f4365582c13
         'Symfony\\Polyfill\\Intl\\Idn\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-intl-idn',
+        ),
+        'Symfony\\Component\\VarDumper\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/var-dumper',
         ),
         'Superbalist\\Flysystem\\GoogleStorage\\' => 
         array (
@@ -223,12 +245,19 @@ class ComposerStaticInit0aa97b73fde75fe2e2bc6f4365582c13
         ),
     );
 
+    public static $classMap = array (
+        'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
+        'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
+        'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
+    );
+
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit0aa97b73fde75fe2e2bc6f4365582c13::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit0aa97b73fde75fe2e2bc6f4365582c13::$prefixDirsPsr4;
             $loader->prefixesPsr0 = ComposerStaticInit0aa97b73fde75fe2e2bc6f4365582c13::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit0aa97b73fde75fe2e2bc6f4365582c13::$classMap;
 
         }, null, ClassLoader::class);
     }

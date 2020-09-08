@@ -456,7 +456,7 @@ class Core_Page_Show extends Core
                 $this->Structure->queryBuilder()->where('parent_id', '=', $this->Structure->getId());
             }
 
-            $TmpStructure = $this->Structure->find();
+            $TmpStructure = $this->Structure->queryBuilder()->find();
             if (!is_null($TmpStructure)) {
                 $this->Structure = $TmpStructure;
             }

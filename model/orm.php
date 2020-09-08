@@ -10,6 +10,18 @@
  */
 class Orm 
 {
+    const OBSERVER_ARG_QUERY = 'query_string';
+    const OBSERVER_ARG_METHOD = 'method';
+    const OBSERVER_METHOD_FIND_ALL = 'findAll';
+    const OBSERVER_METHOD_FIND = 'find';
+    const OBSERVER_METHOD_DELETE = 'delete';
+    const OBSERVER_METHOD_COUNT = 'count';
+    const OBSERVER_METHOD_SUM = 'sum';
+    const OBSERVER_METHOD_INSERT = 'insert';
+    const OBSERVER_METHOD_UPDATE = 'update';
+    const OBSERVER_METHOD_EXECUTE = 'execute';
+
+
     /**
      * Объект с которым связан конструктор запроса по умолчанию
      *
@@ -138,7 +150,7 @@ class Orm
      *
      * @param bool $switch - указатель
      */
-    public static function debug($switch)
+    public static function debug(bool $switch)
     {
         $_SESSION['core']['SQL_DEBUG'] = $switch;
     }
@@ -156,7 +168,7 @@ class Orm
      *
      * @return bool
      */
-    private static function isDebugSql()
+    public static function isDebugSql() : bool
     {
         return Core_Array::getValue($_SESSION['core'], 'SQL_DEBUG', false) === true;
     }
@@ -185,6 +197,22 @@ class Orm
         return $this;
     }
 
+    /**
+     * @return bool
+     */
+    public static function isLogging() : bool
+    {
+        return Core_Array::Session('core/sql_log', false, PARAM_BOOL);
+    }
+
+    /**
+     * @param bool $switcher
+     */
+    public static function logging(bool $switcher)
+    {
+        $_SESSION['core']['sql_log'] = $switcher;
+    }
+
 	/**
 	 * Аналог метода count() для нормальной работы старого кода
      *
@@ -207,9 +235,10 @@ class Orm
         $query = $this->getQueryString();
         $result = DB::instance()->query($query);
 
-        if (self::isDebugSql()) {
-            echo '<br>Строка запроса метода <b>сount()</b>: ' . $query;
-        }
+        Core::notify([
+            self::OBSERVER_ARG_METHOD => self::OBSERVER_METHOD_COUNT,
+            self::OBSERVER_ARG_QUERY => $query
+        ], 'after.orm.' . self::OBSERVER_METHOD_COUNT);
 
         $this->select = $beforeSelect;
 
@@ -234,9 +263,10 @@ class Orm
         $query = $this->getQueryString();
         $result = DB::instance()->query($query);
 
-        if (self::isDebugSql()) {
-            echo '<br>Строка запроса метода <b>sum()</b>: ' . $query;
-        }
+        Core::notify([
+            self::OBSERVER_ARG_METHOD => self::OBSERVER_METHOD_SUM,
+            self::OBSERVER_ARG_QUERY => $query
+        ], 'after.orm.' . self::OBSERVER_METHOD_SUM);
 
         if ($result == false) {
             return 0;
@@ -304,11 +334,12 @@ class Orm
 			$queryStr .= ') ';
 		}
 
-		if (self::isDebugSql()) {
-			echo "<br>Строка запроса метода <b>save()</b>: ".$queryStr;
-		}
-
 		DB::instance()->query($queryStr);
+
+        Core::notify([
+            self::OBSERVER_ARG_METHOD => $eventType,
+            self::OBSERVER_ARG_QUERY => $queryStr
+        ], 'after.orm.' . $eventType);
 
 		/**
          * Если объект только что был сохранен в таблицу то устанавливается значение
@@ -458,10 +489,13 @@ class Orm
      */
     public function executeQuery($sql)
     {
-        if (self::isDebugSql()) {
-            echo "<br>Строка из метода <b>executeQuery()</b>: " . $sql;
-        }
         $result = DB::instance()->query($sql);
+
+        Core::notify([
+            self::OBSERVER_ARG_METHOD => self::OBSERVER_METHOD_EXECUTE,
+            self::OBSERVER_ARG_QUERY => $sql
+        ], 'after.orm.' . self::OBSERVER_METHOD_EXECUTE);
+
         return $result;
     }
 
@@ -473,10 +507,13 @@ class Orm
      */
     static public function execute(string $query)
     {
-        if (self::isDebugSql()) {
-            echo "<br>Строка из метода <b>execute()</b>: " . $query;
-        }
         $result = DB::instance()->query($query);
+
+        Core::notify([
+            self::OBSERVER_ARG_METHOD => self::OBSERVER_METHOD_EXECUTE,
+            self::OBSERVER_ARG_QUERY => $query
+        ], 'after.orm.' . self::OBSERVER_METHOD_EXECUTE);
+
         return $result;
     }
 
@@ -543,9 +580,11 @@ class Orm
     {
         $query = 'DELETE FROM ' . $obj->getTableName() . ' WHERE id = ' . $obj->getId();
         DB::instance()->query($query);
-        if (self::isDebugSql()) {
-            echo '<br>Строка из метода <b>delete()</b>: ' . $query;
-        }
+
+        Core::notify([
+            self::OBSERVER_ARG_METHOD => self::OBSERVER_METHOD_DELETE,
+            self::OBSERVER_ARG_QUERY => $query
+        ], 'after.orm.' . self::OBSERVER_METHOD_DELETE);
     }
 
 	/**
@@ -930,20 +969,21 @@ class Orm
         return $this;
     }
 
-	/**
-	 * Поиск записей в базе данных
+    /**
+     * Поиск записей в базе данных
      *
-	 * @return array
-	 */
-	public function findAll()
+     * @param bool $isIdsKeys
+     * @return array
+     */
+	public function findAll(bool $isIdsKeys = false)
 	{
 		$query = $this->getQueryString();
-
-		if (self::isDebugSql()) {
-			echo '<br>Строка запроса из метода <b>findAll()</b>: ' . $query;
-		}
-
         $result = DB::instance()->query($query);
+
+        Core::notify([
+            self::OBSERVER_ARG_METHOD => self::OBSERVER_METHOD_FIND_ALL,
+            self::OBSERVER_ARG_QUERY => $query
+        ], 'after.orm.' . self::OBSERVER_METHOD_FIND_ALL);
 
         if (!$result) {
             return [];
@@ -953,9 +993,21 @@ class Orm
             ?   $fetchClass = $this->class
             :   $fetchClass = 'stdClass';
 
-        $result->setFetchMode(PDO::FETCH_CLASS, $fetchClass);
-        return $result->fetchAll();
+        if ($isIdsKeys === true) {
+            return $result->fetchAll(PDO::FETCH_CLASS|PDO::FETCH_UNIQUE, $fetchClass);
+        } else {
+            return $result->fetchAll(PDO::FETCH_CLASS, $fetchClass  );
+        }
 	}
+
+    /**
+     * @param bool $isIdsKeys
+     * @return \Tightenco\Collect\Support\Collection
+     */
+	public function get(bool $isIdsKeys = false)
+    {
+        return collect($this->findAll($isIdsKeys));
+    }
 
 	/**
 	 * Выполняет запрос поиска одной записи в таблице и возвращает его в виде объекта класса
@@ -965,12 +1017,12 @@ class Orm
 	public function find()
 	{
 		$query = $this->getQueryString() . ' LIMIT 1';
-
-		if (self::isDebugSql()) {
-			echo '<br>Строка запроса из метода <b>find()</b>: ' . $query;
-		}
-
         $result = DB::instance()->query($query);
+
+        Core::notify([
+            self::OBSERVER_ARG_METHOD => self::OBSERVER_METHOD_FIND,
+            self::OBSERVER_ARG_QUERY => $query
+        ], 'after.orm.' . self::OBSERVER_METHOD_FIND);
 
         if ($result == false) {
             return null;

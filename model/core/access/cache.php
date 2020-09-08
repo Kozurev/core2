@@ -5,8 +5,22 @@ class Core_Access_Cache
     /**
      * @var array
      */
-    private $stash = [];
+    private array $stash = [];
 
+    /**
+     * Core_Access_Cache constructor.
+     * @param User|null $user
+     * @param array|null $capabilities
+     */
+    public function __construct(User $user = null, array $capabilities = null)
+    {
+        if (!is_null($user) && is_array($capabilities)) {
+            /** @var Core_Access_Capability $capability */
+            foreach ($capabilities as $capability) {
+                $this->put($user->getId(), $capability->name(), $capability->access());
+            }
+        }
+    }
 
     /**
      * @param int $userId

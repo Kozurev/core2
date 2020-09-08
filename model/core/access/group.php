@@ -12,11 +12,16 @@ require_once ROOT . '/model/core/access/group/assignment.php';
 class Core_Access_Group extends Core_Access_Group_Model
 {
     /**
+     * @var array
+     */
+    protected static array $capabilities = [];
+
+    /**
      * Список сообщений при возникновении ошибки
      *
      * @var array
      */
-    private $excMsg = [
+    private array $excMsg = [
         'null_subordinate' => 'При формировании списка с указанием принадлежности одному директору необходимо авторизоваться'
     ];
 
@@ -26,26 +31,24 @@ class Core_Access_Group extends Core_Access_Group_Model
      * @param int $userId
      * @return Core_Access_Group_Assignment|null
      */
-    public function appendUser(int $userId)
+    public function appendUser(int $userId) : ?Core_Access_Group_Assignment
     {
         if (empty($this->id)) {
             return null;
         }
-        $GroupAssignment = new Core_Access_Group_Assignment();
-        $Assignment = $GroupAssignment->queryBuilder()
+        $assignment = Core_Access_Group_Assignment::query()
             ->where('user_id', '=', $userId)
             ->find();
-        if (is_null($Assignment)) {
-            $Assignment = new Core_Access_Group_Assignment();
-            $Assignment->userId($userId);
+        if (is_null($assignment)) {
+            $assignment = new Core_Access_Group_Assignment();
+            $assignment->userId($userId);
         }
-        if ($Assignment->groupId() !== $this->getId()) {
-            $Assignment->groupId($this->getId());
-            $Assignment->save();
+        if ($assignment->groupId() !== $this->getId()) {
+            $assignment->groupId($this->getId());
+            $assignment->save();
         }
-        return $Assignment;
+        return $assignment;
     }
-
 
     /**
      * Удаление принадлежности пользователя к группе
@@ -57,27 +60,25 @@ class Core_Access_Group extends Core_Access_Group_Model
         if (empty($this->id)) {
             return;
         }
-        $GroupAssignment = new Core_Access_Group_Assignment();
-        $ExistingAssignment = $GroupAssignment->queryBuilder()
+        $existingAssignment = Core_Access_Group_Assignment::query()
             ->where('user_id', '=', $userId)
             ->where('group_id', '=', $this->getId())
             ->find();
-        if (!is_null($ExistingAssignment)) {
-            $ExistingAssignment->delete();
+        if (!is_null($existingAssignment)) {
+            $existingAssignment->delete();
         }
     }
-
 
     /**
      * Поиск списка пользователей принадлежащих данной группе
      *
      * @param array $params
      * @param bool $isSubordinate
-     * @param User $CurrentUser
+     * @param User|null $currentUser
      * @throws Exception
      * @return array
      */
-    public function getUserList(array $params = [], bool $isSubordinate = true, User $CurrentUser = null) : array
+    public function getUserList(array $params = [], bool $isSubordinate = true, User $currentUser = null) : array
     {
         if (empty($this->id)) {
             return [];
@@ -85,141 +86,134 @@ class Core_Access_Group extends Core_Access_Group_Model
             $nonStrictFilter = ['surname', 'name'];
             $paramFilter = Core_Array::getValue($params, 'filter', [], PARAM_ARRAY);
 
-            $Query = Core::factory('User')->queryBuilder()
+            $query = Core::factory('User')->queryBuilder()
                 ->join('Core_Access_Group_Assignment AS caga', 'caga.user_id = User.id AND caga.group_id = ' . $this->getId());
 
             //Фильтр по директору (организации)
             if ($isSubordinate === true) {
-                if (is_null($CurrentUser)) {
-                    $CurrentUser = User::current();
+                if (is_null($currentUser)) {
+                    $currentUser = User_Auth::current();
                 }
-                if (is_null($CurrentUser)) {
+                if (is_null($currentUser)) {
                     throw new Exception(
                         Core_Array::getValue($this->excMsg, 'null_subordinate', 'null_subordinate', PARAM_STRING)
                     );
                 } else {
-                    $subordinated = $CurrentUser->getDirector()->getId();
-                    $Query->where('User.subordinated', '=', $subordinated);
+                    $subordinated = $currentUser->getDirector()->getId();
+                    $query->where('User.subordinated', '=', $subordinated);
                 }
             }
 
             foreach ($paramFilter as $field => $value) {
                 if (in_array($field, $nonStrictFilter)) {
-                    $Query->open()
+                    $query->open()
                         ->where($field, 'LIKE', '%' . $value)
                         ->orWhere($field, 'LIKE', $value . '%')
                         ->orWhere($field, 'LIKE', '%' . $value . '%')
                         ->orWhere($field, '=', $value)
                     ->close();
                 } else {
-                    $Query->where($field, '=', $value);
+                    $query->where($field, '=', $value);
                 }
             }
 
-            return $Query->findAll();
+            return $query->findAll();
         }
     }
-
 
     /**
      * Поиск количества пользователей, принадлежащих данной группе
      *
      * @param bool $isSubordinate
-     * @param User $CurrentUser
+     * @param User|null $currentUser
      * @throws Exception
      * @return int
      */
-    public function getCountUsers(bool $isSubordinate = true, User $CurrentUser = null) : int
+    public function getCountUsers(bool $isSubordinate = true, User $currentUser = null) : int
     {
         if (empty($this->id)) {
             return 0;
         } else {
-            $GroupAssignment = new Core_Access_Group_Assignment();
-            $GroupAssignment->queryBuilder()
-                ->where($GroupAssignment->getTableName() . '.group_id', '=', $this->getId());
+            $groupAssignment = Core_Access_Group_Assignment::query()
+                ->where((new Core_Access_Group_Assignment)->getTableName() . '.group_id', '=', $this->getId());
 
             if ($isSubordinate === true) {
-                if (is_null($CurrentUser)) {
-                    $CurrentUser = User::current();
+                if (is_null($currentUser)) {
+                    $currentUser = User_Auth::current();
                 }
-                if (is_null($CurrentUser)) {
+                if (is_null($currentUser)) {
                     throw new Exception(
                         Core_Array::getValue($this->excMsg, 'null_subordinate', 'null_subordinate', PARAM_STRING)
                     );
                 } else {
-                    $subordinated = $CurrentUser->getDirector()->getId();
-                    $GroupAssignment
-                        ->queryBuilder()
+                    $subordinated = $currentUser->getDirector()->getId();
+                    $groupAssignment
                         ->join('User', ' User.id = user_id AND User.subordinated = ' . $subordinated);
                 }
             }
 
-            return $GroupAssignment->getCount();
+            return $groupAssignment->count();
         }
     }
-
 
     /**
      * Открыть доступ к действию
      *
-     * @param string $capability
+     * @param string $capabilityName
      * @return void
      */
-    public function capabilityAllow(string $capability)
+    public function capabilityAllow(string $capabilityName)
     {
         if (empty($this->id)) {
             return;
         }
-        $Capability = self::getCapability($capability);
-        if (is_null($Capability)) {
-            $Capability = new Core_Access_Capability();
-            $Capability->groupId($this->getId());
-            $Capability->name($capability);
+        $capability = self::getCapability($capabilityName);
+        if (is_null($capability)) {
+            $capability = new Core_Access_Capability();
+            $capability->groupId($this->getId());
+            $capability->name($capabilityName);
         }
-        $Capability->access(1);
-        $Capability->save();
+        $capability->access(1);
+        $capability->save();
     }
-
 
     /**
      * Закрыть доступ к действию
      *
-     * @param string $capability
+     * @param string $capabilityName
      * @return void
      */
-    public function capabilityForbidden(string $capability)
+    public function capabilityForbidden(string $capabilityName)
     {
         if (empty($this->id)) {
             return;
         }
-        $Capability = self::getCapability($capability);
-        if (is_null($Capability)) {
-            $Capability = new Core_Access_Capability();
-            $Capability->groupId($this->getId());
-            $Capability->name($capability);
+        $capability = self::getCapability($capabilityName);
+        if (is_null($capability)) {
+            $capability = new Core_Access_Capability();
+            $capability->groupId($this->getId());
+            $capability->name($capabilityName);
         }
-        $Capability->access(0);
-        $Capability->save();
+        $capability->access(0);
+        $capability->save();
     }
-
 
     /**
      * Права доступа к действию идентично родительской группе
      *
-     * @param string $capability
+     * @param string $capabilityName
      * @return void
      */
-    public function capabilityAsParent(string $capability)
+    public function capabilityAsParent(string $capabilityName)
     {
         if (empty($this->id)) {
             return;
         }
-        $Capability = self::getCapability($capability);
-        if (!is_null($Capability)) {
-            $Capability->delete();
+        $capability = self::getCapability($capabilityName);
+        if (!is_null($capability)) {
+            $capability->delete();
         }
     }
-
 
     /**
      * Поиск прототипа группы
@@ -231,26 +225,25 @@ class Core_Access_Group extends Core_Access_Group_Model
         if ($this->parentId() === 0) {
             return null;
         } else {
-            return Core::factory('Core_Access_Group', $this->parentId());
+            return Core_Access_Group::find($this->parentId());
         }
     }
-
 
     /**
      * Метод создания группы прав доступа
      *
      * @param string $title
+     * @param string|null $description
      * @return Core_Access_Group
      */
     public static function make(string $title, string $description = null)
     {
-        $Group = new Core_Access_Group();
-        $Group->title($title);
-        $Group->description($description);
-        $Group->save();
-        return $Group;
+        $group = new Core_Access_Group();
+        $group->title($title);
+        $group->description($description);
+        $group->save();
+        return $group;
     }
-
 
     /**
      * Создание прообраза текущей группы
@@ -263,37 +256,35 @@ class Core_Access_Group extends Core_Access_Group_Model
         if (empty($this->id)) {
             return false;
         }
-        $Child = new Core_Access_Group();
-        $Child->parentId($this->getId());
-        $Child->title($title);
-        $Child->subordinated($this->subordinated);
-        $Child->save();
-        return $Child;
+        $child = new Core_Access_Group();
+        $child->parentId($this->getId());
+        $child->title($title);
+        $child->subordinated($this->subordinated);
+        $child->save();
+        return $child;
     }
-
 
     /**
      * Проверка наличия "возмоности" на соверения определенного действия у группы
      *
-     * @param string $capability
+     * @param string $capabilityName
      * @return bool
      */
-    public function hasCapability(string $capability) : bool
+    public function hasCapability(string $capabilityName) : bool
     {
         if (empty($this->id)) {
             return false;
         }
-        $Capability = new Core_Access_Capability();
-        $issetCapability = $Capability->queryBuilder()
+        $issetCapability = Core_Access_Capability::query()
             ->where('group_id', '=', $this->getId())
-            ->where('name', '=', $capability)
+            ->where('name', '=', $capabilityName)
             ->find();
         if (is_null($issetCapability)) {
-            $ParentGroup = $this->getParent();
-            if (is_null($ParentGroup)) {
+            $parentGroup = $this->getParent();
+            if (is_null($parentGroup)) {
                 return false;
             } else {
-                return $ParentGroup->hasCapability($capability);
+                return $parentGroup->hasCapability($capabilityName);
             }
         } elseif ($issetCapability->access() == 1) {
             return true;
@@ -302,47 +293,43 @@ class Core_Access_Group extends Core_Access_Group_Model
         }
     }
 
-
     /**
      * Поиск "возмоности" группы по её наванию
      *
-     * @param string $capability
+     * @param string $capabilityName
      * @return Core_Access_Capability|null
      */
-    public function getCapability(string $capability)
+    public function getCapability(string $capabilityName) : ?Core_Access_Capability
     {
         if (empty($this->id)) {
             return null;
         }
-        $Capability = new Core_Access_Capability();
-        return $Capability->queryBuilder()
+        return Core_Access_Capability::query()
             ->where('group_id', '=', $this->getId())
-            ->where('name', '=', $capability)
+            ->where('name', '=', $capabilityName)
             ->find();
     }
-
 
     /**
      * Рекурсивный поиск "возможности" по её названию
      *
-     * @param string $capability
+     * @param string $capabilityName
      * @return Core_Access_Capability|null
      */
-    public function getCapabilityRecurse(string $capability)
+    public function getCapabilityRecurse(string $capabilityName) : ?Core_Access_Capability
     {
-        $ExistingCapability = $this->getCapability($capability);
-        if (is_null($ExistingCapability)) {
-            $Parent = $this->getParent();
-            if (is_null($Parent)) {
+        $existingCapability = $this->getCapability($capabilityName);
+        if (is_null($existingCapability)) {
+            $parent = $this->getParent();
+            if (is_null($parent)) {
                 return null;
             } else {
-                return $Parent->getCapabilityRecurse($capability);
+                return $parent->getCapabilityRecurse($capabilityName);
             }
         } else {
-            return $ExistingCapability;
+            return $existingCapability;
         }
     }
-
 
     /**
      * Поиск всех "возможностей" принадлежащих именно данной группе
@@ -354,12 +341,58 @@ class Core_Access_Group extends Core_Access_Group_Model
         if (empty($this->id)) {
             return [];
         }
-        $Capability = new Core_Access_Capability();
-        return $Capability->queryBuilder()
+        return Core_Access_Capability::query()
             ->where('group_id', '=', $this->getId())
             ->findAll();
     }
 
+    /**
+     * @param array|null $capabilitiesNames
+     * @return array
+     */
+    public function getAllCapabilities(array $capabilitiesNames = null) : array
+    {
+        if (is_null($capabilitiesNames)) {
+            $capabilitiesNames = self::capabilities();
+        }
+        $capabilities = Core_Access_Capability::query()
+            ->where('group_id', '=', $this->getId())
+            ->whereIn('name', $capabilitiesNames)
+            ->findAll();
+
+        if (count($capabilities) < count($capabilitiesNames)) {
+            /** @var Core_Access_Capability $capability */
+            foreach ($capabilities as $capability) {
+                unset($capabilitiesNames[array_search($capability->name(), $capabilitiesNames)]);
+            }
+
+            $parentGroup = $this->getParent();
+            if (!is_null($parentGroup)) {
+                $capabilities = array_merge($capabilities, $parentGroup->getAllCapabilities($capabilitiesNames));
+            }
+        }
+
+        return $capabilities;
+    }
+
+    /**
+     * @return array
+     */
+    public static function capabilities() : array
+    {
+        return array_keys(self::getCapabilitiesList());
+    }
+
+    /**
+     * @return array
+     */
+    public static function getCapabilitiesList() : array
+    {
+        if (empty(self::$capabilities)) {
+            self::$capabilities = include ROOT . '/model/core/access/capabilities.php';
+        }
+        return self::$capabilities;
+    }
 
     /**
      * Поиск дочерних подгрпп первого уровня
@@ -371,12 +404,10 @@ class Core_Access_Group extends Core_Access_Group_Model
         if (empty($this->id)) {
             return [];
         }
-        $ChildrenGroups = new Core_Access_Group();
-        return $ChildrenGroups->queryBuilder()
+        return Core_Access_Group::query()
             ->where('parent_id', '=', $this->getId())
             ->findAll();
     }
-
 
     /**
      * Рекурсивный поиск дочерних подгрупп всех уровней
@@ -385,14 +416,13 @@ class Core_Access_Group extends Core_Access_Group_Model
      */
     public function getChildrenRecurse() : array
     {
-        $Children = $this->getChildren();
-        $result = $Children;
-        foreach ($Children as $Child) {
-            $result = array_merge($result, $Child->getChildrenRecurse());
+        $children = $this->getChildren();
+        $result = $children;
+        foreach ($children as $child) {
+            $result = array_merge($result, $child->getChildrenRecurse());
         }
         return $result;
     }
-
 
     /**
      * Исходные группы не должны удаляться
@@ -405,12 +435,12 @@ class Core_Access_Group extends Core_Access_Group_Model
         if ($this->parentId() === 0) {
             return;
         } else {
-            foreach ($this->getCapabilities() as $Capability) {
-                $Capability->delete();
+            foreach ($this->getCapabilities() as $capability) {
+                $capability->delete();
             }
             if ($isRecurseDelete === true) {
-                foreach ($this->getChildrenRecurse() as $Group) {
-                    $Group->delete(false);
+                foreach ($this->getChildrenRecurse() as $group) {
+                    $group->delete(false);
                 }
             }
             parent::delete();

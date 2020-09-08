@@ -258,12 +258,24 @@ class Core_Entity extends Core_Entity_Model
 
 
     /**
-     * @return null|mixed
+     * @param int $id
+     * @return self|null
      */
-    public function find()
+    public static function find(int $id) : ?self
     {
-        return $this->queryBuilder()->find();
+        return self::query()
+            ->where('id', '=', $id)
+            ->find();
     }
+
+
+//    /**
+//     * @return null|mixed
+//     */
+//    public function find()
+//    {
+//        return $this->queryBuilder()->find();
+//    }
 
 
     /**
