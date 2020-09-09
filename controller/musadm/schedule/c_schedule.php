@@ -75,6 +75,7 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
 
     //все изменения по времени на текущую дату
     $timeModifies = Schedule_Lesson_TimeModified::query()
+        ->select(['lesson_id', 'Schedule_Lesson_TimeModified.date', 'Schedule_Lesson_TimeModified.time_from', 'Schedule_Lesson_TimeModified.time_to'])
         ->join((new Schedule_Lesson())->getTableName() . ' as l', 'l.id = lesson_id and l.area_id = ' . $areaId)
         ->where('date', '=', $date)
         ->findAll(true);
