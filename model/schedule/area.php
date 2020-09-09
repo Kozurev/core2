@@ -26,7 +26,7 @@ class Schedule_Area extends Schedule_Area_Model
             $this->rooms = [];
             /** @var Schedule_Room $room */
             foreach ($rooms as $room) {
-                $this->rooms[$room->getId()] = $room;
+                $this->rooms[$room->classId()] = $room;
             }
         }
         return $this->rooms;
