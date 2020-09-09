@@ -19,31 +19,29 @@ class Schedule_Area_Controller
      */
     public static function factory(int $id = null, bool $isSubordinate = true)
     {
-        $Area = Core::factory('Schedule_Area');
+        $area = new Schedule_Area();
 
         if (is_null($id)) {
-            return $Area;
+            return $area;
         }
 
-        $Area->queryBuilder()
+        $area->queryBuilder()
             ->where('id', '=', $id);
 
         if ($isSubordinate === true) {
-            $AuthUser = User::current();
-            if (is_null($AuthUser)) {
+            $authUser = User_Auth::current();
+            if (is_null($authUser)) {
                 return null;
             }
 
-            $Director = $AuthUser->getDirector();
-            if (is_null($Director)) {
+            $director = $authUser->getDirector();
+            if (is_null($director)) {
                 return null;
             }
 
-            $Area->queryBuilder()
-                ->where('subordinated', '=', $Director->getId());
+            $area->queryBuilder()
+                ->where('subordinated', '=', $director->getId());
         }
-        return $Area->find();
+        return $area->queryBuilder()->find();
     }
-
-
 }

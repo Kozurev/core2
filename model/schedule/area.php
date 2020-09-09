@@ -128,7 +128,7 @@ class Schedule_Area extends Schedule_Area_Model
      */
     public function getClassName(int $classId, string $default) : string
     {
-        return $this->getRooms()[$classId] ?? $default;
+        return $this->getRooms()[$classId]->title() ?? $default;
     }
 
     /**
