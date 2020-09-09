@@ -65,6 +65,9 @@ function updateLastLessonTime($Lesson, &$maxTime, $time, $period)
  */
 function getLessonData($lesson)
 {
+    if (!empty($lesson->oldid ?? 0)) {
+        $lesson->setId($lesson->oldid);
+    }
     if (isset($_SESSION['core']['lesson_data'][$lesson->getId()])) {
         return $_SESSION['core']['lesson_data'][$lesson->getId()];
     }
