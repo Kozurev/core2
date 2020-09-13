@@ -17,26 +17,89 @@ class Sberbank
     const PARAM_ORDER_NUMBER = 'orderNumber';
     const PARAM_JSON_PARAMS = 'jsonParams';
 
-    private $token = '';
+    /**
+     * Авторизационный токен для платежного шлюза
+     *
+     * @var string
+     */
+    private string $token = '';
 
-    private $isTestMode = true;
+    /**
+     * Режим работы платежного шлюза
+     *
+     * @var bool
+     */
+    private bool $isTestMode = false;
 
-    private $orderNumber;
-    private $amount;
-    private $userId;
-    private $description;
-    private $successUrl;
-    private $errorUrl;
+    /**
+     * id платежа из таблицы "payment"
+     *
+     * @var int|null
+     */
+    private ?int $orderNumber;
 
-    private static $testUrl = 'https://3dsec.sberbank.ru/payment/rest/';
-    private static $realUrl = 'https://securepayments.sberbank.ru/payment/rest';
+    /**
+     * Сумма платежа
+     *
+     * @var int|null
+     */
+    private ?int $amount;
 
+    /**
+     * id пользователя, который производит платеж
+     *
+     * @var int|null
+     */
+    private ?int $userId;
+
+    /**
+     * Примечание к платежу
+     *
+     * @var string|null
+     */
+    private ?string $description;
+
+    /**
+     * URL для редиректа после успешной оплаты
+     *
+     * @var string|null
+     */
+    private ?string $successUrl;
+
+    /**
+     * URL для редиректа, после неудачной оплаты
+     *
+     * @var string|null
+     */
+    private ?string $errorUrl;
+
+    /**
+     * API url для тестовых платежей
+     *
+     * @var string
+     */
+    private static string $testUrl = 'https://3dsec.sberbank.ru/payment/rest/';
+
+    /**
+     * API url для реальных платежей
+     *
+     * @var string
+     */
+    private static string $realUrl = 'https://securepayments.sberbank.ru/payment/rest';
+
+    /**
+     * @return Sberbank
+     */
     public static function instance()
     {
         $token = Property_Controller::factoryByTag('payment_sberbank_token')->getValues(User_Auth::current()->getDirector())[0]->value();
         return new self($token);
     }
 
+    /**
+     * Sberbank constructor.
+     * @param string $token
+     */
     private function __construct(string $token)
     {
         $this->token = $token;
@@ -52,16 +115,33 @@ class Sberbank
         return $this->isTestMode;
     }
 
+    /**
+     * @param bool $mode
+     */
+    public function setTestMode(bool $mode) : void
+    {
+        $this->isTestMode = $mode;
+    }
+
+    /**
+     * @param int $orderNumber
+     */
     public function setOrderNumber(int $orderNumber)
     {
         $this->orderNumber = $orderNumber;
     }
 
+    /**
+     * @param int $amount
+     */
     public function setAmount(int $amount)
     {
         $this->amount = $amount;
     }
 
+    /**
+     * @param int $userId
+     */
     public function setUserId(int $userId)
     {
         $this->userId = $userId;
