@@ -1130,6 +1130,7 @@ function saveClientLesson() {
         $popup = $('.popup'),
         time = $popup.find('input[name=time]:checked').val(),
         data = {
+            action: 'saveLesson',
             typeId: 1,
             scheduleType: 2,
             insertDate: $popup.find('input[name=date]').val(),
