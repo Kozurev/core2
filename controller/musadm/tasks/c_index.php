@@ -6,37 +6,37 @@
  * @date 16.05.2018 17:07
  * @version 20190401
  * @version 20190427
+ * @version 20200914
  */
 
-$today = date('Y-m-d');
-$from =     Core_Array::Get('date_from', null, PARAM_DATE);
-$to =       Core_Array::Get('date_to', null, PARAM_DATE);
+$today =    date('Y-m-d');
+$from =     Core_Array::Get('date_from', date('Y-m-d'), PARAM_DATE);
+$to =       Core_Array::Get('date_to', date('Y-m-d'), PARAM_DATE);
 $areaId =   Core_Array::Get('areaId', 0, PARAM_INT);
 $taskId =   Core_Array::Get('taskId', 0, PARAM_INT);
 
-$Director = User::current()->getDirector();
-$subordinated = $Director->getId();
+$director = User_Auth::current()->getDirector();
+$subordinated = $director->getId();
 
-Core::factory('Task_Controller');
-$TaskController = new Task_Controller(User::current());
+$taskController = new Task_Controller(User_Auth::current());
 
 if(isset($_GET['showCompleted'])){
-    $TaskController->addSimpleEntity('show_completed', true);
+    $taskController->addSimpleEntity('show_completed', true);
     unset($_GET['showCompleted']);
 }
 
 if ($areaId !== 0) {
     $forArea = Core::factory('Schedule_Area', $areaId);
-    $TaskController->forAreas([$forArea]);
-    $TaskController->isEnableCommonTasks(false);
+    $taskController->forAreas([$forArea]);
+    $taskController->isEnableCommonTasks(false);
 }
 
 if ($taskId > 0) {
-    $TaskController->taskId($taskId);
-    $TaskController->addSimpleEntity('task_id', $taskId);
+    $taskController->taskId($taskId);
+    $taskController->addSimpleEntity('task_id', $taskId);
 }
 
-$TaskController
+$taskController
     ->periodFrom($from)
     ->periodTo($to)
     ->isShowPeriods(true)
