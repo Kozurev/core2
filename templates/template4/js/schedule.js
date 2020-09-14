@@ -57,7 +57,7 @@ $(function(){
             Schedule.saveAbsentPeriod(absentData, function (response) {
                 if (response.status !== false) {
                     if ($('#absent_add_task').is(':checked')) {
-                        addAbsentTask(absentData.dateTo, absentData.objectId);
+                        addAbsentTask(absentData.date_to, absentData.object_id);
                     }
 
                     let msg = 'Период отсутствия с ' + response.absent.refactoredDateFrom + ' ';
