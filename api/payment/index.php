@@ -261,7 +261,7 @@ if ($action === 'appendComment') {
         die(REST::error(1, 'Параметр paymentId не может быть пустым'));
     }
     if ($comment === '') {
-        die(REST::error(2, 'Текст комментари долджен содержать минимум один символ'));
+        die(REST::error(2, 'Текст комментари должен содержать минимум один символ'));
     }
 
     $Payment = Payment_Controller::factory($paymentId);
@@ -269,9 +269,7 @@ if ($action === 'appendComment') {
         die(REST::error(3, 'Платеж не найден'));
     }
 
-    $PaymentComment = Core::factory('Property')
-        ->getByTagName('payment_comment')
-        ->addNewValue($Payment, $comment);
+    $PaymentComment = $Payment->appendComment($comment);
 
     $response = new stdClass();
     $response->payment = $Payment->toStd();
@@ -408,8 +406,15 @@ if ($action === 'registerOrder') {
             'successUrl' => Core_Array::Request('successUrl', '', PARAM_STRING),
             'errorUrl' => Core_Array::Request('errorUrl', '', PARAM_STRING)
         ];
-        Temp::put($response->orderId, $tmpData);
+    }else{
+        $payment->setStatusError();
+        $payment->appendComment('Ошибка платежного шлюза: '. ($response->errorMessage ?? 'Неизвестная ошибка'));
+        $tmpData = [
+            'paymentId' => $payment->getId(),
+            'successUrl' => Core_Array::Request('successUrl', '', PARAM_STRING),
+            'errorUrl' => Core_Array::Request('errorUrl', '',PARAM_STRING)
+        ];
     }
-
+    Temp::put($response->orderId, $tmpData);
     exit(json_encode($response));
 }
