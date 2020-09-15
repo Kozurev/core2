@@ -164,4 +164,9 @@ class Payment extends Payment_Model
         Core::notify([&$this], 'after.Payment.delete');
     }
 
+    public function appendComment(string $comment)
+    {
+         return Property_Controller::factoryByTag('payment_comment')
+             ->addNewValue($this, $comment);
+    }
 }
