@@ -72,6 +72,9 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
         ->where('date_from', '<=', $date)
         ->where('date_to', '>=', $date)
         ->get();
+    $clientsAbsentsStd = $clientsAbsents->map(function($absent) {
+        return $absent->toStd();
+    });
 
     //все изменения по времени на текущую дату
     $timeModifies = Schedule_Lesson_TimeModified::query()
@@ -116,7 +119,6 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
             $currentLessons[] = $lesson;
         }
     }
-
 
     echo "<div class='table-responsive'><table class='table table-bordered manager_table'>";
     echo "<tr>";
@@ -214,7 +216,8 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                     $maxLessonTime[0][$class] = $tmpTime;
 
                     //Проверка периода отсутствия
-                    $checkClientAbsent = $clientsAbsents->where('type_id', '=', $mainLesson->typeId())
+                    $checkClientAbsent = $clientsAbsentsStd
+                        ->where('type_id', '=', $mainLesson->typeId())
                         ->where('object_id', '=', $mainLesson->clientId())
                         ->first();
 
@@ -227,8 +230,8 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
 
                     if ($isVisibleData) {
                         if ($checkClientAbsent == true) {
-                            echo "<span><b>Отсутствует <br> с " . refactorDateFormat($checkClientAbsent->dateFrom(), ".", 'short') . "
-                                по " . refactorDateFormat($checkClientAbsent->dateTo(), ".", 'short') . "</b></span><hr>";
+                            echo "<span><b>Отсутствует <br> с " . refactorDateFormat($checkClientAbsent->date_from, ".", 'short') . "
+                                по " . refactorDateFormat($checkClientAbsent->date_to, ".", 'short') . "</b></span><hr>";
                         } elseif ($lessonsAbsents->contains('lesson_id', $mainLesson->getId())) {
                             echo '<span><b>Отсутствует сегодня</b></span><hr>';
                         }
