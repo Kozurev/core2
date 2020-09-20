@@ -5,6 +5,7 @@
  * @author BadWolf
  * @date 24.04.2018 19:59
  * @version 20190304
+ * @version 20200929 - рефакторинг
  *
  * @method static Schedule_Group|null find(int $id)
  *
@@ -12,96 +13,88 @@
  */
 class Schedule_Group extends Schedule_Group_Model
 {
-
     /**
      * Получение списка клиентов группы
      *
      * @return array
      */
-    public function getClientList()
+    public function getClientList() : array
     {
         if ($this->id == null) {
             return [];
         }
 
         if ($this->type() == self::TYPE_CLIENTS) {
-            return Core::factory('User')
-                ->queryBuilder()
+            return User::query()
                 ->join('Schedule_Group_Assignment AS ass', 'ass.user_id = User.id AND ass.group_id = ' . $this->id)
                 ->where('User.group_id', '=', ROLE_CLIENT)
                 ->orderBy('User.surname')
                 ->findAll();
         } else {
-            return Core::factory('Lid')
-                ->queryBuilder()
+            return Lid::query()
                 ->join('Schedule_Group_Assignment AS ass', 'ass.user_id = Lid.id AND ass.group_id = ' . $this->id)
                 ->findAll();
         }
     }
-
 
     /**
      * Очистка списка клиентов группы
      *
      * @return void
      */
-    public function clearClientList()
+    public function clearClientList() : void
     {
         if ($this->id == null) {
             return;
         }
 
-        $Assignments = Core::factory('Schedule_Group_Assignment')
-            ->queryBuilder()
+        $assignments = Schedule_Group_Assignment::query()
             ->where('group_id', '=', $this->id)
             ->findAll();
 
-        foreach ($Assignments as $Assignment) {
-            $Assignment->delete();
+        foreach ($assignments as $assignment) {
+            $assignment->delete();
         }
     }
-
 
     /**
      * Получение объекта учителя
      *
-     * @return object
+     * @return User|null
      */
-    public function getTeacher()
+    public function getTeacher() : ?User
     {
-        return Core::factory('User', $this->teacher_id);
+        return User::find($this->teacher_id);
     }
-
 
     /**
      * Добавление пользователя в список клиентов
      *
      * @param $userId
-     * @return Schedule_Group_Assignment|null
+     * @return Schedule_Group_Assignment
+     * @throws Exception
      */
-    public function appendClient($userId)
+    public function appendClient($userId) : Schedule_Group_Assignment
     {
         if ($this->id == null) {
-            return null;
+            throw new Exception('Невозможно добавить пользователя в несуществующую группу');
         }
 
-        $ExistingAssignment = Core::factory('Schedule_Group_Assignment')
-            ->queryBuilder()
+        $existingAssignment = Schedule_Group_Assignment::query()
             ->where('group_id', '=', $this->id)
             ->where('user_id', '=', $userId)
             ->find();
 
-        if (is_null($ExistingAssignment)) {
-            $NewAssignment = Core::factory('Schedule_Group_Assignment')
+        if (is_null($existingAssignment)) {
+            $newAssignment = (new Schedule_Group_Assignment())
                 ->groupId($this->id)
                 ->userId($userId);
-            $NewAssignment->save();
-            return $NewAssignment;
+            $newAssignment->save();
+            return $newAssignment;
         } else {
-            return $ExistingAssignment;
+            return $existingAssignment;
         }
     }
-
 
     /**
      * Удаление связи группы с клиентом
@@ -109,44 +102,41 @@ class Schedule_Group extends Schedule_Group_Model
      * @param $userId
      * @return void
      */
-    public function removeClient($userId)
+    public function removeClient($userId) : void
     {
         if ($this->id == null) {
             return;
         }
 
-        $ExistingAssignment = Core::factory( 'Schedule_Group_Assignment' )
-            ->queryBuilder()
+        $existingAssignment = Schedule_Group_Assignment::query()
             ->where('group_id', '=', $this->id)
             ->where('user_id', '=', $userId)
             ->find();
 
-        if (!is_null($ExistingAssignment)) {
-            $ExistingAssignment->delete();
+        if (!is_null($existingAssignment)) {
+            $existingAssignment->delete();
         }
     }
-
 
     /**
      * Поиск всех групп, в которых состоит клиент
      *
-     * @param User $Client
+     * @param User $client
      * @return array
      */
-    public static function getClientGroups(User $Client) : array
+    public static function getClientGroups(User $client) : array
     {
-        if (empty($Client->getId())) {
+        if (empty($client->getId())) {
             return [];
         }
-        return Core::factory('Schedule_Group')
-            ->queryBuilder()
-            ->join(
-                'Schedule_Group_Assignment AS sga',
-                'sga.user_id = ' . $Client->getId() . ' AND Schedule_Group.id = sga.group_id'
+        $sg = (new Schedule_Group())->getTableName();
+        $sga = (new Schedule_Group_Assignment())->getTableName();
+        return Schedule_Group::query()
+            ->join($sga . ' AS sga',
+                'sga.user_id = ' . $client->getId() . ' AND '.$sg.'.id = sga.group_id AND sg.type = ' . Schedule_Group::TYPE_CLIENTS
             )
             ->findAll();
     }
-
 
     /**
      * @param null $obj
@@ -160,19 +150,17 @@ class Schedule_Group extends Schedule_Group_Model
         Core::notify([&$this], 'after.ScheduleGroup.delete');
     }
 
-
     /**
      * @param null $obj
      * @return $this|null
      */
     public function save($obj = null)
     {
-        Core::notify([&$this], 'beforeScheduleGroupSave');
+        Core::notify([&$this], 'before.ScheduleGroup.save');
         if (empty(parent::save())) {
             return null;
         }
-        Core::notify([&$this], 'afterScheduleGroupSave');
+        Core::notify([&$this], 'after.ScheduleGroup.save');
         return $this;
     }
-
 }

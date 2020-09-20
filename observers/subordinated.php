@@ -27,11 +27,17 @@ Core::attachObserver('before.Payment.insert', function($args) {
 });
 
 
-Core::attachObserver('before.ScheduleGroup.insert', function($args) {
-    $Group = $args[0];
-    if (empty($Group->subordinated())) {
-        $User = User::current()->getDirector();
-        $Group->subordinated($User->getId());
+Core::attachObserver('before.ScheduleGroup.save', function($args) {
+    /** @var Schedule_Group $group */
+    $group = $args[0];
+    if (empty($group->subordinated())) {
+        $user = User_Auth::current();
+        if (!is_null($user)) {
+            $director = $user->getDirector();
+            if (!is_null($director)) {
+                $group->subordinated($user->getId());
+            }
+        }
     }
 });
 

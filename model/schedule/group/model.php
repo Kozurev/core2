@@ -13,64 +13,72 @@ class Schedule_Group_Model extends Core_Entity
     const TYPE_LIDS =       2;
 
     /**
-     * @var int
-     */
-    protected $id;
-
-
-    /**
      * id пользователя (преподавателя)группы
      *
-     * @var int
+     * @var int|null
      */
-    protected $teacher_id = 0;
-
+    protected ?int $teacher_id = null;
 
     /**
      * Название группы
      *
-     * @var string
+     * @var string|null
      */
-    protected $title;
-
+    protected ?string $title = null;
 
     /**
      * Продолжительность занятия формата (00:00:00)
      *
-     * @var string
+     * @var string|null
      */
-    protected $duration;
-
+    protected ?string $duration = null;
 
     /**
      * Примечание к группе
      *
-     * @var string
+     * @var string|null
      */
-    protected $note = '';
-
+    protected ?string $note = null;
 
     /**
      * id организации (директора), которой принадлежит группа
      *
-     * @var int
+     * @var int|null
      */
-    protected $subordinated = 0;
-
+    protected ?int $subordinated = null;
 
     /**
      * Указатель активности группы
      *
      * @var int
      */
-    protected $active = 1;
-
+    protected int $active = 1;
 
     /**
+     * Тп группы - клиентская или лидовская
+     *
      * @var int
      */
-    protected $type = self::TYPE_CLIENTS;
+    protected int $type = self::TYPE_CLIENTS;
 
+    /**
+     * @var int|null
+     */
+    protected ?int $area_id = null;
+
+    /**
+     * Дата занятия группы, необходима для групп лидов
+     *
+     * @var string|null
+     */
+    protected ?string $date = null;
+
+    /**
+     * Время начала занятия, также используется только для групп лидов
+     *
+     * @var string|null
+     */
+    protected ?string $time_start = null;
 
     /**
      * @param int|null $teacherId
@@ -86,7 +94,6 @@ class Schedule_Group_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param string|null $title
      * @return $this|string
@@ -100,7 +107,6 @@ class Schedule_Group_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @param string|null $duration
@@ -122,7 +128,6 @@ class Schedule_Group_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param int|null $subordinated
      * @return $this|int
@@ -136,7 +141,6 @@ class Schedule_Group_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @param int|null $active
@@ -153,7 +157,6 @@ class Schedule_Group_Model extends Core_Entity
         }
         return $this;
     }
-
 
     /**
      * @param string|null $note
@@ -184,6 +187,58 @@ class Schedule_Group_Model extends Core_Entity
     }
 
     /**
+     * @param int|null $areaId
+     * @return $this|null|int
+     */
+    public function areaId(int $areaId = null)
+    {
+        if (is_null($areaId)) {
+            if (is_null($this->area_id)) {
+                return null;
+            } else {
+                return intval($this->area_id);
+            }
+        } else {
+            $this->area_id = $areaId;
+            return $this;
+        }
+    }
+
+    /**
+     * @param string|null $date
+     * @return $this|string|null
+     */
+    public function date(string $date = null)
+    {
+        if (is_null($date)) {
+            return $this->date;
+        } else {
+            $this->date = $date;
+            return $this;
+        }
+    }
+
+    /**
+     * @param string|null $timeStart
+     * @return $this|string|null
+     */
+    public function timeStart(string $timeStart = null)
+    {
+        if (is_null($timeStart)) {
+            return $this->time_start;
+        } else {
+            if (isTime($timeStart)) {
+                $this->time_start = $timeStart;
+            } else {
+                $timeStart = substr($timeStart, 0, 5);
+                $timeStart .= ':00';
+                $this->time_start = $timeStart;
+            }
+            return $this;
+        }
+    }
+
+    /**
      * @return array
      */
     public function schema() : array
@@ -205,7 +260,7 @@ class Schedule_Group_Model extends Core_Entity
             'teacher_id' => [
                 'required' => true,
                 'type' => PARAM_INT,
-                'minval' => 0
+                'minval' => 1
             ],
             'duration' => [
                 'required' => true,
@@ -219,8 +274,22 @@ class Schedule_Group_Model extends Core_Entity
             'subordinated' => [
                 'required' => true,
                 'type' => PARAM_INT,
-                'minval' => 0,
-            ]
+                'minval' => 1,
+            ],
+            'area_id' => [
+                'required' => false,
+                'type' => PARAM_INT,
+                'minval' => 1
+            ],
+            'date' => [
+                'required' => false,
+                'type' => PARAM_DATE
+            ],
+            'time_start' => [
+                'required' => false,
+                'type' => PARAM_STRING,
+                'length' => 8
+            ],
         ];
     }
 
