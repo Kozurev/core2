@@ -1,6 +1,10 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+    <xsl:include href="areas_select.xsl" />
+
     <xsl:template match="root">
+
+
         <section>
             <div class="row buttons-panel">
                 <input type="hidden" />
@@ -10,6 +14,7 @@
                     </div>
                 </xsl:if>
             </div>
+
 
             <div class="row">
                 <div class="col-md-12">
@@ -80,9 +85,12 @@
                         <tr class="header">
                             <th>Название</th>
                             <th>Учитель</th>
-                            <th>Длит. занятия</th>
+                            <th hidden="true">Длит. занятия</th>
                             <th>Состав группы</th>
                             <th>Примечание</th>
+                            <th>Дата</th>
+                            <th>Начало</th>
+                            <th>Филиал</th>
                             <th>Действия</th>
                         </tr>
                     </thead>
@@ -106,7 +114,7 @@
                     <xsl:value-of select="user[id = $teacher]/name" />
                 </a>
             </td>
-            <td><xsl:value-of select="duration" /></td>
+            <td hidden="true"><xsl:value-of select="duration" /></td>
             <td width="200px">
                 <xsl:choose>
                     <xsl:when test="type = 1">
@@ -135,6 +143,9 @@
             </td>
 
             <td><xsl:value-of select="note" /></td>
+            <td><xsl:value-of select="date"/></td>
+            <td><xsl:value-of select="time_start"/></td>
+            <td></td>
 
             <td width="140px">
                 <xsl:if test="/root/access_group_edit = 1">

@@ -122,9 +122,12 @@ if ($action == 'updateForm') {
         ->orderBy('surname')
         ->findAll();
 
+    $Areas = (new Schedule_Area_Assignment)->getAreas(User_Auth::current());
+
     $popupData
         ->addEntity($Group)
         ->addEntities($Users)
+        ->addEntities($Areas)
         ->xsl('musadm/groups/edit_group_popup.xsl')
         ->show();
 
