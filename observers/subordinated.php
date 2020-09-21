@@ -35,7 +35,7 @@ Core::attachObserver('before.ScheduleGroup.save', function($args) {
         if (!is_null($user)) {
             $director = $user->getDirector();
             if (!is_null($director)) {
-                $group->subordinated($user->getId());
+                $group->subordinated($director->getId());
             }
         }
     }
