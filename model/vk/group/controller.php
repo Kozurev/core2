@@ -1,4 +1,7 @@
 <?php
+/**
+ * @version 2020-09-21 - Рефакторинг
+ */
 
 class Vk_Group_Controller extends Controller
 {
@@ -49,7 +52,7 @@ class Vk_Group_Controller extends Controller
                 ->where('subordinated', '=', $director->getId());
         }
 
-        return $group->find();
+        return $group->queryBuilder()->find();
     }
 
     /**
@@ -63,6 +66,4 @@ class Vk_Group_Controller extends Controller
 
         return $this->getQueryBuilder()->findAll();
     }
-
-
 }

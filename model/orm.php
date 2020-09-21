@@ -231,7 +231,9 @@ class Orm
 	public function count()
     {
         $beforeSelect = $this->select;
+        $beforeOrder = $this->order;
         $this->clearSelect()->select('count(' . $this->table . '.id)', 'count');
+        $this->clearOrderBy();
         $query = $this->getQueryString();
         $result = DB::instance()->query($query);
 
@@ -241,12 +243,13 @@ class Orm
         ], 'after.orm.' . self::OBSERVER_METHOD_COUNT);
 
         $this->select = $beforeSelect;
+        $this->order = $beforeOrder;
 
         if ($result == false) {
             return 0;
         } else {
             $result = $result->fetch();
-            return intval($result['count']);
+            return intval($result['count'] ?? 0);
         }
     }
 
@@ -541,17 +544,6 @@ class Orm
     }
 
     /**
-     * Очистка заданного порядка сортировки
-     *
-     * @return $this
-     */
-    public function clearOrderBy()
-    {
-        $this->order = [];
-        return $this;
-    }
-
-    /**
      * Обертывание значения в одинарные ковычки
      *
      * @date 29.01.2019 12:23
@@ -653,13 +645,41 @@ class Orm
     }
 
     /**
+     * @return array
+     */
+    public function getGroupBy() : array
+    {
+        return $this->groupBy;
+    }
+
+    /**
      * Очистка списка выбираемых полей
      *
      * @return $this
      */
-    public function clearSelect()
+    public function clearSelect() : self
     {
         $this->select = [];
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function clearFrom() : self
+    {
+        $this->from = [];
+        return $this;
+    }
+
+    /**
+     * Очистка заданного порядка сортировки
+     *
+     * @return $this
+     */
+    public function clearOrderBy()
+    {
+        $this->order = [];
         return $this;
     }
 

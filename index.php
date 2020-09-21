@@ -43,8 +43,5 @@ define('TEST_MODE_FACTORY', false);
 //Выключение отладки SQL-запросов
 Orm::debug(false);
 
-//Объявление констант
-//Constant::setAllConstants();
-
 //Создание страницы
 Core_Page_Show::instance()->createPage();

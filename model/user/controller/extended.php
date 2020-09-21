@@ -4,173 +4,153 @@
  *
  * @author BadWolf
  * @date 17.09.2019 14:39
+ * @version 2020-09-21 - рефакторинг
  */
-
-Core::requireClass('Controller');
-Core::requireClass('User');
-Core::requireClass('Schedule_Area_Assignment');
 
 class User_Controller_Extended extends Controller
 {
-
     //Тип таблиц пользователей
     const TABLE_ACTIVE = 'active';
     const TABLE_ARCHIVE = 'archive';
-
 
     /**
      * Массив идентификаторов групп
      *
      * @var array
      */
-    protected $groupIds = [];
-
+    protected array $groupIds = [];
 
     /**
      * Указатель на показ панели с кнопками
      *
      * @var int
      */
-    protected $isActiveBtnPanel = 1;
-
+    protected int $isActiveBtnPanel = 1;
 
     /**
      * Указатель на активность кнопки экспорта пользователей
      *
      * @var int
      */
-    protected $isActiveExportBtn = 1;
-
+    protected int $isActiveExportBtn = 1;
 
     /**
      * Указатель на отображение количества выводимых пользователей
      *
      * @var int
      */
-    protected $isShowCount = 0;
-
+    protected int $isShowCount = 0;
 
     /**
      * Указатель на активность пользователей
      *
      * @var bool|null
      */
-    protected $isActive = true;
-
+    protected ?bool $isActive = true;
 
     /**
      * @param int $groupId
      * @return $this
      */
-    public function setGroup(int $groupId)
+    public function setGroup(int $groupId) : self
     {
         $this->groupIds = [$groupId];
         return $this;
     }
 
-
     /**
      * @param array $groupIds
      * @return $this
      */
-    public function setGroups(array $groupIds)
+    public function setGroups(array $groupIds) : self
     {
         $this->groupIds = $groupIds;
         return $this;
     }
 
-
     /**
      * @return array
      */
-    public function getGroups()
+    public function getGroups() : array
     {
         return $this->groupIds;
     }
-
 
     /**
      * @param bool $isShow
      * @return $this
      */
-    public function isShowCount(bool $isShow)
+    public function isShowCount(bool $isShow) : self
     {
         $this->isShowCount = intval($isShow);
         return $this;
     }
 
-
     /**
      * @param bool $isActive
      * @return $this
      */
-    public function setActiveBtnPanel(bool $isActive)
+    public function setActiveBtnPanel(bool $isActive) : self
     {
         $this->isActiveBtnPanel = intval($isActive);
         return $this;
     }
 
-
     /**
      * @param bool $isActive
      * @return $this
      */
-    public function setActiveExportBtn(bool $isActive)
+    public function setActiveExportBtn(bool $isActive) : self
     {
         $this->isActiveExportBtn = intval($isActive);
         return $this;
     }
 
-
     /**
      * @param bool $isActive
      * @return $this
      */
-    public function setActive(bool $isActive)
+    public function setActive(bool $isActive) : self
     {
         $this->isActive = $isActive;
         return $this;
     }
 
-
     /**
      * @return $this
      */
-    public function unsetActive()
+    public function unsetActive() : self
     {
         $this->isActive = null;
         return $this;
     }
 
-
     /**
      * @return bool|null
      */
-    public function getActive()
+    public function getActive() : ?bool
     {
         return $this->isActive;
     }
 
-
     /**
      * User_Controller_Extended constructor.
-     * @param User $User
+     * @param User $user
      */
-    public function __construct(User $User = null)
+    public function __construct(User $user = null)
     {
-        if (!is_null($User)) {
-            $this->setUser($User);
+        if (!is_null($user)) {
+            $this->setUser($user);
         }
-        $User = new User();
-        $this->setObject($User);
-        $this->setQueryBuilder($User->queryBuilder());
-        if (!is_null($User)) {
-            $this->getQueryBuilder()->orderBy($User->getTableName() . '.id', 'DESC');
+        $user = new User();
+        $this->setObject($user);
+        $this->setQueryBuilder($user->queryBuilder());
+        if (!is_null($user)) {
+            $this->getQueryBuilder()->orderBy($user->getTableName() . '.id', 'DESC');
         }
         $this->isWithComments(false);
         parent::__construct(['user' => &$User]);
     }
-
 
     /**
      * Поиск преподавателей клиента
@@ -214,7 +194,6 @@ class User_Controller_Extended extends Controller
         return $teachers;
     }
 
-
     /**
      * @param string $date
      * @return int|null
@@ -232,7 +211,6 @@ class User_Controller_Extended extends Controller
             return $teacherLessons[0]->lessons[0]->classId();
         }
     }
-
 
     /**
      * @return array
@@ -255,36 +233,36 @@ class User_Controller_Extended extends Controller
             }
         }
 
-        $AreaAssignment = new Schedule_Area_Assignment();
+        $areaAssignment = new Schedule_Area_Assignment();
         $areasMultiAccess = Core_Access::instance()->hasCapability(Core_Access::AREA_MULTI_ACCESS, $this->getUser());
         $areasIds = [];
         if (!empty($this->areasIds)) {
             $areasIds = $this->areasIds;
         } elseif ($areasMultiAccess === false && $this->isLimitedAreasAccess() === true) {
-            $Areas = $AreaAssignment->getAreas($this->getUser());
-            if (empty($Areas)) {
+            $areas = $areaAssignment->getAreas($this->getUser());
+            if (empty($areas)) {
                 //TODO: надо что-то придмать как отлавливать ошибку, если пользователь не авторизован
                 return [];
             }
-            foreach ($Areas as $Area) {
-                $areasIds[] = $Area->getId();
+            foreach ($areas as $area) {
+                $areasIds[] = $area->getId();
             }
         }
         if (!empty($areasIds)) {
             $this->getQueryBuilder()->join(
-                $AreaAssignment->getTableName() . ' AS asgm',
-                $this->User->getTableName() . '.id = asgm.model_id 
-                AND asgm.model_name = \''.get_class($this->User).'\' 
+                $areaAssignment->getTableName() . ' AS asgm',
+                $this->getUser()->getTableName() . '.id = asgm.model_id 
+                AND asgm.model_name = \''.get_class($this->getUser()).'\' 
                 AND asgm.area_id IN (' . implode(', ', $areasIds) . ')');
         }
 
         //Пагинация
         $this->paginateExecute();
 
-        $this->foundObjects = $this->QueryBuilder->findAll();
+        $this->foundObjects = $this->getQueryBuilder()->findAll();
         $this->countFoundObjects = count($this->foundObjects);
-        foreach ($this->foundObjects as $User) {
-            $this->foundObjectsIds[] = $User->getId();
+        foreach ($this->foundObjects as $user) {
+            $this->foundObjectsIds[] = $user->getId();
         }
 
         //Фильтрация по значениям доп.свйотв
@@ -304,31 +282,30 @@ class User_Controller_Extended extends Controller
         return $this->foundObjects;
     }
 
-
     /**
-     * @param null $OutputXml
+     * @param null $outputXml
      * @return mixed
      */
-    public function show($OutputXml = null)
+    public function show($outputXml = null)
     {
         global $CFG;
-        $OutputXml = new Core_Entity();
+        $outputXml = new Core_Entity();
         $observerArgs = [
             'controller' => &$this,
-            'outputXml' => &$OutputXml
+            'outputXml' => &$outputXml
         ];
 
-        $Users = $this->getUsers();
+        $users = $this->getUsers();
 
-        $OutputXml = Core::factory('Core_Entity')
+        $OutputXml = (new Core_Entity)
             ->addSimpleEntity('wwwroot', $CFG->rootdir)
             ->addSimpleEntity('active-btn-panel', $this->isActiveBtnPanel)
             ->addSImpleEntity('active-export-btn', $this->isActiveExportBtn)
             ->addSimpleEntity('show-count-users', $this->isShowCount)
             ->addEntity($this->paginate(), 'pagination')
-            ->addEntities($Users)
+            ->addEntities($users)
             ->addEntities(
-                Core::factory('Schedule_Area')->getList(true, false)
+                (new Schedule_Area)->getList(true, false)
             )
             ->addSimpleEntity(
                 'access_user_export',

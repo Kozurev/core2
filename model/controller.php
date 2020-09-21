@@ -20,47 +20,40 @@ class Controller
      */
     const FILTER_NOT_STRICT = 'not-strict';
 
-
-
     /**
      * Объект пользователя, для которого формируется выборка
      *
-     * @var User
+     * @var User|null
      */
-    protected $User;
-
+    protected ?User $user;
 
     /**
      * Экзэмпляр объекта для контроллера (к примеру: задача, лид или пользователь)
      *
      * @var object
      */
-    protected $Object;
-
+    protected $object;
 
     /**
      * Объект конструктора запроса для выборки объектов
      *
-     * @var Orm
+     * @var Orm|null
      */
-    protected $QueryBuilder;
-
+    protected ?Orm $queryBuilder;
 
     /**
      * Кастомные XML сущьности, добавляемые в результат поиска
      *
      * @var array
      */
-    protected $entities = [];
-
+    protected array $entities = [];
 
     /**
      * Кастомные простые XML сущьности, добавляемые в результат поиска
      *
      * @var array
      */
-    protected $simpleEntities = [];
-
+    protected array $simpleEntities = [];
 
     /**
      * Указатель отвечающий за подгрузку доп. свойств
@@ -71,30 +64,26 @@ class Controller
      */
     protected $properties = false;
 
-
     /**
      * Подключаемый XSL шаблон в методе show по умолчанию
      *
-     * @var string
+     * @var string|null
      */
-    protected $xsl;
-
+    protected ?string $xsl;
 
     /**
      * Идентификатор структуры, к которой относятся объекты
      *
      * @var int
      */
-    protected $subordinate = 0;
-
+    protected ?int $subordinate = 0;
 
     /**
      * Список фильтров по основным свойствам объектов
      *
      * @var array|null
      */
-    protected $filter = [];
-
+    protected array $filter = [];
 
     /**
      * Тип фильтрации: мягкий или строгий
@@ -104,32 +93,28 @@ class Controller
      *
      * @var string
      */
-    protected $filterType = self::FILTER_NOT_STRICT;
-
+    protected string $filterType = self::FILTER_NOT_STRICT;
 
     /**
      * Список фильтров по значениям доп. свойств
      *
      * @var array
      */
-    protected $addFilter = [];
-
+    protected array $addFilter = [];
 
     /**
      * Филиалы для которых производится выборка
      *
      * @var array
      */
-    protected $areasIds = [];
-
+    protected array $areasIds = [];
 
     /**
      * Указатель на подгрузку связей с филлиалами в окончательный XML
      *
      * @var bool
      */
-    protected $isWithAreasAssignments = false;
-
+    protected bool $isWithAreasAssignments = false;
 
     /**
      * Указатель на поиск только тех лидов которые принадлежат тем же филиалам что и пользователь
@@ -138,24 +123,21 @@ class Controller
      *
      * @var bool
      */
-    protected $isLimitedAreasAccess = true;
-
+    protected bool $isLimitedAreasAccess = true;
 
     /**
      * Поиск лидов производится с комментариями или без
      *
      * @var bool
      */
-    protected $isWithComments = true;
-
+    protected bool $isWithComments = true;
 
     /**
      * Кол-во найденных объектов
      *
      * @var int
      */
-    protected $countFoundObjects = 0;
-
+    protected int $countFoundObjects = 0;
 
     /**
      * Общее количество объектов без пагинации
@@ -163,38 +145,33 @@ class Controller
      *
      * @var int
      */
-    protected $totalCountFoundObjects = 0;
-
+    protected int $totalCountFoundObjects = 0;
 
     /**
      * Идентификаторы найденных объектов
      *
      * @var array
      */
-    protected $foundObjectsIds = [];
-
+    protected array $foundObjectsIds = [];
 
     /**
      * Массив найденных объектов
      *
      * @var array
      */
-    protected $foundObjects = [];
-
+    protected array $foundObjects = [];
 
     /**
      * @var bool
      */
-    protected $isPaginate = false;
-
+    protected bool $isPaginate = false;
 
     /**
      * Пагинация
      *
-     * @var Pagination
+     * @var Pagination|null
      */
-    protected $pagination;
-
+    protected ?Pagination $pagination;
 
     /**
      * Controller constructor.
@@ -202,88 +179,78 @@ class Controller
      */
     public function __construct($params = [])
     {
-        Core::requireClass('Pagination');
         $this->pagination = new Pagination();
     }
 
-
     /**
-     * @param Orm $QueryBuilder
+     * @param Orm $queryBuilder
      */
-    protected function setQueryBuilder(Orm $QueryBuilder)
+    protected function setQueryBuilder(Orm $queryBuilder)
     {
-        $this->QueryBuilder = $QueryBuilder;
+        $this->queryBuilder = $queryBuilder;
     }
-
 
     /**
      * @return Orm
      */
-    public function getQueryBuilder()
+    public function getQueryBuilder() : Orm
     {
-        return $this->QueryBuilder;
+        return $this->queryBuilder;
     }
-
 
     /**
      * Сеттер для свойства User должен иметь защищенный тип
      *
-     * @param User $User
+     * @param User $user
      */
-    protected function setUser(User $User)
+    protected function setUser(User $user)
     {
-        $this->User = $User;
-        $UserDirector = $User->getDirector();
-        if (!is_null($UserDirector)) {
-            $this->setSubordinate($UserDirector->getId());
+        $this->user = $user;
+        $userDirector = $user->getDirector();
+        if (!is_null($userDirector)) {
+            $this->setSubordinate($userDirector->getId());
         }
     }
-
 
     /**
      * @return User
      */
-    public function getUser()
+    public function getUser() : ?User
     {
-        return $this->User;
+        return $this->user;
     }
-
 
     /**
      * @param $obj
      */
     protected function setObject($obj)
     {
-        $this->Object = $obj;
+        $this->object = $obj;
     }
-
 
     /**
      * @return object
      */
     public function getObject()
     {
-        return $this->Object;
+        return $this->object;
     }
-
 
     /**
      * @return array
      */
-    public function getFoundObjects()
+    public function getFoundObjects() : array
     {
         return $this->foundObjects;
     }
 
-
     /**
      * @return array
      */
-    public function getFoundObjectsIds()
+    public function getFoundObjectsIds() : array
     {
         return $this->foundObjectsIds;
     }
-
 
     /**
      * @param bool|null $isPaginate
@@ -299,15 +266,13 @@ class Controller
         }
     }
 
-
     /**
      * @return Pagination
      */
-    public function paginate()
+    public function paginate() : ?Pagination
     {
         return $this->pagination;
     }
-
 
     /**
      * Добавление условие выборки объектов
@@ -315,8 +280,9 @@ class Controller
      * для фильтрации по значениям доп. свойств существует метод: appendAddFilter
      *
      * @param string $paramName
-     * @param $condition
      * @param null $searchingValue
+     * @param $condition
+     * @param $type
      * @return $this
      */
     public function appendFilter(string $paramName, $searchingValue, $condition = null, $type = null)
@@ -326,12 +292,12 @@ class Controller
         }
 
         if (is_array($searchingValue)) {
-            $this->QueryBuilder->whereIn($paramName, $searchingValue);
+            $this->getQueryBuilder()->whereIn($paramName, $searchingValue);
         } else {
             if (is_null($condition) && $type == self::FILTER_STRICT) {
-                $this->QueryBuilder->where($paramName, '=', $searchingValue);
+                $this->getQueryBuilder()->where($paramName, '=', $searchingValue);
             } elseif (is_null($condition) || $type == self::FILTER_NOT_STRICT) {
-                $this->QueryBuilder
+                $this->getQueryBuilder()
                     ->open()
                     ->where($paramName, '=', $searchingValue)
                     ->orWhere($paramName, 'LIKE', '%' . $searchingValue . '%')
@@ -339,7 +305,7 @@ class Controller
                     ->orWhere($paramName, 'LIKE', $searchingValue . '%')
                     ->close();
             } else {
-                $this->QueryBuilder->where($paramName, $condition, $searchingValue);
+                $this->getQueryBuilder()->where($paramName, $condition, $searchingValue);
             }
         }
 
@@ -352,7 +318,7 @@ class Controller
      * Значение аргумента filterType должно быть одной из констант с префиксом "FILTER_"
      * Тип фильтрации не играет роли если в качестве значения передается массив
      *
-     * @param string $filterType
+     * @param string|null $filterType
      * @return $this|string
      */
     public function setFilterType(string $filterType = null)
@@ -367,15 +333,13 @@ class Controller
         return $this;
     }
 
-
     /**
      * @return string
      */
-    public function getFilterType()
+    public function getFilterType() : string
     {
         return $this->filterType;
     }
-
 
     /**
      * Добавление фильтров по значениям доп. свойств
@@ -395,35 +359,31 @@ class Controller
         return $this;
     }
 
-
     /**
      * @param int $subordinate
      * @return $this
      */
-    public function setSubordinate(int $subordinate)
+    public function setSubordinate(int $subordinate) : self
     {
         $this->subordinate = $subordinate;
         return $this;
     }
 
-
     /**
-     * @return bool
+     * @return int
      */
-    public function getSubordinate()
+    public function getSubordinate() : int
     {
         return $this->subordinate;
     }
 
-
     /**
      * @return bool
      */
-    public function isSubordinate()
+    public function isSubordinate() : bool
     {
         return $this->subordinate > 0;
     }
-
 
     /**
      * @param bool|null $isLimited
@@ -439,7 +399,6 @@ class Controller
         }
     }
 
-
     /**
      * @param bool|null $isWithComments
      * @return $this|bool
@@ -454,134 +413,128 @@ class Controller
         }
     }
 
-
     /**
-     * @param $Entity
+     * @param $entity
      * @param $tag
      * @return $this
      */
-    public function addEntity($Entity, $tag)
+    public function addEntity($entity, $tag) : self
     {
-        $this->entities[$tag][] = $Entity;
+        $this->entities[$tag][] = $entity;
         return $this;
     }
 
-
     /**
-     * @param $Entities
+     * @param $entities
      * @param $tag
      * @return $this
      */
-    public function addEntities($Entities, $tag)
+    public function addEntities($entities, $tag) : self
     {
-        $this->entities[$tag] = $Entities;
+        $this->entities[$tag] = $entities;
         return $this;
     }
-
 
     /**
      * Метод добавления в окончательный XML различных простых тэгов
      *
      * @param string $entityName - название тэга
-     * @param string $entityValue - значение тэга
+     * @param mixed $entityValue - значение тэга
      * @return $this
      */
-    public function addSimpleEntity(string $entityName, $entityValue)
+    public function addSimpleEntity(string $entityName, $entityValue) : self
     {
-        $this->simpleEntities[] = Core::factory('Core_Entity')
+        $this->simpleEntities[] = (new Core_Entity)
             ->_entityName($entityName)
             ->_entityValue($entityValue);
         return $this;
     }
 
-
     /**
      * @param string $xslPath
      * @return $this
      */
-    public function setXsl(string $xslPath)
+    public function setXsl(string $xslPath) : self
     {
         $this->xsl = $xslPath;
         return $this;
     }
 
-
     /**
      * @return string
      */
-    public function getXsl()
+    public function getXsl() : ?string
     {
         return $this->xsl;
     }
-
 
     /**
      * @param $properties
      * @return $this
      */
-    public function properties($properties)
+    public function properties($properties) : self
     {
         if (is_array($properties) && count($properties) > 0) {
             if (!is_array($this->properties)) {
                 $this->properties = [];
             }
             foreach ($properties as $propId) {
-                $Property = Property_Controller::factory($propId);
-                if (!is_null($Property)) {
-                    $this->properties[] = $Property;
+                $property = Property_Controller::factory($propId);
+                if (!is_null($property)) {
+                    $this->properties[] = $property;
                 }
             }
         } elseif (is_int($properties)) {
             if (!is_array($this->properties)) {
                 $this->properties = [];
             }
-            $Property = Property_Controller::factory($properties);
-            if (!is_null($Property)) {
-                $this->properties[] = $Property;
+            $property = Property_Controller::factory($properties);
+            if (!is_null($property)) {
+                $this->properties[] = $property;
             }
         } elseif (is_bool($properties) && $properties === true) {
-            $this->properties = Core::factory('Property')->getPropertiesList($this->getObject());
+            $this->properties = Property::getProperties($this->getObject());
         }
 
         return $this;
     }
 
-
     /**
-     * @param array $Areas
+     * @param array $areas
      * @return $this
      */
-    public function setAreas(array $Areas)
+    public function setAreas(array $areas) : self
     {
-        Core::requireClass('Schedule_Area_Controller');
-        foreach ($Areas as $Area) {
-            if (!is_null($Area) && !empty($Area->getId())) {
-                $this->areasIds[] = $Area->getId();
+        foreach ($areas as $area) {
+            if (!is_null($area) && !empty($area->getId())) {
+                $this->areasIds[] = $area->getId();
             }
         }
         return $this;
     }
-
 
     /**
      * @return array
      */
-    public function getAreas()
+    public function getAreas() : array
     {
         return $this->areasIds;
     }
-
 
     /**
      * @param bool $isWithAreasAssignments
      * @return $this
      */
-    public function isWithAreasAssignments(bool $isWithAreasAssignments)
+    public function isWithAreasAssignments(bool $isWithAreasAssignments) : self
     {
         $this->isWithAreasAssignments = $isWithAreasAssignments;
         return $this;
     }
 
+    public function paginateGetTotalCount() : int
+    {
+        return $this->getQueryBuilder()->count();
+    }
 
     /**
      * Установление рамок пагинации если не задано фильтрации по доп. свойствам
@@ -590,14 +543,13 @@ class Controller
     {
         if ($this->isPaginate() === true && empty($this->addFilter)) {
             $this->paginate()->setTotalCount(
-                $this->getQueryBuilder()->count()
+                $this->paginateGetTotalCount()
             );
             $this->getQueryBuilder()
                 ->limit($this->paginate()->getLimit())
                 ->offset($this->paginate()->getOffset());
         }
     }
-
 
     /**
      * Фильтрация уже найденных объектов по значениям доп. свойств
@@ -610,15 +562,15 @@ class Controller
 
         foreach ($this->addFilter as $propertyId => $filterParams) {
             foreach ($filterParams as $param) {
-                $NewQueryBuilder = $this->Object->queryBuilder()->clearQuery();
-                $Property = Core::factory('Property', $propertyId);
-                if (is_null($Property)) {
+                $newQueryBuilder = $this->getObject()->queryBuilder()->clearQuery();
+                $property = Property_Controller::factory($propertyId);
+                if (is_null($property)) {
                     continue;
                 }
-                $propertyTableName = 'Property_' . ucfirst($Property->type());
-                $propertyTableVal = $Property->type() == 'list' ? 'p.value_id' : 'p.value';
-                $joinConditions = $this->Object->getTableName() . '.id = p.object_id AND p.model_name = \''
-                    . get_class($this->Object) . '\' AND p.property_id = ' . $propertyId;
+                $propertyTableName = 'Property_' . ucfirst($property->type());
+                $propertyTableVal = $property->type() == 'list' ? 'p.value_id' : 'p.value';
+                $joinConditions = $this->getObject()->getTableName() . '.id = p.object_id AND p.model_name = \''
+                    . get_class($this->getObject()) . '\' AND p.property_id = ' . $propertyId;
 
                 $condition = Core_Array::getValue($param, 'condition', null, PARAM_STRING);
                 $value = Core_Array::getValue($param, 'value', null);
@@ -626,30 +578,30 @@ class Controller
                 //Если ищем совпадение в элементом массива
                 if (is_array($value) && count($value) > 0) {
                     //Если присутствует значение по умолчанию
-                    if (in_array($Property->defaultValue(), $value)) {
-                        $NewQueryBuilder->open()
+                    if (in_array($property->defaultValue(), $value)) {
+                        $newQueryBuilder->open()
                             ->where($propertyTableVal, 'IS', 'NULL')
                             ->orWhereIn($propertyTableVal, $value)
                             ->close();
                     } else {
-                        $NewQueryBuilder->whereIn($propertyTableVal, $value);
+                        $newQueryBuilder->whereIn($propertyTableVal, $value);
                     }
                 } else {
                     //Фильтрация по явно заданному условию
                     if (!is_null($condition)) {
-                        if ($value == $Property->defaultValue()) {
-                            $NewQueryBuilder->open()
+                        if ($value == $property->defaultValue()) {
+                            $newQueryBuilder->open()
                                 ->where($propertyTableVal, 'IS', 'NULL')
                                 ->orWhere($propertyTableVal, $condition, $value)
                                 ->close();
                         } else {
-                            $NewQueryBuilder->where($propertyTableVal, $condition, $value);
+                            $newQueryBuilder->where($propertyTableVal, $condition, $value);
                         }
                     } else { //Фильтрация без явно заданного условия
                         //Мягкая фильтрация
                         if ($this->getFilterType() == self::FILTER_NOT_STRICT) {
-                            if ($value == $Property->defaultValue()) {
-                                $NewQueryBuilder->open()
+                            if ($value == $property->defaultValue()) {
+                                $newQueryBuilder->open()
                                     ->where($propertyTableVal, 'IS', 'NULL')
                                     ->orWhere($propertyTableVal, '=', $value)
                                     ->orWhere($propertyTableVal, '=', '%' . $value . '%')
@@ -657,7 +609,7 @@ class Controller
                                     ->orWhere($propertyTableVal, '=', '%' . $value)
                                     ->close();
                             } else {
-                                $NewQueryBuilder->open()
+                                $newQueryBuilder->open()
                                     ->where($propertyTableVal, '=', $value)
                                     ->orWhere($propertyTableVal, '=', '%' . $value . '%')
                                     ->orWhere($propertyTableVal, '=', $value . '%')
@@ -666,32 +618,32 @@ class Controller
                             }
                         } else {
                             //Строгая фильтрация
-                            if ($value == $Property->defaultValue()) {
-                                $NewQueryBuilder->open()
+                            if ($value == $property->defaultValue()) {
+                                $newQueryBuilder->open()
                                     ->where($propertyTableVal, 'IS', 'NULL')
                                     ->orWhere($propertyTableVal, '=', $value)
                                     ->close();
                             } else {
                                 //Мягкая фильтрация
-                                $NewQueryBuilder->where($propertyTableVal, '=', $value);
+                                $newQueryBuilder->where($propertyTableVal, '=', $value);
                             }
                         }
                     }
                 }
 
                 if (!empty($this->foundObjectsIds)) {
-                    $NewObjectsIds = $NewQueryBuilder
+                    $newObjectsIds = $newQueryBuilder
                         ->clearSelect()
-                        ->select($this->Object->getTableName() . '.id', 'id')
+                        ->select($this->getObject()->getTableName() . '.id', 'id')
                         ->leftJoin($propertyTableName . ' AS p', $joinConditions)
-                        ->whereIn($this->Object->getTableName() . '.id', $this->foundObjectsIds)
+                        ->whereIn($this->getObject()->getTableName() . '.id', $this->foundObjectsIds)
                         ->findAll();
                 } else {
-                    $NewObjectsIds = [];
+                    $newObjectsIds = [];
                 }
 
                 $this->foundObjectsIds = [];
-                foreach ($NewObjectsIds as $obj) {
+                foreach ($newObjectsIds as $obj) {
                     $this->foundObjectsIds[] = $obj->getId();
                 }
             }
@@ -725,62 +677,61 @@ class Controller
         $this->countFoundObjects = count($this->foundObjects);
     }
 
-
     /**
      * Подгрузка значений доп. свойств к объектам
      */
     public function addPropValues()
     {
         if (is_array($this->properties) && count($this->properties) > 0) {
-            foreach ($this->properties as $Property) {
-                $propValueTable = 'Property_' . ucfirst($Property->type());
-                $PropertyValues = Core::factory($propValueTable)
+            foreach ($this->properties as $property) {
+                $propValueTable = 'Property_' . ucfirst($property->type());
+                $propertyValues = Core::factory($propValueTable)
                     ->queryBuilder()
-                    ->where('model_name', '=', get_class($this->Object))
-                    ->where('property_id', '=', $Property->getId())
+                    ->where('model_name', '=', get_class($this->getObject()))
+                    ->where('property_id', '=', $property->getId())
                     ->whereIn('object_id', $this->foundObjectsIds)
                     ->orderBy('object_id', 'DESC')
                     ->findAll();
 
                 //Поиск
-                if ($Property->type() == 'list') {
-                    $PropertyList = [];
-                    foreach ($Property->getList() as $item) {
-                        $PropertyList[$item->getId()] = $item->value();
+                if ($property->type() == 'list') {
+                    $propertyList = [];
+                    foreach ($property->getList() as $item) {
+                        $propertyList[$item->getId()] = $item->value();
                     }
                 }
 
                 $objectsPropertiesAssignment = []; //Массив идентификаторов объектов, к которым найдено значение доп. свойства
-                foreach ($this->foundObjects as $Object) {
-                    foreach ($PropertyValues as $Value) {
-                        if ($Object->getId() == $Value->objectId()) {
-                            if ($Property->type() == 'list') {
-                                $Value->value = $PropertyList[$Value->value()] ?? 'неизвестно';
+                foreach ($this->foundObjects as $object) {
+                    foreach ($propertyValues as $value) {
+                        if ($object->getId() == $value->objectId()) {
+                            if ($property->type() == 'list') {
+                                $value->value = $propertyList[$value->value()] ?? 'неизвестно';
                             }
-                            $objectsPropertiesAssignment[] = $Object->getId();
-                            $Object->addEntity($Value, 'property_value');
-                            $objPropName = 'property_' . $Value->propertyId();
+                            $objectsPropertiesAssignment[] = $object->getId();
+                            $object->addEntity($value, 'property_value');
+                            $objPropName = 'property_' . $value->propertyId();
                             if (isset($Object->$objPropName)) {
-                                $Object->$objPropName[] = $Value;
+                                $object->$objPropName[] = $value;
                             } else {
-                                $Object->$objPropName = [$Value];
+                                $object->$objPropName = [$value];
                             }
                         }
                     }
                 }
 
-                foreach ($this->foundObjects as $Object) {
-                    if (!in_array($Object->getId(), $objectsPropertiesAssignment)) {
-                        $Value = $Property->makeDefaultValue($Object);
-                        if ($Property->type() == 'list') {
-                            $Value->value = isset($PropertyList[$Value->value()]) ? $PropertyList[$Value->value()] : '';
+                foreach ($this->foundObjects as $object) {
+                    if (!in_array($object->getId(), $objectsPropertiesAssignment)) {
+                        $value = $property->makeDefaultValue($object);
+                        if ($property->type() == 'list') {
+                            $value->value = isset($propertyList[$value->value()]) ? $propertyList[$value->value()] : '';
                         }
-                        $Object->addEntity($Property->makeDefaultValue($Object), 'property_value');
-                        $objPropName = 'property_' . $Property->getId();
+                        $object->addEntity($property->makeDefaultValue($object), 'property_value');
+                        $objPropName = 'property_' . $property->getId();
                         if (isset($Object->$objPropName)) {
-                            $Object->$objPropName[] = $Value;
+                            $object->$objPropName[] = $value;
                         } else {
-                            $Object->$objPropName = [$Value];
+                            $object->$objPropName = [$value];
                         }
                     }
                 } //end foreach
@@ -788,140 +739,133 @@ class Controller
         } //end condition properties exists
     }
 
-
     /**
      * Добавление комментариев к объектам
      */
     public function addComments()
     {
-        Core::requireClass('File');
-        Core::requireClass('File_Assignment');
-
         //Поиск комемнтариев для всех найденных ранее объектов
-        $Comment = new Comment();
-        $Assignment = Comment::getAssignment($this->Object);
-        $Comments = $Comment->queryBuilder()
+        $comment = new Comment();
+        $assignment = Comment::getAssignment($this->getObject());
+        $comments = $comment->queryBuilder()
             ->addSelect('asgm.object_id', 'objectId')
             ->join(
-                $Assignment->getTableName() . ' AS asgm',
+                $assignment->getTableName() . ' AS asgm',
                 'asgm.object_id in ('.implode(', ' ,$this->foundObjectsIds).') 
-                AND asgm.comment_id = '.$Comment->getTableName().'.id'
+                AND asgm.comment_id = '.$comment->getTableName().'.id'
             )
             ->orderBy('id', 'DESC')
             ->findAll();
 
         //Подгрузка файлов
         $commentsIds = [];
-        foreach ($Comments as $Comment) {
-            $commentsIds[] = $Comment->getId();
+        foreach ($comments as $comment) {
+            $commentsIds[] = $comment->getId();
         }
-        $File = new File;
-        $FileAssignment = new File_Assignment;
-        $Files = $File->queryBuilder()
+        $file = new File;
+        $fileAssignment = new File_Assignment;
+        $files = $file->queryBuilder()
             ->addSelect('asgm.object_id', 'objectId')
-            ->join($FileAssignment->getTableName() . ' as asgm', 'asgm.file_id = ' . $File->getTableName()
+            ->join($fileAssignment->getTableName() . ' as asgm', 'asgm.file_id = ' . $file->getTableName()
                 . '.id AND asgm.model_id = ' . MODEL_COMMENT_ID
                 . ' AND asgm.object_id in (' . implode(', ', $commentsIds) . ')'
             )
             ->findAll();
         
-        foreach ($Comments as $Comment) {
-            foreach ($Files as $fileKey => $File) {
-                if ($Comment->getId() === intval($File->objectId)) {
-                    $File->link = $File->getLink();
-                    $Comment->addEntity($File);
+        foreach ($comments as $comment) {
+            foreach ($files as $fileKey => $file) {
+                if ($comment->getId() === intval($file->objectId)) {
+                    $file->link = $file->getLink();
+                    $comment->addEntity($file);
                 }
             }
         }
 
-        foreach ($this->foundObjects as $Object) {
-            $XmlComments = Core::factory('Core_Entity')->_entityName('comments');
-            $Object->comments = [];
-            foreach ($Comments as $key => $Comment) {
-                if ($Object->getId() == $Comment->objectId) {
+        foreach ($this->foundObjects as $object) {
+            $xmlComments = (new Core_Entity)->_entityName('comments');
+            $object->comments = [];
+            foreach ($comments as $key => $comment) {
+                if ($object->getId() == $comment->objectId) {
                     //Преобразование строки с датой и временем в нормальный формат
-                    $commentDatetime = $Comment->datetime();
+                    $commentDatetime = $comment->datetime();
                     $commentDatetime = strtotime($commentDatetime);
                     $commentDatetime = date('d.m.y H:i', $commentDatetime);
-                    $Comment->refactoredDatetime = $commentDatetime;
-                    $XmlComments->addEntity($Comment);
-                    $Object->comments[] = $Comment;
-                    unset ($Comments[$key]);
+                    $comment->refactoredDatetime = $commentDatetime;
+                    $xmlComments->addEntity($comment);
+                    $object->comments[] = $comment;
+                    unset ($comments[$key]);
                 }
             }
-            $Object->addEntity($XmlComments);
+            $object->addEntity($xmlComments);
         }
     }
-
 
     /**
      *
      */
     public function addAreasAssignments()
     {
-        $Areas = Core::factory('Schedule_Area')->getList();
-        $this->addEntities($Areas, 'schedule_area');
+        $areas = (new Schedule_Area)->getList();
+        $this->addEntities($areas, 'schedule_area');
 
-        $Assignments = Core::factory('Schedule_Area_Assignment')
-            ->queryBuilder()
-            ->where('model_name', '=', get_class($this->Object))
+        $assignments = Schedule_Area_Assignment::query()
+            ->where('model_name', '=', get_class($this->getObject()))
             ->whereIn('model_id', $this->foundObjectsIds)
             ->findAll();
 
-        foreach ($this->foundObjects as $Object) {
-            foreach ($Assignments as $asgmKey => $Assignment) {
-                if ($Object->getId() == $Assignment->modelId()) {
-                    $Object->addEntity($Assignment);
-                    unset($Assignments[$asgmKey]);
+        foreach ($this->foundObjects as $object) {
+            foreach ($assignments as $asgmKey => $assignment) {
+                if ($object->getId() == $assignment->modelId()) {
+                    $object->addEntity($assignment);
+                    unset($assignments[$asgmKey]);
                 }
             }
         }
     }
 
-
     /**
-     * @param null $OutputXml
+     * @param null $outputXml
      * @return mixed
      */
-    public function show($OutputXml = null)
+    public function show($outputXml = null)
     {
-        if (is_null($OutputXml)) {
+        if (is_null($outputXml)) {
             $OutputXml = new Core_Entity();
         }
 
         //Добавление кастомных тэгов
-        foreach ($this->simpleEntities as $Entity) {
-            $OutputXml->addEntity($Entity);
+        foreach ($this->simpleEntities as $entity) {
+            $outputXml->addEntity($entity);
         }
 
         if (is_array($this->properties) && count($this->properties) > 0) {
-            foreach ($this->properties as $Property) {
-                if ($Property->type() == 'list') {
-                    $Property->addEntity(
-                        Core::factory('Core_Entity')
+            foreach ($this->properties as $property) {
+                if ($property->type() == 'list') {
+                    $property->addEntity(
+                        (new Core_Entity)
                             ->_entityName('values')
-                            ->addEntities($Property->getList())
+                            ->addEntities($property->getList())
                     );
                 }
-                $OutputXml->addEntity($Property);
+                $outputXml->addEntity($property);
             }
         }
 
         foreach ($this->entities as $tag => $values) {
             foreach ($values as $val) {
-                $OutputXml->addEntity($val, $tag);
+                $outputXml->addEntity($val, $tag);
             }
         }
 
-        if ($this->isWithAreasAssignments == true && !is_null($this->User)) {
-            $UserAreas = Core::factory('Schedule_Area_Assignment')->getAreas($this->User);
-            $OutputXml->addEntities($UserAreas ,'assignment_areas');
+        if ($this->isWithAreasAssignments == true && !is_null($this->getUser())) {
+            $userAreas = (new Schedule_Area_Assignment)->getAreas($this->getUser());
+            $outputXml->addEntities($userAreas ,'assignment_areas');
         }
 
         if (!is_null($this->areasIds) && count($this->areasIds) == 1) {
-            $OutputXml->addSimpleEntity('current_area', $this->areasIds[0]);
+            $outputXml->addSimpleEntity('current_area', $this->areasIds[0]);
         }
 
-        return $OutputXml->xsl($this->getXsl());
+        return $outputXml->xsl($this->getXsl());
     }
 }

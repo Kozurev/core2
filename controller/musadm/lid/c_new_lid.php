@@ -8,6 +8,7 @@
  * @version 2019-07-26
  * @version 2019-08-05
  * @version 2020-03-18
+ * @version 2020-09-21 - рефакторинг
  */
 
 $today =        date('Y-m-d');
@@ -20,19 +21,23 @@ $phoneNumber =  Core_Array::Get('number', '', PARAM_STRING);
 $instrument =   Core_Array::Get('instrument', 0, PARAM_INT);
 $vk =           Core_Array::Get('vk', '', PARAM_STRING);
 
-$LidController = new Lid_Controller_Extended(User_Auth::current());
-$LidController->getQueryBuilder()
-    ->leftJoin('Lid_Comment_Assignment', 'Lid_Comment_Assignment.object_id = Lid.id')
-    ->groupBy('Lid.id')
-    ->having('count(Lid_Comment_Assignment.id)','<=',1)
+$lidController = new Lid_Controller_Extended(User_Auth::current());
+$lidController->getQueryBuilder()
+    ->clearSelect()
+    ->clearFrom()
+    ->select('l.*')
+    ->from((new Lid)->getTableName() . ' as l')
+    ->leftJoin((new Lid_Comment_Assignment)->getTableName() . ' as lca', 'lca.object_id = l.id')
+    ->groupBy('l.id')
+    ->having('count(lca.id)','<=',1)
     ->orderBy('priority_id', 'DESC');
 
 if (!empty(Core_Array::Get('notPaginate', 0, PARAM_INT))) {
-    $LidController->isPaginate(false);
+    $lidController->isPaginate(false);
 } else {
-    $LidController->isPaginate(true);
-    $LidController->addSimpleEntity('paginate', true);
-    $LidController->paginate()
+    $lidController->isPaginate(true);
+    $lidController->addSimpleEntity('paginate', true);
+    $lidController->paginate()
         ->setOnPage(25)
         ->setCurrentPage(
             Core_Array::Get('page', 1, PARAM_INT)
@@ -42,31 +47,31 @@ unset($_GET['notPaginate']);
 unset($_GET['paginate']);
 
 if ($areaId !== 0) {
-    $LidController->appendFilter('area_id', $areaId, '=', Lid_Controller::FILTER_STRICT);
-    $LidController->addSimpleEntity('current_area', $areaId);
+    $lidController->appendFilter('area_id', $areaId, '=', Lid_Controller::FILTER_STRICT);
+    $lidController->addSimpleEntity('current_area', $areaId);
 }
 if ($statusId !== 0) {
-    $LidController->appendFilter('status_id', $statusId, '=', Lid_Controller::FILTER_STRICT);
-    $LidController->addSimpleEntity('status_id', $statusId);
+    $lidController->appendFilter('status_id', $statusId, '=', Lid_Controller::FILTER_STRICT);
+    $lidController->addSimpleEntity('status_id', $statusId);
 }
 if (!is_null($id)) {
-    $LidController->isEnabledPeriodControl(false);
-    $LidController->appendFilter('id', $id, '=', Lid_Controller::FILTER_STRICT);
-    $LidController->addSimpleEntity('id', $id);
+    $lidController->isEnabledPeriodControl(false);
+    $lidController->appendFilter('id', $id, '=', Lid_Controller::FILTER_STRICT);
+    $lidController->addSimpleEntity('id', $id);
 }
 if ($phoneNumber != '') {
-    $LidController->isEnabledPeriodControl(false);
-    $LidController->appendFilter('number', $phoneNumber, null, Lid_Controller::FILTER_NOT_STRICT);
-    $LidController->addSimpleEntity('number', $phoneNumber);
+    $lidController->isEnabledPeriodControl(false);
+    $lidController->appendFilter('number', $phoneNumber, null, Lid_Controller::FILTER_NOT_STRICT);
+    $lidController->addSimpleEntity('number', $phoneNumber);
 }
 if ($vk != '') {
-    $LidController->isEnabledPeriodControl(false);
-    $LidController->appendFilter('vk', trim($vk), null, Lid_Controller::FILTER_STRICT);
-    $LidController->addSimpleEntity('vk', $vk);
+    $lidController->isEnabledPeriodControl(false);
+    $lidController->appendFilter('vk', trim($vk), null, Lid_Controller::FILTER_STRICT);
+    $lidController->addSimpleEntity('vk', $vk);
 }
 if ($instrument !== 0) {
-    $LidController->appendAddFilter(20, '=', $instrument);
-    $LidController->addSimpleEntity('instrument', $instrument);
+    $lidController->appendAddFilter(20, '=', $instrument);
+    $lidController->addSimpleEntity('instrument', $instrument);
 }
 
 $lidsPropsIds = [
@@ -74,7 +79,7 @@ $lidsPropsIds = [
     'source' => 50,
     'marker' => 54
 ];
-$LidController
+$lidController
     ->periodFrom($periodFrom)
     ->periodTo($periodTo)
     ->properties($lidsPropsIds)

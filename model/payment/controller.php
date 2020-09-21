@@ -9,48 +9,36 @@
 class Payment_Controller extends Controller
 {
     /**
-     *
-     *
-     * @var string
+     * @var string|null
      */
-    protected $dateFrom;
+    protected ?string $dateFrom = null;
 
     /**
-     *
-     *
-     * @var string
+     * @var string|null
      */
-    protected $dateTo;
-
+    protected ?string $dateTo = null;
 
     /**
      * @param int|null $id
      * @param bool $isWithComments
      * @return Payment|null
      */
-    public static function factory(int $id = null, bool $isWithComments = true)
+    public static function factory(int $id = null, bool $isWithComments = true) : ?Payment
     {
         if (is_null($id) || $id === 0) {
-            return Core::factory('Payment');
+            return (new Payment());
         }
 
-        $Payment = Core::factory('Payment', $id);
-        if (is_null($Payment)) {
+        $payment = Payment::find($id);
+        if (is_null($payment)) {
             return null;
         }
 
         if ($isWithComments === true) {
-            $CommentsProperty = Core::factory('Property')->getByTagName('payment_comment');
-            $Payment->comments = $CommentsProperty->getPropertyValues($Payment);
+            $commentsProperty = Property_Controller::factoryByTag('payment_comment');
+            $payment->comments = $commentsProperty->getPropertyValues($payment);
         }
 
-        return $Payment;
+        return $payment;
     }
-
-
-    public function getPayments()
-    {
-
-    }
-
 }

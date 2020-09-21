@@ -4,6 +4,8 @@
  * User: Egor
  * Date: 13.03.2020
  * Time: 9:57
+ *
+ * @version 2020-09-21 - рефакторинг
  */
 class Schedule_Group_Controller extends Controller
 {
@@ -12,19 +14,19 @@ class Schedule_Group_Controller extends Controller
      *
      * @var bool
      */
-    protected $isWithTeachers = true;
+    protected bool $isWithTeachers = true;
 
     /**
      * Подгружать список клиентов
      *
      * @var bool
      */
-    protected $isWithClientList = true;
+    protected bool $isWithClientList = true;
 
     /**
      * @return bool
      */
-    public function getIsWithTeachers()
+    public function getIsWithTeachers() : bool
     {
         return $this->isWithTeachers;
     }
@@ -32,7 +34,7 @@ class Schedule_Group_Controller extends Controller
     /**
      * @return bool
      */
-    public function getIsWithClientList()
+    public function getIsWithClientList() : bool
     {
         return $this->isWithClientList;
     }
@@ -41,7 +43,7 @@ class Schedule_Group_Controller extends Controller
      * @param bool $isWithTeachers
      * @return $this
      */
-    public function setIsWithTeachers(bool $isWithTeachers)
+    public function setIsWithTeachers(bool $isWithTeachers) : self
     {
         $this->isWithTeachers = $isWithTeachers;
         return $this;
@@ -51,7 +53,7 @@ class Schedule_Group_Controller extends Controller
      * @param bool $isWithClientList
      * @return $this
      */
-    public function setIsWithClientList(bool $isWithClientList)
+    public function setIsWithClientList(bool $isWithClientList) : self
     {
         $this->isWithClientList = $isWithClientList;
         return $this;
@@ -59,25 +61,25 @@ class Schedule_Group_Controller extends Controller
 
     /**
      * Schedule_Group_Controller constructor.
-     * @param User|null $User
+     * @param User|null $user
      */
-    public function __construct(User $User = null)
+    public function __construct(User $user = null)
     {
-        if (!is_null($User)) {
-            $this->setUser($User);
+        if (!is_null($user)) {
+            $this->setUser($user);
         }
         $this->setObject((new Schedule_Group));
         $this->setQueryBuilder((new Schedule_Group)->queryBuilder());
         $this->getQueryBuilder()->where('active', '=', 1);
         $this->getQueryBuilder()->orderBy($this->getObject()->getTableName() . '.id', 'DESC');
         $this->isPaginate(true);
-        parent::__construct(['user' => &$User]);
+        parent::__construct(['user' => &$user]);
     }
 
     /**
      * @return array
      */
-    public function getGroups()
+    public function getGroups() : array
     {
         if (!empty($this->getSubordinate())) {
             $this->getQueryBuilder()->where('subordinated', '=', $this->getSubordinate());
@@ -86,14 +88,11 @@ class Schedule_Group_Controller extends Controller
         //Пагинация
         $this->paginateExecute();
 
-        $this->foundObjects = $this->QueryBuilder->findAll();
+        $this->foundObjects = $this->getQueryBuilder()->findAll();
         $this->countFoundObjects = count($this->foundObjects);
         foreach ($this->foundObjects as $group) {
             $this->foundObjectsIds[] = $group->getId();
         }
-
-        //Фильтрация по значениям доп.свйотв
-        //$this->addFilterExecute();
 
         if ($this->getIsWithTeachers()) {
             $teachersIds = [];
@@ -125,9 +124,6 @@ class Schedule_Group_Controller extends Controller
             }
         }
 
-        //Подгрузка значений доп. свойств
-        //$this->addPropValues();
-
         return $this->foundObjects;
     }
 
@@ -135,7 +131,7 @@ class Schedule_Group_Controller extends Controller
      * @param null $OutputXml
      * @return mixed
      */
-    public function show($OutputXml = null)
+    public function show($outputXml = null)
     {
         global $CFG;
 
@@ -145,11 +141,11 @@ class Schedule_Group_Controller extends Controller
 
         $groups = $this->getGroups();
 
-        if (!($OutputXml instanceof Core_Entity)) {
-            $OutputXml = new Core_Entity();
+        if (!($outputXml instanceof Core_Entity)) {
+            $outputXml = new Core_Entity();
         }
 
-        $OutputXml
+        $outputXml
             ->addEntities($groups)
             ->addEntity($this->paginate(), 'pagination')
             ->addSimpleEntity('wwwroot', $CFG->rootdir)
@@ -157,7 +153,7 @@ class Schedule_Group_Controller extends Controller
             ->addSimpleEntity('access_group_edit', (int)$accessEdit)
             ->addSimpleEntity('access_group_delete', (int)$accessDelete);
 
-        return parent::show($OutputXml)->show();
+        return parent::show($outputXml)->show();
     }
 
 }

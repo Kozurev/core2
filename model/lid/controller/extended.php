@@ -4,6 +4,7 @@
  * User: Egor
  * Date: 05.07.2019
  * Time: 19:14
+ * @version 2020-09-21 - рефакторинг +доработки
  */
 
 class Lid_Controller_Extended extends Controller
@@ -13,81 +14,71 @@ class Lid_Controller_Extended extends Controller
      *
      * @var bool
      */
-    protected $isWithStatuses = true;
-
+    protected bool $isWithStatuses = true;
 
     /**
      * Указатель на то что поиск по лидам будет происходить счключительно в рамках определенного временного промежутка
      *
      * @var bool
      */
-    protected $isEnabledPeriodControl = true;
-
-
-    /**
-     * @var string
-     */
-    protected $periodFrom;
-
+    protected bool $isEnabledPeriodControl = true;
 
     /**
-     * @var string
+     * @var string|null
      */
-    protected $periodTo;
+    protected ?string $periodFrom = null;
 
+    /**
+     * @var string|null
+     */
+    protected ?string $periodTo = null;
 
     /**
      * Указатель на наличие/отсутствие полей ввода для указания периода за который производится выборка
      *
      * @var bool
      */
-    protected $isShowPeriods = true;
-
+    protected bool $isShowPeriods = true;
 
     /**
      * Указатель на наличие/отсутствие строки с кнопками
      *
      * @var bool
      */
-    protected $isShowButtons = true;
-
+    protected bool $isShowButtons = true;
 
     /**
      * @var bool
      */
-    protected $isEnableCommonLids = true;
-
-
+    protected bool $isEnableCommonLids = true;
 
     /**
      * Lid_Controller_Extended constructor.
-     * @param User|null $User
+     * @param User|null $user
      */
-    public function __construct(User $User = null)
+    public function __construct(User $user = null)
     {
-        if (!is_null($User)) {
-            $this->setUser($User);
+        if (!is_null($user)) {
+            $this->setUser($user);
         }
-        Core::requireClass('Lid');
-        $Lid = new Lid();
-        $this->setObject($Lid);
-        $this->setQueryBuilder($Lid->queryBuilder());
+
+        $lid = new Lid();
+        $this->setObject($lid);
+        $this->setQueryBuilder($lid->queryBuilder());
         $this->getQueryBuilder()->orderBy('priority_id', 'DESC');
         $this->setXsl('musadm/lids/lids.xsl');
         parent::__construct();
     }
 
-
     /**
      * @param bool $isWithStatuses
      * @return $this
      */
-    public function isWithStatuses(bool $isWithStatuses)
+    public function isWithStatuses(bool $isWithStatuses) : self
     {
         $this->isWithStatuses = $isWithStatuses;
         return $this;
     }
-
 
     /**
      * @param bool|null $isEnable
@@ -102,7 +93,6 @@ class Lid_Controller_Extended extends Controller
             return $this;
         }
     }
-
 
     /**
      * @param string|null $from
@@ -119,7 +109,6 @@ class Lid_Controller_Extended extends Controller
         }
     }
 
-
     /**
      * @param string|null $to
      * @return $this|string
@@ -135,12 +124,11 @@ class Lid_Controller_Extended extends Controller
         }
     }
 
-
     /**
      * @param bool $isEnable
      * @return $this
      */
-    public function isShowPeriods(bool $isEnable)
+    public function isShowPeriods(bool $isEnable) : self
     {
         $this->isShowPeriods = $isEnable;
         return $this;
@@ -150,12 +138,11 @@ class Lid_Controller_Extended extends Controller
      * @param bool $isEnable
      * @return $this
      */
-    public function isShowButtons(bool $isEnable)
+    public function isShowButtons(bool $isEnable) : self
     {
         $this->isShowButtons = $isEnable;
         return $this;
     }
-
 
     /**
      * @param bool|null $isEnable
@@ -171,6 +158,20 @@ class Lid_Controller_Extended extends Controller
         }
     }
 
+    /**
+     * @return int
+     */
+    public function paginateGetTotalCount() : int
+    {
+        return empty($this->getQueryBuilder()->getGroupBy())
+            ?   (clone $this->getQueryBuilder())->count()
+            :   (clone $this->getQueryBuilder())
+            ->clearSelect()
+            ->clearOrderBy()
+            ->select((new Lid())->getTableName() . '.id')
+            ->get()
+            ->count();
+    }
 
     /**
      * Поиск лидов по заданным параметрам
@@ -201,9 +202,9 @@ class Lid_Controller_Extended extends Controller
         //Формирование условий выборки лидов по филиалам
         if (count($this->areasIds) > 0) {
             //$ForAreas = $this->areasIds;
-        } elseif ($this->isLimitedAreasAccess === true && !is_null($this->User) && $this->User->groupId() !== ROLE_DIRECTOR) {
+        } elseif ($this->isLimitedAreasAccess === true && !is_null($this->getUser()) && $this->getUser()->groupId() !== ROLE_DIRECTOR) {
             $Areas = Core::factory('Schedule_Area_Assignment')
-                ->getAreas($this->User, true);
+                ->getAreas($this->getUser(), true);
             foreach ($Areas as $Area) {
                 $this->areasIds[] = $Area->getId();
             }
@@ -213,12 +214,12 @@ class Lid_Controller_Extended extends Controller
 
         if (count($this->areasIds) > 0) {
             if ($this->isEnableCommonLids == true) {
-                $this->QueryBuilder->open()
+                $this->getQueryBuilder()->open()
                     ->where('Lid.area_id', '=', 0)
                     ->orWhereIn('Lid.area_id', $this->areasIds)
                     ->close();
             } else {
-                $this->QueryBuilder->whereIn('Lid.area_id', $this->areasIds);
+                $this->getQueryBuilder()->whereIn('Lid.area_id', $this->areasIds);
             }
         }
 
@@ -226,10 +227,10 @@ class Lid_Controller_Extended extends Controller
 
         //Пагинация
         $this->paginateExecute();
-        $this->foundObjects = $this->QueryBuilder->findAll();
+        $this->foundObjects = $this->getQueryBuilder()->findAll();
         $this->countFoundObjects = count($this->foundObjects);
-        foreach ($this->foundObjects as $Lid) {
-            $this->foundObjectsIds[] = $Lid->getId();
+        foreach ($this->foundObjects as $lid) {
+            $this->foundObjectsIds[] = $lid->getId();
         }
 
         //Фильтрация по значениям доп.свйотв
@@ -249,25 +250,24 @@ class Lid_Controller_Extended extends Controller
         return $this->foundObjects;
     }
 
-
     /**
-     * @param null $OutputXml
+     * @param null $outputXml
      * @return mixed
      */
-    public function show($OutputXml = null)
+    public function show($outputXml = null)
     {
         global $CFG;
-        $OutputXml = new Core_Entity();
+        $outputXml = new Core_Entity();
 
         //Условие вывода панели с указанием периода
         $this->isShowPeriods === true
-            ?   $OutputXml->addSimpleEntity('periods', '1')
-            :   $OutputXml->addSimpleEntity('periods', '0');
+            ?   $outputXml->addSimpleEntity('periods', '1')
+            :   $outputXml->addSimpleEntity('periods', '0');
 
         //Условие вывода панели с кнопками
         $this->isShowButtons === true
-            ?   $OutputXml->addSimpleEntity('buttons-panel', '1')
-            :   $OutputXml->addSimpleEntity('buttons-panel', '0');
+            ?   $outputXml->addSimpleEntity('buttons-panel', '1')
+            :   $outputXml->addSimpleEntity('buttons-panel', '0');
 
         //Формирование списка приоритетов
         $priorities = [];
@@ -281,7 +281,7 @@ class Lid_Controller_Extended extends Controller
         $priorities[2]->id = 3;
         $priorities[2]->title = 'Высокий';
 
-        $OutputXml
+        $outputXml
             ->addEntity($this->paginate(), 'pagination')
             ->addSimpleEntity('wwwroot', $CFG->wwwroot)
             ->addEntities($this->getLids())
@@ -294,7 +294,7 @@ class Lid_Controller_Extended extends Controller
             ->addSimpleEntity('access_lid_edit', (int)Core_Access::instance()->hasCapability(Core_Access::LID_EDIT))
             ->addSimpleEntity('access_lid_comment', (int)Core_Access::instance()->hasCapability(Core_Access::LID_APPEND_COMMENT));
 
-        return parent::show($OutputXml)->show();
+        return parent::show($outputXml)->show();
     }
 
 }
