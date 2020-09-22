@@ -145,7 +145,7 @@
             <td><xsl:value-of select="note" /></td>
             <td><xsl:value-of select="date"/></td>
             <td><xsl:value-of select="time_start"/></td>
-            <td></td>
+            <td><xsl:value-of select="schedule_area/title"/></td>
 
             <td width="140px">
                 <xsl:if test="/root/access_group_edit = 1">

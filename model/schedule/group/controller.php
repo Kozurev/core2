@@ -24,6 +24,13 @@ class Schedule_Group_Controller extends Controller
     protected bool $isWithClientList = true;
 
     /**
+     * Подгружать список филиалов
+     *
+     * @var bool
+     * */
+    protected bool $isWithAreas = true;
+
+    /**
      * @return bool
      */
     public function getIsWithTeachers() : bool
@@ -37,6 +44,14 @@ class Schedule_Group_Controller extends Controller
     public function getIsWithClientList() : bool
     {
         return $this->isWithClientList;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsWithAreas() : bool
+    {
+        return $this->isWithAreas;
     }
 
     /**
@@ -56,6 +71,16 @@ class Schedule_Group_Controller extends Controller
     public function setIsWithClientList(bool $isWithClientList) : self
     {
         $this->isWithClientList = $isWithClientList;
+        return $this;
+    }
+
+    /**
+     * @param bool $isWithAreas
+     * @return $this
+     */
+    public function setIsWithAreas(bool $isWithAreas) : self
+    {
+        $this->isWithAreas = $isWithAreas;
         return $this;
     }
 
@@ -121,6 +146,27 @@ class Schedule_Group_Controller extends Controller
         if ($this->getIsWithClientList()) {
             foreach ($this->foundObjects as $group) {
                 $group->addEntities($group->getClientList());
+            }
+        }
+
+        if ($this->getIsWithAreas()){
+            $areasIds = [];
+            foreach ($this->foundObjects as $group){
+                if(!in_array($group->areaId(), $areasIds)) {
+                    $areasIds[] = $group->areaId();
+                }
+            }
+            $indexedAreas = [];
+            if(!empty($areasIds)){
+                $areas = (new Schedule_Area_Assignment)->getAreas(User_Auth::current());
+                foreach ($areas as $area){
+                    $indexedAreas[$area->getId()] = clone $area;
+                }
+                foreach ($this->foundObjects as $group) {
+                    if (isset($indexedAreas[$group->areaId()])){
+                        $group->addEntity($indexedAreas[$group->areaId()]);
+                    }
+                }
             }
         }
 
