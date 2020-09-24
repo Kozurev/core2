@@ -113,7 +113,7 @@ class Core_Access
     /**
      * @var Core_Access_Group|null
      */
-    private ?Core_Access_Group $accessGroup;
+    private ?Core_Access_Group $accessGroup = null;
 
     /**
      * Список всех возможных возможностей

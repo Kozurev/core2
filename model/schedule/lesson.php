@@ -656,11 +656,11 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             $this->time_to .= ':00';
         }
 
-        if (!in_array($this->typeId(), [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_GROUP, Schedule_Lesson::TYPE_CONSULT, Schedule_Lesson::TYPE_GROUP_CONSULT])) {
+        if (!in_array($this->typeId(), [self::TYPE_INDIV, self::TYPE_GROUP, self::TYPE_CONSULT, self::TYPE_GROUP_CONSULT])) {
             $this->_setValidateErrorStr('Неверно указан тип занятия');
         }
 
-        if (!in_array($this->lessonType(), [Schedule_Lesson::SCHEDULE_MAIN, Schedule_Lesson::SCHEDULE_CURRENT])) {
+        if (!in_array($this->lessonType(), [self::SCHEDULE_MAIN, self::SCHEDULE_CURRENT])) {
             $this->_setValidateErrorStr('Неверно указан тип графика занятия');
         }
 
@@ -720,6 +720,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
                 $lesson = Core::factory('Schedule_Lesson', $modify->lessonId());
                 if (!$lesson->isAbsent($this->insert_date)) {
                     $this->_setValidateErrorStr('Добавление невозможно по причине пересечения с другим занятием 1');
+                    return false;
                 }
             }
 
@@ -755,14 +756,22 @@ class Schedule_Lesson extends Schedule_Lesson_Model
                 ->close()
                 ->findAll();
 
+            /** @var Schedule_Lesson $lesson */
             foreach ($lessons as $lesson) {
+                if ($lesson->lessonType() === self::SCHEDULE_CURRENT) {
+                    $this->_setValidateErrorStr('Добавление невозможно по причине пересечения с другим занятием 4');
+                    return false;
+                }
+
                 if ($this->lesson_type == self::SCHEDULE_MAIN && $lesson->lessonType() == self::SCHEDULE_MAIN) {
                     $this->_setValidateErrorStr('Добавление невозможно по причине пересечения с другим занятием 2');
+                    return false;
                 }
 
                 if ($lesson->lessonType() == self::SCHEDULE_MAIN && !$lesson->isAbsent($this->insert_date)) {
                     if (!$lesson->isTimeModified($this->insert_date)) {
                         $this->_setValidateErrorStr('Добавление невозможно по причине пересечения с другим занятием 3');
+                        return false;
                     }
                 }
             }
@@ -784,8 +793,8 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     {
         Core::notify([&$this], 'before.ScheduleLesson.save');
 
-        if ($this->delete_date == '') {
-            $this->delete_date = 'NULL';
+        if (empty($this->delete_date)) {
+            $this->delete_date = NULL;
         }
 
         if (empty(parent::save())) {

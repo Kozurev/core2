@@ -220,4 +220,20 @@ class Schedule {
             }
         });
     }
+
+
+    static saveLesson(lessonData, callback) {
+        lessonData.action = 'saveLesson';
+        $.ajax({
+            type: 'POST',
+            url: Schedule.getApiLink(),
+            dataType: 'json',
+            data: lessonData,
+            success: function(response) {
+                if (typeof callback === 'function') {
+                    callback(response);
+                }
+            }
+        });
+    }
 }

@@ -123,7 +123,34 @@ $(function(){
             let typeId = Form.find('select[name=typeId]').val();
             let dayName = Form.find('input[name=dayName]').val();
             let isCreateTask = $('input[name=is_create_task]');
-            let isOnline = Form.find('input[name=is_online]').val();
+            let classId = $('input[name=classId]').val();
+            let isOnline = Form.find('input[name=isOnline]').val();
+
+            let lessonData = {
+                scheduleType: lessonType,
+                typeId: typeId,
+                insertDate: date,
+                clientId: clientId,
+                teacherId: teacherId,
+                areaId: areaId,
+                classId: classId,
+                timeFrom: timeFrom + ':00',
+                timeTo: timeTo + ':00',
+                isOnline: isOnline,
+                dayName: dayName
+            };
+
+            let lessonSaveCallback = function (response) {
+                if (response.status === true) {
+                    notificationSuccess('Занятие сохранено');
+                    closePopup();
+                    addTask(isCreateTask, clientId, date, areaId);
+                    refreshSchedule();
+                } else {
+                    notificationError(response.message);
+                    loaderOff();
+                }
+            }
 
             //Проверка на принадлежность занятия рабочему времени преподавателя
             Schedule.isInTeacherTime({
@@ -139,13 +166,13 @@ $(function(){
                 if (response.time == null) {
                     needConfirm = true;
                 }
-                if (needConfirm == true) {
+                if (needConfirm === true) {
                     isConfirmed = confirm('Занятие выходит за рамки графика работы преподавателя, хотите продолжить?');
                 } else {
                     isConfirmed = true;
                 }
 
-                if (isConfirmed == true) {
+                if (isConfirmed === true) {
                     //Проверка преподавателя на отсутствие
                     Schedule.checkAbsentPeriod({
                         userId: teacherId,
@@ -164,14 +191,8 @@ $(function(){
                                     if (response.isset == true) {
                                         //Постановка в основной график
                                         if (lessonType == 1) {
-                                            if (confirm('В данное время у клиента существует активный период отсутсвия с '
-                                                    + response.period.dateFrom[1] + ' по ' + response.period.dateTo[1] + '. Хотите продолжить?')) {
-                                                saveData('Main', function (response) {
-                                                    if (response == false) {
-                                                        addTask(isCreateTask,clientId,date,areaId);
-                                                    }
-                                                    refreshSchedule();
-                                                });
+                                            if (confirm('В данное время у клиента существует активный период отсутсвия с ' + response.period.dateFrom[1] + ' по ' + response.period.dateTo[1] + '. Хотите продолжить?')) {
+                                                Schedule.saveLesson(lessonData, lessonSaveCallback);
                                             } else {
                                                 loaderOff();
                                             }
@@ -181,12 +202,7 @@ $(function(){
                                             loaderOff();
                                         }
                                     } else {
-                                        saveData('Main', function (response) {
-                                            if (response == false) {
-                                                addTask(isCreateTask,clientId,date,areaId);
-                                            }
-                                            refreshSchedule();
-                                        });
+                                        Schedule.saveLesson(lessonData, lessonSaveCallback);
                                     }
                                 });
                             } else {
@@ -196,19 +212,12 @@ $(function(){
                                             alert('Преподаватель в стоп листе, постановка консультации невозможна!!!');
                                             loaderOff();
                                         } else {
-                                            saveData('Main', function (response) {
-                                                refreshSchedule();
-                                            });
+                                            Schedule.saveLesson(lessonData, lessonSaveCallback);
                                         }
                                     });
                                 } else {
                                     //Сделал сразу заготовку для добавления задачи группе
-                                    saveData('Main', function (response) {
-                                        if (response == false && (typeId == 1 || typeId == 2)) {
-                                            addTask(isCreateTask,clientId,date,areaId);
-                                        }
-                                        refreshSchedule();
-                                    });
+                                    Schedule.saveLesson(lessonData, lessonSaveCallback);
                                 }
                             }
                         }
@@ -238,6 +247,7 @@ $(function(){
             markAbsent(lessonId, clientId, date, function(response) {
                 if (response.error !== undefined) {
                     notificationError(response.message);
+                    loaderOff();
                 } else {
                     refreshSchedule();
                 }
@@ -1145,10 +1155,11 @@ function saveClientLesson() {
         userId: data.clientId,
         date: data.insertDate
     }, function(response) {
-        if (response.isset == false) {
+        if (response.isset === false) {
             $.ajax({
                 type: 'POST',
                 url: root + '/api/schedule/index.php',
+                dataType: 'json',
                 data: data,
                 success: function(response) {
                     closePopup();
