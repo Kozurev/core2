@@ -11,23 +11,20 @@ Core::requireClass('Schedule_Lesson');
 
 class Schedule_Controller_Extended
 {
-
     /**
-     * Поиск занятий для пользователя начиная с $dateStart и заканчивая $dateTo
      * TODO: значение $dateTo может некорректно работать с занятиями основного графика, но это не точно
      *
-     * @param User $User
+     * @param User|null $user
      * @param string|null $dateStart
      * @param string|null $dateTo
-     * @return array
+     * @return Orm
      */
-    public static function getLessons(User $User, string $dateStart = null, string $dateTo = null)
+    public static function getLessonsQuery(User $user = null, string $dateStart = null, string $dateTo = null) : Orm
     {
-        $Lesson = new Schedule_Lesson();
-        $LessonsQuery = $Lesson->queryBuilder();
+        $lessonsQuery = Schedule_Lesson::query();
 
         if (!empty($dateStart) && isDate($dateStart)) {
-            $LessonsQuery
+            $lessonsQuery
                 ->open()
                     ->open()
                         ->where('lesson_type', '=', Schedule_Lesson::SCHEDULE_MAIN)
@@ -39,48 +36,60 @@ class Schedule_Controller_Extended
                     ->open()
                         ->orWhere('lesson_type', '=', Schedule_Lesson::SCHEDULE_CURRENT)
                         ->where('insert_date', '>=', $dateStart);
-                if (isDate(strval($dateTo))) {
-                    $LessonsQuery->where('insert_date', '<=', $dateTo);
-                }
-                $LessonsQuery
-                    ->close()
-                ->close();
+            if (isDate(strval($dateTo))) {
+                $lessonsQuery->where('insert_date', '<=', $dateTo);
+            }
+            $lessonsQuery->close()->close();
         }
 
-        $LessonsQuery
+        $lessonsQuery
             ->orderBy('insert_date', 'ASC')
             ->orderBy('time_from', 'ASC');
 
-        if ($User->groupId() == ROLE_CLIENT) {
-            $ClientGroups = Schedule_Group::getClientGroups($User);
-            $groupsIds = [];
-            foreach ($ClientGroups as $Group) {
-                $groupsIds[] = $Group->getId();
-            }
-            if (!empty($groupsIds)) {
-                $LessonsQuery
-                    ->open()
+        if (!is_null($user)) {
+            if ($user->groupId() == ROLE_CLIENT) {
+                $clientGroups = Schedule_Group::getClientGroups($user);
+                $groupsIds = [];
+                foreach ($clientGroups as $group) {
+                    $groupsIds[] = $group->getId();
+                }
+                if (!empty($groupsIds)) {
+                    $lessonsQuery
                         ->open()
-                            ->where('client_id', '=', $User->getId())
-                            ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
-                        ->close()
-                        ->open()
-                            ->orWhereIn('client_id', $groupsIds)
-                            ->where('type_id', '=', Schedule_Lesson::TYPE_GROUP)
-                        ->close()
-                    ->close();
-            } else {
-                $LessonsQuery
-                    ->where('client_id', '=', $User->getId())
-                    ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV);
+                            ->open()
+                                ->where('client_id', '=', $user->getId())
+                                ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
+                            ->close()
+                            ->open()
+                                ->orWhereIn('client_id', $groupsIds)
+                                ->where('type_id', '=', Schedule_Lesson::TYPE_GROUP)
+                            ->close()
+                        ->close();
+                } else {
+                    $lessonsQuery
+                        ->where('client_id', '=', $user->getId())
+                        ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV);
+                }
+            } elseif ($user->groupId() == ROLE_TEACHER) {
+                $lessonsQuery->where('teacher_id', '=', $user->getId());
             }
-        } elseif ($User->groupId() == ROLE_TEACHER) {
-            $LessonsQuery->where('teacher_id', '=', $User->getId());
         }
 
-        return $LessonsQuery->findAll();
+        return $lessonsQuery;
     }
 
+    /**
+     * Поиск занятий для пользователя начиная с $dateStart и заканчивая $dateTo
+     *
+     * @param User|null $user
+     * @param string|null $dateStart
+     * @param string|null $dateTo
+     * @return array
+     */
+    public static function getLessons(User $user = null, string $dateStart = null, string $dateTo = null)
+    {
+        return self::getLessonsQuery($user, $dateStart, $dateTo)->findAll();
+    }
 
     /**
      * Формирование последовательности занятий для пользователя $User
@@ -146,10 +155,8 @@ class Schedule_Controller_Extended
         } while (!$isEnough);
 
         Core::notify($observerArgs, 'after.ScheduleControllerExtended.getSchedule');
-        // debug($Schedule);
         return $Schedule;
     }
-
 
     /**
      * @param string $date
@@ -198,7 +205,6 @@ class Schedule_Controller_Extended
         return $result;
     }
 
-
     /**
      * Поиск графика работы преподавателя
      *
@@ -219,7 +225,6 @@ class Schedule_Controller_Extended
 
         return $query->findAll();
     }
-
 
     /**
      * Поиск свободных промежутков времени преподавателя исходя из его расписания и графика работы
@@ -266,23 +271,24 @@ class Schedule_Controller_Extended
         return $freeTimeIntervals;
     }
 
-
     /**
      * Поиск свободного времени преподавателя только рядом с другими занятиями
      *
      * @param array $teacherLessons
+     * @param array $classLessons
      * @param array $teacherSchedule
      * @param string $clientLessonDuration
      * @return array
      */
-    public static function getNearestFreeTime(array $teacherLessons, array $teacherSchedule, string $clientLessonDuration)
+    public static function getNearestFreeTime(array $teacherLessons, array $classLessons, array $teacherSchedule, string $clientLessonDuration)
     {
         $freeScheduleTime = [];
+        $allLessons = array_merge($teacherLessons, $classLessons);
         /** @var Schedule_Lesson $lesson */
         foreach ($teacherLessons as $lesson) {
             $timeBefore = deductTime($lesson->timeFrom(), addTime($clientLessonDuration, SCHEDULE_LESSON_INTERVAL));
             $timeAfter = addTime(addTime($lesson->timeTo(), SCHEDULE_LESSON_INTERVAL), $clientLessonDuration);
-            if (Schedule_Controller_Extended::isFreeTime($timeBefore, deductTime($lesson->timeFrom(), SCHEDULE_LESSON_INTERVAL), $teacherLessons, $teacherSchedule)) {
+            if (Schedule_Controller_Extended::isFreeTime($timeBefore, deductTime($lesson->timeFrom(), SCHEDULE_LESSON_INTERVAL), $allLessons, $teacherSchedule)) {
                 if (!isset($freeScheduleTime[$timeBefore])) {
                     $freeScheduleTime[$timeBefore] = new stdClass();
                     $freeScheduleTime[$timeBefore]->area_id = $lesson->areaId();
@@ -291,7 +297,7 @@ class Schedule_Controller_Extended
                     $freeScheduleTime[$timeBefore]->timeTo = deductTime($lesson->timeFrom(), SCHEDULE_LESSON_INTERVAL);
                 }
             }
-            if (Schedule_Controller_Extended::isFreeTime(addTime($lesson->timeTo(), SCHEDULE_LESSON_INTERVAL), $timeAfter, $teacherLessons, $teacherSchedule)) {
+            if (Schedule_Controller_Extended::isFreeTime(addTime($lesson->timeTo(), SCHEDULE_LESSON_INTERVAL), $timeAfter, $allLessons, $teacherSchedule)) {
                 $timeFrom = addTime($lesson->timeTo(), SCHEDULE_LESSON_INTERVAL);
                 if (!isset($freeScheduleTime[$timeFrom])) {
                     $freeScheduleTime[$timeFrom] = new stdClass();
@@ -304,7 +310,6 @@ class Schedule_Controller_Extended
         }
         return $freeScheduleTime;
     }
-
 
     /**
      * Поиск свободного времени преподавателя только рядом с другими занятиями
@@ -329,14 +334,27 @@ class Schedule_Controller_Extended
             return [];
         }
 
-        $nearest = self::getNearestFreeTime($teacherLessons[0]->lessons, $teacherSchedule, $lessonDuration);
+        $classLessons = [];
+        $classLessonsAll = self::getLessonsQuery(null, $date, $date)
+            ->where('class_id', '=', $teacherLessons[0]->lessons[0]->classId())
+            ->where('area_id', '=', $teacherLessons[0]->lessons[0]->areaId())
+            ->where('day_name', '=', date('l', strtotime($date)))
+            ->findAll();
+        /** @var Schedule_Lesson $lesson */
+        foreach ($classLessonsAll as $lesson) {
+            if (!$lesson->isAbsent($date)) {
+                $lesson->setRealTime($date);
+                $classLessons[] = $lesson;
+            }
+        }
+
+        $nearest = self::getNearestFreeTime($teacherLessons[0]->lessons, $classLessons, $teacherSchedule, $lessonDuration);
         foreach ($nearest as $time) {
             $time->date = $date;
         }
 
         return $nearest;
     }
-
 
     /**
      * Проверка на пересечение временного промежутка с графиком и расписанием преподавателя (в рамках одного дня)

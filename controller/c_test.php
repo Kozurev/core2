@@ -7,6 +7,15 @@
  */
 
 
+$teacherId = 14;
+$date = '2020-09-25';
+$lessonDuration = '00:50:00';
+
+Orm::debug(true);
+$nearestTime = Schedule_Controller_Extended::getTeacherNearestFreeTime($teacherId, $date, $lessonDuration);
+
+debug($nearestTime);
+
 exit;
 
 Orm::execute('ALTER TABLE Payment ADD status tinyint DEFAULT 0 NULL;
