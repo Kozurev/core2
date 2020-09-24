@@ -4,10 +4,8 @@
  *
  * @author BadWolf
  * @date 21.10.2019 20:11
+ * @version 2020-09-24 - доработки подбора времени
  */
-
-Core::requireClass('Schedule_Group');
-Core::requireClass('Schedule_Lesson');
 
 class Schedule_Controller_Extended
 {
