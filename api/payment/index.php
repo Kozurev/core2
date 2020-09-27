@@ -331,7 +331,7 @@ if ($action === 'get_client_payments') {
         ?   User_Auth::current()->getId()
         :   Core_Array::Get('user_id', 0, PARAM_INT);
 
-    $paymentsQuery = (new Payment())->queryBuilder()
+    $paymentsQuery = Payment::getListQuery()
         ->where('user', '=', $userId);
 
     //Пагинация

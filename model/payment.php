@@ -19,45 +19,85 @@ class Payment extends Payment_Model
     const STATUS_PENDING = 0;
     const STATUS_SUCCESS = 1;
     const STATUS_ERROR = 2;
+    const STATUS_CANCELED = 3;
 
-    private $defaultUser;
+    /**
+     * @var string|User
+     */
+    private User $defaultUser;
 
+    /**
+     * Payment constructor.
+     */
     public function __construct()
     {
-        $this->defaultUser = Core::factory('User')->surname('Расходы')->name('Организации');
+        $this->defaultUser = (new User)->surname('Расходы')->name('Организации');
     }
 
+    /**
+     * @return Orm
+     */
+    public static function getListQuery() : Orm
+    {
+        return self::query()
+            ->open()
+            ->where('status', '=', self::STATUS_SUCCESS)
+            ->orWhere('status', '=', self::STATUS_ERROR)
+            ->close();
+    }
+
+    /**
+     * @return bool
+     */
     public function isStatusError() : bool
     {
         return $this->status() === self::STATUS_ERROR;
     }
 
+    /**
+     * @return bool
+     */
     public function isStatusSuccess() : bool
     {
         return $this->status() === self::STATUS_SUCCESS;
     }
 
+    /**
+     * @return bool
+     */
     public function isStatusPending() : bool
     {
         return $this->status() === self::STATUS_PENDING;
     }
 
-    public function setStatusPending()
+    /**
+     *
+     */
+    public function setStatusPending() : void
     {
         $this->setStatus(self::STATUS_PENDING);
     }
 
-    public function setStatusSuccess()
+    /**
+     *
+     */
+    public function setStatusSuccess() : void
     {
         $this->setStatus(self::STATUS_SUCCESS);
     }
 
-    public function setStatusError()
+    /**
+     *
+     */
+    public function setStatusError() : void
     {
         $this->setStatus(self::STATUS_ERROR);
     }
 
-    public function setStatus(int $status)
+    /**
+     * @param int $status
+     */
+    public function setStatus(int $status) : void
     {
         $this->status($status)->save();
     }
@@ -65,17 +105,16 @@ class Payment extends Payment_Model
     /**
      * Геттер для объекта пользователя к которому привязан платеж
      *
-     * @return User
+     * @return User|null
      */
-    public function getUser()
+    public function getUser() : ?User
     {
         if (empty($this->user)) {
             return $this->defaultUser;
         } else {
-            return Core::factory('User', $this->user);
+            return User::find($this->user());
         }
     }
-
 
     /**
      * Геттер для объекта автора данного платежа
@@ -91,6 +130,16 @@ class Payment extends Payment_Model
         }
     }
 
+    /**
+     * @param bool $isSubordinated
+     * @param bool $isEditable
+     * @return array
+     * @throws Exception
+     */
+    public function getTypes(bool $isSubordinated = true, bool $isEditable = true)
+    {
+        return self::getTypesList($isSubordinated, $isEditable);
+    }
 
     /**
      * Поиск списка типов платежей под определенные условия
@@ -109,31 +158,30 @@ class Payment extends Payment_Model
      * @throws Exception
      * @return array
      */
-    public function getTypes(bool $isSubordinated = true, bool $isEditable = true)
+    public static function getTypesList(bool $isSubordinated = true, bool $isEditable = true)
     {
-        $PaymentTypes = Core::factory('Payment_Type');
+        $paymentTypesQuery = Payment_Type::query();
 
         //Выборка типов платежа для определенной организации
         if ($isSubordinated === true) {
-            $User = User::current();
-            if (is_null($User)) {
+            $user = User_Auth::current();
+            if (is_null($user)) {
                 throw new Exception('Для получения списка платежей необходимо авторизоваться');
             }
 
-            $PaymentTypes->queryBuilder()
+            $paymentTypesQuery
                 ->open()
-                    ->where('subordinated', '=', $User->getDirector()->getId())
-                    ->orWhere('subordinated', '=', 0)
+                ->where('subordinated', '=', $user->getDirector()->getId())
+                ->orWhere('subordinated', '=', 0)
                 ->close();
         }
 
         //Выборка лишь редактируемых / удаляемых типов
         if ($isEditable === true) {
-            $PaymentTypes->queryBuilder()->where('is_deletable', '=', 1);
+            $paymentTypesQuery->where('is_deletable', '=', 1);
         }
-        return $PaymentTypes->findAll();
+        return $paymentTypesQuery->findAll();
     }
-
 
     /**
      * @param null $obj
@@ -152,7 +200,6 @@ class Payment extends Payment_Model
         return $this;
     }
 
-
     /**
      * @param null $obj
      * @return $this|void
@@ -164,6 +211,10 @@ class Payment extends Payment_Model
         Core::notify([&$this], 'after.Payment.delete');
     }
 
+    /**
+     * @param string $comment
+     * @return object|null
+     */
     public function appendComment(string $comment)
     {
          return Property_Controller::factoryByTag('payment_comment')

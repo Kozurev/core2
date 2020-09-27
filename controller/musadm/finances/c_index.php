@@ -8,9 +8,8 @@
  * @version 20190427
  * @version 20190526
  * @version 20190626
+ * @version 2020-09-27 - рефакторинг
  */
-
-$Payment = new Payment();
 
 //основные права доступа
 $accessPaymentsRead = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_ALL);
@@ -35,18 +34,16 @@ $date = date($dateFormat);
 $dateFrom = Core_Array::Get('date_from', $date, PARAM_DATE);
 $dateTo =   Core_Array::Get('date_to', $date, PARAM_DATE);
 $areaId =   Core_Array::Get('area_id', 0, PARAM_INT);
-$Director = User_Auth::current()->getDirector();
-$subordinated = $Director->getId();
+$director = User_Auth::current()->getDirector();
+$subordinated = $director->getId();
 
 //Тарифы
-$Tarifs = Core::factory('Payment_Tarif')
-    ->queryBuilder()
+$tarifs = Payment_Tarif::query()
     ->where('subordinated', '=', $subordinated)
     ->findAll();
 
 //Типы занятий
-$LessonTypes = Core::factory('Schedule_Lesson_Type')
-    ->queryBuilder()
+$lessonTypes = Schedule_Lesson_Type::query()
     ->where('id', '<>', 3)
     ->findAll();
 
@@ -54,20 +51,18 @@ $LessonTypes = Core::factory('Schedule_Lesson_Type')
 try {
     //Доступные филиалы
     $areasAssignment = new Schedule_Area_Assignment();
-    $PaymentAreas = $areasAssignment->getAreas(User_Auth::current());
+    $paymentAreas = $areasAssignment->getAreas(User_Auth::current());
     $areasIds = [];
-    foreach ($PaymentAreas as $area) {
+    foreach ($paymentAreas as $area) {
         $areasIds[] = $area->getId();
     }
 
-    $PaymentTypes = $Payment->getTypes(true, false);
+    $paymentTypes = Payment::getTypesList(true, false);
 } catch (Exception $e) {
     die($e->getMessage());
 }
 
-
-$Payments = new Payment();
-$Payments->queryBuilder()
+$paymentsQuery = Payment::getListQuery()
     ->where('subordinated', '=', $subordinated)
     ->where('type', '<>', Payment::TYPE_DEBIT)
     ->orderBy('id', 'DESC');
@@ -96,13 +91,12 @@ $cashBack->select('sum(value)', 'value')
 
 //Указание временного промежутка выборки
 if ($dateFrom == $dateTo) {
-    $Payments->queryBuilder()
-        ->where('datetime', '=', $dateFrom);
+    $paymentsQuery->where('datetime', '=', $dateFrom);
     $income->where('datetime', '=', $dateFrom);
     $expenses->where('datetime', '=', $dateFrom);
     $cashBack->where('datetime', '=', $dateFrom);
 } else {
-    $Payments->queryBuilder()
+    $paymentsQuery
         ->where('datetime', '>=', $dateFrom)
         ->where('datetime', '<=', $dateTo);
     $income->where('datetime', '>=', $dateFrom)
@@ -115,18 +109,19 @@ if ($dateFrom == $dateTo) {
 
 $multiAreasAccess = Core_Access::instance()->hasCapability(Core_Access::AREA_MULTI_ACCESS);
 if ($areaId !== 0) {
-    $Payments->queryBuilder()->where('area_id', '=', $areaId);
+    $paymentsQuery->where('area_id', '=', $areaId);
     $income->where('area_id', '=', $areaId);
     $expenses->where('area_id', '=', $areaId);
     $cashBack->where('area_id', '=', $areaId);
 } elseif (!$multiAreasAccess) {
-    $Payments->queryBuilder()->whereIn('area_id', $areasIds);
+    $paymentsQuery->whereIn('area_id', $areasIds);
     $income->whereIn('area_id', $areasIds);
     $expenses->whereIn('area_id', $areasIds);
     $cashBack->whereIn('area_id', $areasIds);
 }
 
-$Payments = $Payments->findAll();
+/** @var Payment[] $payments */
+$payments = $paymentsQuery->findAll();
 
 //Поступления за период
 $incomeValue = $income->find()->value;
@@ -141,52 +136,63 @@ $cashBackValue = $cashBack->find()->value;
 $cashBackValue = !empty($cashBackValue) ? $cashBackValue : 0;
 
 //Поиск информации о платеже: ФИО клиента/преподавателя и фио автора
-foreach ($Payments as $payment) {
-    $PaymentUser = $payment->getUser();
-    if (!is_null($PaymentUser)) {
-        $payment->addEntity($PaymentUser);
+$paymentsUsersIds = [];
+foreach ($payments as $payment) {
+    if (!empty($payment->user()) && !isset($paymentsUsersIds[$payment->user()])) {
+        $paymentsUsersIds[] = $payment->user();
     }
+}
+$paymentsUsers = User::query()
+    ->whereIn('id', $paymentsUsersIds)
+    ->get(true);
 
-    if ($payment->authorId() > 0) {
-        $PaymentAuthor = $payment->getAuthor();
-        if (!is_null($PaymentAuthor)) {
-            $payment->addEntity($PaymentAuthor, 'author');
-        }
-    }
-
+foreach ($payments as $payment) {
+//    $paymentUser = $payment->getUser();
+//    if (!is_null($paymentUser)) {
+//        $payment->addEntity($paymentUser);
+//    }
+//
+//    if ($payment->authorId() > 0) {
+//        $paymentAuthor = $payment->getAuthor();
+//        if (!is_null($paymentAuthor)) {
+//            $payment->addEntity($paymentAuthor, 'author');
+//        }
+//    }
     $payment->datetime(refactorDateFormat($payment->datetime()));
+    if ($paymentsUsers->has($payment->user())) {
+        $payment->addEntity($paymentsUsers->get($payment->user()));
+    }
 }
 
 //Данные настроек ставок
-$DefTeacherIndivRate =  Property_Controller::factoryByTag('teacher_rate_indiv_default');
-$DefTeacherGroupRate =  Property_Controller::factoryByTag('teacher_rate_group_default');
-$DefTeacherConsultRate= Property_Controller::factoryByTag('teacher_rate_consult_default');
-$DefAbsentRate =        Property_Controller::factoryByTag('client_absent_rate');
-$DefAbsentRateType =    Property_Controller::factoryByTag('teacher_rate_type_absent_default');
-$DefAbsentRateVal =     Property_Controller::factoryByTag('teacher_rate_absent_default');
+$defTeacherIndivRate =  Property_Controller::factoryByTag('teacher_rate_indiv_default');
+$defTeacherGroupRate =  Property_Controller::factoryByTag('teacher_rate_group_default');
+$defTeacherConsultRate= Property_Controller::factoryByTag('teacher_rate_consult_default');
+$defAbsentRate =        Property_Controller::factoryByTag('client_absent_rate');
+$defAbsentRateType =    Property_Controller::factoryByTag('teacher_rate_type_absent_default');
+$defAbsentRateVal =     Property_Controller::factoryByTag('teacher_rate_absent_default');
 
-$defTeacherIndivRate =  $DefTeacherIndivRate->getValues($Director)[0]->value();
-$defTeacherGroupRate =  $DefTeacherGroupRate->getValues($Director)[0]->value();
-$defTeacherConsultRate= $DefTeacherConsultRate->getValues($Director)[0]->value();
-$defAbsentRate =        $DefAbsentRate->getValues($Director)[0]->value();
-$defAbsentRateType =    $DefAbsentRateType->getValues($Director)[0]->value();
-$defAbsentRateVal =     $DefAbsentRateVal->getValues($Director)[0]->value();
+$defTeacherIndivRate =  $defTeacherIndivRate->getValues($director)[0]->value();
+$defTeacherGroupRate =  $defTeacherGroupRate->getValues($director)[0]->value();
+$defTeacherConsultRate= $defTeacherConsultRate->getValues($director)[0]->value();
+$defAbsentRate =        $defAbsentRate->getValues($director)[0]->value();
+$defAbsentRateType =    $defAbsentRateType->getValues($director)[0]->value();
+$defAbsentRateVal =     $defAbsentRateVal->getValues($director)[0]->value();
 
 //API Токен авторизации эквайринга
-$ApiToken = Property_Controller::factoryByTag('payment_sberbank_token');
-$apiToken = $ApiToken->getValues($Director)[0]->value();
+$apiToken = Property_Controller::factoryByTag('payment_sberbank_token');
+$apiToken = $apiToken->getValues($director)[0]->value();
 
 //Кэшбэк при пополнении клиентом баланса
-$CashBack = Property_Controller::factoryByTag('payment_cashback');
-$cashBack = $CashBack->getValues($Director)[0]->value();
+$cashBack = Property_Controller::factoryByTag('payment_cashback');
+$cashBack = $cashBack->getValues($director)[0]->value();
 
-
-Core::factory('Core_Entity')
-    ->addEntities($Payments)
-    ->addEntities($Tarifs)
-    ->addEntities($LessonTypes)
-    ->addEntities($PaymentTypes)
-    ->addEntities($PaymentAreas)
+(new Core_Entity)
+    ->addEntities($payments)
+    ->addEntities($tarifs)
+    ->addEntities($lessonTypes)
+    ->addEntities($paymentTypes)
+    ->addEntities($paymentAreas)
     ->addSimpleEntity('current_area', $areaId)
     ->addSimpleEntity('date_from', $dateFrom)
     ->addSimpleEntity('date_to', $dateTo)
@@ -194,7 +200,7 @@ Core::factory('Core_Entity')
     ->addSimpleEntity('total_expenses', $expensesValue)
     ->addSimpleEntity('total_cashback', $cashBackValue)
     //Настройки тарифов
-    ->addSImpleEntity('director_id', $Director->getId())
+    ->addSImpleEntity('director_id', $director->getId())
     ->addSimpleEntity('teacher_indiv_rate', $defTeacherIndivRate)
     ->addSimpleEntity('teacher_group_rate', $defTeacherGroupRate)
     ->addSimpleEntity('teacher_consult_rate', $defTeacherConsultRate)

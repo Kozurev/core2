@@ -313,8 +313,7 @@ if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ)) {
 
 //Платежи
 if (Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_CLIENT)) {
-    $UserPayments = Core::factory('Payment')
-        ->queryBuilder()
+    $UserPayments = Payment::getListQuery()
         ->orderBy('id', 'DESC')
         ->where('user', '=', $User->getId())
         ->findAll();

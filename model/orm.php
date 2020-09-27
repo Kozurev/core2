@@ -782,7 +782,7 @@ class Orm
     public function whereIn($row, $values)
     {
         if (!is_array($values))     return $this;
-        if (count($values) == 0)    return $this;
+        //if (count($values) == 0)    return $this;
 
         if ($this->where != '') {
             $this->where .= ' AND ';
