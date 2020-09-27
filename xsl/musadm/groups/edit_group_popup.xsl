@@ -44,13 +44,11 @@
             </div>
             <hr/>
 
-            <div hidden="true">
-                <div class="column">
-                    <span>Длит. урока</span>
-                </div>
-                <div class="column">
-                    <input type="time" name="duration" class="form-control" value="{schedule_group/duration}" />
-                </div>
+            <div class="column">
+                <span>Длит. урока</span>
+            </div>
+            <div class="column">
+                <input type="time" name="duration" class="form-control" value="{schedule_group/duration}" />
             </div>
             <hr/>
 
@@ -59,18 +57,22 @@
             </div>
             <div class="column">
                 <select class="form-control" name="type">
-                    <option value="1">
-                        <xsl:if test="schedule_group/type = 1">
-                            <xsl:attribute name="selected">selected</xsl:attribute>
-                        </xsl:if>
-                        Клиенты
-                    </option>
-                    <option value="2">
-                        <xsl:if test="schedule_group/type = 2">
-                            <xsl:attribute name="selected">selected</xsl:attribute>
-                        </xsl:if>
-                        Лиды
-                    </option>
+                    <xsl:if test="group_type = 1">
+                        <option value="1">
+                            <xsl:if test="schedule_group/type = 1">
+                                <xsl:attribute name="selected">selected</xsl:attribute>
+                            </xsl:if>
+                            Клиенты
+                        </option>
+                    </xsl:if>
+                    <xsl:if test="group_type = 2">
+                        <option value="2">
+                            <xsl:if test="schedule_group/type = 2">
+                                <xsl:attribute name="selected">selected</xsl:attribute>
+                            </xsl:if>
+                            Лиды
+                        </option>
+                    </xsl:if>
                 </select>
             </div>
             <hr/>
@@ -86,37 +88,38 @@
             <input type="hidden" name="modelName" value="Schedule_Group" />
             <!--<input type="hidden" name="action" value="saveGroup" />-->
 
-            <div class="column">
-                <span>Дата</span>
-            </div>
-            <div class="column">
-                <input class="form-control" type="date" name="date" value="{schedule_group/date}"/>
-            </div>
+            <xsl:if test="(schedule_group/type = 2) or (group_type = 2)">
+                <div class="column">
+                    <span>Дата</span>
+                </div>
+                <div class="column">
+                    <input class="form-control" type="date" name="date" value="{schedule_group/date}"/>
+                </div>
 
-            <div class="column">
-                <span>Начало</span>
-            </div>
-            <div class="column">
-                <input class="form-control" type="time" name="timeStart" value="{schedule_group/time_start}"/>
-            </div>
+                <div class="column">
+                    <span>Начало</span>
+                </div>
+                <div class="column">
+                    <input class="form-control" type="time" name="timeStart" value="{schedule_group/time_start}"/>
+                </div>
 
-            <div class="column">
-                <span>Филиал</span>
-            </div>
-            <div class="column">
-                <select class="form-control" name="areaId">
-                    <xsl:for-each select="schedule_area">
-                        <xsl:variable name="area_id" select="id" />
-                        <option value="{id}">
-                            <xsl:if test="$area_id = //schedule_group/area_id">
-                                <xsl:attribute name="selected">selected</xsl:attribute>
-                            </xsl:if>
-                            <xsl:value-of select="title" />
-                        </option>
-                    </xsl:for-each>
-                </select>
-            </div>
-
+                <div class="column">
+                    <span>Филиал</span>
+                </div>
+                <div class="column">
+                    <select class="form-control" name="areaId">
+                        <xsl:for-each select="schedule_area">
+                            <xsl:variable name="area_id" select="id" />
+                            <option value="{id}">
+                                <xsl:if test="$area_id = //schedule_group/area_id">
+                                    <xsl:attribute name="selected">selected</xsl:attribute>
+                                </xsl:if>
+                                <xsl:value-of select="title" />
+                            </option>
+                        </xsl:for-each>
+                    </select>
+                </div>
+            </xsl:if>
             <button class="btn btn-default" onclick="loaderOn(); saveData('Main', refreshGroupTable)">Сохранить</button>
         </form>
     </xsl:template>

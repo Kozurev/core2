@@ -5,16 +5,33 @@
     <xsl:template match="root">
 
 
-        <section>
-            <div class="row buttons-panel">
-                <input type="hidden" />
-                <xsl:if test="access_group_create = 1">
-                    <div>
-                        <a class="btn btn-blue" onclick="getGroupPopup(0)">Создать группу</a>
-                    </div>
-                </xsl:if>
-            </div>
-
+        <section class="filial">
+                <div class="row buttons-panel">
+                    <input type="hidden" />
+                    <xsl:if test="access_group_create = 1">
+                        <div>
+                            <a class="btn btn-blue" onclick="getGroupPopup(0)">Создать группу</a>
+                        </div>
+                    </xsl:if>
+                    <xsl:if test="schedule_group/type = 2">
+                        <div>
+                            <h4>Период с:</h4>
+                        </div>
+                        <div>
+                            <input type="date" class="form-control" name="date_from" value="{date_from}"/>
+                        </div>
+                        <div>
+                            <h4>по:</h4>
+                        </div>
+                        <div>
+                            <input type="date" class="form-control" name="date_to" value="{date_to}"/>
+                        </div>
+                        <xsl:call-template name="areas_row" />
+                        <div>
+                            <a class="btn btn-green filial_show">Показать</a>
+                        </div>
+                    </xsl:if>
+                </div>
 
             <div class="row">
                 <div class="col-md-12">
@@ -85,12 +102,13 @@
                         <tr class="header">
                             <th>Название</th>
                             <th>Учитель</th>
-                            <th hidden="true">Длит. занятия</th>
                             <th>Состав группы</th>
                             <th>Примечание</th>
-                            <th>Дата</th>
-                            <th>Начало</th>
-                            <th>Филиал</th>
+                            <xsl:if test="schedule_group/type = 2">
+                                <th>Дата</th>
+                                <th>Начало</th>
+                                <th>Филиал</th>
+                            </xsl:if>
                             <th>Действия</th>
                         </tr>
                     </thead>
@@ -114,7 +132,6 @@
                     <xsl:value-of select="user[id = $teacher]/name" />
                 </a>
             </td>
-            <td hidden="true"><xsl:value-of select="duration" /></td>
             <td width="200px">
                 <xsl:choose>
                     <xsl:when test="type = 1">
@@ -143,10 +160,11 @@
             </td>
 
             <td><xsl:value-of select="note" /></td>
-            <td><xsl:value-of select="date"/></td>
-            <td><xsl:value-of select="time_start"/></td>
-            <td><xsl:value-of select="schedule_area/title"/></td>
-
+            <xsl:if test="type = 2">
+                <td><xsl:value-of select="refactored_date_start"/></td>
+                <td><xsl:value-of select="refactored_time_start"/></td>
+                <td><xsl:value-of select="schedule_area/title"/></td>
+            </xsl:if>
             <td width="140px">
                 <xsl:if test="/root/access_group_edit = 1">
                     <a class="action edit group_edit" onclick="getGroupPopup({id})"></a>

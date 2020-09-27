@@ -5,6 +5,13 @@ var root = $('#rootdir').val();
 
 $(function(){
     $('body')
+        .on("click", ".filial_show", function(e){
+            loaderOn();
+            let dateFrom = $('input[name=date_from]').val();
+            let dateTo = $('input[name=date_to]').val();
+            let areaId = $('select[name=area_id]').val();
+            showGroupHistory(dateFrom, dateTo, areaId);
+        })
         .on('submit', '#groupSearch', function(e) {
             e.preventDefault();
             loaderOn();
@@ -205,6 +212,24 @@ function getGroupComposition(groupId) {
         },
         success: function(response) {
             showPopup(response);
+            loaderOff();
+        }
+    });
+}
+function showGroupHistory(periodFrom, periodTo, areaId) {
+    $.ajax({
+        type: 'GET',
+        url: '',
+        data: {
+            action: 'show',
+            date_from: periodFrom,
+            date_to: periodTo,
+            area_id: areaId
+        },
+        success: function(response) {
+            let data = $(response).find('#sortingTable');
+            $('#sortingTable').replaceWith(data);
+            console.log(periodFrom, periodTo, areaId);
             loaderOff();
         }
     });

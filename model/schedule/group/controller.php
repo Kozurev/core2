@@ -110,6 +110,25 @@ class Schedule_Group_Controller extends Controller
             $this->getQueryBuilder()->where('subordinated', '=', $this->getSubordinate());
         }
 
+        if (!(count($this->areasIds)>0)) {
+            if($this->isLimitedAreasAccess === true && !is_null(($this->getUser())) && $this->getUser()->groupId() !== ROLE_DIRECTOR) {
+                $Areas = Core::factory('Schedule_Area_Assignment')
+                    ->getAreas($this->getUser(), true);
+                foreach ($Areas as $Area) {
+                    $this->areasIds[] = $Area->getId();
+                }
+            } else {
+                $this->areasIds = [];
+            }
+        }
+
+        if (count($this->areasIds) > 0) {
+            $this->getQueryBuilder()->open()
+                ->where('area_id', 'is', null)
+                ->orWhereIn('area_id', $this->areasIds)
+                ->close();
+        }
+
         //Пагинация
         $this->paginateExecute();
 
@@ -190,6 +209,8 @@ class Schedule_Group_Controller extends Controller
         if (!($outputXml instanceof Core_Entity)) {
             $outputXml = new Core_Entity();
         }
+
+        Core::notify(['groups' => &$groups], 'before.ScheduleGroupController.show');
 
         $outputXml
             ->addEntities($groups)

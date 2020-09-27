@@ -93,6 +93,12 @@ if ($action == 'updateForm') {
     $popupData = Core::factory('Core_Entity');
     $modelId = Core_Array::Get('group_id', 0, PARAM_INT);
 
+    if (Core_Page_Show::instance()->Structure->path() == 'clients') {
+        $type = Schedule_Group::TYPE_CLIENTS;
+    } else {
+        $type = Schedule_Group::TYPE_LIDS;
+    }
+
     if ($modelId == 0 && !$accessCreate) {
         Core_Page_Show::instance()->error(403);
     }
@@ -128,6 +134,7 @@ if ($action == 'updateForm') {
         ->addEntity($Group)
         ->addEntities($Users)
         ->addEntities($Areas)
+        ->addSimpleEntity('group_type', $type)
         ->xsl('musadm/groups/edit_group_popup.xsl')
         ->show();
 

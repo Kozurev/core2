@@ -20,9 +20,52 @@ if (Core_Page_Show::instance()->Structure->path() == 'clients') {
 $page = Core_Array::Request('page', 1, PARAM_INT);
 
 $groupsController = new Schedule_Group_Controller(User_Auth::current());
-$groupsController->getQueryBuilder()->where('type', '=', $type);
 $groupsController->paginate()->setCurrentPage($page);
+$groupsController->setFilterType(Controller::FILTER_STRICT);
+$groupsController->appendFilter('type', $type,'=');
+
+if ($type == Schedule_Group::TYPE_LIDS) {
+    $dateFormat = 'Y-m-d';
+    $date = date($dateFormat);
+
+    $dateFrom = Core_Array::Get('date_from', '', PARAM_DATE);
+    $dateTo = Core_Array::Get('date_to', '', PARAM_DATE);
+    $areaId = Core_Array::Get('area_id', 0, PARAM_INT);
+
+    $areas = (new Schedule_Area_Assignment())->getAreas(User_Auth::current());
+
+    if($dateFrom !== '' || $dateTo !== '') {
+        if ($dateFrom == $dateTo) {
+            $groupsController->appendFilter('date', $dateFrom, '=');
+        } else {
+            $groupsController->appendFilter('date', $dateFrom, '>=')
+                ->appendFilter('date', $dateTo, '<=');
+        }
+    }
+    if ($areaId !== 0) {
+        $groupsController->appendFilter('area_id', $areaId, '=');
+    }
+}
+
+Core::attachObserver('before.ScheduleGroupController.show', function ($args) {
+    /** @var Schedule_Group[] $groups */
+    $groups = $args['groups'];
+    foreach ($groups as $group) {
+        if (!is_null($group->timeStart())) {
+            $group->refactored_time_start = refactorTimeFormat(strval($group->timeStart()));
+        }
+        if (!is_null($group->date())) {
+            $group->refactored_date_start = refactorDateFormat(strval($group->date()));
+        }
+    }
+});
 
 $groupsController
+    ->addEntities($areas ?? [],'schedule_area')
+    ->addSimpleEntity('current_area', $areaId ?? 0)
+    ->addSimpleEntity('date_from', $dateFrom ?? '')
+    ->addSimpleEntity('date_to', $dateTo ?? '')
     ->setXsl('musadm/groups/groups.xsl')
     ->show();
+
+Core::detachObserver('before.ScheduleGroupController.show');
