@@ -510,23 +510,37 @@ function authOrOut()
  *
  * @param string $route
  * @param array $params
+ * @param string $pathType
  * @return string
  */
-function mapping(string $route, $params = []) : string
+function mapping(string $route, $params = [], string $pathType = MAPPING_BASE) : string
 {
     global $CFG;
 
-    $mapping = [
-        'auth' => 'authorize',
-        'deposit_success' => 'pay/success',
-        'deposit_error' => 'pay/error',
+    $servers = [
+        MAPPING_BASE => $CFG->wwwroot,
+        MAPPING_CLIENT_LC => $CFG->client_lk_link
     ];
+
+    $dirs = [
+        MAPPING_BASE => [
+            'auth' => 'authorize',
+            'deposit_success' => 'pay/success',
+            'deposit_error' => 'pay/error'
+        ],
+        MAPPING_CLIENT_LC => [
+            'auth' => 'login'
+        ]
+    ];
+
+    $server = $servers[$pathType] ?? '';
+    $dir = $dirs[$pathType][$route] ?? '';
 
     $getParams = !empty($params)
         ?   '?' . http_build_query($params)
         :   '';
 
-    return $CFG->wwwroot . '/' . $mapping[$route] . $getParams ?? '';
+    return $server . '/' . $dir . $getParams;
 }
 
 /**

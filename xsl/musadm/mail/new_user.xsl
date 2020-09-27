@@ -18,6 +18,7 @@
                     <xsl:choose>
                         <xsl:when test="password != ''">
                             Данные для входа: <br/>
+                            Ссылка на <a href="{auth_link}">личный кабинет</a><br/>
                             Email: <xsl:value-of select="user/email" /><br/>
                             <xsl:if test="user/login != ''">
                                 Логин: <xsl:value-of select="user/login" /><br/>

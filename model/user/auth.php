@@ -115,13 +115,15 @@ class User_Auth
      */
     public static function userVerify(string $login, string $password)
     {
-        $User = new User();
-        $ExistingUser = $User->queryBuilder()
-            ->where('login', '=', $login)
+        $existingUser = User::query()
+            ->open()
+                ->where('login', '=', $login)
+                ->orWhere('email', '=', $login)
+            ->close()
             ->where('active', '=', 1)
             ->find();
-        if (!empty($ExistingUser) && password_verify($password, $ExistingUser->password())) {
-            return $ExistingUser;
+        if (!empty($existingUser) && password_verify($password, $existingUser->password())) {
+            return $existingUser;
         } else {
             return null;
         }

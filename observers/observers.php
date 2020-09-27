@@ -967,12 +967,16 @@ Core::attachObserver('before.User.save', function ($args) {
         $subject = 'Регистрация Musicmetod';
         $message = (new Core_Entity())
             ->addEntity($user)
-            ->addSimpleEntity('auth_link', htmlspecialchars(mapping('auth', [
-                'action' => 'auth_by_token',
-                'auth_token' => $user->authToken()
-            ])))
+//            ->addSimpleEntity('auth_link', htmlspecialchars(mapping('auth', [
+//                'action' => 'auth_by_token',
+//                'auth_token' => $user->authToken()
+//            ])))
+            ->addSimpleEntity('auth_link', mapping('auth', [
+                'token' => $user->getAuthToken()
+            ], MAPPING_CLIENT_LC))
             ->addSimpleEntity('password', $password ?? '')
             ->addSimpleEntity('wwwroot', $CFG->wwwroot)
+            ->addSimpleEntity('client_lk_link', $CFG->client_lk_link)
             ->addSimpleEntity('service_name', 'Musicmetod')
             ->xsl('musadm/mail/new_user.xsl')
             ->show(false);

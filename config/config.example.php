@@ -6,6 +6,7 @@ $CFG->rootdir = '';
 
 //URL адрес системы
 $CFG->wwwroot = '';
+$CFG->client_lk_link = '';
 
 $CFG->recaptcha = new stdClass();
 $CFG->recaptcha->publicKey = '';

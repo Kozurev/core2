@@ -7,13 +7,8 @@
  * @version 20190528
  * @version 20190611
  * @version 20191021
+ * @version 2020-09-27
  */
-
-
-Core::requireClass('User');
-Core::requireClass('User_Controller');
-Core::requireClass('Property_Controller');
-
 
 foreach ($_GET as $key => $param) {
     if (substr($key, 0, 4) == 'amp;') {
@@ -21,7 +16,6 @@ foreach ($_GET as $key => $param) {
         unset($_GET[$key]);
     }
 }
-
 
 $action = Core_Array::Request('action', null, PARAM_STRING);
 
@@ -47,17 +41,17 @@ if ($action === 'getList') {
     $paramOffset = Core_Array::getValue($params, 'offset', null, PARAM_INT);
     $paramsOrder = Core_Array::getValue($params, 'order', [], PARAM_ARRAY);
 
-    $Controller = new User_Controller(User::current());
-    $Controller->active($paramActive);
-    $Controller->groupId($paramGroups);
+    $controller = new User_Controller(User_Auth::current());
+    $controller->active($paramActive);
+    $controller->groupId($paramGroups);
 
     $userTableName = Core::factory('User')->getTableName();
 
     foreach ($paramFilter as $paramName => $paramValue) {
-        $Controller->appendFilter($userTableName . '.' . $paramName, $paramValue);
+        $controller->appendFilter($userTableName . '.' . $paramName, $paramValue);
     }
     foreach ($paramsOrder as $field => $order) {
-        $Controller->queryBuilder()->orderBy($field, $order);
+        $controller->queryBuilder()->orderBy($field, $order);
     }
     if (!is_null($paramSelect)) {
         if (!is_array($paramSelect)) {
@@ -67,17 +61,17 @@ if ($action === 'getList') {
         foreach ($paramSelect as $key => $paramName) {
             $userSelectFields[] = $userTableName . '.' . $paramName;
         }
-        $Controller->queryBuilder()->clearSelect()->select($userSelectFields);
+        $controller->queryBuilder()->clearSelect()->select($userSelectFields);
     }
     if (!is_null($paramCount)) {
-        $Controller->queryBuilder()->limit($paramCount);
+        $controller->queryBuilder()->limit($paramCount);
     }
     if (!is_null($paramOffset)) {
-        $Controller->queryBuilder()->offset($paramOffset);
+        $controller->queryBuilder()->offset($paramOffset);
     }
 
     $output = [];
-    foreach ($Controller->getUsers() as $user) {
+    foreach ($controller->getUsers() as $user) {
         $stdUser = new stdClass();
         if (!is_null($paramSelect)) {
             foreach ($paramSelect as $fieldName) {
@@ -105,7 +99,6 @@ if ($action === 'getList') {
     exit;
 }
 
-
 /**
  * Сохранение пользователя
  */
@@ -129,71 +122,65 @@ if ($action === 'save') {
         die(REST::error(1, 'Пароли не совпадают'));
     }
 
-    $User = Core::factory('User', $id);
-    if (is_null($User)) {
+    $user = empty($id) ? new User() : User::find($id);
+    if (is_null($user)) {
         die(REST::error(4, 'Пользователь с id ' . $id . ' не найден'));
     }
 
-
-    /**
-     * Обновление основных свойств
-     */
-    $User->surname($surname);
-    $User->name($name);
-    $User->patronymic($patronymic);
-    $User->email($email);
-    $User->groupId($groupId);
-    $User->phoneNumber($phone);
-    $User->login($login);
+    //Обновление основных свойств
+    $user->surname($surname);
+    $user->name($name);
+    $user->patronymic($patronymic);
+    $user->email($email);
+    $user->groupId($groupId);
+    $user->phoneNumber($phone);
+    $user->login($login);
     if (!empty($pass1)) {
-        $User->password($pass1);
+        $user->password($pass1);
     }
-    if (!$User->save()) {
-        exit(REST::error(5, $User->_getValidateErrorsStr()));
+    if (!$user->save()) {
+        exit(REST::error(5, $user->_getValidateErrorsStr()));
     }
 
-
-    /**
-     * Создание связей с филлиалами
-     */
-    $areas = Core_Array::Post('areas', null, PARAM_ARRAY);
-    if (!is_null($areas)) {
-        $Assignment = Core::factory('Schedule_Area_Assignment');
-        if (count($areas) == 0) {
-            $Assignment->clearAssignments($User);
-        }
-        $ExistingAssignments = $Assignment->getAssignments($User);
-        //Отсеивание уже существующих связей
-        foreach ($areas as $areaKey => $areaId) {
-            foreach ($ExistingAssignments as $assignmentKey => $Assignment) {
-                if ($Assignment->areaId() == $areaId) {
-                    unset($areas[$areaKey]);
-                    unset($ExistingAssignments[$assignmentKey]);
+    //Создание связей с филлиалами
+    try {
+        $areas = Core_Array::Post('areas', null, PARAM_ARRAY);
+        if (!is_null($areas)) {
+            $assignment = new Schedule_Area_Assignment();
+            if (count($areas) == 0) {
+                $assignment->clearAssignments($user);
+            }
+            $existingAssignments = $assignment->getAssignments($user);
+            //Отсеивание уже существующих связей
+            foreach ($areas as $areaKey => $areaId) {
+                foreach ($existingAssignments as $assignmentKey => $userAssignment) {
+                    if ($userAssignment->areaId() == $areaId) {
+                        unset($areas[$areaKey]);
+                        unset($existingAssignments[$assignmentKey]);
+                    }
                 }
             }
+            //Создание новых связей
+            foreach ($areas as $areaId) {
+                $assignment->createAssignment($user, $areaId);
+            }
+            //Удаление не актуальных старых связей
+            foreach ($existingAssignments as $existingAssignment) {
+                $existingAssignment->delete();
+            }
         }
-        //Создание новых связей
-        foreach ($areas as $areaId) {
-            Core::factory('Schedule_Area_Assignment')->createAssignment($User, $areaId);
-        }
-        //Удаление не актуальных старых связей
-        foreach ($ExistingAssignments as $ExistingAssignment) {
-            $ExistingAssignment->delete();
-        }
+    } catch (Exception $e) {
+        exit(REST::error(REST::ERROR_CODE_CUSTOM, $e->getMessage()));
     }
 
-
-    /**
-     * Обновление дополнителньых свойств
-     */
+    //Обновление дополнителньых свойств
     $additionalAccumulate = []; //Массив для накопления всех значений доп. свойств
 
     //Создание доп. свойств объекта со значением по умолчанию либо пустых
     if ($id === 0) {
-        $Property = Core::factory('Property');
-        $Properties = $Property->getAllPropertiesList($User);
-        foreach ($Properties as $Prop) {
-            $Prop->addNewValue($User, $Prop->defaultValue());
+        $properties = (new Property())->getAllPropertiesList($user);
+        foreach ($properties as $prop) {
+            $prop->addNewValue($user, $prop->defaultValue());
         }
     }
 
@@ -204,17 +191,20 @@ if ($action === 'save') {
         }
 
         //Получение id свойства и создание его объекта
-        $propertyId = explode('property_', $fieldName)[1];
-        $Property = Core::factory('Property', $propertyId);
+        $propertyId = intval(explode('property_', $fieldName)[1] ?? 0);
+        $property = Property_Controller::factory($propertyId);
+        if (is_null($property)) {
+            continue;
+        }
 
         //$Property->addToPropertiesList($User, $propertyId);
-        $PropertyValues = $Property->getPropertyValues($User);
+        $propertyValues = (new Property())->getPropertyValues($user);
 
         //Список значений свойства
-        $ValuesList = [];
+        $valuesList = [];
 
         //Разница количества переданных значений и существующих
-        $residual = count($fieldValues) - count($PropertyValues);
+        $residual = count($fieldValues) - count($propertyValues);
 
         /**
          * Формирование списка значений дополнительного свойства
@@ -223,98 +213,94 @@ if ($action === 'save') {
          */
         if ($residual > 0) {    //Если переданных значений больше чем существующих
             for ($i = 0; $i < $residual; $i++) {
-                $ValuesList[] = Core::factory('Property_' . ucfirst($Property->type()))
-                    ->propertyId($Property->getId())
-                    ->modelName($User->getTableName())
-                    ->objectId($User->getId());
+                $valuesList[] = Core::factory('Property_' . ucfirst($property->type()))
+                    ->propertyId($property->getId())
+                    ->modelName($user->getTableName())
+                    ->objectId($user->getId());
             }
-            $ValuesList = array_merge($ValuesList, $PropertyValues);
+            $valuesList = array_merge($valuesList, $propertyValues);
         } elseif ($residual < 0) { //Если существующих значений больше чем переданных
             for ($i = 0; $i < abs($residual); $i++) {
-                $PropertyValues[$i]->delete();
-                unset ($PropertyValues[$i]);
+                $propertyValues[$i]->delete();
+                unset ($propertyValues[$i]);
             }
-            $ValuesList = array_values($PropertyValues);
+            $valuesList = array_values($propertyValues);
         } elseif ($residual == 0) { //Если количество переданных значений равно количеству существующих
-            $ValuesList = $PropertyValues;
+            $valuesList = $propertyValues;
         }
-
 
         //Обновление значений
         for ($i = 0; $i < count($fieldValues); $i++) {
-            $ValuesList[$i]->objectId($User->getId());
-            if ($Property->type() == 'list') {
-                $ValuesList[$i]->value(intval($fieldValues[$i]));
-            } elseif ($Property->type() == 'bool') {
+            $valuesList[$i]->objectId($user->getId());
+            if ($property->type() == 'list') {
+                $valuesList[$i]->value(intval($fieldValues[$i]));
+            } elseif ($property->type() == 'bool') {
                 if ($fieldValues[$i] == 'on') {
-                    $ValuesList[$i]->value(1);
+                    $valuesList[$i]->value(1);
                 } else {
-                    $ValuesList[$i]->value(intval($fieldValues[$i]));
+                    $valuesList[$i]->value(intval($fieldValues[$i]));
                 }
-            } elseif (in_array($Property->type(), ['int', 'float'])) {
-                $ValuesList[$i]->value(floatval($fieldValues[$i]));
+            } elseif (in_array($property->type(), ['int', 'float'])) {
+                $valuesList[$i]->value(floatval($fieldValues[$i]));
             } else {
-                $ValuesList[$i]->value(strval($fieldValues[$i]));
+                $valuesList[$i]->value(strval($fieldValues[$i]));
             }
-            $ValuesList[$i]->save();
+            $valuesList[$i]->save();
         }
     }
 
-
-    /**
-     * Формирование ответа
-     */
+    //Формирование ответа
     $output = new stdClass();
 
     //Основные данные пользователя
     $output->user = new stdClass();
-    $output->user->id = $User->getId();
-    $output->user->surname = $User->surname();
-    $output->user->name = $User->name();
-    $output->user->groupId = $User->groupId();
-    $output->user->patronymic = $User->patronymic();
-    $output->user->phone = $User->phoneNumber();
-    $output->user->login = $User->login();
+    $output->user->id = $user->getId();
+    $output->user->surname = $user->surname();
+    $output->user->name = $user->name();
+    $output->user->groupId = $user->groupId();
+    $output->user->patronymic = $user->patronymic();
+    $output->user->phone = $user->phoneNumber();
+    $output->user->login = $user->login();
 
     //Филиалы
     $output->areas = [];
-    $Areas = Core::factory('Schedule_Area_Assignment')->getAreas($User);
-    foreach ($Areas as $Area) {
+    $areas = (new Schedule_Area_Assignment())->getAreas($user);
+    foreach ($areas as $area) {
         $stdArea = new stdClass();
-        $stdArea->id = $Area->getId();
-        $stdArea->title = $Area->title();
-        $stdArea->active = $Area->active();
+        $stdArea->id = $area->getId();
+        $stdArea->title = $area->title();
+        $stdArea->active = $area->active();
         $output->areas[] = $stdArea;
     }
 
     //Допю свойства
     $output->additional = [];
-    $Properties = Core::factory('Property')->getAllPropertiesList($User);
-    $output->count = count($Properties);
-    foreach ($Properties as $Property) {
+    $properties = (new Property())->getAllPropertiesList($user);
+    $output->count = count($properties);
+    foreach ($properties as $property) {
         //Сбор информации по доп. свойству
         $outProp = new stdClass();
-        $outProp->id = $Property->getId();
-        $outProp->title = $Property->title();
-        $outProp->description = $Property->description();
-        $outProp->tagName = $Property->tagName();
-        $outProp->type = $Property->type();
-        $outProp->multiple = $Property->multiple();
+        $outProp->id = $property->getId();
+        $outProp->title = $property->title();
+        $outProp->description = $property->description();
+        $outProp->tagName = $property->tagName();
+        $outProp->type = $property->type();
+        $outProp->multiple = $property->multiple();
         $outProp->values = [];
 
         //Сбор информации значений для доп. свойства
-        $Values = $Property->getPropertyValues($User);
-        foreach ($Values as $Value) {
+        $values = $property->getPropertyValues($user);
+        foreach ($values as $value) {
             $stdVal = new stdClass();
-            $stdVal->id = $Value->getId();
-            $stdVal->propertyId = $Value->propertyId();
-            $stdVal->modelName = $Value->modelName();
-            $stdVal->objectId = $Value->objectId();
-            $stdVal->value = $Value->value();
+            $stdVal->id = $value->getId();
+            $stdVal->propertyId = $value->propertyId();
+            $stdVal->modelName = $value->modelName();
+            $stdVal->objectId = $value->objectId();
+            $stdVal->value = $value->value();
             $outProp->values[] = $stdVal;
         }
 
-        $output->additional['prop_' . $Property->getId()] = $outProp;
+        $output->additional['prop_' . $property->getId()] = $outProp;
     }
 
     //Права доступа
@@ -323,10 +309,8 @@ if ($action === 'save') {
     $output->access->user_edit_client = Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_CLIENT);
     $output->access->user_archive_client = Core_Access::instance()->hasCapability(Core_Access::USER_ARCHIVE_CLIENT);
 
-    //debug($output);exit;
     die(json_encode($output));
 }
-
 
 /**
  * Изменение кол-ва занятий
@@ -349,8 +333,6 @@ if ($action === 'changeCountLessons') {
     $lessonsType = Core_Array::Get('lessonsType', null, PARAM_INT);
     $number = Core_Array::Get('number', null, PARAM_FLOAT);
 
-    Core::factory('User_Controller');
-    Core::factory('Schedule_Lesson');
     $output = new stdClass(); //Ответ
 
     //Проверки
@@ -367,22 +349,22 @@ if ($action === 'changeCountLessons') {
         die(REST::error(3, 'Параметр \'lessonsType\' имеет недопустимое значение'));
     }
 
-    $Client = User_Controller::factory($userId);
-    if (is_null($Client)) {
+    $client = User_Controller::factory($userId);
+    if (is_null($client)) {
         die(REST::error(4, 'Пользователь с id: ' . $userId . ' не существует'));
     }
-    if ($Client->groupId() !== ROLE_CLIENT) {
+    if ($client->groupId() !== ROLE_CLIENT) {
         die(REST::error(5, 'Пользователь с id: ' . $userId . ' не является клиентом'));
     }
 
     $output->user = new stdClass();
-    $output->user->id = $Client->getId();
-    $output->user->surname = $Client->surname();
-    $output->user->name = $Client->name();
-    $output->user->groupId = $Client->groupId();
-    $output->user->patronymic = $Client->patronymic();
-    $output->user->phone = $Client->phoneNumber();
-    $output->user->login = $Client->login();
+    $output->user->id = $client->getId();
+    $output->user->surname = $client->surname();
+    $output->user->name = $client->name();
+    $output->user->groupId = $client->groupId();
+    $output->user->patronymic = $client->patronymic();
+    $output->user->phone = $client->phoneNumber();
+    $output->user->login = $client->login();
 
     //Изменение баланса кол-ва занятий
     if ($lessonsType == Schedule_Lesson::TYPE_INDIV) {
@@ -390,28 +372,27 @@ if ($action === 'changeCountLessons') {
     } else {
         $propName = 'group_lessons';
     }
-    $UserLessons = Core::factory('Property')->getByTagName($propName);
-    $CountLessons = $UserLessons->getPropertyValues($Client)[0];
+    $userLessons = Property_Controller::factoryByTag($propName);
+    $countLessons = $userLessons->getPropertyValues($client)[0];
 
     if ($operation == 'plus') {
-        $newCount = $CountLessons->value() + $number;
+        $newCount = $countLessons->value() + $number;
     } elseif ($operation == 'minus') {
-        $newCount = $CountLessons->value() - $number;
+        $newCount = $countLessons->value() - $number;
     } else {
         $newCount = $number;
     }
 
-    $output->oldCount = $CountLessons->value();
+    $output->oldCount = $countLessons->value();
     $output->newCount = $newCount;
 
-    if ($CountLessons->value() != $newCount) {
-        $CountLessons->value($newCount);
-        $CountLessons->save();
+    if ($countLessons->value() != $newCount) {
+        $countLessons->value($newCount);
+        $countLessons->save();
     }
 
     die(json_encode($output));
 }
-
 
 /**
  * Выборка пользователей по значению доп. свойства принадлежности к преподавателю
@@ -419,44 +400,40 @@ if ($action === 'changeCountLessons') {
  */
 if ($action === 'getListByTeacherId') {
     $teacherId = Core_Array::Get('teacherId', 0, PARAM_INT);
-    $Teacher = User_Controller::factory($teacherId);
+    $teacher = User_Controller::factory($teacherId);
 
-    if (is_null($Teacher)) {
+    if (is_null($teacher)) {
         die(REST::error(1, 'Преподаватель с id ' . $teacherId . ' не существует'));
     }
 
-    $TeacherList = Core::factory('Property')->getByTagName('teachers');
-    $teacherFio = $Teacher->surname() . ' ' . $Teacher->name();
-    $TeacherProperty = Core::factory('Property_List_Values')
-        ->queryBuilder()
-        ->where('property_id', '=', $TeacherList->getId())
+    $teacherList = Property_Controller::factoryByTag('teachers');
+    $teacherFio = $teacher->surname() . ' ' . $teacher->name();
+    $teacherProperty = Property_List_Values::query()
+        ->where('property_id', '=', $teacherList->getId())
         ->where('value', '=', $teacherFio)
         ->find();
 
-    if (is_null($TeacherProperty)) {
-        Core::factory('Property_List_Values')
-            ->propertyId($TeacherList->getId())
+    if (is_null($teacherProperty)) {
+        (new Property_List_Values)
+            ->propertyId($teacherList->getId())
             ->value($teacherFio)
             ->save();
         exit(json_encode([]));
     }
 
-    $RestUsers = REST::user();
-    $RestUsers->appendFilter('property_' . $TeacherList->getId(), $TeacherProperty->getId());
-    $RestUsers->appendOrder('surname');
-    die($RestUsers->getList());
+    $restUsers = REST::user();
+    $restUsers->appendFilter('property_' . $teacherList->getId(), $teacherProperty->getId());
+    $restUsers->appendOrder('surname');
+    die($restUsers->getList());
 }
-
 
 /**
  * Добавление комментария к пользователю
  */
 if ($action === 'saveComment') {
-    Core::requireClass('Comment');
-
     $userId = Core_Array::Post('userId', null, PARAM_INT);
-    $User = User_Controller::factory($userId);
-    if (is_null($userId) || is_null($User)) {
+    $user = User_Controller::factory($userId);
+    if (is_null($userId) || is_null($user)) {
         die(REST::status(REST::STATUS_ERROR, 'Пользователь с id ' . strval($userId) . ' не найден'));
     }
 
@@ -471,30 +448,29 @@ if ($action === 'saveComment') {
 
     if (is_null($commentId)) {
         try {
-            $UserComment = $User->addComment($text, $authorId, $datetime);
+            $userComment = $user->addComment($text, $authorId, $datetime);
         } catch (Exception $e) {
             die(REST::status(REST::STATUS_ERROR, $e->getMessage()));
         }
     } else {
-        $UserComment = Comment::factory($commentId);
-        $UserComment->authorId($authorId);
-        $UserComment->datetime($datetime);
-        $UserComment->text($text);
-        $UserComment->save();
+        $userComment = Comment::factory($commentId);
+        $userComment->authorId($authorId);
+        $userComment->datetime($datetime);
+        $userComment->text($text);
+        $userComment->save();
     }
 
     $response = new stdClass();
-    $response->user = $User->toStd();
-    $response->comment = $UserComment->toStd();
+    $response->user = $user->toStd();
+    $response->comment = $userComment->toStd();
 
-    $commentDatetime = $UserComment->datetime();
+    $commentDatetime = $userComment->datetime();
     $commentDatetime = strtotime($commentDatetime);
     $commentDatetime = date('d.m.y H:i', $commentDatetime);
     $response->comment->refactoredDatetime = $commentDatetime;
 
     die(json_encode($response));
 }
-
 
 /**
  * Авторизация пользователя - получение авторизационного токена
@@ -514,17 +490,15 @@ if ($action === 'do_auth') {
         $response->errors[] = 'empty_password';
     }
 
-    $User = User_Auth::userVerify($login, $password);
-    if (!empty($User)) {
-        //$User = User_Auth::current();
+    $user = User_Auth::userVerify($login, $password);
+    if (!empty($user)) {
         $response->errors = null;
-        $response->token = $User->getAuthToken();
+        $response->token = $user->getAuthToken();
     } else {
         $response->errors[] = 'invalid_auth';
     }
     exit(json_encode($response));
 }
-
 
 /**
  * Получение данных пользователя по токену
@@ -567,12 +541,10 @@ if ($action === 'get_user') {
             $response->user->balance->lessons_group = $lessonsGroup->getValues($user)[0]->value();
             $response->user->lessonDuration = $lessonDuration->getValues($user)[0]->value();
         }
-        //TODO: надо бы потом добавить подгрузку доп. свойств и для дргих групп
     }
 
     exit(json_encode($response));
 }
-
 
 /**
  * Сохранение идентификатора, полученного от сервиса рассылок Firebase
@@ -582,8 +554,8 @@ if ($action === 'savePushId') {
     $response->error = null;
     $response->status = false;
 
-    $User = User_Auth::current();
-    if (empty($User)) {
+    $user = User_Auth::current();
+    if (empty($user)) {
         $response->error = REST::ERROR_UNAUTHORIZED;
         die(json_encode($response));
     }
@@ -594,9 +566,9 @@ if ($action === 'savePushId') {
         die(json_encode($response));
     }
 
-    $User->pushId($pushId);
-    if (empty($User->save())) {
-        $response->error = $User->_getValidateErrorsStr();
+    $user->pushId($pushId);
+    if (empty($user->save())) {
+        $response->error = $user->_getValidateErrorsStr();
         die(json_encode($response));
     }
 
@@ -619,7 +591,9 @@ if ($action === 'archiveUser') {
     $newArchive = $archive->userId($userId)->reasonId($reasonId)->dumpDateStart($dumpStart)->save();
 }
 
-
+/**
+ * Формирование списка преподавателей клиента
+ */
 if ($action === 'getClientTeachers') {
     if (is_null(User_Auth::current())) {
         exit(REST::status(REST::STATUS_ERROR, 'Пользователь не авторизован'));
@@ -627,7 +601,11 @@ if ($action === 'getClientTeachers') {
 
     $clientId = Core_Array::Get('userId', 0, PARAM_INT);
 
-    if (Core_Access::instance()->hasCapability(Core_Access::USER_READ_TEACHERS) && !empty($clientId)) {
+    if (!Core_Access::instance()->hasCapability(Core_Access::USER_READ_TEACHERS)) {
+        exit(REST::status(REST::STATUS_ERROR, 'Недостаточно прав для получения списка преподавателкй клиента'));
+    }
+
+    if (!empty($clientId)) {
         $client = User_Controller::factory($clientId);
     } elseif (User_Auth::current()->groupId() === ROLE_CLIENT) {
         $client = User_Auth::current();
@@ -654,5 +632,4 @@ if ($action === 'getClientTeachers') {
         'status' => true,
         'teachers' => $teachersStd
     ]));
-
 }
