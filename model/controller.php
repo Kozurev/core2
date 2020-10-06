@@ -25,7 +25,7 @@ class Controller
      *
      * @var User|null
      */
-    protected ?User $user;
+    protected ?User $user = null;
 
     /**
      * Экзэмпляр объекта для контроллера (к примеру: задача, лид или пользователь)
@@ -74,7 +74,7 @@ class Controller
     /**
      * Идентификатор структуры, к которой относятся объекты
      *
-     * @var int
+     * @var int|null
      */
     protected ?int $subordinate = 0;
 
