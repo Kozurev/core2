@@ -601,9 +601,9 @@ if ($action === 'getClientTeachers') {
 
     $clientId = Core_Array::Get('userId', 0, PARAM_INT);
 
-    if (!Core_Access::instance()->hasCapability(Core_Access::USER_READ_TEACHERS)) {
-        exit(REST::status(REST::STATUS_ERROR, 'Недостаточно прав для получения списка преподавателкй клиента'));
-    }
+//    if (!Core_Access::instance()->hasCapability(Core_Access::USER_READ_TEACHERS)) {
+//        exit(REST::status(REST::STATUS_ERROR, 'Недостаточно прав для получения списка преподавателкй клиента'));
+//    }
 
     if (!empty($clientId)) {
         $client = User_Controller::factory($clientId);
