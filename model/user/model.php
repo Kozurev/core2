@@ -9,6 +9,11 @@
 class User_Model extends Core_Entity
 {
     /**
+     * @var int|null
+     */
+    protected $id;
+
+    /**
      * @var string
      */
 	protected $name;
