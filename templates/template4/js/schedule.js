@@ -113,7 +113,7 @@ $(function(){
             loaderOn();
 
             let Form = $('#createData');
-            let clientId = Form.find('select[name=clientId]').val();
+            let clientId = Form.find('[name=clientId]').val();
             let teacherId = Form.find('select[name=teacherId]').val();
             let date = Form.find('input[name=insertDate]').val();
             let timeFrom = Form.find('input[name=timeFrom]').val();
@@ -124,7 +124,7 @@ $(function(){
             let dayName = Form.find('input[name=dayName]').val();
             let isCreateTask = $('input[name=is_create_task]');
             let classId = $('input[name=classId]').val();
-            let isOnline = Form.find('input[name=isOnline]').val();
+            let isOnline = Form.find('input[name=isOnline]').is(':checked') ? 1 : 0;
 
             let lessonData = {
                 scheduleType: lessonType,
