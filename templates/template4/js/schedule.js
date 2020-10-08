@@ -313,7 +313,6 @@ $(function(){
                     $(value).show();
                 });
 
-
                 var callback = function(users) {
                     let clientsList = $('#createData').find('select[name=clientId]');
                     clientsList.append('<option value="0"> ... </option>');
@@ -326,9 +325,9 @@ $(function(){
                 };
 
                 clientsList.empty();
-                if (type == 1) {
-                    if ($('input[name=user_group_id]').val() == 4) {
-                        User.getListByTeacherId($('input[name=teacherId]').val(), callback);
+                if (type == 1 || type == 5) {
+                    if ($('select[name=teacherId]').val() > 0) {
+                        User.getListByTeacherId($('select[name=teacherId]').val(), callback);
                     } else {
                         User.getList({
                             select: ['id', 'surname', 'name'],

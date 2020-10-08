@@ -8,65 +8,95 @@
 
 class Schedule_Controller
 {
-    private $userId;    //id пользователя, для которого формируется расписание
-    private $date;      //Конкретная дата, для которой формируется расписание
-    private $periodFrom;    //Начало временного периода расписания
-    private $periodTo;      //Конец временного периода расписания
-    private $calendarMonth; //Номер месяца для формирования расписания в виде календаря
-    private $calendarYear;  //Номер года для оформления расписания в виде календаря
+    /**
+     * id пользователя, для которого формируется расписание
+     *
+     * @var int|null
+     */
+    private ?int $userId = null;
 
-    public function __construct(){}
+    /**
+     * Конкретная дата, для которой формируется расписание
+     *
+     * @var string|null
+     */
+    private ?string $date = null;
 
+    /**
+     * Начало временного периода расписания
+     *
+     * @var string|null
+     */
+    private ?string $periodFrom = null;
+
+    /**
+     * Конец временного периода расписания
+     *
+     * @var string|null
+     */
+    private ?string $periodTo = null;
+
+    /**
+     * Номер месяца для формирования расписания в виде календаря
+     *
+     * @var int|null
+     */
+    private ?int $calendarMonth = null;
+
+    /**
+     * Номер года для оформления расписания в виде календаря
+     *
+     * @var int|null
+     */
+    private ?int $calendarYear = null;
 
     /**
      * @param int $val
      * @return $this
      */
-    public function userId(int $val)
+    public function userId(int $val) : self
     {
         $this->userId = $val;
         return $this;
     }
 
-
     /**
      * @param string $date
      * @return $this
      */
-    public function setDate(string $date)
+    public function setDate(string $date) : self
     {
         $this->date = $date;
         return $this;
     }
 
-
-    public function unsetDate()
+    public function unsetDate() : self
     {
         $this->date = null;
         return $this;
     }
-
 
     /**
      * @param string $from
      * @param string $to
      * @return $this
      */
-    public function setPeriod(string $from, string $to)
+    public function setPeriod(string $from, string $to) : self
     {
         $this->periodFrom = $from;
         $this->periodTo = $to;
         return $this;
     }
 
-
-    public function unsetPeriod()
+    /**
+     * @return $this
+     */
+    public function unsetPeriod() : self
     {
         $this->periodFrom = null;
         $this->periodTo = null;
         return $this;
     }
-
 
     /**
      * Устанавливает временной промежуток на 6 недель
@@ -126,62 +156,61 @@ class Schedule_Controller
         return $this;
     }
 
-
-    public function getLessons()
+    /**
+     * @return array
+     */
+    public function getLessons() : array
     {
-        $Lessons = Core::factory('Schedule_Lesson');
+        $lessons = Schedule_Lesson::query();
 
         //Поиск по роли пользователя
         if ($this->userId) {
-            $User = User_Controller::factory($this->userId);
+            $user = User_Controller::factory($this->userId);
 
-            if ($User->groupId() == ROLE_TEACHER) {
-                $Lessons->queryBuilder()
-                    ->where('teacher_id', '=', $this->userId);
-            } elseif ($User->groupId() == ROLE_CLIENT) {
-                $ClientGroups = Core::factory('Schedule_Group_Assignment')
-                    ->queryBuilder()
+            if ($user->groupId() == ROLE_TEACHER) {
+                $lessons->where('teacher_id', '=', $this->userId);
+            } elseif ($user->groupId() == ROLE_CLIENT) {
+                $clientGroups = Schedule_Group_Assignment::query()
                     ->where('user_id', '=', $this->userId)
                     ->join('Schedule_Group as sg', 'sg.id = Schedule_Group_Assignment.group_id AND sg.type = ' . Schedule_Group::TYPE_CLIENTS)
                     ->findAll();
 
-                $UserGroups = [];
-                foreach ($ClientGroups as $group) {
-                    $UserGroups[] = $group->groupId();
+                $userGroups = [];
+                foreach ($clientGroups as $group) {
+                    $userGroups[] = $group->groupId();
                 }
 
-                $Lessons->queryBuilder()
+                $lessons
                     ->open()
-                    ->where('client_id', '=', $this->userId)
-                    ->where('type_id', '=', 1)
-                    ->where('type_id', '<>', 3);
+                    ->open()
+                        ->where('client_id', '=', $this->userId)
+                        ->whereIn('type_id', [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE])
+                    ->close();
 
-                if (count($UserGroups) > 0) {
-                    $Lessons->queryBuilder()
+                if (count($userGroups) > 0) {
+                    $lessons
                         ->open()
-                            ->orWhereIn('client_id', $UserGroups)
-                            ->where('type_id', '=', 2)
+                            ->orWhereIn('client_id', $userGroups)
+                            ->where('type_id', '=', Schedule_Lesson::TYPE_GROUP)
                         ->close();
                 }
 
-                $Lessons->queryBuilder()->close();
+                $lessons->close();
             }
         }
 
         //Поиск по дате
         if ($this->date) {
             $this->unsetPeriod();
-
-            $Lessons
-                ->queryBuilder()
+            $lessons
                 ->open()
                     ->open()
                         ->where('insert_date', '=', $this->date)
-                        ->where('lesson_type', '=', 2 )
+                        ->where('lesson_type', '=', Schedule_Lesson::SCHEDULE_CURRENT)
                     ->close()
                     ->open()
                         ->orWhere('insert_date', '<=', $this->date)
-                        ->where('lesson_type', '=', 1)
+                        ->where('lesson_type', '=', Schedule_Lesson::SCHEDULE_MAIN)
                         ->open()
                             ->where('delete_date', '>', $this->date)
                             ->orWhere('delete_date', 'IS', 'NULL')
@@ -193,17 +222,16 @@ class Schedule_Controller
         //Поиск по заданному периоду
         if ($this->periodFrom && $this->periodTo) {
             $this->unsetDate();
-
-            $Lessons->queryBuilder()
+            $lessons
                 ->open()
                     ->open()
                         ->where('insert_date', '>=', $this->periodFrom)
                         ->where('insert_date', '<=', $this->periodTo )
-                        ->where('lesson_type', '=', 2 )
+                        ->where('lesson_type', '=', Schedule_Lesson::SCHEDULE_CURRENT)
                     ->close()
                     ->open()
                         ->orWhere('insert_date', '<=', $this->periodTo)
-                        ->where('lesson_type', '=', 1)
+                        ->where('lesson_type', '=', Schedule_Lesson::SCHEDULE_MAIN)
                         ->open()
                             ->where('delete_date', '>', $this->periodFrom)
                             ->orWhere('delete_date', 'IS', 'NULL')
@@ -212,18 +240,20 @@ class Schedule_Controller
                 ->close();
         }
 
-        $Lessons = $Lessons->queryBuilder()
-            ->orderBy('time_from')
-            ->findAll();
+        $lessons = $lessons->orderBy('time_from')->findAll();
 
         if ($this->date) {
-            $Lessons = $this->getLessonsFromArray($Lessons, $this->date);
+            $lessons = $this->getLessonsFromArray($lessons, $this->date);
         }
-
-        return $Lessons;
+        return $lessons;
     }
 
-
+    /**
+     * Отрисовка календаря на определенное кол-во недель
+     *
+     * @param int $weeksCount
+     * @throws Exception
+     */
     public function printCalendar2($weeksCount = 2)
     {
         $today = date('Y-m-d');
@@ -296,6 +326,11 @@ class Schedule_Controller
         }
     }
 
+    /**
+     * @param $date
+     * @param $schedule
+     * @return mixed|null
+     */
     public static function getDayFromSchedule($date, $schedule)
     {
         foreach ($schedule as $day) {
@@ -305,7 +340,6 @@ class Schedule_Controller
         }
         return null;
     }
-
 
     /**
      * Поиск даты начала недели
@@ -322,10 +356,12 @@ class Schedule_Controller
         return $date;
     }
 
-
+    /**
+     * Отрисовка календаря на полный текущий месяц
+     */
     public function printCalendar()
     {
-        $Lessons = $this->getLessons();
+        $allLessons = $this->getLessons();
 
         echo "<div class='table-responsive'><table class='table table-bordered' style='margin-top: 20px'>";
         echo "<tr class='header'>
@@ -362,15 +398,10 @@ class Schedule_Controller
        for ($i = 0; $i < $firstDayNumber - 1; $i++) {
            $day = $countPrevDays - ($firstDayNumber - $i - 2);
            $date = $prevYear . '-' . $prevMonth . '-' . $day;
-           $lessons = $this->getLessonsFromArray($Lessons, $date);
-
+           $lessons = $this->getLessonsFromArray($allLessons, $date);
            $table[$index]['date'] = $date;
            $table[$index]['lessons'] = $lessons;
            $index++;
-
-           if ($i == 0) {
-               $dateStart = $date;
-           }
        }
 
         //Дни текущего месяца
@@ -381,7 +412,7 @@ class Schedule_Controller
                 $day = '0' . $day;
             }
             $date = $this->calendarYear . '-' . $this->calendarMonth . '-' . $day;
-            $lessons = $this->getLessonsFromArray($Lessons, $date);
+            $lessons = $this->getLessonsFromArray($allLessons, $date);
 
             $table[$index]['date'] = $date;
             $table[$index]['lessons'] = $lessons;
@@ -413,7 +444,7 @@ class Schedule_Controller
             }
 
             $date = $nextYear . '-' . $nextMonth . '-' . $day;
-            $lessons = $this->getLessonsFromArray($Lessons, $date);
+            $lessons = $this->getLessonsFromArray($allLessons, $date);
 
             $table[$i+$index-1]['date'] = $date;
             $table[$i+$index-1]['lessons'] = $lessons;
@@ -435,60 +466,56 @@ class Schedule_Controller
             echo "<span class='date'>" . refactorDateFormat($table[$i]['date'], '.', 'short') . "</span>";
 
             //Поиск филиалов в которых проводяться занятия
-            if (count( $table[$i]['lessons']) > 0) {
+            if (count($table[$i]['lessons']) > 0) {
                 $areasIds = [];
-                foreach ($table[$i]['lessons'] as $Lesson) {
-                    $areasIds[] = $Lesson->areaId();
+                foreach ($table[$i]['lessons'] as $lesson) {
+                    $areasIds[] = $lesson->areaId();
                 }
 
-                $Areas = Core::factory('Schedule_Area')
-                    ->queryBuilder()
+                $areas = Schedule_Area::query()
                     ->whereIn('id', $areasIds)
                     ->findAll();
 
-                foreach ($Areas as $Area) {
-                    $Areas[$Area->getId()] = clone $Area;
+                foreach ($areas as $area) {
+                    $areas[$area->getId()] = clone $area;
                 }
             }
 
             if (count($table[$i]['lessons']) > 0) {
                 $lastAreaId = $table[$i]['lessons'][0]->areaId();
-                echo "<hr/><b><span class='area'>". Core_Array::getValue($Areas, $lastAreaId, null)->title() ."</span></b><hr/>";
+                echo "<hr/><b><span class='area'>". Core_Array::getValue($areas ?? [], $lastAreaId, null)->title() ."</span></b><hr/>";
 
-                foreach ($table[$i]['lessons'] as $Lesson) {
-                    if ($Lesson->areaId() != $lastAreaId) {
-                        echo "<hr/><b><span class='area'>". Core_Array::getValue($Areas, $Lesson->areaId(), null)->title() ."</span></b><hr/>";
+                /** @var Schedule_Lesson $lesson */
+                foreach ($table[$i]['lessons'] as $lesson) {
+                    if ($lesson->areaId() != $lastAreaId) {
+                        echo "<hr/><b><span class='area'>". Core_Array::getValue($areas ?? [], $lesson->areaId(), null)->title() ."</span></b><hr/>";
                     }
 
                     if ($today === $table[$i]['date'] ) {
-                        $TeacherLessons[] = $Lesson;
+                        $teacherLessons[] = $lesson;
                     }
 
-                    echo "<span class='time'>" . refactorTimeFormat($Lesson->timeFrom()) . " - " . refactorTimeFormat($Lesson->timeTo()) . "</span>";
+                    echo "<span class='time'>" . refactorTimeFormat($lesson->timeFrom()) . " - " . refactorTimeFormat($lesson->timeTo()) . "</span>";
 
                     if (User_Controller::factory($this->userId)->groupId() == ROLE_CLIENT) {
-                        if ($Lesson->typeId() == Schedule_Lesson::TYPE_GROUP) {
-                            $teacherFIO = $Lesson->getGroup()->title();
+                        if ($lesson->typeId() == Schedule_Lesson::TYPE_GROUP) {
+                            $teacherFIO = $lesson->getGroup()->title();
                         } else {
-                            $Teacher = $Lesson->getTeacher();
-                            if ($Teacher == null) {
-                                $teacherFIO = "Пользователь был удален";
-                            } else {
-                                $teacherFIO = $Teacher->surname() . ' ' . $Teacher->name();
-                            }
+                            $teacher = $lesson->getTeacher();
+                            $teacherFIO = $teacher->getFio();
                         }
                         echo "<span class=\"teacher\"> $teacherFIO</span>";
                     } else {
-                        if ($Lesson->typeId() == Schedule_Lesson::TYPE_INDIV) {
-                            $clientFio = $Lesson->getClient()->surname();
-                        } elseif ($Lesson->typeId() == Schedule_Lesson::TYPE_GROUP) {
-                            $clientFio = $Lesson->getClient()->title();
+                        if ($lesson->typeId() == Schedule_Lesson::TYPE_INDIV) {
+                            $clientFio = $lesson->getClient()->surname();
+                        } elseif ($lesson->typeId() == Schedule_Lesson::TYPE_GROUP) {
+                            $clientFio = $lesson->getClient()->title();
                         } else {
                             $clientFio = 'Консультация';
                         }
                         echo "<span class=\"teacher\"> $clientFio</span>";
                     }
-                    if ($Lesson->isOnline()) {
+                    if ($lesson->isOnline()) {
                         echo ' (Онлайн)';
                     }
 
@@ -502,7 +529,7 @@ class Schedule_Controller
                             <li>
                                 <a href="#"></a>
                                 <ul class="dropdown" data-date="'.$table[$i]['date'].'" 
-                                        data-id="'.$Lesson->getId().'" data-type="'.$Lesson->typeId().'">
+                                        data-id="'.$lesson->getId().'" data-type="'.$lesson->typeId().'">
                                     <li><a href="#" class="schedule_today_absent">Отсутствует сегодня</a></li>
                                 </ul>
                             </li>
@@ -510,31 +537,35 @@ class Schedule_Controller
                     }
 
                     echo "<br/>";
-                    $lastAreaId = $Lesson->areaId();
+                    $lastAreaId = $lesson->areaId();
                 }
             }
 
             echo "</td>";
-            if( ($i + 1) % 7 == 0 )   echo "</tr>";
+            if (($i + 1) % 7 == 0)   echo "</tr>";
         }
         echo "</table></div>";
     }
 
-
+    /**
+     * @param $arr
+     * @param $date
+     * @return array
+     */
     private function getLessonsFromArray($arr, $date)
     {
         $output = [];
-
-        foreach ($arr as $key => $Lesson) {
-            if ($Lesson->lessonType() == 2 && $Lesson->insertDate() == $date && !$Lesson->isAbsent($date)) {
+        /** @var Schedule_Lesson $lesson */
+        foreach ($arr as $key => $lesson) {
+            if ($lesson->lessonType() == Schedule_Lesson::SCHEDULE_CURRENT && $lesson->insertDate() == $date && !$lesson->isAbsent($date)) {
                 $output[] = $arr[$key];
-            } elseif ($Lesson->lessonType() == 1 && !$Lesson->isAbsent($date)) {
+            } elseif ($lesson->lessonType() == Schedule_Lesson::SCHEDULE_MAIN && !$lesson->isAbsent($date)) {
                 $dayName = date('l', strtotime($date));
 
-                if (strtotime($Lesson->insertDate()) <= strtotime($date) && ( $Lesson->deleteDate() == ''
-                        || strtotime($Lesson->deleteDate()) > strtotime($date)) && $Lesson->dayName() == $dayName
+                if (strtotime($lesson->insertDate()) <= strtotime($date) && ($lesson->deleteDate() == ''
+                        || strtotime($lesson->deleteDate()) > strtotime($date)) && $lesson->dayName() == $dayName
                 ) {
-                    $temp = clone $Lesson;
+                    $temp = clone $lesson;
                     $temp->setRealTime($date);
                     $output[] = $temp;
                 }
@@ -544,8 +575,4 @@ class Schedule_Controller
         sortByTime($output, 'timeFrom');
         return $output;
     }
-
-
-
-
 }

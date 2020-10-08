@@ -261,7 +261,7 @@ if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ)) {
         $UserReports
             ->open()
                 ->where('client_id', '=', $User->getId())
-                ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
+                ->whereIn('type_id', [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE])
             ->close()
             ->open()
                 ->orWhereIn('client_id', $UserGroups)
@@ -270,7 +270,7 @@ if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ)) {
     } else {
         $UserReports
             ->where('client_id', '=', $User->getId())
-            ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV);
+            ->whereIn('type_id', [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE]);
     }
 
     $UserReports = $UserReports->findAll();

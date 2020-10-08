@@ -31,6 +31,10 @@
                         <td>Прибыль с учетом зарплат и хозрасходов</td>
                         <td><xsl:value-of select="profit - host_expenses" /></td>
                     </tr>
+                    <tr>
+                        <td>Выручка от частных занятий</td>
+                        <td><xsl:value-of select="income2" /></td>
+                    </tr>
                 </table>
             </div>
 <!--        </div>-->

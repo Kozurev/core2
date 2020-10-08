@@ -331,7 +331,6 @@ if ($action === 'get_nearest_lessons') {
             $response->nearest->date = $nearest[0]->date;
             foreach ($nearest[0]->lessons as $lesson) {
                 $stdLesson = $lesson->toStd();
-                unset($stdLesson->oldid);
 
                 $Teacher = $lesson->getTeacher();
                 $Client = $lesson->getClient();

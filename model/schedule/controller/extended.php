@@ -56,7 +56,7 @@ class Schedule_Controller_Extended
                         ->open()
                             ->open()
                                 ->where('client_id', '=', $user->getId())
-                                ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
+                                ->whereIn('type_id', [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE])
                             ->close()
                             ->open()
                                 ->orWhereIn('client_id', $groupsIds)
@@ -66,7 +66,7 @@ class Schedule_Controller_Extended
                 } else {
                     $lessonsQuery
                         ->where('client_id', '=', $user->getId())
-                        ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV);
+                        ->whereIn('type_id', [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE]);
                 }
             } elseif ($user->groupId() == ROLE_TEACHER) {
                 $lessonsQuery->where('teacher_id', '=', $user->getId());

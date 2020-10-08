@@ -103,8 +103,7 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
         //и добавить его в список занятий текущего расписания
         if (isset($timeModifies[$lesson->getId()])) {
             $modify = $timeModifies[$lesson->getId()];
-
-            $newCurrentLesson = (new Schedule_Lesson)
+            $tmpLesson = (new Schedule_Lesson)
                 ->timeFrom($modify->timeFrom())
                 ->timeTo($modify->timeTo())
                 ->classId($lesson->classId())
@@ -112,9 +111,9 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                 ->teacherId($lesson->teacherId())
                 ->clientId($lesson->clientId())
                 ->lessonType($lesson->lessonType())
-                ->typeId($lesson->typeId());
-            $newCurrentLesson->oldid = $lesson->getId();
-            $currentLessons[] = $newCurrentLesson;
+                ->typeId($lesson->typeId())
+                ->setId($lesson->getId());
+            $currentLessons[] = $tmpLesson;
         } else {
             $currentLessons[] = $lesson;
         }
@@ -285,7 +284,7 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                     $isVisibleData = !$isTeacher || $currentLesson->teacherId() == $userId;
                     echo "<td class='" . ($isVisibleData ? $currentLessonData["client_status"] : 'disabled') . "' rowspan='" . $rowspan . "'>";
                     if ($isVisibleData) {
-                        if (isset($CurrentLesson->oldid)) {
+                        if (isset($timeModifies[$currentLesson->getId()])) {
                             echo "<span><b>Временно</b></span><hr>";
                         }
                         echo "<span class='client'>" . $currentLessonData['client'] . "</span>";
@@ -300,12 +299,7 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                         <li>
                             <a href=\"#\"></a>
                             <ul class=\"dropdown\" data-userid='" . $user->getId() . "' data-date='" . $date . "' ";
-
-                        isset($currentLesson->oldid)
-                            ?   $dataId = $currentLesson->oldid
-                            :   $dataId = $currentLesson->getId();
-
-                        echo "data-id='" . $dataId . "' ";
+                        echo "data-id='" . $currentLesson->getId() . "' ";
                         echo "data-type='" . $currentLesson->lessonType() . "'>";
                         echo "
                                     <li><a href=\"#\" class='schedule_today_absent'>Отсутствует сегодня</a></li>

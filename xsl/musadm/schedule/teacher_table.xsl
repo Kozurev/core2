@@ -81,14 +81,7 @@
 
             <input type="hidden" name="date" value="{//real_date}"/>
             <input type="hidden" name="typeId" value="{type_id}" />
-            <xsl:choose>
-                <xsl:when test="oldid != ''">
-                    <input type="hidden" name="lessonId" value="{oldid}"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <input type="hidden" name="lessonId" value="{id}"/>
-                </xsl:otherwise>
-            </xsl:choose>
+            <input type="hidden" name="lessonId" value="{id}"/>
 
             <td>
                 <xsl:if test="is_reported = 0 and /root/access_report_create = 1">

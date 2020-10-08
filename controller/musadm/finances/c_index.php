@@ -147,17 +147,6 @@ $paymentsUsers = User::query()
     ->get(true);
 
 foreach ($payments as $payment) {
-//    $paymentUser = $payment->getUser();
-//    if (!is_null($paymentUser)) {
-//        $payment->addEntity($paymentUser);
-//    }
-//
-//    if ($payment->authorId() > 0) {
-//        $paymentAuthor = $payment->getAuthor();
-//        if (!is_null($paymentAuthor)) {
-//            $payment->addEntity($paymentAuthor, 'author');
-//        }
-//    }
     $payment->datetime(refactorDateFormat($payment->datetime()));
     if ($paymentsUsers->has($payment->user())) {
         $payment->addEntity($paymentsUsers->get($payment->user()));
@@ -168,6 +157,7 @@ foreach ($payments as $payment) {
 $defTeacherIndivRate =  Property_Controller::factoryByTag('teacher_rate_indiv_default');
 $defTeacherGroupRate =  Property_Controller::factoryByTag('teacher_rate_group_default');
 $defTeacherConsultRate= Property_Controller::factoryByTag('teacher_rate_consult_default');
+$defTeacherPrivateRate= Property_Controller::factoryByTag('teacher_rate_private_default');
 $defAbsentRate =        Property_Controller::factoryByTag('client_absent_rate');
 $defAbsentRateType =    Property_Controller::factoryByTag('teacher_rate_type_absent_default');
 $defAbsentRateVal =     Property_Controller::factoryByTag('teacher_rate_absent_default');
@@ -175,6 +165,7 @@ $defAbsentRateVal =     Property_Controller::factoryByTag('teacher_rate_absent_d
 $defTeacherIndivRate =  $defTeacherIndivRate->getValues($director)[0]->value();
 $defTeacherGroupRate =  $defTeacherGroupRate->getValues($director)[0]->value();
 $defTeacherConsultRate= $defTeacherConsultRate->getValues($director)[0]->value();
+$defTeacherPrivateRate= $defTeacherPrivateRate->getValues($director)[0]->value();
 $defAbsentRate =        $defAbsentRate->getValues($director)[0]->value();
 $defAbsentRateType =    $defAbsentRateType->getValues($director)[0]->value();
 $defAbsentRateVal =     $defAbsentRateVal->getValues($director)[0]->value();
@@ -204,6 +195,7 @@ $cashBack = $cashBack->getValues($director)[0]->value();
     ->addSimpleEntity('teacher_indiv_rate', $defTeacherIndivRate)
     ->addSimpleEntity('teacher_group_rate', $defTeacherGroupRate)
     ->addSimpleEntity('teacher_consult_rate', $defTeacherConsultRate)
+    ->addSimpleEntity('teacher_private_rate', $defTeacherPrivateRate)
     ->addSimpleEntity('absent_rate', $defAbsentRate)
     ->addSimpleEntity('absent_rate_type', $defAbsentRateType)
     ->addSimpleEntity('absent_rate_val', $defAbsentRateVal)

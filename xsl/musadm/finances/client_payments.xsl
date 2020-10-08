@@ -70,6 +70,7 @@
                     <xsl:with-param name="teacher_indiv_rate" select="teacher_indiv_rate" />
                     <xsl:with-param name="teacher_group_rate" select="teacher_group_rate" />
                     <xsl:with-param name="teacher_consult_rate" select="teacher_consult_rate" />
+                    <xsl:with-param name="teacher_private_rate" select="teacher_private_rate" />
                     <xsl:with-param name="absent_rate" select="absent_rate" />
                     <xsl:with-param name="absent_rate_type" select="absent_rate_type" />
                     <xsl:with-param name="absent_rate_val" select="absent_rate_val" />

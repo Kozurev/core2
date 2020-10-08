@@ -5,6 +5,7 @@
         <xsl:param name="teacher_indiv_rate" />
         <xsl:param name="teacher_group_rate" />
         <xsl:param name="teacher_consult_rate" />
+        <xsl:param name="teacher_private_rate" />
         <xsl:param name="absent_rate" />
         <xsl:param name="absent_rate_type" />
         <xsl:param name="absent_rate_val" />
@@ -44,6 +45,17 @@
                             <td class="right">
                                 <span class="current_value"><xsl:value-of select="$teacher_consult_rate" /></span>
                                 <input type="number" class="form-control edit_rate_value" data-prop-name="teacher_rate_consult_default" value="{$teacher_consult_rate}" />
+                            </td>
+                            <td class="right">
+                                <a class="action edit edit_rate" title="Редактировать"></a>
+                                <a class="action save save_rate" title="Сохранить"></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">Ставка преподавателя за частное занятие по умолчанию</td>
+                            <td class="right">
+                                <span class="current_value"><xsl:value-of select="$teacher_private_rate" /></span>
+                                <input type="number" class="form-control edit_rate_value" data-prop-name="teacher_rate_private_default" value="{$teacher_private_rate}" />
                             </td>
                             <td class="right">
                                 <a class="action edit edit_rate" title="Редактировать"></a>

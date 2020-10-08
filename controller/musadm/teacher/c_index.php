@@ -33,13 +33,10 @@ if (intval($month) < 10) {
 $year = getYear($date);
 
 if ($accessScheduleRead) {
-
-
     echo '<section class="section-bordered">';
     (new Schedule_Controller)
         ->userId($userId)
         ->setDate($date)
-        //->setCalendarPeriod($month, $year)
         ->printCalendar2();
     echo '</section>';
 }
@@ -47,56 +44,56 @@ if ($accessScheduleRead) {
 echo '<section class="section-bordered">';
 
 if ($accessReportRead) {
-    $TeacherLessons = (new Schedule_Controller())
+    $teacherLessons = (new Schedule_Controller())
         ->userId($userId)
         ->unsetPeriod()
         ->setDate($date)
         ->getLessons();
 
     //Формирование таблицы с отметками о явке/неявке>>
-    sortByTime($TeacherLessons, 'timeFrom');
+    sortByTime($teacherLessons, 'timeFrom');
 
-    foreach ($TeacherLessons as $key => $Lesson) {
-        $Lesson->timeFrom(refactorTimeFormat($Lesson->timeFrom()));
-        $Lesson->timeTo(refactorTimeFormat($Lesson->timeTo()));
-        $LessonReport = $Lesson->getReport($date);
-        $LessonClient = $Lesson->getClient();
+    foreach ($teacherLessons as $key => $lesson) {
+        $lesson->timeFrom(refactorTimeFormat($lesson->timeFrom()));
+        $lesson->timeTo(refactorTimeFormat($lesson->timeTo()));
+        $lessonReport = $lesson->getReport($date);
+        $lessonClient = $lesson->getClient();
 
-        if ($LessonClient instanceof Schedule_Group) {
-            $Clients = $LessonClient->getClientList();
-            if (!is_null($LessonReport)) {
-                $LessonAttendances = $LessonReport->getAttendances();
-                foreach ($LessonAttendances as $Attendance) {
-                    foreach ($Clients as $Client) {
-                        if ($Attendance->clientId() == $Client->getId()) {
-                            $Client->addEntity($Attendance, 'attendance');
+        if ($lessonClient instanceof Schedule_Group) {
+            $clients = $lessonClient->getClientList();
+            if (!is_null($lessonReport)) {
+                $lessonAttendances = $lessonReport->getAttendances();
+                foreach ($lessonAttendances as $attendance) {
+                    foreach ($clients as $client) {
+                        if ($attendance->clientId() == $client->getId()) {
+                            $client->addEntity($attendance, 'attendance');
                         }
                     }
                 }
             }
-            $LessonClient->addEntities($Clients, 'client');
+            $lessonClient->addEntities($clients, 'client');
         } else {
-            if (!is_null($LessonReport)) {
-                $LessonAttendances = $LessonReport->getAttendances();
-                if (count($LessonAttendances) > 0) {
-                    $LessonClient->addEntity($LessonAttendances[0], 'attendance');
+            if (!is_null($lessonReport)) {
+                $lessonAttendances = $lessonReport->getAttendances();
+                if (count($lessonAttendances) > 0) {
+                    $lessonClient->addEntity($lessonAttendances[0], 'attendance');
                 }
             }
         }
 
-        $Lesson->addSimpleEntity('is_reported', (int)$Lesson->isReported($date));
-        $Lesson->addEntity($LessonReport, 'report');
-        $Lesson->addEntity($LessonClient, 'client');
-        $Lesson->addSimpleEntity('lesson_type', $Lesson->lessonType());
+        $lesson->addSimpleEntity('is_reported', (int)$lesson->isReported($date));
+        $lesson->addEntity($lessonReport, 'report');
+        $lesson->addEntity($lessonClient, 'client');
+        $lesson->addSimpleEntity('lesson_type', $lesson->lessonType());
     }
 
-    $output = Core::factory('Core_Entity')
+    $output = (new Core_Entity)
         ->addSimpleEntity('date', refactorDateFormat($date))
         ->addSimpleEntity('real_date', $date)
         ->addEntity($User)
-        ->addEntities($TeacherLessons, 'lesson');
+        ->addEntities($teacherLessons, 'lesson');
 
-    User::checkUserAccess(['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]], User::parentAuth())
+    User::checkUserAccess(['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]], User_Auth::parentAuth())
         ?   $isAdmin = 1
         :   $isAdmin = 0;
 
@@ -119,53 +116,54 @@ if ($currentMonth < 10) {
 
 $dateTo = $currentYear . '-' . $currentMonth . '-' . $countDays;
 
-$totalCount = Core::factory('Schedule_Lesson_Report')
-    ->queryBuilder()
+$totalCount = Schedule_Lesson_Report::query()
     ->where('teacher_id', '=', $User->getId())
     ->where('date', '>=', $dateFrom)
     ->where('date', '<=', $dateTo)
-    ->where('type_id', '<>', 3)
-    ->getCount();
+    ->open()
+        ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
+        ->orWhere('type_id', '=', Schedule_Lesson::TYPE_GROUP)
+        ->orWhere('type_id', '=', Schedule_Lesson::TYPE_PRIVATE)
+    ->close()
+    ->count();
 
-$attendenceIndivCount = Core::factory('Schedule_Lesson_Report')
-    ->queryBuilder()
+$countQuery = Schedule_Lesson_Report::query()
     ->where('teacher_id', '=', $User->getId())
     ->where('date', '>=', $dateFrom)
-    ->where('date', '<=', $dateTo)
-    ->where('type_id', '=', 1)
-    ->where('attendance', '=', 1)
-    ->getCount();
+    ->where('date', '<=', $dateTo);
+$countPresenceQuery = (clone $countQuery)->where('attendance', '=', 1);
+$countAbsenceQuery = (clone $countQuery)->where('attendance', '=', 0);
 
-$disAttendenceIndivCount = Core::factory('Schedule_Lesson_Report')
-    ->queryBuilder()
-    ->where('teacher_id', '=', $User->getId())
-    ->where('date', '>=', $dateFrom)
-    ->where('date', '<=', $dateTo)
-    ->where('type_id', '=', 1)
-    ->where('attendance', '=', 0)
-    ->getCount();
+$presenceIndivCount = (clone $countPresenceQuery)
+    ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
+    ->count();
 
-$attendenceGroupCount = Core::factory('Schedule_Lesson_Report')
-    ->queryBuilder()
-    ->where('teacher_id', '=', $User->getId())
-    ->where('date', '>=', $dateFrom)
-    ->where('date', '<=', $dateTo)
-    ->where('type_id', '=', 2)
-    ->where('attendance', '=', 1)
-    ->getCount();
+$absenceIndivCount = (clone $countAbsenceQuery)
+    ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
+    ->count();
 
-$disAttendenceGroupCount = Core::factory('Schedule_Lesson_Report')
-    ->queryBuilder()
-    ->where('teacher_id', '=', $User->getId())
-    ->where('date', '>=', $dateFrom)
-    ->where('date', '<=', $dateTo)
-    ->where('type_id', '=', 2)
-    ->where('attendance', '=', 0)
-    ->getCount();
+$presenceGroupCount = (clone $countPresenceQuery)
+    ->where('type_id', '=', Schedule_Lesson::TYPE_GROUP)
+    ->count();
+
+$absenceGroupCount = (clone $countAbsenceQuery)
+    ->where('type_id', '=', Schedule_Lesson::TYPE_GROUP)
+    ->count();
+
+$presencePrivateCount = (clone $countPresenceQuery)
+    ->where('type_id', '=', Schedule_Lesson::TYPE_PRIVATE)
+    ->count();
+
+$absencePrivateCount = (clone $countAbsenceQuery)
+    ->where('type_id', '=', Schedule_Lesson::TYPE_PRIVATE)
+    ->count();
 
 echo "<h4>Общее число проведенных занятий в этом месяце: $totalCount</h4>";
-echo "<h4>из них явки/неявки: $attendenceIndivCount / $disAttendenceIndivCount (индивидуальные), 
-            $attendenceGroupCount / $disAttendenceGroupCount (групповые).</h4>";
+echo "<h4>из них явки/неявки: 
+            $presenceIndivCount / $absenceIndivCount (индивидуальные), 
+            $presenceGroupCount / $absenceGroupCount (групповые),
+            $presencePrivateCount / $absencePrivateCount (частные)
+        </h4>";
 echo '</section>';
 
 

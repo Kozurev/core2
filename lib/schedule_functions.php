@@ -63,14 +63,11 @@ function updateLastLessonTime($Lesson, &$maxTime, $time, $period)
  * @param $lesson
  * @return array
  */
-function getLessonData($lesson)
+function getLessonData(Schedule_Lesson $lesson)
 {
-    if (!empty($lesson->oldid ?? 0)) {
-        $lesson->setId($lesson->oldid);
-    }
-    if (isset($_SESSION['core']['lesson_data'][$lesson->getId()])) {
-        return $_SESSION['core']['lesson_data'][$lesson->getId()];
-    }
+//    if (isset($_SESSION['core']['lesson_data'][$lesson->getId()])) {
+//        return $_SESSION['core']['lesson_data'][$lesson->getId()];
+//    }
 
     $output = [
         'client'    =>  '',
@@ -100,7 +97,7 @@ function getLessonData($lesson)
             $output['client'] = $group->title();
             $output['client_status'] = 'group';
         }
-    } elseif ($lesson->typeId() == Schedule_Lesson::TYPE_INDIV) {
+    } elseif ($lesson->typeId() == Schedule_Lesson::TYPE_INDIV || $lesson->typeId() == Schedule_Lesson::TYPE_PRIVATE) {
         $teacher = $lesson->getTeacher();
         $client = $lesson->getClient();
 

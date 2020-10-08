@@ -494,10 +494,12 @@ if ($dateFrom == $dateTo) {
     $deposits->where('datetime', '<=', $dateTo);
 }
 
-$income =   (clone $finances)->select('sum(client_rate)', 'value');
-$expenses = (clone $finances)->select('sum(teacher_rate)', 'value');
-$profit =   (clone $finances)->select('sum(total_rate)', 'value');
+$income =   (clone $finances)->where('lesson.type_id', '<>', Schedule_Lesson::TYPE_PRIVATE)->select('sum(client_rate)', 'value');
+$expenses = (clone $finances)->where('lesson.type_id', '<>', Schedule_Lesson::TYPE_PRIVATE)->select('sum(teacher_rate)', 'value');
+$income2 =  (clone $finances)->where('lesson.type_id', '=', Schedule_Lesson::TYPE_PRIVATE)->select('sum(teacher_rate)', 'value'); //Выручка от частных загятий
+$profit =   (clone $finances)->where('lesson.type_id', '<>', Schedule_Lesson::TYPE_PRIVATE)->select('sum(total_rate)', 'value');
 $income =   $income->find()->value;
+$income2 =  $income2->find()->value;
 $expenses = $expenses->find()->value;
 $profit =   $profit->find()->value;
 $hostExpenses = $hostExpenses->find()->value();
@@ -505,6 +507,9 @@ $deposits = (int)$deposits->sum('value');
 
 if (is_null($income)) {
     $income = 0;
+}
+if (is_null($income2)) {
+    $income2 = 0;
 }
 if (is_null($expenses)) {
     $expenses = 0;
@@ -518,6 +523,7 @@ if (is_null($hostExpenses)) {
 
 (new Core_Entity())
     ->addSimpleEntity('income', $income)
+    ->addSimpleEntity('income2', $income2 * -1)
     ->addSimpleEntity('expenses', $expenses)
     ->addSimpleEntity('profit', $profit)
     ->addSimpleEntity('deposits', $deposits)
