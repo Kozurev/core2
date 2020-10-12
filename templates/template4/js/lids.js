@@ -689,7 +689,7 @@ function makeLidCommentPopup(commentId, lidId, callback) {
         '<div class="column"><span>Доп. файлы</span></div>' +
         '<div class="column"><input type="file" name="lidCommentFile" id="lidCommentFile" /></div>' +
         '<button class="btn btn-default" ' +
-        'onclick="Lids.saveComment('+commentId+', '+lidId+', $(\'#lidCommentText\').val(), '+callback+')">Сохранить</button>' +
+        'onclick="Lids.saveComment('+commentId+', '+lidlid_before_clientId+', $(\'#lidCommentText\').val(), '+callback+')">Сохранить</button>' +
         '</div>';
     showPopup(popupData);
 }
@@ -702,7 +702,7 @@ function saveLidCommentCallback(comment) {
     } else {
         let lidCommentsBlock = $('.lid_' + comment.lid_id).find('.comments');
         let commentFile = $('#lidCommentFile');
-        if (commentFile.get(0).files.length == 0) {
+        if (commentFile.get(0) === undefined || commentFile.get(0).files.length == 0) {
             lidCommentsBlock.prepend(makeLidCommentBlock(comment));
         } else {
             //Загрузка файла и прикрепление его к комментарию
@@ -843,10 +843,10 @@ function makeClientFromLidCallback(client) {
             let lidId = localStorage.getItem('clientFromLidId');
             localStorage.removeItem('clientFromLidId');
             Lids.changeStatus(lidId, status.id, function(response){
-                changeLidStatusCallback(response);
                 Lids.getLid(lidId, function(lid){
                     Lids.saveComment(0, lidId, 'Добавлен в клиенты', saveLidCommentCallback);
                 });
+                changeLidStatusCallback(response);
                 loaderOff();
                 closePopup();
             });

@@ -198,7 +198,7 @@ if ($action === 'save') {
         }
 
         //$Property->addToPropertiesList($User, $propertyId);
-        $propertyValues = (new Property())->getPropertyValues($user);
+        $propertyValues = $property->getValues($user);
 
         //Список значений свойства
         $valuesList = [];
