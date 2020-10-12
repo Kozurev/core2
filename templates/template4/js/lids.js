@@ -689,7 +689,7 @@ function makeLidCommentPopup(commentId, lidId, callback) {
         '<div class="column"><span>Доп. файлы</span></div>' +
         '<div class="column"><input type="file" name="lidCommentFile" id="lidCommentFile" /></div>' +
         '<button class="btn btn-default" ' +
-        'onclick="Lids.saveComment('+commentId+', '+lidlid_before_clientId+', $(\'#lidCommentText\').val(), '+callback+')">Сохранить</button>' +
+        'onclick="Lids.saveComment('+commentId+', '+lidId+', $(\'#lidCommentText\').val(), '+callback+')">Сохранить</button>' +
         '</div>';
     showPopup(popupData);
 }
