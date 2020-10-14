@@ -90,6 +90,14 @@ return [
     'certificate_delete' => 'Удаление сертификата',
     'certificate_append_comment' => 'Добавление комментария к сертификату',
 
+    'teacher_clients_read' => 'Просмотр списка клиентов преподавателя',
+    'teacher_clients_edit' => 'Редактирование списка клиентов преподавателя',
+
+    'teacher_schedule_time_read' => 'Просмотр рабочего графика преподавателя',
+    'teacher_schedule_time_create' => 'Создание рабочего графика преподавателя',
+    'teacher_schedule_time_edit' => 'Редактирование рабочего графика преподавателя',
+    'teacher_schedule_time_delete' => 'Удаление рабочего графика преподавателя',
+
     'statistic_read' => 'Просмотр статистики',
 
     'cron' => 'Доступ к скриптам крона',

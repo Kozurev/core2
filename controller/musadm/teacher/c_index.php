@@ -426,40 +426,46 @@ if ($accessPaymentConfig) {
         ->show();
 }
 
-if (User_Auth::current()->groupId() == ROLE_DIRECTOR or User_Auth::current()->groupId() == ROLE_MANAGER ) {
+if (Core_Access::instance()->hasCapability(Core_Access::TEACHER_SCHEDULE_TIME_READ) ||
+    Core_Access::instance()->hasCapability(Core_Access::TEACHER_CLIENTS_READ)) {
     //График работы преподавателя
-    $MainSchedule = Core::factory('Schedule_Teacher')
+    $mainSchedule = (new Schedule_Teacher)
         ->queryBuilder()
         ->where('teacher_id', '=', $User->getId())
         ->orderBy('time_from')
         ->findALl();
 
-    foreach ($MainSchedule as $time) {
+    foreach ($mainSchedule as $time) {
         $time->timeFrom = refactorTimeFormat($time->timeFrom());
         $time->timeTo = refactorTimeFormat($time->timeTo());
     }
 
     //Список учеников перподавателя
-    $Teacher = User_Controller::factory($userId);
-    $TeacherList = Core::factory('Property')->getByTagName('teachers');
-    $teacherFio = $Teacher->surname() . ' ' . $Teacher->name();
-    $TeacherProperty = Core::factory('Property_List_Values')
+    $teacher = User_Controller::factory($userId);
+    $teacherList = Core::factory('Property')->getByTagName('teachers');
+    $teacherFio = $teacher->surname() . ' ' . $teacher->name();
+    $teacherProperty = (new Property_List_Values)
         ->queryBuilder()
-        ->where('property_id', '=', $TeacherList->getId())
+        ->where('property_id', '=', $teacherList->getId())
         ->where('value', '=', $teacherFio)
         ->find();
 
-    $UserController =  new User_Controller_Extended(User_Auth::current());
-    $UserController->appendAddFilter($TeacherList->getId(),'=',$TeacherProperty->getId());
-    $Users = $UserController->getUsers();
+    $userController =  new User_Controller_Extended(User_Auth::current());
+    $userController->appendAddFilter($teacherList->getId(), '=', $teacherProperty->getId());
+    $users = $userController->getUsers();
 
-    Core::factory('Core_Entity')
+    (new Core_Entity)
         ->addEntity($User)
-        ->addEntities($MainSchedule)
-        ->addEntities($Users,'clients')
-        ->addSimpleEntity('property_id',$TeacherList->getId())
-        ->addSimpleEntity('user_group',User_Auth::current()->groupId())
-        ->addSimpleEntity('value_id',$TeacherProperty->getId())
+        ->addEntities($mainSchedule)
+        ->addEntities($users,'clients')
+        ->addSimpleEntity('property_id', $teacherList->getId())
+        ->addSimpleEntity('user_group', User_Auth::current()->groupId())
+        ->addSimpleEntity('value_id', $teacherProperty->getId())
+        ->addSimpleEntity('access_teacher_schedule_view', (int)Core_Access::instance()->hasCapability(Core_Access::TEACHER_SCHEDULE_TIME_READ))
+        ->addSimpleEntity('access_teacher_schedule_create', (int)Core_Access::instance()->hasCapability(Core_Access::TEACHER_SCHEDULE_TIME_CREATE))
+        ->addSimpleEntity('access_teacher_schedule_delete', (int)Core_Access::instance()->hasCapability(Core_Access::TEACHER_SCHEDULE_TIME_DELETE))
+        ->addSimpleEntity('access_teacher_clients_view', (int)Core_Access::instance()->hasCapability(Core_Access::TEACHER_CLIENTS_READ))
+        ->addSimpleEntity('access_teacher_clients_edit', (int)Core_Access::instance()->hasCapability(Core_Access::TEACHER_CLIENTS_EDIT))
         ->xsl('musadm/schedule/teacher_time.xsl')
         ->show();
 }

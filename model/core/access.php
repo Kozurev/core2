@@ -92,6 +92,14 @@ class Core_Access
     const CERTIFICATE_DELETE = 'certificate_delete';
     const CERTIFICATE_APPEND_COMMENT = 'certificate_append_comment';
 
+    const TEACHER_CLIENTS_READ = 'teacher_clients_read';
+    const TEACHER_CLIENTS_EDIT = 'teacher_clients_edit';
+
+    const TEACHER_SCHEDULE_TIME_READ = 'teacher_schedule_time_read';
+    const TEACHER_SCHEDULE_TIME_CREATE = 'teacher_schedule_time_create';
+    const TEACHER_SCHEDULE_TIME_EDIT = 'teacher_schedule_time_edit';
+    const TEACHER_SCHEDULE_TIME_DELETE = 'teacher_schedule_time_delete';
+
     const STATISTIC_READ = 'statistic_read';
 
     const CRON = 'cron';

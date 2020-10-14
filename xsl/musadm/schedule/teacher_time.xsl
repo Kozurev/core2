@@ -1,16 +1,16 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:include href="teacher_student.xsl" />
+
     <xsl:template match="root">
         <section class="section-bordered">
             <div class="row">
-                    <div class="col-lg-5 col-sm-12 col-xs-12">
+                <xsl:if test="//access_teacher_schedule_view = 1">
+                    <div class="col-lg-6 col-sm-12 col-xs-12">
                         <h3>Основной график работы</h3>
                         <div class="table-responsive">
                             <table class="table table-bordered teacher-schedule-main">
                                 <tr>
-                                    <td>
-                                        <span class="day-name">Понедельник</span>
-                                    </td>
+                                    <td><span class="day-name">Понедельник</span></td>
                                     <td>
                                         <div class="row">
                                             <xsl:apply-templates select="schedule_teacher[day_name = 'Monday']" />
@@ -31,14 +31,14 @@
                                             </form>
                                         </div>
                                     </td>
-                                    <td>
-                                        <a class="btn btn-success new-teacher-time">+</a>
-                                    </td>
+                                    <xsl:if test="//access_teacher_schedule_delete = 1">
+                                        <td>
+                                            <a class="btn btn-success new-teacher-time">+</a>
+                                        </td>
+                                    </xsl:if>
                                 </tr>
                                 <tr>
-                                    <td>
-                                        <span class="day-name">Вторник</span>
-                                    </td>
+                                    <td><span class="day-name">Вторник</span></td>
                                     <td>
                                         <div class="row">
                                             <xsl:apply-templates select="schedule_teacher[day_name = 'Tuesday']" />
@@ -59,14 +59,14 @@
                                             </form>
                                         </div>
                                     </td>
-                                    <td>
-                                        <a class="btn btn-success new-teacher-time">+</a>
-                                    </td>
+                                    <xsl:if test="//access_teacher_schedule_delete = 1">
+                                        <td>
+                                            <a class="btn btn-success new-teacher-time">+</a>
+                                        </td>
+                                    </xsl:if>
                                 </tr>
                                 <tr>
-                                    <td>
-                                        <span class="day-name">Среда</span>
-                                    </td>
+                                    <td><span class="day-name">Среда</span></td>
                                     <td>
                                         <div class="row">
                                             <xsl:apply-templates select="schedule_teacher[day_name = 'Wednesday']" />
@@ -87,14 +87,14 @@
                                             </form>
                                         </div>
                                     </td>
-                                    <td>
-                                        <a class="btn btn-success new-teacher-time">+</a>
-                                    </td>
+                                    <xsl:if test="//access_teacher_schedule_delete = 1">
+                                        <td>
+                                            <a class="btn btn-success new-teacher-time">+</a>
+                                        </td>
+                                    </xsl:if>
                                 </tr>
                                 <tr>
-                                    <td>
-                                        <span class="day-name">Четверг</span>
-                                    </td>
+                                    <td><span class="day-name">Четверг</span></td>
                                     <td>
                                         <div class="row">
                                             <xsl:apply-templates select="schedule_teacher[day_name = 'Thursday']" />
@@ -115,14 +115,14 @@
                                             </form>
                                         </div>
                                     </td>
-                                    <td>
-                                        <a class="btn btn-success new-teacher-time">+</a>
-                                    </td>
+                                    <xsl:if test="//access_teacher_schedule_delete = 1">
+                                        <td>
+                                            <a class="btn btn-success new-teacher-time">+</a>
+                                        </td>
+                                    </xsl:if>
                                 </tr>
                                 <tr>
-                                    <td>
-                                        <span class="day-name">Пятница</span>
-                                    </td>
+                                    <td><span class="day-name">Пятница</span></td>
                                     <td>
                                         <div class="row">
                                             <xsl:apply-templates select="schedule_teacher[day_name = 'Friday']" />
@@ -143,14 +143,14 @@
                                             </form>
                                         </div>
                                     </td>
-                                    <td>
-                                        <a class="btn btn-success new-teacher-time">+</a>
-                                    </td>
+                                    <xsl:if test="//access_teacher_schedule_delete = 1">
+                                        <td>
+                                            <a class="btn btn-success new-teacher-time">+</a>
+                                        </td>
+                                    </xsl:if>
                                 </tr>
                                 <tr>
-                                    <td>
-                                        <span class="day-name">Суббота</span>
-                                    </td>
+                                    <td><span class="day-name">Суббота</span></td>
                                     <td>
                                         <div class="row">
                                             <xsl:apply-templates select="schedule_teacher[day_name = 'Saturday']" />
@@ -171,14 +171,14 @@
                                             </form>
                                         </div>
                                     </td>
-                                    <td>
-                                        <a class="btn btn-success new-teacher-time">+</a>
-                                    </td>
+                                    <xsl:if test="//access_teacher_schedule_delete = 1">
+                                        <td>
+                                            <a class="btn btn-success new-teacher-time">+</a>
+                                        </td>
+                                    </xsl:if>
                                 </tr>
                                 <tr>
-                                    <td>
-                                        <span class="day-name">Воскресенье</span>
-                                    </td>
+                                    <td><span class="day-name">Воскресенье</span></td>
                                     <td>
                                         <div class="row">
                                             <xsl:apply-templates select="schedule_teacher[day_name = 'Sunday']" />
@@ -199,17 +199,39 @@
                                             </form>
                                         </div>
                                     </td>
-                                    <td>
-                                        <a class="btn btn-success new-teacher-time">+</a>
-                                    </td>
+                                    <xsl:if test="//access_teacher_schedule_delete = 1">
+                                        <td>
+                                            <a class="btn btn-success new-teacher-time">+</a>
+                                        </td>
+                                    </xsl:if>
                                 </tr>
                             </table>
                         </div>
                     </div>
-            <xsl:call-template name="teacher_student"/>
+                </xsl:if>
+
+                <xsl:if test="//access_teacher_clients_view = 1">
+                    <div class="col-lg-6">
+                        <h3>Список учеников преподавателя</h3>
+                        <div class="table-responsive">
+                            <table class="table table-bordered teacher-schedule-main" id="student_table">
+                                <tr>
+                                    <td><span>Фамилия</span></td>
+                                    <td><span>Имя</span></td>
+                                    <td><span>Телефон</span></td>
+                                    <xsl:if test="//access_teacher_clients_edit = 1">
+                                        <td>
+                                            <a class="btn btn-green" onclick="addNewStudentToTeacher({//root/value_id})"> + </a>
+                                        </td>
+                                    </xsl:if>
+                                </tr>
+                                <xsl:apply-templates select="clients"/>
+                            </table>
+                        </div>
+                    </div>
+                </xsl:if>
             </div>
         </section>
-
     </xsl:template>
 
     <xsl:template match="schedule_teacher">
@@ -220,6 +242,7 @@
                 <xsl:value-of select="timeTo" />
             </span>
         </div>
+
         <div class="col-lg-2 teacher-time-{id}">
             <a class="action delete" onclick="loaderOn(); Schedule.removeTeacherTime({id}, removeTeacherTimeCallback);">
                 <input type="hidden" name="kostul" />
@@ -227,6 +250,18 @@
         </div>
     </xsl:template>
 
+    <xsl:template match="clients">
+        <tr id="{id}">
+            <td><xsl:value-of select="surname"/></td>
+            <td><xsl:value-of select="name"/></td>
+            <td><xsl:value-of select="phone_number"/></td>
+            <xsl:if test="//access_teacher_clients_edit = 1">
+                <td>
+                    <a class="btn btn-red" id="del_student" onclick="deleteProperty('teachers','User',{id},delTeachersStudentCallback)"> - </a>
+                </td>
+            </xsl:if>
+        </tr>
+    </xsl:template>
 
 
 </xsl:stylesheet>
