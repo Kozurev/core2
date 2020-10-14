@@ -232,7 +232,8 @@ class Orm
     {
         $beforeSelect = $this->select;
         $beforeOrder = $this->order;
-        $this->clearSelect()->select('count(' . $this->table . '.id)', 'count');
+        $id = !empty($this->table) ? $this->table . '.id' : 'id';
+        $this->clearSelect()->select('count(' . $id . ')', 'count');
         $this->clearOrderBy();
         $query = $this->getQueryString();
         $result = DB::instance()->query($query);

@@ -164,6 +164,9 @@ echo "<h4>из них явки/неявки:
             $presenceGroupCount / $absenceGroupCount (групповые),
             $presencePrivateCount / $absencePrivateCount (частные)
         </h4>";
+if (User_Auth::current()->groupId() == ROLE_DIRECTOR) {
+    echo '<a href="#" class="btn btn-primary" onclick="event.preventDefault(); getTeacherReportsStatistic('.$User->getId().', \''.$dateFrom.'\', \''.$dateTo.'\')" style="margin-bottom: 10px">Подробная информация</a>';
+}
 echo '</section>';
 
 

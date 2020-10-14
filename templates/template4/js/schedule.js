@@ -352,8 +352,8 @@ $(function(){
          * Формирование списка клиентов по принадлежности к преподавателю
          */
         .on('change', 'select[name=teacherId]', function(e){
-            var lessonTyeId = $('select[name=typeId]').val();
-            if (lessonTyeId == 1) {
+            var lessonTypeId = $('select[name=typeId]').val();
+            if (lessonTypeId == 1 || lessonTypeId == 5) {
                 let
                     clientsList = $('select[name=clientId]'),
                     selectedClient = clientsList.val(),
@@ -1173,5 +1173,26 @@ function saveClientLesson() {
         } else {
             notificationError('Невозможно поставить занятие в график при активном периоде отсутствия');
         }
+    });
+}
+
+function getTeacherReportsStatistic(teacherId, dateFrom, dateTo) {
+    loaderOn();
+    Schedule.getReportsStatistic({
+        teacher_id: teacherId,
+        date_from: dateFrom,
+        date_to: dateTo
+    }, function(response) {
+        let $table = $('<table class="table"></table>');
+        $table.append('<tr><th>Тип занятия</th><th>Прис./отс.</th><th>Начислено</th></tr>');
+        $.each(response, function(key, data) {
+            let $tr = $('<tr></tr>');
+            $tr.append('<td>'+data.title+'</td>');
+            $tr.append('<td>'+data.count_attendance+' / '+data.count_absence+'</td>');
+            $tr.append('<td>'+data.teacher_rate+'</td>');
+            $table.append($tr);
+        });
+        showPopup($table);
+        loaderOff();
     });
 }

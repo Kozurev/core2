@@ -12,7 +12,6 @@ class Schedule {
         localStorage.removeItem('schedule.getAreasList.lastParams');
     }
 
-
     /**
      * Проверка на существование периода отсутствия у клиента на определенную дату
      *
@@ -23,7 +22,7 @@ class Schedule {
         params.action = 'checkAbsentPeriod';
         $.ajax({
             type: 'GET',
-            url: Schedule.getApiLink(),
+            url: this.getApiLink(),
             dataType: 'json',
             data: params,
             success: function(response) {
@@ -31,7 +30,6 @@ class Schedule {
             }
         });
     }
-
 
     /**
      * Получение списка филлиалов
@@ -49,7 +47,7 @@ class Schedule {
         } else {
             $.ajax({
                 type: 'GET',
-                url: Schedule.getApiLink(),
+                url: this.getApiLink(),
                 async: false,
                 dataType: 'json',
                 data: params,
@@ -62,7 +60,6 @@ class Schedule {
         }
     }
 
-
     /**
      * Сохранение периода отсутствия
      *
@@ -73,7 +70,7 @@ class Schedule {
         absent.action = 'saveAbsentPeriod';
         $.ajax({
             type: 'POST',
-            url: Schedule.getApiLink(),
+            url: this.getApiLink(),
             dataType: 'json',
             data: absent,
             success: function(response) {
@@ -87,7 +84,6 @@ class Schedule {
         });
     }
 
-
     /**
      * Проверка на совпадение времени занятия с рабочим временем преподавателя
      *
@@ -98,7 +94,7 @@ class Schedule {
         data.action = 'isInTeacherTime';
         $.ajax({
             type: 'POST',
-            url: Schedule.getApiLink(),
+            url: this.getApiLink(),
             dataType: 'json',
             data: data,
             success: function (response) {
@@ -113,7 +109,6 @@ class Schedule {
         });
     }
 
-
     /**
      * Сохранение рабочего времени преподавателя
      *
@@ -124,7 +119,7 @@ class Schedule {
         data.action = 'saveTeacherTime';
         $.ajax({
             type: 'POST',
-            url: Schedule.getApiLink(),
+            url: this.getApiLink(),
             dataType: 'json',
             data: data,
             success: function (response) {
@@ -139,7 +134,6 @@ class Schedule {
         });
     }
 
-
     /**
      * Удаление рабочего времени преподавателя
      *
@@ -149,7 +143,7 @@ class Schedule {
     static removeTeacherTime(id, callback) {
         $.ajax({
             type: 'POST',
-            url: Schedule.getApiLink(),
+            url: this.getApiLink(),
             dataType: 'json',
             data: {
                 action: 'removeTeacherTime',
@@ -167,7 +161,6 @@ class Schedule {
         });
     }
 
-
     /**
      * Поиск свободного врмемени преподавателя рядом с другими его занятиями
      *
@@ -179,7 +172,7 @@ class Schedule {
     static getNearestTeacherTime(teacherId, date, lessonDuration, callback) {
         $.ajax({
             type: 'GET',
-            url: Schedule.getApiLink(),
+            url: this.getApiLink(),
             dataType: 'json',
             data: {
                 action: 'getTeacherNearestTime',
@@ -199,11 +192,16 @@ class Schedule {
         });
     }
 
-
+    /**
+     * Получение графика работы преподавателя (не расписания занятий!)
+     *
+     * @param teacherId
+     * @param callback
+     */
     static getTeacherSchedule(teacherId, callback) {
         $.ajax({
             type: 'GET',
-            url: Schedule.getApiLink(),
+            url: this.getApiLink(),
             dataType: 'json',
             data: {
                 action: 'getTeacherSchedule',
@@ -221,18 +219,48 @@ class Schedule {
         });
     }
 
-
+    /**
+     * Сохранение занятия
+     *
+     * @param lessonData
+     * @param callback
+     */
     static saveLesson(lessonData, callback) {
         lessonData.action = 'saveLesson';
         $.ajax({
             type: 'POST',
-            url: Schedule.getApiLink(),
+            url: this.getApiLink(),
             dataType: 'json',
             data: lessonData,
             success: function(response) {
                 if (typeof callback === 'function') {
                     callback(response);
                 }
+            }
+        });
+    }
+
+    /**
+     * Получение краткой статистики по отчетам/типам занятий
+     *
+     * @param params
+     * @param callback
+     */
+    static getReportsStatistic(params, callback) {
+        params.action = 'getReportsStatistic';
+        $.ajax({
+            type: 'GET',
+            url: this.getApiLink(),
+            data: params,
+            dataType: 'json',
+            success: function(response) {
+                if (typeof callback === 'function') {
+                    callback(response);
+                }
+            },
+            error: function() {
+                notificationError('При получении данных произошла ошибка');
+                loaderOff();
             }
         });
     }

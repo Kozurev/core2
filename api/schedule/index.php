@@ -861,4 +861,48 @@ if ($action === 'markAbsent') {
     exit(json_encode($response));
 }
 
+/**
+ * Получение краткой статистики по отчетам/типам занятий
+ */
+if ($action === 'getReportsStatistic') {
+    $teacherId = Core_Array::Get('teacher_id', null, PARAM_INT);
+    $dateFrom = Core_Array::Get('date_from', null, PARAM_DATE);
+    $dateTo = Core_Array::Get('date_to', null, PARAM_DATE);
+
+    $lessonsTable = (new Schedule_Lesson())->getTableName();
+    $reportsTable = (new Schedule_Lesson_Report())->getTableName();
+
+    $query = (new Orm())->from($reportsTable . ' as r');
+    if (!is_null($teacherId)) {
+        $query->where( 'r.teacher_id', '=', $teacherId);
+    }
+    if (!is_null($dateFrom)) {
+        $query->where('r.date', '>=', $dateFrom);
+    }
+    if (!is_null($dateTo)) {
+        $query->where('r.date', '<=', $dateTo);
+    }
+
+    $outputData = [];
+    $lessonTypes = Schedule_Lesson_Type::query()->findAll();
+    /** @var Schedule_Lesson_Type $lessonType */
+    foreach ($lessonTypes as $lessonType) {
+        $lessonTypeStd = $lessonType->toStd(['statistic']);
+
+        $typeQuery = (clone $query)->where('type_id', '=', $lessonType->getId());
+        $lessonTypeStd->count_attendance = (clone $typeQuery)->where('attendance', '=', 1)->count();
+        $lessonTypeStd->count_absence = (clone $typeQuery)->where('attendance', '=', 0)->count();
+        $ratesSums = (clone $typeQuery)->select([
+            'SUM(teacher_rate) as teacher_rate',
+            'SUM(client_rate) as client_rate',
+            'SUM(total_rate) as total_rate'
+        ])->get()->first();
+        $lessonTypeStd->client_rate = $ratesSums->client_rate ?? 0;
+        $lessonTypeStd->teacher_rate = $ratesSums->teacher_rate ?? 0;
+        $lessonTypeStd->total_rate = $ratesSums->total_rate ?? 0;
+        $outputData[] = $lessonTypeStd;
+    }
+    exit(json_encode($outputData));
+}
+
 die(REST::status(REST::STATUS_ERROR, 'Отсутствует название действия', REST::ERROR_CODE_CUSTOM));

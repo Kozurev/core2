@@ -267,6 +267,9 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                     if ($mainLesson->isOnline()) {
                         echo '<hr><b><span>Онлайн</span></b>';
                     }
+                    if ($mainLesson->typeId() == Schedule_Lesson::TYPE_PRIVATE) {
+                        echo '<hr><b><span>Частное занятие</span></b>';
+                    }
                     echo "</td>";
                 }
             }
@@ -309,6 +312,9 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                         </ul>";
                         if ($currentLesson->isOnline()) {
                             echo '<hr><b><span>Онлайн</span></b>';
+                        }
+                        if ($currentLesson->typeId() == Schedule_Lesson::TYPE_PRIVATE) {
+                            echo '<hr><b><span>Частное занятие</span></b>';
                         }
                         echo "</td>";
                     }
