@@ -1,5 +1,7 @@
 <?php
 
+use Model\MyCalls;
+
 $action = Core_Array::Request('action', null, PARAM_STRING);
 
 if ($action === 'makeCall') {

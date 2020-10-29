@@ -10,82 +10,86 @@
 class Lid_Model extends Core_Entity
 {
     /**
-     * @var int
+     * @var int|null
      */
-    protected $id;
-
+    public $id;
 
     /**
      * Имя
      *
      * @var string
      */
-    protected $name = '';
-
+    public string $name = '';
 
     /**
      * Фамилия
      *
      * @var string
      */
-    protected $surname = '';
-
+    public string $surname = '';
 
     /**
      * Номер телефона
      *
      * @var string
      */
-    protected $number = '';
-
+    public string $number = '';
 
     /**
      * Ссылка Вконтакте
      *
      * @var string
      */
-    protected $vk = '';
-
+    public string $vk = '';
 
     /**
      * id или текстовое значение источника лида
      *
      * @var string
      */
-    protected $source = '';
-
+    public string $source = '';
 
     /**
      * Дата контроля лида
      *
      * @var string
      */
-    protected $control_date = '';
-
+    public string $control_date = '';
 
     /**
      * id организации которой принадлежит лид
      *
      * @var int
      */
-    protected $subordinated = 0;
-
+    public int $subordinated = 0;
 
     /**
      * id филиала которому принадлежит лид
      *
      * @var int
      */
-    protected $area_id = 0;
-
+    public int $area_id = 0;
 
     /**
      * id статуса лида
      *
      * @var int
      */
-    protected $status_id = 0;
+    public int $status_id = 0;
 
+    /**
+     * Переключатель для смс оповещений
+     *
+     * @var int
+     */
+    public int $sms_notification = 1;
+
+    /**
+     * Дата создания лида
+     *
+     * @var string|null
+     */
+    public ?string $date_create = null;
 
     /**
      * Указатель на приоритет лида
@@ -96,8 +100,7 @@ class Lid_Model extends Core_Entity
      *
      * @var int
      */
-    protected $priority_id = 1;
-
+    public int $priority_id = 1;
 
     /**
      * @param string|null $name
@@ -113,7 +116,6 @@ class Lid_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param string|null $surname
      * @return $this|string
@@ -127,7 +129,6 @@ class Lid_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @param string|null $number
@@ -143,7 +144,6 @@ class Lid_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param string|null $vk
      * @return $this|string
@@ -157,7 +157,6 @@ class Lid_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @param string|null $source
@@ -177,7 +176,6 @@ class Lid_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param string|null $controlDate
      * @return $this|string
@@ -191,7 +189,6 @@ class Lid_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @param int|null $subordinated
@@ -207,7 +204,6 @@ class Lid_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param int|null $areaId
      * @return $this|int
@@ -221,7 +217,6 @@ class Lid_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @param int|null $statusId
@@ -237,7 +232,6 @@ class Lid_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param int|null $priorityId
      * @return $this|int
@@ -252,6 +246,33 @@ class Lid_Model extends Core_Entity
         }
     }
 
+    /**
+     * @param int|null $notification
+     * @return $this|int
+     */
+    public function smsNotification(int $notification = null)
+    {
+        if (is_null($notification)) {
+            return intval($this->sms_notification);
+        } else {
+            $this->sms_notification = $notification;
+            return $this;
+        }
+    }
+
+    /**
+     * @param string|null $dateCreate
+     * @return $this|string|null
+     */
+    public function dateCreate(string $dateCreate = null)
+    {
+        if (is_null($dateCreate)) {
+            return $this->date_create;
+        } else {
+            $this->date_create = $dateCreate;
+            return $this;
+        }
+    }
 
     //Параметры валидации при сохранении таблицы
     public function schema()
@@ -303,6 +324,11 @@ class Lid_Model extends Core_Entity
             ],
             'priority_id' => [
                 'required' => true,
+                'type' => PARAM_INT,
+                'minval' => 0
+            ],
+            'sms_notification' => [
+                'required' => false,
                 'type' => PARAM_INT,
                 'minval' => 0
             ]

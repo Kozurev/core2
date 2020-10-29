@@ -1,22 +1,34 @@
 <?php
 
-
+/**
+ * Class Log
+ */
 class Log
 {
     const TYPE_CRON = 'cron';
     const TYPE_PUSH = 'push';
     const TYPE_SENLER = 'senler';
     const TYPE_ORM = 'orm';
+    const TYPE_SMS = 'sms';
 
-    protected static $_instance;
+    protected static ?self $_instance = null;
 
-    protected static $logDir;
+    /**
+     * @var string
+     */
+    protected static string $logDir;
 
+    /**
+     * Log constructor.
+     */
     private function __construct()
     {
         self::$logDir = ROOT . '/log';
     }
 
+    /**
+     * @return Log
+     */
     public static function instance()
     {
         if (is_null(self::$_instance)) {
@@ -25,19 +37,29 @@ class Log
         return self::$_instance;
     }
 
-
+    /**
+     * @param string $type
+     * @param string $message
+     */
     public function debug(string $type, string $message)
     {
         self::makeLog('debug', $type, $message);
     }
 
-
+    /**
+     * @param string $type
+     * @param string $message
+     */
     public function error(string $type, string $message)
     {
         self::makeLog('error', $type, $message);
     }
 
-
+    /**
+     * @param $logType
+     * @param $logDirName
+     * @param $logData
+     */
     private static function makeLog($logType, $logDirName, $logData)
     {
         $logDir = self::$logDir . '/' . $logDirName;

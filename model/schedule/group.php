@@ -24,16 +24,22 @@ class Schedule_Group extends Schedule_Group_Model
             return [];
         }
 
+        return $this->getClientsListQuery()->findAll();
+    }
+
+    /**
+     * @return Orm
+     */
+    public function getClientsListQuery() : Orm
+    {
         if ($this->type() == self::TYPE_CLIENTS) {
             return User::query()
                 ->join('Schedule_Group_Assignment AS ass', 'ass.user_id = User.id AND ass.group_id = ' . $this->id)
                 ->where('User.group_id', '=', ROLE_CLIENT)
-                ->orderBy('User.surname')
-                ->findAll();
+                ->orderBy('User.surname');
         } else {
             return Lid::query()
-                ->join('Schedule_Group_Assignment AS ass', 'ass.user_id = Lid.id AND ass.group_id = ' . $this->id)
-                ->findAll();
+                ->join('Schedule_Group_Assignment AS ass', 'ass.user_id = Lid.id AND ass.group_id = ' . $this->id);
         }
     }
 

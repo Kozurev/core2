@@ -3,6 +3,7 @@
      "kreait/firebase-php": "^4.35",
       "vkcom/vk-php-sdk": "^5.101",
       "phpmailer/phpmailer": "^6.1",
-      "tightenco/collect": "^8.0"
+      "tightenco/collect": "^8.0",
+      "nesbot/carbon": "^2.41"
    }
 }

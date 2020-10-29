@@ -42,7 +42,9 @@ class ComposerStaticInit0aa97b73fde75fe2e2bc6f4365582c13
             'Symfony\\Polyfill\\Php72\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Intl\\Idn\\' => 26,
+            'Symfony\\Contracts\\Translation\\' => 30,
             'Symfony\\Component\\VarDumper\\' => 28,
+            'Symfony\\Component\\Translation\\' => 30,
             'Superbalist\\Flysystem\\GoogleStorage\\' => 36,
         ),
         'R' => 
@@ -94,6 +96,10 @@ class ComposerStaticInit0aa97b73fde75fe2e2bc6f4365582c13
             'Firebase\\Auth\\Token\\' => 20,
             'Fig\\Http\\Message\\' => 17,
         ),
+        'C' => 
+        array (
+            'Carbon\\' => 7,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -125,9 +131,17 @@ class ComposerStaticInit0aa97b73fde75fe2e2bc6f4365582c13
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-intl-idn',
         ),
+        'Symfony\\Contracts\\Translation\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/translation-contracts',
+        ),
         'Symfony\\Component\\VarDumper\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/var-dumper',
+        ),
+        'Symfony\\Component\\Translation\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/translation',
         ),
         'Superbalist\\Flysystem\\GoogleStorage\\' => 
         array (
@@ -232,6 +246,10 @@ class ComposerStaticInit0aa97b73fde75fe2e2bc6f4365582c13
         'Fig\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/fig/http-message-util/src',
+        ),
+        'Carbon\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon',
         ),
     );
 

@@ -9,6 +9,8 @@
  * @version 20200908 - добавлен новый файл наблюдателей
  */
 
+use Model\Senler;
+
 require_once 'database.php';
 require_once 'subordinated.php';
 require_once 'events.php';

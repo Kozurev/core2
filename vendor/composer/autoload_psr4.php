@@ -13,7 +13,9 @@ return array(
     'Symfony\\Polyfill\\Php72\\' => array($vendorDir . '/symfony/polyfill-php72'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'Symfony\\Polyfill\\Intl\\Idn\\' => array($vendorDir . '/symfony/polyfill-intl-idn'),
+    'Symfony\\Contracts\\Translation\\' => array($vendorDir . '/symfony/translation-contracts'),
     'Symfony\\Component\\VarDumper\\' => array($vendorDir . '/symfony/var-dumper'),
+    'Symfony\\Component\\Translation\\' => array($vendorDir . '/symfony/translation'),
     'Superbalist\\Flysystem\\GoogleStorage\\' => array($vendorDir . '/superbalist/flysystem-google-storage/src'),
     'Riverline\\MultiPartParser\\' => array($vendorDir . '/riverline/multipart-parser/src'),
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),
@@ -40,4 +42,5 @@ return array(
     'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
     'Firebase\\Auth\\Token\\' => array($vendorDir . '/kreait/firebase-tokens/src/Firebase/Auth/Token'),
     'Fig\\Http\\Message\\' => array($vendorDir . '/fig/http-message-util/src'),
+    'Carbon\\' => array($vendorDir . '/nesbot/carbon/src/Carbon'),
 );

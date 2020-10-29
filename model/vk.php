@@ -1,5 +1,7 @@
 <?php
 
+namespace Model;
+
 class VK extends Api
 {
     /**
@@ -32,16 +34,14 @@ class VK extends Api
      *
      * @var string
      */
-    private $accessToken;
+    private string $accessToken;
 
     /**
      * Используемая версия API
      *
      * @var string
      */
-    private $apiVersion;
-
-
+    private string $apiVersion;
 
     /**
      * VK constructor.

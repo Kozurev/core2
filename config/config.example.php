@@ -39,3 +39,6 @@ $CFG->initpro = new stdClass();
 $CFG->initpro->login = '';
 $CFG->initpro->password = '';
 $CFG->initpro->groupCode = '';
+
+$CFG->sms = new stdClass();
+$CFG->sms->api_key = '';

@@ -6,6 +6,18 @@
  * Time: 1:02
  */
 
+use Model\Sms;
+use Model\Sms\Template;
+
+//try {
+//    Sms::instance()->setTemplateByTag(Template::TAG_LIDS_BEFORE_CONSULT);
+//    Sms::instance()->toNumbers(['79803782856']);
+//    debug(Sms::instance()->send());
+//} catch (\Exception $e) {
+//    debug($e->getMessage());
+//}
+
+exit;
 
 //Orm::execute('INSERT INTO Schedule_Lesson_Type (title, statistic) VALUES ("Частное занятие", 0)');
 //Orm::execute("INSERT INTO Property (tag_name, title, description, type, multiple, default_value, active, dir, sorting) VALUES ('teacher_rate_private_default', 'Ставка за частные занятия', 'Ставка преподавателя за частные занятия на територии школы', 'int', 0, '0', 1, 0, 0);");

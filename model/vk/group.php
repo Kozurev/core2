@@ -1,6 +1,6 @@
 <?php
 
-Core::requireClass('Vk');
+use Model\VK;
 
 class Vk_Group extends Vk_Group_Model
 {

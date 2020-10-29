@@ -1,37 +1,9 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-
-        <!--<script>-->
-            <!--$(function(){-->
-                <!--$("#createData").validate({-->
-                    <!--rules: {-->
-                        <!--surname:    {required: true, maxlength: 255},-->
-                        <!--name:       {required: true, maxlength: 255},-->
-                        <!--login:      {required: true, maxlength: 255},-->
-                    <!--},-->
-                    <!--messages: {-->
-                        <!--surname: {-->
-                            <!--required: "Это поле обязательноое к заполнению",-->
-                            <!--maxlength: "Длина значения не должна превышать 255 символов"-->
-                        <!--},-->
-                        <!--name: {-->
-                            <!--required: "Это поле обязательноое к заполнению",-->
-                            <!--maxlength: "Длина значения не должна превышать 255 символов"-->
-                        <!--},-->
-                        <!--login: {-->
-                            <!--required: "Это поле обязательноое к заполнению",-->
-                            <!--maxlength: "Длина значения не должна превышать 255 символов"-->
-                        <!--},-->
-                    <!--}-->
-                <!--});-->
-            <!--});-->
-        <!--</script>-->
-
-
         <form name="createData" id="createData" action=".">
             <div class="column">
-                <span>Фамилия</span><!--<span style="color:red" >*</span>-->
+                <span>Фамилия</span>
             </div>
             <div class="column">
                 <input class="form-control" type="text" value="{lid/surname}" name="surname" />
@@ -111,6 +83,21 @@
                         </xsl:attribute>
                     </xsl:if>
                 </input>
+            </div>
+            <hr/>
+            <div class="column">
+                <span>Смс оповещения</span>
+            </div>
+            <div class="column">
+                <input class="checkbox" id="sms_notification" type="checkbox" name="sms_notification">
+                    <xsl:if test="sms_notification = 1">
+                        <xsl:attribute name="checked">true</xsl:attribute>
+                    </xsl:if>
+                </input>
+                <label for="sms_notification" class="checkbox-label">
+                    <span class="off">Отключены</span>
+                    <span class="on">Включены</span>
+                </label>
             </div>
             <hr/>
             <div class="column">

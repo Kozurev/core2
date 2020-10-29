@@ -451,7 +451,19 @@ function makeLidPopup(lidId) {
             '<div class="column">' +
                 '<select class="form-control" name="priorityId" id="priorityId">' +
             '</select>' +
-            '</div>';
+            '</div>' +
+            '<hr/>' +
+            '<div class="column">' +
+            '    <span>Смс оповещения</span>' +
+            '</div>' +
+            '<div class="column">' +
+            '    <input class="checkbox" id="sms_notification" type="checkbox" '+ (lid.sms_notification == "1" ? ' checked ' : ' ') +' name="sms_notification">' +
+            '    <label for="sms_notification" class="checkbox-label">\n' +
+            '        <span class="off">Отключены</span>\n' +
+            '        <span class="on">Включены</span>\n' +
+            '    </label>\n' +
+            '</div>' +
+            '<hr/>';
 
         if (lidId == 0) {
             popupData +=
@@ -739,6 +751,7 @@ function saveLidFrom(form, callback) {
     lidData.property_20 = form.find('select[name=property_20]').val();
     lidData.property_50 = form.find('select[name=property_50]').val();
     lidData.property_54 = form.find('select[name=property_54]').val();
+    lidData.sms_notification = form.find('input[name=sms_notification]').is(':checked') ? 1 : 0;
     let comment = form.find('textarea[name=comment]');
     if (comment.length > 0) {
         lidData.comment = comment.val();

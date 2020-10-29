@@ -1,13 +1,9 @@
 <?php
 
-
-Core::requireClass('Push');
-
 if (!Core_Access::instance()->hasCapability(Core_Access::CRON)) {
     die('Access forbidden');
 }
 
-//$logFile = ROOT . '/log/cron/' . date('Y-m-d H:i') . '.txt';
 $logData = '';
 $logCountNotifies = 0;
 

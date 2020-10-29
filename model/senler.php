@@ -1,5 +1,11 @@
 <?php
 
+namespace Model;
+
+/**
+ * Class Senler
+ * @package Model
+ */
 class Senler extends Api
 {
     /**
@@ -85,9 +91,9 @@ class Senler extends Api
 
     /**
      * Senler constructor.
-     * @param Vk_Group $group
+     * @param \Vk_Group $group
      */
-    public function __construct(Vk_Group $group)
+    public function __construct(\Vk_Group $group)
     {
         if (self::isValidGroup($group)) {
             $this->vkGroupId = $group->vkId();
@@ -96,18 +102,16 @@ class Senler extends Api
     }
 
     /**
-     * @param Vk_Group $group
+     * @param \Vk_Group $group
      * @return bool
      */
-    public static function isValidGroup(Vk_Group $group) : bool
+    public static function isValidGroup(\Vk_Group $group) : bool
     {
         if (empty($group->vkId())) {
             return false;
-            // throw new Exception(self::$errors['empty_required_param_vk_id']);
         }
         if (empty($group->secretCallbackKey())) {
             return false;
-            // throw new Exception(self::$errors['empty_required_param_vk_id']);
         }
         return true;
     }
@@ -118,7 +122,7 @@ class Senler extends Api
      * @param array $params
      * @return array|null
      */
-    public function getSubscriptions(array $params = []) : array
+    public function getSubscriptions(array $params = []) : ?array
     {
         $params[self::PARAM_VERSION_API] =  self::DEFAULT_API_VERSION;
         $params[self::PARAM_VK_GROUP_ID] =  $this->vkGroupId;
@@ -127,7 +131,6 @@ class Senler extends Api
         $response = Api::getRequest(self::API_HOST . self::METHOD_SUBSCRIPTIONS_GET, $params, Api::REQUEST_METHOD_POST);
         if ($response->success !== true) {
             return null;
-            // throw new Exception($response->error_message);
         } else {
             return $response->items;
         }
@@ -135,7 +138,7 @@ class Senler extends Api
 
     /**
      * @param $id
-     * @return stdClass|null
+     * @return \stdClass|null
      */
     public function getSubscriptionById($id)
     {
@@ -147,7 +150,7 @@ class Senler extends Api
      * @param array $params
      * @return array|null
      */
-    public function getSubscribers(array $params = []) : array
+    public function getSubscribers(array $params = []) : ?array
     {
         $params[self::PARAM_VERSION_API] =  self::DEFAULT_API_VERSION;
         $params[self::PARAM_VK_GROUP_ID] =  $this->vkGroupId;
@@ -156,7 +159,6 @@ class Senler extends Api
         $response = Api::getRequest(self::API_HOST . self::METHOD_SUBSCRIBERS_GET, $params, Api::REQUEST_METHOD_POST);
         if ($response->success !== true) {
             return null;
-            // throw new Exception($response->error_message);
         } else {
             return $response->items;
         }
@@ -164,7 +166,7 @@ class Senler extends Api
 
     /**
      * @param $id
-     * @return stdClass|null
+     * @return \stdClass|null
      */
     public function getSubscriberById($id)
     {
@@ -229,10 +231,10 @@ class Senler extends Api
     }
 
     /**
-     * @param Lid $lid
-     * @param Lid_Status|null $status
+     * @param \Lid $lid
+     * @param \Lid_Status|null $status
      */
-    public static function setLidGroup(Lid $lid, Lid_Status $status = null)
+    public static function setLidGroup(\Lid $lid, \Lid_Status $status = null)
     {
         if (is_null($status)) {
             $status = $lid->getStatus();
@@ -245,19 +247,19 @@ class Senler extends Api
         }
 
         try {
-            $lidVkId = Vk_Group::getVkId($link);
-        } catch(Exception $e) {
+            $lidVkId = \Vk_Group::getVkId($link);
+        } catch(\Exception $e) {
             return;
         }
 
-        if ($lidVkId->type != 'user') {
+        if (($lidVkId->type ?? '') !== 'user') {
             return;
         }
 
-        $lidInstrument = Property_Controller::factoryByTag('instrument')->getValues($lid)[0];
-        $groups = (new Vk_Group_Controller(User_Auth::current()))->getList();
+        $lidInstrument = \Property_Controller::factoryByTag('instrument')->getValues($lid)[0];
+        $groups = (new \Vk_Group_Controller(\User_Auth::current()))->getList();
         foreach ($groups as $group) {
-            $setting = (new Senler_Settings())->queryBuilder()
+            $setting = (new \Senler_Settings())->queryBuilder()
                 ->where('vk_group_id', '=', $group->getId())
                 ->where('lid_status_id', '=', $status->getId())
                 ->open()
@@ -278,21 +280,21 @@ class Senler extends Api
     }
 
     /**
-     * @param User $user
+     * @param \User $user
      * @param int $status
-     * @throws Exception
+     * @throws \Exception
      */
-    public static function setUserGroup(User $user, int $status)
+    public static function setUserGroup(\User $user, int $status)
     {
-        $link = Property_Controller::factoryByTag('vk')->getValues($user)[0]->value();
+        $link = \Property_Controller::factoryByTag('vk')->getValues($user)[0]->value();
 
         if (empty($link) || empty(explode('vk.com/', $link))) {
             return;
         }
 
         try {
-            $userVkId = Vk_Group::getVkId($link);
-        } catch(Exception $e) {
+            $userVkId = \Vk_Group::getVkId($link);
+        } catch(\Exception $e) {
             return;
         }
 
@@ -300,13 +302,13 @@ class Senler extends Api
             return;
         }
 
-        $userArea = (new Schedule_Area_Assignment())->getAreas($user)[0];
-        $userInstrument = Property_Controller::factoryByTag('instrument')->getValues($user)[0];
-        $groups = (new Vk_Group_Controller(User_Auth::current()))->getList();
+        $userArea = (new \Schedule_Area_Assignment())->getAreas($user)[0];
+        $userInstrument = \Property_Controller::factoryByTag('instrument')->getValues($user)[0];
+        $groups = (new \Vk_Group_Controller(\User_Auth::current()))->getList();
         foreach ($groups as $group) {
-            $setting = (new Senler_Settings())->queryBuilder()
+            $setting = (new \Senler_Settings())->queryBuilder()
                 ->where('vk_group_id', '=', $group->getId())
-                ->where('other_status', '=', Senler_Settings::USER_STATUS_ARCHIVE)
+                ->where('other_status', '=', \Senler_Settings::USER_STATUS_ARCHIVE)
                 ->open()
                     ->where('training_direction_id', '=', $userInstrument->value())
                     ->orWhere('training_direction_id', '=', 0)
