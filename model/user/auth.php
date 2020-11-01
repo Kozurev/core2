@@ -6,9 +6,9 @@
  * Time: 1:55
  */
 
-Core::requireClass('User');
-Core::requireClass('User_Auth_Log');
-
+/**
+ * Class User_Auth
+ */
 class User_Auth
 {
     /**
@@ -107,7 +107,6 @@ class User_Auth
         return true;
     }
 
-
     /**
      * @param string $login
      * @param string $password
@@ -128,7 +127,6 @@ class User_Auth
             return null;
         }
     }
-
 
     /**
      * Статический аналог метода getCurrent для получение данных текущего авторизованного пользователя
@@ -155,9 +153,9 @@ class User_Auth
         $sesUserId = 'core/' . User_Auth::SESSION_ID;
         $sesUserObject = 'core/' . User_Auth::SESSION_USER;
 
-        $cashedUserData = Core_Array::Session($sesUserObject, null, PARAM_STRING);
-        if (!empty($cashedUserData)) {
-            return unserialize($cashedUserData);
+        $cashedUserData = Core_Array::Session($sesUserObject, null);
+        if (!empty($cashedUserData) && $cashedUserData instanceof User) {
+            return $cashedUserData;
         }
 
         $currentUserId = Core_Array::Session($sesUserId, 0, PARAM_INT);
@@ -174,7 +172,7 @@ class User_Auth
         }
 
         if (!is_null($CurrentUser) && $CurrentUser->active() == 1) {
-            $_SESSION['core'][User_Auth::SESSION_USER] = serialize($CurrentUser);
+            $_SESSION['core'][User_Auth::SESSION_USER] = $CurrentUser;
             $_SESSION['core'][User_Auth::SESSION_ID] = $CurrentUser->getId();
             User_Auth_Log::create($CurrentUser);
             return $CurrentUser;
@@ -183,7 +181,6 @@ class User_Auth
         }
 
     }
-
 
     /**
      * Метод выхода из учетной записи
@@ -196,7 +193,6 @@ class User_Auth
         $cookieTime = 3600 * 24 * 30;
         setcookie(User_Auth::REMEMBER_TOKEN, '', 0 - time() - $cookieTime, '/');
     }
-
 
     /**
      * Метод авторизации под видом другой учетной записи
@@ -217,7 +213,6 @@ class User_Auth
         }
     }
 
-
     /**
      * Проверка на авторизованность под чужим именем
      *
@@ -235,7 +230,6 @@ class User_Auth
         }
     }
 
-
     /**
      * Метод обратной авторизации - возвращение к предыдущей учетной записи
      * после использования метода authAs
@@ -252,13 +246,12 @@ class User_Auth
         }
     }
 
-
     /**
      * Получение пользователя, под которым происходила самая первая рекурсивная авторизация
      *
      * @return User
      */
-    public static function parentAuth()
+    public static function parentAuth() : User
     {
         $backup = Core_Array::Session('core/' . User_Auth::SESSION_PREV_IDS, null, PARAM_ARRAY);
 
@@ -269,8 +262,6 @@ class User_Auth
             return self::current();
         }
 
-        return Core::factory('User', $backup[0]);
+        return User::find($backup[0]);
     }
-
-
 }

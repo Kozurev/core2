@@ -13,9 +13,15 @@ if (
     !is_null(Core_Page_Show::instance()->StructureItem) && Core_Page_Show::instance()->StructureItem->getId() === ROLE_CLIENT
     || Core_Page_Show::instance()->Structure->path() == 'archive'
 ) {
-    $Areas =        Core::factory('Schedule_Area_Assignment')->getAreas(User::current());
-    $Instruments =  Core::factory('Property' )->getByTagName('instrument')->getList();
-    $Teachers =     Core::factory('Property' )->getByTagName('teachers')->getList();
+    $areas = (new Schedule_Area_Assignment(User_Auth::current()))->getAreas();
+    $instruments = Property_Controller::factoryByTag('instrument')->getList();
+
+    $usersController = new User_Controller_Extended(User_Auth::current());
+    $usersController->getQueryBuilder()->select(['id', 'surname', 'name']);
+    $usersController->setGroup(ROLE_TEACHER);
+    $usersController->isWithAreasAssignments(false);
+    $usersController->isWithComments(false);
+    $teachers = $usersController->getUsers();
 
     if (Core_Page_Show::instance()->Structure->path() == 'archive') {
         $formAction = '/user/archive';
@@ -31,9 +37,9 @@ if (
         ->addSimpleEntity('wwwroot', $CFG->rootdir)
         ->addSimpleEntity('action', $formAction)
         ->addSimpleEntity('usersActive', $usersActive)
-        ->addEntities($Areas)
-        ->addEntities($Instruments, 'property_value')
-        ->addEntities($Teachers, 'property_value')
+        ->addEntities($areas)
+        ->addEntities($instruments, 'property_value')
+        ->addEntities($teachers, 'property_value')
         ->xsl('musadm/users/client_filter.xsl')
         ->show();
 }

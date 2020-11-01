@@ -29,50 +29,46 @@ if ($action === 'updateFormClient') {
     }
 
     if ($userId) {
-        $Client = User_Controller::factory($userId);
-        if (is_null($Client)) {
+        $client = User_Controller::factory($userId);
+        if (is_null($client)) {
             exit(Core::getMessage('NOT_FOUND', ['Пользователь', $userId]));
         }
-        if (!User::isSubordinate($Client, $User)) {
+        if (!User::isSubordinate($client, $User)) {
             exit(Core::getMessage('NOT_SUBORDINATE', ['Пользователь', $userId]));
         }
 
-        $AreaAssignments = Core::factory('Schedule_Area_Assignment')->getAssignments($Client);
-        if (count($AreaAssignments) > 0) {
-            $Client->addSimpleEntity('area_id', $AreaAssignments[0]->areaId());
+        $areaAssignments = (new Schedule_Area_Assignment($client))->getAssignments();
+        if (count($areaAssignments) > 0) {
+            $client->addSimpleEntity('area_id', $areaAssignments[0]->areaId());
         }
 
-        $Properties[] = Property_Controller::factoryByTag('add_phone')->getValues($Client)[0]; //Доп. телефон
-        $Properties[] = Property_Controller::factoryByTag('vk')->getValues($Client)[0]; //Ссылка вк
-        $Properties[] = Property_Controller::factoryByTag('lesson_time')->getValues($Client)[0]; //Длительность урока
-        $Properties[] = Property_Controller::factory(18)->getValues($Client)[0]; //Соглашение подписано
-        $Properties[] = Property_Controller::factoryByTag('instrument')->getValues($Client)[0]; //Инструмент
-        $Properties[] = Property_Controller::factoryByTag('birth')->getValues($Client)[0]; //Год рождения
-        $Properties = array_merge($Properties, Property_Controller::factoryByTag('teachers')->getValues($Client)); //Учителя
-        $Properties = array_merge($Properties, Property_Controller::factoryByTag('instrument')->getValues($Client)); //Направление подготовки (инструмент)
+        $properties[] = Property_Controller::factoryByTag('add_phone')->getValues($client)[0]; //Доп. телефон
+        $properties[] = Property_Controller::factoryByTag('vk')->getValues($client)[0]; //Ссылка вк
+        $properties[] = Property_Controller::factoryByTag('lesson_time')->getValues($client)[0]; //Длительность урока
+        $properties[] = Property_Controller::factory(18)->getValues($client)[0]; //Соглашение подписано
+        $properties[] = Property_Controller::factoryByTag('instrument')->getValues($client)[0]; //Инструмент
+        $properties[] = Property_Controller::factoryByTag('birth')->getValues($client)[0]; //Год рождения
+        $properties = array_merge($properties, Property_Controller::factoryByTag('teachers')->getValues($client)); //Учителя
+        $properties = array_merge($properties, Property_Controller::factoryByTag('instrument')->getValues($client)); //Направление подготовки (инструмент)
     } else {
-        $Client = User_Controller::factory();
-        $Properties[] = Core::factory('Property_Int')
+        $client = User_Controller::factory();
+        $properties[] = (new Property_Int)
             ->value(
-                Core::factory('Property', 17)->defaultValue()
+                Property_Controller::factoryByTag('lesson_time')->defaultValue()
             );
     }
 
-    $Areas = Core::factory('Schedule_Area')->getList(true, false);
+    $areas = (new Schedule_Area)->getList(true, false);
 
-    $ListTeachers = Core::factory('Property')
-        ->getByTagName('teachers')
-        ->getList();
-    $ListInstruments = Core::factory('Property')
-        ->getByTagName('instrument')
-        ->getList();
+    //$listTeachers = Property_Controller::factoryByTag('teachers')->getList();
+    $listInstruments = Property_Controller::factoryByTag('instrument')->getList();
 
     $output
-        ->addEntity($Client)
-        ->addEntities($Areas, 'areas')
-        ->addEntities($Properties, 'property_value')
-        ->addEntities($ListTeachers, 'property_list')
-        ->addEntities($ListInstruments, 'property_list')
+        ->addEntity($client)
+        ->addEntities($areas, 'areas')
+        ->addEntities($properties, 'property_value')
+        //->addEntities($listTeachers, 'property_list')
+        ->addEntities($listInstruments, 'property_list')
         ->xsl('musadm/users/edit_client_popup.xsl')
         ->show();
 
@@ -83,7 +79,7 @@ if ($action === 'updateFormClient') {
 //Форма редактирования учителя
 if ($action === 'updateFormTeacher') {
     $userId = Core_Array::Get('userId', 0, PARAM_INT);
-    $output = Core::factory('Core_Entity');
+    $output = new Core_Entity();
 
     //Проверка прав доступа
     if ($userId == 0 && !Core_Access::instance()->hasCapability(Core_Access::USER_CREATE_TEACHER)) {
@@ -93,28 +89,29 @@ if ($action === 'updateFormTeacher') {
     }
 
     if ($userId != 0) {
-        $Teacher = User_Controller::factory($userId);
+        $teacher = User_Controller::factory($userId);
 
-        if (is_null($Teacher)) {
+        if (is_null($teacher)) {
             exit (Core::getMessage('NOT_FOUND', ['Преподаватель', $userId]));
         }
 
-        $Properties = [];
-        $Properties += Property_Controller::factoryByTag('instrument')->getValues($Teacher);    //Инструмент
-        $Properties[] = Property_Controller::factoryByTag('teacher_schedule')->getValues($Teacher)[0];    //Расписание
-        $Properties[] = Property_Controller::factoryByTag('birth')->getValues($Teacher)[0];    //Расписание
-        $output->addEntities($Properties, 'property_value');
-    } else {
-        $Teacher = User_Controller::factory();
+        $properties = [];
+        $properties += Property_Controller::factoryByTag('instrument')->getValues($teacher);    //Инструмент
+        $properties[] = Property_Controller::factoryByTag('teacher_schedule')->getValues($teacher)[0];    //Расписание
+        $properties[] = Property_Controller::factoryByTag('birth')->getValues($teacher)[0];    //Расписание
+        $output->addEntities($properties, 'property_value');
     }
 
-    $PropertyLists = Core::factory('Property')
-        ->getByTagName('instrument')
-        ->getList();
+    $propertyLists = Property_Controller::factoryByTag('instrument')->getList();
+
+    $areas = (new Schedule_Area_Assignment(User_Auth::current()))->getAreas();
+    $assignments = isset($teacher) ? (new Schedule_Area_Assignment($teacher))->getAssignments() : [];
 
     $output
-        ->addEntity($Teacher)
-        ->addEntities($PropertyLists, 'property_list')
+        ->addEntity($teacher ?? (new User))
+        ->addEntities($propertyLists, 'property_list')
+        ->addEntities($areas, 'areas')
+        ->addEntities($assignments, 'assignments')
         ->xsl('musadm/users/edit_teacher_popup.xsl')
         ->show();
     exit;

@@ -26,11 +26,11 @@
                         <div>
                             <input type="date" class="form-control" name="date_to" value="{date_to}"/>
                         </div>
-                        <xsl:call-template name="areas_row" />
-                        <div>
-                            <a class="btn btn-green filial_show">Показать</a>
-                        </div>
                     </xsl:if>
+                    <xsl:call-template name="areas_row" />
+                    <div>
+                        <a class="btn btn-green filial_show">Показать</a>
+                    </div>
                 </div>
 
             <div class="row">
@@ -104,10 +104,10 @@
                             <th>Учитель</th>
                             <th>Состав группы</th>
                             <th>Примечание</th>
+                            <th>Филиал</th>
                             <xsl:if test="schedule_group/type = 2">
                                 <th>Дата</th>
                                 <th>Начало</th>
-                                <th>Филиал</th>
                             </xsl:if>
                             <th>Действия</th>
                         </tr>
@@ -160,10 +160,10 @@
             </td>
 
             <td><xsl:value-of select="note" /></td>
+            <td><xsl:value-of select="schedule_area/title"/></td>
             <xsl:if test="type = 2">
                 <td><xsl:value-of select="refactored_date_start"/></td>
                 <td><xsl:value-of select="refactored_time_start"/></td>
-                <td><xsl:value-of select="schedule_area/title"/></td>
             </xsl:if>
             <td width="140px">
                 <xsl:if test="/root/access_group_edit = 1">

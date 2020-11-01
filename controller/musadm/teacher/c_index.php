@@ -445,16 +445,9 @@ if (Core_Access::instance()->hasCapability(Core_Access::TEACHER_SCHEDULE_TIME_RE
 
     //Список учеников перподавателя
     $teacher = User_Controller::factory($userId);
-    $teacherList = Core::factory('Property')->getByTagName('teachers');
     $teacherFio = $teacher->surname() . ' ' . $teacher->name();
-    $teacherProperty = (new Property_List_Values)
-        ->queryBuilder()
-        ->where('property_id', '=', $teacherList->getId())
-        ->where('value', '=', $teacherFio)
-        ->find();
 
     $userController =  new User_Controller_Extended(User_Auth::current());
-    $userController->appendAddFilter($teacherList->getId(), '=', $teacherProperty->getId());
     $users = $userController->getUsers();
 
     (new Core_Entity)

@@ -11,40 +11,35 @@ class Schedule_Area_Model extends Core_Entity
     /**
      * @var int
      */
-    protected $id;
-
+    public $id;
 
     /**
      * Название филиала
      *
      * @var string
      */
-    protected $title;
-
+    public string $title = '';
 
     /**
      * Количество классов в филиале
      *
      * @var int
      */
-    protected $count_classes;
-
+    public int $count_classes = 0;
 
     /**
      * URL путь к филиалу
      *
      * @var string
      */
-    protected $path;
-
+    public string $path = '';
 
     /**
      * Активность филиала
      *
      * @var int
      */
-    protected $active = 1;
-
+    public int $active = 1;
 
     /**
      * Порядок сортировки
@@ -52,16 +47,14 @@ class Schedule_Area_Model extends Core_Entity
      *
      * @var int
      */
-    protected $sorting = 0;
-
+    public int $sorting = 0;
 
     /**
      * id организации (директора) которой принадлежит филиал
      *
      * @var int
      */
-    protected $subordinated = 0;
-
+    public int $subordinated = 0;
 
     /**
      * @param string|null $title

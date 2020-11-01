@@ -157,41 +157,13 @@ class User_Controller_Extended extends Controller
      *
      * @return array
      */
-    public function getClientTeachers()
+    public function getClientTeachers() : array
     {
         if (empty($this->getUser()) || $this->getUser()->groupId() !== ROLE_CLIENT) {
             return [];
         }
 
-        $teachersProperty = Property_Controller::factoryByTag('teachers');
-        $values = $teachersProperty->getValues($this->getUser());
 
-        if (empty($values)) {
-            return [];
-        }
-
-        $valuesIds = [];
-        foreach ($values as $value) {
-            $valuesIds[] = $value->value();
-        }
-        $propertyTeachers = (new Property_List_Values)
-            ->queryBuilder()
-            ->whereIn('id', $valuesIds)
-            ->findAll();
-
-        $teachers = [];
-        foreach ($propertyTeachers as $propertyTeacher) {
-            $teacher = (new User)->queryBuilder()
-                ->where('surname', '=', explode(' ', $propertyTeacher->value())[0])
-                ->where('name', '=', explode(' ', $propertyTeacher->value())[1])
-                ->where('group_id', '=', ROLE_TEACHER)
-                ->find();
-            if (!empty($teacher)) {
-                $teachers[] = $teacher;
-            }
-        }
-
-        return $teachers;
     }
 
     /**

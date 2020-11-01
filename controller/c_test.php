@@ -6,16 +6,43 @@
  * Time: 1:02
  */
 
-use Model\Sms;
-use Model\Sms\Template;
+$teachersPropList = Property_List_Values::query()
+    ->where('property_id', '=', 21)
+    ->get();
 
-//try {
-//    Sms::instance()->setTemplateByTag(Template::TAG_LIDS_BEFORE_CONSULT);
-//    Sms::instance()->toNumbers(['79803782856']);
-//    debug(Sms::instance()->send());
-//} catch (\Exception $e) {
-//    debug($e->getMessage());
-//}
+foreach ($teachersPropList as $prop) {
+    $delimiter = $prop->value() == 'Дамбаева  Аюна' ? '  ' : ' ';
+    $fio = explode($delimiter, $prop->value());
+    $teacher = User::query()
+        ->where('group_id', '=', ROLE_TEACHER)
+        ->where('surname', '=', $fio[0])
+        ->where('name', '=', $fio[1])
+        ->find();
+
+    if (is_null($teacher)) {
+        echo 'Проблемы с преподом: ' . $prop->value() . '<br>';
+        $prop->delete();
+        continue;
+    }
+
+    $clientsWithTeacher = User::query()
+        ->select(['User.id'])
+        ->join('Property_List as pl', 'pl.property_id = 21 AND pl.value_id = '.$prop->getId().' AND pl.object_id = User.id AND model_name = "User"')
+        ->get()
+        ->pluck('id')
+        ->toArray();
+
+    $queryString = 'INSERT INTO User_Teacher_Assignment (client_id, teacher_id) VALUES ';
+    foreach ($clientsWithTeacher as $key => $clientId) {
+        $queryString .= '('.$clientId.', '.$teacher->getId().')';
+        if ($key + 1 !== count($clientsWithTeacher)) {
+            $queryString .= ', ';
+        }
+    }
+    Orm::execute($queryString);
+    $prop->delete();
+}
+Property_Controller::factoryByTag('teachers')->delete();
 
 exit;
 

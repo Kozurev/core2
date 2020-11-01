@@ -3,11 +3,11 @@
  * @author BadWolf
  * @date 21.05.2018 10:01
  * @version 20190526
+ * @version 2020-10-30
  */
 
-$User = User_Auth::current();
-$subordinated = $User->getDirector()->getId();
-
+$user = User_Auth::current();
+$subordinated = $user->getDirector()->getId();
 
 //права доступа
 $accessCreate = Core_Access::instance()->hasCapability(Core_Access::CERTIFICATE_CREATE);
@@ -15,35 +15,35 @@ $accessEdit = Core_Access::instance()->hasCapability(Core_Access::CERTIFICATE_ED
 $accessDelete = Core_Access::instance()->hasCapability(Core_Access::CERTIFICATE_DELETE);
 $accessComment = Core_Access::instance()->hasCapability(Core_Access::CERTIFICATE_APPEND_COMMENT);
 
-
-$Certificates = Core::factory('Certificate')
-    ->queryBuilder()
+$certificatesQuery = Certificate::query()
     ->where('subordinated', '=', $subordinated)
-    ->orderBy('sell_date', 'DESC')
-    ->findAll();
+    ->orderBy('sell_date', 'DESC');
 
-//Проверка на авторизованность под
-User::checkUserAccess(['groups' => [ROLE_DIRECTOR]]) || User::checkUserAccess(['groups' => [ROLE_DIRECTOR]], User_Auth::parentAuth())
-    ? $isDirector = 1
-    : $isDirector = 0;
+if (!$user->groupId() !== ROLE_DIRECTOR) {
+    $areasIds = collect((new Schedule_Area_Assignment())->getAreas($user))
+        ->pluck('id')
+        ->toArray();
+    $certificatesQuery->whereIn('area_id', $areasIds);
+}
 
-foreach ($Certificates as $cert) {
+$certificates = $certificatesQuery->findAll();
+
+foreach ($certificates as $cert) {
     $cert->sellDate(refactorDateFormat($cert->sellDate()));
     $cert->activeTo(refactorDateFormat($cert->activeTo()));
 }
 
-$Notes = Core::factory('Certificate')->getNotes();
+$notes = (new Certificate())->getNotes();
 
-foreach ($Notes as $Note) {
-    $Note->date(refactorDateFormat($Note->date()));
+foreach ($notes as $note) {
+    $note->date(refactorDateFormat($note->date()));
 }
 
-$areas = Core::factory('Schedule_Area')->getList();
+$areas = (new Schedule_Area())->getList();
 
-Core::factory('Core_Entity')
-    ->addSimpleEntity('is_director', $isDirector)
-    ->addEntities($Certificates)
-    ->addEntities($Notes)
+(new Core_Entity)
+    ->addEntities($certificates)
+    ->addEntities($notes)
     ->addEntities($areas)
     ->addSimpleEntity('access_create', (int)$accessCreate)
     ->addSimpleEntity('access_edit', (int)$accessEdit)

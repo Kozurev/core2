@@ -1,9 +1,6 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="root">
-        <!--<xsl:variable name="modelid" select="object_id" />-->
-        <!--<xsl:variable name="modelname" select="model_name" />-->
-
         <script>
             $(function(){
                 $("#createData").validate({
@@ -99,6 +96,25 @@
                 <input class="form-control" type="text" value="{property_value[property_id = 28]/value}" name="property_28[]"  />
             </div>
             <hr/>
+
+            <div class="column">
+                <span>Филиалы</span>
+            </div>
+            <div class="column">
+                <select class="form-control" name="areas[]" multiple="">
+                    <xsl:for-each select="areas">
+                        <xsl:variable name="areaId" select="id" />
+                        <option value="{id}">
+                            <xsl:if test="//assignments/area_id = $areaId">
+                                <xsl:attribute name="selected">selected</xsl:attribute>
+                            </xsl:if>
+                            <xsl:value-of select="title" />
+                        </option>
+                    </xsl:for-each>
+                </select>
+            </div>
+            <hr/>
+
             <div class="column">
                 <span>График для занятий</span>
             </div>

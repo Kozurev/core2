@@ -12,14 +12,12 @@
  */
 class User extends User_Model
 {
-
     /**
      * Список скрываемых свйойств при отобржаении объекта либо при передаче его данных на клиент
      *
      * @var array
      */
-    private static $hidden = ['password', 'auth_token', 'push_id'];
-
+    private static array $hidden = ['password', 'auth_token', 'push_id'];
 
     /**
      * @return array
@@ -29,38 +27,35 @@ class User extends User_Model
         return self::$hidden;
     }
 
-
     /**
      * Возвращает объект группы, которой принадлежит пользователь.
      * Также служит для ассоциации групп пользователей с доп. свойствами в админ меню
      *
-     * @return User_Group
+     * @return User_Group|null
      */
-    public function getParent() : User_Group
+    public function getParent() : ?User_Group
     {
         if (!empty($this->id)) {
-            return Core::factory('User_Group', $this->group_id);
+            return User_Group::find($this->groupId());
         } else {
-            return Core::factory('User_Group');
+            return null;
         }
     }
-
 
 	/**
 	 * Проверка для избежания создания пользователей с одинаковыми логинами
      *
      * @param string $login
 	 * @return bool
+     * @deprecated заменен на isUnique
 	 */
 	public function isUserExists(string $login) : bool
 	{
-		$user = (new self)
-            ->queryBuilder()
+		$user = self::query()
 			->where('login', '=', $login)
 			->find();
 		return !is_null($user);
 	}
-
 
     /**
      * Проверка пользователя на уникальность
@@ -74,18 +69,16 @@ class User extends User_Model
         if (empty($uniqueVal)) {
             return true;
         }
-        $user = (new self)
-            ->queryBuilder()
+        $user = self::query()
             ->where($uniqueField, '=', $uniqueVal)
             ->find();
         return is_null($user);
     }
 
-
     /**
      * @return string
      */
-    public function getFio()
+    public function getFio() : string
     {
         $fio = $this->surname() . ' ' . $this->name();
         if (!empty($this->patronymic())) {
@@ -94,12 +87,11 @@ class User extends User_Model
         return $fio;
     }
 
-
 	/**
 	 * При сохранении пользователя необходима проверка на заполненность логина и пароля,
      * а также проверка на совпадение логина с уже существующим пользователем
      *
-     * @return self;
+     * @return self
 	 */
 	public function save()
 	{
@@ -133,7 +125,6 @@ class User extends User_Model
         return $this;
 	}
 
-
     /**
      * @param null $obj
      * @throws Exception
@@ -146,18 +137,16 @@ class User extends User_Model
         Core::notify([&$this], 'after.User.delete');
     }
 
-
     /**
      * Статический аналог метода getCurrent для получение данных текущего авторизованного пользователя
      *
      * @return User|null
      * @deprecated
      */
-    public static function current()
+    public static function current() : ?User
     {
         return User_Auth::current();
     }
-
 
 	/**
 	 * Метод выхода из учетной записи
@@ -169,13 +158,13 @@ class User extends User_Model
 		User_Auth::logout();
 	}
 
-
     /**
      * Проверка авторизации пользователя (объявляется в самом начале страницы)
      *
      * @param array $params - ассоциативный массив параметров -> список идентификаторов допустимых групп пользователей и проверка на свойство superuser
      * @param User|null $User - объект пользователя (по умолчанию используется авторизованный пользователь)
      * @return bool
+     * @deprecated
      */
 	static public function checkUserAccess(array $params, User $User = null)
     {
@@ -199,7 +188,6 @@ class User extends User_Model
         return true;
     }
 
-
     /**
      * Метод авторизации под видом другой учетной записи
      * Особенностью является то, что сохраняется исходный id
@@ -213,7 +201,6 @@ class User extends User_Model
         User_Auth::authAs($userId);
     }
 
-
     /**
      * Метод обратной авторизации - возвращение к предыдущей учетной записи
      * после использования метода authAs
@@ -225,30 +212,27 @@ class User extends User_Model
         User_Auth::authRevert();
     }
 
-
     /**
      * Проверка на авторизованность под чужим именем
      *
      * @return bool
      * @deprecated
      */
-    public static function isAuthAs()
+    public static function isAuthAs() : bool
     {
         return User_Auth::isAuthAs();
     }
 
-
     /**
      * Получение пользователя, под которым происходила самая первая рекурсивная авторизация
      *
-     * @return object|bool
+     * @return User
      * @deprecated
      */
-    public static function parentAuth()
+    public static function parentAuth() : User
     {
         return User_Auth::parentAuth();
     }
-
 
     /**
      * Получение объекта пользователя директора в независимости отстепени углубления авторизации
@@ -256,15 +240,14 @@ class User extends User_Model
      *
      * @return User
      */
-    public function getDirector()
+    public function getDirector() : ?User
     {
         if ($this->groupId() == ROLE_DIRECTOR || $this->subordinated() == 0) {
             return $this;
         } else {
-            return Core::factory('User', $this->subordinated())->getDirector();
+            return self::find($this->subordinated());
         }
     }
-
 
     /**
      * Добавление комментария к пользователю
@@ -288,25 +271,22 @@ class User extends User_Model
         return $newComment;
     }
 
-
     /**
      * Геттер для названия организации, которой принадлежит пользователь
      * Название организации это дначение доп. свойства директора
      *
      * @return string
      */
-    public function getOrganizationName()
+    public function getOrganizationName() : string
     {
         $director = $this->getDirector();
         if ($director->groupId() !== ROLE_DIRECTOR) {
             return '';
         } else {
             $property = Property_Controller::factoryByTag('organization');
-            $organization = $property->getPropertyValues($director)[0]->value();
-            return $organization;
+            return $property->getPropertyValues($director)[0]->value();
         }
     }
-
 
     /**
      * Проверка на принадлежность объекта и пользователя одному и тому же директору
@@ -341,16 +321,14 @@ class User extends User_Model
         return false;
     }
 
-
     /**
      * Создание авторизационного токена для пользователя
      */
-    public function createAuthToken()
+    public function createAuthToken() : void
     {
         $this->authToken(uniqidReal(self::getMaxAuthTokenLength()));
         $this->save();
     }
-
 
     /**
      * Геттер для авторизационного токена пользователя
@@ -365,7 +343,6 @@ class User extends User_Model
         return $this->authToken();
     }
 
-
     /**
      * @return int
      */
@@ -373,7 +350,6 @@ class User extends User_Model
     {
         return 50;
     }
-
 
     /**
      * @return bool
@@ -383,4 +359,11 @@ class User extends User_Model
         return in_array($this->groupId(), [ROLE_ADMIN, ROLE_DIRECTOR, ROLE_MANAGER]);
     }
 
+    /**
+     * @return bool
+     */
+    public function isDirector() : bool
+    {
+        return $this->groupId() === ROLE_DIRECTOR;
+    }
 }

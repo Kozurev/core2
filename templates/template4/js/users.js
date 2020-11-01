@@ -36,9 +36,7 @@ $(function(){
         .on('click', '.popop_user_submit', function(e) {
             e.preventDefault();
             loaderOn();
-            userSave(function(response){
-                refreshUserTable();
-            });
+            User.saveFrom('#createData', refreshUserTable);
         })
         //Всплывающее окно с параметрами отвала
         .on('click', '.user_activity', function(e) {

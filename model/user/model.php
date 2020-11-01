@@ -11,88 +11,87 @@ class User_Model extends Core_Entity
     /**
      * @var int|null
      */
-    protected $id;
+    public $id;
 
     /**
      * @var string
      */
-	protected $name;
+    public string $name = '';
 
     /**
      * @var string
      */
-	protected $surname;
+	public string $surname = '';
 
     /**
      * @var string
      */
-	protected $patronymic = '';
+	public string $patronymic = '';
 
     /**
      * @var string
      */
-	protected $phone_number = '';
+	public string $phone_number = '';
 
     /**
      * @var string
      */
-	protected $email = '';
+    public string $email = '';
+
+    /**
+     * @var string|null
+     */
+    public ?string $login = null;
 
     /**
      * @var string
      */
-	protected $login;
-
-    /**
-     * @var string
-     */
-	protected $password = '';
+    public string $password = '';
 
     /**
      * id группы пользователей
      *
      * @var int
      */
-	protected $group_id;
+	public int $group_id = 0;
 
     /**
-     * @var string
+     * @var string|null
      */
-	protected $register_date;
+	public ?string $register_date = null;
 
     /**
      * Указатель активности пользователя
      *
      * @var int
      */
-	protected $active = 1;
+    public int $active = 1;
 
     /**
      * Указатель на "Главного администратора"
      *
      * @var int
      */
-	protected $superuser = 0;
+    public int $superuser = 0;
 
     /**
      * id директора, которому принадлежит пользователь
      *
      * @var int
      */
-	protected $subordinated = 0;
+    public int $subordinated = 0;
 
     /**
      * @var string
      */
-	protected $auth_token = '';
+	public string $auth_token = '';
 
     /**
      * id для push уведомлений, полученный от Firebase
      *
-     * @var string
+     * @var string|null
      */
-	protected $push_id;
-
+	public ?string $push_id = null;
 
     /**
      * @param int|null $groupId
@@ -107,7 +106,6 @@ class User_Model extends Core_Entity
             return $this;
         }
 	}
-
 
     /**
      * @param int|null $active
@@ -125,7 +123,6 @@ class User_Model extends Core_Entity
 		return $this;
 	}
 
-
     /**
      * @param string|null $pass
      * @param bool $type
@@ -138,13 +135,12 @@ class User_Model extends Core_Entity
         }
 		$pass = trim($pass);
 		if ($type === false) {
-            $this->password = password_hash($pass, PASSWORD_DEFAULT);
+            $this->password = strval(password_hash($pass, PASSWORD_DEFAULT));
         } elseif ($type == true) {
             $this->password = $pass;
         }
 		return $this;
 	}
-
 
     /**
      * @param string|null $phoneNumber
@@ -160,7 +156,6 @@ class User_Model extends Core_Entity
         }
 	}
 
-
     /**
      * @param string|null $name
      * @return $this|string
@@ -174,7 +169,6 @@ class User_Model extends Core_Entity
             return $this;
         }
 	}
-
 
     /**
      * @param string|null $surname
@@ -190,7 +184,6 @@ class User_Model extends Core_Entity
         }
 	}
 
-
     /**
      * @param string|null $patronymic
      * @return $this|string
@@ -204,7 +197,6 @@ class User_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @param string|null $email
@@ -220,7 +212,6 @@ class User_Model extends Core_Entity
         }
 	}
 
-
     /**
      * @param string|null $login
      * @return $this|string
@@ -235,7 +226,6 @@ class User_Model extends Core_Entity
         }
 	}
 
-
     /**
      * @return string
      */
@@ -243,7 +233,6 @@ class User_Model extends Core_Entity
 	{
 		return $this->register_date;
 	}
-
 
     /**
      * @param int|null $superuser
@@ -261,7 +250,6 @@ class User_Model extends Core_Entity
 		return $this;
 	}
 
-
     /**
      * @param int|null $subordinated
      * @return $this|int
@@ -275,7 +263,6 @@ class User_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @param string|null $authToken
@@ -291,7 +278,6 @@ class User_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param string|null $pushId
      * @return $this|string
@@ -305,7 +291,6 @@ class User_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @return array

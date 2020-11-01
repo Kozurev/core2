@@ -88,6 +88,23 @@
             <input type="hidden" name="modelName" value="Schedule_Group" />
             <!--<input type="hidden" name="action" value="saveGroup" />-->
 
+            <div class="column">
+                <span>Филиал</span>
+            </div>
+            <div class="column">
+                <select class="form-control" name="areaId">
+                    <xsl:for-each select="schedule_area">
+                        <xsl:variable name="area_id" select="id" />
+                        <option value="{id}">
+                            <xsl:if test="$area_id = //schedule_group/area_id">
+                                <xsl:attribute name="selected">selected</xsl:attribute>
+                            </xsl:if>
+                            <xsl:value-of select="title" />
+                        </option>
+                    </xsl:for-each>
+                </select>
+            </div>
+
             <xsl:if test="(schedule_group/type = 2) or (group_type = 2)">
                 <div class="column">
                     <span>Дата</span>
@@ -101,23 +118,6 @@
                 </div>
                 <div class="column">
                     <input class="form-control" type="time" name="timeStart" value="{schedule_group/time_start}"/>
-                </div>
-
-                <div class="column">
-                    <span>Филиал</span>
-                </div>
-                <div class="column">
-                    <select class="form-control" name="areaId">
-                        <xsl:for-each select="schedule_area">
-                            <xsl:variable name="area_id" select="id" />
-                            <option value="{id}">
-                                <xsl:if test="$area_id = //schedule_group/area_id">
-                                    <xsl:attribute name="selected">selected</xsl:attribute>
-                                </xsl:if>
-                                <xsl:value-of select="title" />
-                            </option>
-                        </xsl:for-each>
-                    </select>
                 </div>
             </xsl:if>
             <button class="btn btn-default" onclick="loaderOn(); saveData('Main', refreshGroupTable)">Сохранить</button>
