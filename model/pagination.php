@@ -35,7 +35,7 @@ class Pagination extends Core_Entity
      *
      * @var int
      */
-    protected int $onPage = 50;
+    protected int $onPage = 25;
 
     /**
      * Общее кол-во страниц
