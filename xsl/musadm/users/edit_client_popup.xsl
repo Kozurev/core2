@@ -144,11 +144,9 @@
                 <span>Учителя</span>
             </div>
             <div class="column">
-                <select class="form-control" name="property_21[]" multiple="multiple" size="3" >
-                    <option value="0">...</option>
-                    <xsl:call-template name="property_list" >
-                        <xsl:with-param name="property_id" select="21" />
-                    </xsl:call-template>
+                <input type="hidden" name="teachers[]" />
+                <select class="form-control" name="teachers[]" multiple="multiple" size="4">
+                    <xsl:apply-templates select="teachers" />
                 </select>
             </div>
             <hr/>
@@ -203,8 +201,19 @@
                 <xsl:value-of select="value" />
             </option>
         </xsl:for-each>
-
     </xsl:template>
 
+
+    <xsl:template match="teachers">
+        <xsl:variable name="teacherId" select="id" />
+        <option value="{$teacherId}">
+            <xsl:if test="/root[teachers_ids = $teacherId]">
+                <xsl:attribute name="selected">selected</xsl:attribute>
+            </xsl:if>
+            <xsl:value-of select="surname" />
+            <xsl:text> </xsl:text>
+            <xsl:value-of select="name" />
+        </option>
+    </xsl:template>
 
 </xsl:stylesheet>

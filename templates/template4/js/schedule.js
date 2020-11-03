@@ -1058,7 +1058,7 @@ function addNewStudentToTeacher(valueId) {
         '</div>' +
         '<div class="row text-center">' +
         '<a class="btn btn-large btn-green" ' +
-        'onclick="savePropertyValue(\'teachers\','+valueId+',\'User\', $(\'#mainUserList\').val(),addTeachersStudentCallback)">Добавить</a>');
+        'onclick="User.appendClientToTeacher('+valueId+', $(\'#mainUserList\').val(), addTeachersStudentCallback)">Добавить</a>');
 
     //Формирование общего списка пользователей
     var mainUserList = popupData.find('#mainUserList');

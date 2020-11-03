@@ -163,7 +163,25 @@ class User_Controller_Extended extends Controller
             return [];
         }
 
+        return User::query()
+            ->where('active', '=', 1)
+            ->join((new User_Teacher_Assignment())->getTableName() . ' as ut', 'id = teacher_id and client_id = ' . $this->getUser()->getId())
+            ->findAll();
+    }
 
+    /**
+     * @return array
+     */
+    public function getTeacherClients() : array
+    {
+        if (empty($this->getUser()) || $this->getUser()->groupId() !== ROLE_TEACHER) {
+            return [];
+        }
+
+        return User::query()
+            ->where('active', '=', 1)
+            ->join((new User_Teacher_Assignment())->getTableName() . ' as ut', 'id = client_id and teacher_id = ' . $this->getUser()->getId())
+            ->findAll();
     }
 
     /**

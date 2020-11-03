@@ -10,6 +10,9 @@
  * @version 2020-09-27
  */
 
+use Model\User\User_Teacher;
+use Model\User\User_Client;
+
 foreach ($_GET as $key => $param) {
     if (substr($key, 0, 4) == 'amp;') {
         $_GET[substr($key, 4)] = $param;
@@ -142,8 +145,8 @@ if ($action === 'save') {
         exit(REST::error(5, $user->_getValidateErrorsStr()));
     }
 
-    //Создание связей с филлиалами
     try {
+        //Создание связей с филлиалами
         $areas = Core_Array::Post('areas', null, PARAM_ARRAY);
         if (!is_null($areas)) {
             $assignment = new Schedule_Area_Assignment();
@@ -167,6 +170,20 @@ if ($action === 'save') {
             //Удаление не актуальных старых связей
             foreach ($existingAssignments as $existingAssignment) {
                 $existingAssignment->delete();
+            }
+        }
+
+        $teachersIds = Core_Array::Post('teachers', null, PARAM_ARRAY);
+        if (!is_null($teachersIds)) {
+            if (count($teachersIds) == 0 && empty($teachersIds[0] ?? null)) {
+                $teachersIds = [];
+            }
+            if (count($teachersIds) > 1 && empty($teachersIds[0] ?? null)) {
+                unset($teachersIds[0]);
+            }
+            $client = User_Client::find($user->getId());
+            if (!is_null($client)) {
+                $client->syncTeachers(array_values($teachersIds));
             }
         }
     } catch (Exception $e) {
@@ -406,25 +423,69 @@ if ($action === 'getListByTeacherId') {
         die(REST::error(1, 'Преподаватель с id ' . $teacherId . ' не существует'));
     }
 
-    $teacherList = Property_Controller::factoryByTag('teachers');
-    $teacherFio = $teacher->surname() . ' ' . $teacher->name();
-    $teacherProperty = Property_List_Values::query()
-        ->where('property_id', '=', $teacherList->getId())
-        ->where('value', '=', $teacherFio)
-        ->find();
+    $teacherController = new User_Controller_Extended($teacher);
+    $clients = collect($teacherController->getTeacherClients());
+    exit (json_encode($clients->map(function (User $user) {
+        return $user->toStd([User::getHiddenProps()]);
+    })->toArray()));
+}
 
-    if (is_null($teacherProperty)) {
-        (new Property_List_Values)
-            ->propertyId($teacherList->getId())
-            ->value($teacherFio)
-            ->save();
-        exit(json_encode([]));
+/**
+ * Добавление ученика в список учеников преподавателя
+ */
+if ($action === 'appendClientToTeacher') {
+    $teacherId = Core_Array::Post('teacherId', 0, PARAM_INT);
+    $clientId = Core_Array::Post('clientId', 0, PARAM_INT);
+
+    $teacher = User_Teacher::find($teacherId);
+    $client = User_Client::find($clientId);
+
+    if (is_null($teacher)) {
+        die(REST::error(1, 'Преподаватель с id ' . $teacherId . ' не существует'));
+    }
+    if (is_null($client)) {
+        die(REST::error(2, 'Клиент с id ' . $clientId . ' не существует'));
     }
 
-    $restUsers = REST::user();
-    $restUsers->appendFilter('property_' . $teacherList->getId(), $teacherProperty->getId());
-    $restUsers->appendOrder('surname');
-    die($restUsers->getList());
+    try {
+        $teacher->appendClient($client);
+    } catch (\Exception $e) {
+        exit(REST::status(REST::STATUS_ERROR, $e->getMessage()));
+    }
+
+    $response = new stdClass();
+    $response->teacher= $teacher->toStd();
+    $response->client = $client->toStd();
+    exit(json_encode($response));
+}
+
+/**
+ * Удаление ученика из списка учеников преподавателя
+ */
+if ($action === 'removeClientFromTeacher') {
+    $teacherId = Core_Array::Post('teacherId', 0, PARAM_INT);
+    $clientId = Core_Array::Post('clientId', 0, PARAM_INT);
+
+    $teacher = User_Teacher::find($teacherId);
+    $client = User_Client::find($clientId);
+
+    if (is_null($teacher)) {
+        die(REST::error(1, 'Преподаватель с id ' . $teacherId . ' не существует'));
+    }
+    if (is_null($client)) {
+        die(REST::error(2, 'Клиент с id ' . $clientId . ' не существует'));
+    }
+
+    try {
+        $teacher->removeClient($client);
+    } catch (\Exception $e) {
+        exit(REST::status(REST::STATUS_ERROR, $e->getMessage()));
+    }
+
+    $response = new stdClass();
+    $response->teacher= $teacher->toStd();
+    $response->client = $client->toStd();
+    exit(json_encode($response));
 }
 
 /**

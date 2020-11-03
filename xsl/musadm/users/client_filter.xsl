@@ -55,7 +55,7 @@
                             <h4>Преподаватели</h4>
                             <div class="row">
                                 <ul class="list">
-                                    <xsl:apply-templates select="property_value[property_id = 21]" />
+                                    <xsl:apply-templates select="teachers" />
                                 </ul>
                                 <span style="display:none">1</span>
                             </div>
@@ -80,10 +80,6 @@
                 </div>
 
                 <input type="hidden" name="active" value="{usersActive}" />
-
-                <!--<div class="row right">-->
-                    <!--<input type="submit" class="btn btn-primary" value="Применить" />-->
-                <!--</div>-->
             </form>
         </section>
     </xsl:template>
@@ -91,11 +87,6 @@
 
     <xsl:template match="schedule_area">
         <li>
-            <!--<input class="checkbox-new" type="checkbox" name="areas[]" id="area_{id}" value="{id}" />-->
-            <!--<label class="label-new" for="area_{id}">-->
-                <!--<div class="tick"><span style="display:none">1</span></div>-->
-            <!--</label>-->
-            <!--<span><xsl:value-of select="title" /></span>-->
             <input type="checkbox" name="areas[]" id="area_{id}" value="{id}" />
             <label for="area_{id}">
                 <xsl:value-of select="title" />
@@ -106,14 +97,20 @@
 
     <xsl:template match="property_value">
         <li>
-            <!--<input class="checkbox-new" type="checkbox" name="property_{property_id}[]" id="property_{id}" value="{id}" />-->
-            <!--<label class="label-new" for="property_{id}">-->
-                <!--<div class="tick"><span style="display:none">1</span></div>-->
-            <!--</label>-->
-            <!--<span><xsl:value-of select="value" /></span>-->
             <input type="checkbox" name="property_{property_id}[]" id="property_{id}" value="{id}" />
             <label for="property_{id}">
                 <xsl:value-of select="value" />
+            </label>
+        </li>
+    </xsl:template>
+
+    <xsl:template match="teachers">
+        <li>
+            <input type="checkbox" name="teachers[]" id="teacher_{position()}" value="{id}" />
+            <label for="teacher_{position()}">
+                <xsl:value-of select="surname" />
+                <xsl:text> </xsl:text>
+                <xsl:value-of select="name" />
             </label>
         </li>
     </xsl:template>

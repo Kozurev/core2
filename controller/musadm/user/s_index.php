@@ -19,7 +19,7 @@ $action = Core_Array::Get('action', null, PARAM_STRING);
 //Форма редактирования клиента
 if ($action === 'updateFormClient') {
     $userId = Core_Array::Get('userId', 0, PARAM_INT);
-    $output = Core::factory('Core_Entity');
+    $output = new Core_Entity();
 
     //Проверка прав доступа
     if ($userId == 0 && !Core_Access::instance()->hasCapability(Core_Access::USER_CREATE_CLIENT)) {
@@ -48,26 +48,34 @@ if ($action === 'updateFormClient') {
         $properties[] = Property_Controller::factory(18)->getValues($client)[0]; //Соглашение подписано
         $properties[] = Property_Controller::factoryByTag('instrument')->getValues($client)[0]; //Инструмент
         $properties[] = Property_Controller::factoryByTag('birth')->getValues($client)[0]; //Год рождения
-        $properties = array_merge($properties, Property_Controller::factoryByTag('teachers')->getValues($client)); //Учителя
         $properties = array_merge($properties, Property_Controller::factoryByTag('instrument')->getValues($client)); //Направление подготовки (инструмент)
+        $teachersController = new User_Controller_Extended($client);
+        $teachersController->isWithComments(false);
+        $teachersController->isWithAreasAssignments(false);
+        $teachers = $teachersController->getClientTeachers();
+        $teachersIds = collect($teachers)->pluck('id')->toArray();
     } else {
         $client = User_Controller::factory();
-        $properties[] = (new Property_Int)
-            ->value(
-                Property_Controller::factoryByTag('lesson_time')->defaultValue()
-            );
+        $properties[] = (new Property_Int)->value(Property_Controller::factoryByTag('lesson_time')->defaultValue());
+        $teachersIds = [];
     }
 
     $areas = (new Schedule_Area)->getList(true, false);
 
-    //$listTeachers = Property_Controller::factoryByTag('teachers')->getList();
+    $teachersController = new User_Controller_Extended(User_Auth::current());
+    $teachersController->setGroup(ROLE_TEACHER);
+    $teachersController->isWithComments(false);
+    $teachersController->isWithAreasAssignments(false);
+    $teachersController->getQueryBuilder()->select(['id, surname', 'name']);
+    $teachers = $teachersController->getUsers();
     $listInstruments = Property_Controller::factoryByTag('instrument')->getList();
 
     $output
         ->addEntity($client)
         ->addEntities($areas, 'areas')
         ->addEntities($properties, 'property_value')
-        //->addEntities($listTeachers, 'property_list')
+        ->addEntities($teachers, 'teachers')
+        ->addEntities($teachersIds, 'teachers_ids')
         ->addEntities($listInstruments, 'property_list')
         ->xsl('musadm/users/edit_client_popup.xsl')
         ->show();

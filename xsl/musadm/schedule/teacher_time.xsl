@@ -221,7 +221,7 @@
                                     <td><span>Телефон</span></td>
                                     <xsl:if test="//access_teacher_clients_edit = 1">
                                         <td>
-                                            <a class="btn btn-green" onclick="addNewStudentToTeacher({//root/value_id})"> + </a>
+                                            <a class="btn btn-green" onclick="addNewStudentToTeacher({/root/user/id})"> + </a>
                                         </td>
                                     </xsl:if>
                                 </tr>
@@ -257,7 +257,7 @@
             <td><xsl:value-of select="phone_number"/></td>
             <xsl:if test="//access_teacher_clients_edit = 1">
                 <td>
-                    <a class="btn btn-red" id="del_student" onclick="deleteProperty('teachers','User',{id},delTeachersStudentCallback)"> - </a>
+                    <a class="btn btn-red" onclick="User.removeClientFromTeacher({//root/user/id}, {id} ,delTeachersStudentCallback)"> - </a>
                 </td>
             </xsl:if>
         </tr>

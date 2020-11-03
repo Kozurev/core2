@@ -28,6 +28,23 @@ class User extends User_Model
     }
 
     /**
+     * @param array $forbiddenProps
+     * @return stdClass
+     */
+    public function toStd(array $forbiddenProps = [])
+    {
+        return parent::toStd(count($forbiddenProps) == 0 ? self::getHiddenProps() : $forbiddenProps);
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableName(): string
+    {
+        return 'User';
+    }
+
+    /**
      * Возвращает объект группы, которой принадлежит пользователь.
      * Также служит для ассоциации групп пользователей с доп. свойствами в админ меню
      *
@@ -62,16 +79,19 @@ class User extends User_Model
      *
      * @param string $uniqueVal
      * @param string $uniqueField
+     * @param int $exceptId
      * @return bool
      */
-	public static function isUnique(string $uniqueVal, string $uniqueField = 'login')
+	public static function isUnique(string $uniqueVal, string $uniqueField = 'login', int $exceptId = 0)
     {
         if (empty($uniqueVal)) {
             return true;
         }
-        $user = self::query()
-            ->where($uniqueField, '=', $uniqueVal)
-            ->find();
+        $userQuery = self::query()->where($uniqueField, '=', $uniqueVal);
+        if ($exceptId > 0) {
+            $userQuery->where('id', '<>', $exceptId);
+        }
+        $user = $userQuery->find();
         return is_null($user);
     }
 
@@ -99,18 +119,18 @@ class User extends User_Model
             $this->register_date = date('Y-m-d');
         }
 
-        if (empty($this->id)) {
+        // if (empty($this->id)) {
             if (!empty($this->login)) {
-                if (!self::isUnique($this->login)) {
+                if (!self::isUnique($this->login, 'login', $this->getId())) {
                     $this->_setValidateErrorStr('Пользователь с таким логином уже существует');
                     return null;
                 }
             }
-            if (!self::isUnique($this->email, 'email')) {
+            if (!self::isUnique($this->email, 'email', $this->getId())) {
                 $this->_setValidateErrorStr('Пользователь с таким email уже существует');
                 return null;
             }
-        }
+        // }
 
         if (empty($this->authToken())) {
             $this->authToken(uniqidReal(self::getMaxAuthTokenLength()));

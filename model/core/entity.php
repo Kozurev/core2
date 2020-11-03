@@ -263,7 +263,7 @@ class Core_Entity extends Core_Entity_Model
      */
     public static function find(int $id) : ?self
     {
-        return self::query()
+        return get_called_class()::query()
             ->where('id', '=', $id)
             ->find();
     }
@@ -529,26 +529,24 @@ class Core_Entity extends Core_Entity_Model
     /**
      * Добавление дочерней сущьности в XML
      *
-     * @param $obj
+     * @param Core_Entity $obj
      * @param null $tag
      * @return $this
      */
     public function addEntity($obj, $tag = null)
     {
-        if (!is_object($obj)) {
-            return $this;
-        }
-
-        if (!is_null($tag)) {
-            if (method_exists($obj,  '_customTag')) {
-                $obj->_customTag($tag);
-            } elseif (get_class($obj) == 'stdClass') {
-                $obj->_customTag = $tag;
+        if (is_object($obj)) {
+            if (!is_null($tag)) {
+                if (method_exists($obj,  '_customTag')) {
+                    $obj->_customTag($tag);
+                } elseif (get_class($obj) == 'stdClass') {
+                    $obj->_customTag = $tag;
+                }
             }
-        }
 
-        if ($this->_entityValue() == '') {
-            $this->childrenObjects[] = $obj;
+            if ($this->_entityValue() == '') {
+                $this->childrenObjects[] = $obj;
+            }
         }
 
         return $this;
@@ -558,16 +556,18 @@ class Core_Entity extends Core_Entity_Model
     /**
      * Добавление массива дочерних сущьностей в XML
      *
-     * @param $Children
+     * @param $children
      * @param null $tags
      * @return $this
      */
-    public function addEntities($Children, $tags = null)
+    public function addEntities($children, $tags = null)
     {
-        if (is_array($Children) && count($Children) > 0) {
-            foreach ($Children as $Child) {
-                if (is_object($Child)) {
-                    $this->addEntity($Child, $tags);
+        if (is_array($children) && count($children) > 0) {
+            foreach ($children as $child) {
+                if (is_object($child)) {
+                    $this->addEntity($child, $tags);
+                } elseif (!is_null($tags)) {
+                    $this->addSimpleEntity($tags, $child);
                 }
             }
         }
@@ -681,7 +681,7 @@ class Core_Entity extends Core_Entity_Model
             $rootTag->appendChild($this->createEntity($obj, $xml));
         }
 
-        //$xml->save('xml.xml');
+        $xml->save(ROOT . '/log/xml.xml');
 
         // Объект стиля
         $xsl = new DOMDocument();
@@ -753,6 +753,41 @@ class Core_Entity extends Core_Entity_Model
             ->queryBuilder()
             ->where('id', '=', $id)
             ->find();
+    }
+
+
+    /**
+     * @return string|array
+     */
+    public function getPrimaryKeyName()
+    {
+        return 'id';
+    }
+
+
+    /**
+     * @return int|array
+     */
+    public function getPrimaryKeyValue()
+    {
+        return $this->getId();
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isExisting() : bool
+    {
+        if (is_string($this->getPrimaryKeyName())) {
+            return $this->getId() > 0;
+        } else {
+            $query = self::query();
+            foreach ($this->getPrimaryKeyValue() as $key => $value) {
+                $query->where($key, '=', $value);
+            }
+            return $query->exists();
+        }
     }
 
 

@@ -447,16 +447,16 @@ if (Core_Access::instance()->hasCapability(Core_Access::TEACHER_SCHEDULE_TIME_RE
     $teacher = User_Controller::factory($userId);
     $teacherFio = $teacher->surname() . ' ' . $teacher->name();
 
-    $userController =  new User_Controller_Extended(User_Auth::current());
-    $users = $userController->getUsers();
+    $userController =  new User_Controller_Extended($User);
+    $users = $userController->getTeacherClients();
 
     (new Core_Entity)
         ->addEntity($User)
         ->addEntities($mainSchedule)
         ->addEntities($users,'clients')
-        ->addSimpleEntity('property_id', $teacherList->getId())
+        //->addSimpleEntity('property_id', $teacherList->getId())
         ->addSimpleEntity('user_group', User_Auth::current()->groupId())
-        ->addSimpleEntity('value_id', $teacherProperty->getId())
+        //->addSimpleEntity('value_id', $teacherProperty->getId())
         ->addSimpleEntity('access_teacher_schedule_view', (int)Core_Access::instance()->hasCapability(Core_Access::TEACHER_SCHEDULE_TIME_READ))
         ->addSimpleEntity('access_teacher_schedule_create', (int)Core_Access::instance()->hasCapability(Core_Access::TEACHER_SCHEDULE_TIME_CREATE))
         ->addSimpleEntity('access_teacher_schedule_delete', (int)Core_Access::instance()->hasCapability(Core_Access::TEACHER_SCHEDULE_TIME_DELETE))

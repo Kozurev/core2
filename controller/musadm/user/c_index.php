@@ -93,7 +93,7 @@ foreach ($_GET as $paramName => $values) {
         foreach ($_GET['areas'] as $areaId) {
             try {
                 if ($areaId > 0
-                    && ($ScheduleAssignment->issetAssignment(User::current(), intval($areaId)) !== null)
+                    && ($ScheduleAssignment->issetAssignment(User_Auth::current(), intval($areaId)) !== null)
                     || User::checkUserAccess(['groups' => [ROLE_DIRECTOR]])
                 ) {
                     $Area = Schedule_Area_Controller::factory(intval($areaId));
@@ -106,9 +106,10 @@ foreach ($_GET as $paramName => $values) {
             }
         }
         continue;
-    }
-
-    if (strpos($paramName, 'property_') !== false) {
+    } elseif ($paramName === 'teachers') {
+        $ClientController->getQueryBuilder()
+            ->join((new User_Teacher_Assignment())->getTableName() . ' as ut', 'id = client_id and teacher_id in(' . implode(', ', $values) . ')');
+    } elseif (strpos($paramName, 'property_') !== false) {
         $propId = explode('property_', $paramName)[1];
         $ClientController->appendAddFilter(intval($propId), '=', $values);
     } elseif (!empty($values)) {

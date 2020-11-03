@@ -80,11 +80,15 @@ class Core
     public static function requireClass(string $className)
     {
         $filePath = ROOT . '/model';
+        $filePath2 = ROOT . '/model';
         $filePathSegments = explode('_', $className);
         $classModelName = $className . '_Model';
 
-        foreach ($filePathSegments as $segment) {
+        foreach ($filePathSegments as $key => $segment) {
             $filePath .= '/' . lcfirst($segment);
+            $filePath2 .= $key + 1 !== count($filePathSegments)
+                ?   '/' . lcfirst($segment)
+                :   '/' . $className;
         }
 
         //Подключение модели если такая существует
@@ -96,6 +100,8 @@ class Core
         if (file_exists($filePath . '.php') && !class_exists($className)) {
             include_once $filePath . '.php';
             return ['success' => true];
+        } elseif (file_exists($filePath2 . '.php') && !class_exists($className)) {
+            include_once $filePath2 . '.php';
         } else {
             return ['success' => false, 'error' => 'Core.requireClass: файл с классом ' . $className . ' не найден'];
         }

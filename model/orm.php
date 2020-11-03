@@ -126,9 +126,9 @@ class Orm
 
     /**
      * Orm constructor.
-     * @param null $obj
+     * @param Core_Entity|null $obj
      */
-    public function __construct($obj = null)
+    public function __construct(Core_Entity $obj = null)
     {
         if (!is_null($obj)) {
             $this->table = $obj->getTableName();
@@ -232,7 +232,7 @@ class Orm
     {
         $beforeSelect = $this->select;
         $beforeOrder = $this->order;
-        $id = !empty($this->table) ? $this->table . '.id' : 'id';
+        $id = is_string($this->object->getPrimaryKeyName()) ? $this->table . '.id' : '*';
         $this->clearSelect()->select('count(' . $id . ')', 'count');
         $this->clearOrderBy();
         $query = $this->getQueryString();
@@ -252,6 +252,14 @@ class Orm
             $result = $result->fetch();
             return intval($result['count'] ?? 0);
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function exists() : bool
+    {
+        return $this->count() > 0;
     }
 
     /**
@@ -284,16 +292,17 @@ class Orm
 	/**
 	 * Метод для добавления/сохранения объектов
      *
+     * @param Core_Entity $obj
 	 * @return $this
 	 */
-	public function save($obj)
+	public function save(Core_Entity $obj)
 	{
 		//Генерация названия объекта для наблюдателя
 		$eventObjectName = $obj->getTableName();
 		$eventObjectName = explode('_', $eventObjectName);
 		$eventObjectName = implode('', $eventObjectName);
 
-		if ($obj->getId() > 0) {
+		if ($obj->isExisting()) {
             $eventType = 'update';
         } else {
             $eventType = 'insert';
@@ -302,13 +311,15 @@ class Orm
         Core::notify([&$obj], 'before.' . $eventObjectName . '.' . $eventType);
 
         $objData = $obj->getObjectProperties();
-        unset($objData['id']);
+        if (is_string($obj->getPrimaryKeyName())) {
+            unset($objData['id']);
+        }
 
         $aRows = array_keys($objData); //Название свйоств (столбцов таблицы)
         $aValues = array_values($objData); //Значения свйоств
 
         //Если этот элемент уже существует в базе данных
-		if ($this->object->getId()) {
+		if ($eventType == 'update') {
 			$queryStr = 'UPDATE ' . $obj->getTableName() . ' SET ';
 			for ($i = 0; $i < count($objData); $i++) {
                 $queryStr .= '`' . $aRows[$i] . '` = ' . $this->parseValue($aValues[$i]);
@@ -317,7 +328,19 @@ class Orm
                 }
                 $queryStr .= ' ';
 			}
-			$queryStr .= 'WHERE `id` = ' . $obj->getId() . ' ';
+			$queryStr .= 'WHERE ';
+			if (is_string($obj->getPrimaryKeyName())) {
+			    $queryStr .= '`id` = ' . $obj->getPrimaryKeyValue() . ' ';
+            } else {
+			    $primaryKeys = $obj->getPrimaryKeyName();
+			    $lastKey = end($primaryKeys);
+			    foreach ($obj->getPrimaryKeyValue() as $key => $value) {
+			        $queryStr .= '`' . $key . '` = ' . self::parseValue($value);
+			        if ($key !== $lastKey) {
+			            $queryStr .= ' AND ';
+                    }
+                }
+            }
 		} else { //Если это новый элемент
 			$queryStr = 'INSERT INTO ' . $obj->getTableName() . '(';
 			for ($i = 0; $i < count($objData); $i++) {
@@ -349,7 +372,7 @@ class Orm
          * Если объект только что был сохранен в таблицу то устанавливается значение
          * присвоенного уникального идентификатора для дальнейшей работы с объектом
          */
-		if (!$obj->getId()) {
+		if (is_string($obj->getPrimaryKeyName()) && !$obj->getId()) {
             $obj->setId(intval(DB::instance()->lastInsertId()));
 		}
 
@@ -569,9 +592,21 @@ class Orm
      *
      * @param $obj
      */
-    public function delete($obj)
+    public function delete(Core_Entity $obj)
     {
-        $query = 'DELETE FROM ' . $obj->getTableName() . ' WHERE id = ' . $obj->getId();
+        $query = 'DELETE FROM ' . $obj->getTableName() . ' WHERE ';
+        if (is_string($obj->getPrimaryKeyName())) {
+            $query .= '`' . $obj->getPrimaryKeyName() . '` = ' . $obj->getPrimaryKeyValue();
+        } else {
+            $primaryKeys = $obj->getPrimaryKeyName();
+            $lastKey = end($primaryKeys);
+            foreach ($obj->getPrimaryKeyValue() as $key => $value) {
+                $query .= '`' . $key . '` = ' . $value;
+                if ($key !== $lastKey) {
+                    $query .= ' AND ';
+                }
+            }
+        }
         DB::instance()->query($query);
 
         Core::notify([

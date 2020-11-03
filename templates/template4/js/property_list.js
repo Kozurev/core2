@@ -277,10 +277,9 @@ function deleteProperty(propName, modelName, modelId,callback)
  */
 function delTeachersStudentCallback(response)
 {
-
-    if (checkResponseStatus(response)){
+    if (checkResponseStatus(response)) {
         notificationSuccess('Ученик удален успешно');
-        $('#'+response.object.id).remove();
+        $('#'+response.client.id).remove();
     } else {
         notificationError('Ученик не удален!!!! Попробуйте еще раз');
     }
@@ -292,17 +291,16 @@ function delTeachersStudentCallback(response)
  */
 function addTeachersStudentCallback(response)
 {
-
     if (checkResponseStatus(response)){
         notificationSuccess('Ученик добавлен к перподавателю успешно');
-        $('#student_table').find('tbody').append("<tr id="+response.object.id+">" +
-            "<td>"+response.object.surname+"</td>" +
-            "<td>"+response.object.name+"</td>" +
-            "<td>"+response.object.phone_number+"</td>" +
-            "<td><a class=\"btn btn-red\" id=\"del_student\" onclick=\"deleteProperty('"+response.property.tag_name+"','"+response.value.model_name+"',"+response.object.id+",delTeachersStudentCallback)\"> - </a></td></tr>");
+        $('#student_table').find('tbody').append("<tr id="+response.client.id+">" +
+            "<td>"+response.client.surname+"</td>" +
+            "<td>"+response.client.name+"</td>" +
+            "<td>"+response.client.phone_number+"</td>" +
+            "<td><a class=\"btn btn-red\" onclick=\"User.removeClientFromTeacher("+response.teacher.id+", "+response.client.id+" ,delTeachersStudentCallback)\"> - </a></td></tr>");
         closePopup();
     } else {
-        notificationError('Ученик не добавлен!!!! Проверьте данные еще раз, возможно он уже есть у данного преподавателя');
+        //notificationError('Ученик не добавлен!!!! Проверьте данные еще раз, возможно он уже есть у данного преподавателя');
         closePopup();
     }
 }

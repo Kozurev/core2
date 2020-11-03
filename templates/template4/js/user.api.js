@@ -59,6 +59,51 @@ class User {
 
 
     /**
+     *
+     * @param teacherId
+     * @param clientId
+     * @param callback
+     */
+    static appendClientToTeacher(teacherId, clientId, callback) {
+        $.ajax({
+            type: 'POST',
+            url: User.getApiLink(),
+            dataType: 'json',
+            data: {
+                action: 'appendClientToTeacher',
+                teacherId: teacherId,
+                clientId: clientId
+            },
+            success: function (response) {
+                callback(response);
+            }
+        });
+    }
+
+
+    /**
+     *
+     * @param teacherId
+     * @param clientId
+     * @param callback
+     */
+    static removeClientFromTeacher(teacherId, clientId, callback) {
+        $.ajax({
+            type: 'POST',
+            url: User.getApiLink(),
+            dataType: 'json',
+            data: {
+                action: 'removeClientFromTeacher',
+                teacherId: teacherId,
+                clientId: clientId
+            },
+            success: function (response) {
+                callback(response);
+            }
+        });
+    }
+
+    /**
      * Помещение пользователя  в список отвала
      */
     static archiveUser(userId, reasonId,dumpStart) {

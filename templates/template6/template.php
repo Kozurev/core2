@@ -32,14 +32,13 @@ if (
     }
 
     global $CFG;
-
-    Core::factory('Core_Entity')
+    (new Core_Entity)
         ->addSimpleEntity('wwwroot', $CFG->rootdir)
         ->addSimpleEntity('action', $formAction)
         ->addSimpleEntity('usersActive', $usersActive)
         ->addEntities($areas)
         ->addEntities($instruments, 'property_value')
-        ->addEntities($teachers, 'property_value')
+        ->addEntities($teachers, 'teachers')
         ->xsl('musadm/users/client_filter.xsl')
         ->show();
 }
