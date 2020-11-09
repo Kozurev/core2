@@ -365,11 +365,11 @@ if ($isAdmin === 1) {
     }
 
     //Считаем кол-во денег, которые принес в систему
-    $money =0;
-    $moneyIn = (new Payment())
-        ->queryBuilder()
-        ->where('user','=',$User->id())
-        ->where('type','=',1)
+    $money = 0;
+    $moneyIn = Payment::query()
+        ->where('user', '=', $User->id())
+        ->where('status', '=', Payment::STATUS_SUCCESS)
+        ->where('type', '=', Payment::TYPE_INCOME)
         ->findAll();
     foreach ($moneyIn as $in) {
         $money +=$in->value();

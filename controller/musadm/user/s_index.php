@@ -60,7 +60,8 @@ if ($action === 'updateFormClient') {
         $teachersIds = [];
     }
 
-    $areas = (new Schedule_Area)->getList(true, false);
+    // $areas = (new Schedule_Area)->getList(true, false);
+    $areas = (new Schedule_Area_Assignment())->getAreas($User);
 
     $teachersController = new User_Controller_Extended(User_Auth::current());
     $teachersController->setGroup(ROLE_TEACHER);
@@ -365,7 +366,8 @@ if ($action === 'showAssignmentsPopup') {
     if (method_exists($Object, 'subordinated') && $Object->subordinated() != $subordinated) {
         exit (Core::getMessage('NOT_SUBORDINATE', [$modelName, $modelId]));
     }
-    $AreasList = Core::factory('Schedule_Area')->getList(true, false);
+    //$AreasList = Core::factory('Schedule_Area')->getList(true, false);
+    $AreasList = (new Schedule_Area_Assignment())->getAreas($User);
     $AreaAssignments = Core::factory('Schedule_Area_Assignment')->getAssignments($Object);
 
     Core::factory('Core_Entity')

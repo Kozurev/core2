@@ -529,7 +529,7 @@ class Core_Entity extends Core_Entity_Model
     /**
      * Добавление дочерней сущьности в XML
      *
-     * @param Core_Entity $obj
+     * @param $obj
      * @param null $tag
      * @return $this
      */
