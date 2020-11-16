@@ -130,3 +130,15 @@ Core::attachObserver('before.VkGroup.save', function($args) {
         $group->subordinated($director->getId());
     }
 });
+
+
+Core::attachObserver('before.User.insert', function($args) {
+    $user = $args[0];
+
+    $director = User_Auth::current()->getDirector();
+    $subordinated = $director->getId();
+
+    if ($user->groupId() != ROLE_DIRECTOR && $user->groupId() != ROLE_ADMIN) {
+        $user->subordinated($subordinated);
+    }
+});
