@@ -147,7 +147,11 @@ if ($action === 'makeClientLessonPopup') {
     }
 
     $clientId = Core_Array::Get('clientId', 0, PARAM_INT);
-    $client = User_Controller::factory($clientId);
+    if (!empty($clientId)) {
+        $client = User_Controller::factory($clientId);
+    } else {
+        $client = User_Auth::current();
+    }
 
     $clientController = new User_Controller_Extended($client);
     $teachers = $clientController->getClientTeachers();
