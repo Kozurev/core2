@@ -1,7 +1,7 @@
 <?php
 
 use Model\Sms;
-use Model\Sms\Template;
+use Model\Sms\Sms_Template;
 use Carbon\Carbon;
 
 if (!Core_Access::instance()->hasCapability(Core_Access::CRON)) {
@@ -13,12 +13,12 @@ if (Core_Array::Get('type', 'day') == 'day') {
     $date = Carbon::tomorrow()->format('Y-m-d');
     $timeFrom = null;
     $timeTo = null;
-    $templateTag = Template::TAG_LIDS_BEFORE_CONSULT_DAY;
+    $templateTag = Sms_Template::TAG_LIDS_BEFORE_CONSULT_DAY;
 } else {
     $date = Carbon::now()->format('Y-m-d');
     $timeFrom = Carbon::now()->addHours(2)->format('H:i:s');
     $timeTo = Carbon::now()->addHours(3)->format('H:i:s');
-    $templateTag = Template::TAG_LIDS_BEFORE_CONSULT_HOUR;
+    $templateTag = Sms_Template::TAG_LIDS_BEFORE_CONSULT_HOUR;
 }
 
 //Поиск консультаций
