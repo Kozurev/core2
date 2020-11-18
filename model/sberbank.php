@@ -6,6 +6,8 @@
  * Time: 17:09
  */
 
+use Model\Api;
+
 class Sberbank
 {
     const ACTION_REGISTER_ORDER = 'register.do';

@@ -6,6 +6,8 @@
  * Time: 1:02
  */
 
+
+exit;
 $teachersPropList = Property_List_Values::query()
     ->where('property_id', '=', 21)
     ->get();
