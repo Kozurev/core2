@@ -10,6 +10,7 @@ class Log
     const TYPE_SENLER = 'senler';
     const TYPE_ORM = 'orm';
     const TYPE_SMS = 'sms';
+    const TYPE_CORE = 'core';
 
     protected static ?self $_instance = null;
 

@@ -74,3 +74,5 @@ define('SCHEDULE_TIME_END', '22:00:00');
 
 define('MAPPING_BASE', 0);
 define('MAPPING_CLIENT_LC', 1);
+
+define('ADMIN_EMAIL', 'creative27016@gmail.com');
