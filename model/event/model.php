@@ -103,6 +103,7 @@ class Event_Model extends Core_Entity
     protected $data = '';
 
 
+    
     /**
      * @param int|null $time
      * @return $this|int
