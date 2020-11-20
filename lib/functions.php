@@ -553,8 +553,9 @@ function mapping(string $route, $params = [], string $pathType = MAPPING_BASE) :
 function checkTimeForScheduleActions(User $user, string $date = null) : bool
 {
     if ($user->groupId() == ROLE_CLIENT || $user->groupId() == ROLE_TEACHER) {
-        $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')
-            ->getValues(User_Auth::current()->getDirector())[0]->value();
+        $endDayTime = $user->groupId() == ROLE_CLIENT
+            ?   SCHEDULE_MAX_ACTION_TIME_CLIENT
+            :   SCHEDULE_MAX_ACTION_TIME_TEACHER;
 
         $today = date('Y-m-d');
         $tomorrow = date('Y-m-d', strtotime('+1 day'));

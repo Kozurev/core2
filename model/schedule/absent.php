@@ -44,7 +44,7 @@ class Schedule_Absent extends Schedule_Absent_Model
         if (User_Auth::current()->groupId() == ROLE_CLIENT) {
             $today = date('Y-m-d');
             $tomorrow = date('Y-m-d', strtotime($today . ' +1 day'));
-            $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')->getValues(User_Auth::current()->getDirector())[0]->value();
+            $endDayTime = SCHEDULE_MAX_ACTION_TIME_CLIENT;
 
             if ($this->dateFrom() < $tomorrow) {
                 $dateStart = $tomorrow;

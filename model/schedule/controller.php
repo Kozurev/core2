@@ -520,10 +520,11 @@ class Schedule_Controller
                     }
 
                     //Кнопка отмены занятия
-                    $tomorrow = date('Y-m-d', strtotime(date('Y-m-d') . ' +1 day'));
-                    $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')->getValues(User_Auth::current()->getDirector())[0]->value();
+                    // $tomorrow = date('Y-m-d', strtotime(date('Y-m-d') . ' +1 day'));
+                    // $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')->getValues(User_Auth::current()->getDirector())[0]->value();
                     if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT)
-                        && ($table[$i]['date'] > $tomorrow || $table[$i]['date'] == $tomorrow && date('H:i:s') < $endDayTime)) {
+                        && checkTimeForScheduleActions(User_Auth::current(), $table[$i]['date'])) {
+                        // && ($table[$i]['date'] > $tomorrow || $table[$i]['date'] == $tomorrow && date('H:i:s') < $endDayTime)) {
                         echo
                         '<ul class="submenu">
                             <li>

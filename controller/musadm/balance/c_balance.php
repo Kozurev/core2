@@ -104,12 +104,13 @@ if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit 
         $nearestLessonXml->addSimpleEntity('date', $nearestLessons[0]->date);
         $nearestLessonXml->addSimpleEntity('refactoredDate', refactorDateFormat($nearestLessons[0]->date));
         $tomorrow = date('Y-m-d', strtotime(date('Y-m-d') . ' +1 day'));
-        $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')->getValues(User_Auth::current()->getDirector())[0]->value();
-        if ($nearestLessons[0]->date > $tomorrow || ($nearestLessons[0]->date == $tomorrow && date('H:i:s') < $endDayTime)) {
-            $isCancellable = 1;
-        } else {
-            $isCancellable = 0;
-        }
+//        $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')->getValues(User_Auth::current()->getDirector())[0]->value();
+//        if ($nearestLessons[0]->date > $tomorrow || ($nearestLessons[0]->date == $tomorrow && date('H:i:s') < $endDayTime)) {
+//            $isCancellable = 1;
+//        } else {
+//            $isCancellable = 0;
+//        }
+        $isCancellable = (int)checkTimeForScheduleActions($User, $nearestLessons[0]->date);
         $nearestLessonXml->addSimpleEntity('is_cancellable', $isCancellable);
         foreach ($nearestLessons[0]->lessons as $lesson) {
             $lessonStd = new stdClass();

@@ -19,7 +19,6 @@ class Event extends Event_Model
     const STRING_FULL =     'full';     //Строка начинается с фамилии и имени клиента/преподавателя
     const STRING_SHORT =    'short';    //Строка НЕ начинается с фамилии и имени клиента/преподавателя
 
-
     /**
      * @return string
      */
@@ -36,7 +35,6 @@ class Event extends Event_Model
             return 'неизвестно';
         }
     }
-
 
     /**
      * Формирование строки текста события
@@ -213,7 +211,6 @@ class Event extends Event_Model
         }
     }
 
-
     /**
      * @param null $obj
      * @return null|$this
@@ -229,7 +226,7 @@ class Event extends Event_Model
 
         //Задание значений связанных с автором события - author_id & author_fio
         if ($this->authorId() === 0) {
-            $CurrentUser = User::parentAuth();
+            $CurrentUser = User_Auth::parentAuth();
 
             if (!is_null($CurrentUser)) {
                 $this->author_id =  $CurrentUser->getId();
@@ -258,7 +255,6 @@ class Event extends Event_Model
 
         return $this;
     }
-
 
     /**
      * @param null $obj
