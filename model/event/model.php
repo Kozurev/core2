@@ -21,6 +21,7 @@ class Event_Model extends Core_Entity
     const SCHEDULE_CHANGE_TIME =            5;
     const SCHEDULE_APPEND_CONSULT =         28;
     const SCHEDULE_SET_ABSENT =             29;
+    const SCHEDULE_APPEND_PRIVATE =         31;
 
     const CLIENT_ARCHIVE =                  7;
     const CLIENT_UNARCHIVE =                8;

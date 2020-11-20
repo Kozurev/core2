@@ -55,7 +55,7 @@ class Event extends Event_Model
         //но на будущее лучше использовать тут конструкцию switch
         if ($type === self::STRING_FULL) {
             $str = $this->user_assignment_fio . '. ';
-        } elseif ($type === self::STRING_SHORT) {
+        } else {
             $str = '';
         }
 
@@ -66,32 +66,28 @@ class Event extends Event_Model
         switch ($this->typeId())
         {
             case self::SCHEDULE_APPEND_USER:
-                $this->getData()->lesson->lesson_type == 1
+                $this->getData()->lesson->lesson_type == Schedule_Lesson::SCHEDULE_MAIN
                     ?   $str .= 'Основной график с '
                     :   $str .= 'Актуальный график на ' ;
                 $insertDate = refactorDateFormat($this->getData()->lesson->insert_date);
                 $timeStart = $this->getData()->lesson->time_from;
                 return $str . $insertDate . ' в ' . substr($timeStart, 0, 5);
-                break;
 
             case self::SCHEDULE_REMOVE_USER:
                 $date = refactorDateFormat($this->getData()->removeDate);
-                $this->getData()->lesson->lesson_type == 1
+                $this->getData()->lesson->lesson_type == Schedule_Lesson::SCHEDULE_MAIN
                     ?   $str .= 'Удален(а) из основного графика с ' . $date
                     :   $str .= 'Удален(а) из актуального графика ' . $date;
                 return $str;
-                break;
 
             case self::SCHEDULE_SET_ABSENT:
                 $date = refactorDateFormat($this->getData()->absentDate);
                 return 'Отсутствует ' . $date;
-                break;
 
             case self::SCHEDULE_CREATE_ABSENT_PERIOD:
                 $dateFrom = refactorDateFormat($this->getData()->period->date_from);
                 $dateTo =   refactorDateFormat($this->getData()->period->date_to);
                 return $str . 'Отсутствует с ' . $dateFrom . ' по ' . $dateTo;
-                break;
 
             case self::SCHEDULE_CHANGE_TIME:
                 $date =         refactorDateFormat($this->getData()->date);
@@ -100,7 +96,6 @@ class Event extends Event_Model
                 return $str . ' Актуальный график изменился на ' . $date
                             . '; старое время ' . $oldTimeFrom
                             . ', новое время ' . $newTimeFrom . '.';
-                break;
 
             case self::SCHEDULE_EDIT_ABSENT_PERIOD:
                 $oldDateFrom =  refactorDateFormat($this->getData()->old_period->date_from);
@@ -109,7 +104,6 @@ class Event extends Event_Model
                 $newDateTo =    refactorDateFormat($this->getData()->new_period->date_to);
                 return $str . 'Период отсутствия изменен с: ' . $oldDateFrom . ' - ' . $oldDateTo
                                                     . ' на: ' . $newDateFrom . ' - ' . $newDateTo;
-                break;
 
             case self::SCHEDULE_APPEND_CONSULT:
                 $Lesson =   $this->getData()->lesson;
@@ -121,34 +115,38 @@ class Event extends Event_Model
                     $str .= "Лид <a href='#' class='info-by-id' data-model='Lid' data-id='".$lidId."'>№".$lidId."</a>";
                 }
                 return $str;
-                break;
+
+            case self::SCHEDULE_APPEND_PRIVATE:
+                $lesson =   $this->getData()->lesson;
+                $timeFrom = refactorTimeFormat($lesson->time_from);
+                // $timeTo =   refactorTimeFormat($lesson->time_to);
+                $str .= 'Частное занятие. ';
+                $str .= $this->getData()->lesson->lesson_type == Schedule_Lesson::SCHEDULE_MAIN
+                    ?   'Основной график с'
+                    :   'Актуальный график на';
+                $str .= ' ' . refactorDateFormat($this->getData()->lesson->insert_date) . ' в ' . refactorTimeFormat($timeFrom);
+                return $str;
 
             case self::CLIENT_ARCHIVE:
                 return $str . 'Добавлен(а) в архив';
-                break;
 
             case self::CLIENT_UNARCHIVE:
                 return $str . 'Восстановлен(а) из архива';
-                break;
 
             case self::CLIENT_APPEND_COMMENT:
                 return $str . 'Добавлен комментарий с текстом: ' . $this->getData()->comment->text;
 
             case self::PAYMENT_CHANGE_BALANCE:
                 return $str . 'Внесение оплаты пользователю на сумму ' . $this->getData()->payment->value . ' руб.';
-                break;
 
             case self::PAYMENT_HOST_COSTS:
                 return 'Внесение хозрасходов на сумму ' . $this->getData()->payment->value . ' руб.';
-                break;
 
             case self::PAYMENT_TEACHER_PAYMENT:
                 return 'преп. ' . $this->user_assignment_fio . '. Выплата на сумму ' . $this->getData()->payment->value . ' руб.';
-                break;
 
             case self::PAYMENT_APPEND_COMMENT:
                 return 'Добавил(а) комментарий к платежу с текстом: \''. $this->getData()->comment->value .'\'';
-                break;
 
             case self::TASK_CREATE:
                 $id =   $this->getData()->note->task_id;
@@ -156,13 +154,11 @@ class Event extends Event_Model
                 return "Добавил(а) задачу 
                         <a href='#' class='info-by-id' data-model='Task' data-id='" . $id . "'>№" . $id . "</a> 
                         с комментарием: '" . $text . "'";
-                break;
 
             case self::TASK_DONE:
                 $id = $this->getData()->task_id;
                 return "Закрыл(а) задачу 
                         <a href='#' class='info-by-id' data-model='Task' data-id='" . $id ."'>№" . $id . "</a>";
-                break;
 
             case self::TASK_APPEND_COMMENT:
                 $id =   $this->getData()->note->task_id;
@@ -170,7 +166,6 @@ class Event extends Event_Model
                 return "Добавил(а) комментарий к задаче 
                         <a href='#' class='info-by-id' data-model='Task' data-id='" . $id . "'>№" . $id . "</a> 
                         с текстом: '" . $text . "'";
-                break;
 
             case self::TASK_CHANGE_DATE:
                 $id =       $this->getData()->task_id;
@@ -179,7 +174,6 @@ class Event extends Event_Model
                 return "Задача 
                         <a href='#' class='info-by-id' data-model='Task' data-id='" . $id . "'>№" . $id . "</a>. 
                         Изменение даты с " . $oldDate . " на " . $newDate;
-                break;
 
             case self::LID_CREATE:
                 $id =           $this->getData()->lid->id;
@@ -187,14 +181,12 @@ class Event extends Event_Model
                 $lidName =      $this->getData()->lid->name;
                 return "Добавил(а) лида 
                         <a href='#' class='info-by-id' data-model='Lid' data-id='" . $id . "'>№$id</a> $lidSurname $lidName";
-                break;
 
             case self::LID_APPEND_COMMENT:
                 $id = $this->getData()->lid->id;
                 return "Добавил(а) комментарий к лиду 
                 <a href='#' class='info-by-id' data-model='Lid' data-id='" . $id . "'>№$id</a> 
                 с текстом '" . $this->getData()->comment->text . "'";
-                break; 
 
             case self::LID_CHANGE_DATE:
                 $id =       $this->getData()->lid->id;
@@ -203,14 +195,12 @@ class Event extends Event_Model
                 return "Лид 
                         <a href='#' class='info-by-id' data-model='Lid' data-id='" . $id . "'>№$id</a>. 
                         Изменение даты с " . $oldDate . " на " . $newDate;
-                break;
 
             case self::CERTIFICATE_CREATE:
                 $id =   $this->getData()->certificate->id;
                 $num =  $this->getData()->certificate->number;
                 return "Добавил(а) сертификат 
                         <a href='#' class='info-by-id' data-model='Certificate' data-id='" . $id . "'>№" . $num . "</a>";
-                break;
 
             case self::CERTIFICATE_APPEND_COMMENT:
                 $id =   $this->getData()->note->certificate_id;
@@ -218,7 +208,6 @@ class Event extends Event_Model
                 return "Сертификат 
                         <a href='#' class='info-by-id' data-model='Certificate' data-id='" . $id . "'>№$num</a>. "
                         . $this->getData()->note->text;
-                break;
 
             default: return 'Шаблон формирования сообщения для события типа ' . $this->type_id . ' отсутствует.';
         }

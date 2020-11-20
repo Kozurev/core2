@@ -16,30 +16,39 @@ Core::requireClass('Event');
  * Добавление клиента в расписание
  */
 Core::attachObserver('after.ScheduleLesson.insert', function($args) {
-    $Lesson = $args[0];
-    $Event = new Event();
-    $EventData = new stdClass();
-    $EventData->lesson = $Lesson->toStd();
+    /** @var Schedule_Lesson $Lesson */
+    $lesson = $args[0];
+    $event = new Event();
+    $eventData = new stdClass();
+    $eventData->lesson = $lesson->toStd();
 
-    if ($Lesson->typeId() == Schedule_Lesson::TYPE_INDIV) {
-        $Client = $Lesson->getClient();
-        $ClientFio = $Client->surname() . ' ' . $Client->name();
-        $Event->userAssignmentId($Client->getId())
-            ->userAssignmentFio($ClientFio)
+    if ($lesson->typeId() == Schedule_Lesson::TYPE_INDIV) {
+        $client = $lesson->getClient();
+        $clientFio = $client->surname() . ' ' . $client->name();
+        $event->userAssignmentId($client->getId())
+            ->userAssignmentFio($clientFio)
             ->typeId(Event::SCHEDULE_APPEND_USER)
-            ->setData($EventData)
+            ->setData($eventData)
             ->save();
-    } elseif ($Lesson->typeId() == Schedule_Lesson::TYPE_CONSULT) {
-        $Event->typeId(Event::SCHEDULE_APPEND_CONSULT);
-        if ($Lesson->clientId()) {
-            $Lid = $Lesson->getClient();
-            if (!is_null($Lid)) {
-                $LidFio = $Lid->surname() . ' ' . $Lid->name();
-                $EventData->lid = $Lid->toStd();
-                $Event->userAssignmentFio($LidFio);
+    } elseif ($lesson->typeId() == Schedule_Lesson::TYPE_CONSULT) {
+        $event->typeId(Event::SCHEDULE_APPEND_CONSULT);
+        if ($lesson->clientId()) {
+            $lid = $lesson->getClient();
+            if (!is_null($lid)) {
+                $lidFio = $lid->surname() . ' ' . $lid->name();
+                $eventData->lid = $lid->toStd();
+                $event->userAssignmentFio($lidFio);
             }
         }
-        $Event->setData($EventData)->save();
+        $event->setData($eventData)->save();
+    } elseif ($lesson->typeId() == Schedule_Lesson::TYPE_PRIVATE) {
+        $event->typeId(Event::SCHEDULE_APPEND_PRIVATE);
+        $client = $lesson->getClient();
+        $clientFio = $client->surname() . ' ' . $client->name();
+        $event->userAssignmentId($client->getId())
+            ->userAssignmentFio($clientFio)
+            ->setData($eventData)
+            ->save();
     }
 });
 

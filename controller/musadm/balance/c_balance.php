@@ -397,7 +397,18 @@ if ($isAdmin === 1) {
 
     $UserEvents = (new Event)->queryBuilder()
         ->where('user_assignment_id', '=', $User->getId())
-        ->whereIn('type_id', [2, 3, 4, 5, 7, 8, 9, 27, 29])
+        ->whereIn('type_id', [
+            Event::SCHEDULE_APPEND_USER,
+            Event::SCHEDULE_REMOVE_USER,
+            Event::SCHEDULE_APPEND_PRIVATE,
+            Event::SCHEDULE_CREATE_ABSENT_PERIOD,
+            Event::SCHEDULE_CHANGE_TIME,
+            Event::CLIENT_ARCHIVE,
+            Event::CLIENT_UNARCHIVE,
+            Event::CLIENT_APPEND_COMMENT,
+            Event::SCHEDULE_EDIT_ABSENT_PERIOD,
+            Event::SCHEDULE_SET_ABSENT
+        ])
         ->orderBy('time', 'DESC');
     $UserEvents = $UserEvents->findAll();
 
