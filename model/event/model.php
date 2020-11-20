@@ -101,7 +101,6 @@ class Event_Model extends Core_Entity
      * @var string
      */
     protected $data = '';
-    
 
 
     /**
