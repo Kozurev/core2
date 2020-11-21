@@ -251,6 +251,7 @@ echo '<div class="col-lg-4">';
  */
 $lessonReportsCount = (new Schedule_Lesson_Report())->queryBuilder()
     ->where('Schedule_Lesson_Report.type_id', '<>', Schedule_Lesson::TYPE_CONSULT)
+    ->where('Schedule_Lesson_Report.type_id', '<>', Schedule_Lesson::TYPE_GROUP_CONSULT)
     ->leftJoin('User as u', 'u.id = teacher_id')
     ->where('u.subordinated', '=', $subordinated)
     ->join(
