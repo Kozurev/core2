@@ -69,7 +69,7 @@
                                     <td class="right">
                                         <xsl:value-of select="/root/totalCount" />
                                     </td>
-                                    <xsl:for-each select="/root/lid_status">
+                                    <xsl:for-each select="/root/statuses">
                                         <td class="center">
                                             <xsl:value-of select="totalCount" />
                                         </td>

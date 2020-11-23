@@ -274,6 +274,14 @@ class Lid_Model extends Core_Entity
         }
     }
 
+    /**
+     * @return string[]
+     */
+    public function getForbiddenRows() : array
+    {
+        return ['date_create'];
+    }
+
     //Параметры валидации при сохранении таблицы
     public function schema()
     {

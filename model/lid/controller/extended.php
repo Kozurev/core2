@@ -282,9 +282,9 @@ class Lid_Controller_Extended extends Controller
         $priorities[2]->title = 'Высокий';
 
         $outputXml
-            ->addEntity($this->paginate(), 'pagination')
             ->addSimpleEntity('wwwroot', $CFG->wwwroot)
             ->addEntities($this->getLids())
+            ->addEntity($this->paginate(), 'pagination')
             ->addEntities(Core::factory('Schedule_Area')->getList())
             ->addEntities(Core::factory('Lid_Status')->getList())
             ->addEntities($priorities, 'lid_priority')

@@ -31,7 +31,7 @@ class Core_Entity extends Core_Entity_Model
      *
      * @var array
      */
-    private $_validateErrors = [];
+    private array $_validateErrors = [];
 
 
     /**
@@ -39,7 +39,7 @@ class Core_Entity extends Core_Entity_Model
      *
      * @var array
      */
-    private $_validateErrorsStr = [];
+    private array $_validateErrorsStr = [];
 
 
     /**
@@ -225,6 +225,13 @@ class Core_Entity extends Core_Entity_Model
         return $returnStr;
     }
 
+    /**
+     * @return array
+     */
+    public function getForbiddenRows() : array
+    {
+        return [];
+    }
 
     /**
      * @return Orm
@@ -267,15 +274,6 @@ class Core_Entity extends Core_Entity_Model
             ->where('id', '=', $id)
             ->find();
     }
-
-
-//    /**
-//     * @return null|mixed
-//     */
-//    public function find()
-//    {
-//        return $this->queryBuilder()->find();
-//    }
 
 
     /**
@@ -434,6 +432,10 @@ class Core_Entity extends Core_Entity_Model
                     $result[$propertyName] = $propertyValue;
                 }
             }
+        }
+
+        foreach ($this->getForbiddenRows() as $row) {
+            unset($result[$row]);
         }
 
         return $result;

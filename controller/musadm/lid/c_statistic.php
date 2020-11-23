@@ -19,6 +19,8 @@ $markerProp = Property_Controller::factoryByTag('lid_marker');
 $sources = $sourceProp->getList();
 $markers = $markerProp->getList();
 $statuses = Lid::getStatusList();
+$areas = (new Schedule_Area_Assignment(User_Auth::current()))->getAreas();
+$userAreasIds = collect($areas)->pluck('id')->toArray();
 
 //Формирование блока редактирования статусов
 $onConsult =        Property_Controller::factoryByTag('lid_status_consult');
@@ -41,7 +43,6 @@ $lidClient =        $lidClient->getValues($director)[0]->value();
     ->addEntities($statuses)
     ->xsl('musadm/lids/statuses.xsl')
     ->show();
-
 
 //Таблица из раздела статистики + фильтр по преподам и филиам
 $teacherId =    Core_Array::Post('teacherId', 0, PARAM_INT);
@@ -93,10 +94,27 @@ if ($teacherId !== 0) {
         'lesson.type_id = ' . Schedule_Lesson::TYPE_CONSULT . ' AND lesson.client_id = Lid.id'
     );
 }
-if ($areaId !== 0) {
+if ($areaId !== 0 && in_array($areaId, $userAreasIds)) {
     $countQuery->where('area_id', '=', $areaId);
     $countFromScheduleQuery->where('lesson.area_id', '=', $areaId);
     $countFromDateControl->where('data', 'like', '%"area_id":' . $areaId . ',%');
+} else {
+    $countQuery->whereIn('area_id', $userAreasIds);
+    $countFromScheduleQuery->whereIn('lesson.area_id', $userAreasIds);
+
+    if (count($userAreasIds) == 1) {
+        $countFromDateControl->where('data', 'like', '%"area_id":' . $userAreasIds[0] . ',%');
+    } else {
+        $countFromDateControl->open();
+        foreach ($userAreasIds as $i => $id) {
+            if ($i == 0) {
+                $countFromDateControl->where('data', 'like', '%"area_id":' . $id . ',%');
+            } else {
+                $countFromDateControl->orWhere('data', 'like', '%"area_id":' . $id . ',%');
+            }
+        }
+        $countFromDateControl->close();
+    }
 }
 
 //Достаем Id лидов для получения актуального статуса по дате создания
@@ -114,14 +132,15 @@ $totalCountFromDateControl = $countFromDateControl->getCount();
 if (count($statuses) > 0) {
     foreach ($statuses as $key => $status) {
         $countWithStatus = clone $countQuery;
-        $countWithStatusFromScheduler = clone $countFromScheduleQuery;
+        $countWithStatusFromSchedule = clone $countFromScheduleQuery;
         $countWithStatusFromDateControl = (new Lid())->queryBuilder()
               ->whereIn('Lid.id',$lidsDateControl);
 
         $count = $countWithStatus
             ->where('status_id', '=', $status->getId())
             ->getCount();
-        $countFromSchedule = $countWithStatusFromScheduler
+
+        $countFromSchedule = $countWithStatusFromSchedule
             ->where('status_id', '=', $status->getId())
             ->getCount();
 
@@ -193,7 +212,7 @@ foreach ($statuses as $status) {
 }
 
 //Для подсчета кол-ва лидов, у которых вручную прописан статус
-$Sources[] = Core::factory('Property_List_Values')
+$sources[] = Core::factory('Property_List_Values')
     ->propertyId(50)
     ->value('Другое')
     ->setId(0);
@@ -204,6 +223,7 @@ foreach ($sources as $source) {
         $lidsController = new Lid_Controller_Extended();
         $lidsController->isWithComments(false);
         $lidsController->getQueryBuilder()->clearSelect()->select(['id']);
+        $lidsController->setAreas($areas);
 
         if ($markerId === 0 && $sourceId !== 0 && $source->getId() !== $sourceId) {
             continue;
@@ -228,7 +248,9 @@ foreach ($sources as $source) {
 
         $statusCloned = clone $status;
         $lidsController->appendFilter('status_id', $status->getId(), '=', Lid_Controller_Extended::FILTER_STRICT);
+        Orm::debug(true);
         $countWithStatus = count($lidsController->getLids());
+        Orm::debug(false);
         $sourceTotalCount += $countWithStatus;
         $statusCloned->addSimpleEntity('count_lids', $countWithStatus);
         $source->addEntity($statusCloned, 'status');
@@ -240,9 +262,11 @@ foreach ($sources as $source) {
 }
 
 $totalCount = 0;
-foreach ($statuses as $status) {
+foreach ($statuses as $key => $status) {
     $totalCount += $status->totalCount;
+    //$statuses[$key]->addSimpleEntity('totalCount', $status->totalCount);
 }
 
+$output->addEntities($statuses, 'statuses');
 $output->addSimpleEntity('totalCount', $totalCount);
 $output->show();
