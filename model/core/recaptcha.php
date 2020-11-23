@@ -4,29 +4,29 @@
  * User: Egor
  * Date: 11.10.2019
  * Time: 10:07
+ *
+ * Class Core_Recaptcha
  */
 class Core_Recaptcha
 {
     /**
-     * @var Core_Recaptcha
+     * @var Core_Recaptcha|null
      */
-    private static $_instance;
-
+    private static ?Core_Recaptcha $_instance = null;
 
     /**
      * Публичный HTML ключ
      *
      * @var string
      */
-    private $publicKey;
+    private string $publicKey;
 
     /**
      * Секретный ключ
      *
      * @var string
      */
-    private $secretKey;
-
+    private string $secretKey;
 
     /**
      * Расшифровка кодов ошибок ответа Google
@@ -38,20 +38,28 @@ class Core_Recaptcha
         'invalid-input-secret' =>   'Указанный секретный ключ не существует или искажен.',
         'missing-input-response' => 'Значение reCAPTCHA не было указано либо указано неверно.',
         'invalid-input-response' => 'Значение передаваемого из формы хэша недопустимо или искажено.',
-        'bad-request' =>            'Невозможно распознать переданный хэш.'
+        'bad-request' =>            'Невозможно распознать переданный хэш.',
+        'timeout-or-duplicate' =>   'Ответ более недействителен: либо слишком старый либо уже использовался'
     ];
 
+    /**
+     * Список полученных кодов ошибок
+     *
+     * @var array
+     */
+    private array $errors = [];
 
-    private $errors = [];
 
-
+    /**
+     * Core_Recaptcha constructor.
+     * @param string $secretKey
+     * @param string $publicKey
+     */
     private function __construct(string $secretKey, string $publicKey)
     {
-        global $CFG;
-        $this->publicKey = $CFG->recaptcha->publicKey;
-        $this->secretKey = $CFG->recaptcha->secretKey;
+        $this->publicKey = $publicKey;
+        $this->secretKey = $secretKey;
     }
-
 
     /**
      * @return Core_Recaptcha
@@ -65,7 +73,6 @@ class Core_Recaptcha
         return self::$_instance;
     }
 
-
     /**
      * @return string
      */
@@ -73,7 +80,6 @@ class Core_Recaptcha
     {
         return $this->publicKey;
     }
-
 
     /**
      * Получение текста ошибок
@@ -84,11 +90,11 @@ class Core_Recaptcha
     {
         $errorsMsg = '';
         foreach ($this->errors as $error) {
-            $errorsMsg .= self::$errorCodesLang[$error] . PHP_EOL;
+            $errorsMsg .= self::$errorCodesLang[$error] ?? 'RECAPTCHA: неизвестная ошибка' . PHP_EOL;
         }
+        $errorsMsg .= PHP_EOL . ' Попробуйте обновить страницу и авторизоваться повторно';
         return $errorsMsg;
     }
-
 
     /**
      * Проверка введения Google reCAPTCHA
@@ -100,7 +106,6 @@ class Core_Recaptcha
         $recaptchaRequest = Core_Array::Request('g-recaptcha-response', null, PARAM_STRING);
         return $this->isValid($recaptchaRequest);
     }
-
 
     /**
      * Отправка запроса в Google API и расшифровка ответа
@@ -138,6 +143,7 @@ class Core_Recaptcha
             return true;
         } else {
             $this->errors = $response['error-codes'];
+            Log::instance()->error(Log::TYPE_CORE, 'RECAPTCHA: ' . json_encode($response));
             return false;
         }
     }
