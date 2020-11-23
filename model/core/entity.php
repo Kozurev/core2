@@ -537,8 +537,8 @@ class Core_Entity extends Core_Entity_Model
      */
     public function addEntity($obj, $tag = null)
     {
-        $entity = (clone $obj);
-        if (is_object($entity)) {
+        if (is_object($obj)) {
+            $entity = (clone $obj);
             if (!is_null($tag)) {
                 if (method_exists($entity,  '_customTag')) {
                     $entity->_customTag($tag);

@@ -305,7 +305,10 @@ class Schedule_Controller
                             } elseif ($client instanceof Schedule_Group) {
                                 $fio = $client->title();
                             } elseif ($client instanceof Lid) {
-                                $fio = 'Консультация ' . $client->number();
+                                $fio = 'Консультация ';
+                                if (User_Auth::current()->isManagementStaff()) {
+                                    $fio .= $client->number();
+                                }
                             }
                         }
                     }

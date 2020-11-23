@@ -22,7 +22,7 @@ function array_pop_lesson($Lessons, $time, $classId)
     $timeMax = addTime($time, SCHEDULE_GAP);
         
     foreach ($Lessons as $key => $lesson) {
-        if (compareTime( $lesson->timeFrom(), '>=', $time)
+        if (compareTime($lesson->timeFrom(), '>=', $time)
             && compareTime( $lesson->timeFrom(), '<', $timeMax)
             && $lesson->classId() == $classId
         ) {
@@ -139,7 +139,7 @@ function getLessonData(Schedule_Lesson $lesson)
                 if (!empty($lid->name())) {
                     $output['client'] .= ' ' . $lid->name();
                 }
-                if (!empty($lid->number())) {
+                if (!empty($lid->number()) && User_Auth::current()->isManagementStaff()) {
                     $output['client'] .= ' ' . $lid->number();
                 }
             }
