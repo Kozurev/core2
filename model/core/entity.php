@@ -535,17 +535,18 @@ class Core_Entity extends Core_Entity_Model
      */
     public function addEntity($obj, $tag = null)
     {
-        if (is_object($obj)) {
+        $entity = (clone $obj);
+        if (is_object($entity)) {
             if (!is_null($tag)) {
-                if (method_exists($obj,  '_customTag')) {
-                    $obj->_customTag($tag);
-                } elseif (get_class($obj) == 'stdClass') {
-                    $obj->_customTag = $tag;
+                if (method_exists($entity,  '_customTag')) {
+                    $entity->_customTag($tag);
+                } elseif (get_class($entity) == 'stdClass') {
+                    $entity->_customTag = $tag;
                 }
             }
 
             if ($this->_entityValue() == '') {
-                $this->childrenObjects[] = $obj;
+                $this->childrenObjects[] = $entity;
             }
         }
 
@@ -681,7 +682,7 @@ class Core_Entity extends Core_Entity_Model
             $rootTag->appendChild($this->createEntity($obj, $xml));
         }
 
-        $xml->save(ROOT . '/log/xml.xml');
+        // $xml->save(ROOT . '/log/xml.xml');
 
         // Объект стиля
         $xsl = new DOMDocument();

@@ -824,8 +824,8 @@ if ($action === 'markAbsent') {
 
         /** @var Schedule_Lesson $lesson */
         if (User_Auth::current()->groupId() == ROLE_CLIENT) {
-            $lesson = (new Schedule_Lesson)
-                ->queryBuilder()
+            $clientId = User_Auth::current()->getId();
+            $lesson = Schedule_Lesson::query()
                 ->where('id', '=', $lessonId)
                 ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
                 ->where('client_id', '=', $clientId)

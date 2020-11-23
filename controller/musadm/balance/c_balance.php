@@ -125,7 +125,7 @@ if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit 
     }
 
     $OutputXml
-        ->addEntity($User)
+        ->addEntity($User, 'client')
         ->addSimpleEntity('note', $clientNote)
         ->addSimpleEntity('entry', $lastEntryDate)
         ->addSimpleEntity('per_lesson', $perLesson)
