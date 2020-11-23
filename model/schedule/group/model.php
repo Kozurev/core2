@@ -258,7 +258,7 @@ class Schedule_Group_Model extends Core_Entity
                 'type' => PARAM_STRING
             ],
             'teacher_id' => [
-                'required' => true,
+                'required' => false,
                 'type' => PARAM_INT,
                 'minval' => 1
             ],

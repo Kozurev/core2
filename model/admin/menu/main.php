@@ -342,9 +342,8 @@ class Admin_Menu_Main
         if (is_null($obj)) {
             Core_Page_Show::instance()->error(403);
         }
-
         Core::notify([$obj], 'before.' . $eventObjectName . '.' . $eventType);
-        $obj->active( $value )->save();
+        $obj->active($value)->save();
         Core::notify([$obj], 'after.' . $eventObjectName . '.' . $eventType);
         echo 0;
     }
