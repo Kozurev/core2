@@ -21,7 +21,6 @@ Core_Page_Show::instance()->setParam('title-first', 'ЭКСПОРТ');
 Core_Page_Show::instance()->setParam('title-second', 'ЛИДОВ');
 Core_Page_Show::instance()->setParam('breadcumbs', $breadcumbs);
 
-Core::requireClass('Lid_Controller_Extended');
 $User = User_Auth::current();
 $accessRules = ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]];
 
@@ -60,9 +59,9 @@ if ($action === 'export') {
         ->select('Lid.id')
         ->select($options);
     if ($areaId !== 0){
-        $LidController->appendFilter('area_id',$areaId, '=', Controller::FILTER_STRICT);
+        $LidController->appendFilter('area_id', $areaId, '=', Controller::FILTER_STRICT);
     } if ($statusId !== 0){
-        $LidController->appendFilter('status_id',$statusId, '=',Controller::FILTER_STRICT);
+        $LidController->appendFilter('status_id', $statusId, '=', Controller::FILTER_STRICT);
     } if ($instrument !== 0) {
         $LidController->appendAddFilter(20, '=', $instrument);
     }
