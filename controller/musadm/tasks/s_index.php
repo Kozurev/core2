@@ -9,7 +9,7 @@
 
 authOrOut();
 
-$User = User::current();
+$User = User_Auth::current();
 $accessRules = ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]];
 if (!User::checkUserAccess($accessRules, $User)) {
     Core_Page_Show::instance()->error(404);
@@ -121,16 +121,15 @@ if ($action === 'new_task_popup') {
 
     $associate = Core_Array::Get('associate', 0, PARAM_INT);
     $callback = Core_Array::Get('callback', '', PARAM_STRING);
-    Core::factory('User_Controller');
 
     if ($associate !== 0) {
-        $Client = User_Controller::factory($associate);
-        if (is_null($Client)) {
+        $client = User_Controller::factory($associate);
+        if (is_null($client)) {
             Core_Page_Show::instance()->error(404);
         }
-        $ClientAreas = Core::factory('Schedule_Area_Assignment')->getAreas($Client);
-        if (count($ClientAreas) > 0) {
-            $clientAreaId = $ClientAreas[0]->getId();
+        $clientAreas = (new Schedule_Area_Assignment($client))->getAreas();
+        if (count($clientAreas) > 0) {
+            $clientAreaId = $clientAreas[0]->getId();
         } else {
             $clientAreaId = 0;
         }
@@ -138,22 +137,22 @@ if ($action === 'new_task_popup') {
         $clientAreaId = 0;
     }
 
-    $Areas = Core::factory('Schedule_Area')->getList();
-    $Priorities = Core::factory('Task_Priority')->findAll();
+    $areas = (new Schedule_Area_Assignment($User))->getAreas();
+    $priorities = Task_Priority::query()->findAll();
 
-    $UserController = new User_Controller(User::current());
-    $UserController
+    $userController = new User_Controller($User);
+    $userController
         ->groupId(ROLE_CLIENT)
         ->isLimitedAreasAccess(true)
         ->isSubordinate(true)
         ->properties(false);
-    $UserController->queryBuilder()->orderBy('surname', 'ASC');
-    $Clients = $UserController->getUsers();
+    $userController->queryBuilder()->orderBy('surname', 'ASC');
+    $clients = $userController->getUsers();
 
-    Core::factory('Core_Entity')
-        ->addEntities($Areas)
-        ->addEntities($Clients)
-        ->addEntities($Priorities)
+    (new Core_Entity)
+        ->addEntities($areas)
+        ->addEntities($clients)
+        ->addEntities($priorities)
         ->addSimpleEntity('date', date('Y-m-d'))
         ->addSimpleEntity('associate', $associate)
         ->addSimpleEntity('client_area_id', $clientAreaId)
