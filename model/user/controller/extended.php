@@ -135,7 +135,7 @@ class User_Controller_Extended extends Controller
 
     /**
      * User_Controller_Extended constructor.
-     * @param User $user
+     * @param User|null $user
      */
     public function __construct(User $user = null)
     {
@@ -248,8 +248,9 @@ class User_Controller_Extended extends Controller
 
         //Пагинация
         $this->paginateExecute();
-
+        Orm::debug(true);
         $this->foundObjects = $this->getQueryBuilder()->findAll();
+        Orm::debug(false);
         $this->countFoundObjects = count($this->foundObjects);
         foreach ($this->foundObjects as $user) {
             $this->foundObjectsIds[] = $user->getId();
