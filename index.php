@@ -43,5 +43,6 @@ define('TEST_MODE_FACTORY', false);
 //Выключение отладки SQL-запросов
 Orm::debug(false);
 
+
 //Создание страницы
 Core_Page_Show::instance()->createPage();
