@@ -213,11 +213,12 @@ class Core_Access_Group_Controller
         $OutputXml->addSimpleEntity('wwwroot', $CFG->rootdir);
         $OutputXml->addSimpleEntity('parent_id', $this->forParent);
         $OutputXml->addSimpleEntity('group_id', $this->forGroup);
-        $OutputXml->addEntities($Groups);
-        $OutputXml->xsl($this->xsl);
 
         $observerArgs['outputXml'] = &$OutputXml;
-        Core::notify($observerArgs, 'beforeCoreAccessGroupController.show');
+        Core::notify($observerArgs, 'before.CoreAccessGroupController.show');
+
+        $OutputXml->addEntities($Groups);
+        $OutputXml->xsl($this->xsl);
 
         return $OutputXml->show($isEcho);
     }

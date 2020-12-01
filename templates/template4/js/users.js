@@ -36,7 +36,15 @@ $(function(){
         .on('click', '.popop_user_submit', function(e) {
             e.preventDefault();
             loaderOn();
-            User.saveFrom('#createData', refreshUserTable);
+            User.saveFrom('#createData', function(response) {
+                if (response.error !== undefined) {
+                    loaderOff();
+                    notificationError(response.error.message);
+                } else {
+                    closePopup();
+                    refreshUserTable();
+                }
+            });
         })
         //Всплывающее окно с параметрами отвала
         .on('click', '.user_activity', function(e) {

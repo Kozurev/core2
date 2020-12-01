@@ -888,7 +888,7 @@ if ($action === 'getReportsStatistic') {
     if (!is_null($dateTo)) {
         $query->where('r.date', '<=', $dateTo);
     }
-
+Orm::debug(true);
     $outputData = [];
     $lessonTypes = Schedule_Lesson_Type::query()->findAll();
     /** @var Schedule_Lesson_Type $lessonType */

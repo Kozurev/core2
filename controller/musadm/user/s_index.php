@@ -68,9 +68,10 @@ if ($action === 'updateFormClient') {
     $teachersController->isWithComments(false);
     $teachersController->isWithAreasAssignments(false);
     $teachersController->getQueryBuilder()
-        ->select(['id, surname', 'name'])
+        ->select([(new User())->getTableName().'.id, surname', 'name'])
         ->clearOrderBy()
         ->orderBy('surname', 'ASC');
+
     $teachers = $teachersController->getUsers();
     $listInstruments = Property_Controller::factoryByTag('instrument')->getList();
 

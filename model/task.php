@@ -13,6 +13,10 @@ class Task extends Task_Model
     const PRIORITY_MEDIUM = 2;  //Средний приоритет
     const PRIORITY_HIGH = 3;    //Высокий приоритет
 
+    const TYPE_PAYMENT = 1;
+    const TYPE_SCHEDULE = 2;
+    const TYPE_CLIENT_COMMENT = 3;
+
     /**
      * Поиск комментариев задачи
      *

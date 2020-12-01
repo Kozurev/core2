@@ -551,10 +551,10 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
      * и создание задачи в случае если их осталось менее заданного значения
      */
     if ($report->typeId() == Schedule_Lesson::TYPE_INDIV) {
-        $clientLessons = 'indiv_lessons';
+        $clientLessonsType = 'indiv_lessons';
         $clients = [User::find($report->clientId())];
     } elseif ($report->typeId() == Schedule_Lesson::TYPE_GROUP) {
-        $clientLessons = 'group_lessons';
+        $clientLessonsType = 'group_lessons';
 
         $group = Schedule_Group::find($report->clientId());
         if (is_null($group)) {
@@ -570,7 +570,7 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
     /** @var User $client */
     foreach ($clients as $client) {
         //Кол-во занятий клиента
-        $clientLessons = Property_Controller::factoryByTag($clientLessons);
+        $clientLessons = Property_Controller::factoryByTag($clientLessonsType);
         $countLessons = $clientLessons->getPropertyValues($client)[0]->value();
         //Присутствие клиента на занятии
         $clientAttendance = $report->getClientAttendance($client->getId());
@@ -600,7 +600,7 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
                 ->queryBuilder()
                 ->where('associate', '=', $client->getId())
                 ->where('done', '=', 0)
-                ->where('type', '=', 1)
+                ->where('type', '=', Task::TYPE_PAYMENT)
                 ->find();
 
             //Если не существет подобной незакрытой задачи
@@ -608,7 +608,8 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
                 $task = Task_Controller::factory()
                     ->date($tomorrow)
                     ->areaId($lesson->areaId())
-                    ->type(1)
+                    ->type(Task::TYPE_PAYMENT)
+                    ->priorityId(Task::PRIORITY_HIGH)
                     ->associate($client->getId())
                     ->save();
 
@@ -666,14 +667,15 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
                 $isIssetTask = Task::query()
                     ->where('associate', '=', $client->getId())
                     ->where('done', '=', 0)
-                    ->where('type', '=', 2)
+                    ->where('type', '=', Task::TYPE_SCHEDULE)
                     ->find();
 
                 if (is_null($isIssetTask)) {
                     $task = Task_Controller::factory()
                         ->date($tomorrow)
-                        ->type(2)
+                        ->type(Task::TYPE_SCHEDULE)
                         ->areaId($lesson->areaId())
+                        ->priorityId(Task::PRIORITY_HIGH)
                         ->associate($client->getId())
                         ->save();
 

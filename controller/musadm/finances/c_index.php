@@ -138,7 +138,7 @@ $cashBackValue = !empty($cashBackValue) ? $cashBackValue : 0;
 //Поиск информации о платеже: ФИО клиента/преподавателя и фио автора
 $paymentsUsersIds = [];
 foreach ($payments as $payment) {
-    if (!empty($payment->user()) && !isset($paymentsUsersIds[$payment->user()])) {
+    if (!empty($payment->user()) && !in_array($payment->user(), $paymentsUsersIds)) {
         $paymentsUsersIds[] = $payment->user();
     }
 }
@@ -149,7 +149,7 @@ $paymentsUsers = User::query()
 foreach ($payments as $payment) {
     $payment->datetime(refactorDateFormat($payment->datetime()));
     if ($paymentsUsers->has($payment->user())) {
-        $payment->addEntity($paymentsUsers->get($payment->user()));
+        $payment->addEntity($paymentsUsers->get($payment->user()), 'assignment_user');
     }
 }
 

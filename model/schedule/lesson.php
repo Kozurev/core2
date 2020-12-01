@@ -400,7 +400,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             $ClientAttendanceInfo->clientId($clientId);
 
             if ($this->typeId() != self::TYPE_CONSULT && $this->typeId() != self::TYPE_GROUP_CONSULT) {
-                if ($this->typeId() == self::TYPE_INDIV) {
+                if ($this->typeId() == self::TYPE_INDIV || $this->typeId() == self::TYPE_GROUP) {
                     //Корректировка баланса количества занятий клиента
                     $ClientCountLessons = $ClientLessons->getPropertyValues($Client)[0];
                     $clientCountLessons = floatval($ClientCountLessons->value());

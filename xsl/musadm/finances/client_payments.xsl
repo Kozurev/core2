@@ -147,13 +147,14 @@
         <xsl:variable name="areaId" select="area_id" />
 
         <tr id="payment_{id}">
-            <td><xsl:value-of select="position()" /></td>
+            <!-- <td><xsl:value-of select="position()" /></td> -->
+            <td><xsl:value-of select="id" /></td>
             <td class="user">
                 <xsl:choose>
-                    <xsl:when test="user/surname != ''">
-                        <xsl:value-of select="user/surname" />
+                    <xsl:when test="assignment_user/surname != ''">
+                        <xsl:value-of select="assignment_user/surname" />
                         <xsl:text>  </xsl:text>
-                        <xsl:value-of select="user/name" />
+                        <xsl:value-of select="assignment_user/name" />
                     </xsl:when>
                     <xsl:otherwise>
                         Расходы организации

@@ -149,7 +149,7 @@ class User_Controller_Extended extends Controller
             $this->getQueryBuilder()->orderBy($user->getTableName() . '.id', 'DESC');
         }
         $this->isWithComments(false);
-        parent::__construct(['user' => &$User]);
+        parent::__construct(['user' => &$user]);
     }
 
     /**
@@ -244,15 +244,18 @@ class User_Controller_Extended extends Controller
                 $this->getUser()->getTableName() . '.id = asgm.model_id 
                 AND asgm.model_name = \''.get_class($this->getUser()).'\' 
                 AND asgm.area_id IN (' . implode(', ', $areasIds) . ')');
+            $this->getQueryBuilder()->groupBy($this->getObject()->getTableName() . '.id');
         }
 
         //Пагинация
         $this->paginateExecute();
+        Orm::debug(true);
         $this->foundObjects = $this->getQueryBuilder()->findAll();
         $this->countFoundObjects = count($this->foundObjects);
         foreach ($this->foundObjects as $user) {
             $this->foundObjectsIds[] = $user->getId();
         }
+        Orm::debug(false);
 
         //Фильтрация по значениям доп.свйотв
         $this->addFilterExecute();

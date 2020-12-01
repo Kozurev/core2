@@ -213,6 +213,32 @@ class Orm
         $_SESSION['core']['sql_log'] = $switcher;
     }
 
+    /**
+     * @return string|array
+     */
+    public function getObjectPrimaryKeyName(string $default = 'id')
+    {
+        if (is_null($this->object)) {
+            return $default;
+        } else {
+            return $this->object->getPrimaryKeyName(); 
+        }
+    }
+
+    public function getTableName() : string
+    {
+        if (!is_null($this->table)) {
+            return $this->table;
+        } elseif (!empty($this->from)) {
+            $fromSegments = explode(' as ', $this->from[0]);
+            return count($fromSegments) > 0
+                ?   $fromSegments[1]
+                :   $this->from[0];
+        } else {
+            return '';
+        }
+    }
+
 	/**
 	 * Аналог метода count() для нормальной работы старого кода
      *
@@ -232,7 +258,7 @@ class Orm
     {
         $beforeSelect = $this->select;
         $beforeOrder = $this->order;
-        $id = is_string($this->object->getPrimaryKeyName()) ? $this->table . '.id' : '*';
+        $id = is_string($this->getObjectPrimaryKeyName()) ? $this->getTableName() . '.id' : '*';
         $this->clearSelect()->select('count(' . $id . ')', 'count');
         $this->clearOrderBy();
         $query = $this->getQueryString();
