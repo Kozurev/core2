@@ -249,13 +249,12 @@ class User_Controller_Extended extends Controller
 
         //Пагинация
         $this->paginateExecute();
-        Orm::debug(true);
+
         $this->foundObjects = $this->getQueryBuilder()->findAll();
         $this->countFoundObjects = count($this->foundObjects);
         foreach ($this->foundObjects as $user) {
             $this->foundObjectsIds[] = $user->getId();
         }
-        Orm::debug(false);
 
         //Фильтрация по значениям доп.свйотв
         $this->addFilterExecute();
