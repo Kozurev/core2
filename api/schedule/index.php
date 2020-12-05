@@ -512,14 +512,6 @@ if ($action === 'getTeacherNearestTime') {
     if (is_numeric($lessonDuration)) {
         $lessonDuration = toTime(intval($lessonDuration) * 60);
     }
-
-//    $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')->getValues(User_Auth::current()->getDirector())[0]->value();
-//    $today = date('Y-m-d');
-//    $tomorrow = date('Y-m-d', strtotime('+1 day'));
-//    $currentTime = date('H:i:s');
-//    if ($date <= $today || ($date == $tomorrow && $currentTime >= $endDayTime)) {
-//        exit(json_encode([]));
-//    }
     if (!checkTimeForScheduleActions(User_Auth::current())) {
         exit(json_encode([]));
     }
@@ -843,12 +835,6 @@ if ($action === 'markAbsent') {
         ];
 
         if (!User_Auth::current()->isManagementStaff()) {
-//            $tomorrow = date('Y-m-d', strtotime(date('Y-m-d') . ' +1 day'));
-//            $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')
-//                ->getValues(User_Auth::current()->getDirector())[0]->value();
-//            if (!($date > $tomorrow || ($date == $tomorrow && date('H:i:s') < $endDayTime))) {
-//                throw new Exception('В данное время отмена занятия в автоматическом режиме недоступна. Для отмены свяжитесь с менеджером');
-//            }
             if (!checkTimeForScheduleActions(User_Auth::current(), $date)) {
                 throw new Exception('В данное время отмена занятия в автоматическом режиме недоступна. Для отмены свяжитесь с менеджером');
             }
@@ -888,7 +874,7 @@ if ($action === 'getReportsStatistic') {
     if (!is_null($dateTo)) {
         $query->where('r.date', '<=', $dateTo);
     }
-Orm::debug(true);
+
     $outputData = [];
     $lessonTypes = Schedule_Lesson_Type::query()->findAll();
     /** @var Schedule_Lesson_Type $lessonType */

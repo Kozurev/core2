@@ -27,6 +27,7 @@ class Senler
             },
             error: function() {
                 notificationError('При получении данных группы сенлера произошла неизвестная ошибка');
+                loaderOff();
             }
         });
     }

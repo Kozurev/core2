@@ -1,5 +1,6 @@
 <?php
 
+use Model\Senler;
 
 $action = Core_Array::Request('action', null, PARAM_STRING);
 
