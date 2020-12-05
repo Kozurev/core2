@@ -1,5 +1,6 @@
 <?php
 
+use Model\Senler;
 global $CFG;
 
 $director = User_Auth::current()->getDirector();
