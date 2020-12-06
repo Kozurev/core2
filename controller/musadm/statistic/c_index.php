@@ -403,7 +403,7 @@ $countComebackClientQuery = (new User_Activity)->queryBuilder()
 $countNewClient = $countNewClientQuery->count();
 $countLeaveClient = $countLeaveClientQuery->findAll();
 $countComebackClient = $countComebackClientQuery->findAll();
-$percentLeaveClient =  (round(((count($countLeaveClient) / $userCount)*100),2)).'%';
+$percentLeaveClient = $userCount === 0 ? 0 : (round(((count($countLeaveClient) / $userCount)*100),2));
 
 (new Core_Entity())
     ->addSimpleEntity('count_new_client',$countNewClient)
