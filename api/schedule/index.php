@@ -512,7 +512,7 @@ if ($action === 'getTeacherNearestTime') {
     if (is_numeric($lessonDuration)) {
         $lessonDuration = toTime(intval($lessonDuration) * 60);
     }
-    if (!checkTimeForScheduleActions(User_Auth::current())) {
+    if (!checkTimeForScheduleActions(User_Auth::current(), $date)) {
         exit(json_encode([]));
     }
 
