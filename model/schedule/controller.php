@@ -316,6 +316,19 @@ class Schedule_Controller
                     if ($lesson->isOnline()) {
                         echo ' (Онлайн)';
                     }
+                    if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT)
+                        && checkTimeForScheduleActions(User_Auth::current(), $date) && $date >= $today) {
+                        echo
+                            '<ul class="submenu">
+                            <li>
+                                <a href="#"></a>
+                                <ul class="dropdown" data-date="'.$date.'" 
+                                        data-id="'.$lesson->getId().'" data-type="'.$lesson->typeId().'">
+                                    <li><a href="#" class="schedule_today_absent">Отсутствует сегодня</a></li>
+                                </ul>
+                            </li>
+                        </ul>';
+                    }
                     echo '<br/>';
                 }
             }

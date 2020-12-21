@@ -220,26 +220,26 @@
                     </tr>
                 </xsl:if>
 
-                <tr>
-                    <td>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="buttons-panel center">
-                                    <div>
-                                        <a class="btn btn-orange user-schedule-btn">Полное расписание</a>
-                                    </div>
-                                    <xsl:if test="//current_user/email != '' and //my_calls_token != ''">
-                                        <div>
-                                            <a class="btn btn-orange" onclick="MyCalls.makeCall({//current_user/id}, '{user/phone_number}', checkResponseStatus)" title="Совершить звонок">
-                                                Позвонить
-                                            </a>
-                                        </div>
-                                    </xsl:if>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
+<!--                <tr>-->
+<!--                    <td>-->
+<!--                        <div class="row">-->
+<!--                            <div class="col-md-12">-->
+<!--                                <div class="buttons-panel center">-->
+<!--                                    <div>-->
+<!--                                        <a class="btn btn-orange user-schedule-btn">Полное расписание</a>-->
+<!--                                    </div>-->
+<!--                                    <xsl:if test="//current_user/email != '' and //my_calls_token != ''">-->
+<!--                                        <div>-->
+<!--                                            <a class="btn btn-orange" onclick="MyCalls.makeCall({//current_user/id}, '{user/phone_number}', checkResponseStatus)" title="Совершить звонок">-->
+<!--                                                Позвонить-->
+<!--                                            </a>-->
+<!--                                        </div>-->
+<!--                                    </xsl:if>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                </tr>-->
 
                 <xsl:if test="is_admin = 1">
 <!--                    <xsl:if test="is_director = 1">-->

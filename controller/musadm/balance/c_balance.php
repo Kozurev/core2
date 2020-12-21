@@ -184,58 +184,15 @@ $OutputXml
 //Формирование таблицы расписания для клиентов
 if ($User->groupId() == ROLE_CLIENT && Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ_USER)) {
     $userId = $User->getId();
-    ?>
-
+?>
     <input type="hidden" id="userid" value="<?=$User->getId()?>" />
 
-    <section class="user-schedule section-bordered"
+    <section class="user-schedule section-bordered">
     <?php
-    if (User_Auth::parentAuth()->groupId() == ROLE_CLIENT)
-        echo ' style="display:none"';
-    ?>
-    >
-        <h3>Расписание занятий</h3>
-        <div class="row">
-            <div class="col-lg-6 col-md-6 col-sm-12">
-                <select class="form-control client_schedule" id="month">
-                    <option value="01">Январь</option>
-                    <option value="02">Февраль</option>
-                    <option value="03">Март</option>
-                    <option value="04">Апрель</option>
-                    <option value="05">Май</option>
-                    <option value="06">Июнь</option>
-                    <option value="07">Июль</option>
-                    <option value="08">Август</option>
-                    <option value="09">Сентябрь</option>
-                    <option value="10">Октябрь</option>
-                    <option value="11">Ноябрь</option>
-                    <option value="12">Декабрь</option>
-                </select>
-            </div>
-
-            <div class="col-lg-6 col-md-6 col-sm-12">
-                <select class="form-control client_schedule" id="year">
-                    <option value="2017">2017</option>
-                    <option value="2018">2018</option>
-                    <option value="2019">2019</option>
-                    <option value="2020">2020</option>
-                    <option value="2021">2021</option>
-                </select>
-            </div>
-        </div>
-    <?php
-    $month = Core_Array::Get('month', date('m'));
-    $year =  Core_Array::Get('year', date('Y'));
-    ?>
-    <script>
-        $("#month").val("<?=$month?>");
-        $("#year").val("<?=$year?>");
-    </script>
-    <?php
-    Core::factory('Schedule_Controller')
+    (new Schedule_Controller)
         ->userId($userId)
-        ->setCalendarPeriod($month, $year)
-        ->printCalendar();
+        ->setDate(date('Y-m-d'))
+        ->printCalendar2();
     ?>
     </section>
     <?php
