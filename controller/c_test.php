@@ -7,6 +7,11 @@
  */
 
 
+use Model\Checkout\Model;
+
+$model = new Model();
+
+
 exit;
 $teachersPropList = Property_List_Values::query()
     ->where('property_id', '=', 21)
