@@ -6,9 +6,10 @@
  * Time: 13:27
  */
 
+use Model\Checkout;
+use Model\Checkout\Model;
 
 $action = Core_Array::Request('action', null, PARAM_STRING);
-
 
 if ($action === 'sendCheck') {
     $paymentId =    Core_Array::Post('paymentId', 0, PARAM_INT);
@@ -22,15 +23,15 @@ if ($action === 'sendCheck') {
     $client->email($userEmail)->save();
 
     try {
-        $initpro = new Rest_Initpro();
-        $response = $initpro->makeReceipt($payment);
+        $checkout = Checkout::makeForUser($client);
+        $checkout->instance()->makeReceipt($payment);
     } catch (Exception $e) {
         exit(json_encode(['error' => $e->getMessage()]));
     }
 
     Core::notify(['payment' => &$payment], 'after.user.deposit');
 
-    exit(json_encode($response));
+    exit(json_encode(['success' => true]));
 }
 
 
