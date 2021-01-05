@@ -383,6 +383,16 @@ if ($action === 'registerOrder') {
     if (is_null($user)) {
         Core_Page_Show::instance()->error(403);
     }
+
+    //Проверка на наличие кассы для филиалов пользователя
+    try {
+        if (!\Model\Checkout::hasCheckout($user)) {
+            throw new Exception('Для вашего филиала отсутствует прием платежей онлайн');
+        }
+    } catch (\Throwable $throwable) {
+        die(json_encode(['errorCode' => '1', 'errorMessage' => $throwable->getMessage()]));
+    }
+
     $userId = $user->getId();
 
     $payment = new Payment();
@@ -406,7 +416,7 @@ if ($action === 'registerOrder') {
             'successUrl' => Core_Array::Request('successUrl', '', PARAM_STRING),
             'errorUrl' => Core_Array::Request('errorUrl', '', PARAM_STRING)
         ];
-    }else{
+    } else {
         $payment->setStatusError();
         $payment->appendComment('Ошибка платежного шлюза: '. ($response->errorMessage ?? 'Неизвестная ошибка'));
         $tmpData = [
@@ -415,6 +425,10 @@ if ($action === 'registerOrder') {
             'errorUrl' => Core_Array::Request('errorUrl', '',PARAM_STRING)
         ];
     }
-    Temp::put($response->orderId, $tmpData);
+
+    if (!empty($response->orderId)) {
+        Temp::put($response->orderId, $tmpData);
+    }
+
     exit(json_encode($response));
 }

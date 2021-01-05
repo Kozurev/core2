@@ -647,6 +647,8 @@ class Core_Entity extends Core_Entity_Model
                     $objChildTag = $this->createEntity($childObject, $xml);
                     $objTag->appendChild($objChildTag);
                 }
+            } elseif (is_object($val)) {
+                $objTag->appendChild($this->createEntity($val, $xml));
             } elseif ($val !== '' && !is_null($val)) {
                 $objTag->appendChild($xml->createElement($key, htmlspecialchars(strval($val))));
             } elseif ($val === '' || is_null($val)) {
@@ -684,7 +686,7 @@ class Core_Entity extends Core_Entity_Model
             $rootTag->appendChild($this->createEntity($obj, $xml));
         }
 
-        // $xml->save(ROOT . '/log/xml.xml');
+        $xml->save(ROOT . '/log/xml.xml');
 
         // Объект стиля
         $xsl = new DOMDocument();

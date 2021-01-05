@@ -10,7 +10,7 @@ $orderId = Core_Array::Get('orderId', null, PARAM_STRING);
 
 
 if (!is_null($orderId)) {
-    $orderData = Temp::getEndRemove($orderId);
+    $orderData = Temp::getAndRemove($orderId);
     if (!is_null($orderData)) {
         /** @var Payment $payment */
         $payment = Core::factory('Payment', intval($orderData->paymentId));

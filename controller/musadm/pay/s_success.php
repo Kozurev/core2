@@ -6,6 +6,9 @@
  * Time: 18:21
  */
 
+
+use Model\Checkout;
+
 $orderId = Core_Array::Get('orderId', null, PARAM_STRING);
 
 if (!is_null($orderId)) {
@@ -20,13 +23,17 @@ if (!is_null($orderId)) {
             Core::notify(['payment' => &$payment], 'after.user.deposit');
 
             try {
-                $initpro = new Rest_Initpro();
-                $response = $initpro->makeReceipt($payment);
-                if (!empty($response->status == 'fail')) {
-                    Log::instance()->error('initpro', $response->error->text);
+                $user = $payment->getUser();
+                if (is_null($user)) {
+                    throw new Exception('У платежа отсутствует пользователь');
                 }
+                $checkout = Checkout::makeForUser($user);
+                if (is_null($checkout)) {
+                    throw new Exception('Отсутствуют настройки кассы для филиала пользователя');
+                }
+                $checkout->instance()->makeReceipt($payment);
             } catch (Exception $e) {
-                Log::instance()->error('initpro', $e->getMessage());
+                Log::instance()->error('checkout', $e->getMessage());
             }
 
             if (!empty($orderData->successUrl ?? '')) {

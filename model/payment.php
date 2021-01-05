@@ -2,6 +2,8 @@
 /**
  * Класс обработчик для платежей
  *
+ * @method static Payment|null find(int $id)
+ *
  * @author Kozurev Egor
  * @date 20.04.2018 15:05
  * @version 20190626
@@ -121,7 +123,7 @@ class Payment extends Payment_Model
      *
      * @return User|null
      */
-    public function getAuthor()
+    public function getAuthor() : ?User
     {
         if (empty($this->authorId())) {
             return null;
@@ -136,7 +138,7 @@ class Payment extends Payment_Model
      * @return array
      * @throws Exception
      */
-    public function getTypes(bool $isSubordinated = true, bool $isEditable = true)
+    public function getTypes(bool $isSubordinated = true, bool $isEditable = true) : array
     {
         return self::getTypesList($isSubordinated, $isEditable);
     }
@@ -158,7 +160,7 @@ class Payment extends Payment_Model
      * @throws Exception
      * @return array
      */
-    public static function getTypesList(bool $isSubordinated = true, bool $isEditable = true)
+    public static function getTypesList(bool $isSubordinated = true, bool $isEditable = true) : array
     {
         $paymentTypesQuery = Payment_Type::query();
 
@@ -187,7 +189,7 @@ class Payment extends Payment_Model
      * @param null $obj
      * @return $this|null
      */
-    public function save($obj = null)
+    public function save($obj = null) : ?self
     {
         Core::notify([&$this], 'before.Payment.save');
         if (empty($this->datetime)) {
@@ -204,7 +206,7 @@ class Payment extends Payment_Model
      * @param null $obj
      * @return $this|void
      */
-    public function delete($obj = null)
+    public function delete($obj = null) : void
     {
         Core::notify([&$this], 'before.Payment.delete');
         parent::delete();
@@ -219,5 +221,13 @@ class Payment extends Payment_Model
     {
          return Property_Controller::factoryByTag('payment_comment')
              ->addNewValue($this, $comment);
+    }
+
+    /**
+     * @param string $uuid
+     */
+    public function saveCheckoutUuid(string $uuid) : void
+    {
+        $this->checkoutUuid($uuid)->save();
     }
 }

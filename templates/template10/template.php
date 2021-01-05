@@ -250,6 +250,9 @@
                                 if (User_Auth::current()->groupId() == ROLE_DIRECTOR) {
                                     echo '<li><a href="' . $CFG->rootdir . '/integration/jivosite">JivoSite</a></li>';
                                 }
+                                if (User_Auth::current()->groupId() == ROLE_DIRECTOR) {
+                                    echo '<li><a href="' . $CFG->rootdir . '/integration/checkouts">Кассы</a></li>';
+                                }
                                 echo '</ul></li>';
                             }
 
@@ -391,6 +394,7 @@ Core_Page_Show::instance()
     ->js('/templates/template4/js/vk.js')
     ->js('/templates/template4/js/senler.js')
     ->js('/templates/template4/js/myCalls.js')
+    ->js('/templates/template4/js/checkouts.js')
     ->js('/templates/template4/js/js.js');
 ?>
 

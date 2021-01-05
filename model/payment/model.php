@@ -10,91 +10,79 @@
 class Payment_Model extends Core_Entity
 {
     /**
-     * @var int
-     */
-    protected $id;
-
-
-    /**
      * id пользователя с которым был связан платеж
      *
-     * @var int
+     * @var int|null
      */
-    protected $user = 0;
-
+    protected ?int $user = null;
 
     /**
      * id типа платежа
      *
      * @var int
      */
-    protected $type = 0;
-
+    protected int $type = 0;
 
     /**
      * Статус платежа
      *
      * @var int
      */
-    protected $status = 1;
-
+    protected int $status = Payment::STATUS_SUCCESS;
 
     /**
      * Дата совершения платежа
      *
-     * @var string
+     * @var string|null
      */
-    protected $datetime;
-
+    protected ?string $datetime = null;
 
     /**
      * Сумма платежа
      *
      * @var int
      */
-    protected $value = 0.0;
-
+    protected int $value = 0;
 
     /**
      * Примечание к платежу
      *
-     * @var string
+     * @var string|null
      */
-    protected $description;
-
+    protected ?string $description = null;
 
     /**
      * id организации (директора) которой принадлежит платеж
      *
      * @var int
      */
-    protected $subordinated = 0;
-
+    protected int $subordinated = 0;
 
     /**
      * id филиала с которым связан платеж
      *
-     * @var int
+     * @var int|null
      */
-    protected $area_id = 0;
-
+    protected ?int $area_id = null;
 
     /**
      * id создателя платежа
      *
-     * @var int
+     * @var int|null
      */
-    protected $author_id = 0;
-
+    protected ?int $author_id = null;
 
     /**
      * ФИО автора на момент созания платежа
      *
-     * @var string
+     * @var string|null
      */
-    protected $author_fio = '';
+    protected ?string $author_fio = null;
 
-
+    /**
+     * @var string|null
+     */
+    protected ?string $checkout_uuid = null;
 
     /**
      * @param int|null $user
@@ -110,7 +98,6 @@ class Payment_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param int|null $typeId
      * @return $this|int
@@ -124,7 +111,6 @@ class Payment_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @param int|null $status
@@ -140,7 +126,6 @@ class Payment_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param string|null $date
      * @return $this|string
@@ -154,7 +139,6 @@ class Payment_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @param int|null $value
@@ -170,7 +154,6 @@ class Payment_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param string|null $description
      * @return $this|string
@@ -184,7 +167,6 @@ class Payment_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @param int|null $subordinated
@@ -200,7 +182,6 @@ class Payment_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param int|null $areaId
      * @return $this|int
@@ -214,7 +195,6 @@ class Payment_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @param int|null $authorId
@@ -230,7 +210,6 @@ class Payment_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param string|null $authorFio
      * @return $this|string
@@ -245,7 +224,19 @@ class Payment_Model extends Core_Entity
         }
     }
 
-
+    /**
+     * @param string|null $checkoutUuid
+     * @return $this|string|null
+     */
+    public function checkoutUuid(string $checkoutUuid = null)
+    {
+        if (is_null($checkoutUuid)) {
+            return $this->checkout_uuid;
+        } else {
+            $this->checkout_uuid = $checkoutUuid;
+            return $this;
+        }
+    }
 
     /**
      * Параметры валидации при сохранении таблицы

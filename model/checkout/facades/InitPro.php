@@ -1,36 +1,17 @@
 <?php
 
-namespace Model\Checkout;
+namespace Model\Checkout\Facades;
+
+use Model\Checkout\Model;
 
 /**
  * Class Checkout_InitPro
  * @package Model\Checkout
  */
-class InitPro
+class InitPro extends A_Facade
 {
     const METHOD_POST = 'post';
     const METHOD_GET = 'get';
-
-    /**
-     * Логин для авторизации
-     *
-     * @var string
-     */
-    private string $login = '';
-
-    /**
-     * Пароль для авторизации
-     *
-     * @var string
-     */
-    private string $pass = '';
-
-    /**
-     * id группы касс
-     *
-     * @var string
-     */
-    private string $groupCode = '';
 
     /**
      * Используемая версия API
@@ -49,9 +30,9 @@ class InitPro
     /**
      * Авторизационный токен
      *
-     * @var string
+     * @var string|null
      */
-    private string $authToken;
+    private ?string $authToken = null;
 
     /**
      * Адрес ответа регистрации чека
@@ -71,27 +52,67 @@ class InitPro
     ];
 
     /**
-     * Rest_Initpro constructor.
+     * @var array|array[]
      */
-    public function __construct()
+    private static array $additionalFields = [
+        [
+            'required' => true,
+            'type' => 'text',
+            'tag' => 'groupCode',
+            'title' => 'Код группы'
+        ],
+        [
+            'required' => true,
+            'type' => 'email',
+            'tag' => 'email',
+            'title' => 'Email'
+        ],
+        [
+            'required' => true,
+            'type' => 'list',
+            'tag' => 'sno',
+            'title' => 'Система налогооблажения',
+            'items' => [
+                'patent' => 'Патент'
+            ]
+        ],
+        [
+            'required' => true,
+            'type' => 'text',
+            'tag' => 'inn',
+            'title' => 'ИНН'
+        ]
+    ];
+
+    /**
+     * @return array|array[]
+     */
+    public function getAdditionalFieldsList() : array
     {
-        global $CFG;
-        $this->login = $CFG->initpro->login;
-        $this->pass = $CFG->initpro->password;
-        $this->groupCode = $CFG->initpro->groupCode;
+        return self::$additionalFields;
+    }
+
+    /**
+     * @return string
+     */
+    public function getValidateModelErrorsStr() : string
+    {
+        return 'Ошибка данных кассы инитпро';
     }
 
     /**
      * Авторизация в сервисе
      *
      * @param string $method
+     * @return string
      * @throws \Exception
      */
-    public function makeAuth($method = self::METHOD_POST) : void
+    protected function makeAuthToken($method = self::METHOD_POST) : string
     {
-        $params = [];
-        $params['login'] = $this->login;
-        $params['pass'] = $this->pass;
+        $params = [
+            'login' => $this->getModel()->getLogin(),
+            'pass' => $this->getModel()->getPassword()
+        ];
 
         if ($method === self::METHOD_GET) {
             $url = self::makeUrl(self::$actions['token'], null, $params);
@@ -117,21 +138,31 @@ class InitPro
         if (empty($response)) {
             throw new \Exception('Инитпро: неизвестная ошибка при авторизации');
         } elseif (!empty($response->error)) {
-            throw new \Exception($response->error->text ?? 'Неизвестная ошибка авторизации');
+            throw new \Exception($response->error->text ?? 'Неизвестная ошибка авторизации InitPro');
         } else {
-            $this->authToken = $response->token;
+            return strval($response->token);
         }
     }
 
     /**
+     * @return string
+     * @throws \Exception
+     */
+    protected function getAuthToken() : string
+    {
+        if (is_null($this->authToken)) {
+            $this->authToken = $this->makeAuthToken();
+        }
+        return $this->authToken;
+    }
+
+    /**
      * @param \Payment $payment
-     * @return mixed
      * @throws \Exception
      */
     public function makeReceipt(\Payment $payment)
     {
-        $this->makeAuth();
-        $url = self::makeUrl(self::$actions['pay'], $this->groupCode, ['token' => $this->authToken]);
+        $url = self::makeUrl(self::$actions['pay'], $this->getModel()->groupCode, ['token' => $this->getAuthToken()]);
         $streamContext = stream_context_create([
             'http' => [
                 'method' => 'POST',
@@ -140,7 +171,12 @@ class InitPro
                 'content' => json_encode($this->makeReceiptData($payment))
             ]
         ]);
-        return json_decode(@file_get_contents($url, false, $streamContext));
+        $response = json_decode(@file_get_contents($url, false, $streamContext));
+        if (!is_null($response->error)) {
+            throw new \Exception($response->error->text);
+        } else {
+            $payment->saveCheckoutUuid($response->uuid);
+        }
     }
 
     /**
@@ -149,7 +185,7 @@ class InitPro
      * @param \Payment $payment
      * @return \stdClass
      */
-    public function makeReceiptData(\Payment $payment): \stdClass
+    protected function makeReceiptData(\Payment $payment): \stdClass
     {
         $check = new \stdClass();
         $check->external_id = strval($payment->getId());
@@ -172,12 +208,11 @@ class InitPro
             $check->receipt->client->phone = $number;
         }
 
-        global $CFG;
         $checkCompany = new \stdClass();
-        $checkCompany->email = $CFG->initpro->email;
-        $checkCompany->sno = $CFG->initpro->sno;
-        $checkCompany->inn = $CFG->initpro->inn;
-        $checkCompany->payment_address = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST']; //'https://musicmetod.ru';
+        $checkCompany->email = $this->getModel()->email;
+        $checkCompany->sno = $this->getModel()->sno;
+        $checkCompany->inn = $this->getModel()->inn;
+        $checkCompany->payment_address = 'https://musicmetod.ru'; //$_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
         $check->receipt->company = $checkCompany;
 
         $checkItem = new \stdClass();
@@ -213,7 +248,7 @@ class InitPro
      * @param array $data
      * @return string
      */
-    static function makeUrl(string $action, string $groupsCode = null, $data = []) : string
+    protected static function makeUrl(string $action, string $groupsCode = null, $data = []) : string
     {
         $url = self::$apiUrl . '/' . self::$apiVersion;
         if (!is_null($groupsCode)) {
