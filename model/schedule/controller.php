@@ -340,6 +340,8 @@ class Schedule_Controller
 
             $date = date('Y-m-d', strtotime($date . ' +1 day'));
         }
+
+        echo '</table></div>';
     }
 
     /**
