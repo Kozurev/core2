@@ -159,6 +159,7 @@ $OutputXml
     ->addSimpleEntity('is_admin', $isAdmin)
     ->addSimpleEntity('is_director', $isDirector)
     ->addSimpleEntity('api_token_sber', $apiTokenSber)
+    ->addSimpleEntity('has_checkout', (int)\Model\Checkout::hasCheckout($User))
     ->addEntity($balance, 'property')
     ->addEntity($privateLessons, 'property')
     ->addEntity($groupLessons, 'property')

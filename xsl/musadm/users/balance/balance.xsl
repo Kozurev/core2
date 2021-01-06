@@ -26,9 +26,8 @@
                                         <!--Пополнить баланс-->
                                     </a>
                                 </xsl:if>
-                                <xsl:if test="is_admin = 0 and api_token_sber != ''">
-                                    <a onclick="Payment.getSberApi()"
-                                       class="btn btn-xs btn-outline btn-primary">
+                                <xsl:if test="is_admin = 0 and api_token_sber != '' and has_checkout = 1">
+                                    <a onclick="Payment.getSberApi()" class="btn btn-xs btn-outline btn-primary">
                                         Пополнить баланс
                                     </a>
                                 </xsl:if>

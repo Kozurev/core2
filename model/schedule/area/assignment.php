@@ -35,7 +35,11 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
         if (!is_null($this->object)) {
             return $this->object;
         } elseif ($this->modelName() != '' && $this->modelId() > 0) {
-            return Core::factory($this->modelName(), $this->modelId());
+            if ($this->modelName() === 'Checkouts') {
+                return \Model\Checkout\Model::find($this->modelId());
+            } else {
+                return Core::factory($this->modelName(), $this->modelId());
+            }
         } else {
             return null;
         }

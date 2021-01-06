@@ -85,7 +85,7 @@ class Checkout
     {
         /** @var \Schedule_Area_Assignment $assignment */
         $assignment = \Schedule_Area_Assignment::query()
-            ->where('model_name', '=', get_class(new Model()))
+            ->where('model_name', '=', (new Model())->getTableName())
             ->whereIn('area_id', $areasIds)
             ->find();
         return !is_null($assignment)
