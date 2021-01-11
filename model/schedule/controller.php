@@ -316,7 +316,8 @@ class Schedule_Controller
                     if ($lesson->isOnline()) {
                         echo ' (Онлайн)';
                     }
-                    if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT)
+                    if ($user->groupId() === ROLE_CLIENT
+                        && Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT)
                         && checkTimeForScheduleActions(User_Auth::current(), $date) && $date >= $today) {
                         echo
                             '<ul class="submenu">
