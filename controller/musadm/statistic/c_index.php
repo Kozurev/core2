@@ -422,7 +422,7 @@ echo '<div class="col-lg-4">';
  * Статистика по выплатам преподавателям
  */
 $queryString = (new Orm())
-    ->select('sum(value)', 'sum')
+    ->select('COALESCE(sum(value), 0)', 'sum')
     ->from('Payment')
     ->where('Payment.subordinated', '=', $subordinated)
     ->join('User as u', 'Payment.user = u.id')
@@ -469,7 +469,7 @@ $finances = Schedule_Lesson_Report::query()
 
 //Хозрасходы
 $hostExpenses = Payment::query()
-    ->select('sum(Payment.value)', 'value')
+    ->select('COALESCE(sum(Payment.value), 0)', 'value')
     ->join('Payment_Type as t', 'Payment.type = t.id')
     ->where('t.subordinated', '=', $subordinated)
     ->where('t.is_deletable', '=', 1)
@@ -503,6 +503,7 @@ $income =   $income->find()->value;
 $income2 =  $income2->find()->value;
 $expenses = $expenses->find()->value;
 $profit =   $profit->find()->value;
+Orm::debug(true);
 $hostExpenses = $hostExpenses->find()->value();
 $deposits = (int)$deposits->sum('value');
 
