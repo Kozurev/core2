@@ -139,7 +139,7 @@ class Schedule_Group extends Schedule_Group_Model
         $sga = (new Schedule_Group_Assignment())->getTableName();
         return Schedule_Group::query()
             ->join($sga . ' AS sga',
-                'sga.user_id = ' . $client->getId() . ' AND '.$sg.'.id = sga.group_id AND sg.type = ' . Schedule_Group::TYPE_CLIENTS
+                'sga.user_id = ' . $client->getId() . ' AND '.$sg.'.id = sga.group_id AND type = ' . Schedule_Group::TYPE_CLIENTS
             )
             ->findAll();
     }
