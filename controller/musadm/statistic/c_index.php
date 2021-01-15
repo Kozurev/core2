@@ -503,7 +503,6 @@ $income =   $income->find()->value;
 $income2 =  $income2->find()->value;
 $expenses = $expenses->find()->value;
 $profit =   $profit->find()->value;
-Orm::debug(true);
 $hostExpenses = $hostExpenses->find()->value();
 $deposits = (int)$deposits->sum('value');
 
