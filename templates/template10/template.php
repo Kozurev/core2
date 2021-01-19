@@ -14,7 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Bitter' rel='stylesheet'>
 
     <script src="https://www.google.com/recaptcha/api.js?hl=ru"></script>
@@ -335,7 +335,7 @@
 
 <footer class="footer text-center">
     <div class="container">
-        <small class="copyright"><a href="http://musicmetod.ru/" target="_blank">ООО"Мьюзикметод"</a></small>
+        <small class="copyright"><a href="https://musicmetod.ru/" target="_blank">ООО"Мьюзикметод"</a></small>
         <small class="copyright">Щорса 54, оф.307 тел. 37-42-11, моб. +7 909 201 25 50</small>
     </div><!--//container-->
 </footer><!--//footer-->

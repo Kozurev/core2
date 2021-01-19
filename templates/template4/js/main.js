@@ -2,6 +2,7 @@
 
 var root = $('#rootdir').val();
 
+$.ajaxSetup({ cache: false });
 
 /**
  * Проверка ответа API от сервера на наличие "успеха" или "ошибки"
