@@ -78,7 +78,7 @@ class Lids {
             $.ajax({
                 type: 'GET',
                 url: Lids.getApiLink(),
-                async: false,
+                // async: false,
                 dataType: 'json',
                 data: {
                     action: 'getStatusList'

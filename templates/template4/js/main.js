@@ -127,7 +127,7 @@ function saveData(tab, func) {
         type: 'GET',
         url: link,
         data: data,
-        async: false,
+        // async: false,
         success: function(response) {
             closePopup();
 

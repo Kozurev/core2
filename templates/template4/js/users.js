@@ -520,7 +520,7 @@ function refreshUserTable() {
     $.ajax({
         type: 'GET',
         url: '',
-        async: false,
+        // async: false,
         data: {
             action: 'refreshTableUsers'
         },

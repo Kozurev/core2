@@ -674,7 +674,7 @@ function saveTeacherPayment(user, summ, date, description, func) {
     $.ajax({
         type: 'GET',
         url: root + '/admin?menuTab=Main&menuAction=updateAction&ajax=1',
-        async: false,
+        // async: false,
         data: {
             id: '',
             modelName: 'Payment',
@@ -766,7 +766,7 @@ function getScheduleAbsentPopup(objectId, typeId, date, id) {
     $.ajax({
         type: 'GET',
         url: root + '/schedule',
-        async: false,
+        // async: false,
         data: {
             action: 'getScheduleAbsentPopup',
             objectId: objectId,

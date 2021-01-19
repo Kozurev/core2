@@ -170,7 +170,7 @@ function refreshGroupTable(page) {
         type: 'GET',
         // url: root + '/groups',
         url: '',
-        async: false,
+        // async: false,
         data: {
             action: 'refreshGroupTable',
             page: page

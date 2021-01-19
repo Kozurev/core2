@@ -308,7 +308,7 @@ function refreshPaymentsTable(userId, func) {
     $.ajax({
         type: 'GET',
         url: root + '/balance',
-        async: false,
+        // async: false,
         data: {
             action: 'refreshTablePayments',
             user_id: userId,
