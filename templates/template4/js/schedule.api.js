@@ -48,7 +48,6 @@ class Schedule {
             $.ajax({
                 type: 'GET',
                 url: this.getApiLink(),
-                async: false,
                 dataType: 'json',
                 data: params,
                 success: function(response) {

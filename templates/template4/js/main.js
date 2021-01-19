@@ -2,7 +2,11 @@
 
 var root = $('#rootdir').val();
 
-$.ajaxSetup({ cache: false });
+$.ajaxSetup({
+    cache: false,
+    async: true,
+    headers: { "cache-control": "no-cache" },
+});
 
 /**
  * Проверка ответа API от сервера на наличие "успеха" или "ошибки"
