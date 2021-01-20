@@ -34,7 +34,7 @@ function addTaskNotePopup(taskId) {
         "<input type='hidden' name='id' value=''>" +
         "<input type='hidden' name='modelName' value='Task_Note'>" +
         "<input type='hidden' name='taskId' value='"+taskId+"'>" +
-        "<button class=\"btn btn-default\" onclick='loaderOn();saveData(\"Main\", function(response){taskAfterAction();loaderOff();})'>Сохранить</button>" +
+        "<button class=\"btn btn-default\" onclick='loaderOn();saveData(\"Main\", function(response){taskAfterAction();loaderOff();}); return false'>Сохранить</button>" +
         "</form>";
 
     showPopup(popupData);
@@ -44,8 +44,7 @@ function addTaskNotePopup(taskId) {
 function taskAfterAction() {
     loaderOn();
 
-    switch(taskAfterActionValue)
-    {
+    switch(taskAfterActionValue) {
         case 'balance':
             var userId = $("#userid").val();
             refreshPaymentsTable(userId, loaderOff);
@@ -58,7 +57,8 @@ function taskAfterAction() {
                 $('input[name=task_id]').val()
             );
             break;
-        default: loaderOff();
+        default:
+            loaderOff();
     }
 }
 
