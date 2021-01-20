@@ -112,7 +112,7 @@ foreach ($_GET as $paramName => $values) {
     } elseif (strpos($paramName, 'property_') !== false) {
         $propId = explode('property_', $paramName)[1];
         $ClientController->appendAddFilter(intval($propId), '=', $values);
-    } elseif (!empty($values)) {
+    } elseif (!empty($values) && $paramName !== '_') {
         $ClientController->appendFilter($paramName, $values, '=', Controller::FILTER_NOT_STRICT);
     }
 }
