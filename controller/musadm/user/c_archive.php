@@ -7,15 +7,11 @@
  * @version 20190923
  */
 
-Core::requireClass('User_Controller_Extended');
-Core::requireClass('Schedule_Area_Controller');
-Core::requireClass('Schedule_Area_Assignment');
-
-$User = User::current();
-$UserController = new User_Controller_Extended(User::current());
+$user = User_Auth::current();
+$userController = new User_Controller_Extended($user);
 
 //Пагинация
-$UserController->paginate()->setCurrentPage(
+$userController->paginate()->setCurrentPage(
     Core_Array::Get('page', 1, PARAM_INT)
 );
 if (isset($_GET['page'])) {
@@ -35,7 +31,7 @@ foreach ($_GET as $paramName => $values) {
                 ) {
                     $Area = Schedule_Area_Controller::factory(intval($areaId));
                     if ($Area !== null) {
-                        $UserController->setAreas([$Area]);
+                        $userController->setAreas([$Area]);
                     }
                 }
             } catch(Exception $e) {
@@ -43,18 +39,19 @@ foreach ($_GET as $paramName => $values) {
             }
         }
         continue;
-    }
-
-    if (strpos($paramName, 'property_') !== false) {
+    } elseif ($paramName === 'teachers') {
+        $userController->getQueryBuilder()
+            ->join((new User_Teacher_Assignment())->getTableName() . ' as ut', 'id = client_id and teacher_id in(' . implode(', ', $values) . ')');
+    } elseif (strpos($paramName, 'property_') !== false) {
         $propId = explode('property_', $paramName)[1];
-        $UserController->appendAddFilter(intval($propId), '=', $values);
-    } elseif (!empty($values)) {
-        $UserController->appendFilter($paramName, $values, '=', User_Controller_Extended::FILTER_NOT_STRICT);
+        $userController->appendAddFilter(intval($propId), '=', $values);
+    } elseif (!empty($values) && $paramName !== '_') {
+        $userController->appendFilter($paramName, $values, '=', Controller::FILTER_NOT_STRICT);
     }
 }
 
 try {
-    $UserController
+    $userController
         ->setActive(false)
         ->properties(true)
         ->isShowCount(true)
