@@ -681,21 +681,21 @@ if ($action === 'get_client_reports') {
  *
  * @OUTPUT_DATA: array of stdClass      список пользователей в виде объектов с их основными полями
  */
-if ($action === 'get_client_schedule') {
+if ($action === 'get_client_schedule' || $action === 'get_schedule_short') {
     $response = new stdClass();
     $response->error = null;
     $response->message = '';
 
     if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ)) {
-        exit(REST::responseError(REST::ERROR_CODE_ACCESS));
+        exit(REST::responseError(REST::ERROR_CODE_ACCESS, 'Недостаточно прав для просмотра расписания'));
     }
     if (is_null(User_Auth::current())) {
         exit(REST::responseError(REST::ERROR_CODE_AUTH));
     }
 
-    $userId = User_Auth::current()->groupId() === ROLE_CLIENT
-        ?   User_Auth::current()->getId()
-        :   Core_Array::Get('user_id', 0, PARAM_INT);
+    $userId = User_Auth::current()->isManagementStaff()
+        ?   Core_Array::Get('user_id', 0, PARAM_INT)
+        :   User_Auth::current()->getId();
 
     $user = User_Controller::factory($userId, false);
     if (is_null($user)) {
@@ -711,10 +711,50 @@ if ($action === 'get_client_schedule') {
         exit(REST::responseError(REST::ERROR_CODE_EMPTY, $e->getMessage()));
     }
 
+    $lessonsIds = collect($schedule)->map(function(stdClass $dayData) : array {
+        return collect($dayData->lessons)->map(function(Schedule_Lesson $lesson) {
+            return $lesson->getId();
+        })->toArray();
+    })
+    ->collapse()
+    ->unique()
+    ->toArray();
+
+    $reportsCollection = Schedule_Lesson_Report::query()
+        ->where('date', '>=', $dateStart)
+        ->where('date', '<=', $dateEnd)
+        ->whereIn('lesson_id', $lessonsIds)
+        ->get();
+    $reportsIds = (clone $reportsCollection)->map(function (Schedule_Lesson_Report $report) : stdClass {
+        return $report->toStd();
+    })->pluck('id')->toArray();
+
+    $attendances = Schedule_Lesson_Report_Attendance::query()
+        ->whereIn('report_id', $reportsIds)
+        ->get()
+        ->map(function(Schedule_Lesson_Report_Attendance $attendance) : \stdClass {
+            return $attendance->toStd();
+        });
+
+    $reports = (clone $reportsCollection)->map(function(Schedule_Lesson_Report $report) use ($attendances) : stdClass {
+        $reportStd = $report->toStd();
+        $reportStd->attendances = $attendances->where('report_id', $report->getId())->all();
+        return $reportStd;
+    });
+
     $teachers = [];
+    $clients = [
+        'users' => [],
+        'groups' => [],
+        'lids' => []
+    ];
     $areas = [];
     foreach ($schedule as $day) {
         $day->refactored_date = refactorDateFormat($day->date);
+        /**
+         * @var int $key
+         * @var Schedule_Lesson $lesson
+         */
         foreach ($day->lessons as $key => $lesson) {
             if (!isset($teachers[$lesson->teacherId()])) {
                 $teachers[$lesson->teacherId()] = $lesson->getTeacher();
@@ -722,10 +762,29 @@ if ($action === 'get_client_schedule') {
             if (!isset($areas[$lesson->areaId()])) {
                 $areas[$lesson->areaId()] = $lesson->getArea();
             }
-            $lesson->area = $areas[$lesson->areaId()]->title();
-            $lesson->teacher = $teachers[$lesson->teacherId()]->getFio();
+            if (in_array($lesson->typeId(), [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE]) && !isset($clients['users'][$lesson->clientId()])) {
+                $clients['users'][$lesson->clientId()] = $lesson->getClientUser();
+            }
+            if (in_array($lesson->typeId(), [Schedule_Lesson::TYPE_GROUP, Schedule_Lesson::TYPE_GROUP_CONSULT]) && !isset($clients['groups'][$lesson->clientId()])) {
+                $group = $lesson->getGroup();
+                $group->clients = $group->getClientList();
+                $clients['groups'][$lesson->clientId()] = $group;
+            }
+            if (in_array($lesson->typeId(), [Schedule_Lesson::TYPE_CONSULT]) && !isset($clients['lids'][$lesson->clientId()])) {
+                $clients['lids'][$lesson->clientId()] = $lesson->getLid();
+            }
+            $lesson->area = $areas[$lesson->areaId()];
+            $lesson->teacher = $teachers[$lesson->teacherId()]->toStd();
+            $lesson->client = !is_null($clients['users'][$lesson->clientId()] ?? null) ? $clients['users'][$lesson->clientId()]->toStd() : null;
+            $lesson->group = !is_null($clients['groups'][$lesson->clientId()] ?? null) ? $clients['groups'][$lesson->clientId()]->toStd() : null;
+            $lesson->lid = !is_null($clients['lids'][$lesson->clientId()] ?? null) ? $clients['lids'][$lesson->clientId()]->toStd() : null;
             $lesson->refactored_time_from = refactorTimeFormat($lesson->timeFrom());
             $lesson->refactored_time_to = refactorTimeFormat($lesson->timeTo());
+
+            $lesson->report = $reports->where('lesson_id', '=', $lesson->getId())
+                ->where('date', '=', $day->date)
+                ->first();
+
             $day->lessons[$key] = $lesson->toStd();
         }
     }
@@ -798,6 +857,40 @@ if ($action === 'saveLesson') {
 
 
 /**
+ * Формирование отчета по проведенному занятию
+ */
+if ($action === 'makeReport') {
+    $user = User_Auth::current();
+
+    //проверка прав доступа
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_CREATE)) {
+        exit(REST::responseError(REST::ERROR_CODE_ACCESS, 'Недостаточно прав для создания отчета о проведенном занятии'));
+    }
+
+    $lessonId = Core_Array::Post('lessonId', 0, PARAM_INT);
+    $date = Core_Array::Post('date', null, PARAM_STRING);
+    $attendance = Core_Array::Post('attendance', null, PARAM_INT);
+    $attendanceClients = Core_Array::Post('attendance_clients', [], PARAM_ARRAY);
+
+    $lesson = Schedule_Lesson::find($lessonId);
+    if (is_null($lessonId) || is_null($date)) {
+        exit(REST::responseError(REST::ERROR_CODE_CUSTOM, 'Отсутствует один из обязательных параметров'));
+    }
+    if (is_null($lesson)) {
+        exit(REST::responseError(REST::ERROR_CODE_NOT_FOUND, 'Занятие с указанным id не существует'));
+    }
+    if (!$user->isManagementStaff() && $lesson->teacherId() !== $user->getId()) {
+        exit(REST::responseError(REST::ERROR_CODE_ACCESS, 'Невозможно отправлять отчет по чужому занятию'));
+    }
+
+    $report = $lesson->makeReport($date, $attendance, $attendanceClients);
+    !is_null($report)
+        ?   exit(REST::status(REST::STATUS_SUCCESS, 'Отчет успешно отправлен'))
+        :   exit(REST::status(REST::STATUS_ERROR, 'Отчет уже существует'));
+}
+
+
+/**
  * Отсутствие занятия
  */
 if ($action === 'markAbsent') {
@@ -860,6 +953,15 @@ if ($action === 'getReportsStatistic') {
     $teacherId = Core_Array::Get('teacher_id', null, PARAM_INT);
     $dateFrom = Core_Array::Get('date_from', null, PARAM_DATE);
     $dateTo = Core_Array::Get('date_to', null, PARAM_DATE);
+
+    $user = User_Auth::current();
+    if (is_null($user) || $user->groupId() === ROLE_CLIENT) {
+        exit(REST::responseError(REST::ERROR_CODE_ACCESS, 'Недостаточно прав для получения статистики проведенных занятий'));
+    }
+
+    if ($user->groupId() === ROLE_TEACHER) {
+        $teacherId = $user->getId();
+    }
 
     $lessonsTable = (new Schedule_Lesson())->getTableName();
     $reportsTable = (new Schedule_Lesson_Report())->getTableName();

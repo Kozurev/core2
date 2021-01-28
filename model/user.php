@@ -386,4 +386,20 @@ class User extends User_Model
     {
         return $this->groupId() === ROLE_DIRECTOR;
     }
+
+    /**
+     * @return bool
+     */
+    public function isTeacher() : bool
+    {
+        return $this->groupId() === ROLE_TEACHER;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isClient() : bool
+    {
+        return $this->groupId() === ROLE_CLIENT;
+    }
 }
