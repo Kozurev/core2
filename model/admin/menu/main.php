@@ -336,14 +336,16 @@ class Admin_Menu_Main
             ?   $eventType = 'activate'
             :   $eventType = 'deactivate';
 
+        /** @var Core_Entity|null $obj */
         $obj = Core::factory($modelName, $modelId);
 
-        //Проверка на существование объекта
         if (is_null($obj)) {
             Core_Page_Show::instance()->error(403);
         }
         Core::notify([$obj], 'before.' . $eventObjectName . '.' . $eventType);
-        $obj->active($value)->save();
+        if (!$obj->active($value)->save()) {
+            exit($obj->_getValidateErrorsStr());
+        }
         Core::notify([$obj], 'after.' . $eventObjectName . '.' . $eventType);
         echo 0;
     }
