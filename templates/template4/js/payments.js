@@ -356,6 +356,7 @@ function makePaymentPopup(paymentId, afterSaveAction) {
     loaderOn();
     Payment.getPayment(paymentId, function(payment) {
         Payment.getCustomTypesList(function(types) {
+            Schedule.clearCache();
             Schedule.getAreasList({}, function(areas) {
                 var popupData = '<div class="popup-row-block">' +
                     '<div class="column"><span>Сумма</span><span style="color:red">*</span></div>' +
