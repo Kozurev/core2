@@ -10,6 +10,20 @@
 $user = User_Auth::current();
 $userController = new User_Controller_Extended($user);
 
+$propertiesIds = [
+    4,  //Примечание пользователя
+    9,  //Ссылка вконтакте
+    12, //Баланс
+    13, //Кол-во индивидуальных занятий
+    14, //Кол-во групповых занятий
+    16, //Дополнительный телефон
+    17, //Длительность занятия
+    18, //Соглашение подписано
+    19, //Примечание (статус)
+    20, //Направление подготовки (инструмент)
+    28  //Год рождения
+];
+
 //Пагинация
 $userController->paginate()->setCurrentPage(
     Core_Array::Get('page', 1, PARAM_INT)
@@ -26,7 +40,7 @@ foreach ($_GET as $paramName => $values) {
         foreach ($_GET['areas'] as $areaId) {
             try {
                 if ($areaId > 0
-                    && ($ScheduleAssignment->issetAssignment(User::current(), intval($areaId)) !== null)
+                    && ($ScheduleAssignment->issetAssignment(User_Auth::current(), intval($areaId)) !== null)
                     || User::checkUserAccess(['groups' => [ROLE_DIRECTOR]])
                 ) {
                     $Area = Schedule_Area_Controller::factory(intval($areaId));
@@ -53,7 +67,7 @@ foreach ($_GET as $paramName => $values) {
 try {
     $userController
         ->setActive(false)
-        ->properties(true)
+        ->properties($propertiesIds)
         ->isShowCount(true)
         ->isPaginate(true)
         ->addSimpleEntity('table-type', User_Controller_Extended::TABLE_ARCHIVE)
