@@ -18,24 +18,33 @@ if ($action === 'getList') {
     $paramActive = Core_Array::Get('params/active', null, PARAM_BOOL);
     $paramTypeId = Core_Array::Get('params/type', 0, PARAM_INT);
 
-    $scheduleGroup = new Schedule_Group();
-    $scheduleGroup->queryBuilder()
+    $groupsQuery = Schedule_Group::query()
         ->where('subordinated', '=', $subordinated)
         ->orderBy('title');
 
     if (!is_null($paramActive)) {
-        $scheduleGroup->queryBuilder()->where('active', '=', intval($paramActive));
+        $groupsQuery->where('active', '=', intval($paramActive));
     }
 
     if ($paramTypeId > 0) {
-        $scheduleGroup->queryBuilder()->where('type', '=', $paramTypeId);
+        $groupsQuery->where('type', '=', $paramTypeId);
     }
 
-    $groups = $scheduleGroup->findAll();
+    $userAreas = (new Schedule_Area_Assignment(User_Auth::current()))->getAreas();
+    $userAreasIds = collect($userAreas)->pluck('id')->toArray();
+    $groupsQuery->open()
+        ->where('area_id', 'is', 'NULL')
+        ->orWhereIn('area_id', $userAreasIds)
+        ->close();
 
-    $response = [];
-    foreach ($groups as $group) {
-        $response[] = $group->toStd();
-    }
-    exit(json_encode($response));
+    $groups = $groupsQuery->get();
+    exit(json_encode($groups->map(function (Schedule_Group $group): stdClass {
+        return $group->toStd();
+    })));
+
+//    $response = [];
+//    foreach ($groups as $group) {
+//        $response[] = $group->toStd();
+//    }
+//    exit(json_encode($response));
 }

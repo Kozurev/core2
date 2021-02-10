@@ -100,7 +100,7 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
 
         //Исключительный случай: если объект является пользователем который имеет роль директора в системе
         //то ему по умолчанию доступен список всех филиалов, принадлежащих его организации
-        if ($object instanceof User && $object->isDirector()) {
+        if ($object instanceof User && ($object->isDirector() || Core_Access::instance()->hasCapability(Core_Access::AREA_MULTI_ACCESS, $object))) {
             return Core::factory('Schedule_Area')->getList(true, false);
         }
 
