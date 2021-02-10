@@ -314,10 +314,10 @@
                                 <div class="col-md-4">Статус</div>
 
                                 <div class="col-md-6">
-                                    <textarea class="form-control" placeholder="Заметки" id="client_notes" data-userid="{user/id}" >
+                                    <textarea class="form-control" placeholder="Заметки" id="client_notes" data-userid="{user/id}">
                                         <xsl:choose>
-                                            <xsl:when test="note != ''">
-                                                <xsl:value-of select="note" />
+                                            <xsl:when test="user/comment != ''">
+                                                <xsl:value-of select="user/comment" />
                                             </xsl:when>
                                             <xsl:otherwise>
                                                 <xsl:text>&#x0A;</xsl:text>

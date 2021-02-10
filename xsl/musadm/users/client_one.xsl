@@ -106,7 +106,7 @@
                 <!--Примечания-->
                 <span class="add__19">
                     <div class="notes">
-                        <xsl:value-of select="property_value[property_id = 19]/value" />
+                        <xsl:value-of select="comment" />
                     </div>
                 </span>
             </td>

@@ -116,6 +116,7 @@ if ($action === 'save') {
     $login = Core_Array::Post('login', null, PARAM_STRING);
     $pass1 = Core_Array::Post('pass1', '', PARAM_STRING);
     $pass2 = Core_Array::Post('pass2', '', PARAM_STRING);
+    $comment = Core_Array::Post('comment', null, PARAM_STRING);
 
     /**
      * Различные проверки
@@ -138,6 +139,7 @@ if ($action === 'save') {
     $user->groupId($groupId);
     $user->phoneNumber($phone);
     $user->login($login);
+    $user->comment($comment);
     if (!empty($pass1)) {
         $user->password($pass1);
     }

@@ -82,6 +82,13 @@ class User_Model extends Core_Entity
     public int $subordinated = 0;
 
     /**
+     * Примечание
+     *
+     * @var string|null
+     */
+    public ?string $comment = null;
+
+    /**
      * @var string
      */
 	public string $auth_token = '';
@@ -265,6 +272,20 @@ class User_Model extends Core_Entity
     }
 
     /**
+     * @param string|null $comment
+     * @return $this|string
+     */
+    public function comment(?string $comment = null)
+    {
+        if (is_null($comment)) {
+            return strval($this->comment);
+        } else {
+            $this->comment = !empty($comment) ? $comment : null;
+            return $this;
+        }
+    }
+
+    /**
      * @param string|null $authToken
      * @return $this|string
      */
@@ -295,7 +316,7 @@ class User_Model extends Core_Entity
     /**
      * @return array
      */
-    public function schema() : array
+    public function schema(): array
     {
         return [
             'id' => [

@@ -67,24 +67,19 @@ if ($action === 'refreshTablePayments') {
  * Редактирование примечания
  */
 if ($action === 'updateNote') {
-    if (!User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]])) {
+    if (!Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_CLIENT)) {
         Core_Page_Show::instance()->error(403);
     }
 
     $userId =   Core_Array::Get('userId', null, PARAM_INT);
-    $note =     Core_Array::Get('note', '', PARAM_STRING);
+    $note =     Core_Array::Get('note', null, PARAM_STRING);
 
-    $User = User_Controller::factory($userId);
-    if (is_null($User)) {
+    $user = User_Controller::factory($userId);
+    if (is_null($user)) {
         Core_Page_Show::instance()->error(404);
     }
-
-    Core::factory('Property')
-        ->getByTagName('notes')
-        ->getPropertyValues($User)[0]
-        ->value($note)
-        ->save();
-
+    $user->comment($note);
+    $user->save();
     exit;
 }
 

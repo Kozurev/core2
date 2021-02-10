@@ -119,8 +119,8 @@
                 <span>График для занятий</span>
             </div>
             <div class="column">
-                <textarea name="property_31[]" class="form-control">
-                    <xsl:value-of select="property_value[property_id = 31]/value" />
+                <textarea name="comment" class="form-control">
+                    <xsl:value-of select="user/comment" />
                 </textarea>
             </div>
 

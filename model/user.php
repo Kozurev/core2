@@ -22,7 +22,7 @@ class User extends User_Model
     /**
      * @return array
      */
-    public static function getHiddenProps() : array
+    public static function getHiddenProps(): array
     {
         return self::$hidden;
     }
@@ -31,7 +31,7 @@ class User extends User_Model
      * @param array $forbiddenProps
      * @return stdClass
      */
-    public function toStd(array $forbiddenProps = [])
+    public function toStd(array $forbiddenProps = []): stdClass
     {
         return parent::toStd(count($forbiddenProps) == 0 ? self::getHiddenProps() : $forbiddenProps);
     }
@@ -50,7 +50,7 @@ class User extends User_Model
      *
      * @return User_Group|null
      */
-    public function getParent() : ?User_Group
+    public function getParent(): ?User_Group
     {
         if (!empty($this->id)) {
             return User_Group::find($this->groupId());
@@ -66,7 +66,7 @@ class User extends User_Model
 	 * @return bool
      * @deprecated заменен на isUnique
 	 */
-	public function isUserExists(string $login) : bool
+	public function isUserExists(string $login): bool
 	{
 		$user = self::query()
 			->where('login', '=', $login)
@@ -82,7 +82,7 @@ class User extends User_Model
      * @param int $exceptId
      * @return bool
      */
-	public static function isUnique(string $uniqueVal, string $uniqueField = 'login', int $exceptId = 0)
+	public static function isUnique(string $uniqueVal, string $uniqueField = 'login', int $exceptId = 0): bool
     {
         if (empty($uniqueVal)) {
             return true;
@@ -98,7 +98,7 @@ class User extends User_Model
     /**
      * @return string
      */
-    public function getFio() : string
+    public function getFio(): string
     {
         $fio = $this->surname() . ' ' . $this->name();
         if (!empty($this->patronymic())) {
@@ -113,31 +113,30 @@ class User extends User_Model
      *
      * @return self
 	 */
-	public function save()
+	public function save(): ?self
 	{
         if (empty($this->register_date)) {
             $this->register_date = date('Y-m-d');
         }
 
-        // if (empty($this->id)) {
-            if (!empty($this->login)) {
-                if (!self::isUnique($this->login, 'login', $this->getId())) {
-                    $this->_setValidateErrorStr('Пользователь с таким логином уже существует');
-                    return null;
-                }
+        if (!empty($this->login)) {
+            if (!self::isUnique($this->login, 'login', $this->getId())) {
+                $this->_setValidateErrorStr('Пользователь с таким логином уже существует');
+                return null;
             }
+        }
+        if (!empty($this->email)) {
             if (!self::isUnique($this->email, 'email', $this->getId())) {
                 $this->_setValidateErrorStr('Пользователь с таким email уже существует');
                 return null;
             }
-        // }
+        }
 
         if (empty($this->authToken())) {
             $this->authToken(uniqidReal(self::getMaxAuthTokenLength()));
         }
 
         Core::notify([&$this], 'before.User.save');
-
 		if (empty(parent::save())) {
 		    return null;
         }
@@ -163,7 +162,7 @@ class User extends User_Model
      * @return User|null
      * @deprecated
      */
-    public static function current() : ?User
+    public static function current(): ?User
     {
         return User_Auth::current();
     }
@@ -173,7 +172,7 @@ class User extends User_Model
      *
      * @deprecated
 	 */
-	static public function disauthorize()
+	static public function disauthorize(): void
 	{
 		User_Auth::logout();
 	}
@@ -186,7 +185,7 @@ class User extends User_Model
      * @return bool
      * @deprecated
      */
-	static public function checkUserAccess(array $params, User $User = null)
+	static public function checkUserAccess(array $params, User $User = null): bool
     {
         $groups =       Core_Array::getValue($params, 'groups', null, PARAM_ARRAY);
         $forSuperuser = Core_Array::getValue($params, 'superuser', null, PARAM_BOOL);
@@ -216,7 +215,7 @@ class User extends User_Model
      * @param int $userId - id пользователя, от имени которого происходит авторизация
      * @deprecated
      */
-    public static function authAs(int $userId)
+    public static function authAs(int $userId): void
     {
         User_Auth::authAs($userId);
     }
@@ -227,7 +226,7 @@ class User extends User_Model
      *
      * @deprecated
      */
-    public static function authRevert()
+    public static function authRevert(): void
     {
         User_Auth::authRevert();
     }
@@ -238,7 +237,7 @@ class User extends User_Model
      * @return bool
      * @deprecated
      */
-    public static function isAuthAs() : bool
+    public static function isAuthAs(): bool
     {
         return User_Auth::isAuthAs();
     }
@@ -249,7 +248,7 @@ class User extends User_Model
      * @return User
      * @deprecated
      */
-    public static function parentAuth() : User
+    public static function parentAuth(): User
     {
         return User_Auth::parentAuth();
     }
@@ -260,7 +259,7 @@ class User extends User_Model
      *
      * @return User
      */
-    public function getDirector() : ?User
+    public function getDirector(): ?User
     {
         if ($this->groupId() == ROLE_DIRECTOR || $this->subordinated() == 0) {
             return $this;
@@ -278,7 +277,7 @@ class User extends User_Model
      * @return Comment|null
      * @throws Exception
      */
-    public function addComment(string $text, int $authorId = null, string $date = null)
+    public function addComment(string $text, int $authorId = null, string $date = null): ?Comment
     {
         Core::notify([&$this], 'before.User.addComment');
 
@@ -297,7 +296,7 @@ class User extends User_Model
      *
      * @return string
      */
-    public function getOrganizationName() : string
+    public function getOrganizationName(): string
     {
         $director = $this->getDirector();
         if ($director->groupId() !== ROLE_DIRECTOR) {
@@ -315,7 +314,7 @@ class User extends User_Model
      * @param User|null $user
      * @return bool
      */
-    public static function isSubordinate($object, User $user = null) : bool
+    public static function isSubordinate($object, User $user = null): bool
     {
         if (is_null($user)) {
             $user = User_Auth::current();
@@ -344,7 +343,7 @@ class User extends User_Model
     /**
      * Создание авторизационного токена для пользователя
      */
-    public function createAuthToken() : void
+    public function createAuthToken(): void
     {
         $this->authToken(uniqidReal(self::getMaxAuthTokenLength()));
         $this->save();
@@ -355,7 +354,7 @@ class User extends User_Model
      *
      * @return string
      */
-    public function getAuthToken() : string
+    public function getAuthToken(): string
     {
         if (empty($this->authToken())) {
             $this->createAuthToken();
@@ -366,7 +365,7 @@ class User extends User_Model
     /**
      * @return int
      */
-    public static function getMaxAuthTokenLength() : int
+    public static function getMaxAuthTokenLength(): int
     {
         return 50;
     }
@@ -374,7 +373,7 @@ class User extends User_Model
     /**
      * @return bool
      */
-    public function isManagementStaff() : bool
+    public function isManagementStaff(): bool
     {
         return in_array($this->groupId(), [ROLE_ADMIN, ROLE_DIRECTOR, ROLE_MANAGER]);
     }
@@ -382,7 +381,7 @@ class User extends User_Model
     /**
      * @return bool
      */
-    public function isDirector() : bool
+    public function isDirector(): bool
     {
         return $this->groupId() === ROLE_DIRECTOR;
     }
@@ -390,7 +389,7 @@ class User extends User_Model
     /**
      * @return bool
      */
-    public function isTeacher() : bool
+    public function isTeacher(): bool
     {
         return $this->groupId() === ROLE_TEACHER;
     }
@@ -398,7 +397,7 @@ class User extends User_Model
     /**
      * @return bool
      */
-    public function isClient() : bool
+    public function isClient(): bool
     {
         return $this->groupId() === ROLE_CLIENT;
     }

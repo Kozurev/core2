@@ -60,10 +60,6 @@ if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit 
     //Дата последней авторизации
     $lastEntryDate = User_Auth_Log::getLastDate($User);
 
-    //Клиентские заметки
-    $ClientNote = Property_Controller::factoryByTag('notes');
-    $clientNote = $ClientNote->getValues($User)[0]->value();
-
     //Поурочная оплата
     $PerLesson = Property_Controller::factoryByTag('per_lesson');
     $perLesson = $PerLesson->getValues($User)[0]->value();
@@ -104,12 +100,6 @@ if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit 
         $nearestLessonXml->addSimpleEntity('date', $nearestLessons[0]->date);
         $nearestLessonXml->addSimpleEntity('refactoredDate', refactorDateFormat($nearestLessons[0]->date));
         $tomorrow = date('Y-m-d', strtotime(date('Y-m-d') . ' +1 day'));
-//        $endDayTime = Property_Controller::factoryByTag('schedule_edit_time_end')->getValues(User_Auth::current()->getDirector())[0]->value();
-//        if ($nearestLessons[0]->date > $tomorrow || ($nearestLessons[0]->date == $tomorrow && date('H:i:s') < $endDayTime)) {
-//            $isCancellable = 1;
-//        } else {
-//            $isCancellable = 0;
-//        }
         $isCancellable = (int)checkTimeForScheduleActions($User, $nearestLessons[0]->date);
         $nearestLessonXml->addSimpleEntity('is_cancellable', $isCancellable);
         foreach ($nearestLessons[0]->lessons as $lesson) {
@@ -126,7 +116,6 @@ if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit 
 
     $OutputXml
         ->addEntity($User, 'client')
-        ->addSimpleEntity('note', $clientNote)
         ->addSimpleEntity('entry', $lastEntryDate)
         ->addSimpleEntity('per_lesson', $perLesson)
         ->addSimpleEntity('prev_lid', $prevLid)
@@ -277,10 +266,10 @@ if (Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_CLIENT)) {
         ->where('user', '=', $User->getId())
         ->findAll();
 
+    $UserPaymentsNotesProperty = Core::factory('Property', 26);
     foreach ($UserPayments as $payment) {
-        $UserPaymentsNotes = Core::factory('Property', 26)->getPropertyValues( $payment );
-        $UserPaymentsNotes = array_reverse($UserPaymentsNotes);
-        $payment->addEntities($UserPaymentsNotes, 'notes');
+        $UserPaymentsNotes = array_reverse($UserPaymentsNotesProperty);
+        $payment->addEntities($UserPaymentsNotes->getPropertyValues($payment), 'notes');
         $payment->datetime(refactorDateFormat($payment->datetime()));
     }
 
