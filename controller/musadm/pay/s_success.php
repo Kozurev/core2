@@ -33,7 +33,7 @@ if (!is_null($orderId)) {
                 }
                 $checkout->instance()->makeReceipt($payment);
             } catch (Exception $e) {
-                Log::instance()->error('checkout', $e->getMessage());
+                Log::instance()->error(Log::TYPE_CHECKOUT, $e->getMessage());
             }
 
             if (!empty($orderData->successUrl ?? '')) {

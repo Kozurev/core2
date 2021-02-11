@@ -12,7 +12,11 @@ class Log
     const TYPE_SMS = 'sms';
     const TYPE_CORE = 'core';
     const TYPE_MAIL = 'mail';
+    const TYPE_CHECKOUT = 'checkout';
 
+    /**
+     * @var self|null
+     */
     protected static ?self $_instance = null;
 
     /**
@@ -29,6 +33,14 @@ class Log
      * @var string
      */
     protected static string $emailNotification = ADMIN_EMAIL;
+
+    /**
+     * @var array|string[]
+     */
+    protected array $emailNotificationTypes = [
+        self::TYPE_CORE,
+        self::TYPE_CHECKOUT
+    ];
 
     /**
      * Log constructor.
@@ -65,6 +77,15 @@ class Log
     public function error(string $type, string $message)
     {
         $this->makeLog('error', $type, $message);
+    }
+
+    /**
+     * @param string $type
+     * @return bool
+     */
+    public function isEmailNotificationTypeEnable(string $type): bool
+    {
+        return in_array($type, $this->emailNotificationTypes);
     }
 
     /**
@@ -111,7 +132,7 @@ class Log
         $newFileStr = date('Y-m-d H:i:s') . ' ' . $logData;
         file_put_contents($logTypeDir . '/log.txt', $newFileStr . PHP_EOL, FILE_APPEND);
 
-        if ($this->isEmailNotificationsEnabled() && $logType === 'error') {
+        if ($this->isEmailNotificationsEnabled() && $logType === 'error' && $this->isEmailNotificationTypeEnable($logDirName)) {
             $this->sendNotification($logData);
         }
     }
