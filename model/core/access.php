@@ -201,18 +201,19 @@ class Core_Access
             $accessGroup = self::getUserGroup($user);
         } else {
             $accessGroup = $this->accessGroup;
+            $user = $this->getUser();
         }
 
-        if (!is_null($this->getUser()) && !is_null($this->cache->get($this->getUser()->getId(), $capability))) {
-            return $this->cache->get($this->getUser()->getId(), $capability);
+        if (!is_null($user) && !is_null($this->cache->get($user->getId(), $capability))) {
+            return $this->cache->get($user->getId(), $capability);
         }
 
         if (is_null($accessGroup)) {
             return false;
         } else {
             $access = $accessGroup->hasCapability($capability);
-            if (!is_null($this->getUser())) {
-                $this->cache->put($this->getUser()->getId(), $capability, $access);
+            if (!is_null($user)) {
+                $this->cache->put($user->getId(), $capability, $access);
             }
             return $access;
         }
