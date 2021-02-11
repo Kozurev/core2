@@ -90,12 +90,8 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
 
         $areasQuery = Schedule_Area::query()->orderBy('sorting', 'ASC');
 
-        if ($isSubordinate === true) {
-            $user = User_Auth::current();
-            if (is_null($user)) {
-                return null;
-            }
-            $areasQuery->where('subordinated', '=', $user->getDirector()->getId());
+        if ($isSubordinate === true && $object instanceof User) {
+            $areasQuery->where('subordinated', '=', $object->getDirector()->getId());
         }
 
         //Исключительный случай: если объект является пользователем который имеет роль директора в системе
