@@ -47,15 +47,5 @@ register_shutdown_function(function() {
     if (!is_null($error)) {
         $errorLogMessage = 'Error in file ' . $error['file'] . ' on line ' . $error['line'] . ':' . PHP_EOL . $error['message'] . PHP_EOL;
         Log::instance()->error(Log::TYPE_CORE, $errorLogMessage);
-
-        try {
-            $mail = \Model\Mail::factory();
-            $mail->addAddress(ADMIN_EMAIL);
-            $mail->Subject = 'Ошибка в musicmetod.ru';
-            $mail->msgHTML($errorLogMessage);
-            $mail->send();
-        } catch (\Exception $e) {
-            Log::instance()->error(Log::TYPE_CORE, 'Ошибка отправки оповещения: ' . $e->getMessage());
-        }
     }
 });

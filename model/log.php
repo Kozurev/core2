@@ -11,6 +11,7 @@ class Log
     const TYPE_ORM = 'orm';
     const TYPE_SMS = 'sms';
     const TYPE_CORE = 'core';
+    const TYPE_MAIL = 'mail';
 
     protected static ?self $_instance = null;
 
@@ -18,6 +19,16 @@ class Log
      * @var string
      */
     protected static string $logDir;
+
+    /**
+     * @var bool
+     */
+    protected bool $emailNotificationEnabled = true;
+
+    /**
+     * @var string
+     */
+    protected static string $emailNotification = ADMIN_EMAIL;
 
     /**
      * Log constructor.
@@ -30,7 +41,7 @@ class Log
     /**
      * @return Log
      */
-    public static function instance()
+    public static function instance(): Log
     {
         if (is_null(self::$_instance)) {
             self::$_instance = new self();
@@ -44,7 +55,7 @@ class Log
      */
     public function debug(string $type, string $message)
     {
-        self::makeLog('debug', $type, $message);
+        $this->makeLog('debug', $type, $message);
     }
 
     /**
@@ -53,7 +64,31 @@ class Log
      */
     public function error(string $type, string $message)
     {
-        self::makeLog('error', $type, $message);
+        $this->makeLog('error', $type, $message);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmailNotificationsEnabled(): bool
+    {
+        return $this->emailNotificationEnabled;
+    }
+
+    /**
+     *
+     */
+    public function emailNotificationsOn(): void
+    {
+        $this->emailNotificationEnabled = true;
+    }
+
+    /**
+     *
+     */
+    public function emailNotificationsOff(): void
+    {
+        $this->emailNotificationEnabled = false;
     }
 
     /**
@@ -61,7 +96,7 @@ class Log
      * @param $logDirName
      * @param $logData
      */
-    private static function makeLog($logType, $logDirName, $logData)
+    private function makeLog($logType, $logDirName, $logData)
     {
         $logDir = self::$logDir . '/' . $logDirName;
         if (!is_dir($logDir)) {
@@ -75,6 +110,29 @@ class Log
 
         $newFileStr = date('Y-m-d H:i:s') . ' ' . $logData;
         file_put_contents($logTypeDir . '/log.txt', $newFileStr . PHP_EOL, FILE_APPEND);
+
+        if ($this->isEmailNotificationsEnabled() && $logType === 'error') {
+            $this->sendNotification($logData);
+        }
+    }
+
+    /**
+     * @param string $message
+     */
+    protected function sendNotification(string $message)
+    {
+        try {
+            $mail = \Model\Mail::factory();
+            $mail->addAddress(self::$emailNotification);
+            $mail->Subject = 'Ошибка в musicmetod.ru';
+            $mail->msgHTML($message);
+            $mail->send();
+        } catch (\Throwable $throwable) {
+            $notificationEnabled = $this->emailNotificationEnabled;
+            $this->emailNotificationsOff();
+            $this->error(self::TYPE_MAIL, $throwable->getMessage());
+            $this->emailNotificationEnabled = $notificationEnabled;
+        }
     }
 
 }

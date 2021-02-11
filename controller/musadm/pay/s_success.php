@@ -25,7 +25,7 @@ if (!is_null($orderId)) {
             try {
                 $user = $payment->getUser();
                 if (is_null($user)) {
-                    throw new Exception('У платежа отсутствует пользователь');
+                    throw new Exception('У платежа ' . $payment->getId() . ' отсутствует пользователь');
                 }
                 $checkout = Checkout::makeForUser($user);
                 if (is_null($checkout)) {
