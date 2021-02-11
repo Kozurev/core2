@@ -38,7 +38,7 @@ class Sberbank
      *
      * @var int|null
      */
-    private ?int $orderNumber;
+    private ?int $orderNumber = null;
 
     /**
      * Сумма платежа
@@ -52,14 +52,14 @@ class Sberbank
      *
      * @var int|null
      */
-    private ?int $userId;
+    private ?int $userId = null;
 
     /**
      * Примечание к платежу
      *
      * @var string|null
      */
-    private ?string $description;
+    private ?string $description = null;
 
     /**
      * URL для редиректа после успешной оплаты
@@ -92,9 +92,11 @@ class Sberbank
     /**
      * @return Sberbank
      */
-    public static function instance()
+    public static function instance(): self
     {
-        $token = Property_Controller::factoryByTag('payment_sberbank_token')->getValues(User_Auth::current()->getDirector())[0]->value();
+        $token = Property_Controller::factoryByTag('payment_sberbank_token')
+            ->getValues(User_Auth::current()->getDirector())[0]
+            ->value();
         return new self($token);
     }
 
@@ -165,6 +167,7 @@ class Sberbank
             self::PARAM_ORDER_NUMBER => $this->orderNumber,
             self::PARAM_SUCCESS_URL => $this->successUrl,
             self::PARAM_ERROR_URL => $this->errorUrl,
+            self::PARAM_DESCRIPTION => strval($this->description)
         ];
         $params[self::PARAM_JSON_PARAMS] = json_encode($params);
         return Api::getRequest($this->getUrl(self::ACTION_REGISTER_ORDER), $params);
