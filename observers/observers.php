@@ -442,7 +442,7 @@ Core::attachObserver('before.Payment.save', function($args) {
 /**
  * Корректировка баланса клиента при сохранении/редактировании платежа типа начисление/списание
  */
-Core::attachObserver('after.Payment.save', function($args) {
+Core::attachObserver('before.Payment.save', function($args) {
     /** @var Payment $Payment */
     $payment = $args[0];
     //$property = new Property();
