@@ -29,7 +29,7 @@ if (!is_null($orderId)) {
                 }
                 $checkout = Checkout::makeForUser($user);
                 if (is_null($checkout)) {
-                    throw new Exception('Отсутствуют настройки кассы для филиала пользователя');
+                    throw new Exception('Отсутствуют настройки кассы для филиала пользователя ' . $user->getFio() . '. Платеж номер: ' . $payment->getId() . ' на сумму: ' . $payment->value());
                 }
                 $checkout->instance()->makeReceipt($payment);
             } catch (Exception $e) {
