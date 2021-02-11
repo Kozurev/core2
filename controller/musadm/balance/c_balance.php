@@ -268,8 +268,8 @@ if (Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_CLIENT)) {
 
     $UserPaymentsNotesProperty = Core::factory('Property', 26);
     foreach ($UserPayments as $payment) {
-        $UserPaymentsNotes = array_reverse($UserPaymentsNotesProperty);
-        $payment->addEntities($UserPaymentsNotes->getPropertyValues($payment), 'notes');
+        //$UserPaymentsNotes = array_reverse($UserPaymentsNotesProperty);
+        $payment->addEntities($UserPaymentsNotesProperty->getPropertyValues($payment), 'notes');
         $payment->datetime(refactorDateFormat($payment->datetime()));
     }
 
