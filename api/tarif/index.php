@@ -102,82 +102,80 @@ if ($action === 'buyForClient' || $action === 'buy_tarif') {
 
     $response = [];
 
-    Core::factory('User_Controller');
-    $Client = User_Controller::factory($clientId);
-    $Tarif = Core::factory('Payment_Tarif', $tarifId);
+    $client = User_Controller::factory($clientId);
+    $tarif = Core::factory('Payment_Tarif', $tarifId);
 
-    if (is_null($Client) && is_null($Tarif)) {
+    if (is_null($client) && is_null($tarif)) {
         Core_Page_Show::instance()->error(404);
     }
 
-    $UserBalance = Core::factory('Property')->getByTagName('balance');
-    $UserBalance = $UserBalance->getPropertyValues($Client)[0];
-    if ($UserBalance->value() < $Tarif->price()) {
+    $balance = Core::factory('Property')->getByTagName('balance');
+    $balance = $balance->getValues($client)[0];
+    if ($balance->value() < $tarif->price()) {
         exit(REST::error(1, 'Недостаточно средств для покупки данного тарифа'));
     }
 
-    $CountIndivLessons = Core::factory('Property')->getByTagName('indiv_lessons');
-    $CountGroupLessons = Core::factory('Property')->getByTagName('group_lessons');
-    $CountIndivLessons = $CountIndivLessons->getPropertyValues($Client)[0];
-    $CountGroupLessons = $CountGroupLessons->getPropertyValues($Client)[0];
+    //Создание платежа
+    $payment = (new Payment())
+        ->type(2)
+        ->user($client->getId())
+        ->value($tarif->price())
+        ->description("Покупка тарифа \"" . $tarif->title() . "\"");
+    if (!$payment->save()) {
+        exit(REST::error(2, $payment->_getValidateErrorsStr()));
+    }
 
     //Корректировка кол-ва занятий
-    if ($Tarif->countIndiv() != 0) {
-        $CountIndivLessons->value($CountIndivLessons->value() + $Tarif->countIndiv())->save();
+    $countIndivLessons = Property_Controller::factoryByTag('indiv_lessons')->getValues($client)[0];
+    $countGroupLessons = Property_Controller::factoryByTag('group_lessons')->getValues($client)[0];
+    if ($tarif->countIndiv() != 0) {
+        $countIndivLessons->value($countIndivLessons->value() + $tarif->countIndiv())->save();
     }
-    if ($Tarif->countGroup() != 0) {
-        $CountGroupLessons->value($CountGroupLessons->value() + $Tarif->countGroup())->save();
+    if ($tarif->countGroup() != 0) {
+        $countGroupLessons->value($countGroupLessons->value() + $tarif->countGroup())->save();
     }
 
     //Корректировка пользовательской медианы (средняя стоимость занятия)
     $clientRate = [];
-    if ($Tarif->countIndiv() != 0) {
-        $clientRate['client_rate_indiv'] = $Tarif->countIndiv();
+    if ($tarif->countIndiv() != 0) {
+        $clientRate['client_rate_indiv'] = $tarif->countIndiv();
     }
-    if ($Tarif->countGroup() != 0) {
-        $clientRate['client_rate_group'] = $Tarif->countGroup();
+    if ($tarif->countGroup() != 0) {
+        $clientRate['client_rate_group'] = $tarif->countGroup();
     }
 
     foreach ($clientRate as $rateType => $countLessons) {
-        $ClientRateProperty = Core::factory('Property')->getByTagName($rateType);
-        $newClientRateValue = $Tarif->price() / $countLessons;
+        $clientRateProperty = Property_Controller::factoryByTag($rateType);
+        $newClientRateValue = $tarif->price() / $countLessons;
         $newClientRateValue = round($newClientRateValue, 2);
-        $OldClientRateValue = $ClientRateProperty->getPropertyValues($Client)[0];
-        $OldClientRateValue->value($newClientRateValue)->save();
+        $oldClientRateValue = $clientRateProperty->getValues($client)[0];
+        $oldClientRateValue->value($newClientRateValue)->save();
         $response['rate'][$rateType] = $newClientRateValue;
     }
 
-    //Создание платежа
-    $Payment = Core::factory('Payment')
-        ->type(2)
-        ->user($Client->getId())
-        ->value($Tarif->price())
-        ->description("Покупка тарифа \"" . $Tarif->title() . "\"")
-        ->save();
-
-    $TarifStd = new stdClass();
-    $TarifStd->id = $Tarif->getId();
-    $TarifStd->title = $Tarif->title();
-    $TarifStd->price = $Tarif->price();
-    $TarifStd->countIndiv = $Tarif->countIndiv();
-    $TarifStd->countGroup = $Tarif->countGroup();
-    $TarifStd->access = $Tarif->access();
-    $response['tarif'] = $TarifStd;
+    $tarifStd = new stdClass();
+    $tarifStd->id = $tarif->getId();
+    $tarifStd->title = $tarif->title();
+    $tarifStd->price = $tarif->price();
+    $tarifStd->countIndiv = $tarif->countIndiv();
+    $tarifStd->countGroup = $tarif->countGroup();
+    $tarifStd->access = $tarif->access();
+    $response['tarif'] = $tarifStd;
 
     $stdUser = new stdClass();
-    $stdUser->id = $Client->getId();
-    $stdUser->surname = $Client->surname();
-    $stdUser->name = $Client->name();
-    $stdUser->patronymic = $Client->patronymic();
-    $stdUser->phone_number = $Client->phoneNumber();
-    $stdUser->email = $Client->email();
-    $stdUser->login = $Client->login();
-    $stdUser->group_id = $Client->groupId();
-    $stdUser->active = $Client->active();
-    $stdUser->subordinated = $Client->subordinated();
+    $stdUser->id = $client->getId();
+    $stdUser->surname = $client->surname();
+    $stdUser->name = $client->name();
+    $stdUser->patronymic = $client->patronymic();
+    $stdUser->phone_number = $client->phoneNumber();
+    $stdUser->email = $client->email();
+    $stdUser->login = $client->login();
+    $stdUser->group_id = $client->groupId();
+    $stdUser->active = $client->active();
+    $stdUser->subordinated = $client->subordinated();
     $response['user'] = $stdUser;
-    $response['user']->countIndiv = $CountIndivLessons->value();
-    $response['user']->countGroup = $CountGroupLessons->value();
+    $response['user']->countIndiv = $countIndivLessons->value();
+    $response['user']->countGroup = $countGroupLessons->value();
 
     die(json_encode($response));
 }

@@ -418,9 +418,31 @@ Core::attachObserver('before.Payment.insert', function($args) {
 
 
 /**
- * Корректировка баланса клиента при сохранении/редактировании платежа типа начисление/списание
+ * Создание связи с филиалом
  */
 Core::attachObserver('before.Payment.save', function($args) {
+    /** @var Payment $Payment */
+    $payment = $args[0];
+
+    //Автоматическое создание связи платежа с филиалом
+    if ($payment->areaId() == 0) {
+        $paymentUser = $payment->getUser();
+        if (!is_null($paymentUser)) {
+            $areasAssignments = new Schedule_Area_Assignment();
+            /** @var Schedule_Area[] $userAreas */
+            $userAreas = $areasAssignments->getAreas($paymentUser, true);
+            if (count($userAreas) == 1) {
+                $payment->areaId($userAreas[0]->getId());
+            }
+        }
+    }
+});
+
+
+/**
+ * Корректировка баланса клиента при сохранении/редактировании платежа типа начисление/списание
+ */
+Core::attachObserver('after.Payment.save', function($args) {
     /** @var Payment $Payment */
     $payment = $args[0];
     //$property = new Property();
@@ -452,19 +474,6 @@ Core::attachObserver('before.Payment.save', function($args) {
                 ?   $balanceNew = $balanceOld + floatval($difference)
                 :   $balanceNew = $balanceOld - floatval($difference);
             $userBalanceVal->value($balanceNew)->save();
-        }
-    }
-
-    //Автоматическое создание связи платежа с филиалом
-    if ($payment->areaId() == 0) {
-        $paymentUser = $payment->getUser();
-        if (!is_null($paymentUser)) {
-            $areasAssignments = new Schedule_Area_Assignment();
-            /** @var Schedule_Area[] $userAreas */
-            $userAreas = $areasAssignments->getAreas($paymentUser, true);
-            if (count($userAreas) == 1) {
-                $payment->areaId($userAreas[0]->getId());
-            }
         }
     }
 });
