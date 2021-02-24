@@ -263,6 +263,7 @@ if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ)) {
 if (Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_CLIENT)) {
     $UserPayments = Payment::getListQuery()
         ->orderBy('id', 'DESC')
+        ->where('status', '=', Payment::STATUS_SUCCESS)
         ->where('user', '=', $User->getId())
         ->findAll();
 
