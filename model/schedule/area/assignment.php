@@ -232,7 +232,7 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
      * @param int|null $areaId
      * @return Schedule_Area_Assignment|null
      */
-    public function issetAssignment(Core_Entity $object = null, int $areaId = null)
+    public function issetAssignment(Core_Entity $object = null, int $areaId = null): ?Schedule_Area_Assignment
     {
         if (is_null($object) && is_null($this->object)) {
             return null;
@@ -245,5 +245,23 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
             ->where('model_name', '=', $object->getTableName())
             ->where('area_id', '=', intval($areaId))
             ->find();
+    }
+
+    /**
+     * @param int $areaId
+     * @return bool
+     */
+    public function hasAccess(int $areaId): bool
+    {
+        if ($this->object instanceof User) {
+            if ($this->object->isDirector() || Core_Access::instance()->hasCapability(Core_Access::AREA_MULTI_ACCESS, $this->object)) {
+                return true;
+            }
+        }
+        return (new self)->queryBuilder()
+            ->where('model_id', '=', $this->object->getId())
+            ->where('model_name', '=', $this->object->getTableName())
+            ->where('area_id', '=', $areaId)
+            ->exists();
     }
 }
