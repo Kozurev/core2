@@ -20,7 +20,6 @@ require_once ROOT . '/model/comment.php';
 spl_autoload_register(function ($className) {
     $classSegments = explode('\\', $className);
     if ($classSegments[0] == 'Model') {
-        // unset($classSegments[0]);
         $classSegments = [end($classSegments)];
     }
     Core::requireClass(implode('_', $classSegments));

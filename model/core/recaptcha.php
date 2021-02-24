@@ -33,7 +33,7 @@ class Core_Recaptcha
      *
      * @var array
      */
-    private static $errorCodesLang = [
+    private static array $errorCodesLang = [
         'missing-input-secret' =>   'Отсутствует секретный ключ',
         'invalid-input-secret' =>   'Указанный секретный ключ не существует или искажен.',
         'missing-input-response' => 'Значение reCAPTCHA не было указано либо указано неверно.',
@@ -64,7 +64,7 @@ class Core_Recaptcha
     /**
      * @return Core_Recaptcha
      */
-    public static function instance()
+    public static function instance(): Core_Recaptcha
     {
         if (empty(self::$_instance)) {
             global $CFG;
@@ -76,7 +76,7 @@ class Core_Recaptcha
     /**
      * @return string
      */
-    public function getPublicKey()
+    public function getPublicKey(): string
     {
         return $this->publicKey;
     }
@@ -86,7 +86,7 @@ class Core_Recaptcha
      *
      * @return string
      */
-    public function getErrorsStr()
+    public function getErrorsStr(): string
     {
         $errorsMsg = '';
         foreach ($this->errors as $error) {
@@ -101,7 +101,7 @@ class Core_Recaptcha
      *
      * @return bool
      */
-    public function checkRequest()
+    public function checkRequest(): bool
     {
         $recaptchaRequest = Core_Array::Request('g-recaptcha-response', null, PARAM_STRING);
         return $this->isValid($recaptchaRequest);
@@ -113,15 +113,13 @@ class Core_Recaptcha
      * @param $request
      * @return bool
      */
-    public function isValid($request)
+    public function isValid($request): bool
     {
-        $postData = http_build_query(
-            [
-                'secret'    =>  $this->secretKey,
-                'response'  =>  $request,
-                'remoteip'  =>  Core_Array::Server('REMOTE_ADDR', '', PARAM_STRING)
-            ]
-        );
+        $postData = http_build_query([
+            'secret'    =>  $this->secretKey,
+            'response'  =>  $request,
+            'remoteip'  =>  Core_Array::Server('REMOTE_ADDR', '', PARAM_STRING)
+        ]);
 
         $opts = [
             'http' => [
@@ -134,7 +132,7 @@ class Core_Recaptcha
         $context  = stream_context_create($opts);
         $response = file_get_contents(
             'https://www.google.com/recaptcha/api/siteverify',
-            FALSE,
+            false,
             $context
         );
         $response = json_decode($response , true);
@@ -143,7 +141,7 @@ class Core_Recaptcha
             return true;
         } else {
             $this->errors = $response['error-codes'];
-            Log::instance()->error(Log::TYPE_CORE, 'RECAPTCHA: ' . json_encode($response));
+            Log::instance()->error(Log::TYPE_RECAPRCHA, 'RECAPTCHA: ' . json_encode($response));
             return false;
         }
     }

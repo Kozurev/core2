@@ -13,6 +13,7 @@ class Log
     const TYPE_CORE = 'core';
     const TYPE_MAIL = 'mail';
     const TYPE_CHECKOUT = 'checkout';
+    const TYPE_RECAPRCHA = 'recaptcha';
 
     /**
      * @var self|null
