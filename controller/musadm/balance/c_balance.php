@@ -320,7 +320,7 @@ if ($isAdmin === 1) {
         ->where('type', '=', Payment::TYPE_INCOME)
         ->findAll();
     foreach ($moneyIn as $in) {
-        $money +=$in->value();
+        $money += $in->value();
     }
 
     //Считаем кешбек
@@ -335,7 +335,7 @@ if ($isAdmin === 1) {
         $cashBack += $in->value();
     }
 
-    Core::factory('Core_Entity')
+    (new Core_Entity)
         ->addSimpleEntity('life_days', $lifeDays)
         ->addSimpleEntity('count_lesson', count($UserReports))
         ->addSimpleEntity('money', $money)

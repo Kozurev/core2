@@ -48,6 +48,11 @@
 
             <td>
                 <p class="description">
+                    <xsl:if test="status = 2">
+                        <p class="text-danger">
+                            Ошибка платежа
+                        </p>
+                    </xsl:if>
                     <xsl:if test="description != ''"><xsl:value-of select="description" /></xsl:if>
                 </p>
 
