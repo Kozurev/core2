@@ -234,9 +234,9 @@ class User_Model extends Core_Entity
 	}
 
     /**
-     * @return string
+     * @return string|null
      */
-	public function registerDate()
+	public function registerDate(): ?string
 	{
 		return $this->register_date;
 	}
@@ -351,7 +351,8 @@ class User_Model extends Core_Entity
             'login' => [
                 'required' => true,
                 'type' => PARAM_STRING,
-                'maxlength' => 255
+                'maxlength' => 255,
+                'minlength' => 1
             ],
 //            'password' => [
 //                'required' => true,

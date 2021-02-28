@@ -60,21 +60,21 @@
                 <span>Логин</span><span style="color:red" >*</span>
             </div>
             <div class="column">
-                <input class="form-control" type="text" value="{user/login}" name="login" />
+                <input class="form-control" type="text" value="{user/login}" name="login" autocomplete="off" />
             </div>
             <hr/>
             <div class="column">
                 <span>Пароль</span>
             </div>
             <div class="column">
-                <input class="form-control" type="password" value="" name="pass1" />
+                <input class="form-control" type="password" value="" name="pass1" autocomplete="off" />
             </div>
             <hr/>
             <div class="column">
                 <span>Повторите пароль</span>
             </div>
             <div class="column">
-                <input class="form-control" type="password" value="" name="pass2" />
+                <input class="form-control" type="password" value="" name="pass2" autocomplete="off" />
             </div>
             <hr/>
             <div class="column">
