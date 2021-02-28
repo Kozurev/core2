@@ -7,7 +7,7 @@
                     rules: {
                         surname:    {required: true, maxlength: 255},
                         name:       {required: true, maxlength: 255},
-                        //phoneNumber:{required: true, maxlength: 255},
+                        "property_17[]": {required: true, maxlength: 3},
                         <xsl:if test="count(user/id) = 0">
                             password: {required: true, maxlength: 255}
                         </xsl:if>
@@ -27,6 +27,10 @@
                             maxlength: "Длина значения не должна превышать 255 символов"
                         }
                         </xsl:if>
+                        "property_17[]": {
+                            required: "Это поле обязательно к заполнению",
+                            maxlength: "Длина значения не должна превышать 3 символов"
+                        }
                     }
                 });
             });
@@ -117,7 +121,7 @@
                 <span>Длительность урока</span>
             </div>
             <div class="column">
-                <input class="form-control" type="text" value="{property_value[property_id=17]/value}" name="property_17[]" />
+                <input class="form-control" type="text" value="{property_value[property_id=17]/value}" name="property_17[]" required="required" />
             </div>
                 <hr/>
             <div class="column">
