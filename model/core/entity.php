@@ -411,7 +411,13 @@ class Core_Entity extends Core_Entity_Model
 
         //ФОрмирование
         if (!is_null($Model)) {
-            $modelProperties = get_object_vars($Model);
+            $modelProperties = collect(get_object_vars($Model));
+
+            if ($modelProperties->has('id')) {
+                $id = $modelProperties->get('id');
+                $modelProperties->forget('id');
+                $modelProperties = collect(['id' => $id] + $modelProperties->toArray());
+            }
 
             foreach ($modelProperties as $propertyName => $propertyValue) {
                 $value = $this->$propertyName;
@@ -421,12 +427,19 @@ class Core_Entity extends Core_Entity_Model
             }
         } elseif (isset($this->tableRows) && is_array($this->tableRows)) {
             foreach ($this->tableRows as $propertyName) {
-                if(!is_array($this->$propertyName) && !is_object($this->$propertyName)) {
+                if (!is_array($this->$propertyName) && !is_object($this->$propertyName)) {
                     $result[$propertyName] = $this->$propertyName;
                 }
             }
         } else {
-            $properties = get_object_vars($this);
+            $properties = collect(get_object_vars($this));
+
+            if ($properties->has('id')) {
+                $id = $properties->get('id');
+                $properties->forget('id');
+                $properties = collect(['id' => $id] + $properties->toArray());
+            }
+
             foreach ($properties as $propertyName => $propertyValue) {
                 if(!is_array($propertyValue) && !is_object($propertyValue)) {
                     $result[$propertyName] = $propertyValue;
