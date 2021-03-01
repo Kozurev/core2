@@ -99,7 +99,16 @@ if ($action === 'checkAbsentPeriod') {
  *                              ->period    stdClass    объект периода отсутствия с его основными полями
  */
 if ($action === 'getAreasList') {
+//    if (!Core_Access::instance()->hasCapability(Core_Access::AREA_READ)) {
+//        exit(REST::responseError(REST::ERROR_CODE_ACCESS, 'Недостаточно прав для просмотра филиалов'));
+//    }
+
     $isRelated = Core_Array::Get('isRelated', true, PARAM_BOOL);
+
+    $user = User_Auth::current();
+    if (!$user->isManagementStaff()) {
+        $isRelated = true;
+    }
 
     if ($isRelated === true) {
         $AreaAssignment = new Schedule_Area_Assignment();
@@ -997,6 +1006,224 @@ if ($action === 'getReportsStatistic') {
         $outputData[] = $lessonTypeStd;
     }
     exit(json_encode($outputData));
+}
+
+if ($action === 'get_schedule_full') {
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ)) {
+        exit(REST::responseError(REST::ERROR_CODE_ACCESS, 'Недостаточно прав для просмотра полного расписания'));
+    }
+
+    $date = Core_Array::Get('date', date('Y-m-d'), PARAM_DATE);
+    $areaId = Core_Array::Get('area_id', null, PARAM_INT);
+
+    if (is_null($areaId)) {
+        exit(REST::responseError(REST::ERROR_CODE_REQUIRED_PARAM, 'Отсутствует обязательный параметр area_id'));
+    }
+
+    /** @var Schedule_Area $area */
+    $area = Schedule_Area::find($areaId);
+
+    if (is_null($area) || !(new Schedule_Area_Assignment(User_Auth::current()))->hasAccess($areaId)) {
+        exit(REST::responseError(REST::ERROR_CODE_ACCESS, 'Отсутствует доступ к указанному филиалу'));
+    }
+
+    $dayName = \Carbon\Carbon::make($date)->format('l');
+
+    $lessons = Schedule_Lesson::query()
+        ->open()
+        ->where('delete_date', '>', $date)
+        ->orWhere('delete_date', 'IS', 'NULL')
+        ->close()
+        ->where('area_id', '=', $areaId)
+        ->orderBy('time_from');
+
+    $currentLessons = (clone $lessons)
+        ->where('insert_date', '=', $date)
+        ->where('lesson_type', '=', Schedule_Lesson::SCHEDULE_CURRENT);
+
+    $lessons
+        ->where('insert_date', '<=', $date)
+        ->where('day_name', '=', $dayName)
+        ->where('lesson_type', '=', Schedule_Lesson::SCHEDULE_MAIN);
+
+    $lessons = $lessons->get();
+    $currentLessons = $currentLessons->get();
+
+    //Все id отмененных занятий на стекущую дату
+    $lessonsAbsents = (new Orm())
+        ->select('lesson_id')
+        ->from((new Schedule_Lesson_Absent())->getTableName())
+        ->join((new Schedule_Lesson())->getTableName() . ' l', 'l.id = lesson_id and l.area_id = ' . $areaId)
+        ->where('date', '=', $date)
+        ->get();
+
+    //все периоды отсутствия на текущую дату
+    $clientsAbsents = Schedule_Absent::query()
+        ->select(['object_id', 'type_id', 'date_from', 'date_to'])
+        ->where('date_from', '<=', $date)
+        ->where('date_to', '>=', $date)
+        ->get();
+    $clientsAbsentsStd = $clientsAbsents->map(function($absent) {
+        return $absent->toStd();
+    });
+
+    //все изменения по времени на текущую дату
+    $timeModifies = Schedule_Lesson_TimeModified::query()
+        ->select(['lesson_id', 'Schedule_Lesson_TimeModified.date', 'Schedule_Lesson_TimeModified.time_from', 'Schedule_Lesson_TimeModified.time_to'])
+        ->join((new Schedule_Lesson())->getTableName() . ' as l', 'l.id = lesson_id and l.area_id = ' . $areaId)
+        ->where('date', '=', $date)
+        ->findAll(true);
+
+    //Все отправленные отчеты по занятиям
+    $reports = Schedule_Lesson_Report::query()
+        ->select('lesson_id')
+        ->join((new Schedule_Lesson())->getTableName() . ' l', 'l.id = lesson_id and l.area_id = ' . $areaId)
+        ->where('date', '=', $date)
+        ->findAll(true);
+
+    //Выходное расписание
+    $schedule = collect();
+
+    //Перенос занятий из основного графика в актуальный
+    foreach ($lessons as $key => $lesson) {
+        if (isLessonAbsent($lesson, $lessonsAbsents, $clientsAbsents)) {
+            continue;
+        }
+
+        //Если у занятия изменено время на текущую дату то необходимо установить актуальное время
+        //и добавить его в список занятий текущего расписания
+        if (isset($timeModifies[$lesson->getId()])) {
+            $tmpLesson = (clone $lesson)
+                ->timeFrom($timeModifies[$lesson->getId()]->timeFrom())
+                ->timeTo($timeModifies[$lesson->getId()]->timeTo());
+            $tmpLesson->is_time_modified = true;
+            $currentLessons->push($tmpLesson);
+        } else {
+            $lesson->is_time_modified = false;
+            $currentLessons->push($lesson);
+        }
+    }
+
+    $teachersIds = $lessons->whereIn('type_id', [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE])
+        ->merge(
+            $currentLessons->whereIn('type_id', [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE])
+        )->unique('id')
+        ->pluck('teacher_id')
+        ->toArray();
+
+    $clientsIds = $lessons->whereIn('type_id', [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE])
+        ->merge(
+            $currentLessons->whereIn('type_id', [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE])
+        )->unique('id')
+        ->pluck('client_id')
+        ->toArray();
+
+    $groupsIds = $lessons->whereIn('type_id', [Schedule_Lesson::TYPE_GROUP, Schedule_Lesson::TYPE_GROUP_CONSULT])
+        ->merge(
+            $currentLessons->whereIn('type_id', [Schedule_Lesson::TYPE_GROUP, Schedule_Lesson::TYPE_GROUP_CONSULT])
+        )->unique('id')
+        ->pluck('client_id')
+        ->toArray();
+
+    $lidsIds = $lessons->where('type_id', Schedule_Lesson::TYPE_CONSULT)
+        ->merge(
+            $currentLessons->where('type_id', Schedule_Lesson::TYPE_CONSULT)
+        )->unique('id')
+        ->pluck('client_id')
+        ->toArray();
+
+    $teachers = User::query()
+        ->whereIn('id', $teachersIds)
+        ->get(true)
+        ->map(function(User $user, int $id): User {
+            unset($user->auth_token);
+            unset($user->password);
+            $user->setId($id);
+            return $user;
+        });
+
+    $clients = User::query()
+        ->whereIn('id', $clientsIds)
+        ->get(true)
+        ->map(function(User $user, int $id): User {
+            unset($user->auth_token);
+            unset($user->password);
+            $user->setId($id);
+            return $user;
+        });
+
+    $groups = Schedule_Group::query()
+        ->whereIn('id', $groupsIds)
+        ->get(true)
+        ->map(function(Schedule_Group $group, int $id): Schedule_Group {
+            $group->setId($id);
+            return $group;
+        });
+
+    $lids = Lid::query()
+        ->whereIn('id', $lidsIds)
+        ->get(true);
+
+    foreach ($lessons->merge($currentLessons) as $lesson) {
+        //Добавление информации о преподавателе
+        $lesson->teacher = $teachers->get($lesson->teacherId());
+
+        //Добавление информации о клиенте/группе/лиде
+        if (in_array($lesson->typeId(), [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE])) {
+            $lesson->client = $clients->get($lesson->clientId());
+        } elseif (in_array($lesson->typeId(), [Schedule_Lesson::TYPE_GROUP, Schedule_Lesson::TYPE_GROUP_CONSULT])) {
+            $lesson->client = $groups->get($lesson->clientId());
+        } else {
+            $lesson->client = $lids->get($lesson->clientId());
+        }
+    }
+
+    foreach ($lessons as $lesson) {
+        //Добавление информации о разовом отсутствии занятия
+        $lesson->is_absent = $lessonsAbsents->where('lesson_id', $lesson->getId())->isNotEmpty();
+
+        //Добавление информации о периоде отсутствия клиента
+        $lesson->client->absent = null;
+        if ($lesson->client instanceof User) {
+            $lesson->client->absent = $clientsAbsentsStd->where('type_id', 1)->where('object_id', $lesson->client->getId())->first();
+        }
+        if ($lesson->client instanceof Schedule_Group) {
+            $lesson->client->absent = $clientsAbsentsStd->where('type_id', 2)->where('object_id', $lesson->client->getId())->first();
+        }
+        if ($lesson->client instanceof Core_Entity) {
+            $lesson->client = $lesson->client->toStd();
+        }
+    }
+
+    $rooms = collect();
+    $customRooms = collect($area->getRooms())
+        ->map(function(Schedule_Room $room): \stdClass {
+            return $room->toStd();
+        })
+        ->sortBy('class_id');
+    for ($i = 1; $i <= $area->countClasses(); $i++) {
+        $room = $customRooms->where('class_id', $i)->first();
+        if (is_null($room)) {
+            $room = (new Schedule_Room())
+                ->title('Класс ' . $i)
+                ->areaId($areaId)
+                ->classId($i)
+                ->toStd();
+        }
+        $rooms->push($room);
+    }
+
+    foreach ($rooms as $room) {
+        $room->main_lessons = $lessons->where('class_id', $room->class_id);
+        $room->current_lessons = $currentLessons->where('class_id', $room->class_id);
+        $schedule->push($room);
+    }
+
+    unset($area->rooms);
+    $response = new stdClass();
+    $response->area = $area->toStd();
+    $response->schedule = $schedule;
+    exit(json_encode($response));
 }
 
 die(REST::status(REST::STATUS_ERROR, 'Отсутствует название действия', REST::ERROR_CODE_CUSTOM));

@@ -18,6 +18,7 @@ class Schedule_Lesson_Model extends Core_Entity
     const SCHEDULE_MAIN = 1;
     const SCHEDULE_CURRENT = 2;
 
+    public $id;
 
     /**
      * Дата первого появления занятия в расписании для основгного графика
@@ -25,8 +26,7 @@ class Schedule_Lesson_Model extends Core_Entity
      *
      * @var string (date format: Y-m-d)
      */
-    protected $insert_date;
-
+    public $insert_date;
 
     /**
      * Дата удаления занятия из расписания для основного графика
@@ -35,24 +35,21 @@ class Schedule_Lesson_Model extends Core_Entity
      *
      * @var string
      */
-    protected $delete_date;
-
+    public $delete_date;
 
     /**
      * Время начала занятия
      *
      * @var string (time format: 00:00:00)
      */
-    protected $time_from;
-
+    public $time_from;
 
     /**
      * Время окончания занятия
      *
      * @var string (time format: 00:00:00)
      */
-    protected $time_to;
-
+    public $time_to;
 
     /**
      * Название дня недели формата:
@@ -61,32 +58,28 @@ class Schedule_Lesson_Model extends Core_Entity
      *
      * @var string
      */
-    protected $day_name;
-
+    public $day_name;
 
     /**
      * id филиала в котором проводиться занятие
      *
      * @var int
      */
-    protected $area_id;
-
+    public $area_id;
 
     /**
      * id класса в котором проводиться занятие
      *
      * @var int
      */
-    protected $class_id;
-
+    public $class_id;
 
     /**
      * id пользователя (преподавателя)
      *
      * @var int
      */
-    protected $teacher_id;
-
+    public $teacher_id;
 
     /**
      * id пользователя (клиента)
@@ -94,8 +87,7 @@ class Schedule_Lesson_Model extends Core_Entity
      *
      * @var int
      */
-    protected $client_id = 0;
-
+    public $client_id = 0;
 
     /**
      * Тип занятия:
@@ -105,8 +97,7 @@ class Schedule_Lesson_Model extends Core_Entity
      *
      * @var int
      */
-    protected $type_id;
-
+    public $type_id;
 
     /**
      * Тип графика:
@@ -115,16 +106,14 @@ class Schedule_Lesson_Model extends Core_Entity
      *
      * @var int
      */
-    protected $lesson_type;
-
+    public $lesson_type;
 
     /**
      * Указатель на то онлайн это занятие или нет, привет от короновируса)
      *
      * @var int
      */
-    protected $is_online = 0;
-
+    public $is_online = 0;
 
     /**
      * @param string|null $insertDate

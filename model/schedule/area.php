@@ -14,7 +14,7 @@ class Schedule_Area extends Schedule_Area_Model
     public ?array $rooms = null;
 
     /**
-     * @return array
+     * @return array|Schedule_Room[]
      */
     public function getRooms() : array
     {
