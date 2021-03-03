@@ -156,7 +156,6 @@ class Core_Array
      */
     public static function Post(string $key, $default = null, string $type = null)
     {
-        Log::instance()->debug('core', json_encode($_POST));
         if (isset($_POST[$key])) {
             $data = $_POST;
         } else {
