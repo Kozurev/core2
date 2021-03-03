@@ -156,11 +156,11 @@ class Core_Array
      */
     public static function Post(string $key, $default = null, string $type = null)
     {
-        $input = file_get_contents('php://input');
-        if (!empty($input)) {
-            $data = (array)json_decode($input, true);
-        } else {
+        if (isset($_REQUEST[$key])) {
             $data = $_REQUEST;
+        } else {
+            $input = file_get_contents('php://input');
+            $data = (array)json_decode($input, true);
         }
         return self::getValue($data, $key, $default, $type);
     }
@@ -176,11 +176,11 @@ class Core_Array
      */
     public static function Request(string $key, $default = null, string $type = null)
     {
-        $input = file_get_contents('php://input');
-        if (!empty($input)) {
-            $data = (array)json_decode($input, true);
-        } else {
+        if (isset($_REQUEST[$key])) {
             $data = $_REQUEST;
+        } else {
+            $input = file_get_contents('php://input');
+            $data = (array)json_decode($input, true);
         }
         return self::getValue($data, $key, $default, $type);
     }
