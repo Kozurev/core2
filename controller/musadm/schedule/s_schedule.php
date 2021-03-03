@@ -407,7 +407,11 @@ if ($action === 'saveScheduleChangeTimePopup') {
 
     $timeFrom .= ':00';
     $timeTo .= ':00';
-    $Lesson->modifyTime($date, $timeFrom, $timeTo);
+    try {
+        $Lesson->modifyTime($date, $timeFrom, $timeTo);
+    } catch (\Throwable $throwable) {
+        exit($throwable->getMessage());
+    }
 
     exit;
 }

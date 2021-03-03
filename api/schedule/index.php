@@ -1226,4 +1226,51 @@ if ($action === 'get_schedule_full') {
     exit(json_encode($response));
 }
 
+/**
+ * Изменение времени занятия
+ */
+if ($action === 'lessonChangeTime') {
+    if (!Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT)) {
+        exit(REST::responseError(REST::ERROR_CODE_ACCESS, 'Недостаточно прав для изменения времени занятия'));
+    }
+
+    $user = User_Auth::current();
+
+    $date = Core_Array::Post('date', null, PARAM_DATE);
+    $lessonId = Core_Array::Post('lessonId', null, PARAM_INT);
+    $timeFrom = Core_Array::Post('time_from', null, PARAM_TIME);
+    $timeTo = Core_Array::Post('time_to', null, PARAM_TIME);
+
+    if (!checkTimeForScheduleActions($user, $date)) {
+        exit(REST::responseError(REST::ERROR_CODE_TIME, 'В данный момент изменение времени занятия недоступно'));
+    }
+    if (is_null($date) || is_null($lessonId) || is_null($timeFrom) || is_null($timeTo)) {
+        exit(REST::responseError(REST::ERROR_CODE_REQUIRED_PARAM, 'Отсутствует один из обязательных параметров'));
+    }
+
+    $lessonQuery = Schedule_Lesson::query()->where('id', '=', $lessonId);
+    if ($user->isClient()) {
+        $lessonQuery->where('client_id', '=', $user->getId())
+            ->open()
+                ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
+                ->orWhere('type_id', '=', Schedule_Lesson::TYPE_PRIVATE)
+            ->close();
+    } elseif ($user->isTeacher()) {
+        $lessonQuery->where('teacher_id', '=', $user->getId());
+    }
+    /** @var Schedule_Lesson $lesson */
+    $lesson = $lessonQuery->find();
+    if (is_null($lesson)) {
+        exit(REST::responseError(REST::ERROR_CODE_NOT_FOUND, 'Занятие с указанным id не найдено'));
+    }
+
+    try {
+        $lesson->modifyTime($date, $timeFrom, $timeTo);
+    } catch (\Throwable $throwable) {
+        exit(REST::responseError(REST::ERROR_CODE_CUSTOM, $throwable->getMessage()));
+    }
+
+    exit(REST::status(REST::STATUS_SUCCESS, 'Время занятия успешно изменено'));
+}
+
 die(REST::status(REST::STATUS_ERROR, 'Отсутствует название действия', REST::ERROR_CODE_CUSTOM));

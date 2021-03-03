@@ -542,7 +542,9 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         if ($this->lessonType() == self::SCHEDULE_CURRENT) {  //Актуальный график
             $this->time_from = $timeFrom;
             $this->time_to = $timeTo;
-            $this->save();
+            if (empty($this->save())) {
+                throw new \Exception($this->_getValidateErrorsStr());
+            }
         } elseif ($this->lessonType() == self::SCHEDULE_MAIN) { // Основной график
             $modify = Schedule_Lesson_TimeModified::query()
                 ->where('date', '=', $date )
@@ -553,15 +555,17 @@ class Schedule_Lesson extends Schedule_Lesson_Model
                     $modify->delete();
                     return $this;
                 } else {
-                    $modify->timeFrom($timeFrom)->timeTo($timeTo)->save();
+                    $modify->timeFrom($timeFrom)->timeTo($timeTo);
                 }
             } else {
-                (new Schedule_Lesson_TimeModified)
+                $modify = (new Schedule_Lesson_TimeModified)
                     ->timeFrom($timeFrom)
                     ->timeTo($timeTo)
                     ->date($date)
-                    ->lessonId($this->getId())
-                    ->save();
+                    ->lessonId($this->getId());
+            }
+            if (!$modify->save()) {
+                throw new \Exception($modify->_getValidateErrorsStr());
             }
         }
 
@@ -639,6 +643,13 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         }
         if (strlen($this->time_to) == 5) {
             $this->time_to .= ':00';
+        }
+
+        if ($this->timeFrom() < SCHEDULE_TIME_START) {
+            $this->_setValidateErrorStr('Время начала занятия не может быть ранее чем ' . refactorTimeFormat(SCHEDULE_TIME_START));
+        }
+        if ($this->timeTo() > SCHEDULE_TIME_END) {
+            $this->_setValidateErrorStr('Время завершения занятия не может быть позднее чем ' . refactorTimeFormat(SCHEDULE_TIME_END));
         }
 
         if (!in_array($this->typeId(), self::types())) {
