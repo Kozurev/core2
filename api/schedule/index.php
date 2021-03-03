@@ -819,12 +819,12 @@ if ($action === 'saveLesson') {
     $timeFrom =     Core_Array::Post('timeFrom', '', PARAM_TIME);
     $timeTo =       Core_Array::Post('timeTo', '', PARAM_TIME);
     $isOnline =     Core_Array::Post('isOnline', null, PARAM_INT);
-    $dayName =      Core_Array::Post('dayName', '', PARAM_STRING);
+    $dayName =      Core_Array::Post('dayName', \Carbon\Carbon::parse($insertDate)->format('l'), PARAM_STRING);
 
     $user = User_Auth::current();
-    if ($user->groupId() == ROLE_CLIENT) {
+    if ($user->isClient()) {
         $clientId = $user->getId();
-    } elseif ($user->groupId() == ROLE_TEACHER) {
+    } elseif ($user->isTeacher()) {
         $teacherId = $user->getId();
     }
 

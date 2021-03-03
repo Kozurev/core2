@@ -696,3 +696,33 @@ if ($action === 'getClientTeachers') {
         'teachers' => $teachersStd
     ]));
 }
+
+
+if ($action === 'getTeacherClients') {
+    $user = User_Auth::current();
+    if (is_null($user)) {
+        exit(REST::responseError(REST::ERROR_CODE_AUTH, 'Для получения списка клиентов преподавателя необходимо авторизоваться'));
+    }
+
+    if ($user->isTeacher()) {
+        $teacherId = $user->getId();
+    } elseif ($user->isManagementStaff()) {
+        $teacherId = Core_Array::Get('teacher_id', null, PARAM_INT);
+    } else {
+        exit(REST::responseError(REST::ERROR_CODE_ACCESS, 'Недостаточно прав для получения списка клиентов преподавателя'));
+    }
+
+    $teacher = User_Teacher::find($teacherId);
+    if (is_null($teacher)) {
+        exit(REST::responseError(REST::ERROR_CODE_NOT_FOUND, 'Преподаватель с указанным id не найден'));
+    }
+    $controller = new User_Controller_Extended($teacher);
+    $clients = $controller->getTeacherClients();
+
+    exit(json_encode([
+        'teacher' => $teacher->toStd(),
+        'clients' => collect($clients)->map(function(User $client): stdClass {
+            return $client->toStd();
+        })
+    ]));
+}
