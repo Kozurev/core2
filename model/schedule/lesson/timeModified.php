@@ -147,6 +147,7 @@ class Schedule_Lesson_TimeModified extends Core_Entity
         }
 
         $lesson = $this->getLesson();
+        $lesson->lessonType(Schedule_Lesson::SCHEDULE_CURRENT);
         $lesson->insertDate($this->date());
         $lesson->timeFrom($this->timeFrom());
         $lesson->timeTo($this->timeTo());
