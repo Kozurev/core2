@@ -98,9 +98,9 @@ if ($action === 'updateFormTeacher') {
     $output = new Core_Entity();
 
     //Проверка прав доступа
-    if ($userId == 0 && !Core_Access::instance()->hasCapability(Core_Access::USER_CREATE_TEACHER)) {
+    if (empty($userId) && !Core_Access::instance()->hasCapability(Core_Access::USER_CREATE_TEACHER)) {
         Core_Page_Show::instance()->error(403);
-    } elseif ($userId != 0 && !Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_TEACHER)) {
+    } elseif (!empty($userId) && !Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_TEACHER)) {
         Core_Page_Show::instance()->error(403);
     }
 

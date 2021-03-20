@@ -116,7 +116,7 @@
             <hr/>
 
             <div class="column">
-                <span>График для занятий</span>
+                <span>Пометки</span>
             </div>
             <div class="column">
                 <textarea name="comment" class="form-control">
