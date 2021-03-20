@@ -699,7 +699,11 @@ class Core_Entity extends Core_Entity_Model
             $rootTag->appendChild($this->createEntity($obj, $xml));
         }
 
-        $xml->save(ROOT . '/log/xml.xml');
+//        $logStorage = ROOT . '/log/xsl/';
+//        $xslRelativePath = explode('/xsl/musadm/', $this->xsl())[1] ?? '';
+//        $xslLogFileName = preg_replace('~/~', '_', $xslRelativePath);
+//        $xslLogFileName = preg_replace('"\.xsl$"', '.xml', $xslLogFileName);
+//        $xml->save($logStorage . '/' . $xslLogFileName);
 
         // Объект стиля
         $xsl = new DOMDocument();
