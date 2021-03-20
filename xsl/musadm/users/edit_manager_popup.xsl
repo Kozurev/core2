@@ -82,12 +82,22 @@
                 <input class="form-control" type="password" value="" name="pass2" autocomplete="off" />
             </div><hr/>
 
-            <!--<div class="column">-->
-                <!--<span>Авторизационный токен "Мои звонки"</span>-->
-            <!--</div>-->
-            <!--<div class="column">-->
-                <!--<input class="form-control" type="text" value="{property_string[property_id = 62]/value}" name="property_62[]" />-->
-            <!--</div><hr/>-->
+            <div class="column">
+                <span>Повторите пароль</span>
+            </div>
+            <div class="column">
+                <select class="form-control" name="areas[]" multiple="multiple">
+                    <xsl:for-each select="areas">
+                        <xsl:variable name="areaId" select="id" />
+                        <option value="{id}">
+                            <xsl:if test="//assignments/area_id = $areaId">
+                                <xsl:attribute name="selected">selected</xsl:attribute>
+                            </xsl:if>
+                            <xsl:value-of select="title" />
+                        </option>
+                    </xsl:for-each>
+                </select>
+            </div><hr/>
 
             <input type="hidden" name="id" value="{user/id}" />
             <input type="hidden" name="groupId" value="2" />

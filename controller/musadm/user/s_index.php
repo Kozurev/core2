@@ -172,21 +172,22 @@ if ($action === 'updateFormDirector') {
 //Форма редактирования менеджера
 if ($action === 'updateFormManager') {
     $userId = Core_Array::Get('userId', 0, PARAM_INT);
-    $output = Core::factory('Core_Entity');
+    $output = new Core_Entity();
 
     //Проверка прав доступа
-    if ($userId == 0 && !Core_Access::instance()->hasCapability(Core_Access::USER_CREATE_MANAGER)) {
+    if (empty($userId) && !Core_Access::instance()->hasCapability(Core_Access::USER_CREATE_MANAGER)) {
         Core_Page_Show::instance()->error(403);
-    } elseif ($userId != 0 && !Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_MANAGER)) {
+    } elseif (!empty($userId) && !Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_MANAGER)) {
         Core_Page_Show::instance()->error(403);
     }
 
-    if ($userId != 0) {
+    if (!empty($userId)) {
         $Manager = User_Controller::factory($userId);
-
         if (is_null($Director)) {
             exit (Core::getMessage('NOT_FOUND', ['Директор', $userId]));
         }
+        $output->addEntities((new Schedule_Area_Assignment($Manager))->getAssignments(), 'assignments')
+            ->addEntities((new Schedule_Area_Assignment($User))->getAreas(), 'areas');
     } else {
         $Manager = User_Controller::factory();
     }
