@@ -329,6 +329,16 @@
                         </td>
                     </tr>
 
+                    <xsl:if test="//current_user/email != '' and //my_calls_token != ''">
+                        <tr>
+                            <td class="text-center">
+                                <a class="btn btn-orange" onclick="MyCalls.makeCall({//current_user/id}, '{user/phone_number}', checkResponseStatus)" title="Совершить звонок">
+                                    Позвонить
+                                </a>
+                            </td>
+                        </tr>
+                    </xsl:if>
+
                     <xsl:if test="prev_lid != '0'">
                         <tr>
                             <td class="center">
