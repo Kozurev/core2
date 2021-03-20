@@ -22,13 +22,13 @@ if ($action === 'updateFormClient') {
     $output = new Core_Entity();
 
     //Проверка прав доступа
-    if ($userId == 0 && !Core_Access::instance()->hasCapability(Core_Access::USER_CREATE_CLIENT)) {
+    if (empty($userId) && !Core_Access::instance()->hasCapability(Core_Access::USER_CREATE_CLIENT)) {
         Core_Page_Show::instance()->error(403);
-    } elseif ($userId != 0 && !Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_CLIENT)) {
+    } elseif (!empty($userId) && !Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_CLIENT)) {
         Core_Page_Show::instance()->error(403);
     }
 
-    if ($userId) {
+    if (!empty($userId)) {
         $client = User_Controller::factory($userId);
         if (is_null($client)) {
             exit(Core::getMessage('NOT_FOUND', ['Пользователь', $userId]));
@@ -56,7 +56,10 @@ if ($action === 'updateFormClient') {
         $teachersIds = collect($teachers)->pluck('id')->toArray();
     } else {
         $client = User_Controller::factory();
-        $properties[] = (new Property_Int)->value(Property_Controller::factoryByTag('lesson_time')->defaultValue());
+        $lessonDurationProperty = Property_Controller::factoryByTag('lesson_time');
+        $properties[] = (new Property_Int)
+            ->propertyId($lessonDurationProperty->getId())
+            ->value($lessonDurationProperty->defaultValue());
         $teachersIds = [];
     }
 
