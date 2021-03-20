@@ -172,6 +172,9 @@ if (count($statuses) > 0) {
 }
 
 $teachersController = new User_Controller(User_Auth::current());
+$teachersController->queryBuilder()
+    ->clearOrderBy()
+    ->orderBy('surname');
 $teachers = $teachersController
     ->filterType(User_Controller::FILTER_STRICT)
     ->appendFilter('group_id', ROLE_TEACHER)

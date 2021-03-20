@@ -208,10 +208,11 @@ if ($action === 'getScheduleLessonPopup') {
         );
 
     if (User_Auth::current()->groupId() !== ROLE_TEACHER) {
-        $TeachersController = new User_Controller_Extended(User::current());
+        $TeachersController = new User_Controller_Extended(User_Auth::current());
         $TeachersController->setGroup(ROLE_TEACHER);
         $TeachersController->isWithComments(false);
         $TeachersController->getQueryBuilder()
+            ->clearOrderBy()
             ->orderBy('surname', 'ASC');
         $Teachers = $TeachersController->getUsers();
 
