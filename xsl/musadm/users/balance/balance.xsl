@@ -329,6 +329,19 @@
                         </td>
                     </tr>
 
+                    <xsl:if test="count(teachers) != 0">
+                        <tr>
+                            <td>
+                                <div class="row">
+                                    <div class="col-md-4">Преподаватель</div>
+                                    <div class="col-md-8">
+                                        <xsl:apply-templates select="teachers" />
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </xsl:if>
+
                     <xsl:if test="//current_user/email != '' and //my_calls_token != ''">
                         <tr>
                             <td class="text-center">
@@ -374,6 +387,16 @@
                 <xsl:value-of select="property[property_id=$id]/value" />
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+    <xsl:template match="teachers">
+        <p>
+            <a href="/lk?userid={id}">
+                <xsl:value-of select="surname" />
+                <xsl:text> </xsl:text>
+                <xsl:value-of select="name" />
+            </a>
+        </p>
     </xsl:template>
 
 </xsl:stylesheet>

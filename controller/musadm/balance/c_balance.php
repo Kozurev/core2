@@ -74,10 +74,9 @@ if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit 
     $medianaIndiv = $MedianaIndiv->getValues($User)[0]->value();
     $medianaGroup = $MedianaGroup->getValues($User)[0]->value();
 
-    $AbsentPeriods = Core::factory('Schedule_Absent')
-        ->queryBuilder()
+    $AbsentPeriods = Schedule_Absent::query()
         ->where('object_id', '=', $User->getId())
-        ->where('type_id', '=', 1)
+        ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
         ->where('date_to', '>=', $today)
         ->orderBy('date_from', 'ASC')
         ->findAll();
@@ -114,6 +113,8 @@ if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit 
         $OutputXml->addEntity($nearestLessonXml, 'nearest_lesson');
     }
 
+    $teachers = (new User_Controller_Extended($User))->getClientTeachers();
+
     $OutputXml
         ->addEntity($User, 'client')
         ->addSimpleEntity('entry', $lastEntryDate)
@@ -124,6 +125,7 @@ if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit 
         ->addEntity(User_Auth::current(), 'current_user')
         ->addSimpleEntity('my_calls_token', Property_Controller::factoryByTag('my_calls_token')->getValues(User_Auth::current()->getDirector())[0]->value())
         ->addEntities($AbsentPeriods, 'absent')
+        ->addEntities($teachers, 'teachers')
         ->addSimpleEntity('access_absent_read', intval($accessAbsentPeriodRead))
         ->addSimpleEntity('access_absent_create', intval($accessAbsentPeriodCreate))
         ->addSimpleEntity('access_absent_edit', intval($accessAbsentPeriodEdit))
