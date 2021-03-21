@@ -33,7 +33,8 @@
 
                     <xsl:if test="show-count-users = 1">
                         <div>
-                            <span>Всего:</span><span><xsl:value-of select="count(user)" /></span>
+                            <span>Всего:</span>
+                            <span><xsl:value-of select="/root/pagination/totalCount" /></span>
                         </div>
                     </xsl:if>
                 </div>
@@ -42,6 +43,64 @@
 
             <xsl:if test="access_user_read_teachers = 1">
                 <div class="table-responsive">
+                    <ul class="pagination pagination-sm">
+                        <!--Первая страница-->
+                        <li class="page-item">
+                            <a class="page-link" href="#" onclick="changeClientsPage(1)">Первая</a>
+                        </li>
+
+                        <!--Указатель на предыдущую страницу-->
+                        <li class="page-item">
+                            <xsl:if test="pagination/currentPage = 1">
+                                <xsl:attribute name="class">
+                                    page-item disabled
+                                </xsl:attribute>
+                            </xsl:if>
+                            <a class="page-link" href="#" onclick="changeClientsPage({pagination/prevPage})">
+                                <span aria-hidden="true">←</span>
+                            </a>
+                        </li>
+                        <!--Предыдущая страница-->
+                        <xsl:if test="pagination/prevPage != 0">
+                            <li class="page-item">
+                                <a class="page-link" href="#" onclick="changeClientsPage({pagination/prevPage})">
+                                    <xsl:value-of select="pagination/prevPage" />
+                                </a>
+                            </li>
+                        </xsl:if>
+
+                        <!--Текущая страница-->
+                        <li class="page-item active">
+                            <a class="page-link" href="#" onclick="changeClientsPage({pagination/currentPage})">
+                                <xsl:value-of select="pagination/currentPage" />
+                            </a>
+                        </li>
+
+                        <!--Следующая страница-->
+                        <xsl:if test="pagination/nextPage != 0">
+                            <li class="page-item">
+                                <a class="page-link" href="#" onclick="changeClientsPage({pagination/nextPage})">
+                                    <xsl:value-of select="pagination/nextPage" />
+                                </a>
+                            </li>
+                        </xsl:if>
+
+                        <!--Указатель на следующую страницу-->
+                        <li class="page-item">
+                            <xsl:if test="pagination/currentPage = pagination/countPages">
+                                <xsl:attribute name="class">
+                                    page-item disabled
+                                </xsl:attribute>
+                            </xsl:if>
+                            <a class="page-link" href="#" onclick="changeClientsPage({pagination/nextPage})">
+                                <span aria-hidden="true">→</span>
+                            </a>
+                        </li>
+
+                        <li class="page-item">
+                            <a class="page-link" href="#" onclick="changeClientsPage({pagination/countPages})">Последняя</a>
+                        </li>
+                    </ul>
                     <table id="sortingTable" class="table table-striped">
                         <thead>
                             <tr class="header">

@@ -60,6 +60,16 @@ if ($groupId == ROLE_CLIENT) {
         31, //Расписание занятий
         59 //Стоп-лист преподавателей
     ];
+
+    $ClientController
+        ->isPaginate(true)
+        ->paginate()
+        ->setOnPage(10)
+        ->setCurrentPage(Core_Array::Get('page', 1, PARAM_INT));
+
+    if (isset($_GET['page'])) {
+        unset($_GET['page']);
+    }
 } elseif ($groupId == ROLE_MANAGER) {
     if (!Core_Access::instance()->hasCapability(Core_Access::USER_READ_MANAGERS)) {
         Core_Page_Show::instance()->error(404);

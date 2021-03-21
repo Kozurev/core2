@@ -51,31 +51,34 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-3">
-                            <h4>Преподаватели</h4>
-                            <div class="row">
-                                <ul class="list">
-                                    <xsl:apply-templates select="teachers" />
-                                </ul>
-                                <span style="display:none">1</span>
+                        <!--Фильтры исключительно для клиентов-->
+                        <xsl:if test="group_id = 5">
+                            <div class="col-lg-3">
+                                <h4>Преподаватели</h4>
+                                <div class="row">
+                                    <ul class="list">
+                                        <xsl:apply-templates select="teachers" />
+                                    </ul>
+                                    <span style="display:none">1</span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="col-lg-3">
-                            <h4>Поурочно</h4>
-                            <div class="row">
-                                <ul class="list">
-                                    <li>
-                                        <input type="checkbox" name="property_32[]" id="property_32_1" value="1" />
-                                        <label for="property_32_1">Да</label>
-                                    </li>
-                                    <li>
-                                        <input type="checkbox" name="property_32[]" id="property_32_2" value="0" />
-                                        <label for="property_32_2">Нет</label>
-                                    </li>
-                                </ul>
+                            <div class="col-lg-3">
+                                <h4>Поурочно</h4>
+                                <div class="row">
+                                    <ul class="list">
+                                        <li>
+                                            <input type="checkbox" name="property_32[]" id="property_32_1" value="1" />
+                                            <label for="property_32_1">Да</label>
+                                        </li>
+                                        <li>
+                                            <input type="checkbox" name="property_32[]" id="property_32_2" value="0" />
+                                            <label for="property_32_2">Нет</label>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
+                        </xsl:if>
                     </div>
                 </div>
 
