@@ -20,6 +20,8 @@ class REST
     const ERROR_CODE_NOT_FOUND = 3;     //Объект не найден
     const ERROR_CODE_TIME = 4;          //Неподходящее время
     const ERROR_CODE_REQUIRED_PARAM = 5;//Отсутствует обязательный параметр
+    const ERROR_CODE_PASSWORD_CONFIRMATION = 6; //Пароли не совпаают
+    const ERROR_CODE_PASSWORD_OLD = 7;          //Неверно введен старый пароль
     const ERROR_CODE_CUSTOM = 999;      //Кастомная ошибка
 
     /**
@@ -31,7 +33,9 @@ class REST
         self::ERROR_CODE_ACCESS => 'Недостаточно прав',
         self::ERROR_CODE_NOT_FOUND => 'Искомый объект не найден',
         self::ERROR_CODE_TIME => 'В данный момент действие недоступно',
-        self::ERROR_CODE_REQUIRED_PARAM => 'Отсутствует один или несколько обязательных параметров'
+        self::ERROR_CODE_REQUIRED_PARAM => 'Отсутствует один или несколько обязательных параметров',
+        self::ERROR_CODE_PASSWORD_CONFIRMATION => 'Парли не совпадают',
+        self::ERROR_CODE_PASSWORD_OLD => 'Неверно введен старый пароль'
     ];
 
     /**
