@@ -107,15 +107,15 @@ if ($action === 'getList') {
  */
 if ($action === 'save') {
     $id = Core_Array::Post('id', 0, PARAM_INT);
-    $surname = Core_Array::Post('surname', '', PARAM_STRING);
-    $name = Core_Array::Post('name', '', PARAM_STRING);
+    $surname = Core_Array::Post('surname', null, PARAM_STRING);
+    $name = Core_Array::Post('name', null, PARAM_STRING);
     $groupId = Core_Array::Post('groupId', null, PARAM_INT);
-    $patronymic = Core_Array::Post('patronymic', '', PARAM_STRING);
-    $email = Core_Array::Post('email', '', PARAM_STRING);
-    $phone = Core_Array::Post('phoneNumber', '', PARAM_STRING);
+    $patronymic = Core_Array::Post('patronymic', null, PARAM_STRING);
+    $email = Core_Array::Post('email', null, PARAM_STRING);
+    $phone = Core_Array::Post('phoneNumber', null, PARAM_STRING);
     $login = Core_Array::Post('login', null, PARAM_STRING);
-    $pass1 = Core_Array::Post('pass1', '', PARAM_STRING);
-    $pass2 = Core_Array::Post('pass2', '', PARAM_STRING);
+    $pass1 = Core_Array::Post('pass1', null, PARAM_STRING);
+    $pass2 = Core_Array::Post('pass2', null, PARAM_STRING);
     $comment = Core_Array::Post('comment', null, PARAM_STRING);
 
     /**
@@ -143,6 +143,14 @@ if ($action === 'save') {
     if (!empty($pass1)) {
         $user->password($pass1);
     }
+    if (User_Auth::current()->isManagementStaff()) {
+        $user->login($login);
+        $user->groupId($groupId);
+        if (!is_null($comment)) {
+            $user->comment($comment);
+        }
+    }
+
     if (!$user->save()) {
         exit(REST::error(5, $user->_getValidateErrorsStr()));
     }
@@ -329,6 +337,65 @@ if ($action === 'save') {
     $output->access->user_archive_client = Core_Access::instance()->hasCapability(Core_Access::USER_ARCHIVE_CLIENT);
 
     die(json_encode($output));
+}
+
+/**
+ * Лайт версия
+ */
+if ($action === 'profile_save') {
+    $user = User_Auth::current();
+    if (is_null($user)) {
+        exit(REST::responseError(REST::ERROR_CODE_AUTH));
+    }
+
+    if (request()->has('surname')) {
+        $user->surname(strval(request()->get('surname', '')));
+    }
+    if (request()->has('name')) {
+        $user->name(strval(request()->get('name', '')));
+    }
+    if (request()->has('phoneNumber')) {
+        $user->phoneNumber(strval(request()->get('phoneNumber', '')));
+    }
+    if (request()->has('email')) {
+        $user->email(strval(request()->get('email', '')));
+    }
+
+    try {
+        if (!$user->save()) {
+            $error = $user->_getValidateErrorsStr();
+        }
+    } catch (\Throwable $throwable) {
+        $error = 'Неизвестная ошибка при обновлении профиля игрока';
+        Log::instance()->error(Log::TYPE_CORE, $throwable->getMessage());
+    }
+
+    !isset($error) ?: exit(REST::responseError(REST::ERROR_CODE_CUSTOM, $error));
+
+    if (request()->has('password_old') && request()->has('password_new')) {
+        if (request()->get('password_new') !== request()->get('password_confirmation')) {
+            $errorCode = REST::ERROR_CODE_PASSWORD_CONFIRMATION;
+        } elseif (!password_verify(request()->get('password_old'), $user->password())) {
+            $errorCode = REST::ERROR_CODE_PASSWORD_OLD;
+        } else {
+            $user->password(request()->get('password_new'));
+            try {
+                if (!$user->save()) {
+                    $errorCode = REST::ERROR_CODE_CUSTOM;
+                    $errorMessage = $user->_getValidateErrorsStr();
+                }
+            } catch (\Throwable $throwable) {
+                $errorCode = REST::ERROR_CODE_CUSTOM;
+                $errorMessage = $throwable->getMessage();
+            }
+        }
+    }
+
+    $response = isset($errorCode)
+        ?   REST::responseError($errorCode, $errorMessage ?? '')
+        :   REST::status(REST::STATUS_SUCCESS, 'Данные профиля успешно обновлены');
+
+    exit($response);
 }
 
 /**
