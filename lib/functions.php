@@ -566,3 +566,8 @@ function checkTimeForScheduleActions(User $user, string $date = null) : bool
     }
     return true;
 }
+
+use Model\Request;
+function request(): Request {
+    return Request::instance();
+}
