@@ -6,7 +6,7 @@ class Tarif {
      * @returns {string}
      */
     static getApiLink () {
-        return root + '/api/tarif/index.php';
+        return root + '/api/tariff/index.php';
     };
 
 
@@ -39,10 +39,10 @@ class Tarif {
      * Покупка тарифа
      *
      * @param userId
-     * @param tarifId
+     * @param tariffId
      * @param callBack
      */
-    static buyTarif(userId, tarifId, callBack) {
+    static buyTarif(userId, tariffId, callBack) {
         $.ajax({
             type: 'GET',
             url: Tarif.getApiLink(),
@@ -50,7 +50,7 @@ class Tarif {
             data: {
                 action: 'buyForClient',
                 userId: userId,
-                tarifId: tarifId
+                tariffId: tariffId
             },
             success: function(response) {
                 callBack(response);

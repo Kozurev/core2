@@ -42,7 +42,7 @@
                     </div>
                 </xsl:if>
 
-                <xsl:if test="access_payment_tarif_read = 1">
+                <xsl:if test="access_payment_tariff_read = 1">
                     <div>
                         <a class="btn btn-green tarifs_show">Тарифы</a>
                     </div>
@@ -81,7 +81,7 @@
         </xsl:if>
 
 
-        <xsl:if test="access_payment_tarif_read = 1">
+        <xsl:if test="access_payment_tariff_read = 1">
             <section class="tarifs section-bordered">
                 <div class="table-responsive">
                     <table  class="table table-striped table-statused">
@@ -97,14 +97,14 @@
                         </thead>
 
                         <tbody>
-                            <xsl:apply-templates select="payment_tarif" />
+                            <xsl:apply-templates select="payment_tariff" />
                         </tbody>
                     </table>
 
-                    <xsl:if test="access_payment_tarif_create = 1">
+                    <xsl:if test="access_payment_tariff_create = 1">
                         <div class="row buttons-panel center">
                             <div>
-                                <a class="btn btn-green tarif_edit" href="#" data-tarifid="">Создать тариф</a>
+                                <a class="btn btn-green tariff_edit" href="#" data-tariff_id="">Создать тариф</a>
                             </div>
                         </div>
                     </xsl:if>
@@ -197,7 +197,7 @@
     </xsl:template>
 
 
-    <xsl:template match="payment_tarif">
+    <xsl:template match="payment_tariff">
         <tr>
             <td><xsl:value-of select="title" /></td>
             <td><xsl:value-of select="price" /></td>
@@ -214,12 +214,12 @@
                 </label>
             </td>
             <td>
-                <xsl:if test="/root/access_payment_tarif_edit = 1">
-                    <a class="action edit tarif_edit" href="#" data-tarifid="{id}"></a>
+                <xsl:if test="/root/access_payment_tariff_edit = 1">
+                    <a class="action edit tariff_edit" href="#" data-tariff_id="{id}"></a>
                 </xsl:if>
 
-                <xsl:if test="/root/access_payment_tarif_delete = 1">
-                    <a class="action delete tarif_delete" href="#" data-model_id="{id}" data-model_name="Payment_Tarif"></a>
+                <xsl:if test="/root/access_payment_tariff_delete = 1">
+                    <a class="action delete tariff_delete" href="#" data-model_id="{id}" data-model_name="Payment_Tariff"></a>
                 </xsl:if>
             </td>
         </tr>

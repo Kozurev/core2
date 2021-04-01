@@ -122,16 +122,16 @@ $(function(){
         /**
          * Открытие всплывающего окна создания/редактирования nfhbaf
          */
-        .on("click", ".tarif_edit", function(e){
+        .on("click", ".tariff_edit", function(e){
             e.preventDefault();
-            var tarifid = $(this).data("tarifid");
-            editTarifPopup(tarifid);
+            var tariffId = $(this).data("tariff_id");
+            editTariffPopup(tariffId);
         })
 
         /**
          * Сохранения формы редактирования тарифа
          */
-        .on("click", ".popop_tarif_submit", function(e){
+        .on("click", ".popop_tariff_submit", function(e){
             e.preventDefault();
             loaderOn();
             saveData("Main", function(response){refreshPayments();});
@@ -260,18 +260,18 @@ $(function(){
 /**
  * Открытие всплывающего окна создания / редактирования тарифа
  *
- * @param tarifId
+ * @param tariffId
  */
-function editTarifPopup(tarifId) {
+function editTariffPopup(tariffId) {
     $.ajax({
         type: 'GET',
         url: 'finances',
         data: {
-            action: 'edit_tarif_popup',
-            tarifid: tarifId
+            action: 'edit_tariff_popup',
+            tariffId: tariffId
         },
-        success: function(responce) {
-            showPopup(responce);
+        success: function(response) {
+            showPopup(response);
         }
     });
 }

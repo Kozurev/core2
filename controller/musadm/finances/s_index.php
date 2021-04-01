@@ -40,26 +40,26 @@ $accessTarifDelete = Core_Access::instance()->hasCapability(Core_Access::PAYMENT
 /**
  * Создание / редактирование тарифа
  */
-if ($action === 'edit_tarif_popup') {
-    $tarifId = Core_Array::Get('tarifid', null, PARAM_INT);
+if ($action === 'edit_tariff_popup') {
+    $tariffId = Core_Array::Get('tariffId', null, PARAM_INT);
 
-    if (is_null($tarifId) && !$accessTarifCreate) {
+    if (is_null($tariffId) && !$accessTarifCreate) {
         Core_Page_Show::instance()->error(403);
-    } elseif (!is_null($tarifId) && !$accessTarifEdit) {
+    } elseif (!is_null($tariffId) && !$accessTarifEdit) {
         Core_Page_Show::instance()->error(403);
     }
 
-    !is_null($tarifId)
-        ?   $Tarif = Core::factory('Payment_Tarif', $tarifId)
-        :   $Tarif = Core::factory('Payment_Tarif');
+    $tariff = !is_null($tariffId)
+        ?   Payment_Tariff::find($tariffId)
+        :   (new Payment_Tariff());
 
-    if (is_null($Tarif)) {
+    if (is_null($tariff)) {
         Core_Page_Show::instance()->error(404);
     }
 
-    Core::factory('Core_Entity')
-        ->addEntity($Tarif)
-        ->xsl( 'musadm/finances/new_tarif_popup.xsl' )
+    (new Core_Entity())
+        ->addEntity($tariff)
+        ->xsl( 'musadm/finances/new_tariff_popup.xsl' )
         ->show();
 
     exit;

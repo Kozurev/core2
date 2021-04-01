@@ -5,38 +5,33 @@
  * @author BadWolf
  * @date 28.04.2018 16:07
  * @version 20190328
- * Class Payment_Tarif_Model
+ * Class Payment_Tariff_Model
  */
-class Payment_Tarif_Model extends Core_Entity
+class Payment_Tariff_Model extends Core_Entity
 {
-    /**
-     * @var int
-     */
-    protected $id;
-
+    const ACCESS_TYPE_PROTECTED = 0;
+    const ACCESS_TYPE_PUBLIC = 1;
 
     /**
      * Название
      *
-     * @var string
+     * @var string|null
      */
-    protected $title;
-
+    protected ?string $title = null;
 
     /**
      * Цена
      *
-     * @var int
+     * @var int|null
      */
-    protected $price = 0;
-
+    protected int $price = 0;
 
     /**
      * Кол-во индивидуальных занятий
      *
      * @var int
      */
-    protected $count_indiv = 0;
+    protected int $count_indiv = 0;
 
 
     /**
@@ -44,7 +39,7 @@ class Payment_Tarif_Model extends Core_Entity
      *
      * @var int
      */
-    protected $count_group = 0;
+    protected int $count_group = 0;
 
 
     /**
@@ -52,14 +47,13 @@ class Payment_Tarif_Model extends Core_Entity
      *
      * @var int
      */
-    protected $access = 0;
+    protected int $access = 0;
 
 
     /**
      * @var int
      */
-    protected $subordinated = 0;
-
+    protected int $subordinated = 0;
 
     /**
      * @param string|null $title
@@ -75,7 +69,6 @@ class Payment_Tarif_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param float|null $price
      * @return $this|float
@@ -89,7 +82,6 @@ class Payment_Tarif_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @param float|null $countIndiv
@@ -105,7 +97,6 @@ class Payment_Tarif_Model extends Core_Entity
         }
     }
 
-
     /**
      * @param float|null $countGroup
      * @return $this|int
@@ -119,7 +110,6 @@ class Payment_Tarif_Model extends Core_Entity
             return $this;
         }
     }
-
 
     /**
      * @param null $access
@@ -137,7 +127,6 @@ class Payment_Tarif_Model extends Core_Entity
         return $this;
     }
 
-
     /**
      * @param int|null $subordinated
      * @return $this|int
@@ -152,11 +141,10 @@ class Payment_Tarif_Model extends Core_Entity
         }
     }
 
-
     /**
      * Параметры валидации при сохранении таблицы
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'id' => [
@@ -196,5 +184,4 @@ class Payment_Tarif_Model extends Core_Entity
             ]
         ];
     }
-
 }

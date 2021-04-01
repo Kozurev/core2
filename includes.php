@@ -28,7 +28,7 @@ spl_autoload_register(function ($className) {
 
 register_shutdown_function(function() {
     $error = error_get_last();
-
+dd($error);
     //Список паттернов файлов, из которых ошибки не логируются, а то всё время прилетают ошибки с файла шрифтов
     $ignoredFiles = [
         '/assets/'

@@ -87,7 +87,6 @@ class User_Client extends \User
     public function syncTeachers(array $teachersIds)
     {
         $this->clearTeachers();
-        Orm::debug(true);
         if (count($teachersIds) > 0) {
             $query = 'INSERT INTO ' . (new User_Teacher_Assignment())->getTableName() . ' (teacher_id, client_id) VALUES ';
             foreach ($teachersIds as $key => $teacherId) {
@@ -98,11 +97,87 @@ class User_Client extends \User
             }
             Orm::execute($query);
         }
-        Orm::debug(false);
     }
 
+    /**
+     *
+     */
     public function clearTeachers()
     {
         Orm::execute('DELETE FROM ' . (new User_Teacher_Assignment())->getTableName() . ' WHERE client_id = ' . $this->getId());
+    }
+
+    /**
+     * @return \User_Balance
+     */
+    public function getBalance(): \User_Balance
+    {
+        return \User_Balance::find($this->getId());
+    }
+
+    /**
+     * @param \Payment_Tariff $tariff
+     * @throws \Exception
+     */
+    public function buyTariff(\Payment_Tariff $tariff): void
+    {
+        $balance = $this->getBalance();
+
+        if ($balance->getBalance() < $tariff->price()) {
+            throw new \Exception('Недостаточно средств для покупки тарифа');
+        }
+
+//        //Создание платежа
+//        $payment = (new \Payment())
+//            ->type(2)
+//            ->user($client->getId())
+//            ->value($tariff->price())
+//            ->description("Покупка тарифа \"" . $tariff->title() . "\"");
+//        if (!$payment->save()) {
+//            throw new \Exception($payment->_getValidateErrorsStr());
+//        }
+
+//        $balance = $balance->getValues($client)[0];
+//        if ($balance->value() < $tariff->price()) {
+//            exit(REST::error(1, 'Недостаточно средств для покупки данного тарифа'));
+//        }
+//
+//        //Создание платежа
+//        $payment = (new \Payment())
+//            ->type(2)
+//            ->user($client->getId())
+//            ->value($tariff->price())
+//            ->description("Покупка тарифа \"" . $tariff->title() . "\"");
+//        if (!$payment->save()) {
+//            throw new \Exception($payment->_getValidateErrorsStr());
+//        }
+//
+//        //Корректировка кол-ва занятий
+//        $countIndivLessons = Property_Controller::factoryByTag('indiv_lessons')->getValues($client)[0];
+//        $countGroupLessons = Property_Controller::factoryByTag('group_lessons')->getValues($client)[0];
+//        if ($tariff->countIndiv() != 0) {
+//            $countIndivLessons->value($countIndivLessons->value() + $tariff->countIndiv())->save();
+//        }
+//        if ($tariff->countGroup() != 0) {
+//            $countGroupLessons->value($countGroupLessons->value() + $tariff->countGroup())->save();
+//        }
+//
+//        //Корректировка пользовательской медианы (средняя стоимость занятия)
+//        $clientRate = [];
+//        if ($tariff->countIndiv() != 0) {
+//            $clientRate['client_rate_indiv'] = $tariff->countIndiv();
+//        }
+//        if ($tariff->countGroup() != 0) {
+//            $clientRate['client_rate_group'] = $tariff->countGroup();
+//        }
+//
+//        foreach ($clientRate as $rateType => $countLessons) {
+//            $clientRateProperty = Property_Controller::factoryByTag($rateType);
+//            $newClientRateValue = $tariff->price() / $countLessons;
+//            $newClientRateValue = round($newClientRateValue, 2);
+//            $oldClientRateValue = $clientRateProperty->getValues($client)[0];
+//            $oldClientRateValue->value($newClientRateValue)->save();
+//            //$response['rate'][$rateType] = $newClientRateValue;
+//        }
     }
 }

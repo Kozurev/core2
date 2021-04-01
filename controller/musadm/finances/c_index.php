@@ -22,10 +22,10 @@ $accessPaymentDeleteA = Core_Access::instance()->hasCapability(Core_Access::PAYM
 $accessPaymentDeleteC = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_CLIENT);
 $accessPaymentDeleteT = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_DELETE_TEACHER);
 
-$accessTarifRead = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_READ);
-$accessTarifCreate = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_CREATE);
-$accessTarifEdit = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_EDIT);
-$accessTarifDelete = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_DELETE);
+$accessTariffRead = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_READ);
+$accessTariffCreate = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_CREATE);
+$accessTariffEdit = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_EDIT);
+$accessTariffDelete = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_DELETE);
 
 
 $dateFormat = 'Y-m-d';
@@ -38,7 +38,7 @@ $director = User_Auth::current()->getDirector();
 $subordinated = $director->getId();
 
 //Тарифы
-$tarifs = Payment_Tarif::query()
+$tariffs = Payment_Tariff::query()
     ->where('subordinated', '=', $subordinated)
     ->findAll();
 
@@ -180,7 +180,7 @@ $cashBack = $cashBack->getValues($director)[0]->value();
 
 (new Core_Entity)
     ->addEntities($payments)
-    ->addEntities($tarifs)
+    ->addEntities($tariffs)
     ->addEntities($lessonTypes)
     ->addEntities($paymentTypes)
     ->addEntities($paymentAreas)
@@ -209,10 +209,10 @@ $cashBack = $cashBack->getValues($director)[0]->value();
     ->addSimpleEntity('access_payment_delete_all', (int)$accessPaymentEditA)
     ->addSimpleEntity('access_payment_delete_client', (int)$accessPaymentEditC)
     ->addSimpleEntity('access_payment_delete_teacher', (int)$accessPaymentEditT)
-    ->addSimpleEntity('access_payment_tarif_read', (int)$accessTarifRead)
-    ->addSimpleEntity('access_payment_tarif_create', (int)$accessTarifCreate)
-    ->addSimpleEntity('access_payment_tarif_edit', (int)$accessTarifEdit)
-    ->addSimpleEntity('access_payment_tarif_delete', (int)$accessTarifDelete)
+    ->addSimpleEntity('access_payment_tariff_read', (int)$accessTariffRead)
+    ->addSimpleEntity('access_payment_tariff_create', (int)$accessTariffCreate)
+    ->addSimpleEntity('access_payment_tariff_edit', (int)$accessTariffEdit)
+    ->addSimpleEntity('access_payment_tariff_delete', (int)$accessTariffDelete)
     ->addSimpleEntity('api_token', $apiToken)
     ->addSimpleEntity('cashback', $cashBack)
     ->xsl('musadm/finances/client_payments.xsl')

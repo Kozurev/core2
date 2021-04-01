@@ -51,11 +51,11 @@ Core::attachObserver('before.Task.insert', function($args) {
 });
 
 
-Core::attachObserver('before.PaymentTarif.insert', function($args) {
-    $Tarif = $args[0];
-    if (empty($Tarif->subordinated())) {
-        $User = User::current()->getDirector();
-        $Tarif->subordinated($User->getId());
+Core::attachObserver('before.PaymentTariff.insert', function($args) {
+    $tariff = $args[0];
+    if (empty($tariff->subordinated())) {
+        $user = User_Auth::current()->getDirector();
+        $tariff->subordinated($user->getId());
     }
 });
 

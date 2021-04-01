@@ -61,7 +61,7 @@
             <input type="hidden" name="modelName" value="Payment_Tarif" />
             <input type="hidden" name="id" value="{payment_tarif/id}" />
 
-            <button class="popop_tarif_submit btn btn-default">Сохранить</button>
+            <button class="popop_tariff_submit btn btn-default">Сохранить</button>
         </form>
 
 
