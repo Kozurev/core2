@@ -292,29 +292,31 @@ if ($action === 'checkLoginExists') {
 
 //Экспорт пользователей в Excel
 if ($action === 'export') {
-    User::checkUserAccess(['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]]);
+    $user = User_Auth::current();
+    if (!$user->isManagementStaff()) {
+        Core_Page_Show::instance()->error(404);
+    }
+
     header('Content-type: application/vnd.ms-excel');
     header('Content-Disposition: attachment; filename=demo.xls');
-    $ClientController = new User_Controller(User_Auth::current());
+
+    $ClientController = new User_Controller($user);
     $ClientController->properties([16]);
     $ClientController->isSubordinate(true);
     $ClientController->isWithAreaAssignments(true);
     $ClientController->groupId(ROLE_CLIENT);
     $ClientController->xsl('musadm/users/export.xsl');
-    $ClientController->queryBuilder()->orderBy('surname', 'ASC');
+    $ClientController->queryBuilder()->clearOrderBy()->orderBy('id', 'DESC');
 
     //Фильтры
-    $ScheduleAssignment = Core::factory('Schedule_Area_Assignment');
+    $ScheduleAssignment = new Schedule_Area_Assignment();
     foreach ($_GET as $paramName => $values) {
         if ($paramName === 'areas') {
             foreach ($_GET['areas'] as $areaId) {
-                if ($areaId > 0
-                    && ($ScheduleAssignment->issetAssignment(User::current(), intval($areaId)) !== null)
-                    || User::checkUserAccess(['groups' => [ROLE_DIRECTOR]])
-                ) {
-                    $Area = Schedule_Area_Controller::factory(intval($areaId));
-                    if ($Area !== null) {
-                        $ClientController->forAreas([$Area]);
+                if (User_Auth::current()->isDirector() || ($ScheduleAssignment->issetAssignment($user, intval($areaId)) !== null)) {
+                    $area = Schedule_Area_Controller::factory(intval($areaId));
+                    if ($area !== null) {
+                        $ClientController->forAreas([$area]);
                     }
                 }
             }
