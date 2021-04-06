@@ -37,7 +37,7 @@ class User_Balance_Model extends Core_Entity
      */
     public function getPrimaryKeyName()
     {
-        return 'client_id';
+        return 'user_id';
     }
 
     /**
@@ -46,6 +46,23 @@ class User_Balance_Model extends Core_Entity
     public function getPrimaryKeyValue()
     {
         return $this->user_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return intval($this->user_id);
+    }
+
+    /**
+     * @param int $userId
+     * @return static|null
+     */
+    public static function find(int $userId): ?self
+    {
+        return self::query()->where('user_id', '=', $userId)->find();
     }
 
     /**

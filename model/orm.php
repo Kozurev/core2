@@ -356,7 +356,7 @@ class Orm
 			}
 			$queryStr .= 'WHERE ';
 			if (is_string($obj->getPrimaryKeyName())) {
-			    $queryStr .= '`id` = ' . $obj->getPrimaryKeyValue() . ' ';
+			    $queryStr .= '`'.$obj->getPrimaryKeyName().'` = ' . $obj->getPrimaryKeyValue() . ' ';
             } else {
 			    $primaryKeys = $obj->getPrimaryKeyName();
 			    $lastKey = end($primaryKeys);

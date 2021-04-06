@@ -880,13 +880,13 @@ function getClientLcTarifsCallBack(response) {
         notificationError(response.error.message);
     } else {
         var select = $('<select class="form-control" id="tarif-list"></select>');
-        $.each(response, function(key, tarif){
-            select.append('<option value="'+tarif.id+'">'
-                +tarif.title+' '+tarif.price+' р. индив: '+tarif.countIndiv+' групп: '+tarif.countGroup
+        $.each(response, function(key, tariff){
+            select.append('<option value="'+tariff.id+'">'
+                +tariff.title+' '+tariff.price+' р. индив: '+tariff.count_indiv+' групп: '+tariff.count_group
             +'</option>');
         });
         var btn = $('<button class="btn btn-default" ' +
-            'onclick="Tarif.buyTarif(' +
+            'onclick="Tarif.buyTariff(' +
                 '$(\'#userid\').val(), ' +
                 '$(\'#tarif-list\').find(\'option:selected\').val(), ' +
                 'function(response){ ' +
@@ -894,11 +894,12 @@ function getClientLcTarifsCallBack(response) {
                     'if (response.error != undefined) { ' +
                         'notificationError(\'Ошибка: \' + response.error.message); ' +
                     '} else {' +
-                    '$(\'#balance\').text(Number($(\'#balance\').text()) - response.tarif.price);' +
-                    '$(\'#countLessonsIndiv\').text(response.user.countIndiv);' +
-                    '$(\'#countLessonsGroup\').text(response.user.countGroup);' +
-                    'if (response.rate.client_rate_indiv != undefined) { $(\'#medianaIdiv\').text(response.rate.client_rate_indiv); }' +
-                    'if (response.rate.client_rate_group != undefined) { $(\'#medianaGroup\').text(response.rate.client_rate_group); }' +
+                    // '$(\'#balance\').text(Number($(\'#balance\').text()) - response.tarif.price);' +
+                    '$(\'#balance\').text(response.user.balance.balance);' +
+                    '$(\'#countLessonsIndiv\').text(response.user.balance.individual_lessons_count);' +
+                    '$(\'#countLessonsGroup\').text(response.user.balance.group_lessons_count);' +
+                    'if (response.user.balance.individual_lessons_average_price != undefined) { $(\'#medianaIdiv\').text(response.user.balance.individual_lessons_average_price); }' +
+                    'if (response.user.balance.group_lessons_average_price != undefined) { $(\'#medianaGroup\').text(response.user.balance.group_lessons_average_price); }' +
                     'notificationSuccess(\'Тариф успешно приобретен\')' +
                 '}}' +
             ')">Купить</button>');

@@ -8,6 +8,7 @@
  * @version 20190405
  * @version 20190410
  * @version 20200224
+ * @version 20210406
  */
 
 
@@ -23,9 +24,9 @@ if ($groupId == ROLE_CLIENT) {
     $xsl = 'musadm/users/clients.xsl';
     $propertiesIds = [
         9,  //Ссылка вконтакте
-        12, //Баланс
-        13, //Кол-во индивидуальных занятий
-        14, //Кол-во групповых занятий
+//        12, //Баланс
+//        13, //Кол-во индивидуальных занятий
+//        14, //Кол-во групповых занятий
         16, //Дополнительный телефон
         17, //Длительность занятия
         18, //Соглашение подписано
@@ -33,6 +34,7 @@ if ($groupId == ROLE_CLIENT) {
         28  //Год рождения
     ];
 
+    $ClientController->setIsWithBalances(true);
     $ClientController->paginate()->setCurrentPage(
         Core_Array::Get('page', 1, PARAM_INT)
     );
@@ -58,7 +60,7 @@ if ($groupId == ROLE_CLIENT) {
         20, //Инструмент
         28, //Год(дата) рождения
         31, //Расписание занятий
-        59 //Стоп-лист преподавателей
+        59  //Стоп-лист преподавателей
     ];
 
     $ClientController

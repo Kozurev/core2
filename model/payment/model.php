@@ -85,6 +85,11 @@ class Payment_Model extends Core_Entity
     protected ?string $checkout_uuid = null;
 
     /**
+     * @var int|null
+     */
+    protected ?int $tariff_id = null;
+
+    /**
      * @param int|null $user
      * @return $this|int
      */
@@ -234,6 +239,20 @@ class Payment_Model extends Core_Entity
             return $this->checkout_uuid;
         } else {
             $this->checkout_uuid = $checkoutUuid;
+            return $this;
+        }
+    }
+
+    /**
+     * @param int|null $tariffId
+     * @return $this|int|null
+     */
+    public function tariffId(?int $tariffId = null)
+    {
+        if (is_null($tariffId)) {
+            return $this->tariff_id;
+        } else {
+            $this->tariff_id = $tariffId;
             return $this;
         }
     }

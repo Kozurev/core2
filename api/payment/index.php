@@ -163,11 +163,9 @@ if ($action === 'save') {
     $Payment->description($description);
     $Payment->save();
 
-    Core::requireClass('User_Controller');
     $Property = new Property();
     if ($typeId == 1 || $typeId == 2) {
-        $UserBalance = $Property->getByTagName('balance');
-        $newUserBalance = $UserBalance->getValues(User_Controller::factory($userId))[0]->value();
+        $newUserBalance = User_Balance::find($Payment->user())->getBalance();
     } else {
         $newUserBalance = 0;
     }

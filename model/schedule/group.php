@@ -33,7 +33,7 @@ class Schedule_Group extends Schedule_Group_Model
     public function getClientsListQuery() : Orm
     {
         if ($this->type() == self::TYPE_CLIENTS) {
-            return User::query()
+            return \Model\User\User_Client::query()
                 ->join('Schedule_Group_Assignment AS ass', 'ass.user_id = User.id AND ass.group_id = ' . $this->id)
                 ->where('User.group_id', '=', ROLE_CLIENT)
                 ->orderBy('User.surname');

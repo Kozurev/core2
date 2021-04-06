@@ -5,36 +5,15 @@
 	<xsl:template match="user">
 
         <xsl:variable name="balance">
-            <xsl:choose>
-                <xsl:when test="property_value[property_id = 12]/value">
-                    <xsl:value-of select="property_value[property_id = 12]/value" />
-                </xsl:when>
-                <xsl:otherwise>
-                    0
-                </xsl:otherwise>
-            </xsl:choose>
+            <xsl:value-of select="user_balance/balance" />
         </xsl:variable>
 
         <xsl:variable name="count_indiv">
-            <xsl:choose>
-                <xsl:when test="property_value[property_id = 13]/value">
-                    <xsl:value-of select="property_value[property_id = 13]/value" />
-                </xsl:when>
-                <xsl:otherwise>
-                    0
-                </xsl:otherwise>
-            </xsl:choose>
+            <xsl:value-of select="user_balance/individual_lessons_count" />
         </xsl:variable>
 
         <xsl:variable name="count_group">
-            <xsl:choose>
-                <xsl:when test="property_value[property_id = 14]/value">
-                    <xsl:value-of select="property_value[property_id = 14]/value" />
-                </xsl:when>
-                <xsl:otherwise>
-                    0
-                </xsl:otherwise>
-            </xsl:choose>
+            <xsl:value-of select="user_balance/group_lessons_count" />
         </xsl:variable>
 
         <xsl:variable name="class" >

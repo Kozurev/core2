@@ -28,7 +28,7 @@ spl_autoload_register(function ($className) {
 
 register_shutdown_function(function() {
     $error = error_get_last();
-dd($error);
+
     //Список паттернов файлов, из которых ошибки не логируются, а то всё время прилетают ошибки с файла шрифтов
     $ignoredFiles = [
         '/assets/'
@@ -44,6 +44,7 @@ dd($error);
     }
 
     if (!is_null($error)) {
+        dd($error);
         $errorLogMessage = 'Error in file ' . $error['file'] . ' on line ' . $error['line'] . ':' . PHP_EOL . $error['message'] . PHP_EOL;
         Log::instance()->error(Log::TYPE_CORE, $errorLogMessage);
     }

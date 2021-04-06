@@ -285,34 +285,28 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
         $Director = User_Auth::current()->getDirector();
 
+        $balanceType = 0;
+        $teacherRate = 0.0;
+        $isTeacherDefaultRate = null;
         if ($this->typeId() == self::TYPE_INDIV) {
-            $clientLessons = 'indiv_lessons';
-            $clientRate = 'client_rate_indiv';
+            $balanceType = User_Balance::LESSONS_INDIVIDUAL;
             $teacherRate = 'teacher_rate_indiv';
             $isTeacherDefaultRate = 'is_teacher_rate_default_indiv';
         } elseif ($this->typeId() == self::TYPE_GROUP) {
-            $clientLessons = 'group_lessons';
-            $clientRate = 'client_rate_group';
+            $balanceType = User_Balance::LESSONS_GROUP;
             $teacherRate = 'teacher_rate_group';
             $isTeacherDefaultRate = 'is_teacher_rate_default_group';
         } elseif ($this->typeId() == self::TYPE_CONSULT) {
-            $clientLessons = null;
             $teacherRate = 'teacher_rate_consult';
             $isTeacherDefaultRate = 'is_teacher_rate_default_consult';
         } elseif ($this->typeId() == self::TYPE_GROUP_CONSULT) {
-            $clientLessons = null;
             $teacherRate = 'teacher_rate_consult';
             $isTeacherDefaultRate = 'is_teacher_rate_default_consult';
         } elseif ($this->typeId() == self::TYPE_PRIVATE) {
-            $clientLessons = null;
             $teacherRate = 'teacher_rate_private';
             $isTeacherDefaultRate = null;
         }
-        if (!is_null($clientLessons ?? null)) {
-            $ClientLessons = Core::factory('Property')->getByTagName($clientLessons ?? '');
-        } else {
-            $ClientLessons = null;
-        }
+
         $clientRateValueSum = 0.0; //Общая сумма медиан для всех клиентов занятия
 
         //Вычисление значения ставки преподавателя за проведенное занятие
@@ -372,6 +366,9 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         } elseif ($this->typeId() == self::TYPE_GROUP_CONSULT) {
             $absentRateValue = 0.0;
             $teacherAbsentValue = 0.0;
+        } else {
+            $absentRateValue = 0.0;
+            $teacherAbsentValue = 0.0;
         }
 
         if ($attendance == 1) {
@@ -383,41 +380,33 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         }
 
         //Доп информация о присутствии клиента на занятии
-        $ClientsAttendancesInfo = [];
+        $clientsAttendancesInfo = [];
 
         //Создание отчета по каждому клиенту
         foreach ($attendanceClients as $clientId => $presence) {
             $clientId = intval($clientId);
 
             if ($this->typeId() == self::TYPE_INDIV || $this->typeId() == self::TYPE_GROUP || $this->typeId() == self::TYPE_PRIVATE) {
-                $Client = User_Controller::factory($clientId);
+                $client = \Model\User\User_Client::find($clientId);
             } else {
-                $Client = Lid_Controller::factory($clientId);
+                $client = Lid_Controller::factory($clientId);
             }
 
-            $ClientAttendanceInfo = new Schedule_Lesson_Report_Attendance();
-            $ClientAttendanceInfo->attendance($presence);
-            $ClientAttendanceInfo->clientId($clientId);
+            $clientAttendanceInfo = new Schedule_Lesson_Report_Attendance();
+            $clientAttendanceInfo->attendance($presence);
+            $clientAttendanceInfo->clientId($clientId);
 
             if ($this->typeId() != self::TYPE_CONSULT && $this->typeId() != self::TYPE_GROUP_CONSULT) {
                 if ($this->typeId() == self::TYPE_INDIV || $this->typeId() == self::TYPE_GROUP) {
+                    $clientBalance = $client->getBalance();
+
                     //Корректировка баланса количества занятий клиента
-                    $ClientCountLessons = $ClientLessons->getPropertyValues($Client)[0];
-                    $clientCountLessons = floatval($ClientCountLessons->value());
-                    if ($presence == 1) {
-                        $clientCountLessons--;
-                        $ClientAttendanceInfo->lessonsWrittenOff(1);
-                    } else {
-                        $clientCountLessons -= $absentRateValue;
-                        $ClientAttendanceInfo->lessonsWrittenOff($absentRateValue);
-                    }
-                    $ClientCountLessons->value($clientCountLessons)->save();
+                    $writtenLessonsCount = $presence ? 1 : $absentRateValue;
+                    $clientBalance->addLessons(0-$writtenLessonsCount, $balanceType);
+                    $clientAttendanceInfo->lessonsWrittenOff($writtenLessonsCount);
 
                     //Задание значения клиентской "медианы" для отчета
-                    $ClientRate = Core::factory('Property')->getByTagName($clientRate);
-                    $ClientRateValue = $ClientRate->getPropertyValues($Client)[0];
-                    $clientRateValue = floatval($ClientRateValue->value());
-
+                    $clientRateValue = $clientBalance->getAvgPrice($balanceType);
                     if ($presence == 0 && $this->typeId() == self::TYPE_INDIV) {
                         $clientRateValue *= $absentRateValue;
                     } elseif ($presence == 0 && $this->typeId() == self::TYPE_GROUP) {
@@ -433,7 +422,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             $clientRateValueSum += floatval($clientRateValue);
 
             if ($this->typeId() != self::TYPE_CONSULT) {
-                $ClientsAttendancesInfo[] = $ClientAttendanceInfo;
+                $clientsAttendancesInfo[] = $clientAttendanceInfo;
             }
         } //end attendance foreach
 
@@ -441,7 +430,7 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         $Report->totalRate($Report->clientRate() - $Report->teacherRate());
         $Report->save();
 
-        foreach ($ClientsAttendancesInfo as $Info) {
+        foreach ($clientsAttendancesInfo ?? [] as $Info) {
             $Info->reportId($Report->getId());
             $Info->save();
         }
@@ -475,15 +464,13 @@ class Schedule_Lesson extends Schedule_Lesson_Model
         //Удаление информации о посещаемости клиентов и восстановление списанных за отчет занятий
         foreach ($attendances as $attendance) {
             if ($report->typeId() != self::TYPE_CONSULT && $report->typeId() != self::TYPE_GROUP_CONSULT) {
-                $client = User::find($attendance->clientId());
+                $client = \Model\User\User_Client::find($attendance->clientId());
                 if ($report->typeId() == self::TYPE_INDIV) {
-                    $clientLessons = Core::factory('Property')->getByTagName('indiv_lessons');
+                    $clientLessons = User_Balance::LESSONS_INDIVIDUAL;
                 } else {
-                    $clientLessons = Core::factory('Property')->getByTagName('group_lessons');
+                    $clientLessons = User_Balance::LESSONS_GROUP;
                 }
-
-                $currentLessons = $clientLessons->getPropertyValues($client)[0];
-                $currentLessons->value($currentLessons->value() + $attendance->lessonsWrittenOff())->save();
+                $client->getBalance()->addLessons($attendance->lessonsWrittenOff(), $clientLessons);
             }
             $attendance->delete();
         }

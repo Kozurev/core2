@@ -264,7 +264,7 @@ class User extends User_Model
         if ($this->groupId() == ROLE_DIRECTOR || $this->subordinated() == 0) {
             return $this;
         } else {
-            return self::find($this->subordinated());
+            return User::find($this->subordinated());
         }
     }
 

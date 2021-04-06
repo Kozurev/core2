@@ -15,9 +15,7 @@
                             <div class="col-md-4">Баланс</div>
                             <div class="col-md-1">
                                 <span id="balance">
-                                    <xsl:call-template name="property">
-                                        <xsl:with-param name="id" select="'12'"/>
-                                    </xsl:call-template>
+                                    <xsl:value-of select="user_balance/balance" />
                                 </span>
                             </div>
                             <div class="col-md-3">
@@ -26,11 +24,11 @@
                                         <!--Пополнить баланс-->
                                     </a>
                                 </xsl:if>
-                                <xsl:if test="is_admin = 0 and api_token_sber != '' and has_checkout = 1">
-                                    <a onclick="Payment.getSberApi()" class="btn btn-xs btn-outline btn-primary">
-                                        Пополнить баланс
-                                    </a>
-                                </xsl:if>
+<!--                                <xsl:if test="is_admin = 0 and api_token_sber != '' and has_checkout = 1">-->
+<!--                                    <a onclick="Payment.getSberApi()" class="btn btn-xs btn-outline btn-primary">-->
+<!--                                        Пополнить баланс-->
+<!--                                    </a>-->
+<!--                                </xsl:if>-->
                             </div>
                         </div>
                     </td>
@@ -47,16 +45,12 @@
                                             <span id="countLessonsIndiv"
                                                   onclick="editClientCountLessons({user/id}, User.TYPE_INDIV, '#countLessonsIndiv')"
                                                   title="Нажмите для редактирования кол-ва индивидуальных занятий">
-                                                <xsl:call-template name="property">
-                                                    <xsl:with-param name="id" select="'13'"/>
-                                                </xsl:call-template>
+                                                <xsl:value-of select="user_balance/individual_lessons_count" />
                                             </span>
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <span id="countLessonsIndiv">
-                                                <xsl:call-template name="property">
-                                                    <xsl:with-param name="id" select="'13'"/>
-                                                </xsl:call-template>
+                                                <xsl:value-of select="user_balance/individual_lessons_count" />
                                             </span>
                                         </xsl:otherwise>
                                     </xsl:choose>
@@ -68,23 +62,19 @@
                                             <span id="countLessonsGroup"
                                                   onclick="editClientCountLessons({user/id}, User.TYPE_GROUP, '#countLessonsGroup')"
                                                   title="Нажмите для редактирования кол-ва групповых занятий">
-                                                <xsl:call-template name="property">
-                                                    <xsl:with-param name="id" select="'14'"/>
-                                                </xsl:call-template>
+                                                <xsl:value-of select="user_balance/group_lessons_count" />
                                             </span>
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <span id="countLessonsGroup">
-                                                <xsl:call-template name="property">
-                                                    <xsl:with-param name="id" select="'14'"/>
-                                                </xsl:call-template>
+                                                <xsl:value-of select="user_balance/group_lessons_count" />
                                             </span>
                                         </xsl:otherwise>
                                     </xsl:choose>
                                 </span>
                             </div>
                             <div class="col-md-3">
-                                <xsl:if test="access_buy_tarif = 1">
+                                <xsl:if test="access_buy_tariff = 1">
                                     <a class="action buy" title="Купить тариф" onclick="loaderOn(); Tarif.getList([], getClientLcTarifsCallBack)">
                                         <!--Купить индивидуальные занятия-->
                                     </a>
@@ -165,9 +155,6 @@
                     <tr>
                         <td>
                             <div class="row">
-<!--                                <div class="col-md-4">-->
-<!--                                    <input type="hidden" />-->
-<!--                                </div>-->
                                 <div class="col-md-12 center">
                                     <a class="btn btn-orange" onclick="makeClientLessonPopup({user/id})">
                                         Найти свободное время у преподавателя
@@ -219,65 +206,61 @@
                     </tr>
                 </xsl:if>
 
-<!--                <tr>-->
-<!--                    <td>-->
-<!--                        <div class="row">-->
-<!--                            <div class="col-md-12">-->
-<!--                                <div class="buttons-panel center">-->
+                <tr>
+                    <td>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="buttons-panel center">
 <!--                                    <div>-->
 <!--                                        <a class="btn btn-orange user-schedule-btn">Полное расписание</a>-->
 <!--                                    </div>-->
-<!--                                    <xsl:if test="//current_user/email != '' and //my_calls_token != ''">-->
-<!--                                        <div>-->
-<!--                                            <a class="btn btn-orange" onclick="MyCalls.makeCall({//current_user/id}, '{user/phone_number}', checkResponseStatus)" title="Совершить звонок">-->
-<!--                                                Позвонить-->
-<!--                                            </a>-->
-<!--                                        </div>-->
-<!--                                    </xsl:if>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </td>-->
-<!--                </tr>-->
+                                    <xsl:if test="//current_user/email != '' and //my_calls_token != ''">
+                                        <div>
+                                            <a class="btn btn-orange" onclick="MyCalls.makeCall({//current_user/id}, '{user/phone_number}', checkResponseStatus)" title="Совершить звонок">
+                                                Позвонить
+                                            </a>
+                                        </div>
+                                    </xsl:if>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
 
                 <xsl:if test="is_admin = 1">
-<!--                    <xsl:if test="is_director = 1">-->
-                        <tr>
-                            <td>
-                                <div class="row">
-                                    <div class="col-md-4">Значение медиан (индив/груп)</div>
-                                    <div class="col-md-3">
-                                        <xsl:choose>
-                                            <xsl:when test="access_user_edit_lessons = 1">
-                                                <span>
-                                                    <span id="medianaIdiv" onclick="editClientRate({user/id}, 'client_rate_indiv', '#medianaIdiv')"
-                                                          title="Нажмите для корректировки медианы">
-                                                        <xsl:value-of select="mediana_indiv" />
-                                                    </span>
+                    <tr>
+                        <td>
+                            <div class="row">
+                                <div class="col-md-4">Значение медиан (индив/груп)</div>
+                                <div class="col-md-3">
+                                    <xsl:choose>
+                                        <xsl:when test="access_user_edit_lessons = 1">
+                                            <span>
+                                                <span id="medianaIdiv" onclick="editClientRate({user/id}, 'client_rate_indiv', '#medianaIdiv')" title="Нажмите для корректировки медианы">
+                                                    <xsl:value-of select="user_balance/individual_lessons_average_price" />
                                                 </span>
-                                                <xsl:text> / </xsl:text>
-                                                <span>
-                                                    <span id="medianaGroup" onclick="editClientRate({user/id}, 'client_rate_group', '#medianaGroup')"
-                                                          title="Нажмите для корректировки медианы">
-                                                        <xsl:value-of select="mediana_group" />
-                                                    </span>
+                                            </span>
+                                            <xsl:text> / </xsl:text>
+                                            <span>
+                                                <span id="medianaGroup" onclick="editClientRate({user/id}, 'client_rate_group', '#medianaGroup')" title="Нажмите для корректировки медианы">
+                                                    <xsl:value-of select="user_balance/group_lessons_average_price" />
                                                 </span>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <span id="medianaIdiv">
-                                                    <xsl:value-of select="mediana_indiv" />
-                                                </span>
-                                                <xsl:text> / </xsl:text>
-                                                <span id="medianaGroup">
-                                                    <xsl:value-of select="mediana_group" />
-                                                </span>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </div>
+                                            </span>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <span id="medianaIdiv">
+                                                <xsl:value-of select="user_balance/individual_lessons_average_price" />
+                                            </span>
+                                            <xsl:text> / </xsl:text>
+                                            <span id="medianaGroup">
+                                                <xsl:value-of select="user_balance/group_lessons_average_price" />
+                                            </span>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </div>
-                            </td>
-                        </tr>
-<!--                    </xsl:if>-->
+                            </div>
+                        </td>
+                    </tr>
 
                     <tr>
                         <td>

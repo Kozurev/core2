@@ -15,6 +15,7 @@ require_once 'database.php';
 require_once 'subordinated.php';
 require_once 'events.php';
 
+use Model\User\User_Client;
 
 ///**
 // * Добавление ФИО преподавателя в список дополнительного свойства "Преподаватель"
@@ -445,7 +446,6 @@ Core::attachObserver('before.Payment.save', function($args) {
 Core::attachObserver('before.Payment.save', function($args) {
     /** @var Payment $Payment */
     $payment = $args[0];
-    //$property = new Property();
 
     //Корректировка баланса клиента
     if ($payment->isStatusSuccess() &&
@@ -464,16 +464,16 @@ Core::attachObserver('before.Payment.save', function($args) {
         } else {
             $difference = $payment->value();
         }
-        $client = $payment->getUser();
+        $client = User_Client::find($payment->user());
         if (!is_null($client)) {
-            $userBalance = Property_Controller::factoryByTag('balance');
-            /** @var Property_Int $userBalanceVal */
-            $userBalanceVal = $userBalance->getPropertyValues($client)[0];
-            $balanceOld =  floatval($userBalanceVal->value());
-            $payment->type() == Payment::TYPE_INCOME || $payment->type() == Payment::TYPE_CASHBACK
-                ?   $balanceNew = $balanceOld + floatval($difference)
-                :   $balanceNew = $balanceOld - floatval($difference);
-            $userBalanceVal->value($balanceNew)->save();
+            $userBalance = $client->getBalance();
+            $balanceOld =  $userBalance->getBalance();
+            $balanceNew = $payment->type() == Payment::TYPE_INCOME || $payment->type() == Payment::TYPE_CASHBACK
+                ?   $balanceOld + floatval($difference)
+                :   $balanceOld - floatval($difference);
+            $userBalance->setBalance($balanceNew);
+            Orm::debug(true);
+            $userBalance->save();
         }
     }
 });
@@ -491,15 +491,14 @@ Core::attachObserver('before.Payment.delete', function($args) {
     if ($payment->type() == Payment::TYPE_INCOME
     || $payment->type() == Payment::TYPE_DEBIT
     || $payment->type() == Payment::TYPE_CASHBACK) {
-        $client = $payment->getUser();
+        $client = User_Client::find($payment->user());
         if (!is_null($client)) {
-            $userBalance = $property->getByTagName('balance');
-            $userBalanceVal = $userBalance->getPropertyValues($client)[0];
-            $balanceOld =  floatval($userBalanceVal->value());
-            $payment->type() == Payment::TYPE_INCOME || $payment->type() == Payment::TYPE_CASHBACK
-                ?   $balanceNew = $balanceOld - floatval($payment->value())
-                :   $balanceNew = $balanceOld + floatval($payment->value());
-            $userBalanceVal->value($balanceNew)->save();
+            $userBalance = $client->getBalance();
+            $balanceNew = $payment->type() == Payment::TYPE_INCOME || $payment->type() == Payment::TYPE_CASHBACK
+                ?   $userBalance->getBalance() - floatval($payment->value())
+                :   $userBalance->getBalance() + floatval($payment->value());
+            $userBalance->setBalance($balanceNew);
+            $userBalance->save();
         }
     }
 
@@ -560,10 +559,10 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
      * и создание задачи в случае если их осталось менее заданного значения
      */
     if ($report->typeId() == Schedule_Lesson::TYPE_INDIV) {
-        $clientLessonsType = 'indiv_lessons';
-        $clients = [User::find($report->clientId())];
+        $clientLessonsType = User_Balance::LESSONS_INDIVIDUAL;
+        $clients = [User_Client::find($report->clientId())];
     } elseif ($report->typeId() == Schedule_Lesson::TYPE_GROUP) {
-        $clientLessonsType = 'group_lessons';
+        $clientLessonsType = User_Balance::LESSONS_GROUP;
 
         $group = Schedule_Group::find($report->clientId());
         if (is_null($group)) {
@@ -576,11 +575,8 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
 
     $tomorrow = date('Y-m-d', strtotime('+1 day'));
 
-    /** @var User $client */
+    /** @var User_Client $client */
     foreach ($clients as $client) {
-        //Кол-во занятий клиента
-        $clientLessons = Property_Controller::factoryByTag($clientLessonsType);
-        $countLessons = $clientLessons->getPropertyValues($client)[0]->value();
         //Присутствие клиента на занятии
         $clientAttendance = $report->getClientAttendance($client->getId());
         if (is_null($clientAttendance)) {
@@ -590,11 +586,12 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
         }
 
         //Создание задачи с напоминанием о низком уровне баланса клиента
-        if ($countLessons <= 0.5) {
+        $balance = $client->getBalance();
+        if ($balance->getCountLessons($clientLessonsType) <= 0.5) {
             //Отправка пуш уведомления с напоминанием о занятиях
             if (!empty($client->pushId())) {
                 $message = [
-                    'title' => 'Остаток занятий на вашем балансе: ' . $countLessons,
+                    'title' => 'Остаток занятий на вашем балансе: ' . $balance->getCountLessons($clientLessonsType),
                     'body' => 'Внести оплату легко, зайдите в приложение, нажмите кнопку "Пополнить", и после этого в личном кабинете сможете внести средства'
                 ];
                 try {
@@ -605,8 +602,7 @@ Core::attachObserver('after.ScheduleLesson.makeReport', function($args) {
                 }
             }
 
-            $isIssetTask = Task_Controller::factory()
-                ->queryBuilder()
+            $isIssetTask = Task::query()
                 ->where('associate', '=', $client->getId())
                 ->where('done', '=', 0)
                 ->where('type', '=', Task::TYPE_PAYMENT)

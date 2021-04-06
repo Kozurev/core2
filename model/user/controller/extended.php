@@ -49,10 +49,15 @@ class User_Controller_Extended extends Controller
     protected ?bool $isActive = true;
 
     /**
+     * @var bool
+     */
+    protected bool $isWithBalances = false;
+
+    /**
      * @param int $groupId
      * @return $this
      */
-    public function setGroup(int $groupId) : self
+    public function setGroup(int $groupId): self
     {
         $this->groupIds = [$groupId];
         return $this;
@@ -62,7 +67,7 @@ class User_Controller_Extended extends Controller
      * @param array $groupIds
      * @return $this
      */
-    public function setGroups(array $groupIds) : self
+    public function setGroups(array $groupIds): self
     {
         $this->groupIds = $groupIds;
         return $this;
@@ -71,7 +76,7 @@ class User_Controller_Extended extends Controller
     /**
      * @return array
      */
-    public function getGroups() : array
+    public function getGroups(): array
     {
         return $this->groupIds;
     }
@@ -80,7 +85,7 @@ class User_Controller_Extended extends Controller
      * @param bool $isShow
      * @return $this
      */
-    public function isShowCount(bool $isShow) : self
+    public function isShowCount(bool $isShow): self
     {
         $this->isShowCount = intval($isShow);
         return $this;
@@ -90,7 +95,7 @@ class User_Controller_Extended extends Controller
      * @param bool $isActive
      * @return $this
      */
-    public function setActiveBtnPanel(bool $isActive) : self
+    public function setActiveBtnPanel(bool $isActive): self
     {
         $this->isActiveBtnPanel = intval($isActive);
         return $this;
@@ -100,7 +105,7 @@ class User_Controller_Extended extends Controller
      * @param bool $isActive
      * @return $this
      */
-    public function setActiveExportBtn(bool $isActive) : self
+    public function setActiveExportBtn(bool $isActive): self
     {
         $this->isActiveExportBtn = intval($isActive);
         return $this;
@@ -110,7 +115,7 @@ class User_Controller_Extended extends Controller
      * @param bool $isActive
      * @return $this
      */
-    public function setActive(bool $isActive) : self
+    public function setActive(bool $isActive): self
     {
         $this->isActive = $isActive;
         return $this;
@@ -119,7 +124,7 @@ class User_Controller_Extended extends Controller
     /**
      * @return $this
      */
-    public function unsetActive() : self
+    public function unsetActive(): self
     {
         $this->isActive = null;
         return $this;
@@ -128,9 +133,27 @@ class User_Controller_Extended extends Controller
     /**
      * @return bool|null
      */
-    public function getActive() : ?bool
+    public function getActive(): ?bool
     {
         return $this->isActive;
+    }
+
+    /**
+     * @param bool $isWithBalances
+     * @return $this
+     */
+    public function setIsWithBalances(bool $isWithBalances): self
+    {
+        $this->isWithBalances = $isWithBalances;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isWithBalances(): bool
+    {
+        return $this->isWithBalances;
     }
 
     /**
@@ -205,7 +228,7 @@ class User_Controller_Extended extends Controller
     /**
      * @return array
      */
-    public function getUsers()
+    public function getUsers(): array
     {
         if (!empty($this->getSubordinate())) {
             $this->getQueryBuilder()->where('subordinated', '=', $this->getSubordinate());
@@ -254,6 +277,24 @@ class User_Controller_Extended extends Controller
         $this->countFoundObjects = count($this->foundObjects);
         foreach ($this->foundObjects as $user) {
             $this->foundObjectsIds[] = $user->getId();
+        }
+
+        if ($this->isWithBalances() === true) {
+            $balances = User_Balance::query()
+                ->whereIn('user_id', $this->foundObjectsIds)
+                ->get(true);
+
+            /** @var User $user */
+            foreach ($this->foundObjects as $key => $user) {
+                /** @var User_Balance $balance */
+                $balance = $balances->get($user->getId());
+                if (!is_null($balance)) {
+                    $balance->setUserId($user->getId());
+                    $user->balance = $balance;
+                    $user->addEntity($balance);
+                    $this->foundObjects[$key] = $user;
+                }
+            }
         }
 
         //Фильтрация по значениям доп.свйотв

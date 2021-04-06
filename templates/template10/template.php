@@ -1,4 +1,5 @@
 <?php
+    authOrOut();
     $Director = User_Auth::current()->getDirector();
     $SberToken = Property_Controller::factoryByTag('payment_sberbank_token');
     $sberTokenVal = $SberToken->getValues($Director)[0]->value();

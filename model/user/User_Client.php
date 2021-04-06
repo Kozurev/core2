@@ -18,6 +18,20 @@ use Model\User\User_Teacher;
 class User_Client extends \User
 {
     /**
+     * @param string|null $tag
+     * @return $this|mixed|User_Client|string
+     */
+    public function _customTag(string $tag = null)
+    {
+        if (is_null($tag)) {
+            return lcfirst(parent::class);
+        } else {
+            $this->aEntityVars['custom_tag'] = $tag;
+            return $this;
+        }
+    }
+
+    /**
      * @return Orm
      */
     public static function query(): Orm
@@ -121,63 +135,44 @@ class User_Client extends \User
      */
     public function buyTariff(\Payment_Tariff $tariff): void
     {
-        $balance = $this->getBalance();
-
-        if ($balance->getBalance() < $tariff->price()) {
+        if ($this->getBalance()->getBalance() < $tariff->price()) {
             throw new \Exception('Недостаточно средств для покупки тарифа');
         }
 
-//        //Создание платежа
-//        $payment = (new \Payment())
-//            ->type(2)
-//            ->user($client->getId())
-//            ->value($tariff->price())
-//            ->description("Покупка тарифа \"" . $tariff->title() . "\"");
-//        if (!$payment->save()) {
-//            throw new \Exception($payment->_getValidateErrorsStr());
-//        }
+        //Создание платежа
+        $payment = (new \Payment())
+            ->type(2)
+            ->user($this->getId())
+            ->tariffId($tariff->getId())
+            ->value($tariff->price())
+            ->description("Покупка тарифа \"" . $tariff->title() . "\"");
+        if (!$payment->save()) {
+            throw new \Exception($payment->_getValidateErrorsStr());
+        }
 
-//        $balance = $balance->getValues($client)[0];
-//        if ($balance->value() < $tariff->price()) {
-//            exit(REST::error(1, 'Недостаточно средств для покупки данного тарифа'));
-//        }
-//
-//        //Создание платежа
-//        $payment = (new \Payment())
-//            ->type(2)
-//            ->user($client->getId())
-//            ->value($tariff->price())
-//            ->description("Покупка тарифа \"" . $tariff->title() . "\"");
-//        if (!$payment->save()) {
-//            throw new \Exception($payment->_getValidateErrorsStr());
-//        }
-//
-//        //Корректировка кол-ва занятий
-//        $countIndivLessons = Property_Controller::factoryByTag('indiv_lessons')->getValues($client)[0];
-//        $countGroupLessons = Property_Controller::factoryByTag('group_lessons')->getValues($client)[0];
-//        if ($tariff->countIndiv() != 0) {
-//            $countIndivLessons->value($countIndivLessons->value() + $tariff->countIndiv())->save();
-//        }
-//        if ($tariff->countGroup() != 0) {
-//            $countGroupLessons->value($countGroupLessons->value() + $tariff->countGroup())->save();
-//        }
-//
-//        //Корректировка пользовательской медианы (средняя стоимость занятия)
-//        $clientRate = [];
-//        if ($tariff->countIndiv() != 0) {
-//            $clientRate['client_rate_indiv'] = $tariff->countIndiv();
-//        }
-//        if ($tariff->countGroup() != 0) {
-//            $clientRate['client_rate_group'] = $tariff->countGroup();
-//        }
-//
-//        foreach ($clientRate as $rateType => $countLessons) {
-//            $clientRateProperty = Property_Controller::factoryByTag($rateType);
-//            $newClientRateValue = $tariff->price() / $countLessons;
-//            $newClientRateValue = round($newClientRateValue, 2);
-//            $oldClientRateValue = $clientRateProperty->getValues($client)[0];
-//            $oldClientRateValue->value($newClientRateValue)->save();
-//            //$response['rate'][$rateType] = $newClientRateValue;
-//        }
+        $balance = $this->getBalance();
+        //Корректировка кол-ва занятий и медианы
+        if ($tariff->countIndiv() != 0) {
+            $balance->addIndividualLessons($tariff->countIndiv(), false);
+        }
+        if ($tariff->countGroup() != 0) {
+            $balance->addGroupLessons($tariff->countGroup(), false);
+        }
+
+        //Корректировка пользовательской медианы (средняя стоимость занятия)
+        if ($tariff->countIndiv() != 0) {
+            $clientRate[\User_Balance::LESSONS_INDIVIDUAL] = $tariff->countIndiv();
+        }
+        if ($tariff->countGroup() != 0) {
+            $clientRate[\User_Balance::LESSONS_GROUP] = $tariff->countGroup();
+        }
+
+        foreach ($clientRate ?? [] as $rateType => $countLessons) {
+            $newClientRateValue = $tariff->price() / $countLessons;
+            $newClientRateValue = round($newClientRateValue, 2);
+            $balance->setAvgPrice($newClientRateValue, $rateType);
+        }
+
+        $balance->save();
     }
 }

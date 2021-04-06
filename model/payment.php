@@ -224,6 +224,18 @@ class Payment extends Payment_Model
     }
 
     /**
+     * @return array
+     */
+    public function getComments(): array
+    {
+        return Property_String::query()
+            ->where('property_id', '=', 26)
+            ->where('object_id', '=', $this->getId())
+            ->orderBy('id', 'desc')
+            ->findAll();
+    }
+
+    /**
      * @param string $uuid
      */
     public function saveCheckoutUuid(string $uuid) : void

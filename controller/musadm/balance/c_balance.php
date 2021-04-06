@@ -5,34 +5,30 @@
  * @author BadWolf
  * @date 19.04.2018 23:18
  * @version 20190412
+ * @version 20210406
  */
 
+use Model\User\User_Client;
+
 //Пользователь под которым происходила изначальная авторизация
-$ParentUser = User_Auth::parentAuth();
+$parentUser = User_Auth::parentAuth();
 
 //id директора, которому принадлежит пользователь
 $subordinated = User_Auth::current()->getDirector()->getId();
 
 //Указатель на авторизацию "под именем" клиента
-User::checkUserAccess(['groups' => [ROLE_MANAGER, ROLE_DIRECTOR]])
-    ?   $isAdmin = 1
-    :   $isAdmin = 0;
+$isAdmin = intval($parentUser->isManagementStaff());
+$isDirector = intval($parentUser->isDirector());
 
-User::checkUserAccess(['groups' => [ROLE_ADMIN, ROLE_DIRECTOR]])
-    ?   $isDirector = 1
-    :   $isDirector = 0;
-
-$Director = User_Auth::current()->getDirector();
+$director = User_Auth::current()->getDirector();
 
 //id клиента под которым авторизован менеджер/директор
 $pageClientId = Core_Array::Get('userid', null, PARAM_INT);
 
 //Получение объекта пользователя клиента
-if (is_null($pageClientId)) {
-    $User = User_Auth::current();
-} else {
-    $User = User_Controller::factory($pageClientId);
-}
+$user = is_null($pageClientId)
+    ?   User_Auth::current()
+    :   User_Client::find($pageClientId);
 
 $accessAbsentPeriodRead =   Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_READ);
 $accessAbsentPeriodCreate = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_CREATE);
@@ -42,15 +38,7 @@ $accessScheduleCreate =     Core_Access::instance()->hasCapability(Core_Access::
 $accessScheduleLessonTime = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_LESSON_TIME);
 $accessScheduleEdit =       Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_EDIT);
 
-/**
- * Проверка на принадлежность клиента, под которым происходит авторизация,
- * тому же директору, которому принадлежит и менеджер
- */
-if (is_null($User)) {
-    Core_Page_Show::instance()->error(403);
-}
-
-$OutputXml = new Core_Entity();
+$outputXml = new Core_Entity();
 
 //Пользовательские примечания и дата последней авторизации
 if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit || $accessScheduleLessonTime) {
@@ -58,73 +46,67 @@ if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit 
     $todayTime = strtotime($today);
 
     //Дата последней авторизации
-    $lastEntryDate = User_Auth_Log::getLastDate($User);
+    $lastEntryDate = User_Auth_Log::getLastDate($user);
 
     //Поурочная оплата
-    $PerLesson = Property_Controller::factoryByTag('per_lesson');
-    $perLesson = $PerLesson->getValues($User)[0]->value();
+    $perLesson = Property_Controller::factoryByTag('per_lesson')->getValues($user)[0]->value();
 
     //id лида, из которого был создан клиент
-    $PrevLid = Property_Controller::factoryByTag('lid_before_client');
-    $prevLid = $PrevLid->getValues($User)[0]->value();
+    $prevLid = Property_Controller::factoryByTag('lid_before_client')->getValues($user)[0]->value();
 
-    //Значение медиан
-    $MedianaIndiv = Property_Controller::factoryByTag('client_rate_indiv');
-    $MedianaGroup = Property_Controller::factoryByTag('client_rate_group');
-    $medianaIndiv = $MedianaIndiv->getValues($User)[0]->value();
-    $medianaGroup = $MedianaGroup->getValues($User)[0]->value();
-
-    $AbsentPeriods = Schedule_Absent::query()
-        ->where('object_id', '=', $User->getId())
+    $absentPeriods = Schedule_Absent::query()
+        ->where('object_id', '=', $user->getId())
         ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
         ->where('date_to', '>=', $today)
-        ->orderBy('date_from', 'ASC')
+        ->orderBy('date_from')
         ->findAll();
 
-    if (count($AbsentPeriods) > 0) {
-        foreach ($AbsentPeriods as $AbsentPeriod) {
-            if (strtotime($AbsentPeriod->dateFrom()) <= $todayTime && strtotime($AbsentPeriod->dateTo()) >= $todayTime) {
-                $AbsentPeriod->current = 1;
+    //Поиск "текущего" периода отсутствия
+    if (count($absentPeriods) > 0) {
+        foreach ($absentPeriods as $absentPeriod) {
+            if (strtotime($absentPeriod->dateFrom()) <= $todayTime && strtotime($absentPeriod->dateTo()) >= $todayTime) {
+                $absentPeriod->current = 1;
             }
-
-            $AbsentPeriod->dateFrom(refactorDateFormat($AbsentPeriod->dateFrom()));
-            $AbsentPeriod->dateTo(refactorDateFormat($AbsentPeriod->dateTo()));
+            $absentPeriod->dateFrom(refactorDateFormat($absentPeriod->dateFrom()));
+            $absentPeriod->dateTo(refactorDateFormat($absentPeriod->dateTo()));
         }
     }
 
-    //Следующее занятие
-    $nearestLessons = Schedule_Controller_Extended::getSchedule($User, date('Y-m-d'), null, 1);
+    //Ближайший день занятия
+    $nearestLessons = Schedule_Controller_Extended::getSchedule($user, date('Y-m-d'), null, 1);
     if (!empty($nearestLessons)) {
         $nearestLessonXml = (new Core_Entity())->_entityName('nearest_lesson');
         $nearestLessonXml->addSimpleEntity('date', $nearestLessons[0]->date);
         $nearestLessonXml->addSimpleEntity('refactoredDate', refactorDateFormat($nearestLessons[0]->date));
         $tomorrow = date('Y-m-d', strtotime(date('Y-m-d') . ' +1 day'));
-        $isCancellable = (int)checkTimeForScheduleActions($User, $nearestLessons[0]->date);
+        $isCancellable = (int)checkTimeForScheduleActions($user, $nearestLessons[0]->date);
         $nearestLessonXml->addSimpleEntity('is_cancellable', $isCancellable);
+        /** @var Schedule_Lesson $lesson */
         foreach ($nearestLessons[0]->lessons as $lesson) {
             $lessonStd = new stdClass();
             $teacher = $lesson->getTeacher();
             $lessonStd->id = $lesson->getId();
-            $lessonStd->teacher = $teacher->surname() . ' ' . $teacher->name();
+            $lessonStd->teacher = $teacher->getFio();
             $lessonStd->time_from = refactorTimeFormat($lesson->timeFrom());
             $lessonStd->time_to = refactorTimeFormat($lesson->timeTo());
             $nearestLessonXml->addEntity($lessonStd, 'lesson');
         }
-        $OutputXml->addEntity($nearestLessonXml, 'nearest_lesson');
+        $outputXml->addEntity($nearestLessonXml, 'nearest_lesson');
     }
 
-    $teachers = (new User_Controller_Extended($User))->getClientTeachers();
+    $teachers = (new User_Controller_Extended($user))->getClientTeachers();
 
-    $OutputXml
-        ->addEntity($User, 'client')
+    //API токен для сервиса "Мои звонки"
+    $myCallsToken = Property_Controller::factoryByTag('my_calls_token')->getValues(User_Auth::current()->getDirector())[0]->value();
+
+    $outputXml
+        ->addEntity($user, 'client')
         ->addSimpleEntity('entry', $lastEntryDate)
         ->addSimpleEntity('per_lesson', $perLesson)
         ->addSimpleEntity('prev_lid', $prevLid)
-        ->addSimpleEntity('mediana_indiv', $medianaIndiv)
-        ->addSimpleEntity('mediana_group', $medianaGroup)
         ->addEntity(User_Auth::current(), 'current_user')
-        ->addSimpleEntity('my_calls_token', Property_Controller::factoryByTag('my_calls_token')->getValues(User_Auth::current()->getDirector())[0]->value())
-        ->addEntities($AbsentPeriods, 'absent')
+        ->addSimpleEntity('my_calls_token', $myCallsToken)
+        ->addEntities($absentPeriods, 'absent')
         ->addEntities($teachers, 'teachers')
         ->addSimpleEntity('access_absent_read', intval($accessAbsentPeriodRead))
         ->addSimpleEntity('access_absent_create', intval($accessAbsentPeriodCreate))
@@ -134,33 +116,18 @@ if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit 
         ->addSimpleEntity('access_schedule_edit', intval($accessScheduleEdit));
 }
 
-//Баланс, кол-во индивидуальных занятий, кол-во групповых занятий
-$Balance =          Core::factory('Property')->getByTagName('balance');
-$PrivateLessons =   Core::factory('Property')->getByTagName('indiv_lessons');
-$GroupLessons =     Core::factory('Property')->getByTagName('group_lessons');
-$balance =          $Balance->getPropertyValues($User)[0];
-$privateLessons =   $PrivateLessons->getPropertyValues($User)[0];
-$groupLessons =     $GroupLessons->getPropertyValues($User)[0];
-
-$ApiTokenSber = Property_Controller::factoryByTag('payment_sberbank_token');
-$apiTokenSber = $ApiTokenSber->getValues($Director)[0]->value();
-
-$OutputXml
-    ->addEntity($User)
+$outputXml
+    ->addEntity($user)
+    ->addEntity($user->getBalance())
     ->addSimpleEntity('is_admin', $isAdmin)
     ->addSimpleEntity('is_director', $isDirector)
-    ->addSimpleEntity('api_token_sber', $apiTokenSber)
-    ->addSimpleEntity('has_checkout', (int)\Model\Checkout::hasCheckout($User))
-    ->addEntity($balance, 'property')
-    ->addEntity($privateLessons, 'property')
-    ->addEntity($groupLessons, 'property')
     ->xsl('musadm/users/balance/balance.xsl')
     ->addSimpleEntity(
         'access_create_payment',
         (int)Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CREATE_CLIENT)
     )
     ->addSimpleEntity(
-        'access_buy_tarif',
+        'access_buy_tariff',
         (int)Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_BUY)
     )
     ->addSimpleEntity('access_schedule_absent_read', $accessAbsentPeriodRead)
@@ -174,15 +141,14 @@ $OutputXml
     ->show();
 
 //Формирование таблицы расписания для клиентов
-if ($User->groupId() == ROLE_CLIENT && Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ_USER)) {
-    $userId = $User->getId();
+if ($user->isClient() && Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_READ_USER)) {
 ?>
-    <input type="hidden" id="userid" value="<?=$User->getId()?>" />
+    <input type="hidden" id="userid" value="<?=$user->getId()?>" />
 
     <section class="user-schedule section-bordered">
     <?php
     (new Schedule_Controller)
-        ->userId($userId)
+        ->userId($user->getId())
         ->setDate(date('Y-m-d'))
         ->printCalendar2();
     ?>
@@ -192,66 +158,62 @@ if ($User->groupId() == ROLE_CLIENT && Core_Access::instance()->hasCapability(Co
 
 //Блок статистики посещаемости
 if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ)) {
-    $UserReports = (new Schedule_Lesson_Report)
-        ->queryBuilder()
+    $reportsQuery = Schedule_Lesson_Report::query()
         ->select(['Schedule_Lesson_Report.id', 'attendance', 'date', 'lesson_id', 'client_id',
             'surname', 'name', 'client_rate', 'teacher_rate', 'total_rate', 'type_id'])
         ->leftJoin('User AS usr', 'usr.id = teacher_id')
         ->orderBy('date', 'DESC');
 
-    $ClientGroups = Core::factory('Schedule_Group_Assignment')
-        ->queryBuilder()
-        ->where('user_id', '=', $User->getId())
-        ->findAll();
-    $UserGroups = [];
-    foreach ($ClientGroups as $group) {
-        $UserGroups[] = $group->groupId();
-    }
-    if (count($UserGroups) > 0) {
-        $UserReports
+    $userGroupsIds = Schedule_Group_Assignment::query()
+        ->where('user_id', '=', $user->getId())
+        ->get()
+        ->map(function(Schedule_Group_Assignment $groupAssignment): int {
+            return $groupAssignment->groupId();
+        });
+    if (count($userGroupsIds) > 0) {
+        $reportsQuery
             ->open()
-                ->where('client_id', '=', $User->getId())
+                ->where('client_id', '=', $user->getId())
                 ->whereIn('type_id', [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE])
             ->close()
             ->open()
-                ->orWhereIn('client_id', $UserGroups)
+                ->orWhereIn('client_id', $userGroupsIds)
                 ->where('type_id', '=', Schedule_Lesson::TYPE_GROUP)
             ->close();
     } else {
-        $UserReports
-            ->where('client_id', '=', $User->getId())
+        $reportsQuery
+            ->where('client_id', '=', $user->getId())
             ->whereIn('type_id', [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE]);
     }
 
-    $UserReports = $UserReports->findAll();
-    foreach ($UserReports as $rep) {
-        $RepLesson = Core::factory('Schedule_Lesson', $rep->lessonId());
-        if (is_null($RepLesson)) {
-            continue;
-        }
+    $reports = $reportsQuery->findAll();
+    /** @var Schedule_Lesson_Report $report */
+    foreach ($reports as $report) {
+        $reportLesson = $report->getLesson();
+        if (!is_null($reportLesson)) {
+            $reportLesson->setRealTime($report->date());
+            $report->time_from = refactorTimeFormat($reportLesson->timeFrom());
+            $report->time_to = refactorTimeFormat($reportLesson->timeTo());
+            $report->date(refactorDateFormat($report->date()));
 
-        $RepLesson->setRealTime($rep->date());
-        $rep->time_from = refactorTimeFormat($RepLesson->timeFrom());
-        $rep->time_to = refactorTimeFormat($RepLesson->timeTo());
-        $rep->date(refactorDateFormat($rep->date()));
-
-        if ($rep->typeId() == Schedule_Lesson::TYPE_GROUP) {
-            $Group = Core::factory('Schedule_Group', $rep->clientId());
-            if (!is_null($Group)) {
-                $rep->surname = $Group->title();
-                $rep->name = '';
-                $ClientAttendance = $rep->getClientAttendance($User->getId());
-                if (is_null($ClientAttendance)) {
-                    $rep->attendance(0);
-                } else {
-                    $rep->attendance($ClientAttendance->attendance());
+            if ($report->typeId() == Schedule_Lesson::TYPE_GROUP) {
+                $group = Schedule_Group::find($report->clientId());
+                if (!is_null($group)) {
+                    $report->surname = $group->title();
+                    $report->name = '';
+                    $clientAttendance = $report->getClientAttendance($user->getId());
+                    if (is_null($clientAttendance)) {
+                        $report->attendance(0);
+                    } else {
+                        $report->attendance($clientAttendance->attendance());
+                    }
                 }
             }
         }
     }
 
     (new Core_Entity())
-        ->addEntities($UserReports)
+        ->addEntities($reports)
         ->addSimpleEntity('is_director', $isDirector)
         ->addSimpleEntity(
             'access_schedule_report_edit',
@@ -263,23 +225,22 @@ if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ)) {
 
 //Платежи
 if (Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_CLIENT)) {
-    $UserPayments = Payment::getListQuery()
+    $payments = Payment::getListQuery()
         ->orderBy('id', 'DESC')
         ->where('status', '=', Payment::STATUS_SUCCESS)
-        ->where('user', '=', $User->getId())
+        ->where('user', '=', $user->getId())
         ->findAll();
 
-    $UserPaymentsNotesProperty = Core::factory('Property', 26);
-    foreach ($UserPayments as $payment) {
-        //$UserPaymentsNotes = array_reverse($UserPaymentsNotesProperty);
-        $payment->addEntities($UserPaymentsNotesProperty->getPropertyValues($payment), 'notes');
+    /** @var Payment $payment */
+    foreach ($payments as $payment) {
+        $payment->addEntities($payment->getComments(), 'notes');
         $payment->datetime(refactorDateFormat($payment->datetime()));
     }
 
-    Core::factory('Core_Entity')
+    (new Core_Entity)
         ->addSimpleEntity('is_admin', $isAdmin)
-        ->addEntities($UserPayments)
-        ->addEntity($ParentUser, 'parent_user')
+        ->addEntities($payments)
+        ->addEntity($parentUser, 'parent_user')
         ->addSimpleEntity(
             'access_payment_edit_client',
             (int)Core_Access::instance()->hasCapability(Core_Access::PAYMENT_EDIT_CLIENT)
@@ -295,13 +256,12 @@ if (Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_CLIENT)) {
 //Новый раздел со списком событий
 if ($isAdmin === 1) {
     //Считаем кол-во дней жизни за вычетом отвала
-    $allDays = (strtotime(date('Y-m-d')) - strtotime($User->registerDate())) / (60*60*24);
+    $allDays = (strtotime(date('Y-m-d')) - strtotime($user->registerDate())) / (60*60*24);
     $absenceDays = 0;
-    $UserActivityList =  (new User_Activity())
-        ->queryBuilder()
-        ->where('user_id', '=', $User->id())
+    $userActivityList = User_Activity::query()
+        ->where('user_id', '=', $user->id())
         ->findAll();
-    foreach ($UserActivityList as $userActivity) {
+    foreach ($userActivityList as $userActivity) {
         $absenceDays += strtotime($userActivity->dumpDateEnd()) - strtotime($userActivity->dumpDateStart());
     }
     $absenceDays = intval($absenceDays / (60*60*24));
@@ -309,8 +269,9 @@ if ($isAdmin === 1) {
 
     //Считаем кол-во уроков , которые отходил
     $countLessons = 0;
-    foreach ($UserReports as $rep) {
-        if ($rep->attendance()) {
+    /** @var Schedule_Lesson_Report $report */
+    foreach ($reports ?? [] as $report) {
+        if ($report->attendance()) {
             $countLessons++;
         }
     }
@@ -318,7 +279,7 @@ if ($isAdmin === 1) {
     //Считаем кол-во денег, которые принес в систему
     $money = 0;
     $moneyIn = Payment::query()
-        ->where('user', '=', $User->id())
+        ->where('user', '=', $user->getId())
         ->where('status', '=', Payment::STATUS_SUCCESS)
         ->where('type', '=', Payment::TYPE_INCOME)
         ->findAll();
@@ -329,10 +290,9 @@ if ($isAdmin === 1) {
     //Считаем кешбек
     $cashBack = 0;
 
-    $cash = (new Payment())
-        ->queryBuilder()
-        ->where('user','=',$User->id())
-        ->where('type','=',15)
+    $cash = Payment::query()
+        ->where('user','=', $user->getId())
+        ->where('type','=', Payment::TYPE_CASHBACK)
         ->findAll();
     foreach ($cash as $in) {
         $cashBack += $in->value();
@@ -340,14 +300,14 @@ if ($isAdmin === 1) {
 
     (new Core_Entity)
         ->addSimpleEntity('life_days', $lifeDays)
-        ->addSimpleEntity('count_lesson', count($UserReports))
+        ->addSimpleEntity('count_lesson', count($reports))
         ->addSimpleEntity('money', $money)
         ->addSimpleEntity('cashBack', $cashBack)
         ->xsl('musadm/users/balance/life_history.xsl')
         ->show();
 
-    $UserEvents = (new Event)->queryBuilder()
-        ->where('user_assignment_id', '=', $User->getId())
+    $eventsQuery = (new Event)->queryBuilder()
+        ->where('user_assignment_id', '=', $user->getId())
         ->whereIn('type_id', [
             Event::SCHEDULE_APPEND_USER,
             Event::SCHEDULE_REMOVE_USER,
@@ -361,44 +321,44 @@ if ($isAdmin === 1) {
             Event::SCHEDULE_SET_ABSENT
         ])
         ->orderBy('time', 'DESC');
-    $UserEvents = $UserEvents->findAll();
+    $events = $eventsQuery->findAll();
 
     //Поиск задачь, связанных с пользователем
-    $TaskController = new Task_Controller($User);
-    $Tasks = $TaskController
+    $taskController = new Task_Controller($user);
+    $tasks = $taskController
         ->isPeriodControl(false)
         ->isLimitedAreasAccess(false)
         ->addSimpleEntity('taskAfterAction', 'balance')
         ->getTasks();
 
-    $TasksPriorities = Core::factory('Task_Priority')
-        ->queryBuilder()
+    $tasksPriorities = Task_Priority::query()
         ->orderBy('priority', 'DESC')
         ->findAll();
 
-    $Areas = Core::factory('Schedule_Area')->getList();
+    $areas = (new Schedule_Area)->getList();
 
-    foreach ($Tasks as $Task) {
-        $Event = Core::factory('Event');
-        $Event->addEntity($Task);
-        $Event->time(strtotime($Task->date()));
-        $UserEvents[] = $Event;
+    foreach ($tasks as $task) {
+        $event = new Event();
+        $event->addEntity($task);
+        $event->time(strtotime($task->date()));
+        $events[] = $event;
     }
 
-    foreach ($UserEvents as $Event) {
-        $Event->date = date('d.m.Y H:i', $Event->time());
-        if ($Event->getId()) {
-            $Event->text = $Event->getTemplateString(Event::STRING_SHORT);
+    /** @var Event $event */
+    foreach ($events as $event) {
+        $event->date = date('d.m.Y H:i', $event->time());
+        if ($event->getId()) {
+            $event->text = $event->getTemplateString(Event::STRING_SHORT);
         }
     }
 
     //Сортировка задач и прочих событий по дате
-    for ($i = 0; $i < count($UserEvents) - 1; $i++) {
-        for($j = 0; $j < count($UserEvents) - 1; $j++) {
-            if($UserEvents[$j]->time() < $UserEvents[$j + 1]->time()) {
-                $tmp = $UserEvents[$j];
-                $UserEvents[$j] = $UserEvents[$j + 1];
-                $UserEvents[$j + 1] = $tmp;
+    for ($i = 0; $i < count($events) - 1; $i++) {
+        for($j = 0; $j < count($events) - 1; $j++) {
+            if($events[$j]->time() < $events[$j + 1]->time()) {
+                $tmp = $events[$j];
+                $events[$j] = $events[$j + 1];
+                $events[$j + 1] = $tmp;
             }
         }
     }
@@ -406,10 +366,10 @@ if ($isAdmin === 1) {
     global $CFG;
     (new Core_Entity)
         ->addSimpleEntity('wwwroot', $CFG->rootdir)
-        ->addEntity($User)
-        ->addEntities($UserEvents)
-        ->addEntities($TasksPriorities)
-        ->addEntities($Areas)
+        ->addEntity($user, 'user')
+        ->addEntities($events)
+        ->addEntities($tasksPriorities)
+        ->addEntities($areas)
         ->addSimpleEntity('afterTaskAction', 'balance')
         ->addSimpleEntity(
             'access_user_append_comment',

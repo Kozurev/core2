@@ -42,7 +42,7 @@ class Tarif {
      * @param tariffId
      * @param callBack
      */
-    static buyTarif(userId, tariffId, callBack) {
+    static buyTariff(userId, tariffId, callBack) {
         $.ajax({
             type: 'GET',
             url: Tarif.getApiLink(),
