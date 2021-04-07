@@ -768,10 +768,10 @@ function saveClientCallback(response) {
             tr.find('.user__phone').text(response.user.phone);
             tr.find('.add__16').text(response.additional.prop_16.values[0].value);
             //Баланс
-            tr.find('.add__12').text(response.additional.prop_12.values[0].value);
+            tr.find('.add__12').text(response.balance.amount);
             //Кол-во занятий
-            tr.find('.add__13').text(response.additional.prop_13.values[0].value);
-            tr.find('.add__14').text(response.additional.prop_14.values[0].value);
+            tr.find('.add__13').text(response.balance.individual_lessons_count);
+            tr.find('.add__14').text(response.balance.group_lessons_count);
             //Длительность занятия
             tr.find('.add__17').text(response.additional.prop_17.values[0].value);
             //Филиал
@@ -895,7 +895,7 @@ function getClientLcTarifsCallBack(response) {
                         'notificationError(\'Ошибка: \' + response.error.message); ' +
                     '} else {' +
                     // '$(\'#balance\').text(Number($(\'#balance\').text()) - response.tarif.price);' +
-                    '$(\'#balance\').text(response.user.balance.balance);' +
+                    '$(\'#balance\').text(response.user.balance.amount);' +
                     '$(\'#countLessonsIndiv\').text(response.user.balance.individual_lessons_count);' +
                     '$(\'#countLessonsGroup\').text(response.user.balance.group_lessons_count);' +
                     'if (response.user.balance.individual_lessons_average_price != undefined) { $(\'#medianaIdiv\').text(response.user.balance.individual_lessons_average_price); }' +

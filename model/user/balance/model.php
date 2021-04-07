@@ -10,7 +10,7 @@ class User_Balance_Model extends Core_Entity
     /**
      * @var float|null
      */
-    public ?float $balance = null;
+    public ?float $amount = null;
 
     /**
      * @var float|null
@@ -84,9 +84,9 @@ class User_Balance_Model extends Core_Entity
     /**
      * @return float
      */
-    public function getBalance(): float
+    public function getAmount(): float
     {
-        return floatval($this->balance);
+        return floatval($this->amount);
     }
 
     /**
@@ -130,11 +130,11 @@ class User_Balance_Model extends Core_Entity
     }
 
     /**
-     * @param float $balance
+     * @param float $amount
      */
-    public function setBalance(float $balance): void
+    public function setAmount(float $amount): void
     {
-        $this->balance = $balance;
+        $this->amount = $amount;
     }
 
     /**
@@ -179,7 +179,7 @@ class User_Balance_Model extends Core_Entity
                 'required' => true,
                 'type' => PARAM_INT
             ],
-            'balance' => [
+            'amount' => [
                 'required' => true,
                 'type' => PARAM_FLOAT
             ],

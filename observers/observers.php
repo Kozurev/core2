@@ -467,11 +467,11 @@ Core::attachObserver('before.Payment.save', function($args) {
         $client = User_Client::find($payment->user());
         if (!is_null($client)) {
             $userBalance = $client->getBalance();
-            $balanceOld =  $userBalance->getBalance();
+            $balanceOld =  $userBalance->getAmount();
             $balanceNew = $payment->type() == Payment::TYPE_INCOME || $payment->type() == Payment::TYPE_CASHBACK
                 ?   $balanceOld + floatval($difference)
                 :   $balanceOld - floatval($difference);
-            $userBalance->setBalance($balanceNew);
+            $userBalance->setAmount($balanceNew);
             Orm::debug(true);
             $userBalance->save();
         }
@@ -495,9 +495,9 @@ Core::attachObserver('before.Payment.delete', function($args) {
         if (!is_null($client)) {
             $userBalance = $client->getBalance();
             $balanceNew = $payment->type() == Payment::TYPE_INCOME || $payment->type() == Payment::TYPE_CASHBACK
-                ?   $userBalance->getBalance() - floatval($payment->value())
-                :   $userBalance->getBalance() + floatval($payment->value());
-            $userBalance->setBalance($balanceNew);
+                ?   $userBalance->getAmount() - floatval($payment->value())
+                :   $userBalance->getAmount() + floatval($payment->value());
+            $userBalance->setAmount($balanceNew);
             $userBalance->save();
         }
     }

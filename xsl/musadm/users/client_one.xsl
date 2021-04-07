@@ -5,7 +5,7 @@
 	<xsl:template match="user">
 
         <xsl:variable name="balance">
-            <xsl:value-of select="user_balance/balance" />
+            <xsl:value-of select="user_balance/amount" />
         </xsl:variable>
 
         <xsl:variable name="count_indiv">

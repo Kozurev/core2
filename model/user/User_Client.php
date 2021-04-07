@@ -135,7 +135,7 @@ class User_Client extends \User
      */
     public function buyTariff(\Payment_Tariff $tariff): void
     {
-        if ($this->getBalance()->getBalance() < $tariff->price()) {
+        if ($this->getBalance()->getAmount() < $tariff->price()) {
             throw new \Exception('Недостаточно средств для покупки тарифа');
         }
 

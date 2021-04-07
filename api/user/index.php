@@ -336,6 +336,10 @@ if ($action === 'save') {
     $output->access->user_edit_client = Core_Access::instance()->hasCapability(Core_Access::USER_EDIT_CLIENT);
     $output->access->user_archive_client = Core_Access::instance()->hasCapability(Core_Access::USER_ARCHIVE_CLIENT);
 
+    if ($user->isClient()) {
+        $output->balance = User_Balance::find($user->getId())->toStd();
+    }
+
     die(json_encode($output));
 }
 
@@ -657,19 +661,16 @@ if ($action === 'get_user') {
 
         if ($user->groupId() == ROLE_CLIENT) {
             $vk =           Property_Controller::factoryByTag('vk');
-            $balance =      Property_Controller::factoryByTag('balance');
-            $lessonsIndiv = Property_Controller::factoryByTag('indiv_lessons');
-            $lessonsGroup = Property_Controller::factoryByTag('group_lessons');
+//            $balance =      Property_Controller::factoryByTag('balance');
+//            $lessonsIndiv = Property_Controller::factoryByTag('indiv_lessons');
+//            $lessonsGroup = Property_Controller::factoryByTag('group_lessons');
             $addPhone =     Property_Controller::factoryByTag('add_phone');
             $lessonDuration=Property_Controller::factoryByTag('lesson_time');
 
             $response->user->vk = $vk->getValues($user)[0]->value();
             $response->user->additional_phone_number = $addPhone->getValues($user)[0]->value();
-            $response->user->balance = new stdClass();
-            $response->user->balance->amount = $balance->getValues($user)[0]->value();
-            $response->user->balance->lessons_indiv = $lessonsIndiv->getValues($user)[0]->value();
-            $response->user->balance->lessons_group = $lessonsGroup->getValues($user)[0]->value();
             $response->user->lessonDuration = $lessonDuration->getValues($user)[0]->value();
+            $response->user->balance = User_Balance::find($user->getId())->toStd();
         }
     }
 

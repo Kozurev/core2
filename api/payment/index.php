@@ -165,7 +165,7 @@ if ($action === 'save') {
 
     $Property = new Property();
     if ($typeId == 1 || $typeId == 2) {
-        $newUserBalance = User_Balance::find($Payment->user())->getBalance();
+        $newUserBalance = User_Balance::find($Payment->user())->getAmount();
     } else {
         $newUserBalance = 0;
     }

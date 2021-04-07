@@ -15,7 +15,7 @@
                             <div class="col-md-4">Баланс</div>
                             <div class="col-md-1">
                                 <span id="balance">
-                                    <xsl:value-of select="user_balance/balance" />
+                                    <xsl:value-of select="user_balance/amount" />
                                 </span>
                             </div>
                             <div class="col-md-3">
