@@ -793,8 +793,9 @@ function saveClientCallback(response) {
  * @param data
  */
 function makeClientTr(data) {
-    var user = data.user;
-    var add = data.additional;
+    let user = data.user,
+        balance = data.balance,
+        add = data.additional;
 
     var tr = $('<tr class="neutral" id="user_'+user.id+'" role="row"></tr>');
     var
@@ -833,11 +834,11 @@ function makeClientTr(data) {
     td2.append('<br/><span class="add__16">'+add.prop_16.values[0].value+'</span>');
 
     //Баланс
-    td3.append('<span class="add__12">'+add.prop_12.values[0].value+'</span>');
+    td3.append('<span class="add__12">'+balance.amount+'</span>');
 
     //Занятия
-    td4.append('<span class="add__13">'+add.prop_13.values[0].value+'</span>');
-    td4.append(' / <span class="add__13">'+add.prop_14.values[0].value+'</span>');
+    td4.append('<span class="add__13">'+balance.individual_lessons_count+'</span>');
+    td4.append(' / <span class="add__13">'+balance.group_lessons_count+'</span>');
 
     //Длительность занятия
     td5.append('<span class="add__17">'+add.prop_17.values[0].value+'</span>');

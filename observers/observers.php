@@ -709,6 +709,16 @@ Core::attachObserver('before.Task.insert', function($args) {
 });
 
 
+Core::attachObserver('after.User.insert', function(array $args): void {
+    /** @var User $user */
+    $user = $args[0];
+    if ($user->isClient()) {
+        Orm::execute('INSERT INTO User_Balance (user_id) VALUES('.$user->getId().')');
+    }
+    // dd('INSERT INTO User_Balance (user_id) VALUES('.$user->getId().')');
+});
+
+
 /**
  * Причисление пользователя к какой-либо группе прав доступа при создании
  */

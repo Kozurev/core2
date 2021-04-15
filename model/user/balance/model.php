@@ -10,27 +10,27 @@ class User_Balance_Model extends Core_Entity
     /**
      * @var float|null
      */
-    public ?float $amount = null;
+    public ?float $amount = 0;
 
     /**
      * @var float|null
      */
-    public ?float $individual_lessons_count = null;
+    public ?float $individual_lessons_count = 0;
 
     /**
      * @var float|null
      */
-    public ?float $group_lessons_count = null;
+    public ?float $group_lessons_count = 0;
 
     /**
      * @var float|null
      */
-    public ?float $individual_lessons_average_price = null;
+    public ?float $individual_lessons_average_price = 0;
 
     /**
      * @var float|null
      */
-    public ?float $group_lessons_average_price = null;
+    public ?float $group_lessons_average_price = 0;
 
     /**
      * @return array|string|string[]
@@ -68,7 +68,7 @@ class User_Balance_Model extends Core_Entity
     /**
      * @return array
      */
-    public function getObjectProperties() : array
+    public function getObjectProperties(): array
     {
         return collect(parent::getObjectProperties())->except(['id'])->toArray();
     }
