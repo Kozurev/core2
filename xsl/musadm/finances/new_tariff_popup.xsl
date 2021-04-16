@@ -20,14 +20,14 @@
                 <span>Название</span><span style="color:red" >*</span>
             </div>
             <div class="column">
-                <input type="text" name="title" class="form-control" value="{payment_tarif/title}" />
+                <input type="text" name="title" class="form-control" value="{payment_tariff/title}" />
             </div>
 
             <div class="column">
                 <span>Цена</span><span style="color:red" >*</span>
             </div>
             <div class="column">
-                <input type="number" name="price" class="form-control" value="{payment_tarif/price}" />
+                <input type="number" name="price" class="form-control" value="{payment_tariff/price}" />
             </div>
 
             <div class="column">
@@ -35,7 +35,7 @@
             </div>
             <div class="column right">
                 <input type="checkbox" name="access" id="access" class="checkbox-new" >
-                    <xsl:if test="payment_tarif/access = 1">
+                    <xsl:if test="payment_tariff/access = 1">
                         <xsl:attribute name="checked">checked</xsl:attribute>
                     </xsl:if>
                 </input>
@@ -48,18 +48,18 @@
                 <span>Кол-во индивидуальных уроков</span>
             </div>
             <div class="column">
-                <input type="number" name="countIndiv" class="form-control" value="{payment_tarif/count_indiv}" />
+                <input type="number" name="countIndiv" class="form-control" value="{payment_tariff/count_indiv}" />
             </div>
 
             <div class="column">
                 <span>Кол-во групповых уроков</span>
             </div>
             <div class="column">
-                <input type="number" name="countGroup" class="form-control" value="{payment_tarif/count_group}"/>
+                <input type="number" name="countGroup" class="form-control" value="{payment_tariff/count_group}"/>
             </div>
 
-            <input type="hidden" name="modelName" value="Payment_Tarif" />
-            <input type="hidden" name="id" value="{payment_tarif/id}" />
+            <input type="hidden" name="modelName" value="Payment_Tariff" />
+            <input type="hidden" name="id" value="{payment_tariff/id}" />
 
             <button class="popop_tariff_submit btn btn-default">Сохранить</button>
         </form>

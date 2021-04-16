@@ -295,7 +295,7 @@ class Payment_Model extends Core_Entity
                 'minval' => 0
             ],
             'area_id' => [
-                'required' => true,
+                'required' => false,
                 'type' => PARAM_INT,
                 'minval' => 0
             ],

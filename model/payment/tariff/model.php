@@ -29,17 +29,17 @@ class Payment_Tariff_Model extends Core_Entity
     /**
      * Кол-во индивидуальных занятий
      *
-     * @var int
+     * @var float
      */
-    protected int $count_indiv = 0;
+    protected float $count_indiv = 0;
 
 
     /**
      * Количество групповых занятий
      *
-     * @var int
+     * @var float
      */
-    protected int $count_group = 0;
+    protected float $count_group = 0;
 
 
     /**
