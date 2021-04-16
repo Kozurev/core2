@@ -9,6 +9,23 @@ class User_Balance extends User_Balance_Model
     const LESSONS_GROUP = 2;
 
     /**
+     * @param float $number
+     * @param int $type
+     * @param bool $withSave
+     */
+    public function setCountLessons(float $number, int $type, bool $withSave = true): void
+    {
+        if ($type === self::LESSONS_INDIVIDUAL) {
+            $this->setIndividualLessonsCount($number);
+        } elseif ($type === self::LESSONS_GROUP) {
+            $this->setGroupLessonsCount($number);
+        }
+        if ($withSave) {
+            $this->save();
+        }
+    }
+
+    /**
      * @param float $count
      * @param int $type
      * @param bool $withSave
@@ -41,6 +58,44 @@ class User_Balance extends User_Balance_Model
     public function addGroupLessons(float $count, bool $withSave): void
     {
         $this->group_lessons_count += $count;
+        if ($withSave) {
+            $this->save();
+        }
+    }
+
+    /**
+     * @param float $number
+     * @param int $type
+     * @param bool $withSave
+     */
+    public function deductLessons(float $number, int $type, bool $withSave = true): void
+    {
+        if ($type === self::LESSONS_INDIVIDUAL) {
+            $this->deductIndividualLessons($number, $withSave);
+        } elseif ($type === self::LESSONS_GROUP) {
+            $this->deductGroupLessons($number, $withSave);
+        }
+    }
+
+    /**
+     * @param float $number
+     * @param bool $withSave
+     */
+    public function deductIndividualLessons(float $number, bool $withSave = true): void
+    {
+        $this->individual_lessons_count -= $number;
+        if ($withSave) {
+            $this->save();
+        }
+    }
+
+    /**
+     * @param float $number
+     * @param bool $withSave
+     */
+    public function deductGroupLessons(float $number, bool $withSave = true): void
+    {
+        $this->group_lessons_count -= $number;
         if ($withSave) {
             $this->save();
         }

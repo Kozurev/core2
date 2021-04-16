@@ -439,47 +439,33 @@ if ($action === 'changeCountLessons') {
         die(REST::error(3, 'Параметр \'lessonsType\' имеет недопустимое значение'));
     }
 
-    $client = User_Controller::factory($userId);
+    $client = User_Client::find($userId);
     if (is_null($client)) {
         die(REST::error(4, 'Пользователь с id: ' . $userId . ' не существует'));
     }
-    if ($client->groupId() !== ROLE_CLIENT) {
-        die(REST::error(5, 'Пользователь с id: ' . $userId . ' не является клиентом'));
-    }
 
     $output->user = new stdClass();
-    $output->user->id = $client->getId();
-    $output->user->surname = $client->surname();
-    $output->user->name = $client->name();
-    $output->user->groupId = $client->groupId();
-    $output->user->patronymic = $client->patronymic();
-    $output->user->phone = $client->phoneNumber();
-    $output->user->login = $client->login();
 
     //Изменение баланса кол-ва занятий
-    if ($lessonsType == Schedule_Lesson::TYPE_INDIV) {
-        $propName = 'indiv_lessons';
-    } else {
-        $propName = 'group_lessons';
-    }
-    $userLessons = Property_Controller::factoryByTag($propName);
-    $countLessons = $userLessons->getPropertyValues($client)[0];
+    $balance = $client->getbalance();
+    $output->oldCount = $balance->getCountLessons($lessonsType);
 
     if ($operation == 'plus') {
-        $newCount = $countLessons->value() + $number;
+        $balance->addLessons($number, $lessonsType);
     } elseif ($operation == 'minus') {
-        $newCount = $countLessons->value() - $number;
+        $balance->deductLessons($number, $lessonsType);
     } else {
-        $newCount = $number;
+        $balance->setCountLessons($number, $lessonsType);
     }
 
-    $output->oldCount = $countLessons->value();
-    $output->newCount = $newCount;
+    $output->newCount = $balance->getCountLessons($lessonsType);
 
-    if ($countLessons->value() != $newCount) {
-        $countLessons->value($newCount);
-        $countLessons->save();
+    if ($output->newCount !== $output->oldCount) {
+        $balance->save();
     }
+
+    $output->user = $client->toStd();
+    $output->balance = $balance->toStd();
 
     die(json_encode($output));
 }
