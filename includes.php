@@ -44,7 +44,6 @@ register_shutdown_function(function() {
     }
 
     if (!is_null($error)) {
-        dd($error);
         $errorLogMessage = 'Error in file ' . $error['file'] . ' on line ' . $error['line'] . ':' . PHP_EOL . $error['message'] . PHP_EOL;
         Log::instance()->error(Log::TYPE_CORE, $errorLogMessage);
     }
