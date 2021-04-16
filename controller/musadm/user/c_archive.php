@@ -9,6 +9,7 @@
 
 $user = User_Auth::current();
 $userController = new User_Controller_Extended($user);
+$userController->setIsWithBalances(true);
 
 $propertiesIds = [
     9,  //Ссылка вконтакте
