@@ -43,6 +43,18 @@ class Core_Entity extends Core_Entity_Model
 
 
     /**
+     * Core_Entity constructor.
+     * @param array $properties
+     */
+    public function __construct(array $properties = [])
+    {
+        foreach ($properties as $propertyName => $propertyValue) {
+            $this->$propertyName = $propertyValue;
+        }
+    }
+
+
+    /**
      * Валидация значнеий сохраняемого объекта
      * все ошибки валидации сохраняются в свойство $validateErrors
      *

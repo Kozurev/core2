@@ -4,6 +4,7 @@
 namespace Model\User;
 
 use Orm;
+use User;
 use User_Teacher_Assignment;
 use Model\User\User_Teacher;
 
@@ -174,5 +175,18 @@ class User_Client extends \User
         }
 
         $balance->save();
+    }
+
+    /**
+     * @return User_Client|null
+     */
+    public static function current(): ?User_Client
+    {
+        $user = \User_Auth::current();
+        if (!is_null($user) && $user->isClient()) {
+            return new User_Client($user->getObjectProperties());
+        } else {
+            return null;
+        }
     }
 }

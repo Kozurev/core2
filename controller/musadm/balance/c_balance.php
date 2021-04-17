@@ -27,7 +27,7 @@ $pageClientId = Core_Array::Get('userid', null, PARAM_INT);
 
 //Получение объекта пользователя клиента
 $user = is_null($pageClientId)
-    ?   User_Auth::current()
+    ?   User_Client::current()
     :   User_Client::find($pageClientId);
 
 $accessAbsentPeriodRead =   Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_READ);
