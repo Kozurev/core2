@@ -65,6 +65,7 @@ try {
 $paymentsQuery = Payment::getListQuery()
     ->where('subordinated', '=', $subordinated)
     ->where('type', '<>', Payment::TYPE_DEBIT)
+    ->where('status', '=', Payment::STATUS_SUCCESS)
     ->orderBy('id', 'DESC');
 
 //Сумма поступлений
