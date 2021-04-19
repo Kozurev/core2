@@ -136,9 +136,9 @@ class User_Balance extends User_Balance_Model
     public function getAvgPrice(int $type): float
     {
         if ($type === self::LESSONS_INDIVIDUAL) {
-            return $this->individual_lessons_count;
+            return $this->individual_lessons_average_price;
         } elseif ($type === self::LESSONS_GROUP) {
-            return $this->group_lessons_count;
+            return $this->group_lessons_average_price;
         } else {
             return 0.0;
         }
