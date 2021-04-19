@@ -169,7 +169,8 @@ if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ)) {
         ->get()
         ->map(function(Schedule_Group_Assignment $groupAssignment): int {
             return $groupAssignment->groupId();
-        });
+        })
+        ->toArray();
     if (count($userGroupsIds) > 0) {
         $reportsQuery
             ->open()
