@@ -1,4 +1,7 @@
 <?php
+
+use Model\User\User_Client;
+
 /**
  * Класс занятия расписания
  *
@@ -29,6 +32,14 @@ class Schedule_Lesson extends Schedule_Lesson_Model
     public static function getDefaultUser() : User
     {
         return (new User)->surname('Неизвестно');
+    }
+
+    /**
+     * @return User_Client
+     */
+    public static function getDefaultClient(): User_Client
+    {
+        return (new User_Client())->surname('Неизвестно');
     }
 
     /**
@@ -112,18 +123,18 @@ class Schedule_Lesson extends Schedule_Lesson_Model
 
     /**
      * @param bool $withDefault
-     * @return User|null
+     * @return User_Client|null
      */
-    public function getClientUser(bool $withDefault = true) : ?User
+    public function getClientUser(bool $withDefault = true) : ?User_Client
     {
         if (empty($this->client_id)) {
-            return $withDefault ? self::getDefaultUser() : null;
+            return $withDefault ? self::getDefaultClient() : null;
         }
-        $client = User::find(intval($this->client_id));
+        $client = User_Client::find(intval($this->client_id));
         if (!is_null($client)) {
             return $client;
         } else {
-            return $withDefault ? self::getDefaultUser() : null;
+            return $withDefault ? self::getDefaultClient() : null;
         }
     }
 

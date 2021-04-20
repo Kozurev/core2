@@ -65,9 +65,9 @@ function updateLastLessonTime($Lesson, &$maxTime, $time, $period)
  */
 function getLessonData(Schedule_Lesson $lesson)
 {
-//    if (isset($_SESSION['core']['lesson_data'][$lesson->getId()])) {
-//        return $_SESSION['core']['lesson_data'][$lesson->getId()];
-//    }
+    if (isset($_SESSION['core']['lesson_data'][$lesson->getId()])) {
+        return $_SESSION['core']['lesson_data'][$lesson->getId()];
+    }
 
     $output = [
         'client'    =>  '',
@@ -75,63 +75,40 @@ function getLessonData(Schedule_Lesson $lesson)
         'client_status' =>  '',
     ];
 
+    $teacher = $lesson->teacher ?? new \Model\User\User_Teacher();
+
     /** @var User $teacher */
-    if ($lesson->typeId() == Schedule_Lesson::TYPE_GROUP) {
-        $group = $lesson->getGroup();
+    if ($lesson->typeId() == Schedule_Lesson::TYPE_GROUP || $lesson->typeId() == Schedule_Lesson::TYPE_GROUP_CONSULT) {
+        $group = $lesson->group ?? new Schedule_Group();
         if ($lesson->teacherId() == 0) {
-            $group = $lesson->getGroup();
-            $teacher = $group->getTeacher();
-        } else {
-            $teacher = $lesson->getTeacher();
+            $teacher = $group->getTeacher() ?? new \Model\User\User_Teacher();
         }
-
-        if (empty($teacher)) {
-            $output['teacher'] = 'Неизвестен';
-        } else {
-            $output['teacher'] = $teacher->getFio();
-        }
-
-        if (empty($group)) {
-            $output['client'] = 'Неизвестен';
-        } else {
-            $output['client'] = $group->title();
-            $output['client_status'] = 'group';
-        }
+        $output['client'] = !empty($group) ? $group->title() : 'Неизвестная группа';
+        $output['client_status'] = 'group';
     } elseif ($lesson->typeId() == Schedule_Lesson::TYPE_INDIV || $lesson->typeId() == Schedule_Lesson::TYPE_PRIVATE) {
-        $teacher = $lesson->getTeacher();
-        $client = $lesson->getClient();
+        $client = $lesson->client ?? new \Model\User\User_Client();
+        $balance = $client->balance ?? new User_Balance();
 
-        $output['teacher'] = $teacher->getFio();
-        $output["client"] = $client->getFio();
-
-        if (!$client->getId()) {
-            $output['client_status'] = 'neutral';
+        $output['client'] = $client->getFio();
+        if ($balance->getIndividualLessonsCount() < 0 || $balance->getGroupLessonsCount() < 0) {
+            $output['client_status'] = 'negative';
+        } elseif ($balance->getIndividualLessonsCount() > 1 || $balance->getGroupLessonsCount() > 1) {
+            $output['client_status'] = 'positive';
         } else {
-            $countPrivateLessons = Property_Controller::factoryByTag('indiv_lessons')->getValues($client)[0]->value();
-            $countGroupLessons = Property_Controller::factoryByTag('group_lessons')->getValues($client)[0]->value();
+            $output['client_status'] = 'neutral';
+        }
 
-            if ($countGroupLessons < 0 || $countPrivateLessons < 0) {
-                $output['client_status'] = 'negative';
-            } elseif ($countPrivateLessons > 1 || $countGroupLessons > 1) {
-                $output['client_status'] = 'positive';
-            } else {
-                $output['client_status'] = 'neutral';
-            }
-
-            $vk = Property_Controller::factoryByTag('vk')->getValues($client)[0]->value();
-            if ($vk != '') {
-                $output['client_status'] .= ' vk';
-            }
+        $vk = Property_Controller::factoryByTag('vk')->getValues($client)[0]->value();
+        if ($vk != '') {
+            $output['client_status'] .= ' vk';
         }
     } elseif ($lesson->typeId() == Schedule_Lesson::TYPE_CONSULT) {
-        $teacher = $lesson->getTeacher();
-        $output['teacher'] = $teacher->getFio();
         $output['client'] = 'Консультация';
         $output['client_status'] = 'neutral';
 
-        if ($lesson->clientId() != 0) {
+        $lid = $lesson->lid ?? null;
+        if (!empty($lesson->clientId())) {
             $output['client'] .= ' ' . $lesson->clientId();
-            $lid = Lid_Controller::factory($lesson->clientId());
             if (!is_null($lid)) {
                 if (!empty($lid->surname())) {
                     $output['client'] .= ' ' . $lid->surname();
@@ -144,28 +121,9 @@ function getLessonData(Schedule_Lesson $lesson)
                 }
             }
         }
-    } elseif ($lesson->typeId() == Schedule_Lesson::TYPE_GROUP_CONSULT) {
-        $group = $lesson->getGroup();
-        if ($lesson->teacherId() == 0) {
-            $teacher = $group->getTeacher();
-        } else {
-            $teacher = $lesson->getTeacher();
-        }
-
-        if (empty($teacher)) {
-            $output['teacher'] = 'Неизвестен';
-        } else {
-            $output['teacher'] = $teacher->getFio();
-        }
-
-        if (empty($group)) {
-            $output['client'] = 'Неизвестен';
-        } else {
-            $output['client'] = $group->title();
-            $output['client_status'] = 'lids_group';
-        }
     }
 
+    $output['teacher'] = !empty($teacher) ? $teacher->getFio() : 'Неизвестный преподаватель';
     $_SESSION['core']['lesson_data'][$lesson->getId()] = $output;
     return $output;
 }
