@@ -54,6 +54,12 @@ if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit 
     //id лида, из которого был создан клиент
     $prevLid = Property_Controller::factoryByTag('lid_before_client')->getValues($user)[0]->value();
 
+    //Ссылка ВК
+    $vkLink = trim(Property_Controller::factoryByTag('vk')->getValues($user)[0]->value());
+    if (substr($vkLink, 0, 5) !== 'https') {
+        $vkLink = 'https://' . $vkLink;
+    }
+
     $absentPeriods = Schedule_Absent::query()
         ->where('object_id', '=', $user->getId())
         ->where('type_id', '=', Schedule_Lesson::TYPE_INDIV)
@@ -102,6 +108,7 @@ if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit 
     $outputXml
         ->addEntity($user, 'client')
         ->addSimpleEntity('entry', $lastEntryDate)
+        ->addSimpleEntity('vk', $vkLink)
         ->addSimpleEntity('per_lesson', $perLesson)
         ->addSimpleEntity('prev_lid', $prevLid)
         ->addEntity(User_Auth::current(), 'current_user')

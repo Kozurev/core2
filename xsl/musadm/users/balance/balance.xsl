@@ -312,6 +312,21 @@
                         </td>
                     </tr>
 
+                    <xsl:if test="vk != ''">
+                        <tr>
+                            <td>
+                                <div class="row">
+                                    <div class="col-md-4">Ссылка ВК</div>
+                                    <div class="col-md-3">
+                                        <a href="{vk}" target="_blank">
+                                            <xsl:value-of select="vk" />
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </xsl:if>
+
                     <xsl:if test="count(teachers) != 0">
                         <tr>
                             <td>
