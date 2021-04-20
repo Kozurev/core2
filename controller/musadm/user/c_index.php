@@ -59,14 +59,14 @@ if ($groupId == ROLE_CLIENT) {
     $propertiesIds = [
         20, //Инструмент
         28, //Год(дата) рождения
-        31, //Расписание занятий
+        // 31, //Расписание занятий
         59  //Стоп-лист преподавателей
     ];
 
     $ClientController
         ->isPaginate(true)
         ->paginate()
-        ->setOnPage(10)
+        ->setOnPage(30)
         ->setCurrentPage(Core_Array::Get('page', 1, PARAM_INT));
 
     if (isset($_GET['page'])) {
