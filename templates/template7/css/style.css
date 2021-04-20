@@ -68,6 +68,19 @@
 .manager_table .empty {
 	background-color: inherit !important;
 }
+
+.manager_table .time {
+	display: block;
+	position: relative;
+	font-size: 11px;
+}
+.manager_table .time:first-child {
+	bottom: 9px;
+}
+/*.manager_table .time:last-child {*/
+/*	top: 3px;*/
+/*}*/
+
 /**
  * << Таблица
  */

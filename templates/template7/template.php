@@ -12,7 +12,6 @@ $subordinated = User_Auth::current()->getDirector()->getId();
 if (is_null($pageUserId)) {
     $User = User_Auth::current();
 } else {
-    Core::factory('User_Controller');
     $User = User_Controller::factory($pageUserId);
 }
 

@@ -232,19 +232,19 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
             if (!compareTime($time, '>=', $maxLessonTime[0][$class])
                 && !compareTime($time, '>=', $maxLessonTime[1][$class])
             ) {
-                echo '<th>' . refactorTimeFormat($time) . '</th>';
+                echo '<th><span class="time">' . refactorTimeFormat($time) . '</span></th>';
                 continue;
             }
 
             //Основное расписание
             if (!compareTime($time, '>=', $maxLessonTime[0][$class])) {
-                echo '<th>' . refactorTimeFormat($time) . '</th>';
+                echo '<th><span class="time">' . refactorTimeFormat($time) . '</span></th>';
             } else {
                 //Урок из основного расписания
                 $mainLesson = array_pop_lesson($lessons, $time, $class);
 
                 if ($mainLesson === false) {
-                    echo '<th>' . refactorTimeFormat($time) . '</th>';
+                    echo '<th><span class="time">' . refactorTimeFormat($time) . '</span></th>';
                     echo '<td class="clear"></td>';
                 } else {
                     $minutes = deductTime($mainLesson->timeTo(), $time);
@@ -271,7 +271,7 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
                     $mainLessonData = getLessonData($mainLesson);
                     $isVisibleData = !$isTeacher || $mainLesson->teacherId() == $userId;
 
-                    echo '<th>' . refactorTimeFormat($time) . '</th>';
+                    echo '<th><span class="time">' . refactorTimeFormat($time) . '</span></th>';
                     echo "<td class='" . ($isVisibleData ? $mainLessonData['client_status'] : 'disabled') . "' rowspan='" . $rowspan . "'>";
 
                     if ($isVisibleData) {
@@ -377,7 +377,7 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
         }
 
         echo '</tr>';
-        $time = addTime( $time, $period );
+        $time = addTime($time, $period);
     }
 
     echo "<tr>";
