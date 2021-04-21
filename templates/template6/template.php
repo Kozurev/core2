@@ -42,7 +42,7 @@ if (
         ->addSimpleEntity('wwwroot', $CFG->rootdir)
         ->addSimpleEntity('action', $formAction)
         ->addSimpleEntity('usersActive', $usersActive)
-        ->addSimpleEntity('group_id', Core_Page_Show::instance()->StructureItem instanceof Structure_Item ? Core_Page_Show::instance()->StructureItem->getId() : 0)
+        ->addSimpleEntity('group_id', Core_Page_Show::instance()->StructureItem instanceof User_Group ? Core_Page_Show::instance()->StructureItem->getId() : 0)
         ->addEntities($areas)
         ->addEntities($instruments, 'property_value')
         ->addEntities($teachers, 'teachers')
