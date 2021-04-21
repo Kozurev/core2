@@ -129,6 +129,12 @@ function getLessonData(Schedule_Lesson $lesson)
 }
 
 
+function clearCache() {
+    if (isset($_SESSION['core']['lesson_data'])) {
+        unset($_SESSION['core']['lesson_data']);
+    }
+}
+
 /**
  * Сортировка массива по времени
  *

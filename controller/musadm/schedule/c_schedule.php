@@ -21,6 +21,8 @@ $date = Core_Array::Get('date', $today, PARAM_STRING);
 
 $isTeacher = $user->groupId() == ROLE_TEACHER;
 
+clearCache();
+
 //Формирование таблицы расписания для менеджеров
 if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGER]], $user)
     && is_object(Core_Page_Show::instance()->StructureItem)
