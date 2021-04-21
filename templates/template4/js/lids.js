@@ -116,6 +116,24 @@ $(function () {
                 sourceInput.val('');
                 sourceInput.hide();
             }
+        })
+        .on('change', '#editLidForm input[name=number]', function(e) {
+            let $duplicateText = $('#duplicatedLidText');
+            $duplicateText.empty();
+            if ($(this).val().length === 12) {
+                Lids.getList({
+                    filter: {
+                        number: $(this).val()
+                    }
+                }, function(lids) {
+                    if (lids.length !== 0) {
+                        $duplicateText.text('Лид(ы) с таким номером телефона уже существуют: ');
+                        $(lids).each(function(key, lid) {
+                            $duplicateText.append('№<a class="info-by-id" data-model="Lid" data-id="'+lid.id+'">' + lid.id + '</a><span> </span>');
+                        });
+                    }
+                });
+            }
         });
 
 
@@ -404,7 +422,7 @@ function makeLidPopup(lidId) {
             '<div class="column"><input class="form-control" type="text" name="name" value="'+lid.name+'"></div>' +
             '<hr>' +
             '<div class="column"><span>Номер телефона</span></div>' +
-            '<div class="column"><input class="form-control masked-phone" type="text" name="number" value="'+lid.number+'"></div>' +
+            '<div class="column"><input class="form-control masked-phone" type="text" name="number" value="'+lid.number+'"><p class="text-danger" id="duplicatedLidText"></p></div>' +
             '<hr>' +
             '<div class="column"><span>Ссылка ВК</span></div>' +
             '<div class="column"><input class="form-control" type="text" name="vk" value="'+lid.vk+'"></div>' +
