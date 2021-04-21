@@ -56,7 +56,7 @@ if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit 
 
     //Ссылка ВК
     $vkLink = trim(Property_Controller::factoryByTag('vk')->getValues($user)[0]->value());
-    if (substr($vkLink, 0, 5) !== 'https') {
+    if (!empty($vkLink) && substr($vkLink, 0, 5) !== 'https') {
         $vkLink = 'https://' . $vkLink;
     }
 
