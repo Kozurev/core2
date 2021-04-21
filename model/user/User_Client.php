@@ -25,7 +25,9 @@ class User_Client extends \User
     public function _customTag(string $tag = null)
     {
         if (is_null($tag)) {
-            return lcfirst(parent::class);
+            return empty(parent::_customTag())
+                ?   lcfirst(parent::class)
+                :   parent::_customTag();
         } else {
             $this->aEntityVars['custom_tag'] = $tag;
             return $this;
