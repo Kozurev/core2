@@ -39,7 +39,7 @@ class User_Client extends \User
      */
     public static function query(): Orm
     {
-        return parent::query()->where('group_id', '=', ROLE_CLIENT);
+        return parent::query()->where('User.group_id', '=', ROLE_CLIENT);
     }
 
     /**
