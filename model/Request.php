@@ -63,4 +63,12 @@ class Request
     {
         return $this->data->get($key, $default);
     }
+
+    /**
+     * @return Collection
+     */
+    public function all(): Collection
+    {
+        return $this->data;
+    }
 }
