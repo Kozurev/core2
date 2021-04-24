@@ -713,9 +713,9 @@ Core::attachObserver('after.User.insert', function(array $args): void {
     /** @var User $user */
     $user = $args[0];
     if ($user->isClient()) {
-        Orm::execute('INSERT INTO User_Balance (user_id) VALUES('.$user->getId().')');
+        $balance = new User_Balance();
+        Orm::execute('INSERT INTO User_Balance (user_id, individual_lessons_average_price, group_lessons_average_price) VALUES('.$user->getId().', '.$balance->getIndividualLessonsAvg().', '.$balance->getGroupLessonsAvg().')');
     }
-    // dd('INSERT INTO User_Balance (user_id) VALUES('.$user->getId().')');
 });
 
 
