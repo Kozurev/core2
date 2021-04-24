@@ -340,7 +340,7 @@
                         </tr>
                     </xsl:if>
 
-                    <xsl:if test="//current_user/email != '' and //my_calls_token != ''">
+                    <xsl:if test="//current_user/email != '' and //my_calls_token != '' and is_admin = 1">
                         <tr>
                             <td class="text-center">
                                 <a class="btn btn-orange" onclick="MyCalls.makeCall({//current_user/id}, '{user/phone_number}', checkResponseStatus)" title="Совершить звонок">
