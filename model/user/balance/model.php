@@ -25,12 +25,12 @@ class User_Balance_Model extends Core_Entity
     /**
      * @var float|null
      */
-    public ?float $individual_lessons_average_price = 0;
+    public ?float $individual_lessons_average_price = 500;
 
     /**
      * @var float|null
      */
-    public ?float $group_lessons_average_price = 0;
+    public ?float $group_lessons_average_price = 350;
 
     /**
      * @return array|string|string[]
