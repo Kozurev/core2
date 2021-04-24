@@ -121,7 +121,13 @@
                 <span>Длительность урока</span>
             </div>
             <div class="column">
-                <input class="form-control" type="text" value="{property_value[property_id=17]/value}" name="property_17[]" required="required" />
+                <input class="form-control" type="text" name="property_17[]" required="required">
+                    <xsl:if test="property_value[property_id=17]/value != 0">
+                        <xsl:attribute name="value">
+                            <xsl:value-of select="property_value[property_id=17]/value" />
+                        </xsl:attribute>
+                    </xsl:if>
+                </input>
             </div>
                 <hr/>
             <div class="column">
