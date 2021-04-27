@@ -11,13 +11,37 @@ use Model\Api;
 class Sberbank
 {
     const ACTION_REGISTER_ORDER = 'register.do';
+    const ACTION_CHECK_STATUS = 'getOrderStatusExtended.do';
+
     const PARAM_TOKEN = 'token';
     const PARAM_AMOUNT = 'amount';
     const PARAM_SUCCESS_URL = 'returnUrl';
     const PARAM_ERROR_URL = 'failUrl';
     const PARAM_DESCRIPTION = 'description';
+    const PARAM_ORDER_ID = 'orderId';
     const PARAM_ORDER_NUMBER = 'orderNumber';
     const PARAM_JSON_PARAMS = 'jsonParams';
+
+    const ORDER_STATUS_PENDING = 0; //заказ зарегистрирован, но не оплачен
+    const ORDER_STATUS_HOLD = 1; //предавторизованная сумма удержана (для двухстадийных платежей)
+    const ORDER_STATUS_SUCCESS = 2; //проведена полная авторизация суммы заказа
+    const ORDER_STATUS_CANCELED = 3; //авторизация отменена
+    const ORDER_STATUS_REFUND = 4; //по транзакции была проведена операция возврата
+    const ORDER_STATUS_AUTH_INIT = 5; //инициирована авторизация через сервер контроля доступа банка-эмитента
+    const ORDER_STATUS_AUTH_CANCELED = 6; //авторизация отклонена
+
+    /**
+     * @var array|string[]
+     */
+    private static array $statuses = [
+        self::ORDER_STATUS_PENDING      => 'Заказ зарегистрирован, но не оплачен',
+        self::ORDER_STATUS_HOLD         => 'Предавторизованная сумма удержана (для двухстадийных платежей)',
+        self::ORDER_STATUS_SUCCESS      => 'Проведена полная авторизация суммы заказа',
+        self::ORDER_STATUS_CANCELED     => 'Авторизация отменена',
+        self::ORDER_STATUS_REFUND       => 'По транзакции была проведена операция возврата',
+        self::ORDER_STATUS_AUTH_INIT    => 'Инициирована авторизация через сервер контроля доступа банка-эмитента',
+        self::ORDER_STATUS_AUTH_CANCELED=> 'Авторизация отклонена'
+    ];
 
     /**
      * Авторизационный токен для платежного шлюза
@@ -172,6 +196,15 @@ class Sberbank
     }
 
     /**
+     * @param int $status
+     * @return string
+     */
+    public static function getStatusName(int $status): string
+    {
+        return self::$statuses[$status] ?? 'Неизвестный статус';
+    }
+
+    /**
      * @return mixed|null
      */
     public function registerOrder()
@@ -186,6 +219,36 @@ class Sberbank
         ];
         $params[self::PARAM_JSON_PARAMS] = json_encode($params);
         return Api::getRequest($this->getUrl(self::ACTION_REGISTER_ORDER), $params);
+    }
+
+    /**
+     * @param Payment $payment
+     * @throws Exception
+     */
+    public function checkStatus(Payment $payment)
+    {
+        if (empty($payment->merchantOrderId())) {
+            throw new Exception('Отсутствует ID платежа в платежном шлюзе');
+        }
+        $params = [
+            self::PARAM_TOKEN => $this->token,
+            self::PARAM_ORDER_ID => $payment->merchantOrderId()
+        ];
+        $response = Api::getRequest($this->getUrl(self::ACTION_CHECK_STATUS), $params);
+
+        if ($payment->isStatusPending()) {
+            if (!empty($response->errorCode ?? null)) {
+                $payment->setStatusError();
+                $payment->appendComment($response->errorMessage);
+            } else {
+                if ($response->orderStatus == self::ORDER_STATUS_SUCCESS) {
+                    $payment->setStatusSuccess();
+                } elseif ($response->orderStatus == self::ORDER_STATUS_CANCELED) {
+                    $payment->setStatusCanceled();
+                }
+                $payment->appendComment('Статус платежа: ' . self::getStatusName($response->orderStatus) . '. ' . $response->actionCodeDescription);
+            }
+        }
     }
 
     /**

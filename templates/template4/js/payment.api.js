@@ -240,6 +240,26 @@ class Payment {
         });
     }
 
+    static checkStatus(paymentId, callBack) {
+        $.ajax({
+            type: 'GET',
+            url: Payment.getApiLink(),
+            dataType: 'json',
+            data: {
+                action: 'checkStatus',
+                paymentId: paymentId
+            },
+            success: function (response) {
+                if (callBack != undefined) {
+                    callBack(response);
+                }
+            },
+            error: function () {
+                notificationError('Произошла ошибка');
+            }
+        });
+    }
+
     static sberApiError(order) {
         console.log(order);
     }

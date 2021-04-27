@@ -233,10 +233,16 @@ if (Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_REPORT_READ)) {
 
 //Платежи
 if (Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_CLIENT)) {
-    $payments = Payment::getListQuery()
+    $payments = Payment::query()
         ->orderBy('id', 'DESC')
-        ->where('status', '=', Payment::STATUS_SUCCESS)
         ->where('user', '=', $user->getId())
+        ->open()
+            ->open()
+                ->where('status', '=', Payment::STATUS_PENDING)
+                ->where('merchant_order_id', 'IS NOT', 'NULL')
+            ->close()
+            ->orWhere('status', '<>', Payment::STATUS_PENDING)
+        ->close()
         ->findAll();
 
     /** @var Payment $payment */

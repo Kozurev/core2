@@ -569,10 +569,6 @@ function saveBalancePaymentCallback(payment) {
     if (!checkResponseStatus(payment)) {
         return false;
     }
-    // if (payment.error != undefined) {
-    //     notificationError(payment.error.message);
-    //     return false;
-    // }
 
     var balanceSpan = $('#balance');
     balanceSpan.text(payment.userBalance);
@@ -637,7 +633,6 @@ function removeBalancePaymentCallback(payment) {
     $('#client_payment_' + payment.id).remove();
     var clientBalance = $('#balance');
     var clientBalanceVal = Number(clientBalance.text());
-    console.log(payment.type == 1);
     if (payment.type == 1) {
         clientBalance.text(clientBalanceVal - payment.value);
     } else {
@@ -694,4 +689,11 @@ function removeTeacherPaymentCallback(payment) {
     }
     refreshSchedule();
     return true;
+}
+
+function checkPaymentStatusCallback(response) {
+    checkResponseStatus(response);
+    setTimeout(function () {
+        window.location.reload();
+    }, 1500);
 }

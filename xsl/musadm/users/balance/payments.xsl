@@ -15,6 +15,7 @@
                                 <tr class="header">
                                     <th>Дата</th>
                                     <th>Сумма</th>
+                                    <th>Статус</th>
                                     <th>Примечание</th>
                                     <xsl:if test="is_admin = 1">
                                         <th><!--Костыль--></th>
@@ -45,14 +46,32 @@
         <tr class="{$class}" id="client_payment_{id}">
             <td class="date"><xsl:value-of select="datetime" /></td>
             <td class="value"><xsl:value-of select="value" /></td>
-
-            <td>
-                <p class="description">
-                    <xsl:if test="status = 2">
+            <td class="status">
+                <xsl:choose>
+                    <xsl:when test="status = 0">
+                        <p class="text-default">
+                            В обработке
+                        </p>
+                    </xsl:when>
+                    <xsl:when test="status = 1">
+                        <p class="text-success">
+                            Выполнен
+                        </p>
+                    </xsl:when>
+                    <xsl:when test="status = 2">
                         <p class="text-danger">
                             Ошибка платежа
                         </p>
-                    </xsl:if>
+                    </xsl:when>
+                    <xsl:when test="status = 3">
+                        <p class="text-warning">
+                            Платеж отменен
+                        </p>
+                    </xsl:when>
+                </xsl:choose>
+            </td>
+            <td>
+                <p class="description">
                     <xsl:if test="description != ''"><xsl:value-of select="description" /></xsl:if>
                 </p>
 
@@ -72,6 +91,9 @@
 
             <xsl:if test="/root/is_admin = 1">
                 <td style="text-align:center">
+                    <xsl:if test="status = 0">
+                        <a class="action settings" onclick="Payment.checkStatus({id}, checkPaymentStatusCallback)" title="Проверить статус платежа"></a>
+                    </xsl:if>
                     <a class="action comment" onclick="makePaymentCommentPopup({id}, savePaymentCommentClient)" title="Добавить комментарий"></a>
                     <xsl:if test="//access_payment_edit_client = 1">
                         <a class="action edit" onclick="makeClientPaymentPopup({id}, {user}, saveBalancePaymentCallback)" title="Редактирование платежа"></a>

@@ -472,7 +472,6 @@ Core::attachObserver('before.Payment.save', function($args) {
                 ?   $balanceOld + floatval($difference)
                 :   $balanceOld - floatval($difference);
             $userBalance->setAmount($balanceNew);
-            Orm::debug(true);
             $userBalance->save();
         }
     }

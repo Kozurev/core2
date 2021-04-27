@@ -97,6 +97,14 @@ class Payment extends Payment_Model
     }
 
     /**
+     *
+     */
+    public function setStatusCanceled() : void
+    {
+        $this->setStatus(self::STATUS_CANCELED);
+    }
+
+    /**
      * @param int $status
      */
     public function setStatus(int $status) : void

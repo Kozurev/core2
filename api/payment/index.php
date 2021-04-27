@@ -418,3 +418,35 @@ if ($action === 'registerOrder') {
 
     exit(json_encode($response));
 }
+
+/**
+ *
+ */
+if ($action === 'checkStatus') {
+    if (!User_Auth::current()->isManagementStaff()) {
+        Core_Page_Show::instance()->error(403);
+    }
+
+    $paymentId = request()->get('paymentId');
+
+    if (empty($paymentId)) {
+        exit(REST::responseError(REST::ERROR_CODE_REQUIRED_PARAM, 'Отсутствует обязательный параметр "paymentId"'));
+    }
+
+    /** @var Payment|null $payment */
+    $payment = Payment::find($paymentId);
+    if (empty($payment)) {
+        exit(REST::responseError(REST::ERROR_CODE_NOT_FOUND, 'Платеж с ID ' . $paymentId . ' не найден'));
+    }
+
+    try {
+        $sberbak = Sberbank::instance();
+        $sberbak->checkStatus($payment);
+    } catch (Throwable $throwable) {
+        exit(REST::responseError($throwable->getCode(), $throwable->getMessage()));
+    }
+    exit(json_encode([
+        'status' => true,
+        'message' => 'Данные платежа были обновлены'
+    ]));
+}
