@@ -374,43 +374,46 @@ foreach ($reasons as $reason) {
     array_push($userActivityList, $reason);
 }
 
-$countNewClientQuery = (new User)->queryBuilder()
-    ->between('register_date',$dateFrom,$dateTo)
+$countNewClientQuery = User::query()
+    ->select('User.id')
+    ->between('register_date', $dateFrom, $dateTo)
     ->where('active', '=', 1)
+    ->where('group_id', '=', ROLE_CLIENT)
     ->join(
         'Schedule_Area_Assignment as saa',
         'User.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
-    );
+    )
+    ->groupBy('User.id');
 
-$countLeaveClientQuery = (new User_Activity)->queryBuilder()
-    ->select('count(User_Activity.id)')
-    ->between('dump_date_start',$dateFrom,$dateTo)
+$countLeaveClientQuery = User_Activity::query()
+    ->select('User_Activity.id')
+    ->between('dump_date_start', $dateFrom, $dateTo)
     ->groupBy('User_Activity.user_id')
     ->join(
         'Schedule_Area_Assignment as saa',
         'user_id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
     );
 
-$countComebackClientQuery = (new User_Activity)->queryBuilder()
-    ->select('count(User_Activity.id)')
-    ->between('dump_date_end',$dateFrom,$dateTo)
+$countComebackClientQuery = User_Activity::query()
+    ->select('User_Activity.id')
+    ->between('dump_date_end', $dateFrom, $dateTo)
     ->groupBy('User_Activity.user_id')
     ->join(
         'Schedule_Area_Assignment as saa',
         'user_id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
     );
 
-$countNewClient = $countNewClientQuery->count();
-$countLeaveClient = $countLeaveClientQuery->findAll();
-$countComebackClient = $countComebackClientQuery->findAll();
-$percentLeaveClient = $userCount === 0 ? 0 : (round(((count($countLeaveClient) / $userCount)*100),2));
+$countNewClient = $countNewClientQuery->get()->count();
+$countLeaveClient = $countLeaveClientQuery->get()->count();
+$countComebackClient = $countComebackClientQuery->get()->count();
+$percentLeaveClient = $userCount === 0 ? 0 : round((($countLeaveClient / $userCount)*100),2);
 
 (new Core_Entity())
-    ->addSimpleEntity('count_new_client',$countNewClient)
-    ->addSimpleEntity('count_leave_client',count($countLeaveClient))
-    ->addSimpleEntity('count_comeback_client',count($countComebackClient))
-    ->addSimpleEntity('count_percent_client',$percentLeaveClient)
-    ->addEntities($userActivityList,'userActivityList')
+    ->addSimpleEntity('count_new_client', $countNewClient)
+    ->addSimpleEntity('count_leave_client', $countLeaveClient)
+    ->addSimpleEntity('count_comeback_client', $countComebackClient)
+    ->addSimpleEntity('count_percent_client', $percentLeaveClient)
+    ->addEntities($userActivityList, 'userActivityList')
     ->xsl('musadm/statistic/archive_clients.xsl')
     ->show();
 
