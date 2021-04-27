@@ -390,7 +390,6 @@ if ($action === 'registerOrder') {
     $payment->save();
 
     $sberbak = Sberbank::instance();
-    $sberbak->setTestMode(true);
     $sberbak->setAmount($amount);
     $sberbak->setUserId($userId);
     $sberbak->setDescription($description);
