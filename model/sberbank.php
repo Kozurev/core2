@@ -90,6 +90,13 @@ class Sberbank
     private static string $realUrl = 'https://securepayments.sberbank.ru/payment/rest';
 
     /**
+     * Тестовый авторизационный токен
+     *
+     * @var string
+     */
+    private static string $testAuthToken = 'pqjg1i2mjl9qjdbmvg5rcok1n9';
+
+    /**
      * @return Sberbank
      */
     public static function instance(): self
@@ -107,8 +114,8 @@ class Sberbank
     private function __construct(string $token)
     {
         $this->token = $token;
-        $this->successUrl = mapping('deposit_success');
-        $this->errorUrl = mapping('deposit_error');
+        $this->successUrl = mapping('deposit_success', ['token' => User_Auth::current()->authToken()]);
+        $this->errorUrl = mapping('deposit_error', ['token' => User_Auth::current()->authToken()]);
     }
 
     /**
@@ -157,12 +164,20 @@ class Sberbank
     }
 
     /**
+     * @return string
+     */
+    public function getToken(): string
+    {
+        return !$this->isTestMode() ? $this->token : self::$testAuthToken;
+    }
+
+    /**
      * @return mixed|null
      */
     public function registerOrder()
     {
         $params = [
-            self::PARAM_TOKEN => $this->token,
+            self::PARAM_TOKEN => $this->getToken(),
             self::PARAM_AMOUNT => $this->amount,
             self::PARAM_ORDER_NUMBER => $this->orderNumber,
             self::PARAM_SUCCESS_URL => $this->successUrl,

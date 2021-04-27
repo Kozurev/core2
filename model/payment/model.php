@@ -90,6 +90,11 @@ class Payment_Model extends Core_Entity
     protected ?int $tariff_id = null;
 
     /**
+     * @var string|null
+     */
+    protected ?string $merchant_order_id = null;
+
+    /**
      * @param int|null $user
      * @return $this|int
      */
@@ -253,6 +258,20 @@ class Payment_Model extends Core_Entity
             return $this->tariff_id;
         } else {
             $this->tariff_id = $tariffId;
+            return $this;
+        }
+    }
+
+    /**
+     * @param string|null $merchantOrderId
+     * @return $this|string|null
+     */
+    public function merchantOrderId(?string $merchantOrderId = null)
+    {
+        if (is_null($merchantOrderId)) {
+            return $this->merchant_order_id;
+        } else {
+            $this->merchant_order_id = $merchantOrderId;
             return $this;
         }
     }

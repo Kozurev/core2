@@ -14,8 +14,12 @@ $orderId = Core_Array::Get('orderId', null, PARAM_STRING);
 if (!is_null($orderId)) {
     $orderData = Temp::getAndRemove($orderId);
     if (!is_null($orderData)) {
-        /** @var Payment $payment */
-        $payment = Core::factory('Payment', intval($orderData->paymentId));
+        /** @var Payment|null $payment */
+        $payment = Payment::query()
+            ->where('merchant_order_id', '=', $orderId)
+            ->where('status', '=', Payment::STATUS_PENDING)
+            ->where('user', '=', User_Auth::current()->getId())
+            ->find();
         if (!is_null($payment)) {
             $payment->setStatusSuccess();
 

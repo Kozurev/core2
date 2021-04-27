@@ -390,6 +390,7 @@ if ($action === 'registerOrder') {
     $payment->save();
 
     $sberbak = Sberbank::instance();
+    $sberbak->setTestMode(true);
     $sberbak->setAmount($amount);
     $sberbak->setUserId($userId);
     $sberbak->setDescription($description);
@@ -397,8 +398,9 @@ if ($action === 'registerOrder') {
     $response = $sberbak->registerOrder();
 
     if (empty($response->errorCode ?? null)) {
+        $payment->merchantOrderId($response->orderId ?? null);
+        $payment->save();
         $tmpData = [
-            'paymentId' => $payment->getId(),
             'successUrl' => Core_Array::Request('successUrl', '', PARAM_STRING),
             'errorUrl' => Core_Array::Request('errorUrl', '', PARAM_STRING)
         ];
@@ -406,7 +408,6 @@ if ($action === 'registerOrder') {
         $payment->setStatusError();
         $payment->appendComment('Ошибка платежного шлюза: '. ($response->errorMessage ?? 'Неизвестная ошибка'));
         $tmpData = [
-            'paymentId' => $payment->getId(),
             'successUrl' => Core_Array::Request('successUrl', '', PARAM_STRING),
             'errorUrl' => Core_Array::Request('errorUrl', '',PARAM_STRING)
         ];
