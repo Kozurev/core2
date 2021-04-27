@@ -12,7 +12,21 @@ $action = Core_Array::Request('action', null, PARAM_STRING);
 
 
 if ($action === 'getGroup') {
-    exit(REST::status(REST::STATUS_ERROR, 'Ошибка'));
+    if (!Core_Access::instance()->hasCapability(Core_Access::INTEGRATION_VK)) {
+        Core_Page_Show::instance()->error(403);
+    }
+
+    $groupId = Core_Array::Get('id', 0, PARAM_INT);
+    if (empty($groupId) || $groupId < 0) {
+        exit(REST::status(REST::STATUS_ERROR, 'Не указан идентификатор группы'));
+    }
+    $group = Vk_Group_Controller::factory($groupId);
+    if (is_null($group)) {
+        exit(REST::status(REST::STATUS_ERROR, 'Группа не найдена'));
+    }
+
+    $group->secretKey($group->getHiddenKey($group->secretKey()));
+    exit(json_encode(['group' => $group->toStd()]));
 }
 
 
