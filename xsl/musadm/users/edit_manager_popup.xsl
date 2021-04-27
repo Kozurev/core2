@@ -83,7 +83,7 @@
             </div><hr/>
 
             <div class="column">
-                <span>Повторите пароль</span>
+                <span>Филиал</span>
             </div>
             <div class="column">
                 <select class="form-control" name="areas[]" multiple="multiple">

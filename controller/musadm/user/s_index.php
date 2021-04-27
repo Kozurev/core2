@@ -186,11 +186,11 @@ if ($action === 'updateFormManager') {
         if (is_null($Director)) {
             exit (Core::getMessage('NOT_FOUND', ['Директор', $userId]));
         }
-        $output->addEntities((new Schedule_Area_Assignment($Manager))->getAssignments(), 'assignments')
-            ->addEntities((new Schedule_Area_Assignment($User))->getAreas(), 'areas');
+        $output->addEntities((new Schedule_Area_Assignment($Manager))->getAssignments(), 'assignments');
     } else {
         $Manager = User_Controller::factory();
     }
+    $output->addEntities((new Schedule_Area_Assignment($User))->getAreas(), 'areas');
 
     $propertiesIds = [62];
     $propertiesValues = [];
