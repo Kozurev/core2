@@ -144,6 +144,11 @@ class Log
     protected function sendNotification(string $message)
     {
         try {
+            if (!is_null(User_Auth::current())) {
+                $user = User_Auth::current();
+                $message = 'Пользователь: ' . $user->getFio() . ' (' . $user->getGroupName() . '). ' . $message;
+            }
+
             $mail = \Model\Mail::factory();
             $mail->addAddress(self::$emailNotification);
             $mail->Subject = 'Ошибка в musicmetod.ru';

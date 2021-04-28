@@ -401,4 +401,29 @@ class User extends User_Model
     {
         return $this->groupId() === ROLE_CLIENT;
     }
+
+    /**
+     * @param int $groupId
+     * @return string
+     */
+    public static function getGroupNameById(int $groupId): string
+    {
+        switch ($groupId)
+        {
+            case ROLE_ADMIN:    return 'Администратор';
+            case ROLE_DIRECTOR: return 'Директор';
+            case ROLE_MANAGER:  return 'Менеджер';
+            case ROLE_TEACHER:  return 'Преподаватель';
+            case ROLE_CLIENT:   return 'Клиент';
+            default:            return 'Неизвестная группа';
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getGroupName(): string
+    {
+        return self::getGroupNameById($this->groupId());
+    }
 }
