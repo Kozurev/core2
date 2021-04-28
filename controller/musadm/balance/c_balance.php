@@ -123,7 +123,9 @@ if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit 
         ->addSimpleEntity('access_schedule_edit', intval($accessScheduleEdit));
 }
 
+global $CFG;
 $outputXml
+    ->addSimpleEntity('wwwroot', $CFG->wwwroot)
     ->addEntity($user)
     ->addEntity($user->getBalance())
     ->addSimpleEntity('is_admin', $isAdmin)

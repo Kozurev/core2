@@ -389,7 +389,7 @@
 
     <xsl:template match="teachers">
         <p>
-            <a href="/lk?userid={id}">
+            <a href="{//wwwroot}/lk?userid={id}">
                 <xsl:value-of select="surname" />
                 <xsl:text> </xsl:text>
                 <xsl:value-of select="name" />
