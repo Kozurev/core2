@@ -60,53 +60,6 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
     $lessons = $lessons->findAll();
     $currentLessons = $currentLessons->findAll();
 
-    //Добавление объектов: преподавателей, клиентов, групп и лидов к занятиям для оптимизации количества запросов
-    $teachersIds = collect();
-    $clientsIds = collect();
-    $groupsIds = collect();
-    $lidsIds = collect();
-    /** @var Schedule_Lesson $lesson */
-    foreach (array_merge($lessons, $currentLessons) as $lesson) {
-        $teachersIds->push($lesson->teacherId());
-        if (in_array($lesson->typeId(), [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE])) {
-            $clientsIds->push($lesson->clientId());
-        } elseif (in_array($lesson->typeId(), [Schedule_Lesson::TYPE_GROUP, Schedule_Lesson::TYPE_GROUP_CONSULT])) {
-            $groupsIds->push($lesson->clientId());
-        } elseif ($lesson->typeId() === Schedule_Lesson::TYPE_CONSULT) {
-            $lidsIds->push($lesson->clientId());
-        }
-    }
-    $teachers = \Model\User\User_Teacher::query()
-        ->whereIn('id', $teachersIds->unique()->toArray())
-        ->get(true);
-    $clients = \Model\User\User_Client::query()
-        ->whereIn('id', $clientsIds->unique()->toArray())
-        ->get(true);
-    $groups = Schedule_Group::query()
-        ->whereIn('id', $groupsIds->unique()->toArray())
-        ->get(true);
-    $lids = Lid::query()
-        ->whereIn('id', $lidsIds->unique()->toArray())
-        ->get(true);
-    $balances = User_Balance::query()
-        ->whereIn('user_id', $clientsIds->unique()->toArray())
-        ->get(true);
-
-    /** @var \Model\User\User_Client $client */
-    foreach ($clients as $clientId => $client) {
-        $client->balance = $balances->get($clientId);
-    }
-    foreach (array_merge($lessons, $currentLessons) as $lesson) {
-        $lesson->teacher = $teachers->get($lesson->teacherId());
-        if (in_array($lesson->typeId(), [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE])) {
-            $lesson->client = $clients->get($lesson->clientId());
-        } elseif (in_array($lesson->typeId(), [Schedule_Lesson::TYPE_GROUP, Schedule_Lesson::TYPE_GROUP_CONSULT])) {
-            $lesson->group = $groups->get($lesson->clientId());
-        } elseif ($lesson->typeId() === Schedule_Lesson::TYPE_CONSULT) {
-            $lesson->lid = $lids->get($lesson->clientId());
-        }
-    }
-
     //Все id отмененных занятий на стекущую дату
     $lessonsAbsents = (new Orm())
         ->select('lesson_id')
@@ -165,6 +118,53 @@ if (User::checkUserAccess(['groups' => [ROLE_TEACHER, ROLE_DIRECTOR, ROLE_MANAGE
             $currentLessons[] = $tmpLesson;
         } else {
             $currentLessons[] = $lesson;
+        }
+    }
+
+    //Добавление объектов: преподавателей, клиентов, групп и лидов к занятиям для оптимизации количества запросов
+    $teachersIds = collect();
+    $clientsIds = collect();
+    $groupsIds = collect();
+    $lidsIds = collect();
+    /** @var Schedule_Lesson $lesson */
+    foreach (array_merge($lessons, $currentLessons) as $lesson) {
+        $teachersIds->push($lesson->teacherId());
+        if (in_array($lesson->typeId(), [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE])) {
+            $clientsIds->push($lesson->clientId());
+        } elseif (in_array($lesson->typeId(), [Schedule_Lesson::TYPE_GROUP, Schedule_Lesson::TYPE_GROUP_CONSULT])) {
+            $groupsIds->push($lesson->clientId());
+        } elseif ($lesson->typeId() === Schedule_Lesson::TYPE_CONSULT) {
+            $lidsIds->push($lesson->clientId());
+        }
+    }
+    $teachers = \Model\User\User_Teacher::query()
+        ->whereIn('id', $teachersIds->unique()->toArray())
+        ->get(true);
+    $clients = \Model\User\User_Client::query()
+        ->whereIn('id', $clientsIds->unique()->toArray())
+        ->get(true);
+    $groups = Schedule_Group::query()
+        ->whereIn('id', $groupsIds->unique()->toArray())
+        ->get(true);
+    $lids = Lid::query()
+        ->whereIn('id', $lidsIds->unique()->toArray())
+        ->get(true);
+    $balances = User_Balance::query()
+        ->whereIn('user_id', $clientsIds->unique()->toArray())
+        ->get(true);
+
+    /** @var \Model\User\User_Client $client */
+    foreach ($clients as $clientId => $client) {
+        $client->balance = $balances->get($clientId);
+    }
+    foreach (array_merge($lessons, $currentLessons) as $lesson) {
+        $lesson->teacher = $teachers->get($lesson->teacherId());
+        if (in_array($lesson->typeId(), [Schedule_Lesson::TYPE_INDIV, Schedule_Lesson::TYPE_PRIVATE])) {
+            $lesson->client = $clients->get($lesson->clientId());
+        } elseif (in_array($lesson->typeId(), [Schedule_Lesson::TYPE_GROUP, Schedule_Lesson::TYPE_GROUP_CONSULT])) {
+            $lesson->group = $groups->get($lesson->clientId());
+        } elseif ($lesson->typeId() === Schedule_Lesson::TYPE_CONSULT) {
+            $lesson->lid = $lids->get($lesson->clientId());
         }
     }
 
