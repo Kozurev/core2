@@ -37,124 +37,68 @@ if (empty($areaIds)) {
 $Orm = new Orm();
 
 //Статистика по балансу и урокам
-$totalBalanceQuery = clone $Orm->clearQuery()
-    ->select('sum(value)', 'sum')
-    ->from('Property_Int', 'p')
-    ->join($userTableName.' AS u',
-         'u.id = p.object_id AND 
-                    u.active = 1 AND 
-                    u.subordinated = ' . $subordinated . ' AND 
-                    u.group_id = ' . ROLE_CLIENT
-    )
-    ->where('p.model_name', '=', 'User')
-    ->where('p.property_id', '=', 12)
+$sum = (new Orm)
+    ->select('sum(amount) as amount')
+    ->from((new User_Balance)->getTableName())
+    ->join('User u', 'user_id = u.id and u.active = 1')
     ->join(
         $areaAsgmTable.' as saa',
         'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
-    );
-
-$result = Orm::execute($totalBalanceQuery->getQueryString());
-$result = $result->fetch();
-$result['sum'] != null
-    ?   $sum = $result['sum']
-    :   $sum = 0;
+    )
+    ->find();
+$sum = intval($sum->amount ?? 0);
 
 //Кол-во оплаченных индивидуальных уроков
-$indivLessonsQuery = clone $Orm->clearQuery()
-    ->select('sum(value)', 'sum')
-    ->from('Property_Int', 'p')
-    ->join($userTableName.' AS u',
-         'u.id = p.object_id AND 
-                    u.active = 1 AND 
-                    u.subordinated = ' . $subordinated . ' AND 
-                    u.group_id = ' . ROLE_CLIENT
-    )
-    ->where('p.model_name', '=', 'User')
-    ->where('p.property_id', '=', 13)
-    ->where('value', '>', 0)
+$indiv_lessons_pos = (new Orm)
+    ->select('sum(individual_lessons_count) as count_lessons')
+    ->from((new User_Balance)->getTableName())
+    ->join('User u', 'user_id = u.id and u.active = 1')
     ->join(
         $areaAsgmTable.' as saa',
         'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
-    );
-
-$result = Orm::execute($indivLessonsQuery->getQueryString());
-$result = $result->fetch();
-$result['sum'] != null
-    ?   $indiv_lessons_pos = $result['sum']
-    :   $indiv_lessons_pos = 0;
+    )
+    ->where('individual_lessons_count', '>', 0)
+    ->find();
+$indiv_lessons_pos = intval($indiv_lessons_pos->count_lessons ?? 0);
 
 //Кол-во неоплаченных индивидуальных уроков
-$indivLessonsDebtQuery = clone $Orm->clearQuery()
-    ->select('sum(value)', 'sum')
-    ->from('Property_Int', 'p')
-    ->join($userTableName.' AS u',
-         'u.id = p.object_id AND 
-                    u.active = 1 AND 
-                    u.subordinated = ' . $subordinated . ' AND 
-                    u.group_id = ' . ROLE_CLIENT
-    )
-    ->where('p.model_name', '=', 'User')
-    ->where('p.property_id', '=', 13)
-    ->where('value', '<', 0)
+$indiv_lessons_neg = (new Orm)
+    ->select('sum(individual_lessons_count) as count_lessons')
+    ->from((new User_Balance)->getTableName())
+    ->join('User u', 'user_id = u.id and u.active = 1')
     ->join(
         $areaAsgmTable.' as saa',
         'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
-    );
-
-
-$result = Orm::execute($indivLessonsDebtQuery->getQueryString());
-$result = $result->fetch();
-$result['sum'] != null
-    ?   $indiv_lessons_neg = $result['sum']
-    :   $indiv_lessons_neg = 0;
+    )
+    ->where('individual_lessons_count', '<', 0)
+    ->find();
+$indiv_lessons_neg = abs(intval($indiv_lessons_neg->count_lessons ?? 0));
 
 //Кол-во оплаченных групповых уроков
-$groupLessonsQuery = clone $Orm->clearQuery()
-    ->select('sum(value)', 'sum')
-    ->from('Property_Int', 'p')
-    ->join($userTableName.' AS u',
-         'u.id = p.object_id AND 
-                    u.active = 1 AND 
-                    u.subordinated = ' . $subordinated . ' AND 
-                    u.group_id = ' . ROLE_CLIENT
-    )
-    ->where('p.model_name', '=', 'User')
-    ->where('p.property_id', '=', 14)
-    ->where('value', '>', 0)
+$group_lessons_pos = (new Orm)
+    ->select('sum(group_lessons_count) as count_lessons')
+    ->from((new User_Balance)->getTableName())
+    ->join('User u', 'user_id = u.id and u.active = 1')
     ->join(
         $areaAsgmTable.' as saa',
         'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
-    );
-
-
-$result = Orm::execute($groupLessonsQuery->getQueryString());
-$result = $result->fetch();
-$result['sum'] != null
-    ?   $group_lessons_pos = $result['sum']
-    :   $group_lessons_pos = 0;
+    )
+    ->where('group_lessons_count', '>', 0)
+    ->find();
+$group_lessons_pos = intval($group_lessons_pos->count_lessons ?? 0);
 
 //Кол-во неоплаченных груповых уроков
-$groupLessonsDebtQuery = clone $Orm->clearQuery()
-    ->select('sum(value)', 'sum')
-    ->from('Property_Int', 'p')
-    ->join($userTableName.' AS u',
-         'u.id = p.object_id AND 
-                    u.active = 1 AND 
-                    u.subordinated = ' . $subordinated . ' AND 
-                    u.group_id = ' . ROLE_CLIENT
-    )
-    ->where('property_id', '=', 14)
-    ->where('value', '<', 0)
+$group_lessons_neg = (new Orm)
+    ->select('sum(group_lessons_count) as count_lessons')
+    ->from((new User_Balance)->getTableName())
+    ->join('User u', 'user_id = u.id and u.active = 1')
     ->join(
         $areaAsgmTable.' as saa',
         'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
-    );
-
-$result = Orm::execute($groupLessonsDebtQuery->getQueryString());
-$result = $result->fetch();
-$result['sum'] != null
-    ?   $group_lessons_neg = $result['sum']
-    :   $group_lessons_neg = 0;
+    )
+    ->where('group_lessons_count', '<', 0)
+    ->find();
+$group_lessons_neg = abs(intval($group_lessons_neg->count_lessons ?? 0));
 
 //Средний возраст
 $birthYears = clone $Orm->clearQuery()
@@ -208,38 +152,36 @@ $avgIndivCost = clone $Orm->clearQuery()
         $areaAsgmTable.' as saa',
         'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
     );
-
-$avgGroupCost = clone $Orm->clearQuery()
-    ->select('avg(value)', 'value')
-    ->from('Property_Int', 'p')
-    ->join($userTableName.' AS u',
-         'u.id = p.object_id AND 
-                    u.active = 1 AND 
-                    u.subordinated = ' . $subordinated . ' AND 
-                    u.group_id = ' . ROLE_CLIENT
-    )
-    ->where('property_id', '=', 43)
-    ->where('value', '>', 0)
+$avgIndivCost = (new Orm)
+    ->select('avg(individual_lessons_average_price) as avg_lessons')
+    ->from((new User_Balance)->getTableName())
+    ->join('User u', 'user_id = u.id and u.active = 1')
     ->join(
         $areaAsgmTable.' as saa',
         'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
-    );
+    )
+    ->find();
+$avgIndivCost = round(floatval($avgIndivCost->avg_lessons));
 
+$avgGroupCost = (new Orm)
+    ->select('avg(group_lessons_average_price) as avg_lessons')
+    ->from((new User_Balance)->getTableName())
+    ->join('User u', 'user_id = u.id and u.active = 1')
+    ->join(
+        $areaAsgmTable.' as saa',
+        'u.id = saa.model_id AND saa.model_name = \'User\' AND saa.area_id in (' . implode(', ', $areaIds) . ')'
+    )
+    ->find();
+$avgGroupCost = round(floatval($avgGroupCost->avg_lessons));
 
-$avgIndivCost = $avgIndivCost->find();
-$avgGroupCost = $avgGroupCost->find();
-$avgIndivCost = is_object($avgIndivCost) && !is_null($avgIndivCost->value) ? round($avgIndivCost->value, 0) : 0;
-$avgGroupCost = is_object($avgGroupCost) && !is_null($avgGroupCost->value) ? round($avgGroupCost->value, 0) : 0;
-
-//echo '<div class="row">';
 echo '<div class="col-lg-4">';
 
 (new Core_Entity())
     ->addSimpleEntity('balance', $sum)
     ->addSimpleEntity('indiv_pos', $indiv_lessons_pos)
-    ->addSimpleEntity('indiv_neg', $indiv_lessons_neg * -1)
+    ->addSimpleEntity('indiv_neg', $indiv_lessons_neg)
     ->addSimpleEntity('group_pos', $group_lessons_pos)
-    ->addSimpleEntity('group_neg', $group_lessons_neg * -1)
+    ->addSimpleEntity('group_neg', $group_lessons_neg)
     ->addSimpleEntity('avgAge', $avgAge)
     ->addSimpleEntity('avgIndivMediana', $avgIndivCost)
     ->addSimpleEntity('avgGroupMediana', $avgGroupCost)
