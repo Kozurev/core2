@@ -4,6 +4,8 @@ $CFG = new stdClass();
 //Корневой каталог
 $CFG->rootdir = '';
 
+$CFG->debug = false;
+
 //URL адрес системы
 $CFG->wwwroot = '';
 $CFG->client_lk_link = '';
@@ -45,3 +47,8 @@ $CFG->initpro->sno = '';
 
 $CFG->sms = new stdClass();
 $CFG->sms->api_key = '';
+
+$CFG->credits = new stdClass();
+$CFG->credits->tinkoff = new stdClass();
+$CFG->credits->tinkoff->shop_id = '09a38fc6-419a-4588-87cc-c9957c500479';
+$CFG->credits->tinkoff->password = 'credmusic0707';

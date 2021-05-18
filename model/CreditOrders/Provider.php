@@ -4,6 +4,8 @@
 namespace Model\CreditOrders;
 
 
+use Model\User\User_Client;
+
 /**
  * Class Provider
  * @package Model\CreditOrders
@@ -13,7 +15,49 @@ abstract class Provider implements CreditProviderInterface
     /**
      * @var CreditOrderModel|null
      */
-    protected ?CreditOrderModel $order = null;
+    private ?CreditOrderModel $order = null;
+
+    /**
+     * @var User_Client|null
+     */
+    private ?User_Client $user = null;
+
+    /**
+     * @var \Payment_Tariff|null
+     */
+    private ?\Payment_Tariff $tariff = null;
+
+    /**
+     * @var string|null
+     */
+    private ?string $returnUrl = null;
+
+    /**
+     * @var string|null
+     */
+    private ?string $successUrl = null;
+
+    /**
+     * @var string|null
+     */
+    private ?string $failUrl = null;
+
+    /**
+     * @var bool
+     */
+    protected bool $testMode = true;
+
+    /**
+     * Provider constructor.
+     * @param CreditOrderModel|null $order
+     */
+    public function __construct(?CreditOrderModel $order = null)
+    {
+        $this->order = $order;
+        $this->returnUrl = mapping('credit_redirect');
+        $this->successUrl = mapping('credit_redirect_success');
+        $this->failUrl = mapping('credit_redirect_fail');
+    }
 
     /**
      * @param CreditOrderModel $order
@@ -26,14 +70,112 @@ abstract class Provider implements CreditProviderInterface
     }
 
     /**
-     * @return CreditOrderModel
+     * @return CreditOrderModel|null
      * @throws \Exception
      */
-    public function getOrder(): CreditOrderModel
+    public function getOrder(): ?CreditOrderModel
     {
-        if (is_null($this->order)) {
-            throw new \Exception('Order not found in credit provider: ' . get_called_class());
-        }
         return $this->order;
+    }
+
+    /**
+     * @param User_Client $user
+     * @return $this
+     */
+    public function setUser(User_Client $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * @return User_Client|null
+     */
+    public function getUser(): ?User_Client
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param \Payment_Tariff $tariff
+     * @return $this
+     */
+    public function setTariff(\Payment_Tariff $tariff): self
+    {
+        $this->tariff = $tariff;
+        return $this;
+    }
+
+    /**
+     * @return \Payment_Tariff|null
+     */
+    public function getTariff(): ?\Payment_Tariff
+    {
+        return $this->tariff;
+    }
+
+    /**
+     *
+     */
+    public function enableTestMode(): void
+    {
+        $this->testMode = true;
+    }
+
+    /**
+     *
+     */
+    public function disableTestMode(): void
+    {
+        $this->testMode = false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTestMode(): bool
+    {
+        return $this->testMode;
+    }
+
+    /**
+     * @return \stdClass[]
+     * @throws \Exception
+     */
+    protected function createItemsList(): array
+    {
+        if (is_null($this->getTariff())) {
+            throw new \Exception('Невозможно сгруппировать параметр "items" для создания заявки, так как отсутствует тариф');
+        }
+
+        $item = new \stdClass();
+        $item->quantity = 1;
+        $item->name = $this->getTariff()->title();
+        $item->price = $this->getTariff()->price();
+        return [$item];
+    }
+
+    /**
+     * @return string
+     */
+    public function getReturnUrl(): string
+    {
+        return $this->returnUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSuccessUrl(): string
+    {
+        return $this->successUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFailUrl(): string
+    {
+        return $this->failUrl;
     }
 }

@@ -4,6 +4,7 @@
 namespace Model\CreditOrders;
 
 
+use Model\User\User_Client;
 use Tightenco\Collect\Support\Collection;
 
 /**
@@ -13,9 +14,17 @@ use Tightenco\Collect\Support\Collection;
 interface CreditProviderInterface
 {
     /**
-     * @return static
+     * CreditProviderInterface constructor.
+     * @param CreditOrderModel|null $order
      */
-    public function createOrder(int $userId, int $tariffId): self;
+    public function __construct(?CreditOrderModel $order = null);
+
+    /**
+     * @param User_Client $user
+     * @param \Payment_Tariff $tariff
+     * @return $this
+     */
+    public function createOrder(User_Client $user, \Payment_Tariff $tariff): self;
 
     /**
      * @param Collection $requestData
@@ -30,7 +39,7 @@ interface CreditProviderInterface
     public function changeStatus(int $status): self;
 
     /**
-     * @return CreditOrderModel
+     * @return CreditOrderModel|null
      */
-    public function getOrder(): CreditOrderModel;
+    public function getOrder(): ?CreditOrderModel;
 }

@@ -4,7 +4,8 @@
       "vkcom/vk-php-sdk": "^5.101",
       "phpmailer/phpmailer": "^6.1",
       "tightenco/collect": "^8.0",
-      "nesbot/carbon": "^2.41"
+      "nesbot/carbon": "^2.41",
+      "ixudra/curl": "^6.21"
    },
    "autoload": {
      "psr-4": {

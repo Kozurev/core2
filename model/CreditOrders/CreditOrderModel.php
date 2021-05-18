@@ -20,9 +20,14 @@ class CreditOrderModel extends \Core_Entity
     protected ?int $user_id = null;
 
     /**
-     * @var int|null
+     * @var int
      */
     protected int $status = self::STATUS_CREATED;
+
+    /**
+     * @var int|null
+     */
+    protected ?int $provider = null;
 
     /**
      * @var string|null
@@ -59,7 +64,7 @@ class CreditOrderModel extends \Core_Entity
      */
     public function getTableName(): string
     {
-        return 'credit_order';
+        return 'Credit_Order';
     }
 
     /**
@@ -94,10 +99,24 @@ class CreditOrderModel extends \Core_Entity
      * @param int|null $providerId
      * @return $this|int
      */
-    public function providerId(?int $providerId)
+    public function provider(?int $providerId = null)
     {
         if (is_null($providerId)) {
             return intval($this->provider_id);
+        } else {
+            $this->provider_id = $providerId;
+            return $this;
+        }
+    }
+
+    /**
+     * @param string|null $providerId
+     * @return $this|string|null
+     */
+    public function providerId(?string $providerId = null)
+    {
+        if (is_null($providerId)) {
+            return $this->provider_id;
         } else {
             $this->provider_id = $providerId;
             return $this;

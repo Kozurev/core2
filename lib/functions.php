@@ -513,7 +513,7 @@ function authOrOut()
  * @param string $pathType
  * @return string
  */
-function mapping(string $route, $params = [], string $pathType = MAPPING_BASE) : string
+function mapping(string $route, array $params = [], string $pathType = MAPPING_BASE) : string
 {
     global $CFG;
 
@@ -526,7 +526,10 @@ function mapping(string $route, $params = [], string $pathType = MAPPING_BASE) :
         MAPPING_BASE => [
             'auth' => 'authorize',
             'deposit_success' => 'pay/success',
-            'deposit_error' => 'pay/error'
+            'deposit_error' => 'pay/error',
+            'credit_redirect' => 'api/credit/index.php?action=redirect',
+            'credit_redirect_success' => 'api/credit/index.php?action=redirectSuccess',
+            'credit_redirect_fail' => 'api/credit/index.php?action=redirectFail',
         ],
         MAPPING_CLIENT_LC => [
             'auth' => 'login'
