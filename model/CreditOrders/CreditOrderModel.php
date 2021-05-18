@@ -96,15 +96,15 @@ class CreditOrderModel extends \Core_Entity
     }
 
     /**
-     * @param int|null $providerId
+     * @param int|null $provider
      * @return $this|int
      */
-    public function provider(?int $providerId = null)
+    public function provider(?int $provider = null)
     {
-        if (is_null($providerId)) {
-            return intval($this->provider_id);
+        if (is_null($provider)) {
+            return intval($this->provider);
         } else {
-            $this->provider_id = $providerId;
+            $this->provider = $provider;
             return $this;
         }
     }
@@ -191,6 +191,23 @@ class CreditOrderModel extends \Core_Entity
             $this->created_at = $createdAt;
             return $this;
         }
+    }
+
+    /**
+     * @return $this|null
+     */
+    public function save(): ?self
+    {
+        if (is_null($this->created_at)) {
+            $this->created_at = date('Y-m-d H:i:s');
+        }
+
+        \Core::notify([&$this], 'before.CreditOrder.save');
+        if (empty(parent::save())) {
+            return null;
+        }
+        \Core::notify([&$this], 'after.CreditOrder.save');
+        return $this;
     }
 
 }
