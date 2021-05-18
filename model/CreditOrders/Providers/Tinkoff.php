@@ -110,18 +110,23 @@ class Tinkoff extends Provider
             self::PARAM_FAIL_URL => $this->getFailUrl()
         ];
 
-        try {
-            $response = file_get_contents($this->createUrl(self::ACTION_CREATE), false, stream_context_create([
-                'http' => [
-                    'method' => 'POST',
-                    'header' => 'Content-Type: application/json',
-                    'content' => json_encode($params)
-                ]
-            ]));
-            dd($response);
-        } catch (\Throwable $throwable) {
-            dd($throwable->getMessage());
+        $ch = curl_init($this->createUrl(self::ACTION_CREATE));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen(json_encode($params)),
+            'Accept: application/json'
+        ]);
+        $response = json_decode(curl_exec($ch));
+        curl_close($ch);
+
+        if (is_array($response->errors ?? null) && count($response->errors) > 0) {
+            throw new \Exception('Ошибка создания заявки: ' . implode('; ', $response->errors));
         }
+
+        dd($response);
 
         return $this;
     }
