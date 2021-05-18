@@ -1,6 +1,6 @@
 <?php
 
-use Tightenco\Collect\Support\Collection;
+use Illuminate\Support\Collection;
 
 /**
  * Класс-контроллер для работы с доп. свойствами
