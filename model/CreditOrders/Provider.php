@@ -139,10 +139,38 @@ abstract class Provider implements CreditProviderInterface
     }
 
     /**
+     * @return \stdClass
+     * @throws \Exception
+     */
+    public function createUserParam(): \stdClass
+    {
+        if (is_null($this->getUser())) {
+            throw new \Exception('Невозможно сгруппировать параметр "values" для создания заявки, так как отсутствует пользователь');
+        }
+
+        $user = new \stdClass();
+        $user->contact = new \stdClass();
+        $user->contact->fio = new \stdClass();
+        $user->contact->fio->lastName = $this->getUser()->surname();
+        $user->contact->fio->firstName = $this->getUser()->name();
+        if (!empty($this->getUser()->patronymic())) {
+            $user->contact->fio->middleName = $this->getUser()->patronymic();
+        }
+        if (!empty($this->getUser()->phoneNumber())) {
+            $phone = preg_replace(['/\+7/', '/(^8)/', '/(^7)/'], ['', '', ''], $this->getUser()->phoneNumber());
+            if (strlen($phone) === 10) {
+                $user->contact->mobilePhone = $phone;
+            }
+        }
+
+        return $user;
+    }
+
+    /**
      * @return \stdClass[]
      * @throws \Exception
      */
-    protected function createItemsList(): array
+    protected function createItemsListParam(): array
     {
         if (is_null($this->getTariff())) {
             throw new \Exception('Невозможно сгруппировать параметр "items" для создания заявки, так как отсутствует тариф');

@@ -27,6 +27,7 @@ class Tinkoff extends Provider
     const PARAM_SUCCESS_URL = 'successURL';
     const PARAM_FAIL_URL = 'failURL';
     const PARAM_RETURN_URL = 'returnURL';
+    const PARAM_USER = 'values';
 
     /**
      * @var string
@@ -104,7 +105,8 @@ class Tinkoff extends Provider
             self::PARAM_SHOP_ID => $this->shopId,
             self::PARAM_AMOUNT => $order->amount(),
             self::PARAM_ORDER_ID => $order->getId(),
-            self::PARAM_ITEMS => $this->createItemsList(),
+            self::PARAM_ITEMS => $this->createItemsListParam(),
+            self::PARAM_USER => $this->createUserParam(),
             self::PARAM_RETURN_URL => $this->getReturnUrl(),
             self::PARAM_SUCCESS_URL => $this->getSuccessUrl(),
             self::PARAM_FAIL_URL => $this->getFailUrl()
