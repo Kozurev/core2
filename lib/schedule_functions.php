@@ -266,7 +266,7 @@ function getLessons($date, $userId = 0)
     return $CurrentLessons;
 }
 
-use Tightenco\Collect\Support\Collection;
+use Illuminate\Support\Collection;
 function isLessonAbsent(Schedule_Lesson $lesson, Collection $lessonsAbsents, Collection $usersAbsents) : bool
 {
     return $lessonsAbsents->contains('lesson_id', $lesson->getId())
