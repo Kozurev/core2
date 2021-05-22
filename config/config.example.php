@@ -50,5 +50,6 @@ $CFG->sms->api_key = '';
 
 $CFG->credits = new stdClass();
 $CFG->credits->tinkoff = new stdClass();
-$CFG->credits->tinkoff->shop_id = '09a38fc6-419a-4588-87cc-c9957c500479';
-$CFG->credits->tinkoff->password = 'credmusic0707';
+$CFG->credits->tinkoff->shop_id = '';
+$CFG->credits->tinkoff->password = '';
+$CFG->credits->tinkoff->showcase_id = '';

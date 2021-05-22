@@ -21,6 +21,7 @@ class Tinkoff extends Provider
     const ACTION_INFO = 4;
 
     const PARAM_SHOP_ID = 'shopId';
+    const PARAM_SHOWCASE_ID = 'showcaseId';
     const PARAM_AMOUNT = 'sum';
     const PARAM_ITEMS = 'items';
     const PARAM_ORDER_ID = 'orderNumber';
@@ -63,6 +64,13 @@ class Tinkoff extends Provider
      */
     private string $shopId;
 
+    /**
+     * Идентификатор витрины(сайта) в системе провайдера
+     *
+     * @var string
+     */
+    private string $showcaseId;
+
 //    /**
 //     * Пароль для авторизации
 //     *
@@ -78,7 +86,7 @@ class Tinkoff extends Provider
     {
         global $CFG;
         $this->shopId = $CFG->credits->tinkoff->shop_id;
-        // $this->password = $CFG->credits->tinkoff->password;
+        $this->showcaseId = $CFG->credits->tinkoff->showcase_id;
         parent::__construct($order);
     }
 
@@ -103,6 +111,7 @@ class Tinkoff extends Provider
 
         $params = [
             self::PARAM_SHOP_ID => $this->shopId,
+            self::PARAM_SHOWCASE_ID => $this->showcaseId,
             self::PARAM_AMOUNT => $order->amount(),
             self::PARAM_ORDER_ID => $order->getId(),
             self::PARAM_ITEMS => $this->createItemsListParam(),
