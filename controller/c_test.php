@@ -15,4 +15,4 @@ $facade = new CreditServiceProvider();
 $user = User_Client::find(500);
 $tariff = Payment_Tariff::find(3);
 
-$facade->getProvider()->createOrder($user, $tariff);
+// $facade->getProvider()->createOrder($user, $tariff);
