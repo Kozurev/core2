@@ -181,7 +181,34 @@ class User {
         });
     }
 
-
+    /**
+     *
+     * @param userId
+     * @param rateType
+     * @param operation
+     * @param num
+     * @param callBack
+     */
+    static changeLessonsAvg(userId, rateType, operation, num, callBack) {
+        $.ajax({
+            type: 'GET',
+            url: User.getApiLink(),
+            dataType: 'json',
+            data: {
+                action: 'changeLessonsAvg',
+                userId: userId,
+                operation: operation,
+                rateType: rateType,
+                number: num
+            },
+            success: function(response) {
+                callBack(response);
+            },
+            error: function(){
+                notificationError('При изменении медианы клиента произошла ошибкаы');
+            }
+        });
+    }
 
     /**
      * Метод сохранения пользователя из данных формы

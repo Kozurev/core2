@@ -119,13 +119,17 @@ class User_Balance extends User_Balance_Model
     /**
      * @param float $price
      * @param int $type
+     * @param bool $withSave
      */
-    public function setAvgPrice(float $price, int $type): void
+    public function setAvgPrice(float $price, int $type, bool $withSave = true): void
     {
         if ($type === self::LESSONS_INDIVIDUAL) {
             $this->individual_lessons_average_price = $price;
         } elseif ($type === self::LESSONS_GROUP) {
             $this->group_lessons_average_price = $price;
+        }
+        if ($withSave) {
+            $this->save();
         }
     }
 
@@ -141,6 +145,82 @@ class User_Balance extends User_Balance_Model
             return $this->group_lessons_average_price;
         } else {
             return 0.0;
+        }
+    }
+
+    /**
+     * @param float $price
+     * @param int $type
+     * @param bool $withSave
+     */
+    public function addAvgPrice(float $price, int $type, bool $withSave = true): void
+    {
+        if ($type === self::LESSONS_INDIVIDUAL) {
+            $this->addAvgIndividualPrice($price, $withSave);
+        } elseif ($type === self::LESSONS_GROUP) {
+            $this->addAvgGroupPrice($price, $withSave);
+        }
+    }
+
+    /**
+     * @param float $price
+     * @param int $type
+     * @param bool $withSave
+     */
+    public function deductAvgPrice(float $price, int $type, bool $withSave = true): void
+    {
+        if ($type === self::LESSONS_INDIVIDUAL) {
+            $this->deductAvgIndividualPrice($price, $withSave);
+        } elseif ($type === self::LESSONS_GROUP) {
+            $this->deductAvgGroupPrice($price, $withSave);
+        }
+    }
+
+    /**
+     * @param float $price
+     * @param bool $withSave
+     */
+    public function addAvgIndividualPrice(float $price, bool $withSave = true): void
+    {
+        $this->individual_lessons_average_price += $price;
+        if ($withSave) {
+            $this->save();
+        }
+    }
+
+    /**
+     * @param float $price
+     * @param bool $withSave
+     */
+    public function deductAvgIndividualPrice(float $price, bool $withSave = true): void
+    {
+        $this->individual_lessons_average_price -= $price;
+        if ($withSave) {
+            $this->save();
+        }
+    }
+
+    /**
+     * @param float $price
+     * @param bool $withSave
+     */
+    public function addAvgGroupPrice(float $price, bool $withSave = true): void
+    {
+        $this->group_lessons_average_price += $price;
+        if ($withSave) {
+            $this->save();
+        }
+    }
+
+    /**
+     * @param float $price
+     * @param bool $withSave
+     */
+    public function deductAvgGroupPrice(float $price, bool $withSave = true): void
+    {
+        $this->group_lessons_average_price -= $price;
+        if ($withSave) {
+            $this->save();
         }
     }
 }

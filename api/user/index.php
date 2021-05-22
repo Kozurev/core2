@@ -471,6 +471,62 @@ if ($action === 'changeCountLessons') {
 }
 
 /**
+ *
+ */
+if ($action === 'changeLessonsAvg') {
+    $userId = Core_Array::Get('userId', null, PARAM_INT);
+    $operation = Core_Array::Get('operation', null, PARAM_STRING);
+    $rateType = Core_Array::Get('rateType', null, PARAM_INT);
+    $number = Core_Array::Get('number', null, PARAM_FLOAT);
+
+    $output = new stdClass(); //Ответ
+
+    //Проверки
+    $existingOperations = ['set', 'plus', 'minus'];
+    $existingAvgTypes = [User_Balance::LESSONS_INDIVIDUAL, User_Balance::LESSONS_GROUP];
+
+    if (is_null($userId) || is_null($operation) || is_null($rateType) || is_null($number)) {
+        die(REST::error(1, 'Отсутствует один из обязательных параметров'));
+    }
+    if (!in_array($operation, $existingOperations)) {
+        die(REST::error(2, 'Параметр \'operation\' имеет недопустимое значение'));
+    }
+    if (!in_array($rateType, $existingAvgTypes)) {
+        die(REST::error(3, 'Параметр \'rateType\' имеет недопустимое значение'));
+    }
+
+    $client = User_Client::find($userId);
+    if (is_null($client)) {
+        die(REST::error(4, 'Пользователь с id: ' . $userId . ' не существует'));
+    }
+
+    $output->user = new stdClass();
+
+    //Изменение баланса кол-ва занятий
+    $balance = $client->getbalance();
+    $output->oldAverage = $balance->getAvgPrice($rateType);
+
+    if ($operation == 'plus') {
+        $balance->addLessons($number, $rateType, false);
+    } elseif ($operation == 'minus') {
+        $balance->deductLessons($number, $rateType, false);
+    } else {
+        $balance->setAvgPrice($number, $rateType, false);
+    }
+
+    $output->newAverage = $balance->getAvgPrice($rateType);
+
+    if ($output->newAverage !== $output->oldAverage) {
+        $balance->save();
+    }
+
+    $output->user = $client->toStd();
+    $output->balance = $balance->toStd();
+
+    die(json_encode($output));
+}
+
+/**
  * Выборка пользователей по значению доп. свойства принадлежности к преподавателю
  * однако id преподавателя и id элемента списка преподавателей разные, поэтому и нужен данный обработчик
  */

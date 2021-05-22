@@ -720,7 +720,7 @@ function editClientRate(userId, rateName, spanSelector) {
         'class="action save"' +
         'id="saveMedianaVal"' +
         'style="vertical-align: middle"' +
-        'onclick="savePropertyValue(\''+rateName+'\', $(\'#newMedianaVal\').val(), \'User\', ' + userId + ', ' +
+        'onclick="User.changeLessonsAvg(\''+userId+'\', \''+rateName+'\', User.OPERATION_SET, $(\'#newMedianaVal\').val(), ' +
         'function(response){' +
         'let lessonsSpan = $(\''+spanSelector+'\');' +
         'lessonsSpan.text($(\'#newMedianaVal\').val());' +

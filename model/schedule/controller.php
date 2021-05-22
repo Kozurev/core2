@@ -282,7 +282,8 @@ class Schedule_Controller
             if ($dayName == 'Monday') {
                 echo '<tr>';
             }
-            echo '<td style="'.($date == $today ? 'background-color: #75c181' : '').'">';
+            // echo '<td style="'.($date == $today ? 'background-color: #75c181' : '').'">';
+            echo '<td>';
             echo "<span class='date'>" . refactorDateFormat($date, '.', 'short') . "</span>";
 
             if (!is_null($day)) {

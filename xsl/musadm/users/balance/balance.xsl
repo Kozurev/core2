@@ -236,13 +236,13 @@
                                     <xsl:choose>
                                         <xsl:when test="access_user_edit_lessons = 1">
                                             <span>
-                                                <span id="medianaIdiv" onclick="editClientRate({user/id}, 'client_rate_indiv', '#medianaIdiv')" title="Нажмите для корректировки медианы">
+                                                <span id="medianaIdiv" onclick="editClientRate({user/id}, 1, '#medianaIdiv')" title="Нажмите для корректировки медианы">
                                                     <xsl:value-of select="user_balance/individual_lessons_average_price" />
                                                 </span>
                                             </span>
                                             <xsl:text> / </xsl:text>
                                             <span>
-                                                <span id="medianaGroup" onclick="editClientRate({user/id}, 'client_rate_group', '#medianaGroup')" title="Нажмите для корректировки медианы">
+                                                <span id="medianaGroup" onclick="editClientRate({user/id}, 2, '#medianaGroup')" title="Нажмите для корректировки медианы">
                                                     <xsl:value-of select="user_balance/group_lessons_average_price" />
                                                 </span>
                                             </span>
