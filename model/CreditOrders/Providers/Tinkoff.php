@@ -7,7 +7,7 @@ namespace Model\CreditOrders\Providers;
 use Model\CreditOrders\CreditOrderModel;
 use Model\CreditOrders\Provider;
 use Model\User\User_Client;
-use Tightenco\Collect\Support\Collection;
+use Illuminate\Support\Collection;
 
 /**
  * Class Tinkoff
@@ -93,10 +93,10 @@ class Tinkoff extends Provider
     /**
      * @param User_Client $user
      * @param \Payment_Tariff $tariff
-     * @return $this
+     * @return \stdClass
      * @throws \Exception
      */
-    public function createOrder(User_Client $user, \Payment_Tariff $tariff): self
+    public function createOrder(User_Client $user, \Payment_Tariff $tariff): \stdClass
     {
         $this->setTariff($tariff);
         $this->setUser($user);
@@ -137,9 +137,11 @@ class Tinkoff extends Provider
             throw new \Exception('Ошибка создания заявки: ' . implode('; ', $response->errors));
         }
 
-        dd($response);
+        if (isset($response->id) && !empty($response->id)) {
+            $this->getOrder()->providerId($response->id)->save();
+        }
 
-        return $this;
+        return $response;
     }
 
     /**

@@ -30,17 +30,17 @@ abstract class Provider implements CreditProviderInterface
     /**
      * @var string|null
      */
-    private ?string $returnUrl = null;
+    private ?string $returnUrl;
 
     /**
      * @var string|null
      */
-    private ?string $successUrl = null;
+    private ?string $successUrl;
 
     /**
      * @var string|null
      */
-    private ?string $failUrl = null;
+    private ?string $failUrl;
 
     /**
      * @var bool

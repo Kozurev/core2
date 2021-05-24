@@ -5,7 +5,7 @@ namespace Model\CreditOrders;
 
 
 use Model\User\User_Client;
-use Tightenco\Collect\Support\Collection;
+use Illuminate\Support\Collection;
 
 /**
  * Interface CreditProviderInterface
@@ -24,7 +24,7 @@ interface CreditProviderInterface
      * @param \Payment_Tariff $tariff
      * @return $this
      */
-    public function createOrder(User_Client $user, \Payment_Tariff $tariff): self;
+    public function createOrder(User_Client $user, \Payment_Tariff $tariff): \stdClass;
 
     /**
      * @param Collection $requestData

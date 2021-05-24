@@ -4,7 +4,7 @@
 namespace Model;
 
 
-use Tightenco\Collect\Support\Collection;
+use Illuminate\Support\Collection;
 
 /**
  * Class Request
