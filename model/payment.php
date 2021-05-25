@@ -17,6 +17,7 @@ class Payment extends Payment_Model
     const TYPE_CASHBACK = 15;
     const TYPE_BONUS_ADD = 16;
     const TYPE_BONUS_PAY = 17;
+    const TYPE_BONUS_CLIENT = 21;
 
     const STATUS_PENDING = 0;
     const STATUS_SUCCESS = 1;
@@ -34,6 +35,7 @@ class Payment extends Payment_Model
     public function __construct()
     {
         $this->defaultUser = (new User)->surname('Расходы')->name('Организации');
+        parent::__construct();
     }
 
     /**

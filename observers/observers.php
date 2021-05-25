@@ -450,6 +450,7 @@ Core::attachObserver('before.Payment.save', function($args) {
     //Корректировка баланса клиента
     if ($payment->isStatusSuccess() &&
         ($payment->type() == Payment::TYPE_INCOME
+        || $payment->type() == Payment::TYPE_BONUS_CLIENT
         || $payment->type() == Payment::TYPE_DEBIT
         || $payment->type() == Payment::TYPE_CASHBACK)) {
 
@@ -468,9 +469,9 @@ Core::attachObserver('before.Payment.save', function($args) {
         if (!is_null($client)) {
             $userBalance = $client->getBalance();
             $balanceOld =  $userBalance->getAmount();
-            $balanceNew = $payment->type() == Payment::TYPE_INCOME || $payment->type() == Payment::TYPE_CASHBACK
-                ?   $balanceOld + floatval($difference)
-                :   $balanceOld - floatval($difference);
+            $balanceNew = $payment->type() == Payment::TYPE_DEBIT
+                ?   $balanceOld - floatval($difference)
+                :   $balanceOld + floatval($difference);
             $userBalance->setAmount($balanceNew);
             $userBalance->save();
         }
@@ -489,13 +490,14 @@ Core::attachObserver('before.Payment.delete', function($args) {
     //Корректировка баланса клиента
     if ($payment->type() == Payment::TYPE_INCOME
     || $payment->type() == Payment::TYPE_DEBIT
-    || $payment->type() == Payment::TYPE_CASHBACK) {
+    || $payment->type() == Payment::TYPE_CASHBACK
+    || $payment->type() == Payment::TYPE_BONUS_CLIENT) {
         $client = User_Client::find($payment->user());
         if (!is_null($client)) {
             $userBalance = $client->getBalance();
-            $balanceNew = $payment->type() == Payment::TYPE_INCOME || $payment->type() == Payment::TYPE_CASHBACK
-                ?   $userBalance->getAmount() - floatval($payment->value())
-                :   $userBalance->getAmount() + floatval($payment->value());
+            $balanceNew = $payment->type() == Payment::TYPE_DEBIT
+                ?   $userBalance->getAmount() + floatval($payment->value())
+                :   $userBalance->getAmount() - floatval($payment->value());
             $userBalance->setAmount($balanceNew);
             $userBalance->save();
         }
