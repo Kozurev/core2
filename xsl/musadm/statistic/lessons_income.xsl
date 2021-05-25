@@ -24,6 +24,10 @@
                         <td><xsl:value-of select="profit" /></td>
                     </tr>
                     <tr>
+                        <td>Выплачено кэшбэка</td>
+                        <td><xsl:value-of select="cashBack" /></td>
+                    </tr>
+                    <tr>
                         <td>Хозрасходы</td>
                         <td><xsl:value-of select="host_expenses" /></td>
                     </tr>

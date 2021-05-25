@@ -515,6 +515,14 @@ function makeClientPaymentPopup(paymentId, userId, saveCallback) {
             popupData += "       />\n" +
             "                    <label for=\"type2\">Списание</label>\n" +
             "                </p>\n" +
+            "                <p style=\"margin-top: 5px\">\n" +
+            "                    <input type=\"radio\" "+disabledType+" name=\"type\" id=\"type15\" value=\"15\" style=\"height: auto\"";
+                                if (payment.typeId == 15) {
+                                    popupData += " checked ";
+                                }
+            popupData += "       />\n" +
+            "                    <label for=\"type15\">Кэшбэк</label>\n" +
+            "                </p>\n" +
             "            </div>";
             popupData += "<button class=\"btn btn-default\" " +
                 "onclick=\"Payment.save(" +
@@ -547,14 +555,16 @@ function saveClientPaymentCallback(payment) {
         return false;
     }
 
-    var balanceSpan = $('#user_' + payment.userId).find('.add__12');
-    var balanceVal = Number(balanceSpan.text());
-    if (payment.typeId == '1') {
-        balanceVal += payment.value;
-    } else {
-        balanceVal -= payment.value;
-    }
-    balanceSpan.text(balanceVal);
+    console.log(payment);
+
+    // var balanceSpan = $('#user_' + payment.userId).find('.add__12');
+    // var balanceVal = Number(balanceSpan.text());
+    // if (payment.typeId == '1') {
+    //     balanceVal += payment.value;
+    // } else {
+    //     balanceVal -= payment.value;
+    // }
+    // balanceSpan.text(balanceVal);
     closePopup();
 }
 
@@ -572,7 +582,7 @@ function saveBalancePaymentCallback(payment) {
 
     var balanceSpan = $('#balance');
     balanceSpan.text(payment.userBalance);
-    if (payment.typeId == '1') {
+    if (payment.typeId == '1' || payment.typeId == '15') {
         var trClass = 'positive';
     } else {
         var trClass = 'negative';
@@ -585,6 +595,7 @@ function saveBalancePaymentCallback(payment) {
         paymentTr = '<tr class=\''+trClass+'\' id=\'client_payment_'+payment.id+'\'>' +
             '<td class=\'date\'>'+payment.refactoredDatetime+'</td>' +
             '<td class=\'value\'>'+payment.value+'</td>' +
+            '<td class=\'status\'><p class=\'text-success\'>Выполнен</p></td>' +
             '<td>' +
             '<p class=\'description\'>'+payment.description+'</p>' +
             '<span class=\'comments\'>';

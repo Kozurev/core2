@@ -427,10 +427,17 @@ $deposits = Payment::query()
     ->where('status', '=', Payment::STATUS_SUCCESS)
     ->whereIn('area_id', $areaIds);
 
+$cashBack = Payment::query()
+    ->where('type', '=', Payment::TYPE_CASHBACK)
+    ->where('subordinated', '=', $subordinated)
+    ->where('status', '=', Payment::STATUS_SUCCESS)
+    ->whereIn('area_id', $areaIds);
+
 if ($dateFrom == $dateTo) {
     $finances->where('date', '=', $dateFrom);
     $hostExpenses->where('datetime', '=', $dateFrom);
     $deposits->where('datetime', '=', $dateFrom);
+    $cashBack->where('datetime', '=', $dateFrom);
 } else {
     $finances->where('date', '>=', $dateFrom);
     $finances->where('date', '<=', $dateTo);
@@ -438,6 +445,8 @@ if ($dateFrom == $dateTo) {
     $hostExpenses->where('datetime', '<=', $dateTo);
     $deposits->where('datetime', '>=', $dateFrom);
     $deposits->where('datetime', '<=', $dateTo);
+    $cashBack->where('datetime', '>=', $dateFrom);
+    $cashBack->where('datetime', '<=', $dateTo);
 }
 
 $income =   (clone $finances)->where('lesson.type_id', '<>', Schedule_Lesson::TYPE_PRIVATE)->select('sum(client_rate)', 'value');
@@ -450,6 +459,7 @@ $expenses = $expenses->find()->value;
 $profit =   $profit->find()->value;
 $hostExpenses = $hostExpenses->find()->value();
 $deposits = (int)$deposits->sum('value');
+$cashBack = (int)$cashBack->sum('value');
 
 if (is_null($income)) {
     $income = 0;
@@ -473,6 +483,7 @@ if (is_null($hostExpenses)) {
     ->addSimpleEntity('expenses', $expenses)
     ->addSimpleEntity('profit', $profit)
     ->addSimpleEntity('deposits', $deposits)
+    ->addSimpleEntity('cashBack', $cashBack)
     ->addSimpleEntity('host_expenses', $hostExpenses)
     ->xsl('musadm/statistic/lessons_income.xsl')
     ->show();

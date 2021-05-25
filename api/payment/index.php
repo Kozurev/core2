@@ -164,12 +164,14 @@ if ($action === 'save') {
     $Payment->save();
 
     $Property = new Property();
-    if ($typeId == 1 || $typeId == 2) {
-        $newUserBalance = User_Balance::find($Payment->user())->getAmount();
-    } else {
-        $newUserBalance = 0;
-    }
     $PaymentComment = $Property->getByTagName('payment_comment');
+//    if ($typeId == 1 || $typeId == 2) {
+//        $newUserBalance = User_Balance::find($Payment->user())->getAmount();
+//    } else {
+//        $newUserBalance = 0;
+//    }
+    $userBalance = User_Balance::find($Payment->user());
+    $newUserBalance = !is_null($userBalance) ? $userBalance->getAmount() : 0;
 
     if (!is_null($comment) && $comment !== '') {
         $Comment = $PaymentComment->getValues($Payment)[0];
