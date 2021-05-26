@@ -179,14 +179,14 @@ class Core_Page_Show extends Core
      * Метод для задания кода заголовка страницы и вывода текста ошибки
      *
      * @param int $code - код ошибки
-     * @param array $data
+     * @param string|null $message
      * @param bool $isJson
      */
-    public function error(int $code, array $data = [], bool $isJson = false)
+    public function error(int $code, string $message = null, bool $isJson = false)
     {
         http_response_code($code);
-        if (!empty($data)) {
-            $error = $data;
+        if (!empty($message)) {
+            $error = $message;
         } else {
             $error = Core_Array::getValue($this->errorCodes, $code, 'Error');
         }
