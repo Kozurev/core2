@@ -28,7 +28,8 @@ if ($action === 'redirectFail') {
     dd(request()->all());
 }
 
-
-$facade = new CreditServiceProvider();
-$facade->getProvider()->changeStatusWebhook(request()->all());
-exit;
+if ($action === 'changeStatus') {
+    $facade = new CreditServiceProvider();
+    $facade->getProvider()->changeStatusWebhook(request()->all());
+    exit;
+}
