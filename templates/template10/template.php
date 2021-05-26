@@ -55,6 +55,7 @@
         ->css('/templates/template10/assets/css/tooltip.css')
         ->css('/templates/template10/assets/css/scroll.css')
         ->css('/templates/template10/assets/css/radiobutton.css')
+        ->css('/templates/template10/assets/plugins/swal/sweetalert.css')
         ->js('/templates/template10/assets/plugins/jquery.min.js');
 
         global $CFG;
@@ -102,6 +103,7 @@
         $accessLidStats =           Core_Access::instance()->hasCapability(Core_Access::LID_STATISTIC);
         $accessCertificates =       Core_Access::instance()->hasCapability(Core_Access::CERTIFICATE_READ);
         $accessFinances =           Core_Access::instance()->hasCapability(Core_Access::PAYMENT_READ_ALL);
+        $accessFinancesConfig =     Core_Access::instance()->hasCapability(Core_Access::PAYMENT_CONFIG);
         $accessTarifs =             Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_READ);
         $accessStatistic =          Core_Access::instance()->hasCapability(Core_Access::STATISTIC_READ);
         $accessIntegrationVk =      Core_Access::instance()->hasCapability(Core_Access::INTEGRATION_VK);
@@ -226,8 +228,17 @@
                             }
 
                             //Финансы
-                            if ($accessFinances || $accessTarifs) {
-                                echo '<li><a href="'.$CFG->rootdir.'/finances">Финансы</a></li>';
+                            if ($accessFinances || $accessTarifs || $accessFinancesConfig) {
+                                echo '<li class="dropdown">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Финансы<span class="caret"></span></a>
+                                        <ul class="dropdown-menu">';
+                                if ($accessFinances || $accessTarifs) {
+                                    echo '<li><a href="'.$CFG->rootdir.'/finances">Платежи</a></li>';
+                                }
+                                if ($accessFinancesConfig) {
+                                    echo '<li><a href="' . $CFG->rootdir . '/finances/plan">План расходов</a></li>';
+                                }
+                                echo '</ul></li>';
                             }
 
                             //Статистика
@@ -355,7 +366,20 @@ Core_Page_Show::instance()
     ->js('/templates/template10/assets/plugins/jquery-scrollTo/jquery.scrollTo.min.js')
     ->js('/templates/template10/assets/plugins/lightbox/dist/ekko-lightbox.min.js')
     ->js('/templates/template10/assets/plugins/jquery-match-height/jquery.matchHeight-min.js')
+    ->js('/templates/template10/assets/plugins/swal/sweetalert.js');
+?>
+<!--    <script>-->
+<!--        const alert = sweetAlert.mixin({-->
+<!--            customClass: {-->
+<!--                confirmButton: 'btn btn-success',-->
+<!--                cancelButton: 'btn btn-danger'-->
+<!--            },-->
+<!--            buttonsStyling: false-->
+<!--        });-->
+<!--    </script>-->
+<?php
     //API
+Core_Page_Show::instance()
     ->js('/templates/template4/js/access.api.js')
     ->js('/templates/template4/js/user.api.js')
     ->js('/templates/template4/js/schedule.api.js')
@@ -371,6 +395,7 @@ Core_Page_Show::instance()
     ->js('/templates/template4/js/senler.api.js')
     ->js('/templates/template4/js/myCalls.api.js')
 
+    ->js('/templates/template10/assets/js/form.js')
     ->js('/templates/template10/assets/js/main.js')
     ->js('/templates/template4/js/bootstrap.min.js')
     ->js('/templates/template4/js/jquery.validate.min.js')
@@ -396,6 +421,7 @@ Core_Page_Show::instance()
     ->js('/templates/template4/js/senler.js')
     ->js('/templates/template4/js/myCalls.js')
     ->js('/templates/template4/js/checkouts.js')
+    ->js('/templates/template4/js/statistic_targets.js')
     ->js('/templates/template4/js/js.js');
 ?>
 

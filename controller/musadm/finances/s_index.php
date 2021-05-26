@@ -10,11 +10,14 @@
 
 authOrOut();
 
-$User = User::current();
+$User = User_Auth::current();
 
 $breadcumbs[0] = new stdClass();
-$breadcumbs[0]->title = Core_Page_Show::instance()->Structure->title();
-$breadcumbs[0]->active = 1;
+$breadcumbs[0]->title = 'Финансы';
+$breadcumbs[0]->href = '#';
+$breadcumbs[1] = new stdClass();
+$breadcumbs[1]->title = 'Платежи';
+$breadcumbs[1]->active = 1;
 
 Core_Page_Show::instance()->setParam('body-class', 'body-green');
 Core_Page_Show::instance()->setParam('title-first', 'ФИНАНСОВЫЕ');
