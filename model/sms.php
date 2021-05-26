@@ -3,8 +3,7 @@
 namespace Model;
 
 use Model\Sms\Sms_Template as Template;
-//use Illuminate\Support\Collection
-use Tightenco\Collect\Support\Collection;
+use Illuminate\Support\Collection;
 
 /**
  * Фассад для рассылки SMS сообщений
