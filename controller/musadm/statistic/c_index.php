@@ -428,7 +428,7 @@ $deposits = Payment::query()
     ->whereIn('area_id', $areaIds);
 
 $clientsBonuses = Payment::query()
-    ->where('type', '=', Payment::TYPE_BONUS_CLIENT)
+    ->whereIn('type', [Payment::TYPE_BONUS_CLIENT, Payment::TYPE_CASHBACK])
     ->where('subordinated', '=', $subordinated)
     ->where('status', '=', Payment::STATUS_SUCCESS)
     ->whereIn('area_id', $areaIds);
@@ -483,7 +483,7 @@ if (is_null($hostExpenses)) {
     ->addSimpleEntity('expenses', $expenses)
     ->addSimpleEntity('profit', $profit)
     ->addSimpleEntity('deposits', $deposits)
-    ->addSimpleEntity('cashBack', $clientsBonuses)
+    ->addSimpleEntity('bonuses', $clientsBonuses)
     ->addSimpleEntity('host_expenses', $hostExpenses)
     ->xsl('musadm/statistic/lessons_income.xsl')
     ->show();

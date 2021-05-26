@@ -24,8 +24,8 @@
                         <td><xsl:value-of select="profit" /></td>
                     </tr>
                     <tr>
-                        <td>Выплачено кэшбэка</td>
-                        <td><xsl:value-of select="cashBack" /></td>
+                        <td>Начислено клиентам кэшбека и бонусов</td>
+                        <td><xsl:value-of select="bonuses" /></td>
                     </tr>
                     <tr>
                         <td>Хозрасходы</td>
