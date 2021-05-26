@@ -333,6 +333,8 @@ if ($action === 'get_payments') {
 
     $dateFrom = Core_Array::Get('date_from', null, PARAM_DATE);
     $dateTo = Core_Array::Get('date_to', null, PARAM_DATE);
+    $types = Core_Array::Get('types', null, PARAM_ARRAY);
+
     $userId = !$user->isManagementStaff()
         ?   $user->getId()
         :   Core_Array::Get('user_id', 0, PARAM_INT);
@@ -345,6 +347,9 @@ if ($action === 'get_payments') {
     }
     if (!is_null($dateTo)) {
         $paymentsQuery->where('datetime', '<=', $dateTo);
+    }
+    if (is_array($types) && !empty($types)) {
+        $paymentsQuery->whereIn('type', $types);
     }
 
     if (Core_Array::Get('without_paginate', 0, PARAM_INT)) {
