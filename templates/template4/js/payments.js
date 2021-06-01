@@ -113,10 +113,10 @@ $(function(){
         /**
          * Удаление тарифа
          */
-        .on("click", ".tarif_delete", function(e){
+        .on("click", ".tariff_delete", function(e){
             e.preventDefault();
             var tarifid = $(this).data("model_id");
-            deleteItem("Payment_Tarif", tarifid, refreshPayments);
+            deleteItem("Payment_Tariff", tarifid, refreshPayments);
         })
 
         /**
@@ -521,7 +521,7 @@ function makeClientPaymentPopup(paymentId, userId, saveCallback) {
                                     popupData += " checked ";
                                 }
             popupData += "       />\n" +
-            "                    <label for=\"type21\">Бонус</label>\n" +
+            "                    <label for=\"type21\">Бонусf</label>\n" +
             "                </p>\n" +
             "            </div>";
             popupData += "<button class=\"btn btn-default\" " +
