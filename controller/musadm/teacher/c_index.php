@@ -27,7 +27,7 @@ $accessAbsentEdit =   Core_Access::instance()->hasCapability(Core_Access::SCHEDU
 $accessAbsentDelete = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_ABSENT_DELETE);
 
 $month = getMonth($date);
-if (intval($month) < 10) {
+if ($month < 10) {
     $month = '0' . $month;
 }
 $year = getYear($date);
@@ -326,7 +326,7 @@ if ($accessPaymentRead) {
     User_Auth::parentAuth()->groupId() === ROLE_DIRECTOR || User_Auth::parentAuth()->superuser() == 1
         ?   $isDirector = 1
         :   $isDirector = 0;
-    Core::factory('Core_Entity')
+    (new Core_Entity)
         ->addEntities($MonthesPayments)
         ->addSimpleEntity('userid', $User->getId())
         ->addSimpleEntity('is_admin', $isAdmin)
@@ -345,23 +345,22 @@ if ($accessPaymentRead) {
 
 //Периоды отсутствия преподавателя
 if ($accessAbsentRead) {
-    $AbsentPeriods = Core::factory('Schedule_Absent')
-        ->queryBuilder()
+    $absentPeriods = Schedule_Absent::query()
         ->where('type_id', '=', 1)
         ->where('date_to', '>=', date('Y-m-d'))
         ->where('object_id', '=', $User->getId())
         ->findAll();
 
-    foreach ($AbsentPeriods as $Period) {
-        $Period->refactoredDateFrom = date('d.m.y', strtotime($Period->dateFrom()));
-        $Period->refactoredDateTo =   date('d.m.y', strtotime($Period->dateTo()));
-        $Period->refactoredTimeFrom = substr($Period->timeFrom(), 0, 5);
-        $Period->refactoredTimeTo =   substr($Period->timeTo(), 0, 5);
+    foreach ($absentPeriods as $period) {
+        $period->refactoredDateFrom = date('d.m.y', strtotime($period->dateFrom()));
+        $period->refactoredDateTo =   date('d.m.y', strtotime($period->dateTo()));
+        $period->refactoredTimeFrom = substr($period->timeFrom(), 0, 5);
+        $period->refactoredTimeTo =   substr($period->timeTo(), 0, 5);
     }
 
-    Core::factory('Core_Entity')
+    (new Core_Entity)
         ->addEntity($User)
-        ->addEntities($AbsentPeriods)
+        ->addEntities($absentPeriods)
         ->addSimpleEntity('userId', $User->getId())
         ->addSimpleEntity('access_absent_create', intval($accessAbsentCreate))
         ->addSimpleEntity('access_absent_edit', intval($accessAbsentEdit))
@@ -373,7 +372,7 @@ if ($accessAbsentRead) {
 //Таблица с настройками тарифов преподавателя
 if ($accessPaymentConfig) {
     //Общие значения
-    $Director = User::current()->getDirector();
+    $Director = User_Auth::current()->getDirector();
 
     $TeacherRateDefaultIndiv =      Property_Controller::factoryByTag('teacher_rate_indiv_default');
     $TeacherRateDefaultGroup =      Property_Controller::factoryByTag('teacher_rate_group_default');
@@ -410,7 +409,7 @@ if ($accessPaymentConfig) {
     $AbsentRateType = Core::factory('Property')->getByTagName('teacher_rate_type_absent_default');
     $absentRateType = $AbsentRateType->getPropertyValues($Director)[0]->value();
 
-    Core::factory('Core_Entity')
+    (new Core_Entity)
         ->addSimpleEntity('teacher_id', $User->getId())
         ->addSimpleEntity('is_teacher_rate_default_indiv', $isTeacherRateDefIndivValue)
         ->addSimpleEntity('is_teacher_rate_default_gorup', $isTeacherRateDefGroupValue)
@@ -454,9 +453,7 @@ if (Core_Access::instance()->hasCapability(Core_Access::TEACHER_SCHEDULE_TIME_RE
         ->addEntity($User)
         ->addEntities($mainSchedule)
         ->addEntities($users,'clients')
-        //->addSimpleEntity('property_id', $teacherList->getId())
         ->addSimpleEntity('user_group', User_Auth::current()->groupId())
-        //->addSimpleEntity('value_id', $teacherProperty->getId())
         ->addSimpleEntity('access_teacher_schedule_view', (int)Core_Access::instance()->hasCapability(Core_Access::TEACHER_SCHEDULE_TIME_READ))
         ->addSimpleEntity('access_teacher_schedule_create', (int)Core_Access::instance()->hasCapability(Core_Access::TEACHER_SCHEDULE_TIME_CREATE))
         ->addSimpleEntity('access_teacher_schedule_delete', (int)Core_Access::instance()->hasCapability(Core_Access::TEACHER_SCHEDULE_TIME_DELETE))
