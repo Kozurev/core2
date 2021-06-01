@@ -13,7 +13,7 @@ use Model\User\User_Client;
 
 $facade = new CreditServiceProvider();
 $user = User_Client::find(2659);
-$tariff = Payment_Tariff::find(3);
+$tariff = Payment_Tariff::find(141);
 
 $response = $facade->getProvider()->createOrder($user, $tariff);
 \Log::instance()->debug('tinkoff', json_encode($response));
