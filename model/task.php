@@ -136,6 +136,7 @@ class Task extends Task_Model
     {
         $task = Task_Controller::factory()
             ->associate($client->getId())
+            ->priorityId(2)
             ->date($date)
             ->save();
 
