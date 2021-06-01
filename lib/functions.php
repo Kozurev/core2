@@ -532,7 +532,8 @@ function mapping(string $route, array $params = [], string $pathType = MAPPING_B
             'credit_redirect_fail' => 'api/credit/index.php?action=redirectFail',
         ],
         MAPPING_CLIENT_LC => [
-            'auth' => 'login'
+            'auth' => 'login',
+            'rates' => 'client/rates'
         ]
     ];
 

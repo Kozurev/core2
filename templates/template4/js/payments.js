@@ -315,7 +315,7 @@ function makeClientPaymentPopup(paymentId, userId, saveCallback) {
                                     popupData += " checked ";
                                 }
             popupData += "       />\n" +
-            "                    <label for=\"type21\">Бонусf</label>\n" +
+            "                    <label for=\"type21\">Бонус</label>\n" +
             "                </p>\n" +
             "            </div>";
             popupData += "<button class=\"btn btn-default\" " +

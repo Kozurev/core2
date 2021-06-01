@@ -33,12 +33,6 @@ interface CreditProviderInterface
     public function changeStatusWebhook(Collection $requestData);
 
     /**
-     * @param int $status
-     * @return $this
-     */
-    public function changeStatus(int $status): self;
-
-    /**
      * @return CreditOrderModel|null
      */
     public function getOrder(): ?CreditOrderModel;

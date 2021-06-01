@@ -30,6 +30,11 @@ class Tinkoff extends Provider
     const PARAM_RETURN_URL = 'returnURL';
     const PARAM_USER = 'values';
 
+    const STATUS_APPROVED = 'approved';
+    const STATUS_SIGNED = 'signed';
+    const STATUS_REJECTED = 'rejected';
+    const STATUS_CANCELED = 'canceled';
+
     /**
      * @var string
      */
@@ -70,13 +75,6 @@ class Tinkoff extends Provider
      * @var string
      */
     private string $showcaseId;
-
-//    /**
-//     * Пароль для авторизации
-//     *
-//     * @var string
-//     */
-//    private string $password;
 
     /**
      * Tinkoff constructor.
@@ -146,9 +144,9 @@ class Tinkoff extends Provider
 
     /**
      * @param Collection $requestData
-     * @return mixed|void
+     * @return void
      */
-    public function changeStatusWebhook(Collection $requestData)
+    public function changeStatusWebhook(Collection $requestData): void
     {
         \Log::instance()->debug('tinkoff', json_encode([
             'request' => $requestData->all(),
@@ -159,15 +157,64 @@ class Tinkoff extends Provider
                 'REMOTE_PORT' => $_SERVER['REMOTE_PORT'] ?? null
             ]
         ]));
-    }
 
-    /**
-     * @param int $status
-     * @return $this
-     */
-    public function changeStatus(int $status): self
-    {
+        $id = $requestData->get('id');
+        /** @var CreditOrderModel|null $creditOrder */
+        $creditOrder = CreditOrderModel::query()
+            ->where('provider_id', '=', $id)
+            ->find();
 
+        if (is_null($creditOrder)) {
+            \Log::instance()->error('tinkoff', 'Ошибка вебхука - заявка не найдена; ' . $requestData->toJson());
+            return;
+        }
+
+        $status = $requestData->get('status');
+        if ($status == self::STATUS_APPROVED) { //заявка одобрена
+            $creditOrder->status(CreditOrderModel::STATUS_APPROVED);
+            $creditOrder->term(intval($requestData->get('term')));
+            $creditOrder->monthlyPayment(floatval($requestData->get('monthly_payment')));
+            $creditOrder->save();
+        } elseif ($status == self::STATUS_REJECTED) { //По заявке отказ
+            $creditOrder->status(CreditOrderModel::STATUS_REJECTED);
+            $creditOrder->save();
+        } elseif ($status == self::STATUS_CANCELED) { //Заявка отменена клиентом
+            $creditOrder->status(CreditOrderModel::STATUS_CANCELED);
+            $creditOrder->save();
+        } elseif ($status == self::STATUS_SIGNED) { //Договор подписан
+            $creditOrder->status(CreditOrderModel::STATUS_SIGNED);
+            $creditOrder->save();
+
+            $payment = (new \Payment())
+                ->user($creditOrder->userId())
+                ->status(\Payment::STATUS_SUCCESS)
+                ->type(\Payment::TYPE_INCOME)
+                ->description('Оформление рассрочки')
+                ->value($creditOrder->amount())
+                ->save();
+            $payment->appendComment('Заявка № ' . $creditOrder->providerId());
+
+            $client = User_Client::find($creditOrder->userId());
+            $tariff = \Payment_Tariff::find($creditOrder->tariffId());
+            if (is_null($client) || is_null($tariff)) {
+                $payment->delete();
+                if (is_null($client)) {
+                    \Log::instance()->error('tinkoff', 'Клиент с id ' . $creditOrder->userId() . ' не найден. Заявка № ' . $creditOrder->providerId());
+                }
+                if (is_null($tariff)) {
+                    \Log::instance()->error('tinkoff', 'Тариф с id ' . $creditOrder->tariffId() . ' не найден. Заявка № ' . $creditOrder->providerId());
+                }
+                return;
+            }
+            try {
+                $client->buyTariff($tariff);
+            } catch (\Throwable $throwable) {
+                $payment->delete();
+                \Log::instance()->error('tinkoff', $throwable->getMessage());
+            }
+        } else {
+            \Log::instance()->error('tinkoff', 'неизвестный статус вебхука: ' . $requestData->toJson());
+        }
     }
 
     /**
