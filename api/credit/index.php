@@ -33,3 +33,6 @@ if ($action === 'changeStatus') {
     $facade->getProvider()->changeStatusWebhook(request()->all());
     exit;
 }
+
+$facade = new CreditServiceProvider();
+$facade->getProvider()->changeStatusWebhook(array_merge(request()->all(), ['withoutAction' => true]));

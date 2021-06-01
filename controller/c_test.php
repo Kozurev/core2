@@ -16,4 +16,5 @@ $user = User_Client::find(2659);
 $tariff = Payment_Tariff::find(3);
 
 $response = $facade->getProvider()->createOrder($user, $tariff);
+\Log::instance()->debug('tinkoff', json_encode($response));
 header('Location: ' . $response->link);
