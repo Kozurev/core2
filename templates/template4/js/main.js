@@ -30,6 +30,20 @@ function checkResponseStatus(response) {
     return result;
 }
 
+/**
+ *
+ * @param response
+ */
+function showResponseNotification(response) {
+    let status, message;
+    status = (response.status === undefined || response.status === true) ? 'success' : 'error';
+    message = response.message !== undefined ? response.message : 'Неизвестная ошибка';
+    swal({
+        type: status,
+        title: message
+    });
+}
+
 function getCurrentDate() {
     var date = new Date();
     var year = date.getFullYear();

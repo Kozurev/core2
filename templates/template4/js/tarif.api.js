@@ -61,4 +61,30 @@ class Tarif {
         });
     }
 
+    /**
+     * Удаление тарифа
+     *
+     * @param tariffId
+     * @param callback
+     */
+    static remove(tariffId, callback) {
+        $.ajax({
+            type: 'POST',
+            url: Tarif.getApiLink(),
+            dataType: 'json',
+            data: {
+                action: 'remove',
+                tariffId: tariffId
+            },
+            success: function(response) {
+                if (typeof callback === 'function') {
+                    callback(response);
+                }
+            },
+            error: function (response) {
+                showResponseNotification(response.responseJSON);
+            }
+        });
+    }
+
 }

@@ -1,92 +1,7 @@
-//var root = "/musadm";
 var root = $("#rootdir").val();
 
 $(function(){
     $("body")
-        //Открытие формы добавления комментария к платежу
-        // .on("click", ".payment_add_note", function(){
-        //     var modelid = $(this).data("modelid");
-        //     $.ajax({
-        //         type: "GET",
-        //         url: root + "/balance",
-        //         data: {
-        //             action: "add_note",
-        //             model_id: modelid
-        //         },
-        //         success: function(responce){
-        //             showPopup(responce);
-        //         }
-        //     });
-        // })
-        // //Отправка формы комментария платежа
-        // .on("click", ".popop_payment_note_submit", function(e){
-        //     e.preventDefault();
-        //     loaderOn();
-        //     var userid = $(this).data("userid");
-        //     var note = $('#property_26').val();
-        //     if (note == '') {
-        //         closePopup();
-        //         loaderOff();
-        //         return;
-        //     }
-        //     saveData("Main", function(response){loaderOff();});
-        //     refreshPaymentsTable(userid, loaderOff);
-        // })
-        //Открытие формы пополнения баланса
-        // .on("click", ".btn_balance", function(e){
-        //     e.preventDefault();
-        //     var userid = $(this).data("userid");
-        //     getPaymentPopup(userid, root + "/balance");
-        // })
-        //Отправка формы пополнения баланса
-        // .on('click', '.popop_balance_payment_submit', function(e){
-        //     e.preventDefault();
-        //     loaderOn();
-        //     var form = $('#createData');
-        //     if($(form).valid() == false) {
-        //         loaderOff();
-        //         return;
-        //     }
-        //     var userid = $(this).data('userid');
-        //     var value = $(form).find('input[name=value]').val();
-        //     var description = $(form).find('textarea[name=description]').val();
-        //     var description2 = $(form).find('textarea[name=property_26]').val();
-        //     var type = $(form).find('input[name=type]:checked').val();
-        //
-        //     //Если это страница со списком клиентов
-        //     if ($('#payment_from').val() == 'clients') {
-        //         savePayment(userid, value, description, description2, type, 'balance', refreshUserTable);
-        //     } else {
-        //         savePayment(userid, value, description, description2, type, 'balance', function() {
-        //             refreshPaymentsTable(userid, loaderOff);
-        //         });
-        //     }
-        //     loaderOff();
-        // })
-        //Открытие формы покупки индивидуальных уроков
-        // .on("click", ".btn_private_lessons", function(e){
-        //     e.preventDefault();
-        //     var userid = $(this).data("userid");
-        //     getTarifPopup(userid, 1);
-        // })
-        // //Открытие формы покупки групповых уроков
-        // .on("click", ".btn_group_lessons", function(e){
-        //     e.preventDefault();
-        //     var userid = $(this).data("userid");
-        //     getTarifPopup(userid, 2);
-        // })
-
-        /**
-         * Покупка тарифа
-         */
-        // .on('click', '.popop_buy_tarif_submit', function(e) {
-        //     e.preventDefault();
-        //     loaderOn();
-        //     var tarifid = $('select[name=tarif_id]').val();
-        //     var userid = $(this).data('userid');
-        //     buyTarif(userid, tarifid);
-        // })
-
         /**
          * Форма открытия/скрытия блока (таблицы) с существующими тарифами
          */
@@ -115,8 +30,11 @@ $(function(){
          */
         .on("click", ".tariff_delete", function(e){
             e.preventDefault();
-            var tarifid = $(this).data("model_id");
-            deleteItem("Payment_Tariff", tarifid, refreshPayments);
+            let tariffId = $(this).data("model_id");
+            Tarif.remove(tariffId, function(response) {
+                showResponseNotification(response);
+                refreshPayments();
+            });
         })
 
         /**
@@ -134,128 +52,15 @@ $(function(){
         .on("click", ".popop_tariff_submit", function(e){
             e.preventDefault();
             loaderOn();
-            saveData("Main", function(response){refreshPayments();});
+            saveData("Main", function(response) {
+                refreshPayments();
+                swal({
+                    type: 'success',
+                    title: 'Данные тарифа успешно сохранены'
+                });
+            });
         });
-
-        /**
-         * Открытие всплывающего окна создания/редактирования платежа
-         */
-        // .on('click', '.payment_edit', function(e) {
-        //     e.preventDefault();
-        //     var id = $(this).data('id');
-        //     var afterSaveAction = $(this).data('after_save_action');
-        //
-        //     if (afterSaveAction == 'payment' && $(this).data('type') < 3) {
-        //         editPaymentPopup(id, afterSaveAction);
-        //     } else {
-        //         editPaymentPopup(id, afterSaveAction);
-        //     }
-        // })
-
-        // .on('click', '.payment_delete', function(e){
-        //     e.preventDefault();
-        //     loaderOn();
-        //     var id = $(this).data('id');
-        //     var afterSaveAction = $(this).data('after_save_action');
-        //     deletePayment(id, function(response) {
-        //         if (afterSaveAction == 'client') {
-        //             refreshUserTable();
-        //         }
-        //         loaderOff();
-        //     });
-        // })
-
-        /**
-         * Сохранение формы редактирования платежа
-         */
-        // .on("click", ".popop_payment_submit", function(e){
-        //     e.preventDefault();
-        //     loaderOn();
-        //
-        //     var afterSaveAction = $("#createData").find("input[name=after_save_action]").val();
-        //
-        //     saveData("Main", function(response){
-        //         /**
-        //          * Сохранение изменений свойств платежа может происходить из разных разделов и требуют
-        //          * различных действия для обновления контента страницы.
-        //          * На данный момент информация о платеже редактируется из разделов клиента и страницы расписания преподавателя
-        //          */
-        //         switch (afterSaveAction)
-        //         {
-        //             case 'client':  //обновление контента страницы клиента
-        //                 refreshUserTable();
-        //                 break;
-        //             case 'teacher': //обновление контента страницы преподавателя
-        //                 refreshSchedule();
-        //                 break;
-        //             case 'payment': //обновление контента страницы финансов
-        //                 refreshPayments();
-        //                 break;
-        //             default: loaderOff();
-        //         }
-        //     });
-        // })
-        //.on("click", ".teacher_payment_delete", function(e){
-            // e.preventDefault();
-            // loaderOn();
-            // var id = $(this).data("id");
-            // var paymentValue = Number( $(this).parent().parent().parent().find(".value").text() );
-            //
-            // var debt = $("#teacher-debt");
-            // var alreadyPayed = $("#teacher-payed");
-            //
-            // var debtVal = Number(debt.text());
-            // var alreadyPayedVal = Number(alreadyPayed.text());
-            //
-            // debt.text(debtVal + paymentValue);
-            // alreadyPayed.text(alreadyPayedVal - paymentValue);
-            //
-            // $(this).parent().parent().parent().remove();
-            //
-            // deletePayment(id, function(response){
-            //     loaderOff();
-            // });
-        //});
 });
-
-
-// /**
-//  * Функция удаления платежа
-//  *
-//  * @date 21.01.2019 09:50
-//  * @param paymentId
-//  * @param func
-//  */
-// function deletePayment(paymentId, func) {
-//     $.ajax({
-//         type: 'GET',
-//         url: root + '/balance',
-//         data: {
-//             action: 'payment_delete',
-//             id: paymentId
-//         },
-//         success: function(response) {
-//             func(response);
-//         }
-//     });
-// }
-
-
-// function editPaymentPopup(id, afterSaveAction) {
-//     $.ajax({
-//         type: 'GET',
-//         url: root + '/finances',
-//         data: {
-//             action: 'edit_payment',
-//             id: id,
-//             afterSaveAction: afterSaveAction
-//         },
-//         success: function(response){
-//             showPopup(response);
-//         }
-//     });
-// }
-
 
 /**
  * Открытие всплывающего окна создания / редактирования тарифа
@@ -275,7 +80,6 @@ function editTariffPopup(tariffId) {
         }
     });
 }
-
 
 /**
  * Обновление содержимого раздела "Финансы"
@@ -303,7 +107,6 @@ function refreshPayments() {
     });
 }
 
-
 function refreshPaymentsTable(userId, func) {
     $.ajax({
         type: 'GET',
@@ -322,7 +125,6 @@ function refreshPaymentsTable(userId, func) {
     });
 }
 
-
 function getTarifPopup(id, type) {
     $.ajax({
         type: 'GET',
@@ -338,13 +140,9 @@ function getTarifPopup(id, type) {
     });
 }
 
-
-
-
 /*-----------------------------------------------*/
 /*---------------Новые обработчики---------------*/
 /*-----------------------------------------------*/
-
 
 /**
  * Формирование всплывающего окна редактирования платежа
@@ -418,7 +216,6 @@ function makePaymentPopup(paymentId, afterSaveAction) {
     });
 }
 
-
 /**
  * Колбэк функция для сохранения платежа и раздела "Финансы"
  * Пока что тут стоит "функция-затычка" для бновления контента страницы, со временем надо бы доработать
@@ -430,7 +227,6 @@ function savePaymentCallback(payment) {
     showFinancesHistory($('input[name=date_from]').val(), $('input[name=date_to]').val(), $('select[name=area_id]').val());
 }
 
-
 /**
  * Колбэк функция для удаления платежа и раздела "Финансы"
  * Пока что тут стоит "функция-затычка" для бновления контента страницы, со временем надо бы доработать
@@ -440,8 +236,6 @@ function savePaymentCallback(payment) {
 function removePaymentCallback(payment) {
     showFinancesHistory($('input[name=date_from]').val(), $('input[name=date_to]').val(), $('select[name=area_id]').val());
 }
-
-
 
 /**
  * Функция создания всплывающего окна для начисления платежа клиенту
@@ -542,7 +336,6 @@ function makeClientPaymentPopup(paymentId, userId, saveCallback) {
     });
 }
 
-
 /**
  * Коллбэк функция для изменения баланса клиента в общем списке
  * ВНИМАНИЕ!!! в коде данной функции СТРОГО ЗАПРЕЩЕНО использовать двойные кавычки
@@ -559,7 +352,6 @@ function saveClientPaymentCallback(payment) {
     balanceSpan.text(payment.userBalance);
     closePopup();
 }
-
 
 /**
  * Коллбэк функция для создания платежа из личного кабинета ученика
@@ -626,7 +418,6 @@ function saveBalancePaymentCallback(payment) {
     closePopup();
 }
 
-
 /**
  * Колбэк функция для удаления платежа клиента
  *
@@ -642,7 +433,6 @@ function removeBalancePaymentCallback(payment) {
         clientBalance.text(clientBalanceVal + Number(payment.value));
     }
 }
-
 
 /**
  * Формирование всплывающего окна для добавления примечания к платежу
@@ -660,7 +450,6 @@ function makePaymentCommentPopup(paymentId, callBack) {
     showPopup(popupData);
 }
 
-
 /**
  * Коллэк функция для сохранения комментария к платежу из личного каинета клиента
  * ВНИМАНИЕ!!! в коде данной функции СТРОГО ЗАПРЕЩЕНО использовать двойные кавычки
@@ -674,7 +463,6 @@ function savePaymentCommentClient(response) {
     closePopup();
 }
 
-
 function saveTeacherPaymentCallback(payment) {
     if (payment.error != undefined) {
         notificationError(payment.error.message);
@@ -683,7 +471,6 @@ function saveTeacherPaymentCallback(payment) {
     refreshSchedule();
     return true;
 }
-
 
 function removeTeacherPaymentCallback(payment) {
     if (payment.error != undefined) {

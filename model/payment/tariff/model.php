@@ -22,9 +22,14 @@ class Payment_Tariff_Model extends Core_Entity
     /**
      * Цена
      *
-     * @var int|null
+     * @var float|null
      */
-    protected int $price = 0;
+    protected float $price = 0;
+
+    /**
+     * @var int
+     */
+    protected int $status = 1;
 
     /**
      * Кол-во индивидуальных занятий
@@ -79,6 +84,20 @@ class Payment_Tariff_Model extends Core_Entity
             return floatval($this->price);
         } else {
             $this->price = $price;
+            return $this;
+        }
+    }
+
+    /**
+     * @param int|null $status
+     * @return $this|int
+     */
+    public function status(?int $status = null)
+    {
+        if (is_null($status)) {
+            return intval($this->status);
+        } else {
+            $this->status = $status;
             return $this;
         }
     }

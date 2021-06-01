@@ -130,3 +130,19 @@ if ($action === 'get_rate_by_id') {
 
     die(json_encode($tariff->toStd()));
 }
+
+if ($action === 'remove') {
+    if (!Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_DELETE)) {
+        Core_Page_Show::instance()->error(403, 'Недостаточно прав для удаления тарифа', true);
+    }
+
+    $tariffId = request()->get('tariffId', 0);
+    $tariff = Payment_Tariff::find($tariffId);
+
+    if (empty($tariffId) || is_null($tariff)) {
+        Core_Page_Show::instance()->error(422, 'Тариф с указанным id не найден', true);
+    }
+
+    $tariff->delete();
+    exit(REST::status(REST::STATUS_SUCCESS, 'Тариф был успешно удален'));
+}

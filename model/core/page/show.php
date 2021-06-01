@@ -194,7 +194,7 @@ class Core_Page_Show extends Core
         if (!$isJson) {
             die($error);
         } else {
-            die(json_encode(['error' => $error]));
+            die(json_encode(['status' => false, 'message' => $error]));
         }
     }
 

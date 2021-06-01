@@ -12,6 +12,14 @@
 class Payment_Tariff extends Payment_Tariff_Model
 {
     /**
+     * @return Orm
+     */
+    public static function query(): Orm
+    {
+        return parent::query()->where('status', '=', 1);
+    }
+
+    /**
      * @param null $obj
      * @return $this|null
      */
@@ -33,7 +41,7 @@ class Payment_Tariff extends Payment_Tariff_Model
     public function delete($obj = null)
     {
         Core::notify([&$this], 'before.PaymentTariff.delete');
-        parent::delete();
+        Orm::execute('UPDATE ' . $this->getTableName() . ' SET status = 0 WHERE id = ' . $this->id);
         Core::notify([&$this], 'after.PaymentTariff.delete');
     }
 }
