@@ -895,11 +895,6 @@ Core::attachObserver('before.User.save', function ($args) {
 
         $subject = 'Регистрация Musicmetod';
         $message = (new Core_Entity())
-            ->addEntity($user)
-//            ->addSimpleEntity('auth_link', htmlspecialchars(mapping('auth', [
-//                'action' => 'auth_by_token',
-//                'auth_token' => $user->authToken()
-//            ])))
             ->addSimpleEntity('auth_link', mapping('auth', [
                 'token' => $user->getAuthToken()
             ], MAPPING_CLIENT_LC))
@@ -955,5 +950,39 @@ Core::attachObserver('after.ScheduleAbsent.save', function($args) {
     if ($user instanceof User && $user->groupId() == ROLE_CLIENT && $absent->typeId() == Schedule_Lesson::TYPE_INDIV) {
         $client = $absent->getClient();
         Task::addClientReminderTask($client, $absent->dateTo());
+    }
+});
+
+/**
+ *
+ */
+Core::attachObserver('after.ScheduleLesson.insert', function(array $args) {
+    /** @var Schedule_Lesson $lesson */
+    $lesson = $args[0];
+    if ($lesson->typeId() == Schedule_Lesson::TYPE_INDIV && User_Auth::current()->getId() == $lesson->clientId()) {
+        $client = User_Client::find(User_Auth::current()->getId());
+        $balance = $client->getBalance();
+        if ($balance->getIndividualLessonsCount() < 1) {
+            //Создание задачи с напоминанием о самостоятельной постановки в график при нулевом балансе
+            $isIssetTask = Task::query()
+                ->where('associate', '=', $client->getId())
+                ->where('done', '=', 0)
+                ->where('type', '=', Task::TYPE_PAYMENT_WHEN_IN_SCHEDULE)
+                ->find();
+
+            //Если не существет подобной незакрытой задачи
+            if (is_null($isIssetTask)) {
+                $task = Task_Controller::factory()
+                    ->date(date('Y-m-d'))
+                    ->areaId($lesson->areaId())
+                    ->type(Task::TYPE_PAYMENT_WHEN_IN_SCHEDULE)
+                    ->priorityId(Task::PRIORITY_HIGH)
+                    ->associate($client->getId())
+                    ->save();
+
+                $taskNoteText = $client->getFio() . '. Ученик поставил себя в график, на балансе не хватает купленных уроков. Контроль.';
+                $task->addNote($taskNoteText, 0, date('Y-m-d'));
+            }
+        }
     }
 });

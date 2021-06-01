@@ -16,6 +16,7 @@ class Task extends Task_Model
     const TYPE_PAYMENT = 1;
     const TYPE_SCHEDULE = 2;
     const TYPE_CLIENT_COMMENT = 3;
+    const TYPE_PAYMENT_WHEN_IN_SCHEDULE = 4; //Задача для менеджеров в случае если клиент ставит себя в график не имея занятий на балансе
 
     /**
      * Поиск комментариев задачи
