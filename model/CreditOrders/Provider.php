@@ -45,7 +45,7 @@ abstract class Provider implements CreditProviderInterface
     /**
      * @var bool
      */
-    protected bool $testMode = false;
+    protected bool $testMode = true;
 
     /**
      * Provider constructor.
