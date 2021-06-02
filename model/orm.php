@@ -258,9 +258,19 @@ class Orm
     {
         $beforeSelect = $this->select;
         $beforeOrder = $this->order;
+        $beforeGroup = $this->groupBy;
+
         $id = is_string($this->getObjectPrimaryKeyName()) ? $this->getTableName() . '.id' : '*';
-        $this->clearSelect()->select('count(' . $id . ')', 'count');
+        $this->clearSelect();
+
+        if (empty($this->join)) {
+            $this->select('count(' . $id . ')', 'count');
+        } else {
+            $this->select('count(distinct('.$id.'))', 'count');
+        }
+
         $this->clearOrderBy();
+        $this->clearGroupBy();
         $query = $this->getQueryString();
         $result = DB::instance()->query($query);
 
@@ -271,6 +281,7 @@ class Orm
 
         $this->select = $beforeSelect;
         $this->order = $beforeOrder;
+        $this->groupBy = $beforeGroup;
 
         if ($result == false) {
             return 0;
@@ -742,6 +753,15 @@ class Orm
     public function clearOrderBy()
     {
         $this->order = [];
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function clearGroupBy()
+    {
+        $this->groupBy = [];
         return $this;
     }
 
