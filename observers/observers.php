@@ -362,6 +362,7 @@ Core::attachObserver('before.Payment.save', function($args) {
         ($payment->type() == Payment::TYPE_INCOME
         || $payment->type() == Payment::TYPE_BONUS_CLIENT
         || $payment->type() == Payment::TYPE_DEBIT
+        || $payment->type() == Payment::TYPE_REFUND_CLIENT
         || $payment->type() == Payment::TYPE_CASHBACK)) {
 
         if ($payment->getId() > 0) {
@@ -379,7 +380,7 @@ Core::attachObserver('before.Payment.save', function($args) {
         if (!is_null($client)) {
             $userBalance = $client->getBalance();
             $balanceOld =  $userBalance->getAmount();
-            $balanceNew = $payment->type() == Payment::TYPE_DEBIT
+            $balanceNew = $payment->type() == Payment::TYPE_DEBIT || $payment->type() == Payment::TYPE_REFUND_CLIENT
                 ?   $balanceOld - floatval($difference)
                 :   $balanceOld + floatval($difference);
             $userBalance->setAmount($balanceNew);
@@ -400,12 +401,13 @@ Core::attachObserver('before.Payment.delete', function($args) {
     //Корректировка баланса клиента
     if ($payment->type() == Payment::TYPE_INCOME
     || $payment->type() == Payment::TYPE_DEBIT
+    || $payment->type() == Payment::TYPE_REFUND_CLIENT
     || $payment->type() == Payment::TYPE_CASHBACK
     || $payment->type() == Payment::TYPE_BONUS_CLIENT) {
         $client = User_Client::find($payment->user());
         if (!is_null($client)) {
             $userBalance = $client->getBalance();
-            $balanceNew = $payment->type() == Payment::TYPE_DEBIT
+            $balanceNew = $payment->type() == Payment::TYPE_DEBIT || $payment->type() == Payment::TYPE_REFUND_CLIENT
                 ?   $userBalance->getAmount() + floatval($payment->value())
                 :   $userBalance->getAmount() - floatval($payment->value());
             $userBalance->setAmount($balanceNew);

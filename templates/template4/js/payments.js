@@ -316,6 +316,13 @@ function makeClientPaymentPopup(paymentId, userId, saveCallback) {
                                 }
             popupData += "       />\n" +
             "                    <label for=\"type21\">Бонус</label>\n" +
+            "                <p style=\"margin-top: 5px\">\n" +
+            "                    <input type=\"radio\" "+disabledType+" name=\"type\" id=\"type23\" value=\"23\" style=\"height: auto\"";
+                                if (payment.typeId == 23) {
+                                    popupData += " checked ";
+                                }
+            popupData += "       />\n" +
+                "                    <label for=\"type23\">Возврат средств</label>\n" +
             "                </p>\n" +
             "            </div>";
             popupData += "<button class=\"btn btn-default\" " +
@@ -366,20 +373,35 @@ function saveBalancePaymentCallback(payment) {
 
     var balanceSpan = $('#balance');
     balanceSpan.text(payment.userBalance);
-    if (payment.typeId == '1' || payment.typeId == '15') {
+    if (payment.typeId == 1 || payment.typeId == 15) {
         var trClass = 'positive';
     } else {
         var trClass = 'negative';
     }
 
-    var paymentsTable = $('.user-payments').find('table');
+    var paymentsTable = $('.user-payments-table');
     var paymentTr = $('#client_payment_' + payment.id);
+    let typeClass = payment.typeId == 1 || payment.typeId == 21 ? 'text-success' : 'text-danger';
+    let typeName;
+    if (payment.typeId == 1) {
+        typeName = 'Зачилсение';
+    } else if (payment.typeId == 2) {
+        typeName = 'Списание';
+    } else if (payment.typeId == 15) {
+        typeName = 'Кэшбэк';
+    } else if (payment.typeId == 21) {
+        typeName = 'Бонус';
+    } else if (payment.typeId == 23) {
+        typeName = 'Возврат';
+    }
 
     if (paymentTr.length == 0) {    //Если это новый платеж
         paymentTr = '<tr class=\''+trClass+'\' id=\'client_payment_'+payment.id+'\'>' +
             '<td class=\'date\'>'+payment.refactoredDatetime+'</td>' +
             '<td class=\'value\'>'+payment.value+'</td>' +
+            '<td class=\'type\'><p class=\''+ typeClass +'\'>' + typeName + '</p>' +
             '<td class=\'status\'><p class=\'text-success\'>Выполнен</p></td>' +
+            '</td>' +
             '<td>' +
             '<p class=\'description\'>'+payment.description+'</p>' +
             '<span class=\'comments\'>';

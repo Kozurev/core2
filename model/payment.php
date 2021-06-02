@@ -18,6 +18,7 @@ class Payment extends Payment_Model
     const TYPE_BONUS_ADD = 16;
     const TYPE_BONUS_PAY = 17;
     const TYPE_BONUS_CLIENT = 21;
+    const TYPE_REFUND_CLIENT = 23;
 
     const STATUS_PENDING = 0;
     const STATUS_SUCCESS = 1;

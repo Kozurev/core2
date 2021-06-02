@@ -12,6 +12,10 @@
                         <td><xsl:value-of select="deposits" /></td>
                     </tr>
                     <tr>
+                        <td>Возвраты за период:</td>
+                        <td><xsl:value-of select="refunds" /></td>
+                    </tr>
+                    <tr>
                         <td>Выручка от занятий</td>
                         <td><xsl:value-of select="income" /></td>
                     </tr>

@@ -352,6 +352,8 @@ if ($action === 'get_payments') {
         $paymentsQuery->whereIn('type', $types);
     }
 
+    $paymentsQuery->orderBy('id', 'DESC');
+
     if (Core_Array::Get('without_paginate', 0, PARAM_INT)) {
         $response = $paymentsQuery->get()->map(function(Payment $payment) {
             return $payment->toStd();

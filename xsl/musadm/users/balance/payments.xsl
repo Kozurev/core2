@@ -4,17 +4,18 @@
         <section class="user-payments section-bordered">
             <h3>Список платежей</h3>
 
-            <xsl:choose>
-                <xsl:when test="count(payment) = 0">
-                    <p>Финансовых операций не найдено</p>
-                </xsl:when>
-                <xsl:otherwise>
+<!--            <xsl:choose>-->
+<!--                <xsl:when test="count(payment) = 0">-->
+<!--                    <p>Финансовых операций не найдено</p>-->
+<!--                </xsl:when>-->
+<!--                <xsl:otherwise>-->
                     <div class="balance-payments tab">
-                        <table id="sortingTable" class="table table-statused">
+                        <table id="sortingTable" class="table table-statused user-payments-table">
                             <thead>
                                 <tr class="header">
                                     <th>Дата</th>
                                     <th>Сумма</th>
+                                    <th>Тип</th>
                                     <th>Статус</th>
                                     <th>Примечание</th>
                                     <xsl:if test="is_admin = 1">
@@ -28,8 +29,8 @@
                             </tbody>
                         </table>
                     </div>
-                </xsl:otherwise>
-            </xsl:choose>
+<!--                </xsl:otherwise>-->
+<!--            </xsl:choose>-->
         </section>
     </xsl:template>
 
@@ -66,6 +67,35 @@
                     <xsl:when test="status = 3">
                         <p class="text-warning">
                             Платеж отменен
+                        </p>
+                    </xsl:when>
+                </xsl:choose>
+            </td>
+            <td class="type">
+                <xsl:choose>
+                    <xsl:when test="type = 1">
+                        <p class="text-success">
+                            Зачисление
+                        </p>
+                    </xsl:when>
+                    <xsl:when test="type = 2">
+                        <p class="text-danger">
+                            Списание
+                        </p>
+                    </xsl:when>
+                    <xsl:when test="type = 15">
+                        <p class="text-success">
+                            Кэшбэк
+                        </p>
+                    </xsl:when>
+                    <xsl:when test="type = 21">
+                        <p class="text-success">
+                            Бонус
+                        </p>
+                    </xsl:when>
+                    <xsl:when test="type = 23">
+                        <p class="text-danger">
+                            Возврат
                         </p>
                     </xsl:when>
                 </xsl:choose>
