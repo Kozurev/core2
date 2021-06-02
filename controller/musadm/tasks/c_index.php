@@ -14,6 +14,7 @@ $from =     Core_Array::Get('date_from', date('Y-m-d'), PARAM_DATE);
 $to =       Core_Array::Get('date_to', date('Y-m-d'), PARAM_DATE);
 $areaId =   Core_Array::Get('areaId', 0, PARAM_INT);
 $taskId =   Core_Array::Get('taskId', 0, PARAM_INT);
+$onlySystem=Core_Array::Get('onlySystem', false, PARAM_BOOL);
 
 $director = User_Auth::current()->getDirector();
 $subordinated = $director->getId();
@@ -36,6 +37,11 @@ if ($taskId > 0) {
     $taskController->addSimpleEntity('task_id', $taskId);
 }
 
+if ($onlySystem) {
+    $taskController->queryBuilder()->where('type', '<>', 0);
+}
+
+
 $taskController
     ->periodFrom($from)
     ->periodTo($to)
@@ -44,4 +50,5 @@ $taskController
     ->isLimitedAreasAccess(true)
     ->isWithAreasAssignments(true)
     ->addSimpleEntity('taskAfterAction', 'tasks')
+    ->addSimpleEntity('only_system', (int)$onlySystem)
     ->show();

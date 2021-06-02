@@ -52,6 +52,18 @@
                 <div class="row buttons-panel">
                     <xsl:call-template name="areas_row" />
 
+                    <div style="display: inline-block;width: 200px;">
+                        <input class="checkbox" id="only_system_tasks" name="only_system_tasks" type="checkbox">
+                            <xsl:if test="//only_system = 1">
+                                <xsl:attribute name="checked">true</xsl:attribute>
+                            </xsl:if>
+                        </input>
+                        <label for="only_system_tasks" class="checkbox-label" style="position:relative;top:20px;">
+                            <span class="off">Все</span>
+                            <span class="on">Системные</span>
+                        </label>
+                    </div>
+
                     <xsl:choose>
                         <xsl:when test="periods = 1">
                             <xsl:if test="access_task_create = 1">
@@ -66,6 +78,8 @@
                             </div>
                         </xsl:otherwise>
                     </xsl:choose>
+
+                    <span>Всего: <xsl:value-of select="count(//task)" /></span>
                 </div>
             </xsl:if>
         </section>

@@ -164,7 +164,8 @@ function refreshTasksTable(from, to, areaId, taskId,showCompleted) {
             date_to: to,
             areaId: areaId,
             taskId: taskId,
-            showCompleted:showCompleted
+            showCompleted:showCompleted,
+            onlySystem: $('#only_system_tasks').is(':checked')
         },
         success: function(response) {
             $('.tasks').html(response);
