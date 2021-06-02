@@ -47,30 +47,6 @@
         <tr class="{$class}" id="client_payment_{id}">
             <td class="date"><xsl:value-of select="datetime" /></td>
             <td class="value"><xsl:value-of select="value" /></td>
-            <td class="status">
-                <xsl:choose>
-                    <xsl:when test="status = 0">
-                        <p class="text-default">
-                            В обработке
-                        </p>
-                    </xsl:when>
-                    <xsl:when test="status = 1">
-                        <p class="text-success">
-                            Выполнен
-                        </p>
-                    </xsl:when>
-                    <xsl:when test="status = 2">
-                        <p class="text-danger">
-                            Ошибка платежа
-                        </p>
-                    </xsl:when>
-                    <xsl:when test="status = 3">
-                        <p class="text-warning">
-                            Платеж отменен
-                        </p>
-                    </xsl:when>
-                </xsl:choose>
-            </td>
             <td class="type">
                 <xsl:choose>
                     <xsl:when test="type = 1">
@@ -96,6 +72,30 @@
                     <xsl:when test="type = 23">
                         <p class="text-danger">
                             Возврат
+                        </p>
+                    </xsl:when>
+                </xsl:choose>
+            </td>
+            <td class="status">
+                <xsl:choose>
+                    <xsl:when test="status = 0">
+                        <p class="text-default">
+                            В обработке
+                        </p>
+                    </xsl:when>
+                    <xsl:when test="status = 1">
+                        <p class="text-success">
+                            Выполнен
+                        </p>
+                    </xsl:when>
+                    <xsl:when test="status = 2">
+                        <p class="text-danger">
+                            Ошибка платежа
+                        </p>
+                    </xsl:when>
+                    <xsl:when test="status = 3">
+                        <p class="text-warning">
+                            Платеж отменен
                         </p>
                     </xsl:when>
                 </xsl:choose>
