@@ -42,7 +42,7 @@ $groups = Schedule_Group::query()
                                         <?php
                                         /** @var Schedule_Group $group */
                                         foreach ($groups as $group) {
-                                            echo '<option value="'.$group->getId().'">'.$group->title() . '(' . refactorDateFormat($group->date()) . ' / ' . refactorTimeFormat($group->timeStart()) .')</option>';
+                                            echo '<option value="'.$group->getId().'">'.$group->title() . ' (' . refactorDateFormat($group->date()) . ' / ' . refactorTimeFormat($group->timeStart()) .')</option>';
                                         }
                                         ?>
                                     </select>
