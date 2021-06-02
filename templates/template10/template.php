@@ -56,6 +56,7 @@
         ->css('/templates/template10/assets/css/scroll.css')
         ->css('/templates/template10/assets/css/radiobutton.css')
         ->css('/templates/template10/assets/plugins/swal/sweetalert.css')
+        ->css('/templates/template10/assets/plugins/bootstrap-select/dist/css/bootstrap-select.css')
         ->js('/templates/template10/assets/plugins/jquery.min.js');
 
         global $CFG;
@@ -366,7 +367,8 @@ Core_Page_Show::instance()
     ->js('/templates/template10/assets/plugins/jquery-scrollTo/jquery.scrollTo.min.js')
     ->js('/templates/template10/assets/plugins/lightbox/dist/ekko-lightbox.min.js')
     ->js('/templates/template10/assets/plugins/jquery-match-height/jquery.matchHeight-min.js')
-    ->js('/templates/template10/assets/plugins/swal/sweetalert.js');
+    ->js('/templates/template10/assets/plugins/swal/sweetalert.js')
+    ->js('/templates/template10/assets/plugins/bootstrap-select/dist/js/bootstrap-select.js');
 ?>
 <!--    <script>-->
 <!--        const alert = sweetAlert.mixin({-->

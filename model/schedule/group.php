@@ -1,4 +1,7 @@
 <?php
+
+use Model\User\User_Client;
+
 /**
  * Класс реализующий методы для работы с группами
  *
@@ -125,6 +128,38 @@ class Schedule_Group extends Schedule_Group_Model
     }
 
     /**
+     * @param int $objectId
+     * @throws Exception
+     */
+    public function appendItem(int $objectId): void
+    {
+        if ($this->type == self::TYPE_CLIENTS && is_null(User_Client::find($objectId))) {
+            throw new \Exception('Ошибка добавления в состав группы: клиент с ID ' . $objectId . ' не найден');
+        } elseif ($this->type == self::TYPE_LIDS && is_null(Lid::find($objectId))) {
+            throw new \Exception('Ошибка добавления в состав группы: лид с ID ' . $objectId . ' не найден');
+        }
+
+        $isInGroup = Schedule_Group_Assignment::query()
+            ->where('group_id', '=', $this->getId())
+            ->where('user_id', '=', $objectId)
+            ->exists();
+
+        if (!$isInGroup) {
+            (new Schedule_Group_Assignment)
+                ->groupId($this->getId())
+                ->userId($objectId)
+                ->save();
+        }  else {
+            throw new \Exception(($this->type == self::TYPE_CLIENTS ? 'Клиент' : 'Лид') . ' уже находится в составе группы');
+        }
+    }
+
+    public function removeItem(int $objectId)
+    {
+
+    }
+
+    /**
      * Поиск всех групп, в которых состоит клиент
      *
      * @param User $client
@@ -168,5 +203,13 @@ class Schedule_Group extends Schedule_Group_Model
         }
         Core::notify([&$this], 'after.ScheduleGroup.save');
         return $this;
+    }
+
+    /**
+     * @return Orm
+     */
+    public static function query(): Orm
+    {
+        return parent::query()->where('active', '=', 1);
     }
 }

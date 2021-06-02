@@ -41,10 +41,29 @@ if ($action === 'getList') {
     exit(json_encode($groups->map(function (Schedule_Group $group): stdClass {
         return $group->toStd();
     })));
+}
 
-//    $response = [];
-//    foreach ($groups as $group) {
-//        $response[] = $group->toStd();
-//    }
-//    exit(json_encode($response));
+/**
+ * Добавление клиента/лида в группу
+ */
+if ($action === 'appendToGroup') {
+    $groupId = request()->get('group_id');
+    $objectId = request()->get('object_id');
+
+    if (empty($groupId) || empty($objectId)) {
+        exit(REST::responseError(REST::ERROR_CODE_REQUIRED_PARAM, 'Отсутствует один или несколько обязательныхъ параметров'));
+    }
+
+    $group = Schedule_Group::find($groupId);
+    if (is_null($group)) {
+        exit(REST::responseError(REST::ERROR_CODE_NOT_FOUND, 'Группа с ID ' . $groupId . ' не найдена'));
+    }
+
+    try {
+        $group->appendItem($objectId);
+    } catch (\Throwable $throwable) {
+        exit(REST::responseError(REST::ERROR_CODE_CUSTOM, $throwable->getMessage()));
+    }
+
+    exit(REST::status(REST::STATUS_SUCCESS, ($group->type() == Schedule_Group::TYPE_CLIENTS ? 'Клиент' : 'Лид') . ' успешно добавлен в группу'));
 }

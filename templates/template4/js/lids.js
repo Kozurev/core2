@@ -134,8 +134,23 @@ $(function () {
                     }
                 });
             }
+        })
+        .on('click', '.lid_group_setting', function(e) {
+            e.preventDefault();
+            let lidId = $(this).data('id'),
+                $modal = $('#lidsGroupsModal');
+            $modal.find('input[name=object_id]').val(lidId);
+            // $modal.find('select').selectpicker('deselectAll');
+            // $modal.find('select').selectpicker('refresh');
+            $modal.modal();
         });
 
+    if ($('#lids_groups_ajax_form').length !== 0) {
+        initAjaxForm('#lids_groups_ajax_form', function(response) {
+            $('#lidsGroupsModal').modal('hide');
+            ajaxFormSuccessCallbackDefault(response);
+        });
+    }
 
         $('#table-lid-statuses').on('change', 'input[type=radio]', function() {
             var

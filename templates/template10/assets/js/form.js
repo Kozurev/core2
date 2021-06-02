@@ -39,8 +39,11 @@ function initAjaxForm(formSelector, successCallback, errorCallback) {
  * @param afterModal
  */
 function ajaxFormSuccessCallbackDefault(response, afterModal) {
+    let status = response.status !== undefined
+        ?   response.status === true || response.status === 'success' ? 'success' : 'error'
+        :   'success';
     swal({
-        type: response.status !== undefined ? response.status : 'success',
+        type: status,
         title: response.message !== undefined ? response.message : '',
     }).then((result) => {
         if (typeof afterModal === 'function') {
