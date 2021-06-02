@@ -215,7 +215,7 @@ foreach ($statuses as $status) {
 }
 
 //Для подсчета кол-ва лидов, у которых вручную прописан статус
-$sources[] = Core::factory('Property_List_Values')
+$sources[] = (new Property_List_Values)
     ->propertyId(50)
     ->value('Другое')
     ->setId(0);
@@ -238,10 +238,10 @@ foreach ($sources as $source) {
             $lidsController->appendAddFilter($markerProp->getId(), '=', $markerId);
         } else {
             if ($dateFrom === $dateTo) {
-                $lidsController->appendFilter('control_date', $dateFrom, '=', Lid_Controller_Extended::FILTER_STRICT);
+                $lidsController->appendFilter('date_create', $dateFrom, '=', Lid_Controller_Extended::FILTER_STRICT);
             } else {
-                $lidsController->appendFilter('control_date', $dateFrom, '>=', Lid_Controller_Extended::FILTER_STRICT);
-                $lidsController->appendFilter('control_date', $dateTo, '<=', Lid_Controller_Extended::FILTER_STRICT);
+                $lidsController->appendFilter('date_create', $dateFrom, '>=', Lid_Controller_Extended::FILTER_STRICT);
+                $lidsController->appendFilter('date_create', $dateTo, '<=', Lid_Controller_Extended::FILTER_STRICT);
             }
         }
 
@@ -251,9 +251,7 @@ foreach ($sources as $source) {
 
         $statusCloned = clone $status;
         $lidsController->appendFilter('status_id', $status->getId(), '=', Lid_Controller_Extended::FILTER_STRICT);
-        Orm::debug(true);
         $countWithStatus = count($lidsController->getLids());
-        Orm::debug(false);
         $sourceTotalCount += $countWithStatus;
         $statusCloned->addSimpleEntity('count_lids', $countWithStatus);
         $source->addEntity($statusCloned, 'status');
