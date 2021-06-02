@@ -31,7 +31,7 @@
                 <div class="row">
                     <xsl:choose>
                         <xsl:when test="group/type = 1">
-                            <select class="form-control" id="groupUserList" multiple="multiple" size="7">
+                            <select class="form-control" id="groupUserList" multiple="multiple" size="10">
                                 <xsl:apply-templates select="user" />
                             </select>
                         </xsl:when>
@@ -47,7 +47,8 @@
             </div>
 
             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                <select class="form-control" id="groupUserAssignments" multiple="multiple" size="10">
+                <h4>В составе группы</h4>
+                <select class="form-control" id="groupUserAssignments" multiple="multiple" size="11">
                     <xsl:choose>
                         <xsl:when test="group/type = 1">
                             <xsl:apply-templates select="group/user" />
