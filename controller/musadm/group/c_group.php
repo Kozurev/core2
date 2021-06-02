@@ -18,7 +18,7 @@ if (Core_Page_Show::instance()->Structure->path() == 'clients') {
 }
 
 $page = Core_Array::Request('page', 1, PARAM_INT);
-$dateFrom = Core_Array::Get('date_from', '', PARAM_DATE);
+$dateFrom = Core_Array::Get('date_from', date('Y-m-d'), PARAM_DATE);
 $dateTo = Core_Array::Get('date_to', '', PARAM_DATE);
 $areaId = Core_Array::Get('area_id', 0, PARAM_INT);
 
@@ -40,8 +40,12 @@ if ($type == Schedule_Group::TYPE_LIDS) {
         if ($dateFrom == $dateTo) {
             $groupsController->appendFilter('date', $dateFrom, '=');
         } else {
-            $groupsController->appendFilter('date', $dateFrom, '>=')
-                ->appendFilter('date', $dateTo, '<=');
+            if (!empty($dateFrom)) {
+                $groupsController->appendFilter('date', $dateFrom, '>=');
+            }
+            if (!empty($dateTo)) {
+                $groupsController->appendFilter('date', $dateTo, '<=');
+            }
         }
     }
 }
@@ -62,8 +66,9 @@ Core::attachObserver('before.ScheduleGroupController.show', function ($args) {
 $groupsController
     ->addEntities($areas ?? [],'schedule_area')
     ->addSimpleEntity('current_area', $areaId ?? 0)
-    ->addSimpleEntity('date_from', $dateFrom ?? '')
-    ->addSimpleEntity('date_to', $dateTo ?? '')
+    ->addSimpleEntity('date_from', $dateFrom)
+    ->addSimpleEntity('date_to', $dateTo)
+    ->addSimpleEntity('type', $type)
     ->setXsl('musadm/groups/groups.xsl')
     ->show();
 

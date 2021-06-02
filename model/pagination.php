@@ -257,6 +257,8 @@ class Pagination extends Core_Entity
             $this->nextPage = $this->currentPage + 1;
         }
 
+        //dd($totalCount, $this->currentPage, $this->countPages);
+
         return $this;
     }
 

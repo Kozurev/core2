@@ -9,15 +9,9 @@
  * @version 20190526
  */
 
-Core::factory('User_Controller');
-
 authOrOut();
 
-$User = User::current();
-$accessRules = ['groups' => [ROLE_DIRECTOR, ROLE_MANAGER]];
-if (!User::checkUserAccess($accessRules, $User)) {
-    Core_Page_Show::instance()->error(403);
-}
+$User = User_Auth::current();
 
 $Director = $User->getDirector();
 $subordinated = $Director->getId();
@@ -39,6 +33,10 @@ $accessCreate = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_GRO
 $accessEdit =   Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_GROUP_EDIT);
 $accessDelete = Core_Access::instance()->hasCapability(Core_Access::SCHEDULE_GROUP_DELETE);
 
+if ($action === 'show') {
+    Core_Page_Show::instance()->execute();
+    exit();
+}
 
 //Формирование содержания всплывающего окна состава группы
 if ($action === 'getGroupComposition') {

@@ -13,7 +13,7 @@
                             <a class="btn btn-blue" onclick="getGroupPopup(0)">Создать группу</a>
                         </div>
                     </xsl:if>
-                    <xsl:if test="schedule_group/type = 2">
+                    <xsl:if test="type = 2">
                         <div>
                             <h4>Период с:</h4>
                         </div>

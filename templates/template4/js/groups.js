@@ -227,9 +227,7 @@ function showGroupHistory(periodFrom, periodTo, areaId) {
             area_id: areaId
         },
         success: function(response) {
-            let data = $(response).find('#sortingTable');
-            $('#sortingTable').replaceWith(data);
-            console.log(periodFrom, periodTo, areaId);
+            $('section.filial').html(response);
             loaderOff();
         }
     });
