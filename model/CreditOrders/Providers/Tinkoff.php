@@ -29,6 +29,7 @@ class Tinkoff extends Provider
     const PARAM_FAIL_URL = 'failURL';
     const PARAM_RETURN_URL = 'returnURL';
     const PARAM_USER = 'values';
+    const PARAM_PROMO_CODE = 'promoCode';
 
     const STATUS_APPROVED = 'approved';
     const STATUS_SIGNED = 'signed';
@@ -116,7 +117,8 @@ class Tinkoff extends Provider
             self::PARAM_USER => $this->createUserParam(),
             self::PARAM_RETURN_URL => $this->getReturnUrl(),
             self::PARAM_SUCCESS_URL => $this->getSuccessUrl(),
-            self::PARAM_FAIL_URL => $this->getFailUrl()
+            self::PARAM_FAIL_URL => $this->getFailUrl(),
+            self::PARAM_PROMO_CODE => 'installment_0_0_6_6'
         ];
 
         $ch = curl_init($this->createUrl(self::ACTION_CREATE));
