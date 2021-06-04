@@ -19,7 +19,7 @@ if (
 
     $teachers = [];
     $usersController = new User_Controller_Extended(User_Auth::current());
-    $usersController->getQueryBuilder()->select(['id', 'surname', 'name']);
+    $usersController->getQueryBuilder()->select(['User.id', 'surname', 'name']);
     $usersController->setGroup(ROLE_TEACHER);
     $usersController->isWithAreasAssignments(false);
     $usersController->isWithComments(false);
