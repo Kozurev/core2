@@ -216,6 +216,7 @@
             <td>
                 <xsl:if test="/root/access_payment_tariff_edit = 1">
                     <a class="action edit tariff_edit" href="#" data-tariff_id="{id}"></a>
+                    <a class="action associate areas_assignments" href="#" data-model-id="{id}" data-model-name="Payment_Tariff"></a>
                 </xsl:if>
 
                 <xsl:if test="/root/access_payment_tariff_delete = 1">

@@ -16,6 +16,8 @@ foreach ($_GET as $key => $param) {
 
 $action = Core_Array::Request('action', null, PARAM_STRING);
 
+$currentUser = User_Auth::current();
+$accessAreaMultiAccess = Core_Access::instance()->hasCapability(Core_Access::AREA_MULTI_ACCESS);
 
 
 /**
@@ -36,13 +38,27 @@ if ($action === 'getList' || $action === 'get_list') {
     $tariffsQuery = Payment_Tariff::query();
 
     //TODO: пока что проверка прав доступа осуществляется именно вот так, надо бы потом поменять
-    $currentUser = User_Auth::current();
     if (is_null($currentUser) || $currentUser->isClient()) {
         $tariffsQuery->where('access', '=', Payment_Tariff::ACCESS_TYPE_PUBLIC);
     }
 
     if (!is_null($currentUser)) {
         $tariffsQuery->where('subordinated', '=', $currentUser->getDirector()->getId());
+    }
+
+    if (!$currentUser->isDirector() && !$accessAreaMultiAccess) {
+        $userAreas = (new Schedule_Area_Assignment($currentUser))->getAssignments();
+        $userAreasIds = collect($userAreas)->map(function(Schedule_Area_Assignment $assignment) {
+            return $assignment->areaId();
+        });
+        $tariffsQuery->leftJoin(
+            'Schedule_Area_Assignment as saa',
+            'saa.model_id = Payment_Tariff.id and saa.model_name = "Payment_Tariff"'
+            )
+            ->open()
+            ->whereIn('saa.area_id', $userAreasIds->toArray())
+            ->orWhere('saa.area_id', 'is', 'NULL')
+            ->close();
     }
 
     if (!is_null($limit)) {
@@ -100,6 +116,11 @@ if ($action === 'buyForClient' || $action === 'buy_tariff') {
     }
 
     try {
+        $tariffAreas = (new Schedule_Area_Assignment($tariff))->getAssignments();
+        if (!$currentUser->isDirector() && !$accessAreaMultiAccess && !(new Schedule_Area_Assignment($currentUser))->hasAccessMulti($tariffAreas)) {
+            throw new Exception('Отсутствует доступ к текущему тарифу');
+        }
+
         $client->buyTariff($tariff);
     } catch (\Throwable $throwable) {
         exit(REST::responseError(REST::ERROR_CODE_CUSTOM, $throwable->getMessage()));

@@ -258,10 +258,28 @@ class Schedule_Area_Assignment extends Schedule_Area_Assignment_Model
                 return true;
             }
         }
-        return (new self)->queryBuilder()
+        return self::query()
             ->where('model_id', '=', $this->object->getId())
             ->where('model_name', '=', $this->object->getTableName())
             ->where('area_id', '=', $areaId)
+            ->exists();
+    }
+
+    /**
+     * @param array $areasIds
+     * @return bool
+     */
+    public function hasAccessMulti(array $areasIds): bool
+    {
+        if ($this->object instanceof User) {
+            if ($this->object->isDirector() || Core_Access::instance()->hasCapability(Core_Access::AREA_MULTI_ACCESS, $this->object)) {
+                return true;
+            }
+        }
+        return self::query()
+            ->where('model_id', '=', $this->object->getId())
+            ->where('model_name', '=', $this->object->getTableName())
+            ->whereIn('area_id', $areasIds)
             ->exists();
     }
 }

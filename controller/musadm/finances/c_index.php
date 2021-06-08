@@ -27,6 +27,7 @@ $accessTariffCreate = Core_Access::instance()->hasCapability(Core_Access::PAYMEN
 $accessTariffEdit = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_EDIT);
 $accessTariffDelete = Core_Access::instance()->hasCapability(Core_Access::PAYMENT_TARIF_DELETE);
 
+$accessAreaMultiAccess = Core_Access::instance()->hasCapability(Core_Access::AREA_MULTI_ACCESS);
 
 $dateFormat = 'Y-m-d';
 $date = date($dateFormat);
@@ -37,10 +38,29 @@ $areaId =   Core_Array::Get('area_id', 0, PARAM_INT);
 $director = User_Auth::current()->getDirector();
 $subordinated = $director->getId();
 
+$user = User_Auth::current();
+
 //Тарифы
-$tariffs = Payment_Tariff::query()
-    ->where('subordinated', '=', $subordinated)
-    ->findAll();
+$tariffsQuery = Payment_Tariff::query()
+    ->where('subordinated', '=', $subordinated);
+
+if (!$user->isDirector() && !$accessAreaMultiAccess) {
+    $userAreas = (new Schedule_Area_Assignment($user))->getAssignments();
+    $userAreasIds = collect($userAreas)->map(function(Schedule_Area_Assignment $assignment) {
+        return $assignment->areaId();
+    });
+    $tariffsQuery->leftJoin(
+        'Schedule_Area_Assignment as saa',
+        'saa.model_id = Payment_Tariff.id and saa.model_name = "Payment_Tariff"'
+        )
+        ->open()
+        ->whereIn('saa.area_id', $userAreasIds->toArray())
+        ->orWhere('saa.area_id', 'is', 'NULL')
+        ->close();
+}
+Orm::debug(true);
+$tariffs = $tariffsQuery->findAll();
+Orm::debug(false);
 
 //Типы занятий
 $lessonTypes = Schedule_Lesson_Type::query()
