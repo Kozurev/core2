@@ -17,17 +17,19 @@ if ($action === 'getList') {
 
     $paramActive = Core_Array::Get('params/active', null, PARAM_BOOL);
     $paramTypeId = Core_Array::Get('params/type', 0, PARAM_INT);
+    $paramDateFrom = Core_Array::Get('params/date_from', null, PARAM_DATE);
 
     $groupsQuery = Schedule_Group::query()
         ->where('subordinated', '=', $subordinated)
-        ->orderBy('title');
-
+        ->orderBy('date');
     if (!is_null($paramActive)) {
         $groupsQuery->where('active', '=', intval($paramActive));
     }
-
     if ($paramTypeId > 0) {
         $groupsQuery->where('type', '=', $paramTypeId);
+    }
+    if (!is_null($paramDateFrom)) {
+        $groupsQuery->where('date', '>=', $paramDateFrom);
     }
 
     $userAreas = (new Schedule_Area_Assignment(User_Auth::current()))->getAreas();
@@ -39,7 +41,14 @@ if ($action === 'getList') {
 
     $groups = $groupsQuery->get();
     exit(json_encode($groups->map(function (Schedule_Group $group): stdClass {
-        return $group->toStd();
+        $group = $group->toStd();
+        if (!is_null($group->date)) {
+            $group->refactored_date = refactorDateFormat($group->date);
+        }
+        if (!is_null($group->time_start)) {
+            $group->refactored_time_start = refactorTimeFormat($group->time_start);
+        }
+        return $group;
     })));
 }
 

@@ -337,10 +337,17 @@ $(function(){
                         }, callback);
                     }
                 } else {
-                    let typeId = type == 2 ? 1 : 2;
-                    Group.getList({active: true, type: typeId}, function (groups) {
+                    let typeId = type == 2 ? 1 : 2,
+                        dateFrom = $('input[name=insertDate]').val();
+                    Group.getList({active: true, type: typeId, date_from: dateFrom}, function (groups) {
                         $.each(groups, function (key, group) {
-                            clientsList.append('<option value="'+group.id+'">'+group.title+'</option>');
+                            let option = '<option value="'+group.id+'">'+group.title;
+                            if (typeId === 2) {
+                                option += ' (' + group.refactored_date + ' ' + group.refactored_time_start + ')';
+                            }
+                            option += '</option>';
+
+                            clientsList.append(option);
                         });
                         loaderOff();
                     });
