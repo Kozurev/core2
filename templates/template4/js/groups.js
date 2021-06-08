@@ -166,15 +166,22 @@ function refreshGroupTable(page) {
     if (page === undefined || page < 1) {
         page = 1;
     }
+
+    let data = {
+        action: 'refreshGroupTable',
+        page: page
+    },
+        $dateFrom = $('input[name=date_from]'),
+        $dateTo = $('input[name=date_to]');
+    if ($dateFrom.length > 0 && $dateTo.length > 0) {
+        data.date_from = $dateFrom.val();
+        data.date_to = $dateTo.val();
+    }
+
     $.ajax({
         type: 'GET',
-        // url: root + '/groups',
         url: '',
-        // async: false,
-        data: {
-            action: 'refreshGroupTable',
-            page: page
-        },
+        data: data,
         success: function(response) {
             $('.page').html(response);
             $('#sortingTable').tablesorter();

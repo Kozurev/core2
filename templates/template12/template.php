@@ -10,6 +10,7 @@ global $CFG;
 
 $groups = Schedule_Group::query()
     ->where('type', '=', Schedule_Group::TYPE_LIDS)
+    ->where('date', '>=', date('Y-m-d'))
     ->get();
 
 ?>
