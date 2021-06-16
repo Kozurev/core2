@@ -155,6 +155,12 @@ $(function(){
             var userId = $(this).data('userid');
             updateUserPerLesson(userId, value, loaderOff);
         })
+        .on('click', 'input[name=stop_list]', function(e) {
+            loaderOn();
+            let userId = $(this).data('user_id');
+            let value = $(this).prop('checked');
+            savePropertyValue('teacher_stop_list', value, 'User', userId, loaderOff);
+        })
         //Сохранение логина клиента в личном кабинете
         .on("click", ".change_login_submit", function(e){
             e.preventDefault();

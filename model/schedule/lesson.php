@@ -678,6 +678,16 @@ class Schedule_Lesson extends Schedule_Lesson_Model
             }
         }
 
+        if ($this->typeId() == self::TYPE_INDIV || $this->typeId() == self::TYPE_PRIVATE) {
+            $client = User::find($this->clientId());
+            if (!is_null($client)) {
+                $isInStopList = Property_Controller::factoryByTag('teacher_stop_list')->getValues($client)[0]->value();
+                if ($isInStopList) {
+                    $this->_setValidateErrorStr('Клиент "'.$client->getFio().'" находится в стоп-листе');
+                }
+            }
+        }
+
         if (!empty($this->_getValidateErrors())) {
             return false;
         }

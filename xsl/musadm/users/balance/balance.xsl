@@ -280,6 +280,27 @@
                         </td>
                     </tr>
 
+                    <tr>
+                        <td>
+                            <div class="row">
+                                <div class="col-md-4">Стоп лист</div>
+                                <div class="col-md-3">
+                                    <span>
+                                        <input class="checkbox red client_stop_list" id="client_stop_list" type="checkbox" name="stop_list" data-user_id="{user/id}">
+                                            <xsl:if test="stop_list = 1">
+                                                <xsl:attribute name="checked">checked</xsl:attribute>
+                                            </xsl:if>
+                                        </input>
+                                        <label for="client_stop_list" class="checkbox-label">
+                                            <span class="off">Нет</span>
+                                            <span class="on">Да</span>
+                                        </label>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
                     <xsl:if test="entry != ''">
                         <tr>
                             <td>

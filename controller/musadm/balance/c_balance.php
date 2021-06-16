@@ -51,6 +51,9 @@ if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit 
     //Поурочная оплата
     $perLesson = Property_Controller::factoryByTag('per_lesson')->getValues($user)[0]->value();
 
+    //Стоп лист для занятия
+    $stopList = Property_Controller::factoryByTag('teacher_stop_list')->getValues($user)[0]->value();
+
     //id лида, из которого был создан клиент
     $prevLid = Property_Controller::factoryByTag('lid_before_client')->getValues($user)[0]->value();
 
@@ -110,6 +113,7 @@ if ($accessAbsentPeriodCreate || $accessAbsentPeriodEdit || $accessScheduleEdit 
         ->addSimpleEntity('entry', $lastEntryDate)
         ->addSimpleEntity('vk', $vkLink)
         ->addSimpleEntity('per_lesson', $perLesson)
+        ->addSimpleEntity('stop_list', $stopList)
         ->addSimpleEntity('prev_lid', $prevLid)
         ->addEntity(User_Auth::current(), 'current_user')
         ->addSimpleEntity('my_calls_token', $myCallsToken)
