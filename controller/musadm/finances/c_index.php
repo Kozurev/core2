@@ -58,9 +58,9 @@ if (!$user->isDirector() && !$accessAreaMultiAccess) {
         ->orWhere('saa.area_id', 'is', 'NULL')
         ->close();
 }
-Orm::debug(true);
+
 $tariffs = $tariffsQuery->findAll();
-Orm::debug(false);
+
 
 //Типы занятий
 $lessonTypes = Schedule_Lesson_Type::query()
