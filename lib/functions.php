@@ -278,6 +278,16 @@ function refactorDateFormat($date, $glue = '.', $type = 'full')
 
 
 /**
+ * @param string $date
+ * @return string
+ */
+function refactorDateTimeFormat(string $date): string
+{
+    return date('d.m.y H:i', strtotime($date));
+}
+
+
+/**
  * Сравнение даты
  * Формат даты учитывается только для строгого сравнения "===" и "!=="
  * К примеру:

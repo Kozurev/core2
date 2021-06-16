@@ -10,32 +10,33 @@
 
 authOrOut();
 
-$User = User_Auth::current();
 
-$host  = Core_Array::Server('HTTP_HOST', '', PARAM_STRING);
-$uri   = rtrim(dirname(Core_Array::Server('PHP_SELF', '', PARAM_STRING)), '/\\');
+
+//$host  = Core_Array::Server('HTTP_HOST', '', PARAM_STRING);
+//$uri   = rtrim(dirname(Core_Array::Server('PHP_SELF', '', PARAM_STRING)), '/\\');
 
 Core_Page_Show::instance()->setParam('body-class', 'body-green');
-Core_Page_Show::instance()->setParam('title-first', 'ГЛАВНАЯ');
-Core_Page_Show::instance()->setParam('title-second', 'СТРАНИЦА');
+Core_Page_Show::instance()->setParam('title-first', 'НОВОСТИ');
+// Core_Page_Show::instance()->setParam('title-second', 'СТРАНИЦА');
 
-if (Core_Array::Get('ajax', null, PARAM_STRING) === null) {
-    if ($User->groupId() == ROLE_DIRECTOR) {
-        header("Location: http://$host$uri/user/client");
-    }
-    if ($User->groupId() == ROLE_CLIENT) {
-        header("Location: http://$host$uri/balance");
-    }
-    if ($User->groupId() == ROLE_TEACHER) {
-        header("Location: http://$host$uri/lk");
-    }
-}
+//if (Core_Array::Get('ajax', null, PARAM_STRING) === null) {
+//    if ($User->groupId() == ROLE_DIRECTOR) {
+//        header("Location: http://$host$uri/user/client");
+//    }
+//    if ($User->groupId() == ROLE_CLIENT) {
+//        header("Location: http://$host$uri/balance");
+//    }
+//    if ($User->groupId() == ROLE_TEACHER) {
+//        header("Location: http://$host$uri/lk");
+//    }
+//}
 
 
 $action = Core_Array::Get('action', null, PARAM_STRING);
 
-$Director = $User->getDirector();
-$subordinated = $Director->getId();
+$user = User_Auth::current();
+$director = $user->getDirector();
+$subordinated = $director->getId();
 
 
 /**
@@ -243,92 +244,92 @@ if ($action === 'deleteProperty') {
     exit(json_encode($response));
 }
 
-/**
- * Обновление таблицы лидов
- */
-if ($action === 'refreshLidTable') {
-    $LidController = new Lid_Controller($User);
+///**
+// * Обновление таблицы лидов
+// */
+//if ($action === 'refreshLidTable') {
+//    $LidController = new Lid_Controller(User_Auth::current());
+//
+//    $areaId = Core_Array::Get('area_id', 0, PARAM_INT);
+//    if ($areaId !== 0) {
+//        $forArea = Core::factory('Schedule_Area', $areaId);
+//        $LidController->forAreas([$forArea]);
+//        $LidController->isEnableCommonLids(false);
+//    }
+//
+//    $phone = Core_Array::Get('phone', null, PARAM_STRING);
+//    if (!is_null($phone)) {
+//        $LidController->appendFilter('number', $phone);
+//        $LidController->addSimpleEntity('number', $phone);
+//        $LidController->isPeriodControl(false);
+//    }
+//
+//    $LidController
+//        ->lidId(Core_Array::Get('lidid', null, PARAM_INT))
+//        ->isEnableCommonLids(false)
+//        ->isWithAreasAssignments(true)
+//        ->isShowPeriods(false)
+//        ->show();
+//    exit;
+//}
+//
+//
+///**
+// * Обновление таблицы
+// */
+//if ($action === 'refreshTasksTable') {
+//    $TaskController = new Task_Controller(User::current());
+//
+//    $areaId = Core_Array::Get('areaId', 0, PARAM_INT);
+//    if ($areaId !== 0) {
+//        $forArea = Core::factory('Schedule_Area', $areaId);
+//        $TaskController->forAreas([$forArea]);
+//        $TaskController->isEnableCommonTasks(false);
+//    }
+//
+//    $TaskController
+//        ->isWithAreasAssignments(true)
+//        ->isShowPeriods(false)
+//        ->isSubordinate(true)
+//        ->isLimitedAreasAccess(true)
+//        ->show();
+//    exit;
+//}
 
-    $areaId = Core_Array::Get('area_id', 0, PARAM_INT);
-    if ($areaId !== 0) {
-        $forArea = Core::factory('Schedule_Area', $areaId);
-        $LidController->forAreas([$forArea]);
-        $LidController->isEnableCommonLids(false);
-    }
 
-    $phone = Core_Array::Get('phone', null, PARAM_STRING);
-    if (!is_null($phone)) {
-        $LidController->appendFilter('number', $phone);
-        $LidController->addSimpleEntity('number', $phone);
-        $LidController->isPeriodControl(false);
-    }
-
-    $LidController
-        ->lidId(Core_Array::Get('lidid', null, PARAM_INT))
-        ->isEnableCommonLids(false)
-        ->isWithAreasAssignments(true)
-        ->isShowPeriods(false)
-        ->show();
-    exit;
-}
-
-
-/**
- * Обновление таблицы
- */
-if ($action === 'refreshTasksTable') {
-    $TaskController = new Task_Controller(User::current());
-
-    $areaId = Core_Array::Get('areaId', 0, PARAM_INT);
-    if ($areaId !== 0) {
-        $forArea = Core::factory('Schedule_Area', $areaId);
-        $TaskController->forAreas([$forArea]);
-        $TaskController->isEnableCommonTasks(false);
-    }
-
-    $TaskController
-        ->isWithAreasAssignments(true)
-        ->isShowPeriods(false)
-        ->isSubordinate(true)
-        ->isLimitedAreasAccess(true)
-        ->show();
-    exit;
-}
-
-
-if ($action === 'search_client') {
-    $surname = Core_Array::Get('surname', null, PARAM_STRING);
-    $name    = Core_Array::Get('name', null, PARAM_STRING);
-    $phone   = Core_Array::Get('phone', null, PARAM_STRING);
-
-    $ClientController = new User_Controller(User::current());
-    $ClientController
-        ->isSubordinate(true)
-        ->filterType(User_Controller::FILTER_NOT_STRICT)
-        ->isActiveBtnPanel(false)
-        ->groupId(ROLE_CLIENT)
-        ->properties(true)
-        ->isLimitedAreasAccess(true)
-        ->xsl('musadm/users/clients.xsl');
-
-    if (!is_null($surname)) {
-        $ClientController->appendFilter('surname', $surname);
-    }
-    if (!is_null($name)) {
-        $ClientController->appendFilter('name', $name);
-    }
-    if (!is_null($phone)) {
-        $ClientController->appendFilter('phone_number', $phone);
-    }
-
-    $SearchingClientsHtml = $ClientController->show(false);
-    if (count($ClientController->getUserIds()) > 0) {
-        echo "<div class='users'>";
-        echo $SearchingClientsHtml;
-        echo "</div>";
-    }
-    exit;
-}
+//if ($action === 'search_client') {
+//    $surname = Core_Array::Get('surname', null, PARAM_STRING);
+//    $name    = Core_Array::Get('name', null, PARAM_STRING);
+//    $phone   = Core_Array::Get('phone', null, PARAM_STRING);
+//
+//    $ClientController = new User_Controller(User::current());
+//    $ClientController
+//        ->isSubordinate(true)
+//        ->filterType(User_Controller::FILTER_NOT_STRICT)
+//        ->isActiveBtnPanel(false)
+//        ->groupId(ROLE_CLIENT)
+//        ->properties(true)
+//        ->isLimitedAreasAccess(true)
+//        ->xsl('musadm/users/clients.xsl');
+//
+//    if (!is_null($surname)) {
+//        $ClientController->appendFilter('surname', $surname);
+//    }
+//    if (!is_null($name)) {
+//        $ClientController->appendFilter('name', $name);
+//    }
+//    if (!is_null($phone)) {
+//        $ClientController->appendFilter('phone_number', $phone);
+//    }
+//
+//    $SearchingClientsHtml = $ClientController->show(false);
+//    if (count($ClientController->getUserIds()) > 0) {
+//        echo "<div class='users'>";
+//        echo $SearchingClientsHtml;
+//        echo "</div>";
+//    }
+//    exit;
+//}
 
 
 if ($action === 'getObjectInfoPopup') {

@@ -45,7 +45,7 @@ function ajaxFormSuccessCallbackDefault(response, afterModal) {
     swal({
         type: status,
         title: response.message !== undefined ? response.message : '',
-    }).then((result) => {
+    }, (result) => {
         if (typeof afterModal === 'function') {
             afterModal(result);
         }

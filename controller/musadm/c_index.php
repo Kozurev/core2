@@ -1,6 +1,6 @@
 <?php
 /**
- * Страница менеджера 3 в 1
+ * Страница новостей
  *
  * @author BadWolf
  * @date 18.03.2018 21:21
@@ -9,15 +9,14 @@
  * @version 20190427
  * @version 20190526
  * @version 20200401
+ * @version 20210615
  */
 
 global $CFG;
-$User = User_Auth::current();
-Core_Page_Show::instance()->css('/templates/template6/css/style.css');
-Core::factory('User_Controller');
+$user = User_Auth::current();
 
 //Список директоров
-if (User::checkUserAccess(['groups' => [ROLE_ADMIN]], $User )) {
+if ($user->groupId() == ROLE_ADMIN) {
     $DirectorController = new User_Controller(User_Auth::current());
     $DirectorController
         ->properties([29, 30, 33])
@@ -32,57 +31,19 @@ if (User::checkUserAccess(['groups' => [ROLE_ADMIN]], $User )) {
     echo "<div class='users'>";
     $DirectorController->show();
     echo "</div>";
-}
+} else {
+    echo '<script src="https://cdn.tiny.cloud/1/t7307b0z05f5zhsbr4mpdlbrxx9gz5kghs76v6w76led5ld2/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>';
+    Core_Page_Show::instance()
+        ->js('/templates/template4/js/posts.js');
 
-//Страница для менеджера
-if (User::checkUserAccess(['groups' => [ROLE_MANAGER]], $User)) {
-    //Список действий менеджера
-    $LIMIT_STEP = 25;    //Лимит кол-ва отображаемых/подгружаемых событий
-    $limit = Core_Array::Get('limit', $LIMIT_STEP);
-    $bEnableLoadButton = 1;  //Флаг активности кнопки подгрузки
-    $dateFrom = Core_Array::Get('event_date_from', null, PARAM_DATE); //Начала временного периода
-    $dateTo = Core_Array::Get('event_date_to', null, PARAM_DATE);     //Конец временного периода
+    $areas = (new Schedule_Area_Assignment($user))->getAreas();
 
-    $Events = Core::factory('Event');
-    $Events
-        ->queryBuilder()
-        ->where('author_id', '=', $User->getId())
-        ->orderBy('time', 'DESC');
-
-    if (is_null($dateFrom) && is_null($dateTo)) {
-        $totalCount = clone $Events;
-        $totalCount = $totalCount->getCount();
-        $Events->queryBuilder()->limit($limit);
-        if ($totalCount <= $limit) {
-            $bEnableLoadButton = 0;
-        }
-    } else {
-        $bEnableLoadButton = 0;
-        if (!is_null($dateFrom)) {
-            $Events->queryBuilder()->where('time', '>=', strtotime($dateFrom));
-        }
-        if (!is_null($dateTo)) {
-            $Events->queryBuilder()->where('time', '<=', strtotime($dateTo . ' + 1 day'));
-        }
-    }
-
-    $Events = $Events->findAll();
-    foreach ($Events as $Event) {
-        $Event->date = date('d.m.Y H:i', $Event->time());
-        $Event->text = $Event->getTemplateString();
-    }
-
-    global $CFG;
-
-    echo "<div class='events'>";
-    (new Core_Entity())
-        ->addEntity($User)
-        ->addEntities($Events)
-        ->addSimpleEntity('limit', $limit += $LIMIT_STEP)
-        ->addSimpleEntity('date_from', $dateFrom)
-        ->addSimpleEntity('date_to', $dateTo)
-        ->addSimpleEntity('enable_load_button', $bEnableLoadButton)
-        ->xsl('musadm/users/events.xsl')
-        ->show();
-    echo "</div>";
+    $postsController = new Post_Controller();
+    $postsController->addSimpleEntity('access_post_create', $user->isDirector());
+    $postsController->addEntities($areas, 'area');
+    $postsController->setAreas($areas);
+    $postsController->paginate()->setCurrentPage(request()->get('page', 1));
+    $postsController->paginate()->setOnPage(10);
+    $postsController->setXsl('musadm/posts/index.xsl');
+    $postsController->show();
 }
