@@ -10,9 +10,6 @@ if ($action === 'save') {
     $content = request()->get('content');
     $areasIds = request()->get('areas', []);
 
-//    if (empty($title)) {
-//        Core_Page_Show::instance()->error(500, 'Поле "Заголовок" обязательно для заполнения', true);
-//    }
     if (empty($content)) {
         Core_Page_Show::instance()->error(500, 'Поле "Контент" обязательно для заполнения', true);
     }
@@ -26,7 +23,9 @@ if ($action === 'save') {
     $post->content = $content;
 
     try {
-        $post->save();
+        if (!$post->save()) {
+            Core_Page_Show::instance()->error(422, $post->_getValidateErrorsStr(), true);
+        }
         foreach ($areasIds as $areasId) {
             (new Schedule_Area_Assignment)->createAssignment($post, $areasId);
         }

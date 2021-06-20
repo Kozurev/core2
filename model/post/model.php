@@ -57,7 +57,7 @@ class Post_Model extends Core_Entity
     {
         return [
             'title' => [
-                'required' => true,
+                'required' => false,
                 'type' => PARAM_STRING,
                 'maxlength' => 255
             ],
