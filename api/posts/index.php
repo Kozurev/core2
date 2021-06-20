@@ -10,11 +10,15 @@ if ($action === 'save') {
     $content = request()->get('content');
     $areasIds = request()->get('areas', []);
 
-    if (empty($title)) {
-        Core_Page_Show::instance()->error(500, 'Поле "Заголовок" обязательно для заполнения', true);
-    }
+//    if (empty($title)) {
+//        Core_Page_Show::instance()->error(500, 'Поле "Заголовок" обязательно для заполнения', true);
+//    }
     if (empty($content)) {
         Core_Page_Show::instance()->error(500, 'Поле "Контент" обязательно для заполнения', true);
+    }
+
+    if (empty($title)) {
+        $title = null;
     }
 
     $post = new Post();
