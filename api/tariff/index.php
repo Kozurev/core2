@@ -58,7 +58,8 @@ if ($action === 'getList' || $action === 'get_list') {
             ->open()
             ->whereIn('saa.area_id', $userAreasIds->toArray())
             ->orWhere('saa.area_id', 'is', 'NULL')
-            ->close();
+            ->close()
+            ->groupBy((new Payment_Tariff)->getTableName() . '.id');
     }
 
     if (!is_null($limit)) {
@@ -117,7 +118,10 @@ if ($action === 'buyForClient' || $action === 'buy_tariff') {
 
     try {
         $tariffAreas = (new Schedule_Area_Assignment($tariff))->getAssignments();
-        if (!$currentUser->isDirector() && !$accessAreaMultiAccess && !(new Schedule_Area_Assignment($currentUser))->hasAccessMulti($tariffAreas)) {
+        $tariffAreasIds = collect($tariffAreas)->map(function(Schedule_Area_Assignment $assignment): int {
+            return $assignment->areaId();
+        })->toArray();
+        if (!$currentUser->isDirector() && !$accessAreaMultiAccess && !(new Schedule_Area_Assignment($currentUser))->hasAccessMulti($tariffAreasIds)) {
             throw new Exception('Отсутствует доступ к текущему тарифу');
         }
 

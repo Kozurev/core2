@@ -619,6 +619,9 @@ class Orm
         } elseif ($value === 'NULL' || $value === null) {
             $val = 'NULL';
         } else {
+//            if (is_object($value)) {
+//                dd($value);
+//            }
             $val = '\'' . addslashes($value) . '\'';
         }
         return $val;
