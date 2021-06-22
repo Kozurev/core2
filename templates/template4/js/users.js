@@ -899,7 +899,7 @@ function getClientLcTarifsCallBack(response) {
                 'function(response){ ' +
                     'closePopup();' +
                     'if (response.error != undefined) { ' +
-                        'notificationError(\'Ошибка: \' + response.error.message); ' +
+                        'notificationError(\'Ошибка: \' + response.message); ' +
                     '} else {' +
                     // '$(\'#balance\').text(Number($(\'#balance\').text()) - response.tarif.price);' +
                     '$(\'#balance\').text(response.user.balance.amount);' +

@@ -121,7 +121,7 @@ if ($action === 'buyForClient' || $action === 'buy_tariff') {
         $tariffAreasIds = collect($tariffAreas)->map(function(Schedule_Area_Assignment $assignment): int {
             return $assignment->areaId();
         })->toArray();
-        if (!$currentUser->isDirector() && !$accessAreaMultiAccess && !(new Schedule_Area_Assignment($currentUser))->hasAccessMulti($tariffAreasIds)) {
+        if (!empty($tariffAreasIds) && !$currentUser->isDirector() && !$accessAreaMultiAccess && !(new Schedule_Area_Assignment($currentUser))->hasAccessMulti($tariffAreasIds)) {
             throw new Exception('Отсутствует доступ к текущему тарифу');
         }
 
