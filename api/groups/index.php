@@ -28,7 +28,7 @@ if ($action === 'getList') {
     if ($paramTypeId > 0) {
         $groupsQuery->where('type', '=', $paramTypeId);
     }
-    if (!is_null($paramDateFrom)) {
+    if ($paramTypeId == Schedule_Group::TYPE_LIDS && !is_null($paramDateFrom)) {
         $groupsQuery->where('date', '>=', $paramDateFrom);
     }
 
