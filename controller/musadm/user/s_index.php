@@ -296,42 +296,47 @@ if ($action === 'export') {
     if (!$user->isManagementStaff()) {
         Core_Page_Show::instance()->error(404);
     }
+     header('Content-type: application/vnd.ms-excel');
+     header('Content-Disposition: attachment; filename=demo.xls');
 
-    header('Content-type: application/vnd.ms-excel');
-    header('Content-Disposition: attachment; filename=demo.xls');
-
-    $ClientController = new User_Controller($user);
+    $ClientController = new User_Controller_Extended($user);
     $ClientController->properties([16]);
-    $ClientController->isSubordinate(true);
-    $ClientController->isWithAreaAssignments(true);
-    $ClientController->groupId(ROLE_CLIENT);
-    $ClientController->xsl('musadm/users/export.xsl');
-    $ClientController->queryBuilder()->clearOrderBy()->orderBy('id', 'DESC');
+    $ClientController->setSubordinate($user->getDirector()->getId());
+    $ClientController->isWithAreasAssignments(true);
+    $ClientController->setGroup(ROLE_CLIENT);
+    $ClientController->setXsl('musadm/users/export.xsl');
+    $ClientController->getQueryBuilder()->clearOrderBy()->orderBy('id', 'DESC');
 
     //Фильтры
     $ScheduleAssignment = new Schedule_Area_Assignment();
+    unset($_GET['action']);
+    unset($_GET['active']);
     foreach ($_GET as $paramName => $values) {
         if ($paramName === 'areas') {
             foreach ($_GET['areas'] as $areaId) {
-                if (User_Auth::current()->isDirector() || ($ScheduleAssignment->issetAssignment($user, intval($areaId)) !== null)) {
-                    $area = Schedule_Area_Controller::factory(intval($areaId));
-                    if ($area !== null) {
-                        $ClientController->forAreas([$area]);
+                try {
+                    if ($areaId > 0
+                        && ($ScheduleAssignment->issetAssignment(User_Auth::current(), intval($areaId)) !== null)
+                        || User::checkUserAccess(['groups' => [ROLE_DIRECTOR]])
+                    ) {
+                        $Area = Schedule_Area_Controller::factory(intval($areaId));
+                        if ($Area !== null) {
+                            $ClientController->setAreas([$Area]);
+                        }
                     }
+                } catch(Exception $e) {
+                    die('Ошибка: ' . $e->getMessage());
                 }
             }
             continue;
-        }
-
-        if ($paramName == 'active') {
-            $ClientController->active(boolval($values));
-        }
-
-        if (strpos($paramName, 'property_') !== false) {
-            foreach ($_GET[$paramName] as $value) {
-                $propId = explode('property_', $value)[0];
-                $ClientController->appendFilter($paramName, $value);
-            }
+        } elseif ($paramName === 'teachers') {
+            $ClientController->getQueryBuilder()
+                ->join((new User_Teacher_Assignment())->getTableName() . ' as ut', 'id = client_id and teacher_id in(' . implode(', ', $values) . ')');
+        } elseif (strpos($paramName, 'property_') !== false) {
+            $propId = explode('property_', $paramName)[1];
+            $ClientController->appendAddFilter(intval($propId), '=', $values);
+        } elseif (!empty($values) && $paramName !== '_') {
+            $ClientController->appendFilter($paramName, $values, '=', Controller::FILTER_NOT_STRICT);
         }
     }
 
