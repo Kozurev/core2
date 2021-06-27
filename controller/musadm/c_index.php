@@ -39,7 +39,7 @@ if ($user->groupId() == ROLE_ADMIN) {
     $areas = (new Schedule_Area_Assignment($user))->getAreas();
 
     $postsController = new Post_Controller();
-    $postsController->addSimpleEntity('access_post_create', $user->isDirector());
+    $postsController->addSimpleEntity('access_post_create', $user->isManagementStaff());
     $postsController->addEntities($areas, 'area');
     $postsController->setAreas($areas);
     $postsController->paginate()->setCurrentPage(request()->get('page', 1));
