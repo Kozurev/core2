@@ -33,6 +33,9 @@ $absentConsult =    $absentConsult->getValues($director)[0]->value();
 $lidClient =        $lidClient->getValues($director)[0]->value();
 
 (new Core_Entity())
+    ->addSimpleEntity('capability_create_status', (int)User_Auth::current()->isDirector())
+    ->addSimpleEntity('capability_edit_status', (int)User_Auth::current()->isDirector())
+    ->addSimpleEntity('capability_remove_status', (int)User_Auth::current()->isDirector())
     ->addSimpleEntity('date_from', $dateFrom)
     ->addSimpleEntity('date_to', $dateTo)
     ->addSimpleEntity('directorid', $subordinated)
@@ -41,6 +44,7 @@ $lidClient =        $lidClient->getValues($director)[0]->value();
     ->addSimpleEntity('lid_status_consult_absent', $absentConsult)
     ->addSimpleEntity('lid_status_client', $lidClient)
     ->addEntities($statuses)
+    ->addEntities(Lid_Status::getColors(), 'color')
     ->xsl('musadm/lids/statuses.xsl')
     ->show();
 

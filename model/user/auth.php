@@ -153,9 +153,9 @@ class User_Auth
         $sesUserId = 'core/' . User_Auth::SESSION_ID;
         $sesUserObject = 'core/' . User_Auth::SESSION_USER;
 
-        $cashedUserData = Core_Array::Session($sesUserObject, null);
-        if (!empty($cashedUserData) && $cashedUserData instanceof User) {
-            return $cashedUserData;
+        $cashedUserData = Core_Array::Session($sesUserObject);
+        if (!empty($cashedUserData)) {
+            return unserialize($cashedUserData);
         }
 
         $currentUserId = Core_Array::Session($sesUserId, 0, PARAM_INT);
@@ -172,7 +172,7 @@ class User_Auth
         }
 
         if (!is_null($CurrentUser) && $CurrentUser->active() == 1) {
-            $_SESSION['core'][User_Auth::SESSION_USER] = $CurrentUser;
+            $_SESSION['core'][User_Auth::SESSION_USER] = serialize($CurrentUser);
             $_SESSION['core'][User_Auth::SESSION_ID] = $CurrentUser->getId();
             User_Auth_Log::create($CurrentUser);
             return $CurrentUser;

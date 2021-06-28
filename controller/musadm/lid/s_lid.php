@@ -41,28 +41,27 @@ $accessComment = Core_Access::instance()->hasCapability(Core_Access::LID_APPEND_
  * Открытие всплывающего окна создание/редактирование статуса лида
  */
 if ($action === 'getLidStatusPopup') {
-    if (!User::checkUserAccess(['groups' => [ROLE_DIRECTOR]])) {
+    if (!User_Auth::current()->isDirector()) {
         Core_Page_Show::instance()->error(403);
     }
 
     $id = Core_Array::Get('id', 0, PARAM_INT);
     if ($id !== 0) {
-        $Status = Core::factory('Lid_Status')
-            ->queryBuilder()
+        $status = Lid_Status::query()
             ->where('id', '=', $id)
             ->where('subordinated', '=', $subordinated)
             ->find();
 
-        if (is_null($Status)) {
+        if (is_null($status)) {
             Core_Page_Show::instance()->error(404);
         }
     } else {
-        $Status = Core::factory('Lid_Status');
+        $status = new Lid_Status();
     }
 
-    Core::factory('Core_Entity')
-        ->addEntity(User::current())
-        ->addEntity($Status)
+    (new Core_Entity)
+        ->addEntity(User_Auth::current())
+        ->addEntity($status)
         ->addEntities(Lid_Status::getColors(), 'color')
         ->xsl('musadm/lids/edit_lid_status_popup.xsl')
         ->show();

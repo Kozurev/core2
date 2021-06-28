@@ -89,6 +89,7 @@ function showSenlerSettingPopup(response) {
 
     vkGroupId.val(selectedVkGroupId);
 
+    Lids.clearCache();
     Lids.getStatusList(function(statuses) {
         if (!checkResponseStatus(statuses)) {
             closePopup();

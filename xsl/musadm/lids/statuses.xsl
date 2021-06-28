@@ -96,11 +96,13 @@
                 </tbody>
             </table>
 
-            <div class="row buttons-panel center">
-                <div>
-                    <a class="edit_lid_status btn btn-orange">Создать статус</a>
+            <xsl:if test="//capability_create_status = 1">
+                <div class="row buttons-panel center">
+                    <div>
+                        <a class="edit_lid_status btn btn-orange">Создать статус</a>
+                    </div>
                 </div>
-            </div>
+            </xsl:if>
         </section>
     </xsl:template>
 
@@ -150,13 +152,20 @@
                     <xsl:if test="/root/lid_status_client = $id">
                         <xsl:attribute name="checked">checked</xsl:attribute>
                     </xsl:if>
+                    <xsl:if test="/root/capability_edit_status = 0">
+                        <xsl:attribute name="disabled">disabled</xsl:attribute>
+                    </xsl:if>
                 </input>
                 <label for="lid_status_client_{id}"></label>
             </td>
 
             <td class="right">
-                <a class="action edit edit_lid_status" data-id="{id}"></a>
-                <a class="action delete delete_lid_status" data-id="{id}"></a>
+                <xsl:if test="/root/capability_edit_status = 1">
+                    <a class="action edit edit_lid_status" data-id="{id}"></a>
+                </xsl:if>
+                <xsl:if test="/root/capability_remove_status = 1">
+                    <a class="action delete delete_lid_status" data-id="{id}"></a>
+                </xsl:if>
             </td>
         </tr>
     </xsl:template>
