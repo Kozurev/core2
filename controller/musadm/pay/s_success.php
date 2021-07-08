@@ -36,6 +36,7 @@ if (!is_null($orderId)) {
                     throw new Exception('Отсутствуют настройки кассы для филиала пользователя ' . $user->getFio() . '. Платеж номер: ' . $payment->getId() . ' на сумму: ' . $payment->value());
                 }
                 $checkout->instance()->makeReceipt($payment);
+                $payment->appendComment('ID в онлайн-кассе: ' . $payment->checkoutUuid() . '; ID в платежном шлюзе: ' . $payment->merchantOrderId());
             } catch (Exception $e) {
                 Log::instance()->error(Log::TYPE_CHECKOUT, $e->getMessage());
             }
