@@ -462,11 +462,11 @@ $income =   (clone $finances)->where('lesson.type_id', '<>', Schedule_Lesson::TY
 $expenses = (clone $finances)->where('lesson.type_id', '<>', Schedule_Lesson::TYPE_PRIVATE)->select('sum(teacher_rate)', 'value');
 $income2 =  (clone $finances)->where('lesson.type_id', '=', Schedule_Lesson::TYPE_PRIVATE)->select('sum(teacher_rate)', 'value'); //Выручка от частных загятий
 $profit =   (clone $finances)->where('lesson.type_id', '<>', Schedule_Lesson::TYPE_PRIVATE)->select('sum(total_rate)', 'value');
-$income =   $income->find()->value;
-$income2 =  $income2->find()->value;
-$expenses = $expenses->find()->value;
-$profit =   $profit->find()->value;
-$hostExpenses = $hostExpenses->find()->value();
+$income =   round($income->find()->value, 2);
+$income2 =  round($income2->find()->value, 2);
+$expenses = round($expenses->find()->value, 2);
+$profit =   round($profit->find()->value, 2);
+$hostExpenses = round($hostExpenses->find()->value(), 2);
 $deposits = (int)$deposits->sum('value');
 $clientsBonuses = (int)$clientsBonuses->sum('value');
 $refunds = (int)$refunds->sum('value');
